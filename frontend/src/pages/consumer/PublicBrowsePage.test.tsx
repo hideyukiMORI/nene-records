@@ -3,6 +3,7 @@ import { cleanup, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { PublicBrowsePage } from '@/pages/consumer/PublicBrowsePage'
+import { PublicIndexPage } from '@/pages/consumer/PublicIndexPage'
 import { PublicRecordDetailPage } from '@/pages/consumer/PublicRecordDetailPage'
 import { resetEntityStore, seedEntities } from '@tests/msw/handlers/entity'
 import { resetEntityTypeStore, seedEntityTypes } from '@tests/msw/handlers/entity-type'
@@ -10,10 +11,11 @@ import { resetTextFieldStore, seedTextFields } from '@tests/msw/handlers/text-fi
 import { mswServer } from '@tests/msw/server'
 import { renderWithProviders } from '@tests/render/render-with-providers'
 
-function renderBrowsePage(slug = 'article') {
+function renderBrowsePage(initialEntry = '/view/article') {
   return renderWithProviders(
-    <MemoryRouter initialEntries={[`/view/${slug}`]}>
+    <MemoryRouter initialEntries={[initialEntry]}>
       <Routes>
+        <Route path="/view" element={<PublicIndexPage />} />
         <Route path="/view/:entityTypeSlug" element={<PublicBrowsePage />} />
         <Route path="/view/:entityTypeSlug/:entityId" element={<PublicRecordDetailPage />} />
       </Routes>
@@ -83,7 +85,7 @@ describe('PublicBrowsePage', () => {
   })
 
   it('shows empty state for unknown entity type slug', async () => {
-    renderBrowsePage('missing-type')
+    renderBrowsePage('/view/missing-type')
 
     expect(await screen.findByText('Entity type not found')).toBeInTheDocument()
     expect(screen.getByText('No public content for "missing-type".')).toBeInTheDocument()
@@ -116,5 +118,39 @@ describe('PublicBrowsePage', () => {
     await waitFor(() => {
       expect(screen.getByRole('button', { name: 'Back to Article' })).toBeInTheDocument()
     })
+  })
+
+  it('paginates records with offset query param', async () => {
+    seedEntityTypes([{ id: 1, name: 'Article', slug: 'article' }])
+    seedEntities(
+      Array.from({ length: 21 }, (_, index) => ({
+        id: index + 1,
+        entity_type_id: 1,
+        is_deleted: false,
+        deleted_at: null,
+      })),
+    )
+    seedTextFields(
+      Array.from({ length: 21 }, (_, index) => ({
+        id: index + 1,
+        entity_id: index + 1,
+        field_key: 'title',
+        value: `Post ${String(index + 1)}`,
+      })),
+    )
+
+    const user = userEvent.setup()
+    renderBrowsePage('/view/article')
+
+    expect(await screen.findByText('21 records · showing 1–20')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Post 1' })).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Post 21' })).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Next' }))
+
+    await waitFor(() => {
+      expect(screen.getByText('21 records · showing 21–21')).toBeInTheDocument()
+    })
+    expect(screen.getByRole('link', { name: 'Post 21' })).toBeInTheDocument()
   })
 })

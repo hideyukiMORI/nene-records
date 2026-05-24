@@ -16,9 +16,13 @@ npm run check        # type-check, lint, format, test, build-storybook
 ## Structure
 
 - `src/app/` — providers, router, auth shell
-- `src/pages/` — route wiring
-- `src/features/` — user workflows
+- `src/pages/` — route wiring (`pages/consumer/` = public `/view/*` shell)
+- `src/features/` — user workflows (`public-browse-*`, `public-view-*` = consumer-only)
 - `src/entities/` — API resource slices (TanStack Query)
 - `src/shared/ui/` — theme tokens, primitives, Storybook catalog
 
-Theme swap: edit `src/shared/ui/theme/active.css` import only.
+Public consumer routes: `/view` (type index), `/view/:slug` (list), `/view/:slug/:id` (detail).
+
+Theme swap: edit `src/shared/ui/theme/active.css` import only. Consumer shell uses `themes/consumer-brand.css` via `pages/consumer/consumer-theme.css` (`data-theme="consumer"`).
+
+API-only consumer patterns: [`docs/examples/consumer-api.md`](../docs/examples/consumer-api.md).

@@ -52,11 +52,13 @@ export function defaultEntityListParams(
   entityTypeId: number,
   tagSlugs: string[] = [],
   relationFilters: EntityListParams['relationFilters'] = {},
+  offset = 0,
 ): EntityListParams {
   return {
     entityTypeId,
     tagSlugs,
     relationFilters,
-    ...DEFAULT_LIST_PARAMS,
+    limit: DEFAULT_LIST_PARAMS.limit,
+    offset,
   }
 }
