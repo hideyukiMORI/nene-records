@@ -12,18 +12,19 @@ New contributors and AI agents: read [`handoff-2026-05-24-workspace-switch.md`](
 
 | Issue | Branch | Summary |
 | --- | --- | --- |
-| #11 | `feat/11-int-fields` | Phase 2: `int_fields` CRUD + `data_type=int` |
+| — | — | _(none — pick next Phase 2 item)_ |
 
 ## Up Next
 
 | Issue | Summary |
 | --- | --- |
-| — | Phase 2: enum / bool / datetime field types |
+| TBD | Phase 2: enum / bool / datetime field types |
 
 ## Recently Completed
 
 | Issue | Summary |
 | --- | --- |
+| #11 | int_fields CRUD + data_type=int (merged PR #12) |
 | #9 | field_defs schema registry (merged PR #10, ADR 0002) |
 | #1 | MVP entity CRUD vertical slice (merged PR #8) |
 | #6 | Frontend/backend coding standards (merged PR #7) |
