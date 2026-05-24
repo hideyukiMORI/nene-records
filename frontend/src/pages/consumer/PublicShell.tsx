@@ -1,12 +1,13 @@
+import './consumer-theme.css'
 import { Link, Outlet } from 'react-router-dom'
 import { Text } from '@/shared/ui'
 
 export function PublicShell() {
   return (
-    <div className="min-h-screen bg-surface font-sans text-text-primary">
+    <div data-theme="consumer" className="min-h-screen bg-surface font-sans text-text-primary">
       <header className="border-b border-border bg-surface-raised shadow-sm">
         <div className="mx-auto max-w-3xl px-inline-md py-stack-md">
-          <Link to="/">
+          <Link to="/view">
             <Text as="span" variant="heading-sm">
               NeNe Records
             </Text>

@@ -56,6 +56,10 @@ const importZones = [
     from: './src/shared/api',
   },
   {
+    target: './src/features/public-browse-index',
+    from: './src/features/manage-*',
+  },
+  {
     target: './src/features/public-browse-entity-records',
     from: './src/features/manage-*',
   },

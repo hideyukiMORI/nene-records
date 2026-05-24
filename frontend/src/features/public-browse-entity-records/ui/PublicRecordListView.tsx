@@ -7,6 +7,12 @@ export interface PublicRecordListViewProps {
   entityTypeName: string | null
   items: PublicRecordListItem[]
   total: number
+  offset: number
+  pageSize: number
+  hasPreviousPage: boolean
+  hasNextPage: boolean
+  onPreviousPage: () => void
+  onNextPage: () => void
   isLoading: boolean
   isError: boolean
   isUnknownType: boolean
@@ -19,6 +25,12 @@ export function PublicRecordListView({
   entityTypeName,
   items,
   total,
+  offset,
+  pageSize,
+  hasPreviousPage,
+  hasNextPage,
+  onPreviousPage,
+  onNextPage,
   isLoading,
   isError,
   isUnknownType,
@@ -63,6 +75,9 @@ export function PublicRecordListView({
     <Stack gap="md">
       <Text as="p" muted>
         {total} record{total === 1 ? '' : 's'}
+        {total > pageSize
+          ? ` · showing ${String(offset + 1)}–${String(Math.min(offset + items.length, total))}`
+          : ''}
       </Text>
       <ul className="flex flex-col gap-stack-sm">
         {items.map((item) => (
@@ -79,6 +94,21 @@ export function PublicRecordListView({
           </li>
         ))}
       </ul>
+      {(hasPreviousPage || hasNextPage) && (
+        <Stack direction="horizontal" gap="sm">
+          <Button
+            variant="secondary"
+            size="sm"
+            disabled={!hasPreviousPage}
+            onClick={onPreviousPage}
+          >
+            Previous
+          </Button>
+          <Button variant="secondary" size="sm" disabled={!hasNextPage} onClick={onNextPage}>
+            Next
+          </Button>
+        </Stack>
+      )}
     </Stack>
   )
 }

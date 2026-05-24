@@ -1,5 +1,6 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { PublicBrowsePage } from '@/pages/consumer/PublicBrowsePage'
+import { PublicIndexPage } from '@/pages/consumer/PublicIndexPage'
 import { PublicRecordDetailPage } from '@/pages/consumer/PublicRecordDetailPage'
 import { PublicShell } from '@/pages/consumer/PublicShell'
 import { EntityRecordPage } from '@/pages/entity-record/EntityRecordPage'
@@ -27,6 +28,7 @@ const router = createBrowserRouter([
     path: '/view',
     element: <PublicShell />,
     children: [
+      { index: true, element: <PublicIndexPage /> },
       { path: ':entityTypeSlug', element: <PublicBrowsePage /> },
       { path: ':entityTypeSlug/:entityId', element: <PublicRecordDetailPage /> },
     ],

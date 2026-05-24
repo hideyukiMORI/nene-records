@@ -12,7 +12,7 @@ Last updated: 2026-05-24
 
 | Issue | Summary |
 | --- | --- |
-| — | （なし） |
+| #72 | Consumer Views Phase 6 強化 |
 
 ## Recently Completed
 

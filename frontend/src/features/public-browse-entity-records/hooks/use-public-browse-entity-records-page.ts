@@ -4,13 +4,14 @@ import { useEntityTypeList } from '@/entities/entity-type'
 import { defaultTextFieldListParamsForEntityType, useTextFieldList } from '@/entities/text-field'
 import { findEntityTypeBySlug } from '@/shared/lib/find-entity-type-by-slug'
 import { getRecordDisplayLabel } from '@/shared/lib/get-record-display-label'
+import { PUBLIC_BROWSE_PAGE_SIZE } from '../lib/public-browse-pagination'
 
 export interface PublicRecordListItem {
   id: number
   label: string
 }
 
-export function usePublicBrowseEntityRecordsPage(entityTypeSlug: string) {
+export function usePublicBrowseEntityRecordsPage(entityTypeSlug: string, offset: number) {
   const entityTypeQuery = useEntityTypeList()
   const entityType = useMemo(
     () => findEntityTypeBySlug(entityTypeQuery.data?.items ?? [], entityTypeSlug),
@@ -18,7 +19,10 @@ export function usePublicBrowseEntityRecordsPage(entityTypeSlug: string) {
   )
 
   const entityTypeId = entityType !== undefined ? Number(entityType.id) : 0
-  const listParams = defaultEntityListParams(entityTypeId)
+  const listParams = useMemo(
+    () => defaultEntityListParams(entityTypeId, [], {}, offset),
+    [entityTypeId, offset],
+  )
   const entityListQuery = useEntityList(listParams, { enabled: entityTypeId > 0 })
   const textFieldListParams = useMemo(
     () => defaultTextFieldListParamsForEntityType(entityTypeId),
@@ -47,11 +51,20 @@ export function usePublicBrowseEntityRecordsPage(entityTypeSlug: string) {
     textFieldQuery.error?.title ??
     null
 
+  const total = entityListQuery.data?.total ?? 0
+  const pageSize = PUBLIC_BROWSE_PAGE_SIZE
+  const hasPreviousPage = offset > 0
+  const hasNextPage = offset + pageSize < total
+
   return {
     entityType,
     entityTypeSlug,
     items,
-    total: entityListQuery.data?.total ?? 0,
+    total,
+    offset,
+    pageSize,
+    hasPreviousPage,
+    hasNextPage,
     isLoading,
     isError,
     errorTitle,
