@@ -843,6 +843,22 @@ foreach (['text', 'int', 'enum', 'bool', 'datetime'] as $kind) {
     array_push($tools, ...fieldTools($kind));
 }
 
+// Auth
+$tools[] = readTool(
+    'login',
+    'Login',
+    'Authenticate with email/password and obtain an API bearer token.',
+    'login',
+    'POST',
+    '/api/v1/auth/login',
+    [
+        'email' => ['type' => 'string', 'format' => 'email', 'minLength' => 1],
+        'password' => ['type' => 'string', 'minLength' => 1],
+    ],
+    '#/components/schemas/LoginResponse',
+    ['email', 'password'],
+);
+
 $catalog = [
     'version' => 1,
     'source' => 'docs/openapi/openapi.yaml',

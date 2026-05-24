@@ -1,4 +1,4 @@
-export type ButtonVariant = 'primary' | 'secondary' | 'danger'
+export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost'
 export type ButtonSize = 'sm' | 'md'
 
 export interface ButtonProps {
@@ -20,6 +20,8 @@ const variantClasses: Record<ButtonVariant, string> = {
     'bg-surface-raised text-text-primary hover:bg-surface-overlay border-border focus-visible:shadow-focus',
   danger:
     'bg-danger text-text-inverse hover:bg-danger-hover border-transparent focus-visible:shadow-focus',
+  ghost:
+    'bg-transparent text-text-muted hover:text-text-primary border-transparent focus-visible:shadow-focus',
 }
 
 const sizeClasses: Record<ButtonSize, string> = {

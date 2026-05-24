@@ -8,6 +8,8 @@ servers:
   - url: http://localhost:8080
     description: Local development server
 tags:
+  - name: Auth
+    description: Authentication endpoints.
   - name: System
     description: Runtime health endpoints.
   - name: EntityTypes
@@ -39,6 +41,36 @@ tags:
   - name: Settings
     description: Site-wide settings registry with revision history.
 paths:
+  /api/v1/auth/login:
+    post:
+      tags:
+        - Auth
+      summary: Admin login
+      description: Authenticates with email/password and returns a bearer token.
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            example:
+              email: admin@example.com
+              password: secret
+      responses:
+        '200':
+          description: Token issued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+              example:
+                token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                expires_at: '2026-05-25T00:00:00Z'
+                email: admin@example.com
+                role: admin
+        '401':
+          $ref: '#/components/responses/InvalidCredentials'
   /health:
     get:
       tags:
@@ -1875,6 +1907,19 @@ components:
         pattern: '^[a-z][a-z0-9_]*$'
       example: site_name
   responses:
+    InvalidCredentials:
+      description: Email or password is incorrect.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          examples:
+            invalidCredentials:
+              value:
+                type: https://nene-records.dev/problems/invalid-credentials
+                title: Invalid credentials
+                status: 401
+                detail: Email or password is incorrect.
     NotFound:
       description: Resource not found.
       content:
@@ -2912,4 +2957,39 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/EntityRelationItemResponse'
+      additionalProperties: false
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+        password:
+          type: string
+          minLength: 1
+      additionalProperties: false
+    LoginResponse:
+      type: object
+      required:
+        - token
+        - expires_at
+        - email
+        - role
+      properties:
+        token:
+          type: string
+          minLength: 1
+        expires_at:
+          type: string
+          format: date-time
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          minLength: 1
       additionalProperties: false

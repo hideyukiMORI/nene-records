@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace NeNeRecords\Http;
 
 use LogicException;
-use Nene2\Auth\BearerTokenMiddleware;
 use Nene2\Auth\LocalBearerTokenVerifier;
+use Nene2\Auth\TokenIssuerInterface;
+use Nene2\Auth\TokenVerifierInterface;
 use Nene2\Config\AppConfig;
 use Nene2\Config\ConfigLoader;
 use Nene2\Database\DatabaseConnectionFactoryInterface;
@@ -26,6 +27,8 @@ use Nene2\Log\MonologLoggerFactory;
 use Nene2\Log\RequestIdHolder;
 use NeNeRecords\Analytics\AccessLogMiddleware;
 use NeNeRecords\ApplicationServiceProvider;
+use NeNeRecords\Auth\AdminApiAuthMiddleware;
+use NeNeRecords\Auth\AuthServiceProvider;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -40,6 +43,7 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
     public function register(ContainerBuilder $builder): void
     {
         $builder->addProvider(new ApplicationServiceProvider());
+        $builder->addProvider(new AuthServiceProvider());
 
         $builder
             ->set(
@@ -168,6 +172,48 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
             )
             ->set(RequestIdHolder::class, static fn (ContainerInterface $container): RequestIdHolder => new RequestIdHolder())
             ->set(
+                LocalBearerTokenVerifier::class,
+                static function (ContainerInterface $container): LocalBearerTokenVerifier {
+                    $config = $container->get(AppConfig::class);
+
+                    if (!$config instanceof AppConfig) {
+                        throw new LogicException('Application config service is invalid.');
+                    }
+
+                    return new LocalBearerTokenVerifier($config->localJwtSecret ?? 'nene-records-dev-secret');
+                },
+            )
+            ->set(
+                TokenVerifierInterface::class,
+                static function (ContainerInterface $container): TokenVerifierInterface {
+                    $verifier = $container->get(LocalBearerTokenVerifier::class);
+
+                    if (!$verifier instanceof TokenVerifierInterface) {
+                        throw new LogicException('LocalBearerTokenVerifier service is invalid.');
+                    }
+
+                    return $verifier;
+                },
+            )
+            ->set(
+                TokenIssuerInterface::class,
+                static function (ContainerInterface $container): TokenIssuerInterface {
+                    $issuer = $container->get(LocalBearerTokenVerifier::class);
+
+                    if (!$issuer instanceof TokenIssuerInterface) {
+                        throw new LogicException('LocalBearerTokenVerifier service is invalid.');
+                    }
+
+                    return $issuer;
+                },
+            )
+            ->set(
+                'nene-records.token_issuer',
+                static function (ContainerInterface $container): TokenIssuerInterface {
+                    return $container->get(TokenIssuerInterface::class);
+                },
+            )
+            ->set(
                 LoggerInterface::class,
                 static function (ContainerInterface $container): LoggerInterface {
                     $config = $container->get(AppConfig::class);
@@ -227,19 +273,18 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
 
                     $authMiddleware = [$accessLogMiddleware];
 
-                    if ($config->localJwtSecret !== null) {
-                        $problemDetails = $container->get(ProblemDetailsResponseFactory::class);
+                    $problemDetails = $container->get(ProblemDetailsResponseFactory::class);
+                    $tokenVerifier = $container->get(TokenVerifierInterface::class);
 
-                        if (!$problemDetails instanceof ProblemDetailsResponseFactory) {
-                            throw new LogicException('ProblemDetailsResponseFactory service is invalid.');
-                        }
-
-                        $authMiddleware[] = new BearerTokenMiddleware(
-                            $problemDetails,
-                            new LocalBearerTokenVerifier($config->localJwtSecret),
-                            [],
-                        );
+                    if (!$problemDetails instanceof ProblemDetailsResponseFactory) {
+                        throw new LogicException('ProblemDetailsResponseFactory service is invalid.');
                     }
+
+                    if (!$tokenVerifier instanceof TokenVerifierInterface) {
+                        throw new LogicException('TokenVerifierInterface service is invalid.');
+                    }
+
+                    $authMiddleware[] = new AdminApiAuthMiddleware($problemDetails, $tokenVerifier);
 
                     return new RuntimeApplicationFactory(
                         $responseFactory,
