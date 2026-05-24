@@ -4,6 +4,7 @@ import { EntityCreatePanel } from './EntityCreatePanel'
 import { EntityListPanel } from './EntityListPanel'
 
 export interface ManageEntitiesViewProps {
+  entityTypeId: number
   entityTypeName: string | null
   entityTypeSlug: string | null
   items: Entity[]
@@ -23,6 +24,7 @@ export interface ManageEntitiesViewProps {
 }
 
 export function ManageEntitiesView({
+  entityTypeId,
   entityTypeName,
   entityTypeSlug,
   items,
@@ -61,6 +63,7 @@ export function ManageEntitiesView({
             {entityTypeName !== null ? `${entityTypeName} records` : 'Records'}
           </Text>
           <EntityListPanel
+            entityTypeId={entityTypeId}
             items={items}
             isLoading={isLoading}
             isError={isError}

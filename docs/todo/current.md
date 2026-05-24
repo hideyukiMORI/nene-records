@@ -12,57 +12,40 @@ New contributors and AI agents: read [`handoff-2026-05-24-workspace-switch.md`](
 
 | Issue | Branch | Summary |
 | --- | --- | --- |
-| #28 | `feat/28-field-defs-ui` | field_defs 一覧・作成・削除 UI |
+| #30 | `feat/30-text-fields-ui` | text_fields 値編集 UI（レコード詳細） |
 
 ## Up Next
 
 | Issue | Summary |
 | --- | --- |
-| TBD | text_fields 等のフィールド値編集 UI |
+| TBD | int/enum/bool/datetime フィールド値 UI |
 | TBD | Entity type 編集（PUT） |
+| TBD | API: text-fields list filter by entity_id |
 | TBD | GitHub Actions frontend CI |
 
 ## Recently Completed
 
 | Issue | Summary |
 | --- | --- |
+| #28 | field_defs 一覧・作成・削除 UI (PR #29) |
 | #26 | Entity（Record）一覧・作成・削除 UI (PR #27) |
 | #24 | Entity type 作成・一覧・削除 UI (PR #25) |
-| #22 | Docker compose — MySQL + phpMyAdmin darkwolf + Mailpit (PR #23) |
+| #22 | Docker compose (PR #23) |
 | #20 | Phase 4 Admin React scaffold (PR #21) |
-| #18 | Frontend design system / Storybook policy (PR #19) |
-| #16 | Tags, entity_tags, entity list filters (PR #17, ADR 0003) — **Phase 3 complete** |
-| #14 | enum/bool/datetime fields (PR #15) — Phase 2 complete |
-| #11 | int_fields CRUD (PR #12) |
-| #9 | field_defs schema registry (PR #10, ADR 0002) |
-| #1 | MVP entity CRUD (PR #8) — Phase 1 |
+| #18 | Frontend design system / Storybook (PR #19) |
+| #16 | Tags + entity list filters (PR #17) — **Phase 3 complete** |
 
 ## Handoff Notes
 
-- **Phase 3 complete.** Tags + entity tag attach/detach + filtered entity list with `total`.
-- **127 tests** via `composer check`.
-- ADRs: 0002 (field defs), 0003 (tags).
-- **Docker:** `docker compose up --build` → API `:8080`, phpMyAdmin `:8081`, Mailpit `:8025`. See `docs/development/docker.md`.
-- **Phase 4:** entity types, field defs, entity records admin UI.
-- Run admin UI: `npm run dev --prefix frontend` (API on :8080 via Docker or PHP built-in).
+- **Phase 4:** entity types → field defs → records → text field values admin flow.
+- text-fields list has no `entity_id` filter yet; frontend filters client-side (limit 100).
+- Run admin UI: `npm run dev --prefix frontend` + Docker API on :8080.
 
 ## Verification Commands
 
 ```bash
 composer check
-composer openapi
+npm run check --prefix frontend
 docker compose up --build
 curl http://localhost:8080/health
-npm run check --prefix frontend
-```
-
-## Example queries (Phase 3)
-
-```bash
-# Entities for type 1 tagged php or api
-curl 'http://localhost:8080/api/v1/entities?entity_type_id=1&tags=php,api'
-
-# Attach tag 2 to entity 5
-curl -X POST http://localhost:8080/api/v1/entities/5/tags \
-  -H 'Content-Type: application/json' -d '{"tag_id":2}'
 ```
