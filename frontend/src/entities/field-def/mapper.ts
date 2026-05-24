@@ -4,7 +4,7 @@ import type {
   FieldDefListDto,
   UpdateFieldDefDto,
 } from './api-types'
-import { isFieldDataType } from './enum'
+import { isFieldDataType, isRelationCardinality } from './enum'
 import { toFieldDefId } from './ids'
 import type { CreateFieldDefInput, FieldDef, FieldDefList, UpdateFieldDefInput } from './model'
 
@@ -22,6 +22,11 @@ export function mapFieldDefDtoToModel(dto: FieldDefDto): FieldDef {
     entityTypeId: dto.entity_type_id,
     fieldKey: dto.field_key,
     dataType: mapDataType(dto.data_type),
+    targetEntityTypeId: dto.target_entity_type_id,
+    cardinality:
+      dto.cardinality !== undefined && isRelationCardinality(dto.cardinality)
+        ? dto.cardinality
+        : undefined,
   }
 }
 
@@ -34,11 +39,18 @@ export function mapFieldDefListDtoToModel(dto: FieldDefListDto): FieldDefList {
 }
 
 export function mapCreateInputToDto(input: CreateFieldDefInput): CreateFieldDefDto {
-  return {
+  const dto: CreateFieldDefDto = {
     entity_type_id: input.entityTypeId,
     field_key: input.fieldKey,
     data_type: input.dataType,
   }
+
+  if (input.dataType === 'relation') {
+    dto.target_entity_type_id = input.targetEntityTypeId
+    dto.cardinality = input.cardinality
+  }
+
+  return dto
 }
 
 export function mapUpdateInputToDto(input: UpdateFieldDefInput): UpdateFieldDefDto {

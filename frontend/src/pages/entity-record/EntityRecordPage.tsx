@@ -5,6 +5,7 @@ import {
   useEditEntityTextFieldsPage,
 } from '@/features/edit-entity-text-fields'
 import { ManageEntityTagsView, useManageEntityTagsPage } from '@/features/manage-entity-tags'
+import { ManageEntityRelationsView } from '@/features/manage-entity-relations'
 import { Button, Stack, Text } from '@/shared/ui'
 
 export function EntityRecordPage() {
@@ -85,6 +86,7 @@ export function EntityRecordPage() {
         onAttach={attachTag}
         onDetach={detachTag}
       />
+      <ManageEntityRelationsView entityId={entityId} entityTypeId={entityTypeId} />
     </Stack>
   )
 }
