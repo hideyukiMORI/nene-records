@@ -1722,7 +1722,7 @@ paths:
                 $ref: '#/components/schemas/PublicSettingListResponse'
         '500':
           $ref: '#/components/responses/InternalServerError'
-  /api/v1/public/entity-types/{slug}/records/{entityId}:
+  /api/v1/public/entity-types/{slug}/records/{entitySlug}:
     get:
       tags:
         - PublicConsumer
@@ -1740,13 +1740,13 @@ paths:
           schema:
             type: string
             minLength: 1
-        - name: entityId
+        - name: entitySlug
           in: path
           required: true
-          description: Entity instance id.
+          description: Entity slug.
           schema:
-            type: integer
-            minimum: 1
+            type: string
+            minLength: 1
       responses:
         '200':
           description: Aggregated public record view bootstrap payload.
@@ -2148,6 +2148,7 @@ components:
       required:
         - id
         - entity_type_id
+        - slug
         - status
         - published_at
         - is_deleted
@@ -2159,6 +2160,11 @@ components:
         entity_type_id:
           type: integer
           format: int64
+        slug:
+          type:
+            - string
+            - 'null'
+          minLength: 1
         status:
           $ref: '#/components/schemas/EntityStatus'
         published_at:
@@ -2182,6 +2188,9 @@ components:
           type: integer
           format: int64
           minimum: 1
+        slug:
+          type: string
+          minLength: 1
         status:
           $ref: '#/components/schemas/EntityStatus'
       additionalProperties: false
@@ -2194,6 +2203,9 @@ components:
           type: integer
           format: int64
           minimum: 1
+        slug:
+          type: string
+          minLength: 1
         status:
           $ref: '#/components/schemas/EntityStatus'
         published_at:

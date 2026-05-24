@@ -50,6 +50,7 @@ final readonly class ListEntitiesHandler
                     static fn (ListEntityItem $item) => [
                         'id' => $item->id,
                         'entity_type_id' => $item->entityTypeId,
+                        'slug' => $item->slug,
                         'status' => $item->status,
                         'published_at' => $item->publishedAtIso,
                         'is_deleted' => $item->isDeleted,

@@ -14,6 +14,7 @@ final readonly class GetPublicRecordViewOutput
         public string $entityTypeSlug,
         public string $entityTypeName,
         public int $entityId,
+        public string $entitySlug,
         public string $pageTitle,
         public array $bootstrap,
         public array $displayFields,

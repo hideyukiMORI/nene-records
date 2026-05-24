@@ -320,6 +320,11 @@
                         "type": "integer",
                         "minimum": 1
                     },
+                    "slug": {
+                        "type": "string",
+                        "minLength": 1,
+                        "description": "URL slug (unique per entity type)."
+                    },
                     "status": {
                         "type": "string",
                         "enum": [
@@ -373,7 +378,7 @@
                 "type": "openapi",
                 "operationId": "getPublicRecordView",
                 "method": "GET",
-                "path": "/api/v1/public/entity-types/{slug}/records/{entityId}"
+                "path": "/api/v1/public/entity-types/{slug}/records/{entitySlug}"
             },
             "inputSchema": {
                 "type": "object",
@@ -383,15 +388,15 @@
                         "minLength": 1,
                         "description": "Entity type slug."
                     },
-                    "entityId": {
-                        "type": "integer",
-                        "minimum": 1,
-                        "description": "Entity instance id."
+                    "entitySlug": {
+                        "type": "string",
+                        "minLength": 1,
+                        "description": "Entity slug."
                     }
                 },
                 "required": [
                     "slug",
-                    "entityId"
+                    "entitySlug"
                 ],
                 "additionalProperties": false
             },
@@ -419,6 +424,11 @@
                     "entity_type_id": {
                         "type": "integer",
                         "minimum": 1
+                    },
+                    "slug": {
+                        "type": "string",
+                        "minLength": 1,
+                        "description": "URL slug (unique per entity type)."
                     },
                     "status": {
                         "type": "string",

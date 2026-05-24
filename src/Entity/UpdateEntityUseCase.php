@@ -36,6 +36,12 @@ final readonly class UpdateEntityUseCase implements UpdateEntityUseCaseInterface
             throw new EntityTypeNotFoundException($input->entityTypeId);
         }
 
+        $slug = $this->normalizeSlug($input->slug);
+
+        if ($slug !== null && $this->entities->existsBySlug($slug, $input->entityTypeId, $entityId)) {
+            throw new DuplicateEntitySlugException($slug);
+        }
+
         // Auto-set published_at when transitioning to published for the first time.
         $publishedAt = $input->publishedAt ?? $existing->publishedAt;
         if ($input->status === EntityStatus::PUBLISHED && $publishedAt === null) {
@@ -45,6 +51,7 @@ final readonly class UpdateEntityUseCase implements UpdateEntityUseCaseInterface
         $updated = new Entity(
             id: $entityId,
             entityTypeId: $input->entityTypeId,
+            slug: $slug,
             status: $input->status,
             publishedAt: $publishedAt,
             isDeleted: $existing->isDeleted,
@@ -56,10 +63,22 @@ final readonly class UpdateEntityUseCase implements UpdateEntityUseCaseInterface
         return new UpdateEntityOutput(
             id: $entityId,
             entityTypeId: $input->entityTypeId,
+            slug: $slug,
             status: $input->status,
             publishedAtIso: $publishedAt?->format(DateTimeInterface::ATOM),
             isDeleted: $existing->isDeleted,
             deletedAtIso: $existing->deletedAt?->format(DateTimeInterface::ATOM),
         );
+    }
+
+    private function normalizeSlug(?string $slug): ?string
+    {
+        if ($slug === null) {
+            return null;
+        }
+
+        $normalized = trim($slug);
+
+        return $normalized !== '' ? $normalized : null;
     }
 }

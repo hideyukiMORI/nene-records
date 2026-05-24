@@ -43,6 +43,9 @@ final readonly class UpdateEntityHandler
             $errors[] = new ValidationError('entity_type_id', 'Entity type id is required and must be a positive integer.', 'required');
         }
 
+        $rawSlug = $body['slug'] ?? null;
+        $slug = is_string($rawSlug) && trim($rawSlug) !== '' ? trim($rawSlug) : null;
+
         $rawStatus = $body['status'] ?? null;
         $status = is_string($rawStatus) && EntityStatus::isValid($rawStatus) ? $rawStatus : EntityStatus::DRAFT;
 
@@ -57,6 +60,7 @@ final readonly class UpdateEntityHandler
         $output = $this->useCase->execute(new UpdateEntityInput(
             id: $id,
             entityTypeId: $entityTypeId,
+            slug: $slug,
             status: $status,
             publishedAt: $publishedAt,
         ));
@@ -64,6 +68,7 @@ final readonly class UpdateEntityHandler
         return $this->response->create([
             'id' => $output->id,
             'entity_type_id' => $output->entityTypeId,
+            'slug' => $output->slug,
             'status' => $output->status,
             'published_at' => $output->publishedAtIso,
             'is_deleted' => $output->isDeleted,

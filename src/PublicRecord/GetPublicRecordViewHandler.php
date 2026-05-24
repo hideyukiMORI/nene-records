@@ -20,14 +20,17 @@ final readonly class GetPublicRecordViewHandler
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $parameters = $request->getAttribute(Router::PARAMETERS_ATTRIBUTE, []);
-        $slug = trim((string) ($parameters['slug'] ?? ''));
-        $entityId = (int) ($parameters['entityId'] ?? 0);
+        $typeSlug = trim((string) ($parameters['slug'] ?? ''));
+        $entitySlug = trim((string) ($parameters['entitySlug'] ?? ''));
 
-        if ($slug === '' || $entityId <= 0) {
-            throw new PublicRecordNotFoundException($slug !== '' ? $slug : 'unknown', max(0, $entityId));
+        if ($typeSlug === '' || $entitySlug === '') {
+            throw new PublicRecordNotFoundException(
+                $typeSlug !== '' ? $typeSlug : 'unknown',
+                $entitySlug !== '' ? $entitySlug : 'unknown',
+            );
         }
 
-        $output = $this->useCase->execute(new GetPublicRecordViewInput($slug, $entityId));
+        $output = $this->useCase->execute(new GetPublicRecordViewInput($typeSlug, $entitySlug));
 
         return $this->response->create($output->bootstrap);
     }

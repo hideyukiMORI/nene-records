@@ -56,7 +56,7 @@ final class PublicRecordHttpTest extends TestCase
             new EntityType(name: 'Article', slug: 'article', id: 1),
         ]);
         $entities = new InMemoryEntityRepository([
-            new Entity(id: 10, entityTypeId: 1, status: EntityStatus::PUBLISHED),
+            new Entity(id: 10, entityTypeId: 1, slug: 'hello-world', status: EntityStatus::PUBLISHED),
         ]);
         $fieldDefs = new InMemoryFieldDefRepository([
             new FieldDef(entityTypeId: 1, fieldKey: 'title', dataType: 'text', id: 1),
@@ -125,7 +125,7 @@ final class PublicRecordHttpTest extends TestCase
         $response = $this->application->handle(
             $this->factory->createServerRequest(
                 'GET',
-                'https://example.test/api/v1/public/entity-types/article/records/10',
+                'https://example.test/api/v1/public/entity-types/article/records/hello-world',
             ),
         );
         $payload = $this->decodeJson($response);
@@ -141,7 +141,7 @@ final class PublicRecordHttpTest extends TestCase
         $response = $this->application->handle(
             $this->factory->createServerRequest(
                 'GET',
-                'https://example.test/api/v1/public/entity-types/missing/records/10',
+                'https://example.test/api/v1/public/entity-types/missing/records/some-slug',
             ),
         );
 
@@ -153,7 +153,7 @@ final class PublicRecordHttpTest extends TestCase
         $response = $this->application->handle(
             $this->factory->createServerRequest(
                 'GET',
-                'https://example.test/view/article/10',
+                'https://example.test/view/article/hello-world',
             ),
         );
         $html = (string) $response->getBody();

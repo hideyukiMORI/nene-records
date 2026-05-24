@@ -57,7 +57,9 @@ export function EntityRecordPage() {
           {entityTypeQuery.data?.name ?? 'Record'}
         </Text>
       </Stack>
-      {entity !== null && <EntityStatusPanel entity={entity} />}
+      {entity !== null && (
+        <EntityStatusPanel entity={entity} entityTypeSlug={entityTypeQuery.data?.slug} />
+      )}
       <EditEntityTextFieldsView
         entity={entity}
         textFieldDefs={textFieldDefs}

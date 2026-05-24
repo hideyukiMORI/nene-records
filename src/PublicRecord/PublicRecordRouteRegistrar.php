@@ -21,12 +21,12 @@ final readonly class PublicRecordRouteRegistrar
         $renderPublicRecordViewHandler = $this->renderPublicRecordViewHandler;
 
         $router->get(
-            '/api/v1/public/entity-types/{slug}/records/{entityId}',
+            '/api/v1/public/entity-types/{slug}/records/{entitySlug}',
             static fn (ServerRequestInterface $request) => $getPublicRecordViewHandler->handle($request),
         );
 
         $router->get(
-            '/view/{slug}/{entityId}',
+            '/view/{slug}/{entitySlug}',
             static fn (ServerRequestInterface $request) => $renderPublicRecordViewHandler->handle($request),
         );
     }
