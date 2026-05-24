@@ -12,6 +12,7 @@ use NeNeRecords\EntityType\CreateEntityTypeUseCase;
 use NeNeRecords\EntityType\DeleteEntityTypeHandler;
 use NeNeRecords\EntityType\DeleteEntityTypeUseCase;
 use NeNeRecords\EntityType\EntityType;
+use NeNeRecords\EntityType\EntityTypeHasEntitiesExceptionHandler;
 use NeNeRecords\EntityType\EntityTypeNotFoundExceptionHandler;
 use NeNeRecords\EntityType\EntityTypeRouteRegistrar;
 use NeNeRecords\EntityType\EntityTypeSlugConflictExceptionHandler;
@@ -21,6 +22,7 @@ use NeNeRecords\EntityType\ListEntityTypesHandler;
 use NeNeRecords\EntityType\ListEntityTypesUseCase;
 use NeNeRecords\EntityType\UpdateEntityTypeHandler;
 use NeNeRecords\EntityType\UpdateEntityTypeUseCase;
+use NeNeRecords\Tests\Entity\InMemoryEntityRepository;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
@@ -42,11 +44,13 @@ final class EntityTypeHttpTest extends TestCase
         $jsonResponse = new JsonResponseFactory($this->factory, $this->factory);
         $problemDetails = new ProblemDetailsResponseFactory($this->factory, $this->factory);
 
+        $entityRepository = new InMemoryEntityRepository();
+
         $registrar = new EntityTypeRouteRegistrar(
             new GetEntityTypeByIdHandler(new GetEntityTypeByIdUseCase($this->repository), $jsonResponse),
             new CreateEntityTypeHandler(new CreateEntityTypeUseCase($this->repository), $jsonResponse),
             new UpdateEntityTypeHandler(new UpdateEntityTypeUseCase($this->repository), $jsonResponse),
-            new DeleteEntityTypeHandler(new DeleteEntityTypeUseCase($this->repository), $this->factory),
+            new DeleteEntityTypeHandler(new DeleteEntityTypeUseCase($this->repository, $entityRepository), $this->factory),
             new ListEntityTypesHandler(new ListEntityTypesUseCase($this->repository), $jsonResponse),
         );
 
@@ -55,6 +59,7 @@ final class EntityTypeHttpTest extends TestCase
             $this->factory,
             domainExceptionHandlers: [
                 new EntityTypeNotFoundExceptionHandler($problemDetails),
+                new EntityTypeHasEntitiesExceptionHandler($problemDetails),
                 new EntityTypeSlugConflictExceptionHandler($problemDetails),
             ],
             routeRegistrars: [$registrar],

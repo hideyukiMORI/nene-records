@@ -6,6 +6,7 @@ export interface ConfirmDialogProps {
   open: boolean
   title: string
   description?: string
+  errorDetail?: string | null
   confirmLabel?: string
   cancelLabel?: string
   isPending?: boolean
@@ -25,6 +26,7 @@ export function ConfirmDialog({
   open,
   title,
   description,
+  errorDetail = null,
   confirmLabel = 'Confirm',
   cancelLabel = 'Cancel',
   isPending = false,
@@ -56,6 +58,14 @@ export function ConfirmDialog({
             </Text>
             {description !== undefined ? <Text muted>{description}</Text> : null}
           </Stack>
+          {errorDetail !== null ? (
+            <div
+              role="alert"
+              className="rounded-md border border-red-200 bg-red-50 px-inline-sm py-stack-xs text-sm text-red-700"
+            >
+              {errorDetail}
+            </div>
+          ) : null}
           <Stack direction="horizontal" gap="sm">
             <Button variant="secondary" disabled={isPending} onClick={onCancel}>
               {cancelLabel}
