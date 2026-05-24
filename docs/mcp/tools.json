@@ -175,7 +175,7 @@
         {
             "name": "listEntities",
             "title": "List Entities",
-            "description": "List entity records with optional entity_type_id, tag, and relation filters.",
+            "description": "List entity records with optional entity_type_id, status, tag, and relation filters.",
             "safety": "read",
             "source": {
                 "type": "openapi",
@@ -201,6 +201,15 @@
                         "type": "integer",
                         "minimum": 1,
                         "description": "Filter by entity type id."
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "draft",
+                            "published",
+                            "archived"
+                        ],
+                        "description": "Filter by publish status."
                     },
                     "tags": {
                         "type": "string",
@@ -310,6 +319,15 @@
                     "entity_type_id": {
                         "type": "integer",
                         "minimum": 1
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "draft",
+                            "published",
+                            "archived"
+                        ],
+                        "description": "Initial publish status (default: draft)."
                     }
                 },
                 "required": [
@@ -382,7 +400,7 @@
         {
             "name": "updateEntityById",
             "title": "Update Entity",
-            "description": "Update an entity record entity type id.",
+            "description": "Update an entity record entity type id and publish status.",
             "safety": "write",
             "source": {
                 "type": "openapi",
@@ -401,6 +419,20 @@
                     "entity_type_id": {
                         "type": "integer",
                         "minimum": 1
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "draft",
+                            "published",
+                            "archived"
+                        ],
+                        "description": "Publish status."
+                    },
+                    "published_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Override published_at timestamp (ISO 8601). Auto-set on first publish if omitted."
                     }
                 },
                 "required": [
@@ -1918,6 +1950,38 @@
                 "additionalProperties": false
             },
             "responseSchemaRef": null
+        },
+        {
+            "name": "login",
+            "title": "Login",
+            "description": "Authenticate with email/password and obtain an API bearer token.",
+            "safety": "write",
+            "source": {
+                "type": "openapi",
+                "operationId": "login",
+                "method": "POST",
+                "path": "/api/v1/auth/login"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "minLength": 1
+                    },
+                    "password": {
+                        "type": "string",
+                        "minLength": 1
+                    }
+                },
+                "required": [
+                    "email",
+                    "password"
+                ],
+                "additionalProperties": false
+            },
+            "responseSchemaRef": "#/components/schemas/LoginResponse"
         }
     ]
 }

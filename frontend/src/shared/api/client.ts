@@ -1,3 +1,4 @@
+import { authStore } from '@/entities/auth/model'
 import { env } from '@/shared/config/env'
 import { AppError, parseProblemDetails } from '@/shared/api/errors'
 
@@ -12,9 +13,13 @@ interface RequestOptions {
 async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const base = env.apiBaseUrl.replace(/\/$/, '')
   const url = `${base}${path}`
-  const headers: HeadersInit = {}
+  const headers: Record<string, string> = {}
   if (options.body !== undefined) {
     headers['Content-Type'] = 'application/json'
+  }
+  const token = authStore.getToken()
+  if (token !== null) {
+    headers['Authorization'] = `Bearer ${token}`
   }
 
   const response = await fetch(url, {

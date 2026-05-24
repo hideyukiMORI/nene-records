@@ -9,6 +9,7 @@ use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\DomainExceptionHandlerInterface;
 use NeNeRecords\Analytics\AnalyticsServiceProvider;
+use NeNeRecords\Auth\InvalidCredentialsExceptionHandler;
 use NeNeRecords\BoolField\BoolFieldNotFoundExceptionHandler;
 use NeNeRecords\BoolField\BoolFieldServiceProvider;
 use NeNeRecords\BoolField\FieldKeyNotRegisteredExceptionHandler as BoolFieldKeyNotRegisteredExceptionHandler;
@@ -99,6 +100,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $analytics = $container->get('nene-records.route_registrar.analytics');
                     $publicRecord = $container->get('nene-records.route_registrar.public_record');
                     $setting = $container->get('nene-records.route_registrar.setting');
+                    $auth = $container->get('nene-records.route_registrar.auth');
 
                     if (
                         !is_callable($entityType)
@@ -115,11 +117,13 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         || !is_callable($analytics)
                         || !is_callable($publicRecord)
                         || !is_callable($setting)
+                        || !is_callable($auth)
                     ) {
                         throw new LogicException('Route registrar service is invalid.');
                     }
 
                     return [
+                        $auth,
                         $entityType,
                         $fieldDef,
                         $entity,
@@ -173,6 +177,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $publicRecordNotFound = $container->get(PublicRecordNotFoundExceptionHandler::class);
                     $settingKeyNotFound = $container->get(SettingKeyNotFoundExceptionHandler::class);
                     $settingValueInvalid = $container->get(SettingValueInvalidExceptionHandler::class);
+                    $invalidCredentials = $container->get(InvalidCredentialsExceptionHandler::class);
 
                     foreach ([
                         $entityTypeNotFound,
@@ -208,6 +213,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $publicRecordNotFound,
                         $settingKeyNotFound,
                         $settingValueInvalid,
+                        $invalidCredentials,
                     ] as $handler) {
                         if (!$handler instanceof DomainExceptionHandlerInterface) {
                             throw new LogicException('Exception handler service is invalid.');
@@ -248,6 +254,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $publicRecordNotFound,
                         $settingKeyNotFound,
                         $settingValueInvalid,
+                        $invalidCredentials,
                     ];
                 },
             );

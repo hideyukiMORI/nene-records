@@ -9,13 +9,27 @@ import { EntityTypesPage } from '@/pages/entity-types/EntityTypesPage'
 import { FieldDefsPage } from '@/pages/field-defs/FieldDefsPage'
 import { HomePage } from '@/pages/home/HomePage'
 import { AppShell } from '@/pages/layout/AppShell'
+import { LoginPage } from '@/pages/login/LoginPage'
 import { SiteSettingsPage } from '@/pages/settings/SiteSettingsPage'
 import { TagsPage } from '@/pages/tags/TagsPage'
+import { RequireAuth } from '@/shared/auth/RequireAuth'
+
+function AdminShell() {
+  return (
+    <RequireAuth>
+      <AppShell />
+    </RequireAuth>
+  )
+}
 
 const router = createBrowserRouter([
   {
+    path: '/login',
+    element: <LoginPage />,
+  },
+  {
     path: '/',
-    element: <AppShell />,
+    element: <AdminShell />,
     children: [
       { index: true, element: <HomePage /> },
       { path: 'entity-types', element: <EntityTypesPage /> },

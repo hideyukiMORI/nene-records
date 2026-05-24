@@ -1,5 +1,6 @@
-import { Outlet, NavLink } from 'react-router-dom'
-import { Stack, Text } from '@/shared/ui'
+import { Outlet, NavLink, useNavigate } from 'react-router-dom'
+import { authStore } from '@/entities/auth'
+import { Button, Stack, Text } from '@/shared/ui'
 
 const navLinkClass = ({ isActive }: { isActive: boolean }): string =>
   [
@@ -8,6 +9,15 @@ const navLinkClass = ({ isActive }: { isActive: boolean }): string =>
   ].join(' ')
 
 export function AppShell() {
+  const navigate = useNavigate()
+
+  const handleLogout = () => {
+    authStore.clearSession()
+    void navigate('/login')
+  }
+
+  const session = authStore.getSession()
+
   return (
     <div className="min-h-screen bg-surface font-sans text-text-primary">
       <header className="border-b border-border bg-surface-raised shadow-sm">
@@ -34,6 +44,16 @@ export function AppShell() {
               </NavLink>
             </Stack>
           </nav>
+          <Stack direction="horizontal" gap="sm">
+            {session && (
+              <Text muted className="hidden text-sm sm:block">
+                {session.email}
+              </Text>
+            )}
+            <Button variant="ghost" size="sm" onClick={handleLogout}>
+              ログアウト
+            </Button>
+          </Stack>
         </div>
       </header>
       <main className="mx-auto max-w-5xl px-inline-md py-stack-lg">
