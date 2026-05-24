@@ -25,6 +25,8 @@ NeNe Records inherits NENE2 engineering discipline:
 
 | Topic | Document |
 | --- | --- |
+| **Product vision** | [`docs/explanation/product-vision.md`](./docs/explanation/product-vision.md) |
+| **Workspace handoff** | [`docs/todo/handoff-2026-05-24-workspace-switch.md`](./docs/todo/handoff-2026-05-24-workspace-switch.md) |
 | **Start here (agents)** | [`AGENTS.md`](./AGENTS.md) |
 | NENE2 inheritance map | [`docs/inheritance-from-nene2.md`](./docs/inheritance-from-nene2.md) |
 | Workflow | [`docs/workflow.md`](./docs/workflow.md) |

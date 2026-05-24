@@ -2,11 +2,17 @@
 
 Last updated: 2026-05-24
 
+## Workspace
+
+**Main Cursor workspace:** `/home/xi/docker/nene-records`
+
+New contributors and AI agents: read [`handoff-2026-05-24-workspace-switch.md`](./handoff-2026-05-24-workspace-switch.md) and [`docs/explanation/product-vision.md`](../explanation/product-vision.md) first.
+
 ## In Progress
 
 | Issue | Branch | Summary |
 | --- | --- | --- |
-| #2 | `docs/2-inherit-nene2-governance` | NENE2 系ガバナンス・ワークフロー規約の継承 |
+| #4 | `docs/4-workspace-handoff` | Workspace switch handoff and product vision |
 
 ## Up Next
 
@@ -18,13 +24,14 @@ Last updated: 2026-05-24
 
 | Issue | Summary |
 | --- | --- |
+| #2 | NENE2 governance inheritance (merged PR #3) |
 | — | Repository bootstrap (`README`, MIT license) |
 
 ## Handoff Notes
 
-- Governance docs and Cursor rules land in PR for #2.
-- Runtime scaffold (`composer.json`, Docker, migrations) starts in #1 after #2 merges.
+- Phase 0 governance complete. Phase 1 runtime scaffold starts in Issue #1.
 - Framework reference: `hideyukimori/nene2` via Composer; see `docs/inheritance-from-nene2.md`.
+- NENE2 sibling in workspace is optional; see handoff §1.
 
 ## Verification Commands
 

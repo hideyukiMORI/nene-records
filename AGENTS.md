@@ -4,6 +4,8 @@ This file is the entry point for AI agents working on NeNe Records.
 
 ## Read First
 
+- **Workspace handoff (2026-05-24):** `docs/todo/handoff-2026-05-24-workspace-switch.md`
+- **Product vision:** `docs/explanation/product-vision.md`
 - Inheritance map: `docs/inheritance-from-nene2.md`
 - Human and AI collaboration: `docs/CONTRIBUTING.md`
 - Workflow: `docs/workflow.md`
