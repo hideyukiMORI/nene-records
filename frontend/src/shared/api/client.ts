@@ -31,6 +31,10 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
   })
 
   if (!response.ok) {
+    if (response.status === 401 && !path.includes('/auth/login')) {
+      authStore.clearSession()
+      window.location.href = '/login'
+    }
     throw await parseProblemDetails(response)
   }
 
