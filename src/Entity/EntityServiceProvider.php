@@ -1,0 +1,234 @@
+<?php
+
+declare(strict_types=1);
+
+namespace NeNeRecords\Entity;
+
+use LogicException;
+use Nene2\Database\DatabaseQueryExecutorInterface;
+use Nene2\DependencyInjection\ContainerBuilder;
+use Nene2\DependencyInjection\ServiceProviderInterface;
+use Nene2\Error\ProblemDetailsResponseFactory;
+use Nene2\Http\JsonResponseFactory;
+use NeNeRecords\EntityType\EntityTypeRepositoryInterface;
+use Psr\Container\ContainerInterface;
+use Psr\Http\Message\ResponseFactoryInterface;
+
+final readonly class EntityServiceProvider implements ServiceProviderInterface
+{
+    public function register(ContainerBuilder $builder): void
+    {
+        $builder
+            ->set(
+                EntityRepositoryInterface::class,
+                static function (ContainerInterface $c): EntityRepositoryInterface {
+                    $query = $c->get(DatabaseQueryExecutorInterface::class);
+
+                    if (!$query instanceof DatabaseQueryExecutorInterface) {
+                        throw new LogicException('Database query executor service is invalid.');
+                    }
+
+                    return new PdoEntityRepository($query);
+                },
+            )
+            ->set(
+                GetEntityByIdUseCaseInterface::class,
+                static function (ContainerInterface $c): GetEntityByIdUseCaseInterface {
+                    $repository = $c->get(EntityRepositoryInterface::class);
+
+                    if (!$repository instanceof EntityRepositoryInterface) {
+                        throw new LogicException('Entity repository service is invalid.');
+                    }
+
+                    return new GetEntityByIdUseCase($repository);
+                },
+            )
+            ->set(
+                GetEntityByIdHandler::class,
+                static function (ContainerInterface $c): GetEntityByIdHandler {
+                    $useCase = $c->get(GetEntityByIdUseCaseInterface::class);
+                    $response = $c->get(JsonResponseFactory::class);
+
+                    if (!$useCase instanceof GetEntityByIdUseCaseInterface) {
+                        throw new LogicException('GetEntityById use case service is invalid.');
+                    }
+
+                    if (!$response instanceof JsonResponseFactory) {
+                        throw new LogicException('JSON response factory service is invalid.');
+                    }
+
+                    return new GetEntityByIdHandler($useCase, $response);
+                },
+            )
+            ->set(
+                CreateEntityUseCaseInterface::class,
+                static function (ContainerInterface $c): CreateEntityUseCaseInterface {
+                    $entities = $c->get(EntityRepositoryInterface::class);
+                    $entityTypes = $c->get(EntityTypeRepositoryInterface::class);
+
+                    if (!$entities instanceof EntityRepositoryInterface) {
+                        throw new LogicException('Entity repository service is invalid.');
+                    }
+
+                    if (!$entityTypes instanceof EntityTypeRepositoryInterface) {
+                        throw new LogicException('Entity type repository service is invalid.');
+                    }
+
+                    return new CreateEntityUseCase($entities, $entityTypes);
+                },
+            )
+            ->set(
+                CreateEntityHandler::class,
+                static function (ContainerInterface $c): CreateEntityHandler {
+                    $useCase = $c->get(CreateEntityUseCaseInterface::class);
+                    $response = $c->get(JsonResponseFactory::class);
+
+                    if (!$useCase instanceof CreateEntityUseCaseInterface) {
+                        throw new LogicException('CreateEntity use case service is invalid.');
+                    }
+
+                    if (!$response instanceof JsonResponseFactory) {
+                        throw new LogicException('JSON response factory service is invalid.');
+                    }
+
+                    return new CreateEntityHandler($useCase, $response);
+                },
+            )
+            ->set(
+                DeleteEntityUseCaseInterface::class,
+                static function (ContainerInterface $c): DeleteEntityUseCaseInterface {
+                    $repository = $c->get(EntityRepositoryInterface::class);
+
+                    if (!$repository instanceof EntityRepositoryInterface) {
+                        throw new LogicException('Entity repository service is invalid.');
+                    }
+
+                    return new DeleteEntityUseCase($repository);
+                },
+            )
+            ->set(
+                DeleteEntityHandler::class,
+                static function (ContainerInterface $c): DeleteEntityHandler {
+                    $useCase = $c->get(DeleteEntityUseCaseInterface::class);
+                    $responseFactory = $c->get(ResponseFactoryInterface::class);
+
+                    if (!$useCase instanceof DeleteEntityUseCaseInterface) {
+                        throw new LogicException('DeleteEntity use case service is invalid.');
+                    }
+
+                    if (!$responseFactory instanceof ResponseFactoryInterface) {
+                        throw new LogicException('Response factory service is invalid.');
+                    }
+
+                    return new DeleteEntityHandler($useCase, $responseFactory);
+                },
+            )
+            ->set(
+                ListEntitiesUseCaseInterface::class,
+                static function (ContainerInterface $c): ListEntitiesUseCaseInterface {
+                    $repository = $c->get(EntityRepositoryInterface::class);
+
+                    if (!$repository instanceof EntityRepositoryInterface) {
+                        throw new LogicException('Entity repository service is invalid.');
+                    }
+
+                    return new ListEntitiesUseCase($repository);
+                },
+            )
+            ->set(
+                ListEntitiesHandler::class,
+                static function (ContainerInterface $c): ListEntitiesHandler {
+                    $useCase = $c->get(ListEntitiesUseCaseInterface::class);
+                    $response = $c->get(JsonResponseFactory::class);
+
+                    if (!$useCase instanceof ListEntitiesUseCaseInterface) {
+                        throw new LogicException('ListEntities use case service is invalid.');
+                    }
+
+                    if (!$response instanceof JsonResponseFactory) {
+                        throw new LogicException('JSON response factory service is invalid.');
+                    }
+
+                    return new ListEntitiesHandler($useCase, $response);
+                },
+            )
+            ->set(
+                UpdateEntityUseCaseInterface::class,
+                static function (ContainerInterface $c): UpdateEntityUseCaseInterface {
+                    $entities = $c->get(EntityRepositoryInterface::class);
+                    $entityTypes = $c->get(EntityTypeRepositoryInterface::class);
+
+                    if (!$entities instanceof EntityRepositoryInterface) {
+                        throw new LogicException('Entity repository service is invalid.');
+                    }
+
+                    if (!$entityTypes instanceof EntityTypeRepositoryInterface) {
+                        throw new LogicException('Entity type repository service is invalid.');
+                    }
+
+                    return new UpdateEntityUseCase($entities, $entityTypes);
+                },
+            )
+            ->set(
+                UpdateEntityHandler::class,
+                static function (ContainerInterface $c): UpdateEntityHandler {
+                    $useCase = $c->get(UpdateEntityUseCaseInterface::class);
+                    $response = $c->get(JsonResponseFactory::class);
+
+                    if (!$useCase instanceof UpdateEntityUseCaseInterface) {
+                        throw new LogicException('UpdateEntity use case service is invalid.');
+                    }
+
+                    if (!$response instanceof JsonResponseFactory) {
+                        throw new LogicException('JSON response factory service is invalid.');
+                    }
+
+                    return new UpdateEntityHandler($useCase, $response);
+                },
+            )
+            ->set(
+                EntityNotFoundExceptionHandler::class,
+                static function (ContainerInterface $c): EntityNotFoundExceptionHandler {
+                    $problemDetails = $c->get(ProblemDetailsResponseFactory::class);
+
+                    if (!$problemDetails instanceof ProblemDetailsResponseFactory) {
+                        throw new LogicException('Problem details response factory service is invalid.');
+                    }
+
+                    return new EntityNotFoundExceptionHandler($problemDetails);
+                },
+            )
+            ->set(
+                'nene-records.route_registrar.entity',
+                static function (ContainerInterface $c): EntityRouteRegistrar {
+                    $get = $c->get(GetEntityByIdHandler::class);
+                    $create = $c->get(CreateEntityHandler::class);
+                    $update = $c->get(UpdateEntityHandler::class);
+                    $delete = $c->get(DeleteEntityHandler::class);
+                    $list = $c->get(ListEntitiesHandler::class);
+
+                    if (!$get instanceof GetEntityByIdHandler) {
+                        throw new LogicException('GetEntityById handler service is invalid.');
+                    }
+
+                    if (!$create instanceof CreateEntityHandler) {
+                        throw new LogicException('CreateEntity handler service is invalid.');
+                    }
+
+                    if (!$update instanceof UpdateEntityHandler) {
+                        throw new LogicException('UpdateEntity handler service is invalid.');
+                    }
+
+                    if (!$delete instanceof DeleteEntityHandler) {
+                        throw new LogicException('DeleteEntity handler service is invalid.');
+                    }
+
+                    if (!$list instanceof ListEntitiesHandler) {
+                        throw new LogicException('ListEntities handler service is invalid.');
+                    }
+
+                    return new EntityRouteRegistrar($get, $create, $update, $delete, $list);
+                },
+            );
+    }
+}

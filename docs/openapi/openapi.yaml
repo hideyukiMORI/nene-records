@@ -1,0 +1,777 @@
+openapi: 3.1.0
+info:
+  title: NeNe Records API
+  version: 0.1.0
+  description: >
+    NeNe Records public API contract — entity_types, entities, and text_fields CRUD (MVP).
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+tags:
+  - name: System
+    description: Runtime health endpoints.
+  - name: EntityTypes
+    description: Entity type schema definitions.
+  - name: Entities
+    description: Entity instances bound to an entity type.
+  - name: TextFields
+    description: Typed text field values on entities.
+paths:
+  /health:
+    get:
+      tags:
+        - System
+      summary: Health endpoint
+      description: Operational health check (NENE2 runtime).
+      operationId: getHealth
+      responses:
+        '200':
+          description: Healthy response (no checks configured).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+              examples:
+                ok:
+                  summary: Healthy response (no checks)
+                  value:
+                    status: ok
+                    service: NENE2
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/entity-types:
+    get:
+      tags:
+        - EntityTypes
+      summary: List entity types
+      description: Returns a paginated list of entity types.
+      operationId: listEntityTypes
+      parameters:
+        - $ref: '#/components/parameters/LimitQuery'
+        - $ref: '#/components/parameters/OffsetQuery'
+      responses:
+        '200':
+          description: Paginated entity type list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntityTypeListResponse'
+              examples:
+                ok:
+                  summary: Empty list
+                  value:
+                    items: []
+                    limit: 20
+                    offset: 0
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - EntityTypes
+      summary: Create entity type
+      description: Creates a new entity type with a unique slug.
+      operationId: createEntityType
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEntityTypeRequest'
+            examples:
+              ok:
+                value:
+                  name: Article
+                  slug: article
+      responses:
+        '201':
+          description: Entity type created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntityTypeResponse'
+              examples:
+                ok:
+                  value:
+                    id: 1
+                    name: Article
+                    slug: article
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/entity-types/{id}:
+    get:
+      tags:
+        - EntityTypes
+      summary: Get entity type by id
+      operationId: getEntityTypeById
+      parameters:
+        - $ref: '#/components/parameters/IdPath'
+      responses:
+        '200':
+          description: Entity type found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntityTypeResponse'
+              examples:
+                ok:
+                  value:
+                    id: 1
+                    name: Article
+                    slug: article
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - EntityTypes
+      summary: Update entity type
+      operationId: updateEntityType
+      parameters:
+        - $ref: '#/components/parameters/IdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateEntityTypeRequest'
+            examples:
+              ok:
+                value:
+                  name: Blog Post
+                  slug: blog-post
+      responses:
+        '200':
+          description: Entity type updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntityTypeResponse'
+              examples:
+                ok:
+                  value:
+                    id: 1
+                    name: Blog Post
+                    slug: blog-post
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - EntityTypes
+      summary: Delete entity type
+      description: Permanently deletes an entity type (hard delete).
+      operationId: deleteEntityType
+      parameters:
+        - $ref: '#/components/parameters/IdPath'
+      responses:
+        '204':
+          description: Entity type deleted.
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/entities:
+    get:
+      tags:
+        - Entities
+      summary: List entities
+      description: Returns non-deleted entities.
+      operationId: listEntities
+      parameters:
+        - $ref: '#/components/parameters/LimitQuery'
+        - $ref: '#/components/parameters/OffsetQuery'
+      responses:
+        '200':
+          description: Paginated entity list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntityListResponse'
+              examples:
+                ok:
+                  summary: Empty list
+                  value:
+                    items: []
+                    limit: 20
+                    offset: 0
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Entities
+      summary: Create entity
+      operationId: createEntity
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEntityRequest'
+            examples:
+              ok:
+                value:
+                  entity_type_id: 1
+      responses:
+        '201':
+          description: Entity created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntityResponse'
+              examples:
+                ok:
+                  value:
+                    id: 1
+                    entity_type_id: 1
+                    is_deleted: false
+                    deleted_at: null
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/entities/{id}:
+    get:
+      tags:
+        - Entities
+      summary: Get entity by id
+      operationId: getEntityById
+      parameters:
+        - $ref: '#/components/parameters/IdPath'
+      responses:
+        '200':
+          description: Entity found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntityResponse'
+              examples:
+                ok:
+                  value:
+                    id: 1
+                    entity_type_id: 1
+                    is_deleted: false
+                    deleted_at: null
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Entities
+      summary: Update entity
+      operationId: updateEntity
+      parameters:
+        - $ref: '#/components/parameters/IdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateEntityRequest'
+            examples:
+              ok:
+                value:
+                  entity_type_id: 2
+      responses:
+        '200':
+          description: Entity updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntityResponse'
+              examples:
+                ok:
+                  value:
+                    id: 1
+                    entity_type_id: 2
+                    is_deleted: false
+                    deleted_at: null
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Entities
+      summary: Soft delete entity
+      operationId: deleteEntity
+      parameters:
+        - $ref: '#/components/parameters/IdPath'
+      responses:
+        '204':
+          description: Entity soft-deleted.
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/text-fields:
+    get:
+      tags:
+        - TextFields
+      summary: List text fields
+      description: Returns non-deleted text fields.
+      operationId: listTextFields
+      parameters:
+        - $ref: '#/components/parameters/LimitQuery'
+        - $ref: '#/components/parameters/OffsetQuery'
+      responses:
+        '200':
+          description: Paginated text field list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TextFieldListResponse'
+              examples:
+                ok:
+                  summary: Empty list
+                  value:
+                    items: []
+                    limit: 20
+                    offset: 0
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - TextFields
+      summary: Create text field
+      operationId: createTextField
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTextFieldRequest'
+            examples:
+              ok:
+                value:
+                  entity_id: 1
+                  field_key: title
+                  value: Hello world
+      responses:
+        '201':
+          description: Text field created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TextFieldResponse'
+              examples:
+                ok:
+                  value:
+                    id: 1
+                    entity_id: 1
+                    field_key: title
+                    value: Hello world
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/text-fields/{id}:
+    get:
+      tags:
+        - TextFields
+      summary: Get text field by id
+      operationId: getTextFieldById
+      parameters:
+        - $ref: '#/components/parameters/IdPath'
+      responses:
+        '200':
+          description: Text field found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TextFieldResponse'
+              examples:
+                ok:
+                  value:
+                    id: 1
+                    entity_id: 1
+                    field_key: title
+                    value: Hello world
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - TextFields
+      summary: Update text field
+      operationId: updateTextField
+      parameters:
+        - $ref: '#/components/parameters/IdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTextFieldRequest'
+            examples:
+              ok:
+                value:
+                  field_key: title
+                  value: Updated title
+      responses:
+        '200':
+          description: Text field updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TextFieldResponse'
+              examples:
+                ok:
+                  value:
+                    id: 1
+                    entity_id: 1
+                    field_key: title
+                    value: Updated title
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - TextFields
+      summary: Soft delete text field
+      operationId: deleteTextField
+      parameters:
+        - $ref: '#/components/parameters/IdPath'
+      responses:
+        '204':
+          description: Text field soft-deleted.
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+components:
+  parameters:
+    IdPath:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+        minimum: 1
+      example: 1
+    LimitQuery:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+      example: 20
+    OffsetQuery:
+      name: offset
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+      example: 0
+  responses:
+    NotFound:
+      description: Resource not found.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          examples:
+            notFound:
+              value:
+                type: https://nene-records.dev/problems/not-found
+                title: Not Found
+                status: 404
+                detail: The requested resource was not found.
+                instance: /api/v1/entity-types/99
+    Conflict:
+      description: Request conflicts with current state.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          examples:
+            conflict:
+              value:
+                type: https://nene-records.dev/problems/conflict
+                title: Conflict
+                status: 409
+                detail: The slug is already in use.
+                instance: /api/v1/entity-types
+    ValidationFailed:
+      description: Validation failed.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ValidationProblemDetails'
+          examples:
+            validationFailed:
+              value:
+                type: https://nene-records.dev/problems/validation-failed
+                title: Validation Failed
+                status: 422
+                detail: One or more fields failed validation.
+                instance: /api/v1/entity-types
+                errors:
+                  - field: slug
+                    message: Slug is required.
+                    code: required
+    InternalServerError:
+      description: Internal server error.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          examples:
+            internal:
+              value:
+                type: https://nene-records.dev/problems/internal-server-error
+                title: Internal Server Error
+                status: 500
+                detail: An unexpected error occurred.
+                instance: /api/v1/entity-types
+  schemas:
+    HealthResponse:
+      type: object
+      required:
+        - status
+        - service
+      properties:
+        status:
+          type: string
+          enum:
+            - ok
+            - degraded
+        service:
+          type: string
+    ProblemDetails:
+      type: object
+      required:
+        - type
+        - title
+        - status
+        - instance
+      properties:
+        type:
+          type: string
+          format: uri
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        instance:
+          type: string
+    ValidationProblemDetails:
+      allOf:
+        - $ref: '#/components/schemas/ProblemDetails'
+        - type: object
+          required:
+            - errors
+          properties:
+            errors:
+              type: array
+              items:
+                $ref: '#/components/schemas/ValidationError'
+    ValidationError:
+      type: object
+      required:
+        - field
+        - message
+        - code
+      properties:
+        field:
+          type: string
+        message:
+          type: string
+        code:
+          type: string
+    EntityTypeResponse:
+      type: object
+      required:
+        - id
+        - name
+        - slug
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        slug:
+          type: string
+    CreateEntityTypeRequest:
+      type: object
+      required:
+        - name
+        - slug
+      properties:
+        name:
+          type: string
+          minLength: 1
+        slug:
+          type: string
+          pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$'
+      additionalProperties: false
+    UpdateEntityTypeRequest:
+      $ref: '#/components/schemas/CreateEntityTypeRequest'
+    EntityTypeListResponse:
+      type: object
+      required:
+        - items
+        - limit
+        - offset
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/EntityTypeResponse'
+        limit:
+          type: integer
+        offset:
+          type: integer
+    EntityResponse:
+      type: object
+      required:
+        - id
+        - entity_type_id
+        - is_deleted
+        - deleted_at
+      properties:
+        id:
+          type: integer
+          format: int64
+        entity_type_id:
+          type: integer
+          format: int64
+        is_deleted:
+          type: boolean
+        deleted_at:
+          type:
+            - string
+            - 'null'
+          format: date-time
+    CreateEntityRequest:
+      type: object
+      required:
+        - entity_type_id
+      properties:
+        entity_type_id:
+          type: integer
+          format: int64
+          minimum: 1
+      additionalProperties: false
+    UpdateEntityRequest:
+      type: object
+      required:
+        - entity_type_id
+      properties:
+        entity_type_id:
+          type: integer
+          format: int64
+          minimum: 1
+      additionalProperties: false
+    EntityListResponse:
+      type: object
+      required:
+        - items
+        - limit
+        - offset
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/EntityResponse'
+        limit:
+          type: integer
+        offset:
+          type: integer
+    TextFieldResponse:
+      type: object
+      required:
+        - id
+        - entity_id
+        - field_key
+        - value
+      properties:
+        id:
+          type: integer
+          format: int64
+        entity_id:
+          type: integer
+          format: int64
+        field_key:
+          type: string
+        value:
+          type: string
+    CreateTextFieldRequest:
+      type: object
+      required:
+        - entity_id
+        - field_key
+        - value
+      properties:
+        entity_id:
+          type: integer
+          format: int64
+          minimum: 1
+        field_key:
+          type: string
+          minLength: 1
+        value:
+          type: string
+      additionalProperties: false
+    UpdateTextFieldRequest:
+      type: object
+      required:
+        - field_key
+        - value
+      properties:
+        field_key:
+          type: string
+          minLength: 1
+        value:
+          type: string
+      additionalProperties: false
+    TextFieldListResponse:
+      type: object
+      required:
+        - items
+        - limit
+        - offset
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/TextFieldResponse'
+        limit:
+          type: integer
+        offset:
+          type: integer
