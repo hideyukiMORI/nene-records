@@ -1,10 +1,12 @@
 import type { Entity } from '@/entities/entity'
 import { Button, Stack, Text } from '@/shared/ui'
-import type { PublicFieldDisplay } from '../hooks/use-public-view-entity-record-page'
+import type { PublicFieldRow } from '../hooks/use-public-view-entity-record-page'
+import { PublicRelationFieldDisplay } from './PublicRelationFieldDisplay'
 
 export interface PublicRecordDetailViewProps {
   entity: Entity | null
-  fields: PublicFieldDisplay[]
+  fieldRows: PublicFieldRow[]
+  entityTypeSlugById: Record<number, string>
   isLoading: boolean
   isError: boolean
   errorTitle: string | null
@@ -13,7 +15,8 @@ export interface PublicRecordDetailViewProps {
 
 export function PublicRecordDetailView({
   entity,
-  fields,
+  fieldRows,
+  entityTypeSlugById,
   isLoading,
   isError,
   errorTitle,
@@ -39,22 +42,35 @@ export function PublicRecordDetailView({
     return <Text muted>Record not found.</Text>
   }
 
-  if (fields.length === 0) {
+  if (fieldRows.length === 0) {
     return <Text muted>No fields defined for this record.</Text>
   }
 
   return (
     <dl className="flex flex-col gap-stack-md">
-      {fields.map((field) => (
-        <div key={field.fieldKey} className="flex flex-col gap-stack-xs">
-          <Text as="dt" variant="heading-sm">
-            {field.fieldKey}
-          </Text>
-          <Text as="dd" muted>
-            {field.displayValue}
-          </Text>
-        </div>
-      ))}
+      {fieldRows.map((row) => {
+        if (row.kind === 'relation') {
+          return (
+            <PublicRelationFieldDisplay
+              key={row.fieldDef.fieldKey}
+              entityId={Number(entity.id)}
+              fieldDef={row.fieldDef}
+              entityTypeSlugById={entityTypeSlugById}
+            />
+          )
+        }
+
+        return (
+          <div key={row.fieldKey} className="flex flex-col gap-stack-xs">
+            <Text as="dt" variant="heading-sm">
+              {row.fieldKey}
+            </Text>
+            <Text as="dd" muted>
+              {row.displayValue}
+            </Text>
+          </div>
+        )
+      })}
     </dl>
   )
 }

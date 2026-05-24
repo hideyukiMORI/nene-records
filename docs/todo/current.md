@@ -6,13 +6,13 @@ Last updated: 2026-05-24
 
 | Issue | Summary |
 | --- | --- |
-| — | Consumer view relation links |
+| — | MCP relation tools |
 
 ## In Progress
 
 | Issue | Summary |
 | --- | --- |
-| — | （なし） |
+| #63 | Consumer view relation リンク表示 |
 
 ## Recently Completed
 

@@ -4,6 +4,7 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { PublicRecordDetailPage } from '@/pages/consumer/PublicRecordDetailPage'
 import { resetBoolFieldStore, seedBoolFields } from '@tests/msw/handlers/bool-field'
 import { resetEntityStore, seedEntities } from '@tests/msw/handlers/entity'
+import { resetEntityRelationStore, seedEntityRelations } from '@tests/msw/handlers/entity-relation'
 import { resetEntityTypeStore, seedEntityTypes } from '@tests/msw/handlers/entity-type'
 import { resetFieldDefStore, seedFieldDefs } from '@tests/msw/handlers/field-def'
 import { resetIntFieldStore, seedIntFields } from '@tests/msw/handlers/int-field'
@@ -30,6 +31,7 @@ describe('PublicRecordDetailPage', () => {
     mswServer.resetHandlers()
     resetEntityTypeStore()
     resetEntityStore()
+    resetEntityRelationStore()
     resetFieldDefStore()
     resetTextFieldStore()
     resetIntFieldStore()
@@ -90,6 +92,41 @@ describe('PublicRecordDetailPage', () => {
     expect(screen.getByText('42')).toBeInTheDocument()
     expect(screen.getByText('published')).toBeInTheDocument()
     expect(screen.getByText('Yes')).toBeInTheDocument()
+  })
+
+  it('renders relation fields as links to target records', async () => {
+    seedEntityTypes([
+      { id: 1, name: 'Article', slug: 'article' },
+      { id: 2, name: 'Author', slug: 'author' },
+    ])
+    seedEntities([
+      { id: 1, entity_type_id: 1, is_deleted: false, deleted_at: null },
+      { id: 2, entity_type_id: 2, is_deleted: false, deleted_at: null },
+    ])
+    seedFieldDefs([
+      { id: 1, entity_type_id: 1, field_key: 'title', data_type: 'text' },
+      {
+        id: 2,
+        entity_type_id: 1,
+        field_key: 'author',
+        data_type: 'relation',
+        target_entity_type_id: 2,
+        cardinality: 'one',
+      },
+    ])
+    seedTextFields([
+      { id: 1, entity_id: 1, field_key: 'title', value: 'My article' },
+      { id: 2, entity_id: 2, field_key: 'title', value: 'Alice' },
+    ])
+    seedEntityRelations([{ source_entity_id: 1, target_entity_id: 2, field_key: 'author' }])
+
+    renderDetailPage('article', 1)
+
+    expect(await screen.findByText('My article')).toBeInTheDocument()
+    expect(await screen.findByText('author')).toBeInTheDocument()
+
+    const authorLink = screen.getByRole('link', { name: 'Alice' })
+    expect(authorLink).toHaveAttribute('href', '/view/author/2')
   })
 
   it('shows not found for unknown entity type slug', async () => {

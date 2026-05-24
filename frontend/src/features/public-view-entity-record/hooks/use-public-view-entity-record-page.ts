@@ -1,6 +1,11 @@
 import { useMemo } from 'react'
 import type { FieldDataType } from '@/entities/field-def'
-import { defaultFieldDefListParams, useFieldDefList } from '@/entities/field-def'
+import {
+  defaultFieldDefListParams,
+  isRelationFieldDef,
+  useFieldDefList,
+  type RelationFieldDef,
+} from '@/entities/field-def'
 import { toEntityId, useEntity } from '@/entities/entity'
 import { useBoolFieldList } from '@/entities/bool-field'
 import { useDateTimeFieldList } from '@/entities/datetime-field'
@@ -11,11 +16,19 @@ import { formatFieldDisplayValue } from '@/shared/lib/format-field-display-value
 
 const FIELD_LIST_PARAMS = { limit: 100, offset: 0 } as const
 
-export interface PublicFieldDisplay {
+export interface PublicScalarFieldDisplay {
+  kind: 'scalar'
   fieldKey: string
-  dataType: FieldDataType
+  dataType: Exclude<FieldDataType, 'relation'>
   displayValue: string
 }
+
+export interface PublicRelationFieldRow {
+  kind: 'relation'
+  fieldDef: RelationFieldDef
+}
+
+export type PublicFieldRow = PublicScalarFieldDisplay | PublicRelationFieldRow
 
 export function usePublicViewEntityRecordPage(entityTypeId: number, entityId: number) {
   const listParams = useMemo(() => ({ ...FIELD_LIST_PARAMS, entityId }), [entityId])
@@ -28,10 +41,14 @@ export function usePublicViewEntityRecordPage(entityTypeId: number, entityId: nu
   const boolFieldQuery = useBoolFieldList(listParams)
   const dateTimeFieldQuery = useDateTimeFieldList(listParams)
 
-  const fields = useMemo((): PublicFieldDisplay[] => {
+  const fieldRows = useMemo((): PublicFieldRow[] => {
     const fieldDefs = fieldDefQuery.data?.items ?? []
 
-    return fieldDefs.map((fieldDef) => {
+    return fieldDefs.flatMap((fieldDef): PublicFieldRow[] => {
+      if (isRelationFieldDef(fieldDef)) {
+        return [{ kind: 'relation', fieldDef }]
+      }
+
       let raw: string | number | boolean | null = null
 
       switch (fieldDef.dataType) {
@@ -62,11 +79,14 @@ export function usePublicViewEntityRecordPage(entityTypeId: number, entityId: nu
           break
       }
 
-      return {
-        fieldKey: fieldDef.fieldKey,
-        dataType: fieldDef.dataType,
-        displayValue: formatFieldDisplayValue(fieldDef.dataType, raw),
-      }
+      return [
+        {
+          kind: 'scalar',
+          fieldKey: fieldDef.fieldKey,
+          dataType: fieldDef.dataType,
+          displayValue: formatFieldDisplayValue(fieldDef.dataType, raw),
+        },
+      ]
     })
   }, [
     boolFieldQuery.data?.items,
@@ -105,7 +125,7 @@ export function usePublicViewEntityRecordPage(entityTypeId: number, entityId: nu
 
   return {
     entity: entityQuery.data ?? null,
-    fields,
+    fieldRows,
     isLoading,
     isError,
     errorTitle,
