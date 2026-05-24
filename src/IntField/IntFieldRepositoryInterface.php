@@ -15,6 +15,13 @@ interface IntFieldRepositoryInterface
      */
     public function findAll(int $limit, int $offset): array;
 
+    /**
+     * Active (non-soft-deleted) rows for the given entity only.
+     *
+     * @return list<IntField>
+     */
+    public function findByEntityId(int $entityId, int $limit, int $offset): array;
+
     public function save(IntField $intField): int;
 
     public function update(IntField $intField): void;

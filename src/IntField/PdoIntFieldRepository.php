@@ -52,6 +52,25 @@ final readonly class PdoIntFieldRepository implements IntFieldRepositoryInterfac
         );
     }
 
+    /** @return list<IntField> */
+    public function findByEntityId(int $entityId, int $limit, int $offset): array
+    {
+        $rows = $this->query->fetchAll(
+            'SELECT id, entity_id, field_key, value FROM int_fields WHERE entity_id = ? AND is_deleted = 0 ORDER BY id ASC LIMIT ? OFFSET ?',
+            [$entityId, $limit, $offset],
+        );
+
+        return array_map(
+            static fn (array $row) => new IntField(
+                entityId: (int) $row['entity_id'],
+                fieldKey: (string) $row['field_key'],
+                value: (int) $row['value'],
+                id: (int) $row['id'],
+            ),
+            $rows,
+        );
+    }
+
     public function save(IntField $intField): int
     {
         $this->query->execute(

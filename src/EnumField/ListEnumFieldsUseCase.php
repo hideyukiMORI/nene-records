@@ -13,7 +13,9 @@ final readonly class ListEnumFieldsUseCase implements ListEnumFieldsUseCaseInter
 
     public function execute(ListEnumFieldsInput $input): ListEnumFieldsOutput
     {
-        $rows = $this->intFields->findAll($input->limit, $input->offset);
+        $rows = $input->entityId !== null
+            ? $this->intFields->findByEntityId($input->entityId, $input->limit, $input->offset)
+            : $this->intFields->findAll($input->limit, $input->offset);
 
         $items = array_map(
             static fn (EnumField $field) => new ListEnumFieldItem(

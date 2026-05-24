@@ -15,6 +15,13 @@ interface BoolFieldRepositoryInterface
      */
     public function findAll(int $limit, int $offset): array;
 
+    /**
+     * Active (non-soft-deleted) rows for the given entity only.
+     *
+     * @return list<BoolField>
+     */
+    public function findByEntityId(int $entityId, int $limit, int $offset): array;
+
     public function save(BoolField $intField): int;
 
     public function update(BoolField $intField): void;

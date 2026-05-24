@@ -59,6 +59,22 @@ final class InMemoryEnumFieldRepository implements EnumFieldRepositoryInterface
         return array_slice($active, $offset, $limit);
     }
 
+    /** @return list<EnumField> */
+    public function findByEntityId(int $entityId, int $limit, int $offset): array
+    {
+        $active = [];
+
+        foreach ($this->fields as $id => $textField) {
+            if (!isset($this->deletedIds[$id]) && $textField->entityId === $entityId) {
+                $active[] = $textField;
+            }
+        }
+
+        usort($active, static fn (EnumField $a, EnumField $b): int => ($a->id ?? 0) <=> ($b->id ?? 0));
+
+        return array_slice($active, $offset, $limit);
+    }
+
     public function save(EnumField $intField): int
     {
         $id = $this->nextId++;

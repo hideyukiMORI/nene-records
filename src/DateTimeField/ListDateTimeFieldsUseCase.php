@@ -13,7 +13,9 @@ final readonly class ListDateTimeFieldsUseCase implements ListDateTimeFieldsUseC
 
     public function execute(ListDateTimeFieldsInput $input): ListDateTimeFieldsOutput
     {
-        $rows = $this->intFields->findAll($input->limit, $input->offset);
+        $rows = $input->entityId !== null
+            ? $this->intFields->findByEntityId($input->entityId, $input->limit, $input->offset)
+            : $this->intFields->findAll($input->limit, $input->offset);
 
         $items = array_map(
             static fn (DateTimeField $field) => new ListDateTimeFieldItem(

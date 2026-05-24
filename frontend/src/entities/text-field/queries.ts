@@ -18,6 +18,9 @@ export function useTextFieldList(
         limit: String(params.limit),
         offset: String(params.offset),
       })
+      if (params.entityId !== undefined) {
+        search.set('entity_id', String(params.entityId))
+      }
       const dto = await apiClient.get<TextFieldListDto>(
         `/api/v1/text-fields?${search.toString()}`,
         signal,

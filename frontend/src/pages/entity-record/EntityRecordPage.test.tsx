@@ -3,8 +3,11 @@ import { cleanup, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { EntityRecordPage } from '@/pages/entity-record/EntityRecordPage'
+import { resetBoolFieldStore } from '@tests/msw/handlers/bool-field'
+import { resetDateTimeFieldStore } from '@tests/msw/handlers/datetime-field'
 import { resetEntityStore, seedEntities } from '@tests/msw/handlers/entity'
 import { resetEntityTypeStore, seedEntityTypes } from '@tests/msw/handlers/entity-type'
+import { resetEnumFieldStore } from '@tests/msw/handlers/enum-field'
 import { resetFieldDefStore, seedFieldDefs } from '@tests/msw/handlers/field-def'
 import { resetIntFieldStore } from '@tests/msw/handlers/int-field'
 import { resetTextFieldStore } from '@tests/msw/handlers/text-field'
@@ -38,6 +41,9 @@ describe('EntityRecordPage', () => {
     resetEntityStore()
     resetTextFieldStore()
     resetIntFieldStore()
+    resetEnumFieldStore()
+    resetBoolFieldStore()
+    resetDateTimeFieldStore()
     cleanup()
   })
 
@@ -147,6 +153,33 @@ describe('EntityRecordPage', () => {
 
     await waitFor(() => {
       expect(screen.getByLabelText('count (int)')).toHaveValue(42)
+    })
+  })
+
+  it('creates bool field values on save', async () => {
+    seedEntityTypes([{ id: 1, name: 'Article', slug: 'article' }])
+    seedFieldDefs([{ id: 1, entity_type_id: 1, field_key: 'enabled', data_type: 'bool' }])
+    seedEntities([
+      {
+        id: 1,
+        entity_type_id: 1,
+        is_deleted: false,
+        deleted_at: null,
+      },
+    ])
+
+    const user = userEvent.setup()
+    renderEntityRecordPage()
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('enabled (bool)')).toBeInTheDocument()
+    })
+
+    await user.click(screen.getByLabelText('enabled (bool)'))
+    await user.click(screen.getByRole('button', { name: 'Save values' }))
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('enabled (bool)')).toBeChecked()
     })
   })
 })

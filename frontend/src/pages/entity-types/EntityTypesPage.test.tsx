@@ -23,6 +23,14 @@ function getCreateForm(): HTMLElement {
   return form
 }
 
+function getEditForm(): HTMLElement {
+  const form = screen.getByRole('heading', { name: 'Edit entity type' }).closest('form')
+  if (form === null) {
+    throw new Error('Edit entity type form not found')
+  }
+  return form
+}
+
 describe('EntityTypesPage', () => {
   beforeAll(() => {
     mswServer.listen()
@@ -69,6 +77,39 @@ describe('EntityTypesPage', () => {
     expect(
       await screen.findByText('Use lowercase letters, numbers, and hyphens'),
     ).toBeInTheDocument()
+  })
+
+  it('updates an entity type name and slug', async () => {
+    const user = userEvent.setup()
+    renderEntityTypesPage()
+
+    await user.type(screen.getByLabelText('Name'), 'Article')
+    await user.type(screen.getByLabelText('Slug'), 'article')
+    const createForm = getCreateForm()
+    await user.click(within(createForm).getByRole('button', { name: 'Create entity type' }))
+
+    await waitFor(() => {
+      expect(screen.getByText('Article')).toBeInTheDocument()
+    })
+
+    await user.click(screen.getByRole('button', { name: 'Edit' }))
+
+    const editForm = getEditForm()
+    const nameInput = within(editForm).getByLabelText('Name')
+    const slugInput = within(editForm).getByLabelText('Slug')
+
+    await user.clear(nameInput)
+    await user.type(nameInput, 'Blog post')
+    await user.clear(slugInput)
+    await user.type(slugInput, 'blog-post')
+    await user.click(within(editForm).getByRole('button', { name: 'Save changes' }))
+
+    await waitFor(() => {
+      expect(screen.getByText('Blog post')).toBeInTheDocument()
+      expect(screen.getByText('blog-post')).toBeInTheDocument()
+      expect(screen.queryByText('Article')).not.toBeInTheDocument()
+      expect(screen.queryByText('article')).not.toBeInTheDocument()
+    })
   })
 
   it('deletes an entity type after confirmation', async () => {

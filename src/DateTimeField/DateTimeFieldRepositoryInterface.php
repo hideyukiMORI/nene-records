@@ -15,6 +15,13 @@ interface DateTimeFieldRepositoryInterface
      */
     public function findAll(int $limit, int $offset): array;
 
+    /**
+     * Active (non-soft-deleted) rows for the given entity only.
+     *
+     * @return list<DateTimeField>
+     */
+    public function findByEntityId(int $entityId, int $limit, int $offset): array;
+
     public function save(DateTimeField $intField): int;
 
     public function update(DateTimeField $intField): void;

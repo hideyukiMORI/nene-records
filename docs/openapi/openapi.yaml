@@ -577,6 +577,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/LimitQuery'
         - $ref: '#/components/parameters/OffsetQuery'
+        - $ref: '#/components/parameters/EntityIdQuery'
       responses:
         '200':
           description: Paginated text field list.
@@ -732,6 +733,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/LimitQuery'
         - $ref: '#/components/parameters/OffsetQuery'
+        - $ref: '#/components/parameters/EntityIdQuery'
       responses:
         '200':
           description: Paginated int field list.
@@ -887,6 +889,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/LimitQuery'
         - $ref: '#/components/parameters/OffsetQuery'
+        - $ref: '#/components/parameters/EntityIdQuery'
       responses:
         '200':
           description: Paginated enum field list.
@@ -1042,6 +1045,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/LimitQuery'
         - $ref: '#/components/parameters/OffsetQuery'
+        - $ref: '#/components/parameters/EntityIdQuery'
       responses:
         '200':
           description: Paginated bool field list.
@@ -1197,6 +1201,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/LimitQuery'
         - $ref: '#/components/parameters/OffsetQuery'
+        - $ref: '#/components/parameters/EntityIdQuery'
       responses:
         '200':
           description: Paginated datetime field list.
@@ -1517,6 +1522,15 @@ components:
       example: 0
     EntityTypeIdQuery:
       name: entity_type_id
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int64
+        minimum: 1
+      example: 1
+    EntityIdQuery:
+      name: entity_id
       in: query
       required: false
       schema:

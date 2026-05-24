@@ -13,7 +13,9 @@ final readonly class ListIntFieldsUseCase implements ListIntFieldsUseCaseInterfa
 
     public function execute(ListIntFieldsInput $input): ListIntFieldsOutput
     {
-        $rows = $this->intFields->findAll($input->limit, $input->offset);
+        $rows = $input->entityId !== null
+            ? $this->intFields->findByEntityId($input->entityId, $input->limit, $input->offset)
+            : $this->intFields->findAll($input->limit, $input->offset);
 
         $items = array_map(
             static fn (IntField $field) => new ListIntFieldItem(

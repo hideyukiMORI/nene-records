@@ -21,3 +21,10 @@ export function useCreateEntityTypeForm() {
     },
   })
 }
+
+export function useEditEntityTypeForm(defaultValues: CreateEntityTypeFormValues) {
+  return useForm<CreateEntityTypeFormValues>({
+    resolver: zodResolver(createEntityTypeFormSchema),
+    defaultValues,
+  })
+}

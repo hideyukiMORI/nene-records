@@ -223,6 +223,56 @@ final class TextFieldHttpTest extends TestCase
         self::assertStringEndsWith('not-found', (string) $payload['type']);
     }
 
+    public function testListTextFieldsFiltersByEntityId(): void
+    {
+        $typeId = $this->entityTypes->save(new EntityType(name: 'Item', slug: 'item'));
+        $this->fieldDefs->save(new FieldDef(entityTypeId: $typeId, fieldKey: 'title', dataType: 'text'));
+        $this->fieldDefs->save(new FieldDef(entityTypeId: $typeId, fieldKey: 'body', dataType: 'text'));
+
+        $bodyEntity = $this->factory->createStream(json_encode(['entity_type_id' => $typeId], JSON_THROW_ON_ERROR));
+
+        $entityAResponse = $this->application->handle(
+            $this->factory->createServerRequest('POST', 'https://example.test/api/v1/entities')->withBody($bodyEntity),
+        );
+        $entityAId = (int) $this->decodeJson($entityAResponse)['id'];
+
+        $entityBResponse = $this->application->handle(
+            $this->factory->createServerRequest('POST', 'https://example.test/api/v1/entities')->withBody(
+                $this->factory->createStream(json_encode(['entity_type_id' => $typeId], JSON_THROW_ON_ERROR)),
+            ),
+        );
+        $entityBId = (int) $this->decodeJson($entityBResponse)['id'];
+
+        $bodyA = $this->factory->createStream(json_encode([
+            'entity_id' => $entityAId,
+            'field_key' => 'title',
+            'value' => 'Entity A title',
+        ], JSON_THROW_ON_ERROR));
+        $this->application->handle(
+            $this->factory->createServerRequest('POST', 'https://example.test/api/v1/text-fields')->withBody($bodyA),
+        );
+
+        $bodyB = $this->factory->createStream(json_encode([
+            'entity_id' => $entityBId,
+            'field_key' => 'body',
+            'value' => 'Entity B body',
+        ], JSON_THROW_ON_ERROR));
+        $this->application->handle(
+            $this->factory->createServerRequest('POST', 'https://example.test/api/v1/text-fields')->withBody($bodyB),
+        );
+
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('GET', "https://example.test/api/v1/text-fields?entity_id={$entityAId}"),
+        );
+        $payload = $this->decodeJson($response);
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertCount(1, $payload['items']);
+        self::assertSame($entityAId, $payload['items'][0]['entity_id']);
+        self::assertSame('title', $payload['items'][0]['field_key']);
+        self::assertSame('Entity A title', $payload['items'][0]['value']);
+    }
+
     /**
      * @return array<string, mixed>
      */
