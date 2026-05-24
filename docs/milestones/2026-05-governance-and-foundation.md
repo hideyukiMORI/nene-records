@@ -12,6 +12,7 @@ Goal: establish NeNe Records engineering discipline inherited from NENE2 before 
 - [x] `docs/review/` initial self-review checklists
 - [x] ADR 0001 accepted
 - [x] `docs/roadmap.md` and `docs/todo/current.md` initialized
+- [x] Workspace handoff and product vision documented (Issue #4)
 
 ## Issues
 
