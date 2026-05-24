@@ -1,7 +1,7 @@
 import type { FieldDefId } from './ids'
 
 export interface FieldDefListParams {
-  entityTypeId: number
+  entityTypeId?: number
   limit: number
   offset: number
 }

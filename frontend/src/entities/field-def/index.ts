@@ -18,4 +18,9 @@ export { isRelationFieldDef } from './model'
 export { fieldDefKeys } from './query-keys'
 export type { FieldDefListParams } from './query-keys'
 export { useCreateFieldDef, useDeleteFieldDef, useUpdateFieldDef } from './mutations'
-export { defaultFieldDefListParams, useFieldDef, useFieldDefList } from './queries'
+export {
+  allFieldDefListParams,
+  defaultFieldDefListParams,
+  useFieldDef,
+  useFieldDefList,
+} from './queries'

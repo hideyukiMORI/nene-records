@@ -6,6 +6,7 @@ import {
 } from '@/features/edit-entity-text-fields'
 import { ManageEntityTagsView, useManageEntityTagsPage } from '@/features/manage-entity-tags'
 import { ManageEntityRelationsView } from '@/features/manage-entity-relations'
+import { InverseEntityRelationsView } from '@/features/inverse-entity-relations'
 import { Button, Stack, Text } from '@/shared/ui'
 
 export function EntityRecordPage() {
@@ -87,6 +88,7 @@ export function EntityRecordPage() {
         onDetach={detachTag}
       />
       <ManageEntityRelationsView entityId={entityId} entityTypeId={entityTypeId} />
+      <InverseEntityRelationsView entityId={entityId} entityTypeId={entityTypeId} />
     </Stack>
   )
 }

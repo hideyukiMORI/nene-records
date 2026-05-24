@@ -1,0 +1,6 @@
+export { useInverseRelationFieldDefs } from './hooks/use-inverse-relation-field-defs'
+export { useInverseRelationPanel } from './hooks/use-inverse-relation-panel'
+export { InverseEntityRelationsView } from './ui/InverseEntityRelationsView'
+export { InverseRelationPanel } from './ui/InverseRelationPanel'
+export type { InverseEntityRelationsViewProps } from './ui/InverseEntityRelationsView'
+export type { InverseRelationPanelProps } from './ui/InverseRelationPanel'
