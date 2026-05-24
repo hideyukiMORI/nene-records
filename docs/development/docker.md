@@ -114,6 +114,18 @@ Inside the app container:
 docker compose exec app composer check
 ```
 
+## Demo blog data (optional)
+
+To populate Consumer View with ~50 English blog posts via the HTTP API:
+
+```bash
+docker compose exec app php tools/seed-blog-demo.php http://localhost
+```
+
+Then browse http://localhost:5173/view/blog (frontend dev server required).
+
+See [`tools/README.md`](../tools/README.md) for details. The seed script is idempotent.
+
 ## Stop
 
 ```bash
