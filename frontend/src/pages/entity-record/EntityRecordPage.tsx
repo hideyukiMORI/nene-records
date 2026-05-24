@@ -4,6 +4,7 @@ import {
   EditEntityTextFieldsView,
   useEditEntityTextFieldsPage,
 } from '@/features/edit-entity-text-fields'
+import { ManageEntityTagsView, useManageEntityTagsPage } from '@/features/manage-entity-tags'
 import { Button, Stack, Text } from '@/shared/ui'
 
 export function EntityRecordPage() {
@@ -24,6 +25,22 @@ export function EntityRecordPage() {
     isSaving,
     saveErrorTitle,
   } = useEditEntityTextFieldsPage(entityTypeId, entityId)
+
+  const {
+    attachedTags,
+    availableTags,
+    selectedTagId,
+    setSelectedTagId,
+    isLoading: isTagsLoading,
+    isError: isTagsError,
+    errorTitle: tagsErrorTitle,
+    isAttaching,
+    attachErrorTitle,
+    isDetaching,
+    attachTag,
+    detachTag,
+    refetch: refetchTags,
+  } = useManageEntityTagsPage(entityId)
 
   return (
     <Stack gap="md">
@@ -50,6 +67,23 @@ export function EntityRecordPage() {
           void refetch()
         }}
         onSave={saveTextFields}
+      />
+      <ManageEntityTagsView
+        attachedTags={attachedTags}
+        availableTags={availableTags}
+        selectedTagId={selectedTagId}
+        isLoading={isTagsLoading}
+        isError={isTagsError}
+        errorTitle={tagsErrorTitle}
+        isAttaching={isAttaching}
+        attachErrorTitle={attachErrorTitle}
+        isDetaching={isDetaching}
+        onSelectedTagIdChange={setSelectedTagId}
+        onRetry={() => {
+          void refetchTags()
+        }}
+        onAttach={attachTag}
+        onDetach={detachTag}
       />
     </Stack>
   )
