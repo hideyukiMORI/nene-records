@@ -295,6 +295,28 @@ $tools = [
         ['id'],
         'Get an entity record by id.',
     ),
+    readTool(
+        'getPublicRecordView',
+        'Get Public Record View',
+        'Aggregated bootstrap payload for a public consumer record detail page.',
+        'getPublicRecordView',
+        'GET',
+        '/api/v1/public/entity-types/{slug}/records/{entityId}',
+        [
+            'slug' => [
+                'type' => 'string',
+                'minLength' => 1,
+                'description' => 'Entity type slug.',
+            ],
+            'entityId' => [
+                'type' => 'integer',
+                'minimum' => 1,
+                'description' => 'Entity instance id.',
+            ],
+        ],
+        '#/components/schemas/PublicRecordViewResponse',
+        ['slug', 'entityId'],
+    ),
     idTool(
         'updateEntityById',
         'Update Entity',

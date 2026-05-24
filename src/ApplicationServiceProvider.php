@@ -42,6 +42,9 @@ use NeNeRecords\IntField\FieldKeyNotRegisteredExceptionHandler as IntFieldKeyNot
 use NeNeRecords\IntField\FieldTypeMismatchExceptionHandler as IntFieldTypeMismatchExceptionHandler;
 use NeNeRecords\IntField\IntFieldNotFoundExceptionHandler;
 use NeNeRecords\IntField\IntFieldServiceProvider;
+use NeNeRecords\PublicRecord\PublicEntityTypeNotFoundExceptionHandler;
+use NeNeRecords\PublicRecord\PublicRecordNotFoundExceptionHandler;
+use NeNeRecords\PublicRecord\PublicRecordServiceProvider;
 use NeNeRecords\Tag\TagNotFoundExceptionHandler;
 use NeNeRecords\Tag\TagServiceProvider;
 use NeNeRecords\Tag\TagSlugConflictExceptionHandler;
@@ -71,7 +74,8 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
             ->addProvider(new TagServiceProvider())
             ->addProvider(new EntityTagServiceProvider())
             ->addProvider(new EntityRelationServiceProvider())
-            ->addProvider(new AnalyticsServiceProvider());
+            ->addProvider(new AnalyticsServiceProvider())
+            ->addProvider(new PublicRecordServiceProvider());
 
         $builder
             ->set(
@@ -89,6 +93,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $entityTag = $container->get('nene-records.route_registrar.entity_tag');
                     $entityRelation = $container->get('nene-records.route_registrar.entity_relation');
                     $analytics = $container->get('nene-records.route_registrar.analytics');
+                    $publicRecord = $container->get('nene-records.route_registrar.public_record');
 
                     if (
                         !is_callable($entityType)
@@ -103,6 +108,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         || !is_callable($entityTag)
                         || !is_callable($entityRelation)
                         || !is_callable($analytics)
+                        || !is_callable($publicRecord)
                     ) {
                         throw new LogicException('Route registrar service is invalid.');
                     }
@@ -120,6 +126,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $entityTag,
                         $entityRelation,
                         $analytics,
+                        $publicRecord,
                     ];
                 },
             )
@@ -155,6 +162,8 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $relationTargetTypeMismatch = $container->get(RelationTargetTypeMismatchExceptionHandler::class);
                     $relationAlreadyAttached = $container->get(RelationAlreadyAttachedExceptionHandler::class);
                     $relationNotAttached = $container->get(RelationNotAttachedExceptionHandler::class);
+                    $publicEntityTypeNotFound = $container->get(PublicEntityTypeNotFoundExceptionHandler::class);
+                    $publicRecordNotFound = $container->get(PublicRecordNotFoundExceptionHandler::class);
 
                     foreach ([
                         $entityTypeNotFound,
@@ -186,6 +195,8 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $relationTargetTypeMismatch,
                         $relationAlreadyAttached,
                         $relationNotAttached,
+                        $publicEntityTypeNotFound,
+                        $publicRecordNotFound,
                     ] as $handler) {
                         if (!$handler instanceof DomainExceptionHandlerInterface) {
                             throw new LogicException('Exception handler service is invalid.');
@@ -222,6 +233,8 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $relationTargetTypeMismatch,
                         $relationAlreadyAttached,
                         $relationNotAttached,
+                        $publicEntityTypeNotFound,
+                        $publicRecordNotFound,
                     ];
                 },
             );
