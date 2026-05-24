@@ -9,6 +9,8 @@ NeNe Records is built through small, Issue-driven changes. This document is the 
 | NENE2 inheritance map | `docs/inheritance-from-nene2.md` |
 | Workflow | `docs/workflow.md` |
 | Coding standards | `docs/development/coding-standards.md` |
+| Backend standards (PHP/API) | `docs/development/backend-standards.md` |
+| Frontend standards (Phase 4+) | `docs/development/frontend-standards.md` |
 | Commit messages | `docs/development/commit-conventions.md` |
 | AI tools | `docs/integrations/ai-tools.md` |
 | Agent entry point | `AGENTS.md` |

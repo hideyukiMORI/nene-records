@@ -1,0 +1,49 @@
+---
+description: NeNe Records フロント（React/TS）— 厳格アーキテクチャ・データフロー・テスト規約（Phase 4+）
+globs: "frontend/**/*.{ts,tsx}"
+alwaysApply: false
+---
+
+# Frontend React / TypeScript
+
+正本: **`docs/development/frontend-standards.md`**（違反はマージ不可）
+
+## アーキテクチャ
+
+- レイヤー: `app → pages → features → entities → shared`。上向き・feature 横断 import 禁止。
+- 公開面: `entities/{resource}/index.ts` と `features/{feature}/index.ts` のみから import。
+- Phase 1（Issue #1）ではフロント実装しない。
+
+## 配置（zero tolerance）
+
+- model / enum / ids / api-types / mapper / query-keys / queries / mutations は `entities/{resource}/` の規定ファイルのみ。
+- generated 型は `shared/api/generated/` のみ。features / pages / `*.tsx` から DTO を import しない。
+- HTTP は `shared/api/client.ts` のみ。
+
+## データフロー
+
+- Read: API → client → mapper → entity query → feature hook → UI（UI は model のみ）。
+- Write: UI → mutation hook → client → API → 明示的 invalidation。
+- `useEffect` + fetch 禁止。Query cache を useState に複製しない。
+- loading / empty / error / success を明示。
+
+## デザインパターン
+
+- Hook + View（`features/*/hooks` + `features/*/ui`）。`shared/ui` にドメインロジックなし。
+- TanStack Query v5。query key は factory のみ。
+- Form: React Hook Form + Zod（UX 用）。破壊的操作は confirm dialog。
+- named export のみ。class component / default export 禁止。
+
+## 型・セキュリティ
+
+- TS strict + `noUncheckedIndexedAccess`。`any` / 無理由 `@ts-ignore` / `!` 禁止。
+- 401/403 fail closed。秘密情報をソースに埋め込まない。
+
+## テスト
+
+- Vitest + Testing Library + MSW。mapper / feature の happy + error path 必須。
+- factories は model 用。MSW は OpenAPI 準拠。
+
+## CI
+
+- `npm run check --prefix frontend` 必須。ESLint boundary 違反は fail。

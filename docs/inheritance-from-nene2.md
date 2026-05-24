@@ -51,6 +51,8 @@ Install NENE2 as a Composer dependency and treat `vendor/hideyukimori/nene2/docs
 | Public Problem Details base URL | `https://nene-records.dev/problems/` (application errors) |
 | NENE2 framework errors | Keep NENE2 canonical types when surfaced by the runtime |
 | Coding standards | `docs/development/coding-standards.md` — NENE2 baseline + entity-platform additions |
+| Backend standards | `docs/development/backend-standards.md` — PHP/API strict policy (NENE2 consumer) |
+| Frontend standards | `docs/development/frontend-standards.md` — React + TypeScript strict policy (Phase 4+ implementation) |
 | Language policy | English for public docs, OpenAPI, and API error metadata; Japanese allowed in Issues, PRs, commits, and `.cursor/rules/` |
 | Review checklists | `docs/review/` — task-specific lists for this product |
 
