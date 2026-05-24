@@ -12,7 +12,7 @@ New contributors and AI agents: read [`handoff-2026-05-24-workspace-switch.md`](
 
 | Issue | Branch | Summary |
 | --- | --- | --- |
-| #30 | `feat/30-text-fields-ui` | text_fields 値編集 UI（レコード詳細） |
+| #32 | `feat/32-record-list-labels` | レコード一覧に title 表示 |
 
 ## Up Next
 
@@ -27,19 +27,18 @@ New contributors and AI agents: read [`handoff-2026-05-24-workspace-switch.md`](
 
 | Issue | Summary |
 | --- | --- |
+| #30 | text_fields 値編集 UI (PR #31) |
 | #28 | field_defs 一覧・作成・削除 UI (PR #29) |
 | #26 | Entity（Record）一覧・作成・削除 UI (PR #27) |
 | #24 | Entity type 作成・一覧・削除 UI (PR #25) |
 | #22 | Docker compose (PR #23) |
 | #20 | Phase 4 Admin React scaffold (PR #21) |
-| #18 | Frontend design system / Storybook (PR #19) |
-| #16 | Tags + entity list filters (PR #17) — **Phase 3 complete** |
 
 ## Handoff Notes
 
-- **Phase 4:** entity types → field defs → records → text field values admin flow.
-- text-fields list has no `entity_id` filter yet; frontend filters client-side (limit 100).
-- Run admin UI: `npm run dev --prefix frontend` + Docker API on :8080.
+- **Phase 4:** entity types → field defs → records → text values — admin loop complete for text.
+- text-fields list: client-side filter (limit 100) until API adds `entity_id` query.
+- Run: `npm run dev --prefix frontend` + Docker API :8080.
 
 ## Verification Commands
 

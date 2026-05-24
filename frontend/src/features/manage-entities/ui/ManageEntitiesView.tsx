@@ -8,6 +8,7 @@ export interface ManageEntitiesViewProps {
   entityTypeName: string | null
   entityTypeSlug: string | null
   items: Entity[]
+  recordLabels: Record<string, string>
   total: number
   isLoading: boolean
   isError: boolean
@@ -28,6 +29,7 @@ export function ManageEntitiesView({
   entityTypeName,
   entityTypeSlug,
   items,
+  recordLabels,
   total,
   isLoading,
   isError,
@@ -65,6 +67,7 @@ export function ManageEntitiesView({
           <EntityListPanel
             entityTypeId={entityTypeId}
             items={items}
+            recordLabels={recordLabels}
             isLoading={isLoading}
             isError={isError}
             errorTitle={errorTitle}
