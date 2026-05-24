@@ -24,7 +24,7 @@
 
 - OpenAPI 3.1 contract: [docs/openapi/openapi.yaml](./docs/openapi/openapi.yaml)
 - Base URL (local): http://localhost:8080
-- Auth: Bearer JWT via `POST /api/v1/auth/login`
+- Auth: Bearer JWT via `POST /api/v1/auth/login` — roles: `admin` (full access), `editor` (content + settings read)
 
 ### Key endpoints
 

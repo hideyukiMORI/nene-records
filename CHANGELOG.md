@@ -9,10 +9,18 @@ NeNe Records does not yet follow Semantic Versioning — entries are grouped by 
 ## [Unreleased]
 
 ### Added
+- Admin / editor roles with JWT-embedded `role` and `CapabilityMiddleware` on mutating routes (#108, PR #111)
+- Entity archive before entity type purge — JSON snapshot + CSV download API (PR #107)
+- Default user seed migration — `admin@nene-records.local` / `editor@nene-records.local` (#108)
+- Admin UI role-based nav and button visibility; 403 → `/forbidden` page (#108)
 - `CHANGELOG.md` — this file (#94)
 - `SECURITY.md` — vulnerability reporting policy (#97)
 - `llms.txt` — LLM crawler summary (#96)
 - README badges and OSS-ready copy (#98)
+
+### Fixed
+- Entity type delete failing with 500 when soft-deleted entities existed (FK RESTRICT + count mismatch) (#106, PR #106)
+- ConfirmDialog not clearing delete mutation error on reopen (#106)
 
 ---
 

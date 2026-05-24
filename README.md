@@ -52,18 +52,20 @@ AI clients (MCP)        ──┘
 
 **M1 — Usable Blog CMS: complete (2026-05-24)**
 
+**M2 — Team-Ready CMS: in progress** — roles done; i18n infrastructure next
+
 | Area | State |
 | --- | --- |
-| Entity model | entity_types, entities, 6 typed field tables, relations, tags |
+| Entity model | entity_types, entities, 6 typed field tables, relations, tags, entity archive |
 | Admin UI | entity types, field defs, records, tags, relations, site settings, login |
-| Auth | JWT Bearer — Admin login, protected mutating endpoints |
+| Auth | JWT Bearer — admin / editor roles, capability checks on mutating endpoints (#108) |
 | Publish workflow | `draft` / `published` / `archived` + `published_at` |
 | Public consumer | `/view/{type}/{slug}`, Markdown body, site settings |
 | OpenAPI | 3.1 contract, validated on every CI run |
 | MCP tools | 60+ tools auto-generated from OpenAPI |
-| CI | Backend (PHPUnit 178 tests / PHPStan / CS-Fixer / OpenAPI / MCP) + Frontend (ESLint / TypeScript / Vitest) |
+| CI | Backend (PHPUnit 193 tests / PHPStan / CS-Fixer / OpenAPI / MCP) + Frontend (ESLint / TypeScript / Vitest) |
 
-Next up: **M2 — Team-Ready CMS** (roles, entity revisions, image upload, per-record SEO, navigation).
+Next up: **M2 — Team-Ready CMS** (admin i18n #109–#110, entity revisions, image upload, per-record SEO, navigation).
 See [`docs/roadmap.md`](./docs/roadmap.md) and [`docs/todo/current.md`](./docs/todo/current.md).
 
 ## Contributing

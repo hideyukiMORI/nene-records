@@ -87,7 +87,7 @@ Goal: operate as a small headless CMS — auth, publish workflow, media, SEO, re
 Policy: same API-first boundary; no WordPress compatibility.
 
 - **M1 Usable Blog CMS:** ✅ 完了（2026-05-24）— Markdown consumer, publish status, JWT auth, public slugs, CI, OSS prep
-- **M2 Team-Ready:** roles, entity revisions, image/file upload, navigation, per-record SEO
+- **M2 Team-Ready:** 進行中 — roles ✅ (#108)、admin i18n (#109–#110)、entity revisions, image/file upload, navigation, per-record SEO
 - **M3 Platform:** full-text search, scheduled publish, webhooks, import/export
 
 Tracked by `docs/milestones/2026-06-cms-mid-term.md` (Issue #82).

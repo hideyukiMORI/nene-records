@@ -31,6 +31,6 @@ Flexible entity platform — lighter and more typed than WordPress post meta. Ad
 ## Verification
 
 ```bash
-composer check                    # 178 tests + PHPStan + CS-Fixer + OpenAPI + MCP
+composer check                    # 193 tests + PHPStan + CS-Fixer + OpenAPI + MCP
 npm run check --prefix frontend   # type-check + lint + test + storybook
 ```
