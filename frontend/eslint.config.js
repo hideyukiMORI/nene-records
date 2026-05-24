@@ -55,6 +55,14 @@ const importZones = [
     target: './src/shared/ui',
     from: './src/shared/api',
   },
+  {
+    target: './src/features/public-browse-entity-records',
+    from: './src/features/manage-*',
+  },
+  {
+    target: './src/features/public-view-entity-record',
+    from: './src/features/manage-*',
+  },
 ]
 
 export default tseslint.config(

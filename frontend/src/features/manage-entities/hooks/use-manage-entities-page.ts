@@ -8,7 +8,7 @@ import {
   type EntityId,
 } from '@/entities/entity'
 import { useTextFieldList } from '@/entities/text-field'
-import { getRecordDisplayLabel } from '../lib/get-record-display-label'
+import { getRecordDisplayLabel } from '@/shared/lib/get-record-display-label'
 
 export function useManageEntitiesPage(entityTypeId: number) {
   const listParams = defaultEntityListParams(entityTypeId)
