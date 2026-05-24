@@ -6,7 +6,7 @@ Last updated: 2026-05-24
 
 | Issue | Summary |
 | --- | --- |
-| — | MCP relation tools |
+| — | Phase 5: 全 API MCP カタログ拡充 |
 
 ## In Progress
 
@@ -18,6 +18,7 @@ Last updated: 2026-05-24
 
 | Issue | Summary |
 | --- | --- |
+| #65 | MCP relation tools カタログ (PR #66) |
 | #63 | Consumer view relation リンク表示 (PR #64) |
 | #61 | Record 詳細 inverse relation 参照元一覧 UI (PR #62) |
 | #59 | Records 一覧 relation フィルタ UI (PR #60) |
@@ -35,12 +36,12 @@ Last updated: 2026-05-24
 
 - **API（済）:** tags CRUD, entity_tags, entities `?tags=` フィルタ
 - **Admin UI（済）:** Tag CRUD (#44), Record tag attach/detach (#46), Records 一覧 tag フィルタ (#48)
-- **Relations（済）:** API #51, Admin UI #52, list filter #57/#59, inverse UI #61, Consumer view #63
-- **Relations 後続:** MCP
+- **Relations（済）:** API #51, Admin UI #52, list filter #57/#59, inverse UI #61, Consumer view #63, MCP #65
+- **Relations 後続:** detach MCP（upstream 待ち）、Phase 5 全 API MCP 化
 
 ## Verification
 
 ```bash
-composer check                    # 144 tests
+composer check                    # 144 tests + openapi + mcp
 npm run check --prefix frontend   # 65 tests
 ```
