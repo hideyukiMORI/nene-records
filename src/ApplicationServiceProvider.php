@@ -21,6 +21,7 @@ use NeNeRecords\DateTimeField\FieldTypeMismatchExceptionHandler as DateTimeField
 use NeNeRecords\Entity\DuplicateEntitySlugExceptionHandler;
 use NeNeRecords\Entity\EntityNotFoundExceptionHandler;
 use NeNeRecords\Entity\EntityServiceProvider;
+use NeNeRecords\EntityArchive\EntityArchiveServiceProvider;
 use NeNeRecords\EntityRelation\EntityRelationServiceProvider;
 use NeNeRecords\EntityRelation\FieldKeyNotRegisteredExceptionHandler as EntityRelationFieldKeyNotRegisteredExceptionHandler;
 use NeNeRecords\EntityRelation\FieldTypeMismatchExceptionHandler as EntityRelationFieldTypeMismatchExceptionHandler;
@@ -69,6 +70,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
     public function register(ContainerBuilder $builder): void
     {
         $builder
+            ->addProvider(new EntityArchiveServiceProvider())
             ->addProvider(new EntityTypeServiceProvider())
             ->addProvider(new FieldDefServiceProvider())
             ->addProvider(new EntityServiceProvider())
@@ -89,6 +91,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                 self::ROUTE_REGISTRARS,
                 static function (ContainerInterface $container): array {
                     $entityType = $container->get('nene-records.route_registrar.entity_type');
+                    $entityArchive = $container->get('nene-records.route_registrar.entity_archive');
                     $fieldDef = $container->get('nene-records.route_registrar.field_def');
                     $entity = $container->get('nene-records.route_registrar.entity');
                     $textField = $container->get('nene-records.route_registrar.text_field');
@@ -106,6 +109,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
 
                     if (
                         !is_callable($entityType)
+                        || !is_callable($entityArchive)
                         || !is_callable($fieldDef)
                         || !is_callable($entity)
                         || !is_callable($textField)
@@ -127,6 +131,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     return [
                         $auth,
                         $entityType,
+                        $entityArchive,
                         $fieldDef,
                         $entity,
                         $textField,

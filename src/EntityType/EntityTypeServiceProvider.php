@@ -11,6 +11,7 @@ use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use NeNeRecords\Entity\EntityRepositoryInterface;
+use NeNeRecords\EntityArchive\EntityArchiveRepositoryInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 
@@ -94,6 +95,7 @@ final readonly class EntityTypeServiceProvider implements ServiceProviderInterfa
                 static function (ContainerInterface $c): DeleteEntityTypeUseCaseInterface {
                     $repository = $c->get(EntityTypeRepositoryInterface::class);
                     $entities = $c->get(EntityRepositoryInterface::class);
+                    $archive = $c->get(EntityArchiveRepositoryInterface::class);
 
                     if (!$repository instanceof EntityTypeRepositoryInterface) {
                         throw new LogicException('Entity type repository service is invalid.');
@@ -103,7 +105,11 @@ final readonly class EntityTypeServiceProvider implements ServiceProviderInterfa
                         throw new LogicException('Entity repository service is invalid.');
                     }
 
-                    return new DeleteEntityTypeUseCase($repository, $entities);
+                    if (!$archive instanceof EntityArchiveRepositoryInterface) {
+                        throw new LogicException('Entity archive repository service is invalid.');
+                    }
+
+                    return new DeleteEntityTypeUseCase($repository, $entities, $archive);
                 },
             )
             ->set(

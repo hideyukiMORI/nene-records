@@ -69,10 +69,10 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
         return $row !== null;
     }
 
-    public function existsByEntityTypeId(int $entityTypeId): bool
+    public function existsActiveByEntityTypeId(int $entityTypeId): bool
     {
         $row = $this->query->fetchOne(
-            'SELECT id FROM entities WHERE entity_type_id = ? LIMIT 1',
+            'SELECT id FROM entities WHERE entity_type_id = ? AND is_deleted = 0 LIMIT 1',
             [$entityTypeId],
         );
 

@@ -87,6 +87,7 @@ final readonly class PdoEntityTypeRepository implements EntityTypeRepositoryInte
 
     public function delete(int $id): void
     {
+        $this->query->execute('DELETE FROM field_defs WHERE entity_type_id = ?', [$id]);
         $this->query->execute('DELETE FROM entity_types WHERE id = ?', [$id]);
     }
 }

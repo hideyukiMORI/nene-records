@@ -11,7 +11,7 @@ final class EntityTypeHasEntitiesException extends RuntimeException
     public function __construct(int $entityTypeId)
     {
         parent::__construct(
-            "Entity type #{$entityTypeId} cannot be deleted because it still has records. Delete all records first.",
+            "Entity type #{$entityTypeId} cannot be deleted because it has active records. Delete or remove all records first.",
         );
     }
 }

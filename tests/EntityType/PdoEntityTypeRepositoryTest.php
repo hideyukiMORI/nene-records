@@ -46,6 +46,7 @@ final class PdoEntityTypeRepositoryTest extends TestCase
         $projectRoot = dirname(__DIR__, 2);
         $paths = [
             $projectRoot . '/database/schema/entity_types.sql',
+            $projectRoot . '/database/schema/field_defs.sql',
             $projectRoot . '/database/schema/entities.sql',
             $projectRoot . '/database/schema/text_fields.sql',
         ];
