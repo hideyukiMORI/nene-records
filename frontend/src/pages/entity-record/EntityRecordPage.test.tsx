@@ -6,6 +6,7 @@ import { EntityRecordPage } from '@/pages/entity-record/EntityRecordPage'
 import { resetEntityStore, seedEntities } from '@tests/msw/handlers/entity'
 import { resetEntityTypeStore, seedEntityTypes } from '@tests/msw/handlers/entity-type'
 import { resetFieldDefStore, seedFieldDefs } from '@tests/msw/handlers/field-def'
+import { resetIntFieldStore } from '@tests/msw/handlers/int-field'
 import { resetTextFieldStore } from '@tests/msw/handlers/text-field'
 import { mswServer } from '@tests/msw/server'
 import { renderWithProviders } from '@tests/render/render-with-providers'
@@ -36,6 +37,7 @@ describe('EntityRecordPage', () => {
     resetFieldDefStore()
     resetEntityStore()
     resetTextFieldStore()
+    resetIntFieldStore()
     cleanup()
   })
 
@@ -59,14 +61,14 @@ describe('EntityRecordPage', () => {
     renderEntityRecordPage()
 
     await waitFor(() => {
-      expect(screen.getByLabelText('title')).toBeInTheDocument()
+      expect(screen.getByLabelText('title (text)')).toBeInTheDocument()
     })
 
-    await user.type(screen.getByLabelText('title'), 'Hello world')
+    await user.type(screen.getByLabelText('title (text)'), 'Hello world')
     await user.click(screen.getByRole('button', { name: 'Save values' }))
 
     await waitFor(() => {
-      expect(screen.getByLabelText('title')).toHaveValue('Hello world')
+      expect(screen.getByLabelText('title (text)')).toHaveValue('Hello world')
     })
   })
 
@@ -86,22 +88,22 @@ describe('EntityRecordPage', () => {
     renderEntityRecordPage()
 
     await waitFor(() => {
-      expect(screen.getByLabelText('title')).toBeInTheDocument()
+      expect(screen.getByLabelText('title (text)')).toBeInTheDocument()
     })
 
-    await user.type(screen.getByLabelText('title'), 'First title')
+    await user.type(screen.getByLabelText('title (text)'), 'First title')
     await user.click(screen.getByRole('button', { name: 'Save values' }))
 
     await waitFor(() => {
-      expect(screen.getByLabelText('title')).toHaveValue('First title')
+      expect(screen.getByLabelText('title (text)')).toHaveValue('First title')
     })
 
-    await user.clear(screen.getByLabelText('title'))
-    await user.type(screen.getByLabelText('title'), 'Updated title')
+    await user.clear(screen.getByLabelText('title (text)'))
+    await user.type(screen.getByLabelText('title (text)'), 'Updated title')
     await user.click(screen.getByRole('button', { name: 'Save values' }))
 
     await waitFor(() => {
-      expect(screen.getByLabelText('title')).toHaveValue('Updated title')
+      expect(screen.getByLabelText('title (text)')).toHaveValue('Updated title')
     })
   })
 
@@ -118,6 +120,33 @@ describe('EntityRecordPage', () => {
 
     renderEntityRecordPage()
 
-    expect(await screen.findByText('No text fields defined')).toBeInTheDocument()
+    expect(await screen.findByText('No editable fields defined')).toBeInTheDocument()
+  })
+
+  it('creates int field values on save', async () => {
+    seedEntityTypes([{ id: 1, name: 'Article', slug: 'article' }])
+    seedFieldDefs([{ id: 1, entity_type_id: 1, field_key: 'count', data_type: 'int' }])
+    seedEntities([
+      {
+        id: 1,
+        entity_type_id: 1,
+        is_deleted: false,
+        deleted_at: null,
+      },
+    ])
+
+    const user = userEvent.setup()
+    renderEntityRecordPage()
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('count (int)')).toBeInTheDocument()
+    })
+
+    await user.type(screen.getByLabelText('count (int)'), '42')
+    await user.click(screen.getByRole('button', { name: 'Save values' }))
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('count (int)')).toHaveValue(42)
+    })
   })
 })
