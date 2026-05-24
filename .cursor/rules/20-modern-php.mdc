@@ -1,17 +1,45 @@
 ---
-description: NeNe Records PHP 実装時のモダン PHP / API 契約ルール
+description: NeNe Records PHP/API 実装時の厳格ルール — NENE2 consumer
 globs: "**/*.php"
 alwaysApply: false
 ---
 
-# Modern PHP
+# Backend PHP / API
 
-- 新規 PHP ファイルは `declare(strict_types=1);` を付け、PSR-12 を基本にする（NENE2 継承）。
-- Controller は薄く保ち、入力解釈、UseCase 呼び出し、Response 生成に集中する。
-- UseCase / Domain は HTTP、DB、テンプレート、CLI、frontend build から独立させる。
-- 配列のまま境界を越えず、DTO、value object、enum、readonly property を優先する。
-- エンティティスキーマとフィールド型は API 境界で検証する。フロントのみのスキーマ定義に依存しない。
-- OpenAPI で表現する public API 契約と実装のズレを避ける。
-- MCP 連携は DB 直結ではなく、OpenAPI 経由の HTTP API を通す。
-- アプリ固有 Problem Details の type は `https://nene-records.dev/problems/{problem-name}` を使う。
-- 正本は `docs/development/coding-standards.md` と NENE2 `docs/development/coding-standards.md`。
+正本: **`docs/development/backend-standards.md`**（配置・レイヤー違反はマージ不可）
+
+## NENE2 継承
+
+- フレームワークは `vendor/hideyukimori/nene2`。参照実装: `../NENE2/src/Example/Note/`
+- Runtime / Middleware / DI / Problem Details / DatabaseQueryExecutor は NENE2 を使用
+- `Nene2\Example\` は本番 NeNe Records に載せない
+
+## 配置（zero tolerance）
+
+- ドメイン単位フォルダ: `src/EntityType/`, `src/Entity/` 等。**`src/Controllers/` 等のレイヤー分割禁止**
+- Handler / UseCase / DTO / Repository / RouteRegistrar / ServiceProvider は同一ドメインフォルダ内
+- SQL は `Pdo*Repository.php` のみ。Migration は `database/migrations/`
+
+## レイヤー
+
+- Handler: PSR-7 解析 + format validation → Input DTO → UseCase → JSON
+- UseCase: ビジネス不変条件。`execute(Input): Output` のみ。PDO/HTTP 禁止
+- Repository: interface + `Pdo*` adapter。`DatabaseQueryExecutorInterface` 経由
+- 依存は下向きのみ。Handler が Repository を直接呼ばない
+
+## 型・命名
+
+- 全ファイル `declare(strict_types=1);`。PHP >=8.4.1。DTO/handler は `final readonly` 優先
+- Namespace: `NeNeRecords\{Domain}\`
+- Path param は `Router::PARAMETERS_ATTRIBUTE` から取得
+
+## 契約
+
+- 公開 API は `docs/openapi/openapi.yaml` と一致。endpoint 追加 = OpenAPI + テスト
+- Problem Details type: `https://nene-records.dev/problems/{problem-name}`
+- MCP は HTTP/OpenAPI 経由のみ
+
+## テスト・CI
+
+- UseCase: InMemory repository。Repository: SQLite `:memory:`
+- マージ前 `composer check` 必須

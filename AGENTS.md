@@ -10,6 +10,8 @@ This file is the entry point for AI agents working on NeNe Records.
 - Human and AI collaboration: `docs/CONTRIBUTING.md`
 - Workflow: `docs/workflow.md`
 - Coding standards: `docs/development/coding-standards.md`
+- Backend standards: `docs/development/backend-standards.md`
+- Frontend standards (Phase 4+; policy now): `docs/development/frontend-standards.md`
 - Commit messages: `docs/development/commit-conventions.md`
 - AI tool policy: `docs/integrations/ai-tools.md`
 - Roadmap: `docs/roadmap.md`

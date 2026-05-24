@@ -28,6 +28,8 @@ Tracked by `docs/milestones/2026-05-governance-and-foundation.md`.
 
 Goal: smallest vertical slice proving the entity model.
 
+Policy (now): `docs/development/backend-standards.md` — NENE2 consumer, domain-grouped modules, zero-tolerance placement.
+
 - `entity_types`, `entities`, `text_fields` tables and migrations
 - CRUD API + OpenAPI
 - PHPUnit + SQLite tests
@@ -54,6 +56,8 @@ Goal: support real CMS/app patterns.
 ## Phase 4: Admin Frontend
 
 Goal: schema and record management UI.
+
+Policy (now): `docs/development/frontend-standards.md` — React + TypeScript strict, layered architecture, MSW tests.
 
 - React + TypeScript admin starter
 - entity type editor

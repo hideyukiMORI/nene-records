@@ -1,50 +1,60 @@
 # Coding Standards
 
-NeNe Records follows NENE2 coding standards for PHP, HTTP, and API design, with additions for the flexible entity platform.
+NeNe Records coding standards split by surface. **Full policies live in the dedicated documents below** — this file is the index.
 
-**Framework baseline:** [NENE2 coding standards](https://github.com/hideyukiMORI/NENE2/blob/main/docs/development/coding-standards.md)
+| Surface | Source of truth |
+| --- | --- |
+| **PHP / API / database** | [`backend-standards.md`](./backend-standards.md) |
+| **React / TypeScript admin & consumer** | [`frontend-standards.md`](./frontend-standards.md) |
+| **NENE2 inheritance map** | [`../inheritance-from-nene2.md`](../inheritance-from-nene2.md) |
 
-**Inheritance map:** `docs/inheritance-from-nene2.md`
+**Framework baseline:** [NENE2 coding standards](https://github.com/hideyukiMORI/NENE2/blob/main/docs/development/coding-standards.md) — NeNe Records deviates only where local docs or ADRs say so.
 
-## PHP Baseline (inherited)
+---
 
-- Target PHP `>=8.4.1 <9.0`
-- `declare(strict_types=1);` on all new PHP files
-- PSR-12 style
-- Readonly DTOs, value objects, and enums at boundaries
-- Thin controllers; use cases independent from HTTP and persistence
-- Constructor injection; no service locator in domain code
-- RFC 9457 Problem Details for public JSON errors
+## Shared rules (all surfaces)
 
-## NeNe Records Additions
+- GitHub Issue-driven work; focused PRs; no direct commits to `main`
+- **Strict typing** at boundaries — PHP readonly DTOs; TypeScript strict mode
+- **OpenAPI** is the public API contract; MCP maps to the same HTTP operations
+- Application Problem Details `type`: `https://nene-records.dev/problems/{problem-name}`
+- **Placement violations block merge** — see backend and frontend standards
+- Public docs, OpenAPI text, and API error metadata: **English**
+- Issues, PRs, commits, `.cursor/rules/`: **Japanese allowed**
 
-### Entity platform boundaries
+---
 
-- **Entity types and field definitions** are persisted and validated at the API layer using a schema registry — do not rely on frontend-only schema knowledge for writes.
-- **Typed field values** live in type-specific tables or documented storage adapters; avoid a single untyped key/value blob for all field types.
-- **Soft delete** (`is_deleted`, `deleted_at`) should be consistent across entity tables unless an ADR documents an exception.
-- **SQL stays in repositories**; use cases express business rules, not query text.
+## Backend (summary)
 
-### API surface
+Full policy: **`docs/development/backend-standards.md`**.
 
-- JSON APIs are the primary product surface.
-- OpenAPI describes public request, response, and error shapes.
-- MCP tools map to the same OpenAPI operations; no direct database access from MCP.
-- Application-specific Problem Details `type` values use `https://nene-records.dev/problems/{problem-name}`.
+- NENE2 consumer — framework in `vendor/`, product in `src/`
+- Domain-grouped modules (`EntityType/`, `Entity/`, …) — not layer folders
+- Handler → UseCase → RepositoryInterface → PdoRepository
+- No PDO/SQL outside `Pdo*Repository`; no business logic in handlers
+- Phinx migrations + `database/schema/` snapshots; soft delete conventions
+- PHPUnit: in-memory use cases, SQLite repositories, OpenAPI contract tests
+- `composer check` before merge
 
-### Frontend layers (future)
+---
 
-- **Admin frontend** owns schema editing UI and most configuration workflows.
-- **Consumer views** are replaceable presentation layers over the same API.
-- Backend domain logic must not depend on React or admin-specific assumptions.
+## Frontend (summary)
 
-### Language
+Full policy: **`docs/development/frontend-standards.md`**.
 
-- Public docs, OpenAPI text, Problem Details titles, and validation codes: **English**
-- Issues, PR descriptions, commit messages, and `.cursor/rules/`: **Japanese allowed**
+- Phase 4+ implementation; Issue `#1` is API-only
+- React + TypeScript strict + TanStack Query + zero-tolerance module placement
+- API first — schema validation at API, not browser alone
 
-## Testing (inherited intent)
+---
 
-- Unit-test use cases without a database when practical.
-- Add HTTP or contract tests for public API behavior.
-- Keep tests deterministic and small.
+## Verification (once scaffolded)
+
+```bash
+composer check
+composer openapi
+composer mcp
+npm run check --prefix frontend   # when frontend/ exists
+```
+
+Until `composer.json` exists, governance and standards docs are verified by review and `git diff --check`.

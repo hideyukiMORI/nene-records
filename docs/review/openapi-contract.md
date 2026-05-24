@@ -1,18 +1,37 @@
 # OpenAPI Contract Self-Review
 
-Use when changing `docs/openapi/openapi.yaml` or API response shapes.
+Use when changing `docs/openapi/openapi.yaml` or API response shapes. Policy source: **`docs/development/backend-standards.md`**.
 
-Source policies:
+Also read:
 
-- `docs/development/coding-standards.md`
-- NENE2: `docs/integrations/openapi.md`
+- NENE2: `docs/integrations/openapi.md`, `docs/development/endpoint-scaffold.md`
 
-## Checklist
+## Contract completeness
 
-- [ ] Every shipped JSON endpoint has an OpenAPI path with `operationId`.
-- [ ] Success and error responses reference shared Problem Details schemas where applicable.
-- [ ] Request bodies and query parameters match handler DTO validation rules.
-- [ ] Examples are realistic (`ok` examples for success paths).
-- [ ] `composer openapi` passes after runtime scaffold exists.
-- [ ] MCP tool entries in `docs/mcp/tools.json` align with OpenAPI when tools are added.
-- [ ] Public text in OpenAPI descriptions is English.
+- [ ] Every shipped JSON endpoint has an OpenAPI path with stable `operationId`.
+- [ ] Summary, description, request body, query params match handler format validation.
+- [ ] Success response has schema and realistic `ok` example.
+- [ ] Problem Details responses documented (`401`, `404`, `422`, `500`, … as applicable).
+- [ ] Public OpenAPI text is English.
+
+## Runtime alignment
+
+- [ ] Handler response shapes match OpenAPI success schema.
+- [ ] Request DTO rules align with documented required fields and formats.
+- [ ] `composer openapi` passes.
+- [ ] Contract tests in `tests/OpenApi/` updated when public examples change.
+
+## MCP (when applicable)
+
+- [ ] `docs/mcp/tools.json` entries reference valid OpenAPI `method`, `path`, `operationId`.
+- [ ] `composer mcp` passes when catalog changed.
+
+## Endpoint completion
+
+- [ ] Route + handler + use case + repository (if persistent) land together or same PR series.
+- [ ] Migration + schema snapshot included when new tables introduced.
+
+## PR
+
+- [ ] PR notes mention `Self-review: openapi-contract` when contract-facing.
+- [ ] No merge with OpenAPI drift from runtime behavior.
