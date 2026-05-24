@@ -135,6 +135,101 @@ export const fieldDefHandlers = [
 
     return HttpResponse.json(created, { status: 201 })
   }),
+  http.put('/api/v1/field-defs/:id', async ({ params, request }) => {
+    const id = Number(params.id)
+    const index = items.findIndex((item) => item.id === id)
+
+    if (index === -1) {
+      return HttpResponse.json(
+        {
+          type: 'https://nene-records.dev/problems/field-def-not-found',
+          title: 'Field definition not found',
+          status: 404,
+          instance: `/api/v1/field-defs/${String(id)}`,
+        },
+        { status: 404 },
+      )
+    }
+
+    const body = (await request.json()) as {
+      entity_type_id?: number
+      field_key?: string
+      data_type?: string
+    }
+
+    if (typeof body.entity_type_id !== 'number' || body.entity_type_id < 1) {
+      return HttpResponse.json(
+        {
+          type: 'https://nene-records.dev/problems/validation-failed',
+          title: 'Validation failed',
+          status: 422,
+          instance: `/api/v1/field-defs/${String(id)}`,
+          errors: [{ field: 'entity_type_id', message: 'Invalid', code: 'invalid' }],
+        },
+        { status: 422 },
+      )
+    }
+
+    if (typeof body.field_key !== 'string' || body.field_key.trim() === '') {
+      return HttpResponse.json(
+        {
+          type: 'https://nene-records.dev/problems/validation-failed',
+          title: 'Validation failed',
+          status: 422,
+          instance: `/api/v1/field-defs/${String(id)}`,
+          errors: [{ field: 'field_key', message: 'Required', code: 'required' }],
+        },
+        { status: 422 },
+      )
+    }
+
+    if (typeof body.data_type !== 'string' || !isFieldDataType(body.data_type)) {
+      return HttpResponse.json(
+        {
+          type: 'https://nene-records.dev/problems/validation-failed',
+          title: 'Validation failed',
+          status: 422,
+          instance: `/api/v1/field-defs/${String(id)}`,
+          errors: [{ field: 'data_type', message: 'Invalid', code: 'invalid' }],
+        },
+        { status: 422 },
+      )
+    }
+
+    const duplicate = items.some(
+      (item) =>
+        item.entity_type_id === body.entity_type_id &&
+        item.field_key === body.field_key &&
+        item.id !== id,
+    )
+
+    if (duplicate) {
+      return HttpResponse.json(
+        {
+          type: 'https://nene-records.dev/problems/field-def-conflict',
+          title: 'Conflict',
+          status: 409,
+          instance: `/api/v1/field-defs/${String(id)}`,
+        },
+        { status: 409 },
+      )
+    }
+
+    const current = items[index]
+    if (current === undefined) {
+      return HttpResponse.json({ title: 'Not found' }, { status: 404 })
+    }
+
+    const updated: FieldDefRecord = {
+      id,
+      entity_type_id: body.entity_type_id,
+      field_key: body.field_key,
+      data_type: body.data_type,
+    }
+    items = items.map((item, itemIndex) => (itemIndex === index ? updated : item))
+
+    return HttpResponse.json(updated)
+  }),
   http.delete('/api/v1/field-defs/:id', ({ params }) => {
     const id = Number(params.id)
     const exists = items.some((item) => item.id === id)

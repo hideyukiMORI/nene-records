@@ -23,3 +23,10 @@ export function useCreateFieldDefForm() {
     },
   })
 }
+
+export function useEditFieldDefForm(defaultValues: CreateFieldDefFormValues) {
+  return useForm<CreateFieldDefFormValues>({
+    resolver: zodResolver(createFieldDefFormSchema),
+    defaultValues,
+  })
+}
