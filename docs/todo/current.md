@@ -12,13 +12,13 @@ New contributors and AI agents: read [`handoff-2026-05-24-workspace-switch.md`](
 
 | Issue | Branch | Summary |
 | --- | --- | --- |
-| — | — | _(none — pick next Phase 2 item)_ |
+| #14 | `feat/14-enum-bool-datetime-fields` | enum_fields / bool_fields / datetime_fields CRUD + field_defs data_type expansion |
 
 ## Up Next
 
 | Issue | Summary |
 | --- | --- |
-| TBD | Phase 2: enum / bool / datetime field types |
+| TBD | Phase 2: next typed field or registry follow-up |
 
 ## Recently Completed
 

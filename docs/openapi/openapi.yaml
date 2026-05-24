@@ -3,7 +3,7 @@ info:
   title: NeNe Records API
   version: 0.1.0
   description: >
-    NeNe Records public API contract — entity_types, field_defs, entities, text_fields, and int_fields CRUD (MVP + Phase 2 registry).
+    NeNe Records public API contract — entity_types, field_defs, entities, text_fields, int_fields, enum_fields, bool_fields, and datetime_fields CRUD (MVP + Phase 2 registry).
 servers:
   - url: http://localhost:8080
     description: Local development server
@@ -20,6 +20,12 @@ tags:
     description: Typed text field values on entities.
   - name: IntFields
     description: Typed integer field values on entities.
+  - name: EnumFields
+    description: Typed enum field values on entities.
+  - name: BoolFields
+    description: Typed boolean field values on entities.
+  - name: DateTimeFields
+    description: Typed datetime field values on entities.
 paths:
   /health:
     get:
@@ -786,6 +792,471 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /api/v1/enum-fields:
+    get:
+      tags:
+        - EnumFields
+      summary: List enum fields
+      description: Returns non-deleted enum fields.
+      operationId: listEnumFields
+      parameters:
+        - $ref: '#/components/parameters/LimitQuery'
+        - $ref: '#/components/parameters/OffsetQuery'
+      responses:
+        '200':
+          description: Paginated enum field list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnumFieldListResponse'
+              examples:
+                ok:
+                  summary: Empty list
+                  value:
+                    items: []
+                    limit: 20
+                    offset: 0
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - EnumFields
+      summary: Create enum field
+      operationId: createEnumField
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEnumFieldRequest'
+            examples:
+              ok:
+                value:
+                  entity_id: 1
+                  field_key: status
+                  value: active
+      responses:
+        '201':
+          description: Enum field created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnumFieldResponse'
+              examples:
+                ok:
+                  value:
+                    id: 1
+                    entity_id: 1
+                    field_key: status
+                    value: active
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          description: Validation failed, unregistered field key, or field type mismatch.
+          content:
+            application/problem+json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ValidationProblemDetails'
+                  - $ref: '#/components/schemas/ProblemDetails'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/enum-fields/{id}:
+    get:
+      tags:
+        - EnumFields
+      summary: Get enum field by id
+      operationId: getEnumFieldById
+      parameters:
+        - $ref: '#/components/parameters/IdPath'
+      responses:
+        '200':
+          description: Enum field found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnumFieldResponse'
+              examples:
+                ok:
+                  value:
+                    id: 1
+                    entity_id: 1
+                    field_key: status
+                    value: active
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - EnumFields
+      summary: Update enum field
+      operationId: updateEnumField
+      parameters:
+        - $ref: '#/components/parameters/IdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateEnumFieldRequest'
+            examples:
+              ok:
+                value:
+                  field_key: status
+                  value: inactive
+      responses:
+        '200':
+          description: Enum field updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnumFieldResponse'
+              examples:
+                ok:
+                  value:
+                    id: 1
+                    entity_id: 1
+                    field_key: status
+                    value: inactive
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          description: Validation failed, unregistered field key, or field type mismatch.
+          content:
+            application/problem+json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ValidationProblemDetails'
+                  - $ref: '#/components/schemas/ProblemDetails'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - EnumFields
+      summary: Soft delete enum field
+      operationId: deleteEnumField
+      parameters:
+        - $ref: '#/components/parameters/IdPath'
+      responses:
+        '204':
+          description: Enum field soft-deleted.
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/bool-fields:
+    get:
+      tags:
+        - BoolFields
+      summary: List bool fields
+      description: Returns non-deleted bool fields.
+      operationId: listBoolFields
+      parameters:
+        - $ref: '#/components/parameters/LimitQuery'
+        - $ref: '#/components/parameters/OffsetQuery'
+      responses:
+        '200':
+          description: Paginated bool field list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BoolFieldListResponse'
+              examples:
+                ok:
+                  summary: Empty list
+                  value:
+                    items: []
+                    limit: 20
+                    offset: 0
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - BoolFields
+      summary: Create bool field
+      operationId: createBoolField
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBoolFieldRequest'
+            examples:
+              ok:
+                value:
+                  entity_id: 1
+                  field_key: enabled
+                  value: true
+      responses:
+        '201':
+          description: Bool field created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BoolFieldResponse'
+              examples:
+                ok:
+                  value:
+                    id: 1
+                    entity_id: 1
+                    field_key: enabled
+                    value: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          description: Validation failed, unregistered field key, or field type mismatch.
+          content:
+            application/problem+json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ValidationProblemDetails'
+                  - $ref: '#/components/schemas/ProblemDetails'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/bool-fields/{id}:
+    get:
+      tags:
+        - BoolFields
+      summary: Get bool field by id
+      operationId: getBoolFieldById
+      parameters:
+        - $ref: '#/components/parameters/IdPath'
+      responses:
+        '200':
+          description: Bool field found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BoolFieldResponse'
+              examples:
+                ok:
+                  value:
+                    id: 1
+                    entity_id: 1
+                    field_key: enabled
+                    value: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - BoolFields
+      summary: Update bool field
+      operationId: updateBoolField
+      parameters:
+        - $ref: '#/components/parameters/IdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBoolFieldRequest'
+            examples:
+              ok:
+                value:
+                  field_key: enabled
+                  value: false
+      responses:
+        '200':
+          description: Bool field updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BoolFieldResponse'
+              examples:
+                ok:
+                  value:
+                    id: 1
+                    entity_id: 1
+                    field_key: enabled
+                    value: false
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          description: Validation failed, unregistered field key, or field type mismatch.
+          content:
+            application/problem+json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ValidationProblemDetails'
+                  - $ref: '#/components/schemas/ProblemDetails'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - BoolFields
+      summary: Soft delete bool field
+      operationId: deleteBoolField
+      parameters:
+        - $ref: '#/components/parameters/IdPath'
+      responses:
+        '204':
+          description: Bool field soft-deleted.
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/datetime-fields:
+    get:
+      tags:
+        - DateTimeFields
+      summary: List datetime fields
+      description: Returns non-deleted datetime fields.
+      operationId: listDateTimeFields
+      parameters:
+        - $ref: '#/components/parameters/LimitQuery'
+        - $ref: '#/components/parameters/OffsetQuery'
+      responses:
+        '200':
+          description: Paginated datetime field list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DateTimeFieldListResponse'
+              examples:
+                ok:
+                  summary: Empty list
+                  value:
+                    items: []
+                    limit: 20
+                    offset: 0
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - DateTimeFields
+      summary: Create datetime field
+      operationId: createDateTimeField
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDateTimeFieldRequest'
+            examples:
+              ok:
+                value:
+                  entity_id: 1
+                  field_key: published_at
+                  value: 2026-05-24T12:00:00+00:00
+      responses:
+        '201':
+          description: Datetime field created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DateTimeFieldResponse'
+              examples:
+                ok:
+                  value:
+                    id: 1
+                    entity_id: 1
+                    field_key: published_at
+                    value: 2026-05-24T12:00:00+00:00
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          description: Validation failed, unregistered field key, or field type mismatch.
+          content:
+            application/problem+json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ValidationProblemDetails'
+                  - $ref: '#/components/schemas/ProblemDetails'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/datetime-fields/{id}:
+    get:
+      tags:
+        - DateTimeFields
+      summary: Get datetime field by id
+      operationId: getDateTimeFieldById
+      parameters:
+        - $ref: '#/components/parameters/IdPath'
+      responses:
+        '200':
+          description: Datetime field found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DateTimeFieldResponse'
+              examples:
+                ok:
+                  value:
+                    id: 1
+                    entity_id: 1
+                    field_key: published_at
+                    value: 2026-05-24T12:00:00+00:00
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - DateTimeFields
+      summary: Update datetime field
+      operationId: updateDateTimeField
+      parameters:
+        - $ref: '#/components/parameters/IdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDateTimeFieldRequest'
+            examples:
+              ok:
+                value:
+                  field_key: published_at
+                  value: 2026-05-25T12:00:00+00:00
+      responses:
+        '200':
+          description: Datetime field updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DateTimeFieldResponse'
+              examples:
+                ok:
+                  value:
+                    id: 1
+                    entity_id: 1
+                    field_key: published_at
+                    value: 2026-05-25T12:00:00+00:00
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          description: Validation failed, unregistered field key, or field type mismatch.
+          content:
+            application/problem+json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ValidationProblemDetails'
+                  - $ref: '#/components/schemas/ProblemDetails'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - DateTimeFields
+      summary: Soft delete datetime field
+      operationId: deleteDateTimeField
+      parameters:
+        - $ref: '#/components/parameters/IdPath'
+      responses:
+        '204':
+          description: Datetime field soft-deleted.
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 components:
   parameters:
     IdPath:
@@ -1120,6 +1591,9 @@ components:
           enum:
             - text
             - int
+            - enum
+            - bool
+            - datetime
     CreateFieldDefRequest:
       type: object
       required:
@@ -1139,6 +1613,9 @@ components:
           enum:
             - text
             - int
+            - enum
+            - bool
+            - datetime
       additionalProperties: false
     UpdateFieldDefRequest:
       $ref: '#/components/schemas/CreateFieldDefRequest'
@@ -1280,6 +1757,198 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/IntFieldResponse'
+        limit:
+          type: integer
+        offset:
+          type: integer
+
+    EnumFieldResponse:
+      type: object
+      required:
+        - id
+        - entity_id
+        - field_key
+        - value
+      properties:
+        id:
+          type: integer
+          format: int64
+        entity_id:
+          type: integer
+          format: int64
+        field_key:
+          type: string
+        value:
+          type: string
+    CreateEnumFieldRequest:
+      type: object
+      required:
+        - entity_id
+        - field_key
+        - value
+      properties:
+        entity_id:
+          type: integer
+          format: int64
+          minimum: 1
+        field_key:
+          type: string
+          minLength: 1
+        value:
+          type: string
+      additionalProperties: false
+    UpdateEnumFieldRequest:
+      type: object
+      required:
+        - field_key
+        - value
+      properties:
+        field_key:
+          type: string
+          minLength: 1
+        value:
+          type: string
+      additionalProperties: false
+    EnumFieldListResponse:
+      type: object
+      required:
+        - items
+        - limit
+        - offset
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/EnumFieldResponse'
+        limit:
+          type: integer
+        offset:
+          type: integer
+
+    BoolFieldResponse:
+      type: object
+      required:
+        - id
+        - entity_id
+        - field_key
+        - value
+      properties:
+        id:
+          type: integer
+          format: int64
+        entity_id:
+          type: integer
+          format: int64
+        field_key:
+          type: string
+        value:
+          type: boolean
+    CreateBoolFieldRequest:
+      type: object
+      required:
+        - entity_id
+        - field_key
+        - value
+      properties:
+        entity_id:
+          type: integer
+          format: int64
+          minimum: 1
+        field_key:
+          type: string
+          minLength: 1
+        value:
+          type: boolean
+      additionalProperties: false
+    UpdateBoolFieldRequest:
+      type: object
+      required:
+        - field_key
+        - value
+      properties:
+        field_key:
+          type: string
+          minLength: 1
+        value:
+          type: boolean
+      additionalProperties: false
+    BoolFieldListResponse:
+      type: object
+      required:
+        - items
+        - limit
+        - offset
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/BoolFieldResponse'
+        limit:
+          type: integer
+        offset:
+          type: integer
+
+    DateTimeFieldResponse:
+      type: object
+      required:
+        - id
+        - entity_id
+        - field_key
+        - value
+      properties:
+        id:
+          type: integer
+          format: int64
+        entity_id:
+          type: integer
+          format: int64
+        field_key:
+          type: string
+        value:
+          type: string
+          format: date-time
+    CreateDateTimeFieldRequest:
+      type: object
+      required:
+        - entity_id
+        - field_key
+        - value
+      properties:
+        entity_id:
+          type: integer
+          format: int64
+          minimum: 1
+        field_key:
+          type: string
+          minLength: 1
+        value:
+          type: string
+          format: date-time
+      additionalProperties: false
+    UpdateDateTimeFieldRequest:
+      type: object
+      required:
+        - field_key
+        - value
+      properties:
+        field_key:
+          type: string
+          minLength: 1
+        value:
+          type: string
+          format: date-time
+      additionalProperties: false
+    DateTimeFieldListResponse:
+      type: object
+      required:
+        - items
+        - limit
+        - offset
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/DateTimeFieldResponse'
         limit:
           type: integer
         offset:
