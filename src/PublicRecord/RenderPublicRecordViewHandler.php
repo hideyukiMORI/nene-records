@@ -56,6 +56,7 @@ final readonly class RenderPublicRecordViewHandler
             'bootstrapJson' => $bootstrapJson,
             'includeViteClient' => $this->config->debug,
             'viteUrl' => rtrim($viteUrl, '/'),
+            'renderMarkdown' => static fn (string $markdown): string => PublicMarkdownRenderer::toSafeHtml($markdown),
         ]);
     }
 

@@ -129,6 +129,41 @@ describe('PublicRecordDetailPage', () => {
     expect(authorLink).toHaveAttribute('href', '/view/author/2')
   })
 
+  it('renders body text fields as markdown', async () => {
+    seedEntityTypes([{ id: 1, name: 'Article', slug: 'article' }])
+    seedEntities([
+      {
+        id: 1,
+        entity_type_id: 1,
+        is_deleted: false,
+        deleted_at: null,
+      },
+    ])
+    seedFieldDefs([
+      { id: 1, entity_type_id: 1, field_key: 'title', data_type: 'text' },
+      { id: 2, entity_type_id: 1, field_key: 'body', data_type: 'text' },
+    ])
+    seedTextFields([
+      {
+        id: 1,
+        entity_id: 1,
+        field_key: 'title',
+        value: 'My article',
+      },
+      {
+        id: 2,
+        entity_id: 1,
+        field_key: 'body',
+        value: '## Intro\n\n**bold** paragraph',
+      },
+    ])
+
+    renderDetailPage()
+
+    expect(await screen.findByRole('heading', { level: 2, name: 'Intro' })).toBeInTheDocument()
+    expect(screen.getByText('bold')).toBeInTheDocument()
+  })
+
   it('shows not found for unknown entity type slug', async () => {
     renderDetailPage('unknown', 1)
 
