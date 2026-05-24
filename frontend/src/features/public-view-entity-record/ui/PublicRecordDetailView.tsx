@@ -1,5 +1,7 @@
 import type { Entity } from '@/entities/entity'
+import { isMarkdownBodyField } from '@/shared/lib/is-markdown-body-field'
 import { Button, Stack, Text } from '@/shared/ui'
+import { PublicMarkdownContent } from '@/shared/ui/markdown'
 import type { PublicFieldRow } from '../hooks/use-public-view-entity-record-page'
 import { PublicRelationFieldDisplay } from './PublicRelationFieldDisplay'
 
@@ -65,9 +67,17 @@ export function PublicRecordDetailView({
             <Text as="dt" variant="heading-sm">
               {row.fieldKey}
             </Text>
-            <Text as="dd" muted>
-              {row.displayValue}
-            </Text>
+            {isMarkdownBodyField(row.fieldKey) && row.dataType === 'text' ? (
+              <dd>
+                <PublicMarkdownContent
+                  markdown={row.displayValue === '—' ? '' : row.displayValue}
+                />
+              </dd>
+            ) : (
+              <Text as="dd" muted>
+                {row.displayValue}
+              </Text>
+            )}
           </div>
         )
       })}

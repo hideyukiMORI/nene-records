@@ -7,6 +7,15 @@
       <meta name="description" content="<?= $e($metaDescription) ?>" />
     <?php endif; ?>
     <title><?= $e($pageTitle) ?> — <?= $e($siteName) ?></title>
+    <style>
+      .markdown-body { display: flex; flex-direction: column; gap: 0.75rem; line-height: 1.6; }
+      .markdown-body :is(h1, h2, h3, h4) { font-weight: 600; line-height: 1.3; }
+      .markdown-body h2 { font-size: 1.25rem; }
+      .markdown-body h3 { font-size: 1.125rem; }
+      .markdown-body p { margin: 0; }
+      .markdown-body ul, .markdown-body ol { margin: 0; padding-left: 1.25rem; }
+      .markdown-body blockquote { margin: 0; padding-left: 0.75rem; border-left: 3px solid #d1d5db; color: #6b7280; }
+    </style>
     <?php if ($includeViteClient): ?>
       <script type="module" src="<?= $e($viteUrl) ?>/@vite/client"></script>
     <?php endif; ?>
@@ -34,7 +43,7 @@
         <?php elseif ($field->fieldKey === 'body'): ?>
           <section>
             <h2><?= $e($field->fieldKey) ?></h2>
-            <div><?= nl2br($e($field->displayValue)) ?></div>
+            <div class="markdown-body"><?= $renderMarkdown($field->displayValue) ?></div>
           </section>
         <?php else: ?>
           <section>

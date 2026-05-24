@@ -1,0 +1,50 @@
+.markdown-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  line-height: 1.6;
+}
+
+.markdown-body :is(h1, h2, h3, h4) {
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.markdown-body h2 {
+  font-size: 1.25rem;
+}
+
+.markdown-body h3 {
+  font-size: 1.125rem;
+}
+
+.markdown-body p {
+  margin: 0;
+}
+
+.markdown-body ul,
+.markdown-body ol {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.markdown-body li + li {
+  margin-top: 0.25rem;
+}
+
+.markdown-body blockquote {
+  margin: 0;
+  padding-left: 0.75rem;
+  border-left: 3px solid var(--color-border, #d1d5db);
+  color: var(--color-text-muted, #6b7280);
+}
+
+.markdown-body code {
+  font-family: ui-monospace, monospace;
+  font-size: 0.875em;
+}
+
+.markdown-body a {
+  color: var(--color-accent, #2563eb);
+  text-decoration: underline;
+}

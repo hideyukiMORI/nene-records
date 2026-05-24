@@ -63,7 +63,7 @@ final class PublicRecordHttpTest extends TestCase
         ]);
         $textFields = new InMemoryTextFieldRepository([
             new TextField(entityId: 10, fieldKey: 'title', value: 'Hello world', id: 1),
-            new TextField(entityId: 10, fieldKey: 'body', value: "Line one\nLine two", id: 2),
+            new TextField(entityId: 10, fieldKey: 'body', value: "## Sample\n\n**bold** line", id: 2),
         ], $entities);
 
         $publicSettings = new ListPublicSettingsUseCase(new InMemorySettingRepository());
@@ -162,7 +162,8 @@ final class PublicRecordHttpTest extends TestCase
         self::assertStringContainsString('<h1>Hello world</h1>', $html);
         self::assertStringContainsString('id="nene-records-public-record-bootstrap"', $html);
         self::assertStringContainsString('"entityTypeSlug":"article"', $html);
-        self::assertStringContainsString('Line one', $html);
+        self::assertStringContainsString('<h2>Sample</h2>', $html);
+        self::assertStringContainsString('<strong>bold</strong>', $html);
     }
 
     /** @return array<string, mixed> */
