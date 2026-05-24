@@ -11,6 +11,8 @@ import { resetEnumFieldStore } from '@tests/msw/handlers/enum-field'
 import { resetFieldDefStore, seedFieldDefs } from '@tests/msw/handlers/field-def'
 import { resetIntFieldStore } from '@tests/msw/handlers/int-field'
 import { resetTextFieldStore } from '@tests/msw/handlers/text-field'
+import { resetEntityTagStore } from '@tests/msw/handlers/entity-tag'
+import { resetTagStore, seedTags } from '@tests/msw/handlers/tag'
 import { mswServer } from '@tests/msw/server'
 import { renderWithProviders } from '@tests/render/render-with-providers'
 
@@ -44,6 +46,8 @@ describe('EntityRecordPage', () => {
     resetEnumFieldStore()
     resetBoolFieldStore()
     resetDateTimeFieldStore()
+    resetTagStore()
+    resetEntityTagStore()
     cleanup()
   })
 
@@ -180,6 +184,42 @@ describe('EntityRecordPage', () => {
 
     await waitFor(() => {
       expect(screen.getByLabelText('enabled (bool)')).toBeChecked()
+    })
+  })
+
+  it('attaches and removes tags on the record', async () => {
+    seedEntityTypes([{ id: 1, name: 'Article', slug: 'article' }])
+    seedEntities([
+      {
+        id: 1,
+        entity_type_id: 1,
+        is_deleted: false,
+        deleted_at: null,
+      },
+    ])
+    seedTags([
+      { id: 1, name: 'Featured', slug: 'featured' },
+      { id: 2, name: 'Draft', slug: 'draft' },
+    ])
+
+    const user = userEvent.setup()
+    renderEntityRecordPage()
+
+    expect(await screen.findByText('No tags attached yet.')).toBeInTheDocument()
+
+    await user.selectOptions(screen.getByLabelText('Add tag'), '1')
+    await user.click(screen.getByRole('button', { name: 'Add tag' }))
+
+    await waitFor(() => {
+      expect(screen.getByText('Featured')).toBeInTheDocument()
+      expect(screen.getByText('featured')).toBeInTheDocument()
+    })
+
+    await user.click(screen.getByRole('button', { name: 'Remove' }))
+
+    await waitFor(() => {
+      expect(screen.queryByRole('button', { name: 'Remove' })).not.toBeInTheDocument()
+      expect(screen.getByText('No tags attached yet.')).toBeInTheDocument()
     })
   })
 })

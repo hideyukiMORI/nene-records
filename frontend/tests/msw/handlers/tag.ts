@@ -19,6 +19,10 @@ export function seedTags(seed: TagRecord[]): void {
   nextId = Math.max(0, ...seed.map((item) => item.id)) + 1
 }
 
+export function getTagById(id: number): TagRecord | undefined {
+  return items.find((item) => item.id === id)
+}
+
 export const tagHandlers = [
   http.get('/api/v1/tags', ({ request }) => {
     const url = new URL(request.url)
