@@ -2,30 +2,38 @@
 
 Last updated: 2026-05-24
 
-## In Progress
-
-| Issue | Branch | Summary |
-| --- | --- | --- |
-| #36 | `feat/36-phase4-batch` | Phase 4 完走（enum/bool/datetime, entity type 編集, API filter, CI） |
-
 ## Up Next
 
 | Issue | Summary |
 | --- | --- |
-| TBD | Records 一覧のラベル取得を API 最適化 |
+| TBD | Records 一覧ラベル取得の API 最適化（entity_type 単位 batch 等） |
 | TBD | field_def 編集（PUT） |
 | TBD | Consumer views / public site |
 
-## Recently Completed (Phase 4 batch)
+## Recently Completed
 
-- enum / bool / datetime フィールド値 UI
-- Entity type 編集（PUT）
-- API field list `entity_id` フィルタ
-- GitHub Actions frontend CI
+| Issue | Summary |
+| --- | --- |
+| #36 | Phase 4 完走 — enum/bool/datetime UI, entity type 編集, API entity_id filter, frontend CI (PR #37) |
+| #34 | int_fields 値編集 UI (PR #35) |
+| #32 | レコード一覧 title 表示 (PR #33) |
+| #30 | text_fields 値編集 UI (PR #31) |
+| #28 | field_defs UI (PR #29) |
+| #26 | Entity records UI (PR #27) |
+| #24 | Entity type CRUD UI (PR #25) |
+| #20 | Admin React scaffold (PR #21) |
+
+## Phase 4 Admin（完了）
+
+- Entity types（作成・一覧・編集・削除）
+- Field defs（作成・一覧・削除）
+- Records（作成・一覧・削除・全型フィールド値編集）
+- Records 一覧に title ラベル表示
+- CI: `.github/workflows/frontend-ci.yml`
 
 ## Verification
 
 ```bash
-composer check
-npm run check --prefix frontend
+composer check                    # 128 tests
+npm run check --prefix frontend   # 46 tests
 ```
