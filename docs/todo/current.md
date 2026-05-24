@@ -2,51 +2,60 @@
 
 Last updated: 2026-05-24
 
-## Up Next
+## Up Next（Phase 7 / CMS Mid-Term M1）
 
-| Issue | Summary |
-| --- | --- |
-| — | （Phase 5 残: detachEntityRelation MCP — upstream 待ち） |
+| 優先 | 項目 | 備考 |
+| --- | --- | --- |
+| P0 | #78 Consumer Markdown マージ | body + footer Markdown レンダリング |
+| P0 | Users + Admin ログイン + API auth | 書込 endpoint 保護 |
+| P0 | Publish status + `published_at` | draft / published、公開フィルタ |
+| P1 | Public slug routing | `/view/{type}/{slug}` |
+| P1 | Admin Markdown エディタ UX | preview 付き |
+
+詳細ギャップ表・3 フェーズ計画: `docs/milestones/2026-06-cms-mid-term.md`（#82）
 
 ## In Progress
 
 | Issue | Summary |
 | --- | --- |
-| — | （なし） |
+| — | （なし — #80 マージ済み、ここから M1 起票） |
 
 ## Recently Completed
 
 | Issue | Summary |
 | --- | --- |
+| #80 | Site Settings（defs + values + revisions）+ Consumer 反映 (PR #81) |
 | #72 | Consumer Views Phase 6 強化 (PR #73) |
 | #69 | Analytics / access log API (PR #70) |
-| #67 | 全 API MCP カタログ 53 ツール (PR #68) |
+| #67 | 全 API MCP カタログ 59 tools (PR #68) |
 | #65 | MCP relation tools カタログ (PR #66) |
 | #63 | Consumer view relation リンク表示 (PR #64) |
-| #61 | Record 詳細 inverse relation 参照元一覧 UI (PR #62) |
-| #59 | Records 一覧 relation フィルタ UI (PR #60) |
-| #57 | entities 一覧 relation フィルタ API (PR #58) |
-| #52 | Record 詳細 relation attach/detach UI |
-| #51 | entity relations API + field_defs relation 型 (PR #54) |
-| #48 | Records 一覧 tag フィルタ UI (PR #49) |
-| #46 | Record tag attach/detach UI (PR #47) |
-| #44 | Tag CRUD Admin UI (PR #45) |
-| #42 | text-fields entity_type_id フィルタ (PR #43) |
-| #40 | field_def 編集 UI (PR #41) |
-| #38 | Consumer views (PR #39) |
+| #75 | Public bootstrap API + HTML + React seed (PR #76) |
 
-## Phase 3 Tags / Query / Relations
+## Phase 3–6 サマリー（完了）
 
-- **API（済）:** tags CRUD, entity_tags, entities `?tags=` フィルタ
-- **Admin UI（済）:** Tag CRUD (#44), Record tag attach/detach (#46), Records 一覧 tag フィルタ (#48)
-- **Relations（済）:** Phase 3 一式 + MCP #65/#67
-- **Phase 5（一部済）:** MCP 全 API カタログ（54 tools）、Analytics / access log (#69)
-- **Phase 5 残:** detachEntityRelation MCP（upstream 待ち）
-- **Phase 6（一部済）:** Consumer Views #38/#63/#72 — `/view` index, pagination, consumer theme, API 例
+- **Tags / Relations / Query:** API + Admin UI 一式
+- **Phase 5:** MCP カタログ、Analytics（detachEntityRelation MCP は upstream 待ち）
+- **Phase 6:** Consumer `/view`、public record bootstrap、site settings
+
+## CMS 中期 TODO（Issue 未起票 → M1 から順に起票）
+
+- [ ] Users テーブル + session/JWT + AuthGate
+- [ ] Mutating API auth middleware（public GET は open）
+- [ ] Publish workflow（status enum + published_at + Admin UI）
+- [ ] #78 マージ後: footer Markdown を PublicShell でもレンダリング
+- [ ] Public slug（field convention + route + bootstrap）
+- [ ] Per-record SEO（meta override on bootstrap）
+- [ ] Entity record revisions（settings パターン）
+- [ ] Image/file field + upload API + media UI
+- [ ] Navigation / menu settings
+- [ ] Full-text search API
+- [ ] Scheduled publish / webhooks / import-export（M3）
 
 ## Verification
 
 ```bash
-composer check                    # 154 tests + openapi + mcp
+composer check                    # 165 tests + openapi + mcp
 npm run check --prefix frontend   # 68 tests
+docker compose exec app vendor/bin/phinx migrate
 ```
