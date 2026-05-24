@@ -16,6 +16,7 @@ export interface ManageEntityTypesViewProps {
   updateErrorTitle: string | null
   deleteTarget: EntityType | null
   isDeleting: boolean
+  deleteErrorDetail: string | null
   onRetry: () => void
   onCreate: (values: { name: string; slug: string }) => Promise<void>
   onRequestEdit: (entityType: EntityType) => void
@@ -38,6 +39,7 @@ export function ManageEntityTypesView({
   updateErrorTitle,
   deleteTarget,
   isDeleting,
+  deleteErrorDetail,
   onRetry,
   onCreate,
   onRequestEdit,
@@ -88,6 +90,7 @@ export function ManageEntityTypesView({
             ? `"${deleteTarget.name}" will be removed. This cannot be undone.`
             : undefined
         }
+        errorDetail={deleteErrorDetail}
         confirmLabel={isDeleting ? 'Deleting…' : 'Delete'}
         isPending={isDeleting}
         onCancel={onCancelDelete}

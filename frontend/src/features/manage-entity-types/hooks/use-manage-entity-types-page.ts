@@ -85,5 +85,6 @@ export function useManageEntityTypesPage() {
     cancelDelete,
     confirmDelete,
     isDeleting: deleteMutation.isPending,
+    deleteErrorDetail: deleteMutation.error?.detail ?? deleteMutation.error?.title ?? null,
   }
 }

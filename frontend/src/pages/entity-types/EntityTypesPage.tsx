@@ -22,6 +22,7 @@ export function EntityTypesPage() {
     cancelDelete,
     confirmDelete,
     isDeleting,
+    deleteErrorDetail,
   } = useManageEntityTypesPage()
 
   return (
@@ -41,6 +42,7 @@ export function EntityTypesPage() {
         updateErrorTitle={updateErrorTitle}
         deleteTarget={deleteTarget}
         isDeleting={isDeleting}
+        deleteErrorDetail={deleteErrorDetail}
         onRetry={() => {
           void refetch()
         }}

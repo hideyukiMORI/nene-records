@@ -30,6 +30,7 @@ use NeNeRecords\EntityRelation\RelationTargetTypeMismatchExceptionHandler;
 use NeNeRecords\EntityTag\EntityTagAlreadyAttachedExceptionHandler;
 use NeNeRecords\EntityTag\EntityTagNotAttachedExceptionHandler;
 use NeNeRecords\EntityTag\EntityTagServiceProvider;
+use NeNeRecords\EntityType\EntityTypeHasEntitiesExceptionHandler;
 use NeNeRecords\EntityType\EntityTypeNotFoundExceptionHandler;
 use NeNeRecords\EntityType\EntityTypeServiceProvider;
 use NeNeRecords\EntityType\EntityTypeSlugConflictExceptionHandler;
@@ -146,6 +147,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                 self::EXCEPTION_HANDLERS,
                 static function (ContainerInterface $container): array {
                     $entityTypeNotFound = $container->get(EntityTypeNotFoundExceptionHandler::class);
+                    $entityTypeHasEntities = $container->get(EntityTypeHasEntitiesExceptionHandler::class);
                     $entityTypeSlugConflict = $container->get(EntityTypeSlugConflictExceptionHandler::class);
                     $fieldDefNotFound = $container->get(FieldDefNotFoundExceptionHandler::class);
                     $fieldDefConflict = $container->get(FieldDefConflictExceptionHandler::class);
@@ -183,6 +185,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
 
                     foreach ([
                         $entityTypeNotFound,
+                        $entityTypeHasEntities,
                         $entityTypeSlugConflict,
                         $fieldDefNotFound,
                         $fieldDefConflict,
@@ -225,6 +228,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
 
                     return [
                         $entityTypeNotFound,
+                        $entityTypeHasEntities,
                         $entityTypeSlugConflict,
                         $fieldDefNotFound,
                         $fieldDefConflict,

@@ -10,6 +10,7 @@ use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
+use NeNeRecords\Entity\EntityRepositoryInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 
@@ -92,12 +93,17 @@ final readonly class EntityTypeServiceProvider implements ServiceProviderInterfa
                 DeleteEntityTypeUseCaseInterface::class,
                 static function (ContainerInterface $c): DeleteEntityTypeUseCaseInterface {
                     $repository = $c->get(EntityTypeRepositoryInterface::class);
+                    $entities = $c->get(EntityRepositoryInterface::class);
 
                     if (!$repository instanceof EntityTypeRepositoryInterface) {
                         throw new LogicException('Entity type repository service is invalid.');
                     }
 
-                    return new DeleteEntityTypeUseCase($repository);
+                    if (!$entities instanceof EntityRepositoryInterface) {
+                        throw new LogicException('Entity repository service is invalid.');
+                    }
+
+                    return new DeleteEntityTypeUseCase($repository, $entities);
                 },
             )
             ->set(
@@ -185,6 +191,18 @@ final readonly class EntityTypeServiceProvider implements ServiceProviderInterfa
                     }
 
                     return new EntityTypeNotFoundExceptionHandler($problemDetails);
+                },
+            )
+            ->set(
+                EntityTypeHasEntitiesExceptionHandler::class,
+                static function (ContainerInterface $c): EntityTypeHasEntitiesExceptionHandler {
+                    $problemDetails = $c->get(ProblemDetailsResponseFactory::class);
+
+                    if (!$problemDetails instanceof ProblemDetailsResponseFactory) {
+                        throw new LogicException('Problem details response factory service is invalid.');
+                    }
+
+                    return new EntityTypeHasEntitiesExceptionHandler($problemDetails);
                 },
             )
             ->set(
