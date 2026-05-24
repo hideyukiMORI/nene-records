@@ -18,6 +18,10 @@ export function seedEntityRelations(seed: EntityRelationLink[]): void {
   links = [...seed]
 }
 
+export function getEntityRelationLinks(): EntityRelationLink[] {
+  return links
+}
+
 export const entityRelationHandlers = [
   http.get('/api/v1/entities/:entityId/relations', ({ params, request }) => {
     const entityId = Number(params.entityId)

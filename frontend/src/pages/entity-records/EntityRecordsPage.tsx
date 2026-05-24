@@ -13,7 +13,9 @@ export function EntityRecordsPage() {
     recordLabels,
     total,
     availableTags,
+    relationFieldDefs,
     selectedTagSlugs,
+    selectedRelationFilters,
     isFilterActive,
     isLoading,
     isError,
@@ -24,6 +26,8 @@ export function EntityRecordsPage() {
     createErrorTitle,
     toggleTagSlug,
     clearTagFilter,
+    setRelationFilter,
+    clearRelationFilters,
     deleteTarget,
     requestDelete,
     cancelDelete,
@@ -51,7 +55,9 @@ export function EntityRecordsPage() {
         recordLabels={recordLabels}
         total={total}
         availableTags={availableTags}
+        relationFieldDefs={relationFieldDefs}
         selectedTagSlugs={selectedTagSlugs}
+        selectedRelationFilters={selectedRelationFilters}
         isFilterActive={isFilterActive}
         isLoading={isLoading}
         isError={isError}
@@ -65,6 +71,8 @@ export function EntityRecordsPage() {
         }}
         onToggleTagSlug={toggleTagSlug}
         onClearTagFilter={clearTagFilter}
+        onSelectRelationFilter={setRelationFilter}
+        onClearRelationFilters={clearRelationFilters}
         onCreate={createEntity}
         onRequestDelete={requestDelete}
         onCancelDelete={cancelDelete}

@@ -6,23 +6,36 @@ import {
   useEntityList,
   type Entity,
   type EntityId,
+  type EntityRelationFilters,
 } from '@/entities/entity'
+import {
+  defaultFieldDefListParams,
+  isRelationFieldDef,
+  useFieldDefList,
+  type RelationFieldDef,
+} from '@/entities/field-def'
 import { useTagList } from '@/entities/tag'
 import { defaultTextFieldListParamsForEntityType, useTextFieldList } from '@/entities/text-field'
 import { getRecordDisplayLabel } from '@/shared/lib/get-record-display-label'
 
 export function useManageEntitiesPage(entityTypeId: number) {
   const [selectedTagSlugs, setSelectedTagSlugs] = useState<string[]>([])
+  const [selectedRelationFilters, setSelectedRelationFilters] = useState<EntityRelationFilters>({})
   const listParams = useMemo(
-    () => defaultEntityListParams(entityTypeId, selectedTagSlugs),
-    [entityTypeId, selectedTagSlugs],
+    () => defaultEntityListParams(entityTypeId, selectedTagSlugs, selectedRelationFilters),
+    [entityTypeId, selectedRelationFilters, selectedTagSlugs],
   )
   const listQuery = useEntityList(listParams)
   const tagListQuery = useTagList({ limit: 100, offset: 0 })
+  const fieldDefQuery = useFieldDefList(defaultFieldDefListParams(entityTypeId))
   const textFieldQuery = useTextFieldList(defaultTextFieldListParamsForEntityType(entityTypeId))
   const createMutation = useCreateEntity()
   const deleteMutation = useDeleteEntity()
   const [deleteTarget, setDeleteTarget] = useState<Entity | null>(null)
+
+  const relationFieldDefs = useMemo((): RelationFieldDef[] => {
+    return (fieldDefQuery.data?.items ?? []).filter(isRelationFieldDef)
+  }, [fieldDefQuery.data?.items])
 
   const items = useMemo(() => listQuery.data?.items ?? [], [listQuery.data?.items])
 
@@ -47,6 +60,20 @@ export function useManageEntitiesPage(entityTypeId: number) {
     setSelectedTagSlugs([])
   }, [])
 
+  const setRelationFilter = useCallback((fieldKey: string, targetEntityId: number | undefined) => {
+    setSelectedRelationFilters((current) => {
+      if (targetEntityId === undefined) {
+        return Object.fromEntries(Object.entries(current).filter(([key]) => key !== fieldKey))
+      }
+
+      return { ...current, [fieldKey]: targetEntityId }
+    })
+  }, [])
+
+  const clearRelationFilters = useCallback(() => {
+    setSelectedRelationFilters({})
+  }, [])
+
   const createEntity = useCallback(async () => {
     await createMutation.mutateAsync({ entityTypeId })
   }, [createMutation, entityTypeId])
@@ -69,24 +96,34 @@ export function useManageEntitiesPage(entityTypeId: number) {
     setDeleteTarget(null)
   }, [deleteMutation, deleteTarget, entityTypeId])
 
-  const isLoading = listQuery.isLoading || textFieldQuery.isLoading
-  const isError = listQuery.isError || textFieldQuery.isError
-  const errorTitle = listQuery.error?.title ?? textFieldQuery.error?.title ?? null
+  const isLoading = listQuery.isLoading || textFieldQuery.isLoading || fieldDefQuery.isLoading
+  const isError = listQuery.isError || textFieldQuery.isError || fieldDefQuery.isError
+  const errorTitle =
+    listQuery.error?.title ?? textFieldQuery.error?.title ?? fieldDefQuery.error?.title ?? null
 
   return {
     items,
     recordLabels,
     total: listQuery.data?.total ?? 0,
     availableTags: tagListQuery.data?.items ?? [],
+    relationFieldDefs,
     selectedTagSlugs,
+    selectedRelationFilters,
     toggleTagSlug,
     clearTagFilter,
-    isFilterActive: selectedTagSlugs.length > 0,
+    setRelationFilter,
+    clearRelationFilters,
+    isFilterActive: selectedTagSlugs.length > 0 || Object.keys(selectedRelationFilters).length > 0,
     isLoading,
     isError,
     errorTitle,
     refetch: async () => {
-      await Promise.all([listQuery.refetch(), textFieldQuery.refetch(), tagListQuery.refetch()])
+      await Promise.all([
+        listQuery.refetch(),
+        textFieldQuery.refetch(),
+        tagListQuery.refetch(),
+        fieldDefQuery.refetch(),
+      ])
     },
     createEntity,
     isCreating: createMutation.isPending,
