@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { defaultEntityListParams, useEntityList } from '@/entities/entity'
 import { useEntityTypeList } from '@/entities/entity-type'
-import { useTextFieldList } from '@/entities/text-field'
+import { defaultTextFieldListParamsForEntityType, useTextFieldList } from '@/entities/text-field'
 import { findEntityTypeBySlug } from '@/shared/lib/find-entity-type-by-slug'
 import { getRecordDisplayLabel } from '@/shared/lib/get-record-display-label'
 
@@ -20,7 +20,11 @@ export function usePublicBrowseEntityRecordsPage(entityTypeSlug: string) {
   const entityTypeId = entityType !== undefined ? Number(entityType.id) : 0
   const listParams = defaultEntityListParams(entityTypeId)
   const entityListQuery = useEntityList(listParams, { enabled: entityTypeId > 0 })
-  const textFieldQuery = useTextFieldList()
+  const textFieldListParams = useMemo(
+    () => defaultTextFieldListParamsForEntityType(entityTypeId),
+    [entityTypeId],
+  )
+  const textFieldQuery = useTextFieldList(textFieldListParams, { enabled: entityTypeId > 0 })
 
   const items = useMemo((): PublicRecordListItem[] => {
     const entities = entityListQuery.data?.items ?? []
@@ -35,7 +39,7 @@ export function usePublicBrowseEntityRecordsPage(entityTypeSlug: string) {
   const isLoading =
     entityTypeQuery.isLoading ||
     (entityTypeId > 0 && entityListQuery.isLoading) ||
-    textFieldQuery.isLoading
+    (entityTypeId > 0 && textFieldQuery.isLoading)
   const isError = entityTypeQuery.isError || entityListQuery.isError || textFieldQuery.isError
   const errorTitle =
     entityTypeQuery.error?.title ??

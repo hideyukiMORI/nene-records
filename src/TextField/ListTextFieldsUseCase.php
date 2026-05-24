@@ -13,9 +13,19 @@ final readonly class ListTextFieldsUseCase implements ListTextFieldsUseCaseInter
 
     public function execute(ListTextFieldsInput $input): ListTextFieldsOutput
     {
-        $rows = $input->entityId !== null
-            ? $this->textFields->findByEntityId($input->entityId, $input->limit, $input->offset)
-            : $this->textFields->findAll($input->limit, $input->offset);
+        $rows = match (true) {
+            $input->entityId !== null => $this->textFields->findByEntityId(
+                $input->entityId,
+                $input->limit,
+                $input->offset,
+            ),
+            $input->entityTypeId !== null => $this->textFields->findByEntityTypeId(
+                $input->entityTypeId,
+                $input->limit,
+                $input->offset,
+            ),
+            default => $this->textFields->findAll($input->limit, $input->offset),
+        };
 
         $items = array_map(
             static fn (TextField $textField) => new ListTextFieldItem(

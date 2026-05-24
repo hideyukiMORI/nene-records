@@ -1,4 +1,5 @@
 import { http, HttpResponse } from 'msw'
+import { getActiveEntities } from './entity'
 
 interface TextFieldRecord {
   id: number
@@ -28,10 +29,22 @@ export const textFieldHandlers = [
     const offset = Number(url.searchParams.get('offset') ?? '0')
     const entityIdParam = url.searchParams.get('entity_id')
     const entityId = entityIdParam === null ? null : Number(entityIdParam)
+    const entityTypeIdParam = url.searchParams.get('entity_type_id')
+    const entityTypeId = entityTypeIdParam === null ? null : Number(entityTypeIdParam)
 
     const active = items.filter((item) => !item.is_deleted)
-    const filtered =
-      entityId === null ? active : active.filter((item) => item.entity_id === entityId)
+    let filtered = active
+
+    if (entityId !== null) {
+      filtered = active.filter((item) => item.entity_id === entityId)
+    } else if (entityTypeId !== null) {
+      const entityIds = new Set(
+        getActiveEntities()
+          .filter((entity) => entity.entity_type_id === entityTypeId)
+          .map((entity) => entity.id),
+      )
+      filtered = active.filter((item) => entityIds.has(item.entity_id))
+    }
 
     return HttpResponse.json({
       items: filtered.slice(offset, offset + limit).map((item) => ({

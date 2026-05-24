@@ -22,6 +22,13 @@ interface TextFieldRepositoryInterface
      */
     public function findByEntityId(int $entityId, int $limit, int $offset): array;
 
+    /**
+     * Active (non-soft-deleted) rows for entities belonging to the given entity type.
+     *
+     * @return list<TextField>
+     */
+    public function findByEntityTypeId(int $entityTypeId, int $limit, int $offset): array;
+
     public function save(TextField $textField): int;
 
     public function update(TextField $textField): void;

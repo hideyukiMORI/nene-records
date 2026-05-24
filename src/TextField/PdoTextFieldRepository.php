@@ -71,6 +71,34 @@ final readonly class PdoTextFieldRepository implements TextFieldRepositoryInterf
         );
     }
 
+    /** @return list<TextField> */
+    public function findByEntityTypeId(int $entityTypeId, int $limit, int $offset): array
+    {
+        $rows = $this->query->fetchAll(
+            <<<'SQL'
+            SELECT tf.id, tf.entity_id, tf.field_key, tf.value
+            FROM text_fields tf
+            INNER JOIN entities e ON e.id = tf.entity_id
+            WHERE tf.is_deleted = 0
+              AND e.is_deleted = 0
+              AND e.entity_type_id = ?
+            ORDER BY tf.id ASC
+            LIMIT ? OFFSET ?
+            SQL,
+            [$entityTypeId, $limit, $offset],
+        );
+
+        return array_map(
+            static fn (array $row) => new TextField(
+                entityId: (int) $row['entity_id'],
+                fieldKey: (string) $row['field_key'],
+                value: (string) $row['value'],
+                id: (int) $row['id'],
+            ),
+            $rows,
+        );
+    }
+
     public function save(TextField $textField): int
     {
         $this->query->execute(

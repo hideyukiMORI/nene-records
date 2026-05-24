@@ -31,8 +31,17 @@ final readonly class ListTextFieldsHandler
             }
         }
 
+        $entityTypeId = null;
+        if ($entityId === null && isset($query['entity_type_id'])) {
+            $raw = (int) $query['entity_type_id'];
+            if ($raw > 0) {
+                $entityTypeId = $raw;
+            }
+        }
+
         $output = $this->useCase->execute(new ListTextFieldsInput(
             entityId: $entityId,
+            entityTypeId: $entityTypeId,
             limit: $pagination->limit,
             offset: $pagination->offset,
         ));

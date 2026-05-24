@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NeNeRecords\Tests\TextField;
 
+use NeNeRecords\Entity\EntityRepositoryInterface;
 use NeNeRecords\TextField\TextField;
 use NeNeRecords\TextField\TextFieldNotFoundException;
 use NeNeRecords\TextField\TextFieldRepositoryInterface;
@@ -18,9 +19,13 @@ final class InMemoryTextFieldRepository implements TextFieldRepositoryInterface
 
     private int $nextId;
 
-    /** @param list<TextField> $seed */
-    public function __construct(array $seed = [])
-    {
+    /**
+     * @param list<TextField> $seed
+     */
+    public function __construct(
+        array $seed = [],
+        private ?EntityRepositoryInterface $entities = null,
+    ) {
         $this->fields = [];
         $this->deletedIds = [];
         $this->nextId = 1;
@@ -66,6 +71,32 @@ final class InMemoryTextFieldRepository implements TextFieldRepositoryInterface
 
         foreach ($this->fields as $id => $textField) {
             if (!isset($this->deletedIds[$id]) && $textField->entityId === $entityId) {
+                $active[] = $textField;
+            }
+        }
+
+        usort($active, static fn (TextField $a, TextField $b): int => ($a->id ?? 0) <=> ($b->id ?? 0));
+
+        return array_slice($active, $offset, $limit);
+    }
+
+    /** @return list<TextField> */
+    public function findByEntityTypeId(int $entityTypeId, int $limit, int $offset): array
+    {
+        $active = [];
+
+        foreach ($this->fields as $id => $textField) {
+            if (isset($this->deletedIds[$id])) {
+                continue;
+            }
+
+            if ($this->entities === null) {
+                continue;
+            }
+
+            $entity = $this->entities->findById($textField->entityId);
+
+            if ($entity !== null && $entity->entityTypeId === $entityTypeId) {
                 $active[] = $textField;
             }
         }

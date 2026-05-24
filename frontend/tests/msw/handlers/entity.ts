@@ -20,6 +20,10 @@ export function seedEntities(seed: EntityRecord[]): void {
   nextId = Math.max(0, ...seed.map((item) => item.id)) + 1
 }
 
+export function getActiveEntities(): EntityRecord[] {
+  return items.filter((item) => !item.is_deleted)
+}
+
 export const entityHandlers = [
   http.get('/api/v1/entities', ({ request }) => {
     const url = new URL(request.url)

@@ -156,4 +156,30 @@ final class PdoTextFieldRepositoryTest extends TestCase
         self::assertCount(1, $list);
         self::assertSame('a', $list[0]->fieldKey);
     }
+
+    public function testFindByEntityTypeIdExcludesOtherTypesAndDeleted(): void
+    {
+        $this->executor->execute("INSERT INTO entity_types (name, slug) VALUES ('A', 'a')");
+        $typeAId = $this->executor->lastInsertId();
+        $this->executor->execute("INSERT INTO entity_types (name, slug) VALUES ('B', 'b')");
+        $typeBId = $this->executor->lastInsertId();
+
+        $this->executor->execute('INSERT INTO entities (entity_type_id) VALUES (?)', [$typeAId]);
+        $entityAId = $this->executor->lastInsertId();
+        $this->executor->execute('INSERT INTO entities (entity_type_id) VALUES (?)', [$typeBId]);
+        $entityBId = $this->executor->lastInsertId();
+
+        $repository = new PdoTextFieldRepository($this->executor);
+
+        $repository->save(new TextField(entityId: $entityAId, fieldKey: 'title', value: 'A'));
+        $repository->save(new TextField(entityId: $entityBId, fieldKey: 'title', value: 'B'));
+        $deletedId = $repository->save(new TextField(entityId: $entityAId, fieldKey: 'body', value: 'gone'));
+        $repository->delete($deletedId);
+
+        $list = $repository->findByEntityTypeId($typeAId, 10, 0);
+
+        self::assertCount(1, $list);
+        self::assertSame('title', $list[0]->fieldKey);
+        self::assertSame('A', $list[0]->value);
+    }
 }

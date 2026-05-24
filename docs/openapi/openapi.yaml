@@ -578,6 +578,7 @@ paths:
         - $ref: '#/components/parameters/LimitQuery'
         - $ref: '#/components/parameters/OffsetQuery'
         - $ref: '#/components/parameters/EntityIdQuery'
+        - $ref: '#/components/parameters/EntityTypeIdQuery'
       responses:
         '200':
           description: Paginated text field list.
