@@ -19,9 +19,27 @@ Consumer views          ──┼──→  NeNe Records API (NENE2)  ──→ 
 AI clients (MCP)        ──┘
 ```
 
+## Contributing
+
+NeNe Records inherits NENE2 engineering discipline:
+
+| Topic | Document |
+| --- | --- |
+| **Start here (agents)** | [`AGENTS.md`](./AGENTS.md) |
+| NENE2 inheritance map | [`docs/inheritance-from-nene2.md`](./docs/inheritance-from-nene2.md) |
+| Workflow | [`docs/workflow.md`](./docs/workflow.md) |
+| Commit conventions | [`docs/development/commit-conventions.md`](./docs/development/commit-conventions.md) |
+| Coding standards | [`docs/development/coding-standards.md`](./docs/development/coding-standards.md) |
+| Full contributing guide | [`docs/CONTRIBUTING.md`](./docs/CONTRIBUTING.md) |
+
+**Rules in brief:** GitHub Issue-driven work, `type/issue-number-summary` branches, Conventional Commits (Japanese description, English type), PR with verification and self-review checklist, no direct commits to `main`.
+
 ## Status
 
-Early planning. See [Issues](https://github.com/hideyukiMORI/nene-records/issues) for roadmap.
+Early planning. See [Issues](https://github.com/hideyukiMORI/nene-records/issues).
+
+- [#1](https://github.com/hideyukiMORI/nene-records/issues/1) — MVP entity CRUD vertical slice
+- [#2](https://github.com/hideyukiMORI/nene-records/issues/2) — NENE2 governance inheritance
 
 ## Related
 
