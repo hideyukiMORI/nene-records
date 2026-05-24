@@ -32,6 +32,8 @@ tags:
     description: Tags attached to entity instances.
   - name: EntityRelations
     description: Typed relation links between entity instances.
+  - name: Analytics
+    description: HTTP access log aggregation and reporting.
 paths:
   /health:
     get:
@@ -1588,6 +1590,51 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /api/v1/analytics/access-stats:
+    get:
+      tags:
+        - Analytics
+      summary: Access stats by date
+      description: Returns daily HTTP access counts and average duration for the inclusive date range.
+      operationId: getAccessStatsByDate
+      parameters:
+        - name: from
+          in: query
+          required: true
+          description: Start date (inclusive), YYYY-MM-DD.
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          required: true
+          description: End date (inclusive), YYYY-MM-DD. Range must not exceed 366 days.
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Daily access statistics.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessStatsByDateResponse'
+              examples:
+                ok:
+                  value:
+                    from: '2026-05-01'
+                    to: '2026-05-03'
+                    items:
+                      - date: '2026-05-01'
+                        request_count: 12
+                        avg_duration_ms: 8.5
+                      - date: '2026-05-02'
+                        request_count: 7
+                        avg_duration_ms: 11.2
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 components:
   parameters:
     IdPath:
@@ -2464,3 +2511,38 @@ components:
           type: integer
         offset:
           type: integer
+    AccessStatsByDateResponse:
+      type: object
+      required:
+        - from
+        - to
+        - items
+      properties:
+        from:
+          type: string
+          format: date
+        to:
+          type: string
+          format: date
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccessStatsDayItem'
+      additionalProperties: false
+    AccessStatsDayItem:
+      type: object
+      required:
+        - date
+        - request_count
+        - avg_duration_ms
+      properties:
+        date:
+          type: string
+          format: date
+        request_count:
+          type: integer
+          minimum: 0
+        avg_duration_ms:
+          type: number
+          minimum: 0
+      additionalProperties: false

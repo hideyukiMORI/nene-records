@@ -8,6 +8,7 @@ use LogicException;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\DomainExceptionHandlerInterface;
+use NeNeRecords\Analytics\AnalyticsServiceProvider;
 use NeNeRecords\BoolField\BoolFieldNotFoundExceptionHandler;
 use NeNeRecords\BoolField\BoolFieldServiceProvider;
 use NeNeRecords\BoolField\FieldKeyNotRegisteredExceptionHandler as BoolFieldKeyNotRegisteredExceptionHandler;
@@ -69,7 +70,8 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
             ->addProvider(new DateTimeFieldServiceProvider())
             ->addProvider(new TagServiceProvider())
             ->addProvider(new EntityTagServiceProvider())
-            ->addProvider(new EntityRelationServiceProvider());
+            ->addProvider(new EntityRelationServiceProvider())
+            ->addProvider(new AnalyticsServiceProvider());
 
         $builder
             ->set(
@@ -86,6 +88,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $tag = $container->get('nene-records.route_registrar.tag');
                     $entityTag = $container->get('nene-records.route_registrar.entity_tag');
                     $entityRelation = $container->get('nene-records.route_registrar.entity_relation');
+                    $analytics = $container->get('nene-records.route_registrar.analytics');
 
                     if (
                         !is_callable($entityType)
@@ -99,6 +102,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         || !is_callable($tag)
                         || !is_callable($entityTag)
                         || !is_callable($entityRelation)
+                        || !is_callable($analytics)
                     ) {
                         throw new LogicException('Route registrar service is invalid.');
                     }
@@ -115,6 +119,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $tag,
                         $entityTag,
                         $entityRelation,
+                        $analytics,
                     ];
                 },
             )

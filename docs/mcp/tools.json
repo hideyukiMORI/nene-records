@@ -571,6 +571,39 @@
             "responseSchemaRef": null
         },
         {
+            "name": "getAccessStatsByDate",
+            "title": "Access Stats By Date",
+            "description": "Return daily HTTP access counts and average duration for an inclusive date range (YYYY-MM-DD).",
+            "safety": "read",
+            "source": {
+                "type": "openapi",
+                "operationId": "getAccessStatsByDate",
+                "method": "GET",
+                "path": "/api/v1/analytics/access-stats"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "from": {
+                        "type": "string",
+                        "format": "date",
+                        "description": "Start date (inclusive), YYYY-MM-DD."
+                    },
+                    "to": {
+                        "type": "string",
+                        "format": "date",
+                        "description": "End date (inclusive), YYYY-MM-DD. Range must not exceed 366 days."
+                    }
+                },
+                "required": [
+                    "from",
+                    "to"
+                ],
+                "additionalProperties": false
+            },
+            "responseSchemaRef": "#/components/schemas/AccessStatsByDateResponse"
+        },
+        {
             "name": "listFieldDefs",
             "title": "List Field Definitions",
             "description": "List registered field definitions, optionally filtered by entity type.",

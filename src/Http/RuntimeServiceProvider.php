@@ -24,6 +24,7 @@ use Nene2\Http\ResponseEmitter;
 use Nene2\Http\RuntimeApplicationFactory;
 use Nene2\Log\MonologLoggerFactory;
 use Nene2\Log\RequestIdHolder;
+use NeNeRecords\Analytics\AccessLogMiddleware;
 use NeNeRecords\ApplicationServiceProvider;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Psr\Container\ContainerInterface;
@@ -218,7 +219,13 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
                         throw new LogicException('RequestIdHolder service is invalid.');
                     }
 
-                    $bearerMiddleware = null;
+                    $accessLogMiddleware = $container->get(AccessLogMiddleware::class);
+
+                    if (!$accessLogMiddleware instanceof AccessLogMiddleware) {
+                        throw new LogicException('Access log middleware service is invalid.');
+                    }
+
+                    $authMiddleware = [$accessLogMiddleware];
 
                     if ($config->localJwtSecret !== null) {
                         $problemDetails = $container->get(ProblemDetailsResponseFactory::class);
@@ -227,7 +234,7 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
                             throw new LogicException('ProblemDetailsResponseFactory service is invalid.');
                         }
 
-                        $bearerMiddleware = new BearerTokenMiddleware(
+                        $authMiddleware[] = new BearerTokenMiddleware(
                             $problemDetails,
                             new LocalBearerTokenVerifier($config->localJwtSecret),
                             [],
@@ -242,7 +249,7 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
                         $exceptionHandlers,
                         $requestIdHolder,
                         $routeRegistrars,
-                        $bearerMiddleware,
+                        $authMiddleware,
                         [],
                         null,
                         $config->debug,

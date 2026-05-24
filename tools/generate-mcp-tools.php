@@ -434,6 +434,28 @@ $tools = [
         ['entityId', 'field_key', 'target_entity_id'],
     ),
     readTool(
+        'getAccessStatsByDate',
+        'Access Stats By Date',
+        'Return daily HTTP access counts and average duration for an inclusive date range (YYYY-MM-DD).',
+        'getAccessStatsByDate',
+        'GET',
+        '/api/v1/analytics/access-stats',
+        [
+            'from' => [
+                'type' => 'string',
+                'format' => 'date',
+                'description' => 'Start date (inclusive), YYYY-MM-DD.',
+            ],
+            'to' => [
+                'type' => 'string',
+                'format' => 'date',
+                'description' => 'End date (inclusive), YYYY-MM-DD. Range must not exceed 366 days.',
+            ],
+        ],
+        '#/components/schemas/AccessStatsByDateResponse',
+        ['from', 'to'],
+    ),
+    readTool(
         'listFieldDefs',
         'List Field Definitions',
         'List registered field definitions, optionally filtered by entity type.',

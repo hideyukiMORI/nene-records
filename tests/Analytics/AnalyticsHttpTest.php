@@ -1,0 +1,121 @@
+<?php
+
+declare(strict_types=1);
+
+namespace NeNeRecords\Tests\Analytics;
+
+use DateTimeImmutable;
+use DateTimeZone;
+use Nene2\Http\JsonResponseFactory;
+use Nene2\Http\RuntimeApplicationFactory;
+use NeNeRecords\Analytics\AccessLogEntry;
+use NeNeRecords\Analytics\AnalyticsRouteRegistrar;
+use NeNeRecords\Analytics\GetAccessStatsByDateHandler;
+use NeNeRecords\Analytics\GetAccessStatsByDateUseCase;
+use Nyholm\Psr7\Factory\Psr17Factory;
+use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Server\RequestHandlerInterface;
+
+final class AnalyticsHttpTest extends TestCase
+{
+    private Psr17Factory $factory;
+    private InMemoryAccessLogRepository $repository;
+    private RequestHandlerInterface $application;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->factory = new Psr17Factory();
+        $this->repository = new InMemoryAccessLogRepository();
+
+        $utc = new DateTimeZone('UTC');
+        $this->repository->insert(new AccessLogEntry(
+            requestId: null,
+            method: 'GET',
+            path: '/api/v1/tags',
+            statusCode: 200,
+            durationMs: 10.0,
+            accessedAt: new DateTimeImmutable('2026-05-01T12:00:00+00:00', $utc),
+        ));
+        $this->repository->insert(new AccessLogEntry(
+            requestId: null,
+            method: 'GET',
+            path: '/api/v1/entities',
+            statusCode: 200,
+            durationMs: 30.0,
+            accessedAt: new DateTimeImmutable('2026-05-02T08:00:00+00:00', $utc),
+        ));
+
+        $jsonResponse = new JsonResponseFactory($this->factory, $this->factory);
+        $registrar = new AnalyticsRouteRegistrar(
+            new GetAccessStatsByDateHandler(
+                new GetAccessStatsByDateUseCase($this->repository),
+                $jsonResponse,
+            ),
+        );
+
+        $this->application = (new RuntimeApplicationFactory(
+            $this->factory,
+            $this->factory,
+            routeRegistrars: [$registrar],
+        ))->create();
+    }
+
+    public function testGetAccessStatsByDateReturnsAggregatedItems(): void
+    {
+        $response = $this->application->handle(
+            $this->factory->createServerRequest(
+                'GET',
+                'https://example.test/api/v1/analytics/access-stats?from=2026-05-01&to=2026-05-02',
+            ),
+        );
+        $payload = $this->decodeJson($response);
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('2026-05-01', $payload['from']);
+        self::assertSame('2026-05-02', $payload['to']);
+        self::assertCount(2, $payload['items']);
+        self::assertSame('2026-05-01', $payload['items'][0]['date']);
+        self::assertSame(1, $payload['items'][0]['request_count']);
+        self::assertSame(10.0, $payload['items'][0]['avg_duration_ms']);
+    }
+
+    public function testMissingFromReturns422(): void
+    {
+        $response = $this->application->handle(
+            $this->factory->createServerRequest(
+                'GET',
+                'https://example.test/api/v1/analytics/access-stats?to=2026-05-02',
+            ),
+        );
+        $payload = $this->decodeJson($response);
+
+        self::assertSame(422, $response->getStatusCode());
+        self::assertStringEndsWith('validation-failed', (string) $payload['type']);
+    }
+
+    public function testInvalidDateFormatReturns422(): void
+    {
+        $response = $this->application->handle(
+            $this->factory->createServerRequest(
+                'GET',
+                'https://example.test/api/v1/analytics/access-stats?from=2026/05/01&to=2026-05-02',
+            ),
+        );
+
+        self::assertSame(422, $response->getStatusCode());
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function decodeJson(ResponseInterface $response): array
+    {
+        $payload = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
+        self::assertIsArray($payload);
+
+        return $payload;
+    }
+}

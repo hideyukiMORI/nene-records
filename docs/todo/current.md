@@ -6,13 +6,13 @@ Last updated: 2026-05-24
 
 | Issue | Summary |
 | --- | --- |
-| — | Analytics / access log API（Phase 5 残） |
+| — | （なし — Phase 5 Analytics 完了後） |
 
 ## In Progress
 
 | Issue | Summary |
 | --- | --- |
-| — | （なし） |
+| #69 | Analytics / access log API |
 
 ## Recently Completed
 
@@ -38,8 +38,8 @@ Last updated: 2026-05-24
 - **API（済）:** tags CRUD, entity_tags, entities `?tags=` フィルタ
 - **Admin UI（済）:** Tag CRUD (#44), Record tag attach/detach (#46), Records 一覧 tag フィルタ (#48)
 - **Relations（済）:** Phase 3 一式 + MCP #65/#67
-- **Phase 5（一部済）:** MCP 全 API カタログ（53 tools, `composer mcp:generate`）
-- **Phase 5 残:** Analytics / access log、detachEntityRelation MCP（upstream 待ち）
+- **Phase 5（一部済）:** MCP 全 API カタログ（53 tools → 54 tools, `composer mcp:generate`）
+- **Phase 5 残:** detachEntityRelation MCP（upstream 待ち）
 
 ## Verification
 
