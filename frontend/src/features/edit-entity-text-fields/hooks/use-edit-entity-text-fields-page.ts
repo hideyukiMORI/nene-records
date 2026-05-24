@@ -33,7 +33,9 @@ import {
   type TextField,
 } from '@/entities/text-field'
 
-const EDITABLE_DATA_TYPES: FieldDataType[] = [...FIELD_DATA_TYPES]
+const EDITABLE_DATA_TYPES: FieldDataType[] = FIELD_DATA_TYPES.filter(
+  (dataType) => dataType !== 'relation',
+)
 
 const FIELD_LIST_PARAMS = { limit: 100, offset: 0 } as const
 

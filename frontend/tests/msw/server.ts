@@ -1,6 +1,7 @@
 import { setupServer } from 'msw/node'
 import { boolFieldHandlers } from './handlers/bool-field'
 import { dateTimeFieldHandlers } from './handlers/datetime-field'
+import { entityRelationHandlers } from './handlers/entity-relation'
 import { entityTagHandlers } from './handlers/entity-tag'
 import { entityHandlers } from './handlers/entity'
 import { entityTypeHandlers } from './handlers/entity-type'
@@ -14,6 +15,7 @@ export const mswServer = setupServer(
   ...entityTypeHandlers,
   ...entityHandlers,
   ...entityTagHandlers,
+  ...entityRelationHandlers,
   ...fieldDefHandlers,
   ...textFieldHandlers,
   ...intFieldHandlers,

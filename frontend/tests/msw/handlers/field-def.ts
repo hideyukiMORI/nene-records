@@ -1,18 +1,21 @@
 import { http, HttpResponse } from 'msw'
 
-type FieldDataType = 'text' | 'int' | 'enum' | 'bool' | 'datetime'
+type FieldDataType = 'text' | 'int' | 'enum' | 'bool' | 'datetime' | 'relation'
+type RelationCardinality = 'one' | 'many'
 
-const FIELD_DATA_TYPES: FieldDataType[] = ['text', 'int', 'enum', 'bool', 'datetime']
+const FIELD_DATA_TYPES: FieldDataType[] = ['text', 'int', 'enum', 'bool', 'datetime', 'relation']
 
 function isFieldDataType(value: string): value is FieldDataType {
   return (FIELD_DATA_TYPES as string[]).includes(value)
 }
 
-interface FieldDefRecord {
+export interface FieldDefRecord {
   id: number
   entity_type_id: number
   field_key: string
   data_type: FieldDataType
+  target_entity_type_id?: number
+  cardinality?: RelationCardinality
 }
 
 let nextId = 1
@@ -26,6 +29,13 @@ export function resetFieldDefStore(): void {
 export function seedFieldDefs(seed: FieldDefRecord[]): void {
   items = [...seed]
   nextId = Math.max(0, ...seed.map((item) => item.id)) + 1
+}
+
+export function findFieldDefForEntityType(
+  entityTypeId: number,
+  fieldKey: string,
+): FieldDefRecord | undefined {
+  return items.find((item) => item.entity_type_id === entityTypeId && item.field_key === fieldKey)
 }
 
 export const fieldDefHandlers = [
@@ -68,6 +78,8 @@ export const fieldDefHandlers = [
       entity_type_id?: number
       field_key?: string
       data_type?: string
+      target_entity_type_id?: number
+      cardinality?: RelationCardinality
     }
 
     if (typeof body.entity_type_id !== 'number' || body.entity_type_id < 1) {
@@ -130,6 +142,8 @@ export const fieldDefHandlers = [
       entity_type_id: body.entity_type_id,
       field_key: body.field_key,
       data_type: body.data_type,
+      target_entity_type_id: body.target_entity_type_id,
+      cardinality: body.cardinality,
     }
     items = [...items, created]
 
@@ -155,6 +169,8 @@ export const fieldDefHandlers = [
       entity_type_id?: number
       field_key?: string
       data_type?: string
+      target_entity_type_id?: number
+      cardinality?: RelationCardinality
     }
 
     if (typeof body.entity_type_id !== 'number' || body.entity_type_id < 1) {
@@ -225,6 +241,8 @@ export const fieldDefHandlers = [
       entity_type_id: body.entity_type_id,
       field_key: body.field_key,
       data_type: body.data_type,
+      target_entity_type_id: body.target_entity_type_id,
+      cardinality: body.cardinality,
     }
     items = items.map((item, itemIndex) => (itemIndex === index ? updated : item))
 
