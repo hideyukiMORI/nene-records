@@ -3,7 +3,7 @@ info:
   title: NeNe Records API
   version: 0.1.0
   description: >
-    NeNe Records public API contract — entity_types, entities, and text_fields CRUD (MVP).
+    NeNe Records public API contract — entity_types, field_defs, entities, and text_fields CRUD (MVP + Phase 2 registry).
 servers:
   - url: http://localhost:8080
     description: Local development server
@@ -14,6 +14,8 @@ tags:
     description: Entity type schema definitions.
   - name: Entities
     description: Entity instances bound to an entity type.
+  - name: FieldDefs
+    description: Registered field definitions per entity type.
   - name: TextFields
     description: Typed text field values on entities.
 paths:
@@ -322,6 +324,156 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /api/v1/field-defs:
+    get:
+      tags:
+        - FieldDefs
+      summary: List field definitions
+      description: Returns non-deleted field definitions, optionally filtered by entity type.
+      operationId: listFieldDefs
+      parameters:
+        - $ref: '#/components/parameters/LimitQuery'
+        - $ref: '#/components/parameters/OffsetQuery'
+        - $ref: '#/components/parameters/EntityTypeIdQuery'
+      responses:
+        '200':
+          description: Paginated field definition list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FieldDefListResponse'
+              examples:
+                ok:
+                  summary: Empty list
+                  value:
+                    items: []
+                    limit: 20
+                    offset: 0
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - FieldDefs
+      summary: Create field definition
+      description: Registers a field key and data type for an entity type.
+      operationId: createFieldDef
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFieldDefRequest'
+            examples:
+              ok:
+                value:
+                  entity_type_id: 1
+                  field_key: title
+                  data_type: text
+      responses:
+        '201':
+          description: Field definition created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FieldDefResponse'
+              examples:
+                ok:
+                  value:
+                    id: 1
+                    entity_type_id: 1
+                    field_key: title
+                    data_type: text
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/FieldDefConflict'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/field-defs/{id}:
+    get:
+      tags:
+        - FieldDefs
+      summary: Get field definition by id
+      operationId: getFieldDefById
+      parameters:
+        - $ref: '#/components/parameters/IdPath'
+      responses:
+        '200':
+          description: Field definition found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FieldDefResponse'
+              examples:
+                ok:
+                  value:
+                    id: 1
+                    entity_type_id: 1
+                    field_key: title
+                    data_type: text
+        '404':
+          $ref: '#/components/responses/FieldDefNotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - FieldDefs
+      summary: Update field definition
+      operationId: updateFieldDef
+      parameters:
+        - $ref: '#/components/parameters/IdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateFieldDefRequest'
+            examples:
+              ok:
+                value:
+                  entity_type_id: 1
+                  field_key: headline
+                  data_type: text
+      responses:
+        '200':
+          description: Field definition updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FieldDefResponse'
+              examples:
+                ok:
+                  value:
+                    id: 1
+                    entity_type_id: 1
+                    field_key: headline
+                    data_type: text
+        '404':
+          $ref: '#/components/responses/FieldDefNotFound'
+        '409':
+          $ref: '#/components/responses/FieldDefConflict'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - FieldDefs
+      summary: Soft delete field definition
+      operationId: deleteFieldDef
+      parameters:
+        - $ref: '#/components/parameters/IdPath'
+      responses:
+        '204':
+          description: Field definition soft-deleted.
+        '404':
+          $ref: '#/components/responses/FieldDefNotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /api/v1/text-fields:
     get:
       tags:
@@ -384,7 +536,13 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
         '422':
-          $ref: '#/components/responses/ValidationFailed'
+          description: Validation failed, unregistered field key, or field type mismatch.
+          content:
+            application/problem+json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ValidationProblemDetails'
+                  - $ref: '#/components/schemas/ProblemDetails'
         '500':
           $ref: '#/components/responses/InternalServerError'
   /api/v1/text-fields/{id}:
@@ -448,7 +606,13 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
         '422':
-          $ref: '#/components/responses/ValidationFailed'
+          description: Validation failed, unregistered field key, or field type mismatch.
+          content:
+            application/problem+json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ValidationProblemDetails'
+                  - $ref: '#/components/schemas/ProblemDetails'
         '500':
           $ref: '#/components/responses/InternalServerError'
     delete:
@@ -495,6 +659,15 @@ components:
         minimum: 0
         default: 0
       example: 0
+    EntityTypeIdQuery:
+      name: entity_type_id
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int64
+        minimum: 1
+      example: 1
   responses:
     NotFound:
       description: Resource not found.
@@ -524,6 +697,62 @@ components:
                 status: 409
                 detail: The slug is already in use.
                 instance: /api/v1/entity-types
+    FieldDefNotFound:
+      description: Field definition not found.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          examples:
+            fieldDefNotFound:
+              value:
+                type: https://nene-records.dev/problems/field-def-not-found
+                title: Field Definition Not Found
+                status: 404
+                detail: The requested field definition was not found.
+                instance: /api/v1/field-defs/99
+    FieldDefConflict:
+      description: Duplicate field key for entity type.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          examples:
+            fieldDefConflict:
+              value:
+                type: https://nene-records.dev/problems/field-def-conflict
+                title: Conflict
+                status: 409
+                detail: A field definition with this key already exists for the entity type.
+                instance: /api/v1/field-defs
+    FieldKeyNotRegistered:
+      description: Field key is not registered for the entity type.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          examples:
+            fieldKeyNotRegistered:
+              value:
+                type: https://nene-records.dev/problems/field-key-not-registered
+                title: Field Key Not Registered
+                status: 422
+                detail: The field key is not registered for this entity type.
+                instance: /api/v1/text-fields
+    FieldTypeMismatch:
+      description: Field key is registered with a non-text data type.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          examples:
+            fieldTypeMismatch:
+              value:
+                type: https://nene-records.dev/problems/field-type-mismatch
+                title: Field Type Mismatch
+                status: 422
+                detail: The field key is registered with a different data type.
+                instance: /api/v1/text-fields
     ValidationFailed:
       description: Validation failed.
       content:
@@ -709,6 +938,62 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/EntityResponse'
+        limit:
+          type: integer
+        offset:
+          type: integer
+    FieldDefResponse:
+      type: object
+      required:
+        - id
+        - entity_type_id
+        - field_key
+        - data_type
+      properties:
+        id:
+          type: integer
+          format: int64
+        entity_type_id:
+          type: integer
+          format: int64
+        field_key:
+          type: string
+        data_type:
+          type: string
+          enum:
+            - text
+    CreateFieldDefRequest:
+      type: object
+      required:
+        - entity_type_id
+        - field_key
+        - data_type
+      properties:
+        entity_type_id:
+          type: integer
+          format: int64
+          minimum: 1
+        field_key:
+          type: string
+          minLength: 1
+        data_type:
+          type: string
+          enum:
+            - text
+      additionalProperties: false
+    UpdateFieldDefRequest:
+      $ref: '#/components/schemas/CreateFieldDefRequest'
+    FieldDefListResponse:
+      type: object
+      required:
+        - items
+        - limit
+        - offset
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/FieldDefResponse'
         limit:
           type: integer
         offset:

@@ -11,6 +11,7 @@ use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use NeNeRecords\Entity\EntityRepositoryInterface;
+use NeNeRecords\FieldDef\FieldDefRepositoryInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 
@@ -36,6 +37,7 @@ final readonly class TextFieldServiceProvider implements ServiceProviderInterfac
                 static function (ContainerInterface $container): CreateTextFieldUseCaseInterface {
                     $textFields = $container->get(TextFieldRepositoryInterface::class);
                     $entities = $container->get(EntityRepositoryInterface::class);
+                    $fieldDefs = $container->get(FieldDefRepositoryInterface::class);
 
                     if (!$textFields instanceof TextFieldRepositoryInterface) {
                         throw new LogicException('Text field repository service is invalid.');
@@ -45,7 +47,11 @@ final readonly class TextFieldServiceProvider implements ServiceProviderInterfac
                         throw new LogicException('Entity repository service is invalid.');
                     }
 
-                    return new CreateTextFieldUseCase($textFields, $entities);
+                    if (!$fieldDefs instanceof FieldDefRepositoryInterface) {
+                        throw new LogicException('Field definition repository service is invalid.');
+                    }
+
+                    return new CreateTextFieldUseCase($textFields, $entities, $fieldDefs);
                 },
             )
             ->set(
@@ -155,13 +161,23 @@ final readonly class TextFieldServiceProvider implements ServiceProviderInterfac
             ->set(
                 UpdateTextFieldUseCaseInterface::class,
                 static function (ContainerInterface $container): UpdateTextFieldUseCaseInterface {
-                    $repository = $container->get(TextFieldRepositoryInterface::class);
+                    $textFields = $container->get(TextFieldRepositoryInterface::class);
+                    $entities = $container->get(EntityRepositoryInterface::class);
+                    $fieldDefs = $container->get(FieldDefRepositoryInterface::class);
 
-                    if (!$repository instanceof TextFieldRepositoryInterface) {
+                    if (!$textFields instanceof TextFieldRepositoryInterface) {
                         throw new LogicException('Text field repository service is invalid.');
                     }
 
-                    return new UpdateTextFieldUseCase($repository);
+                    if (!$entities instanceof EntityRepositoryInterface) {
+                        throw new LogicException('Entity repository service is invalid.');
+                    }
+
+                    if (!$fieldDefs instanceof FieldDefRepositoryInterface) {
+                        throw new LogicException('Field definition repository service is invalid.');
+                    }
+
+                    return new UpdateTextFieldUseCase($textFields, $entities, $fieldDefs);
                 },
             )
             ->set(
@@ -191,6 +207,30 @@ final readonly class TextFieldServiceProvider implements ServiceProviderInterfac
                     }
 
                     return new TextFieldNotFoundExceptionHandler($problemDetails);
+                },
+            )
+            ->set(
+                FieldKeyNotRegisteredExceptionHandler::class,
+                static function (ContainerInterface $container): FieldKeyNotRegisteredExceptionHandler {
+                    $problemDetails = $container->get(ProblemDetailsResponseFactory::class);
+
+                    if (!$problemDetails instanceof ProblemDetailsResponseFactory) {
+                        throw new LogicException('Problem details response factory service is invalid.');
+                    }
+
+                    return new FieldKeyNotRegisteredExceptionHandler($problemDetails);
+                },
+            )
+            ->set(
+                FieldTypeMismatchExceptionHandler::class,
+                static function (ContainerInterface $container): FieldTypeMismatchExceptionHandler {
+                    $problemDetails = $container->get(ProblemDetailsResponseFactory::class);
+
+                    if (!$problemDetails instanceof ProblemDetailsResponseFactory) {
+                        throw new LogicException('Problem details response factory service is invalid.');
+                    }
+
+                    return new FieldTypeMismatchExceptionHandler($problemDetails);
                 },
             )
             ->set(

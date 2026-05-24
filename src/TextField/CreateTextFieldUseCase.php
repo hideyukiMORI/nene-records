@@ -6,20 +6,28 @@ namespace NeNeRecords\TextField;
 
 use NeNeRecords\Entity\EntityNotFoundException;
 use NeNeRecords\Entity\EntityRepositoryInterface;
+use NeNeRecords\FieldDef\FieldDefRepositoryInterface;
 
 final readonly class CreateTextFieldUseCase implements CreateTextFieldUseCaseInterface
 {
+    private const TEXT_DATA_TYPE = 'text';
+
     public function __construct(
         private TextFieldRepositoryInterface $textFields,
         private EntityRepositoryInterface $entities,
+        private FieldDefRepositoryInterface $fieldDefs,
     ) {
     }
 
     public function execute(CreateTextFieldInput $input): CreateTextFieldOutput
     {
-        if ($this->entities->findById($input->entityId) === null) {
+        $entity = $this->entities->findById($input->entityId);
+
+        if ($entity === null) {
             throw new EntityNotFoundException($input->entityId);
         }
+
+        $this->assertTextFieldKeyRegistered($entity->entityTypeId, $input->fieldKey);
 
         $id = $this->textFields->save(new TextField(
             entityId: $input->entityId,
@@ -33,5 +41,18 @@ final readonly class CreateTextFieldUseCase implements CreateTextFieldUseCaseInt
             fieldKey: $input->fieldKey,
             value: $input->value,
         );
+    }
+
+    private function assertTextFieldKeyRegistered(int $entityTypeId, string $fieldKey): void
+    {
+        $fieldDef = $this->fieldDefs->findByEntityTypeIdAndFieldKey($entityTypeId, $fieldKey);
+
+        if ($fieldDef === null) {
+            throw new FieldKeyNotRegisteredException($entityTypeId, $fieldKey);
+        }
+
+        if ($fieldDef->dataType !== self::TEXT_DATA_TYPE) {
+            throw new FieldTypeMismatchException($fieldKey, self::TEXT_DATA_TYPE, $fieldDef->dataType);
+        }
     }
 }
