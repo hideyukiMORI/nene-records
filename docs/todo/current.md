@@ -12,12 +12,13 @@ Last updated: 2026-05-24
 
 | Issue | Summary |
 | --- | --- |
-| #59 | Records 一覧 relation フィルタ UI |
+| — | （なし） |
 
 ## Recently Completed
 
 | Issue | Summary |
 | --- | --- |
+| #59 | Records 一覧 relation フィルタ UI (PR #60) |
 | #57 | entities 一覧 relation フィルタ API (PR #58) |
 | #52 | Record 詳細 relation attach/detach UI |
 | #51 | entity relations API + field_defs relation 型 (PR #54) |
@@ -32,8 +33,8 @@ Last updated: 2026-05-24
 
 - **API（済）:** tags CRUD, entity_tags, entities `?tags=` フィルタ
 - **Admin UI（済）:** Tag CRUD (#44), Record tag attach/detach (#46), Records 一覧 tag フィルタ (#48)
-- **Relations（済）:** API #51, Admin UI #52, list filter API #57
-- **Relations 後続:** list filter UI #59, inverse, MCP
+- **Relations（済）:** API #51, Admin UI #52, list filter API #57, list filter UI #59
+- **Relations 後続:** inverse, Consumer view relation links, MCP
 
 ## Verification
 
