@@ -1,0 +1,71 @@
+import { Button } from '@/shared/ui/primitives/Button'
+import { Stack } from '@/shared/ui/primitives/Stack'
+import { Text } from '@/shared/ui/primitives/Text'
+
+export interface ConfirmDialogProps {
+  open: boolean
+  title: string
+  description?: string
+  confirmLabel?: string
+  cancelLabel?: string
+  isPending?: boolean
+  onConfirm: () => void
+  onCancel: () => void
+}
+
+/**
+ * ConfirmDialog — destructive or important action confirmation.
+ *
+ * In:  open, title, description, confirmLabel, cancelLabel, isPending
+ * Out: onConfirm(), onCancel()
+ *
+ * Does not: perform mutations or know entity ids.
+ */
+export function ConfirmDialog({
+  open,
+  title,
+  description,
+  confirmLabel = 'Confirm',
+  cancelLabel = 'Cancel',
+  isPending = false,
+  onConfirm,
+  onCancel,
+}: ConfirmDialogProps) {
+  if (!open) {
+    return null
+  }
+
+  return (
+    <div className="fixed inset-0 z-modal flex items-center justify-center px-inline-md py-stack-md">
+      <button
+        type="button"
+        aria-label="Close dialog"
+        className="absolute inset-0 bg-surface-overlay/80"
+        onClick={onCancel}
+      />
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="confirm-dialog-title"
+        className="relative w-full max-w-md rounded-md border border-border bg-surface-raised p-inline-lg shadow-md"
+      >
+        <Stack gap="md">
+          <Stack gap="xs">
+            <Text as="h2" id="confirm-dialog-title" variant="heading-sm">
+              {title}
+            </Text>
+            {description !== undefined ? <Text muted>{description}</Text> : null}
+          </Stack>
+          <Stack direction="horizontal" gap="sm">
+            <Button variant="secondary" disabled={isPending} onClick={onCancel}>
+              {cancelLabel}
+            </Button>
+            <Button variant="danger" disabled={isPending} onClick={onConfirm}>
+              {confirmLabel}
+            </Button>
+          </Stack>
+        </Stack>
+      </div>
+    </div>
+  )
+}
