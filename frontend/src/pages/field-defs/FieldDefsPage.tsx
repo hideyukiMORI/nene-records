@@ -17,6 +17,12 @@ export function FieldDefsPage() {
     createFieldDef,
     isCreating,
     createErrorTitle,
+    editTarget,
+    requestEdit,
+    cancelEdit,
+    updateFieldDef,
+    isUpdating,
+    updateErrorTitle,
     deleteTarget,
     requestDelete,
     cancelDelete,
@@ -44,12 +50,18 @@ export function FieldDefsPage() {
         errorTitle={errorTitle}
         isCreating={isCreating}
         createErrorTitle={createErrorTitle}
+        editTarget={editTarget}
+        isUpdating={isUpdating}
+        updateErrorTitle={updateErrorTitle}
         deleteTarget={deleteTarget}
         isDeleting={isDeleting}
         onRetry={() => {
           void refetch()
         }}
         onCreate={createFieldDef}
+        onRequestEdit={requestEdit}
+        onCancelEdit={cancelEdit}
+        onUpdate={updateFieldDef}
         onRequestDelete={requestDelete}
         onCancelDelete={cancelDelete}
         onConfirmDelete={confirmDelete}

@@ -16,6 +16,7 @@ export interface FieldDefListPanelProps {
   errorTitle: string | null
   isDeleting: boolean
   onRetry: () => void
+  onEdit: (fieldDef: FieldDef) => void
   onDelete: (fieldDef: FieldDef) => void
 }
 
@@ -26,6 +27,7 @@ export function FieldDefListPanel({
   errorTitle,
   isDeleting,
   onRetry,
+  onEdit,
   onDelete,
 }: FieldDefListPanelProps) {
   if (isLoading) {
@@ -68,16 +70,27 @@ export function FieldDefListPanel({
               {DATA_TYPE_LABELS[item.dataType]}
             </Text>
           </Stack>
-          <Button
-            variant="danger"
-            size="sm"
-            disabled={isDeleting}
-            onClick={() => {
-              onDelete(item)
-            }}
-          >
-            Delete
-          </Button>
+          <div className="flex items-center gap-inline-sm">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => {
+                onEdit(item)
+              }}
+            >
+              Edit
+            </Button>
+            <Button
+              variant="danger"
+              size="sm"
+              disabled={isDeleting}
+              onClick={() => {
+                onDelete(item)
+              }}
+            >
+              Delete
+            </Button>
+          </div>
         </li>
       ))}
     </ul>

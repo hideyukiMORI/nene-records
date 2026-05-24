@@ -3,7 +3,7 @@ import { cleanup, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { FieldDefsPage } from '@/pages/field-defs/FieldDefsPage'
-import { resetFieldDefStore } from '@tests/msw/handlers/field-def'
+import { resetFieldDefStore, seedFieldDefs } from '@tests/msw/handlers/field-def'
 import { resetEntityTypeStore, seedEntityTypes } from '@tests/msw/handlers/entity-type'
 import { mswServer } from '@tests/msw/server'
 import { renderWithProviders } from '@tests/render/render-with-providers'
@@ -73,6 +73,34 @@ describe('FieldDefsPage', () => {
     expect(
       await screen.findByText('Use lowercase letters, numbers, and underscores'),
     ).toBeInTheDocument()
+  })
+
+  it('edits a field definition', async () => {
+    seedEntityTypes([{ id: 1, name: 'Article', slug: 'article' }])
+    seedFieldDefs([{ id: 1, entity_type_id: 1, field_key: 'title', data_type: 'text' }])
+    const user = userEvent.setup()
+    renderFieldDefsPage()
+
+    await waitFor(() => {
+      expect(screen.getByText('title')).toBeInTheDocument()
+    })
+
+    await user.click(screen.getByRole('button', { name: 'Edit' }))
+
+    const editForm = screen.getByRole('heading', { name: 'Edit field' }).closest('form')
+    if (editForm === null) {
+      throw new Error('Edit field form not found')
+    }
+
+    const fieldKeyInput = within(editForm).getByLabelText('Field key')
+    await user.clear(fieldKeyInput)
+    await user.type(fieldKeyInput, 'headline')
+    await user.click(within(editForm).getByRole('button', { name: 'Save changes' }))
+
+    await waitFor(() => {
+      expect(screen.getByText('headline')).toBeInTheDocument()
+      expect(screen.queryByText('title')).not.toBeInTheDocument()
+    })
   })
 
   it('deletes a field definition after confirmation', async () => {
