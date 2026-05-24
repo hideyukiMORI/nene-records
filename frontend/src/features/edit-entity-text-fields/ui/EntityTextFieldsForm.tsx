@@ -18,11 +18,12 @@ export function EntityTextFieldsForm({
   onSubmit,
 }: EntityTextFieldsFormProps) {
   const [values, setValues] = useState(defaultValues)
+
   if (fieldDefs.length === 0) {
     return (
       <EmptyState
-        title="No text fields defined"
-        description="Add text field definitions for this entity type first."
+        title="No editable fields defined"
+        description="Add text or integer field definitions for this entity type first."
       />
     )
   }
@@ -37,13 +38,14 @@ export function EntityTextFieldsForm({
     >
       <Stack gap="md">
         <Text as="h2" variant="heading-sm">
-          Text field values
+          Field values
         </Text>
         {fieldDefs.map((fieldDef) => (
           <Input
             key={fieldDef.fieldKey}
-            id={`text-field-${fieldDef.fieldKey}`}
-            label={fieldDef.fieldKey}
+            id={`record-field-${fieldDef.fieldKey}`}
+            label={`${fieldDef.fieldKey} (${fieldDef.dataType})`}
+            type={fieldDef.dataType === 'int' ? 'number' : 'text'}
             autoComplete="off"
             disabled={isSubmitting}
             value={values[fieldDef.fieldKey] ?? ''}
