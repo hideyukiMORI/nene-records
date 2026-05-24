@@ -6,13 +6,13 @@ Last updated: 2026-05-24
 
 | Issue | Summary |
 | --- | --- |
-| — | Phase 5: 全 API MCP カタログ拡充 |
+| — | Analytics / access log API（Phase 5 残） |
 
 ## In Progress
 
 | Issue | Summary |
 | --- | --- |
-| — | （なし） |
+| #67 | 全 API MCP カタログ拡充 |
 
 ## Recently Completed
 
