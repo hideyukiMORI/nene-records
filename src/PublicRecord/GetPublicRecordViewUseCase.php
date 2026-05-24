@@ -10,6 +10,7 @@ use NeNeRecords\DateTimeField\DateTimeField;
 use NeNeRecords\DateTimeField\DateTimeFieldRepositoryInterface;
 use NeNeRecords\Entity\EntityRepositoryInterface;
 use NeNeRecords\Entity\EntityStatus;
+use NeNeRecords\EntityRelation\EntityRelationListItem;
 use NeNeRecords\EntityRelation\EntityRelationRepositoryInterface;
 use NeNeRecords\EntityType\EntityTypeRepositoryInterface;
 use NeNeRecords\EnumField\EnumField;
@@ -114,6 +115,13 @@ final readonly class GetPublicRecordViewUseCase implements GetPublicRecordViewUs
             );
         }
 
+        $allRelations = $this->entityRelations->findByEntityId($entityId);
+        $relationsByFieldKey = [];
+
+        foreach ($allRelations as $relation) {
+            $relationsByFieldKey[$relation->fieldKey][] = $relation;
+        }
+
         $displayFields = $this->buildDisplayFields(
             $fieldDefRows,
             $textFieldRows,
@@ -124,6 +132,7 @@ final readonly class GetPublicRecordViewUseCase implements GetPublicRecordViewUs
             $entityId,
             $entityTypeSlugById,
             $relationTextFieldsByEntityTypeId,
+            $relationsByFieldKey,
         );
 
         $pageTitle = $this->resolvePageTitle($textFieldRows, $entityId);
@@ -141,7 +150,7 @@ final readonly class GetPublicRecordViewUseCase implements GetPublicRecordViewUs
             dateTimeFieldRows: $dateTimeFieldRows,
             entityId: $entityId,
             entityTypeId: $entityTypeId,
-            relationQueries: $this->buildRelationQueries($fieldDefRows, $entityId),
+            relationQueries: $this->buildRelationQueries($relationsByFieldKey),
             relationTextFieldRowsByEntityTypeId: $relationTextFieldsByEntityTypeId,
         );
 
@@ -173,6 +182,7 @@ final readonly class GetPublicRecordViewUseCase implements GetPublicRecordViewUs
      * @param list<DateTimeField> $dateTimeFieldRows
      * @param array<int, string> $entityTypeSlugById
      * @param array<int, list<TextField>> $relationTextFieldsByEntityTypeId
+     * @param array<string, list<EntityRelationListItem>> $relationsByFieldKey
      * @return list<PublicRecordViewDisplayField>
      */
     private function buildDisplayFields(
@@ -185,6 +195,7 @@ final readonly class GetPublicRecordViewUseCase implements GetPublicRecordViewUs
         int $entityId,
         array $entityTypeSlugById,
         array $relationTextFieldsByEntityTypeId,
+        array $relationsByFieldKey,
     ): array {
         $displayFields = [];
 
@@ -198,7 +209,7 @@ final readonly class GetPublicRecordViewUseCase implements GetPublicRecordViewUs
 
                 $targetSlug = $entityTypeSlugById[$targetEntityTypeId] ?? (string) $targetEntityTypeId;
                 $labelFields = $relationTextFieldsByEntityTypeId[$targetEntityTypeId] ?? [];
-                $relations = $this->entityRelations->findByEntityIdAndFieldKey($entityId, $fieldDef->fieldKey);
+                $relations = $relationsByFieldKey[$fieldDef->fieldKey] ?? [];
                 $links = [];
 
                 foreach ($relations as $relation) {
@@ -238,28 +249,24 @@ final readonly class GetPublicRecordViewUseCase implements GetPublicRecordViewUs
     }
 
     /**
-     * @param list<FieldDef> $fieldDefRows
+     * @param array<string, list<EntityRelationListItem>> $relationsByFieldKey
      * @return list<array{fieldKey: string, items: list<array{field_key: string, target_entity_id: int}>}>
      */
-    private function buildRelationQueries(array $fieldDefRows, int $entityId): array
+    private function buildRelationQueries(array $relationsByFieldKey): array
     {
         $queries = [];
 
-        foreach ($fieldDefRows as $fieldDef) {
-            if ($fieldDef->dataType !== 'relation') {
-                continue;
-            }
-
+        foreach ($relationsByFieldKey as $fieldKey => $relations) {
             $items = array_map(
                 static fn ($relation) => [
                     'field_key' => $relation->fieldKey,
                     'target_entity_id' => $relation->targetEntityId,
                 ],
-                $this->entityRelations->findByEntityIdAndFieldKey($entityId, $fieldDef->fieldKey),
+                $relations,
             );
 
             $queries[] = [
-                'fieldKey' => $fieldDef->fieldKey,
+                'fieldKey' => $fieldKey,
                 'items' => $items,
             ];
         }
