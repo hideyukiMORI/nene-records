@@ -12,6 +12,9 @@ export function EntityRecordsPage() {
     items,
     recordLabels,
     total,
+    availableTags,
+    selectedTagSlugs,
+    isFilterActive,
     isLoading,
     isError,
     errorTitle,
@@ -19,6 +22,8 @@ export function EntityRecordsPage() {
     createEntity,
     isCreating,
     createErrorTitle,
+    toggleTagSlug,
+    clearTagFilter,
     deleteTarget,
     requestDelete,
     cancelDelete,
@@ -45,6 +50,9 @@ export function EntityRecordsPage() {
         items={items}
         recordLabels={recordLabels}
         total={total}
+        availableTags={availableTags}
+        selectedTagSlugs={selectedTagSlugs}
+        isFilterActive={isFilterActive}
         isLoading={isLoading}
         isError={isError}
         errorTitle={errorTitle}
@@ -55,6 +63,8 @@ export function EntityRecordsPage() {
         onRetry={() => {
           void refetch()
         }}
+        onToggleTagSlug={toggleTagSlug}
+        onClearTagFilter={clearTagFilter}
         onCreate={createEntity}
         onRequestDelete={requestDelete}
         onCancelDelete={cancelDelete}

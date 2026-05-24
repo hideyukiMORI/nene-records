@@ -23,6 +23,10 @@ export function getTagById(id: number): TagRecord | undefined {
   return items.find((item) => item.id === id)
 }
 
+export function getTagBySlug(slug: string): TagRecord | undefined {
+  return items.find((item) => item.slug === slug)
+}
+
 export const tagHandlers = [
   http.get('/api/v1/tags', ({ request }) => {
     const url = new URL(request.url)

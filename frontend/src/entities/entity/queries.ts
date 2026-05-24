@@ -21,6 +21,9 @@ export function useEntityList(
         offset: String(params.offset),
         entity_type_id: String(params.entityTypeId),
       })
+      if (params.tagSlugs !== undefined && params.tagSlugs.length > 0) {
+        search.set('tags', params.tagSlugs.join(','))
+      }
       const dto = await apiClient.get<EntityListDto>(
         `/api/v1/entities?${search.toString()}`,
         signal,
@@ -40,9 +43,13 @@ export function useEntity(id: EntityId): UseQueryResult<Entity, AppError> {
   })
 }
 
-export function defaultEntityListParams(entityTypeId: number): EntityListParams {
+export function defaultEntityListParams(
+  entityTypeId: number,
+  tagSlugs: string[] = [],
+): EntityListParams {
   return {
     entityTypeId,
+    tagSlugs,
     ...DEFAULT_LIST_PARAMS,
   }
 }

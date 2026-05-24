@@ -4,6 +4,7 @@ export interface EntityListParams {
   entityTypeId: number
   limit: number
   offset: number
+  tagSlugs?: string[]
 }
 
 export const entityKeys = {

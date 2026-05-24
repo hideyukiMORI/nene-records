@@ -7,12 +7,18 @@ import {
   type Entity,
   type EntityId,
 } from '@/entities/entity'
+import { useTagList } from '@/entities/tag'
 import { defaultTextFieldListParamsForEntityType, useTextFieldList } from '@/entities/text-field'
 import { getRecordDisplayLabel } from '@/shared/lib/get-record-display-label'
 
 export function useManageEntitiesPage(entityTypeId: number) {
-  const listParams = defaultEntityListParams(entityTypeId)
+  const [selectedTagSlugs, setSelectedTagSlugs] = useState<string[]>([])
+  const listParams = useMemo(
+    () => defaultEntityListParams(entityTypeId, selectedTagSlugs),
+    [entityTypeId, selectedTagSlugs],
+  )
   const listQuery = useEntityList(listParams)
+  const tagListQuery = useTagList({ limit: 100, offset: 0 })
   const textFieldQuery = useTextFieldList(defaultTextFieldListParamsForEntityType(entityTypeId))
   const createMutation = useCreateEntity()
   const deleteMutation = useDeleteEntity()
@@ -30,6 +36,16 @@ export function useManageEntitiesPage(entityTypeId: number) {
       ]),
     )
   }, [items, textFieldQuery.data?.items])
+
+  const toggleTagSlug = useCallback((slug: string) => {
+    setSelectedTagSlugs((current) =>
+      current.includes(slug) ? current.filter((item) => item !== slug) : [...current, slug],
+    )
+  }, [])
+
+  const clearTagFilter = useCallback(() => {
+    setSelectedTagSlugs([])
+  }, [])
 
   const createEntity = useCallback(async () => {
     await createMutation.mutateAsync({ entityTypeId })
@@ -61,11 +77,16 @@ export function useManageEntitiesPage(entityTypeId: number) {
     items,
     recordLabels,
     total: listQuery.data?.total ?? 0,
+    availableTags: tagListQuery.data?.items ?? [],
+    selectedTagSlugs,
+    toggleTagSlug,
+    clearTagFilter,
+    isFilterActive: selectedTagSlugs.length > 0,
     isLoading,
     isError,
     errorTitle,
     refetch: async () => {
-      await Promise.all([listQuery.refetch(), textFieldQuery.refetch()])
+      await Promise.all([listQuery.refetch(), textFieldQuery.refetch(), tagListQuery.refetch()])
     },
     createEntity,
     isCreating: createMutation.isPending,
