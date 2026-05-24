@@ -12,13 +12,14 @@ New contributors and AI agents: read [`handoff-2026-05-24-workspace-switch.md`](
 
 | Issue | Branch | Summary |
 | --- | --- | --- |
-| — | — | _(none — Phase 4 planning)_ |
+| #20 | `feat/20-frontend-scaffold` | Phase 4 Admin React scaffold |
 
 ## Up Next
 
 | Issue | Summary |
 | --- | --- |
-| TBD | **Phase 4:** Admin React frontend scaffold |
+| TBD | Entity type editor UI |
+| TBD | Record CRUD screens |
 
 ## Recently Completed
 
@@ -35,7 +36,8 @@ New contributors and AI agents: read [`handoff-2026-05-24-workspace-switch.md`](
 - **Phase 3 complete.** Tags + entity tag attach/detach + filtered entity list with `total`.
 - **127 tests** via `composer check`.
 - ADRs: 0002 (field defs), 0003 (tags).
-- Phase 4 admin UI: see `docs/development/frontend-standards.md`.
+- Phase 4 scaffold: `frontend/` — React + Tailwind theme + Storybook + `entities/entity-type`.
+- Run admin UI: `npm run dev --prefix frontend` (API on :8080).
 
 ## Verification Commands
 
@@ -43,6 +45,7 @@ New contributors and AI agents: read [`handoff-2026-05-24-workspace-switch.md`](
 composer check
 composer openapi
 composer migrations:migrate   # requires .env with SQLite
+npm run check --prefix frontend
 ```
 
 ## Example queries (Phase 3)

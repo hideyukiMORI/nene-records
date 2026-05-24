@@ -2,7 +2,7 @@
 
 NeNe Records admin and consumer frontends are **React + TypeScript** clients of the JSON API. They are not the source of truth for schema, validation, or persistence.
 
-**Status:** policy only — **Phase 4** implementation. Issue `#1` (Phase 1 MVP) is API-only; do not add `frontend/` until the OpenAPI contract for entity CRUD is stable enough to build against.
+**Status:** **Phase 4 scaffold** — `frontend/` implements this document; expand screens via Issues.
 
 **Framework baseline:** [NENE2 frontend integration](https://github.com/hideyukiMORI/NENE2/blob/main/docs/development/frontend-integration.md) — directory layout, npm, lockfile, build output, and dev proxy.
 
