@@ -55,7 +55,7 @@ export function PublicRecordDetailPage() {
   const { entityTypeSlug = '', entityId: entityIdParam = '' } = useParams()
   const entityId = Number(entityIdParam)
 
-  const entityTypeQuery = useEntityTypeList()
+  const entityTypeQuery = useEntityTypeList({ limit: 100, offset: 0 })
   const entityType = useMemo(
     () => findEntityTypeBySlug(entityTypeQuery.data?.items ?? [], entityTypeSlug),
     [entityTypeQuery.data?.items, entityTypeSlug],

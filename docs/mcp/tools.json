@@ -347,6 +347,39 @@
             "responseSchemaRef": "#/components/schemas/EntityResponse"
         },
         {
+            "name": "getPublicRecordView",
+            "title": "Get Public Record View",
+            "description": "Aggregated bootstrap payload for a public consumer record detail page.",
+            "safety": "read",
+            "source": {
+                "type": "openapi",
+                "operationId": "getPublicRecordView",
+                "method": "GET",
+                "path": "/api/v1/public/entity-types/{slug}/records/{entityId}"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "slug": {
+                        "type": "string",
+                        "minLength": 1,
+                        "description": "Entity type slug."
+                    },
+                    "entityId": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Entity instance id."
+                    }
+                },
+                "required": [
+                    "slug",
+                    "entityId"
+                ],
+                "additionalProperties": false
+            },
+            "responseSchemaRef": "#/components/schemas/PublicRecordViewResponse"
+        },
+        {
             "name": "updateEntityById",
             "title": "Update Entity",
             "description": "Update an entity record entity type id.",

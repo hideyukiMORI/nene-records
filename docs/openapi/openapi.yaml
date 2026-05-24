@@ -34,6 +34,8 @@ tags:
     description: Typed relation links between entity instances.
   - name: Analytics
     description: HTTP access log aggregation and reporting.
+  - name: PublicConsumer
+    description: Aggregated read-only views for public consumer pages and MCP.
 paths:
   /health:
     get:
@@ -1590,6 +1592,42 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /api/v1/public/entity-types/{slug}/records/{entityId}:
+    get:
+      tags:
+        - PublicConsumer
+      summary: Get aggregated public record view
+      description: >
+        Returns a single JSON payload with entity type list, entity, field definitions,
+        typed field values, and relation data — aligned with the consumer detail page
+        TanStack Query cache keys.
+      operationId: getPublicRecordView
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          description: Entity type slug.
+          schema:
+            type: string
+            minLength: 1
+        - name: entityId
+          in: path
+          required: true
+          description: Entity instance id.
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Aggregated public record view bootstrap payload.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicRecordViewResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /api/v1/analytics/access-stats:
     get:
       tags:
@@ -2545,4 +2583,69 @@ components:
         avg_duration_ms:
           type: number
           minimum: 0
+      additionalProperties: false
+    PublicRecordViewResponse:
+      type: object
+      required:
+        - entityTypeSlug
+        - entityTypeId
+        - entityId
+        - entityTypes
+        - entity
+        - fieldDefs
+        - textFields
+        - intFields
+        - enumFields
+        - boolFields
+        - dateTimeFields
+        - entityRelations
+        - relationTextFieldsByEntityTypeId
+      properties:
+        entityTypeSlug:
+          type: string
+          minLength: 1
+        entityTypeId:
+          type: integer
+          minimum: 1
+        entityId:
+          type: integer
+          minimum: 1
+        entityTypes:
+          $ref: '#/components/schemas/EntityTypeListResponse'
+        entity:
+          $ref: '#/components/schemas/EntityResponse'
+        fieldDefs:
+          $ref: '#/components/schemas/FieldDefListResponse'
+        textFields:
+          $ref: '#/components/schemas/TextFieldListResponse'
+        intFields:
+          $ref: '#/components/schemas/IntFieldListResponse'
+        enumFields:
+          $ref: '#/components/schemas/EnumFieldListResponse'
+        boolFields:
+          $ref: '#/components/schemas/BoolFieldListResponse'
+        dateTimeFields:
+          $ref: '#/components/schemas/DateTimeFieldListResponse'
+        entityRelations:
+          type: array
+          items:
+            $ref: '#/components/schemas/PublicRecordRelationQuery'
+        relationTextFieldsByEntityTypeId:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/TextFieldListResponse'
+      additionalProperties: false
+    PublicRecordRelationQuery:
+      type: object
+      required:
+        - fieldKey
+        - items
+      properties:
+        fieldKey:
+          type: string
+          minLength: 1
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/EntityRelationItemResponse'
       additionalProperties: false

@@ -1,11 +1,12 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useState, type ReactNode } from 'react'
+import { seedPublicRecordViewCache } from '@/shared/lib/seed-public-record-view-cache'
 import { AppError } from '@/shared/api/client'
 import { AuthGate } from './auth-gate'
 import { RootErrorBoundary } from './root-error-boundary'
 
 function createAppQueryClient(): QueryClient {
-  return new QueryClient({
+  const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
         staleTime: 30_000,
@@ -18,6 +19,10 @@ function createAppQueryClient(): QueryClient {
       },
     },
   })
+
+  seedPublicRecordViewCache(queryClient)
+
+  return queryClient
 }
 
 export function AppProviders({ children }: { children: ReactNode }) {
