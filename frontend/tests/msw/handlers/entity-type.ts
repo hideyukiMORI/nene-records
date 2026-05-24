@@ -86,6 +86,58 @@ export const entityTypeHandlers = [
 
     return HttpResponse.json(item)
   }),
+  http.put('/api/v1/entity-types/:id', async ({ params, request }) => {
+    const id = Number(params.id)
+    const index = items.findIndex((entry) => entry.id === id)
+
+    if (index === -1) {
+      return HttpResponse.json(
+        {
+          type: 'https://nene-records.dev/problems/not-found',
+          title: 'Not found',
+          status: 404,
+          instance: `/api/v1/entity-types/${String(id)}`,
+        },
+        { status: 404 },
+      )
+    }
+
+    const body = (await request.json()) as { name?: string; slug?: string }
+
+    if (typeof body.name !== 'string' || body.name.trim() === '') {
+      return HttpResponse.json(
+        {
+          type: 'https://nene-records.dev/problems/validation-failed',
+          title: 'Validation failed',
+          status: 422,
+          instance: `/api/v1/entity-types/${String(id)}`,
+          errors: [{ field: 'name', message: 'Required', code: 'required' }],
+        },
+        { status: 422 },
+      )
+    }
+
+    if (items.some((item) => item.id !== id && item.slug === body.slug)) {
+      return HttpResponse.json(
+        {
+          type: 'https://nene-records.dev/problems/conflict',
+          title: 'Conflict',
+          status: 409,
+          instance: `/api/v1/entity-types/${String(id)}`,
+        },
+        { status: 409 },
+      )
+    }
+
+    const updated = {
+      id,
+      name: body.name,
+      slug: body.slug ?? '',
+    }
+    items = [...items.slice(0, index), updated, ...items.slice(index + 1)]
+
+    return HttpResponse.json(updated)
+  }),
   http.delete('/api/v1/entity-types/:id', ({ params }) => {
     const id = Number(params.id)
     const exists = items.some((item) => item.id === id)

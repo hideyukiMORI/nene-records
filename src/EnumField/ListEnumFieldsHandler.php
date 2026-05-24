@@ -21,8 +21,21 @@ final readonly class ListEnumFieldsHandler
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $pagination = PaginationQueryParser::parse($request);
+        $query = $request->getQueryParams();
 
-        $output = $this->useCase->execute(new ListEnumFieldsInput($pagination->limit, $pagination->offset));
+        $entityId = null;
+        if (isset($query['entity_id'])) {
+            $raw = (int) $query['entity_id'];
+            if ($raw > 0) {
+                $entityId = $raw;
+            }
+        }
+
+        $output = $this->useCase->execute(new ListEnumFieldsInput(
+            entityId: $entityId,
+            limit: $pagination->limit,
+            offset: $pagination->offset,
+        ));
 
         return $this->response->create(
             (new PaginationResponse(

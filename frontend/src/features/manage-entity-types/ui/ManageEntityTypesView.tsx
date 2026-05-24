@@ -1,6 +1,7 @@
 import type { EntityType } from '@/entities/entity-type'
 import { ConfirmDialog, Stack, Text } from '@/shared/ui'
 import { EntityTypeCreateForm } from './EntityTypeCreateForm'
+import { EntityTypeEditForm } from './EntityTypeEditForm'
 import { EntityTypeListPanel } from './EntityTypeListPanel'
 
 export interface ManageEntityTypesViewProps {
@@ -10,10 +11,16 @@ export interface ManageEntityTypesViewProps {
   errorTitle: string | null
   isCreating: boolean
   createErrorTitle: string | null
+  editTarget: EntityType | null
+  isUpdating: boolean
+  updateErrorTitle: string | null
   deleteTarget: EntityType | null
   isDeleting: boolean
   onRetry: () => void
   onCreate: (values: { name: string; slug: string }) => Promise<void>
+  onRequestEdit: (entityType: EntityType) => void
+  onCancelEdit: () => void
+  onUpdate: (values: { name: string; slug: string }) => Promise<void>
   onRequestDelete: (entityType: EntityType) => void
   onCancelDelete: () => void
   onConfirmDelete: () => Promise<void>
@@ -26,10 +33,16 @@ export function ManageEntityTypesView({
   errorTitle,
   isCreating,
   createErrorTitle,
+  editTarget,
+  isUpdating,
+  updateErrorTitle,
   deleteTarget,
   isDeleting,
   onRetry,
   onCreate,
+  onRequestEdit,
+  onCancelEdit,
+  onUpdate,
   onRequestDelete,
   onCancelDelete,
   onConfirmDelete,
@@ -42,6 +55,15 @@ export function ManageEntityTypesView({
           serverErrorTitle={createErrorTitle}
           onSubmit={onCreate}
         />
+        {editTarget !== null ? (
+          <EntityTypeEditForm
+            entityType={editTarget}
+            isSubmitting={isUpdating}
+            serverErrorTitle={updateErrorTitle}
+            onSubmit={onUpdate}
+            onCancel={onCancelEdit}
+          />
+        ) : null}
         <Stack gap="sm">
           <Text as="h2" variant="heading-sm">
             Existing types
@@ -53,6 +75,7 @@ export function ManageEntityTypesView({
             errorTitle={errorTitle}
             isDeleting={isDeleting}
             onRetry={onRetry}
+            onEdit={onRequestEdit}
             onDelete={onRequestDelete}
           />
         </Stack>

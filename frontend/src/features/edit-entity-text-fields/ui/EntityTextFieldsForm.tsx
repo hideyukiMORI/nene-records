@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { FieldDef } from '@/entities/field-def'
+import type { FieldDataType, FieldDef } from '@/entities/field-def'
 import { Button, EmptyState, Input, Stack, Text } from '@/shared/ui'
 
 export interface EntityTextFieldsFormProps {
@@ -8,6 +8,17 @@ export interface EntityTextFieldsFormProps {
   isSubmitting: boolean
   serverErrorTitle: string | null
   onSubmit: (values: Record<string, string>) => Promise<void>
+}
+
+function getInputType(dataType: FieldDataType): 'text' | 'number' | 'datetime-local' {
+  switch (dataType) {
+    case 'int':
+      return 'number'
+    case 'datetime':
+      return 'datetime-local'
+    default:
+      return 'text'
+  }
 }
 
 export function EntityTextFieldsForm({
@@ -23,7 +34,7 @@ export function EntityTextFieldsForm({
     return (
       <EmptyState
         title="No editable fields defined"
-        description="Add text or integer field definitions for this entity type first."
+        description="Add field definitions for this entity type first."
       />
     )
   }
@@ -40,20 +51,51 @@ export function EntityTextFieldsForm({
         <Text as="h2" variant="heading-sm">
           Field values
         </Text>
-        {fieldDefs.map((fieldDef) => (
-          <Input
-            key={fieldDef.fieldKey}
-            id={`record-field-${fieldDef.fieldKey}`}
-            label={`${fieldDef.fieldKey} (${fieldDef.dataType})`}
-            type={fieldDef.dataType === 'int' ? 'number' : 'text'}
-            autoComplete="off"
-            disabled={isSubmitting}
-            value={values[fieldDef.fieldKey] ?? ''}
-            onChange={(event) => {
-              setValues((current) => ({ ...current, [fieldDef.fieldKey]: event.target.value }))
-            }}
-          />
-        ))}
+        {fieldDefs.map((fieldDef) => {
+          const fieldId = `record-field-${fieldDef.fieldKey}`
+          const label = `${fieldDef.fieldKey} (${fieldDef.dataType})`
+
+          if (fieldDef.dataType === 'bool') {
+            return (
+              <div key={fieldDef.fieldKey} className="flex flex-col gap-stack-xs">
+                <label
+                  htmlFor={fieldId}
+                  className="flex items-center gap-inline-sm font-sans text-body font-medium text-text-primary"
+                >
+                  <input
+                    id={fieldId}
+                    type="checkbox"
+                    disabled={isSubmitting}
+                    checked={values[fieldDef.fieldKey] === 'true'}
+                    onChange={(event) => {
+                      setValues((current) => ({
+                        ...current,
+                        [fieldDef.fieldKey]: event.target.checked ? 'true' : 'false',
+                      }))
+                    }}
+                    className="size-4 rounded border border-border"
+                  />
+                  {label}
+                </label>
+              </div>
+            )
+          }
+
+          return (
+            <Input
+              key={fieldDef.fieldKey}
+              id={fieldId}
+              label={label}
+              type={getInputType(fieldDef.dataType)}
+              autoComplete="off"
+              disabled={isSubmitting}
+              value={values[fieldDef.fieldKey] ?? ''}
+              onChange={(event) => {
+                setValues((current) => ({ ...current, [fieldDef.fieldKey]: event.target.value }))
+              }}
+            />
+          )
+        })}
         {serverErrorTitle !== null ? <Text muted>{serverErrorTitle}</Text> : null}
         <Button type="submit" disabled={isSubmitting}>
           {isSubmitting ? 'Saving…' : 'Save values'}

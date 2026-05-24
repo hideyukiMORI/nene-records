@@ -18,6 +18,9 @@ export function useIntFieldList(
         limit: String(params.limit),
         offset: String(params.offset),
       })
+      if (params.entityId !== undefined) {
+        search.set('entity_id', String(params.entityId))
+      }
       const dto = await apiClient.get<IntFieldListDto>(
         `/api/v1/int-fields?${search.toString()}`,
         signal,

@@ -3,6 +3,7 @@ import {
   useCreateEntityType,
   useDeleteEntityType,
   useEntityTypeList,
+  useUpdateEntityType,
   type EntityType,
   type EntityTypeId,
 } from '@/entities/entity-type'
@@ -11,7 +12,9 @@ import type { CreateEntityTypeFormValues } from './use-create-entity-type-form'
 export function useManageEntityTypesPage() {
   const listQuery = useEntityTypeList()
   const createMutation = useCreateEntityType()
+  const updateMutation = useUpdateEntityType()
   const deleteMutation = useDeleteEntityType()
+  const [editTarget, setEditTarget] = useState<EntityType | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<EntityType | null>(null)
 
   const createEntityType = useCallback(
@@ -19,6 +22,29 @@ export function useManageEntityTypesPage() {
       await createMutation.mutateAsync(values)
     },
     [createMutation],
+  )
+
+  const requestEdit = useCallback((entityType: EntityType) => {
+    setEditTarget(entityType)
+  }, [])
+
+  const cancelEdit = useCallback(() => {
+    setEditTarget(null)
+  }, [])
+
+  const updateEntityType = useCallback(
+    async (values: CreateEntityTypeFormValues) => {
+      if (editTarget === null) {
+        return
+      }
+
+      await updateMutation.mutateAsync({
+        id: editTarget.id,
+        input: values,
+      })
+      setEditTarget(null)
+    },
+    [editTarget, updateMutation],
   )
 
   const requestDelete = useCallback((entityType: EntityType) => {
@@ -48,6 +74,12 @@ export function useManageEntityTypesPage() {
     createEntityType,
     isCreating: createMutation.isPending,
     createErrorTitle: createMutation.error?.title ?? null,
+    editTarget,
+    requestEdit,
+    cancelEdit,
+    updateEntityType,
+    isUpdating: updateMutation.isPending,
+    updateErrorTitle: updateMutation.error?.title ?? null,
     deleteTarget,
     requestDelete,
     cancelDelete,

@@ -3,6 +3,7 @@ import type { IntFieldId } from './ids'
 export interface IntFieldListParams {
   limit: number
   offset: number
+  entityId?: number
 }
 
 export const intFieldKeys = {

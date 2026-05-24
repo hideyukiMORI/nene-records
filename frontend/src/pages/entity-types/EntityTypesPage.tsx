@@ -11,6 +11,12 @@ export function EntityTypesPage() {
     createEntityType,
     isCreating,
     createErrorTitle,
+    editTarget,
+    requestEdit,
+    cancelEdit,
+    updateEntityType,
+    isUpdating,
+    updateErrorTitle,
     deleteTarget,
     requestDelete,
     cancelDelete,
@@ -30,12 +36,18 @@ export function EntityTypesPage() {
         errorTitle={errorTitle}
         isCreating={isCreating}
         createErrorTitle={createErrorTitle}
+        editTarget={editTarget}
+        isUpdating={isUpdating}
+        updateErrorTitle={updateErrorTitle}
         deleteTarget={deleteTarget}
         isDeleting={isDeleting}
         onRetry={() => {
           void refetch()
         }}
         onCreate={createEntityType}
+        onRequestEdit={requestEdit}
+        onCancelEdit={cancelEdit}
+        onUpdate={updateEntityType}
         onRequestDelete={requestDelete}
         onCancelDelete={cancelDelete}
         onConfirmDelete={confirmDelete}

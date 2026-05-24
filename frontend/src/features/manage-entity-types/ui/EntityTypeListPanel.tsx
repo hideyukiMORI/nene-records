@@ -9,6 +9,7 @@ export interface EntityTypeListPanelProps {
   errorTitle: string | null
   isDeleting: boolean
   onRetry: () => void
+  onEdit: (entityType: EntityType) => void
   onDelete: (entityType: EntityType) => void
 }
 
@@ -19,6 +20,7 @@ export function EntityTypeListPanel({
   errorTitle,
   isDeleting,
   onRetry,
+  onEdit,
   onDelete,
 }: EntityTypeListPanelProps) {
   if (isLoading) {
@@ -72,6 +74,15 @@ export function EntityTypeListPanel({
                 Records
               </Button>
             </Link>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => {
+                onEdit(item)
+              }}
+            >
+              Edit
+            </Button>
             <Button
               variant="danger"
               size="sm"

@@ -3,6 +3,7 @@ import type { TextFieldId } from './ids'
 export interface TextFieldListParams {
   limit: number
   offset: number
+  entityId?: number
 }
 
 export const textFieldKeys = {

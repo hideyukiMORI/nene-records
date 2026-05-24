@@ -26,10 +26,14 @@ export const intFieldHandlers = [
     const url = new URL(request.url)
     const limit = Number(url.searchParams.get('limit') ?? '20')
     const offset = Number(url.searchParams.get('offset') ?? '0')
+    const entityIdParam = url.searchParams.get('entity_id')
+    const entityId = entityIdParam === null ? null : Number(entityIdParam)
     const active = items.filter((item) => !item.is_deleted)
+    const filtered =
+      entityId === null ? active : active.filter((item) => item.entity_id === entityId)
 
     return HttpResponse.json({
-      items: active.slice(offset, offset + limit).map((item) => ({
+      items: filtered.slice(offset, offset + limit).map((item) => ({
         id: item.id,
         entity_id: item.entity_id,
         field_key: item.field_key,

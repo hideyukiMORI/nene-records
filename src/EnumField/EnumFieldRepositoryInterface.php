@@ -15,6 +15,13 @@ interface EnumFieldRepositoryInterface
      */
     public function findAll(int $limit, int $offset): array;
 
+    /**
+     * Active (non-soft-deleted) rows for the given entity only.
+     *
+     * @return list<EnumField>
+     */
+    public function findByEntityId(int $entityId, int $limit, int $offset): array;
+
     public function save(EnumField $intField): int;
 
     public function update(EnumField $intField): void;
