@@ -27,6 +27,20 @@ alwaysApply: false
 - `useEffect` + fetch 禁止。Query cache を useState に複製しない。
 - loading / empty / error / success を明示。
 
+## デザインシステム・テーマ
+
+- **Tailwind CSS v4** + `@theme` + CSS カスタムプロパティ。CSS Modules / CSS-in-JS 混在禁止（ADR 除く）。
+- 生の margin / padding / color / font / background 等は **`shared/ui/theme/themes/*.css` のみ**。コンポーネント・features にリテラル禁止。
+- テーマ差し替えは **`shared/ui/theme/active.css` の import 差し替えだけ**で全 UI が変わること。
+- Tailwind **任意値**（`p-[13px]`、`text-[#fff]`）禁止。セマンティック utility のみ（`bg-surface`、`p-inline-md` 等）。
+- features は **`shared/ui` barrel のみ** import。primitives 直 import や素の `<button>` スタイリング禁止。
+
+## Storybook
+
+- **`shared/ui/primitives` と `components` に必須**。features/pages には stories 置かない。
+- 各 story ファイル先頭に **In / Out / Does not** 契約コメント必須。
+- `npm run build-storybook` は CI（`check`）に含める。
+
 ## デザインパターン
 
 - Hook + View（`features/*/hooks` + `features/*/ui`）。`shared/ui` にドメインロジックなし。

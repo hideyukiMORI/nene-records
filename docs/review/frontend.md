@@ -30,6 +30,21 @@ Also read:
 - [ ] Screens implement loading, empty, error, and success states explicitly.
 - [ ] Optimistic updates (if any) roll back on Problem Details failure and have a test.
 
+## Design system and theming
+
+- [ ] All visual tokens live in `shared/ui/theme/themes/*.css`; `active.css` is the only swap point for full theme change.
+- [ ] No hex/rgb/hsl/px literals or Tailwind arbitrary values (`[…]`) in components, features, or pages.
+- [ ] Components use semantic Tailwind utilities only (`bg-surface`, `text-primary`, `p-inline-md`, etc.).
+- [ ] Features import UI only from `shared/ui` barrel — no deep `primitives/` paths, no styled raw HTML elements.
+- [ ] Optional `tokens.ts` mirrors CSS vars — not a second source of truth.
+
+## Storybook and component contracts
+
+- [ ] Every exported `shared/ui` primitive and composed component has a colocated `*.stories.tsx`.
+- [ ] Story file header documents **In**, **Out**, and **Does not** boundaries.
+- [ ] Stories cover default, disabled (if applicable), and all variants; no API/Query/router in primitive stories.
+- [ ] `npm run build-storybook --prefix frontend` passes (included in `check`).
+
 ## Design patterns
 
 - [ ] Feature split: `hooks/` (logic) + `ui/` (presentational); no fetch/query in `shared/ui`.

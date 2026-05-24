@@ -23,7 +23,9 @@ NeNe Records admin and consumer frontends are **React + TypeScript** clients of 
 | [Data flow](#data-flow) | Read/write paths, cache, URL state |
 | [Design patterns](#design-patterns) | Mandatory React/TS patterns and forbidden anti-patterns |
 | [TypeScript](#typescript-strictness) | Compiler and type rules |
-| [Components](#component-conventions) | UI structure and styling |
+| [Design system](#design-system-and-theming-zero-tolerance) | Tokens, theme swap, Tailwind — zero tolerance |
+| [Storybook](#storybook-and-component-contracts) | Primitive catalog, In/Out contracts, swappable parts |
+| [Components](#component-conventions) | UI structure and React rules |
 | [API access](#api-and-data-access) | HTTP, TanStack Query, errors |
 | [State](#state-management) | What state lives where |
 | [Security](#security) | Client-side security baseline |
@@ -46,6 +48,8 @@ NeNe Records admin and consumer frontends are **React + TypeScript** clients of 
 | **Secure by default** | Fail closed on auth errors; minimal trust of client input and third-party markup. |
 | **Test by behavior** | Tests assert user-observable outcomes; MSW mirrors OpenAPI at boundaries. |
 | **Replaceable** | Admin SPA and consumer views swap independently when contracts stay stable. |
+| **Theme by substitution** | Visual design is fully defined in theme token files; swapping the active theme replaces the entire look without touching components. |
+| **No magic styling** | Margin, padding, color, typography, and background never appear as raw literals outside the theme layer. |
 
 ---
 
@@ -81,8 +85,30 @@ Adopt current stable majors at scaffold time; keep them current with Dependabot 
 | Unit / integration | **Vitest** + **Testing Library** + **MSW** | jsdom environment |
 | E2E | **Playwright** | Critical admin flows after Phase 4 stabilizes |
 | Dead code | **knip** (recommended) | Fail CI on unused exports in `entities/` and `features/` |
+| Styling | **Tailwind CSS v4** | Semantic utilities mapped to CSS custom properties via `@theme` |
+| Design tokens | **CSS custom properties** in `shared/ui/theme/` | Single source of truth for all visual values |
+| Component catalog | **Storybook** (React + Vite) | Required for `shared/ui` primitives; documents In/Out contracts |
 
-Alternate UI frameworks, state libraries, or package managers require an ADR.
+Alternate UI frameworks, state libraries, CSS approaches, or package managers require an ADR.
+
+### Why Tailwind (and what we considered)
+
+NeNe Records standardizes on **Tailwind CSS v4** with **`@theme` + CSS custom properties** because it satisfies:
+
+- one theme file (or import chain) swap → full visual replacement;
+- semantic utility classes in components without per-component stylesheets;
+- small runtime footprint and mature ecosystem.
+
+| Alternative | Verdict |
+| --- | --- |
+| **Tailwind v4 + `@theme`** | **Default** — best fit for token swap + utility simplicity |
+| CSS Modules + shared `tokens.css` | Valid but more boilerplate; no ADR needed if staying on Tailwind |
+| [Panda CSS](https://panda-css.com/) | Strong token model; smaller ecosystem — ADR to switch |
+| [Vanilla Extract](https://vanilla-extract.style/) | Type-safe CSS-in-TS; heavier setup — ADR to switch |
+| [UnoCSS](https://unocss.dev/) | Tailwind-compatible utilities; less tooling/docs — ADR to switch |
+| styled-components / Emotion | Runtime CSS-in-JS — conflicts with “simple, token-driven” goal |
+
+Do **not** mix Tailwind with CSS Modules or CSS-in-JS in the same app without an ADR.
 
 ---
 
@@ -180,6 +206,20 @@ frontend/
     features/
     entities/
     shared/
+      ui/
+        theme/                  # design tokens — ONLY place for raw visual values
+          index.css             # Tailwind entry + imports active theme
+          active.css            # pointer: @import './themes/default.css'
+          themes/
+            default.css         # complete theme (all tokens)
+          tokens.ts             # optional read-only TS accessors
+        primitives/             # Button, Input, Text, Stack, …
+        components/             # composed UI (Dialog, DataTable shell, …)
+        index.ts                # public barrel — features import from here only
+      api/
+      lib/
+      config/
+  .storybook/                   # Storybook config (Vite builder)
   tests/
     setup/                    # vitest setup, MSW server bootstrap
     msw/                      # shared MSW handlers (or per-entity __msw__)
@@ -240,6 +280,12 @@ entities/entity-type/
 | Test render helpers | `tests/render/` |
 | MSW handlers | `tests/msw/{resource}.ts` or `entities/{resource}/__msw__/handlers.ts` |
 | Test factories | `tests/factories/{resource}.ts` |
+| Design token CSS | `shared/ui/theme/themes/*.css` only |
+| Theme entry / active pointer | `shared/ui/theme/index.css`, `active.css` |
+| Token TS accessors | `shared/ui/theme/tokens.ts` (optional) |
+| UI primitives | `shared/ui/primitives/` |
+| UI composed components | `shared/ui/components/` |
+| Component stories | `shared/ui/**/*.stories.tsx` (colocated) |
 
 ### Import surface rules
 
@@ -399,6 +445,11 @@ features/entity-type-editor/
 | String query keys in features | Untyped invalidation bugs |
 | `dangerouslySetInnerHTML` without policy | XSS risk |
 | Auth token in `localStorage` without ADR | XSS exfiltration risk |
+| Raw color/spacing/typography literals in components | Breaks theme swap; use semantic tokens |
+| Tailwind arbitrary values (`p-[13px]`, `text-[#fff]`) | Bypasses token layer |
+| Inline `style={{ … }}` with design literals | Same — only dynamic layout from tokens or measured values |
+| Feature-local `<button>` / `<input>` styling | Bypasses swappable primitives |
+| Storybook stories under `features/` or `pages/` | Catalog is `shared/ui` only |
 
 ---
 
@@ -445,6 +496,168 @@ Frontend validation is UX-only; API owns authoritative schema validation.
 
 ---
 
+---
+
+## Design system and theming (zero tolerance)
+
+All visual design values live in **`shared/ui/theme/`**. Components and features **never** hard-code margins, paddings, colors, font families, backgrounds, radii, shadows, or z-index layers.
+
+### Theme swap rule (mandatory)
+
+Replacing the active theme must change **every** visual aspect of the app without editing component source:
+
+1. **`shared/ui/theme/themes/{name}.css`** — one file per complete theme; contains **all** token definitions.
+2. **`shared/ui/theme/active.css`** — single pointer file:
+
+   ```css
+   @import './themes/default.css';
+   ```
+
+3. To switch themes, change **only** the import in `active.css` (or swap `active.css` in build/deploy). No component PR required.
+
+`app/providers.tsx` imports `shared/ui/theme/index.css` once at bootstrap. Features and pages **must not** import theme CSS directly.
+
+**Example — `themes/default.css` (excerpt):**
+
+```css
+@theme {
+  /* Color */
+  --color-surface: oklch(99% 0.01 260);
+  --color-surface-raised: oklch(100% 0 0);
+  --color-text-primary: oklch(25% 0.02 260);
+  --color-text-muted: oklch(55% 0.02 260);
+  --color-border: oklch(90% 0.01 260);
+  --color-accent: oklch(55% 0.15 250);
+  --color-danger: oklch(55% 0.2 25);
+
+  /* Spacing */
+  --spacing-inline-sm: 0.5rem;
+  --spacing-inline-md: 1rem;
+  --spacing-stack-sm: 0.75rem;
+  --spacing-stack-md: 1.25rem;
+
+  /* Typography */
+  --font-family-sans: 'Inter', system-ui, sans-serif;
+  --font-size-body: 0.875rem;
+  --line-height-body: 1.5;
+
+  /* Radius, shadow, z-index — same file, full set required */
+}
+```
+
+**Example — primitive usage:**
+
+```tsx
+<button className="bg-surface-raised text-primary border-border rounded-md px-inline-md py-stack-sm font-sans text-body">
+  {children}
+</button>
+```
+
+Alternate theme `themes/consumer-brand.css` redefines **every** `--*` above; change `active.css` import → entire app restyles.
+
+### Token categories (required in every theme file)
+
+Each `themes/*.css` defines the full set using Tailwind v4 `@theme` (CSS custom properties):
+
+| Category | Examples (semantic names) |
+| --- | --- |
+| **Color** | `color-surface`, `color-surface-raised`, `color-text-primary`, `color-text-muted`, `color-border`, `color-accent`, `color-danger`, `color-focus-ring` |
+| **Spacing** | `spacing-inline-xs` … `spacing-inline-xl`, `spacing-stack-xs` … `spacing-stack-xl` |
+| **Typography** | `font-family-sans`, `font-family-mono`, `font-size-body`, `font-size-heading-sm`, `line-height-body`, `font-weight-medium` |
+| **Background** | map to semantic colors — `color-surface`, `color-surface-overlay`; no raw hex in components |
+| **Radius** | `radius-sm`, `radius-md`, `radius-full` |
+| **Shadow** | `shadow-sm`, `shadow-md`, `shadow-focus` |
+| **Border** | `border-width-default`, tied to `color-border` |
+| **Motion** | `duration-fast`, `duration-normal`, `ease-default` (optional but single-sourced) |
+| **Z-index** | `z-dropdown`, `z-modal`, `z-toast` |
+
+Use **semantic** names (`text-primary`, `bg-surface-raised`), not palette slots alone (`blue-500`). Palette aliases may exist **inside** the theme file only.
+
+### How components consume tokens
+
+- **Tailwind semantic utilities only** — e.g. `bg-surface`, `text-primary`, `p-inline-md`, `gap-stack-sm`, `rounded-md`, `font-sans`.
+- **No arbitrary Tailwind values** — `[…]` syntax forbidden outside `shared/ui/theme/`.
+- **No hex / rgb / hsl / px literals** in `.tsx`, `.ts`, or feature CSS — ESLint and review enforce this.
+- **`shared/ui/theme/tokens.ts`** (optional): read-only exports for programmatic use (charts, canvas). Values must mirror CSS vars — never a second source of truth.
+
+### Layering inside `shared/ui`
+
+```text
+shared/ui/
+  theme/           # tokens only — no React
+  primitives/      # smallest swappable parts (Button, Input, Text, Icon, Stack)
+  components/      # composition (Dialog, ConfirmDialog, EmptyState, PageHeader)
+  index.ts         # public exports
+```
+
+| Layer | May import | Must not |
+| --- | --- | --- |
+| `primitives/` | `theme/` (types only if needed) | `entities/`, `features/`, API |
+| `components/` | `primitives/`, `theme/` | domain logic, TanStack Query |
+| `features/*/ui` | `shared/ui` barrel only | `primitives/` deep paths, theme CSS |
+
+Features **compose** screens from `shared/ui` exports. They do not create parallel styled elements.
+
+### Swappable parts
+
+Each primitive is replaceable when its **public contract** (props in, callbacks out) stays stable:
+
+- Implementation files stay private to the primitive folder.
+- Upper layers import **`shared/ui` only** — never `@/shared/ui/primitives/Button` internals from features.
+- Visual refresh = theme swap and/or primitive internals change — **not** feature rewrites.
+
+---
+
+## Storybook and component contracts
+
+**Storybook is required** for Phase 4 scaffold. It is the living catalog of `shared/ui` primitives and composed components.
+
+### Scope
+
+| Location | Stories |
+| --- | --- |
+| `shared/ui/primitives/**` | **Required** — every exported primitive |
+| `shared/ui/components/**` | **Required** — every exported composed component |
+| `features/`, `pages/`, `entities/` | **Forbidden** — integration tests cover those |
+
+Run locally: `npm run storybook --prefix frontend`. CI: `npm run build-storybook --prefix frontend`.
+
+### In / Out contract (mandatory per story file)
+
+Every story file documents the component boundary at the top:
+
+```typescript
+/**
+ * Button — primary action control.
+ *
+ * In:  variant, size, disabled, type, children (label)
+ * Out: onClick(event), onFocus(event), onBlur(event)
+ *
+ * Does not: fetch data, know entity ids, or read router/query cache.
+ */
+```
+
+| Term | Meaning |
+| --- | --- |
+| **In** | Props and visual slots the parent supplies |
+| **Out** | Events and callbacks the component emits upward |
+| **Does not** | Explicit non-responsibilities — keeps primitives domain-free |
+
+Stories must cover at least: **default**, **disabled** (if applicable), and **each variant** (`primary`, `danger`, etc.). Use Storybook **controls** for In props; **actions** for Out callbacks.
+
+### Story file placement
+
+Colocate: `shared/ui/primitives/Button.tsx` + `Button.stories.tsx`. Same for composed components.
+
+Optional: `shared/ui/theme/ThemeGallery.stories.tsx` — documents all tokens visually (colors, spacing scale, type ramp).
+
+### Dependency direction in Storybook
+
+- Stories import the component under test and theme CSS only.
+- No MSW, no TanStack Query, no router — unless testing a thin wrapper that only needs a decorator (prefer pure presentational stories).
+
+---
+
 ## Component conventions
 
 ### Files and exports
@@ -453,9 +666,12 @@ Frontend validation is UX-only; API owns authoritative schema validation.
 - Components: `PascalCase.tsx`; hooks: `use-kebab-case.ts`; utils: `kebab-case.ts`.
 - Props: `{ComponentName}Props` in the same file.
 
-### Styling
+### Styling (see [Design system](#design-system-and-theming-zero-tolerance))
 
-Pick **CSS Modules** or **Tailwind** at scaffold (ADR). Design tokens in `shared/ui/theme` or equivalent — no magic values scattered in features.
+- **Tailwind semantic utilities** mapped to theme tokens — no CSS Modules, no CSS-in-JS.
+- **No magic values** in components: all spacing, color, type, and background via token utilities.
+- **`className` extension**: primitives accept optional `className` for layout-only tweaks; features must not use it to introduce new colors or spacing literals.
+- Compound components (`Dialog.Header`, etc.) inherit the same token rules.
 
 ### React rules
 
@@ -632,8 +848,10 @@ Recommended scripts:
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build",
     "knip": "knip",
-    "check": "npm run type-check && npm run lint && npm run format && npm run test"
+    "check": "npm run type-check && npm run lint && npm run format && npm run test && npm run build-storybook"
   }
 }
 ```
@@ -644,6 +862,12 @@ CI on frontend PRs:
 2. `npm run check --prefix frontend`
 3. `npm run knip --prefix frontend` (when configured)
 4. `npm audit --audit-level=high` (fail on high/critical)
+
+ESLint additions for styling (configure at scaffold):
+
+- **`eslint-plugin-tailwindcss`** — canonical class order; flag unknown utilities.
+- **Custom or `no-restricted-syntax`** — forbid arbitrary value classes matching `/\[.+\]/` outside `shared/ui/theme/`.
+- **Optional `eslint-plugin-react-no-manual-styles`** or regex rule — block inline `style` with literal numbers/colors in `features/` and `pages/`.
 
 Encode boundary rules in `eslint.config.js`:
 
@@ -668,6 +892,8 @@ Consumer must not import admin feature modules.
 
 - Frontend in Phase 1 (Issue `#1`).
 - Duplicating API validation in the browser as source of truth.
+- Hard-coded visual values outside `shared/ui/theme/`.
+- Per-component hex/spacing literals or Tailwind arbitrary values.
 - DB or MCP access from the browser.
 - Committing `node_modules/` or generated assets.
 - Alternate UI stack without ADR.
