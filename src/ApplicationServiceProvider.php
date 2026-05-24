@@ -8,11 +8,23 @@ use LogicException;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\DomainExceptionHandlerInterface;
+use NeNeRecords\BoolField\BoolFieldNotFoundExceptionHandler;
+use NeNeRecords\BoolField\BoolFieldServiceProvider;
+use NeNeRecords\BoolField\FieldKeyNotRegisteredExceptionHandler as BoolFieldKeyNotRegisteredExceptionHandler;
+use NeNeRecords\BoolField\FieldTypeMismatchExceptionHandler as BoolFieldTypeMismatchExceptionHandler;
+use NeNeRecords\DateTimeField\DateTimeFieldNotFoundExceptionHandler;
+use NeNeRecords\DateTimeField\DateTimeFieldServiceProvider;
+use NeNeRecords\DateTimeField\FieldKeyNotRegisteredExceptionHandler as DateTimeFieldKeyNotRegisteredExceptionHandler;
+use NeNeRecords\DateTimeField\FieldTypeMismatchExceptionHandler as DateTimeFieldTypeMismatchExceptionHandler;
 use NeNeRecords\Entity\EntityNotFoundExceptionHandler;
 use NeNeRecords\Entity\EntityServiceProvider;
 use NeNeRecords\EntityType\EntityTypeNotFoundExceptionHandler;
 use NeNeRecords\EntityType\EntityTypeServiceProvider;
 use NeNeRecords\EntityType\EntityTypeSlugConflictExceptionHandler;
+use NeNeRecords\EnumField\EnumFieldNotFoundExceptionHandler;
+use NeNeRecords\EnumField\EnumFieldServiceProvider;
+use NeNeRecords\EnumField\FieldKeyNotRegisteredExceptionHandler as EnumFieldKeyNotRegisteredExceptionHandler;
+use NeNeRecords\EnumField\FieldTypeMismatchExceptionHandler as EnumFieldTypeMismatchExceptionHandler;
 use NeNeRecords\FieldDef\FieldDefConflictExceptionHandler;
 use NeNeRecords\FieldDef\FieldDefNotFoundExceptionHandler;
 use NeNeRecords\FieldDef\FieldDefServiceProvider;
@@ -39,7 +51,10 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
             ->addProvider(new FieldDefServiceProvider())
             ->addProvider(new EntityServiceProvider())
             ->addProvider(new TextFieldServiceProvider())
-            ->addProvider(new IntFieldServiceProvider());
+            ->addProvider(new IntFieldServiceProvider())
+            ->addProvider(new EnumFieldServiceProvider())
+            ->addProvider(new BoolFieldServiceProvider())
+            ->addProvider(new DateTimeFieldServiceProvider());
 
         $builder
             ->set(
@@ -50,6 +65,9 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $entity = $container->get('nene-records.route_registrar.entity');
                     $textField = $container->get('nene-records.route_registrar.text_field');
                     $intField = $container->get('nene-records.route_registrar.int_field');
+                    $enumField = $container->get('nene-records.route_registrar.enum_field');
+                    $boolField = $container->get('nene-records.route_registrar.bool_field');
+                    $datetimeField = $container->get('nene-records.route_registrar.datetime_field');
 
                     if (
                         !is_callable($entityType)
@@ -57,11 +75,23 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         || !is_callable($entity)
                         || !is_callable($textField)
                         || !is_callable($intField)
+                        || !is_callable($enumField)
+                        || !is_callable($boolField)
+                        || !is_callable($datetimeField)
                     ) {
                         throw new LogicException('Route registrar service is invalid.');
                     }
 
-                    return [$entityType, $fieldDef, $entity, $textField, $intField];
+                    return [
+                        $entityType,
+                        $fieldDef,
+                        $entity,
+                        $textField,
+                        $intField,
+                        $enumField,
+                        $boolField,
+                        $datetimeField,
+                    ];
                 },
             )
             ->set(
@@ -78,6 +108,15 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $intFieldNotFound = $container->get(IntFieldNotFoundExceptionHandler::class);
                     $intFieldKeyNotRegistered = $container->get(IntFieldKeyNotRegisteredExceptionHandler::class);
                     $intFieldTypeMismatch = $container->get(IntFieldTypeMismatchExceptionHandler::class);
+                    $enumFieldNotFound = $container->get(EnumFieldNotFoundExceptionHandler::class);
+                    $enumFieldKeyNotRegistered = $container->get(EnumFieldKeyNotRegisteredExceptionHandler::class);
+                    $enumFieldTypeMismatch = $container->get(EnumFieldTypeMismatchExceptionHandler::class);
+                    $boolFieldNotFound = $container->get(BoolFieldNotFoundExceptionHandler::class);
+                    $boolFieldKeyNotRegistered = $container->get(BoolFieldKeyNotRegisteredExceptionHandler::class);
+                    $boolFieldTypeMismatch = $container->get(BoolFieldTypeMismatchExceptionHandler::class);
+                    $datetimeFieldNotFound = $container->get(DateTimeFieldNotFoundExceptionHandler::class);
+                    $datetimeFieldKeyNotRegistered = $container->get(DateTimeFieldKeyNotRegisteredExceptionHandler::class);
+                    $datetimeFieldTypeMismatch = $container->get(DateTimeFieldTypeMismatchExceptionHandler::class);
 
                     foreach ([
                         $entityTypeNotFound,
@@ -91,6 +130,15 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $intFieldNotFound,
                         $intFieldKeyNotRegistered,
                         $intFieldTypeMismatch,
+                        $enumFieldNotFound,
+                        $enumFieldKeyNotRegistered,
+                        $enumFieldTypeMismatch,
+                        $boolFieldNotFound,
+                        $boolFieldKeyNotRegistered,
+                        $boolFieldTypeMismatch,
+                        $datetimeFieldNotFound,
+                        $datetimeFieldKeyNotRegistered,
+                        $datetimeFieldTypeMismatch,
                     ] as $handler) {
                         if (!$handler instanceof DomainExceptionHandlerInterface) {
                             throw new LogicException('Exception handler service is invalid.');
@@ -109,6 +157,15 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $intFieldNotFound,
                         $intFieldKeyNotRegistered,
                         $intFieldTypeMismatch,
+                        $enumFieldNotFound,
+                        $enumFieldKeyNotRegistered,
+                        $enumFieldTypeMismatch,
+                        $boolFieldNotFound,
+                        $boolFieldKeyNotRegistered,
+                        $boolFieldTypeMismatch,
+                        $datetimeFieldNotFound,
+                        $datetimeFieldKeyNotRegistered,
+                        $datetimeFieldTypeMismatch,
                     ];
                 },
             );

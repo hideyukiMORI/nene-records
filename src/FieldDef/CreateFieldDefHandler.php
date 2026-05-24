@@ -14,7 +14,7 @@ use Psr\Http\Message\ServerRequestInterface;
 final readonly class CreateFieldDefHandler
 {
     /** @var list<string> */
-    private const ALLOWED_DATA_TYPES = ['text', 'int'];
+    private const ALLOWED_DATA_TYPES = ['text', 'int', 'enum', 'bool', 'datetime'];
 
     public function __construct(
         private CreateFieldDefUseCaseInterface $useCase,
@@ -43,7 +43,7 @@ final readonly class CreateFieldDefHandler
         if ($dataType === '') {
             $errors[] = new ValidationError('data_type', 'Data type is required.', 'required');
         } elseif (!in_array($dataType, self::ALLOWED_DATA_TYPES, true)) {
-            $errors[] = new ValidationError('data_type', 'Data type must be one of: text, int.', 'invalid');
+            $errors[] = new ValidationError('data_type', 'Data type must be one of: text, int, enum, bool, datetime.', 'invalid');
         }
 
         if ($errors !== []) {
