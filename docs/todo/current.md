@@ -6,18 +6,19 @@ Last updated: 2026-05-24
 
 | Issue | Summary |
 | --- | --- |
-| — | （なし — Phase 5 Analytics 完了後） |
+| — | （Phase 5 残: detachEntityRelation MCP — upstream 待ち） |
 
 ## In Progress
 
 | Issue | Summary |
 | --- | --- |
-| #69 | Analytics / access log API |
+| — | （なし） |
 
 ## Recently Completed
 
 | Issue | Summary |
 | --- | --- |
+| #69 | Analytics / access log API (PR #70) |
 | #67 | 全 API MCP カタログ 53 ツール (PR #68) |
 | #65 | MCP relation tools カタログ (PR #66) |
 | #63 | Consumer view relation リンク表示 (PR #64) |
@@ -38,12 +39,12 @@ Last updated: 2026-05-24
 - **API（済）:** tags CRUD, entity_tags, entities `?tags=` フィルタ
 - **Admin UI（済）:** Tag CRUD (#44), Record tag attach/detach (#46), Records 一覧 tag フィルタ (#48)
 - **Relations（済）:** Phase 3 一式 + MCP #65/#67
-- **Phase 5（一部済）:** MCP 全 API カタログ（53 tools → 54 tools, `composer mcp:generate`）
+- **Phase 5（一部済）:** MCP 全 API カタログ（54 tools, `composer mcp:generate`）、Analytics / access log (#69)
 - **Phase 5 残:** detachEntityRelation MCP（upstream 待ち）
 
 ## Verification
 
 ```bash
-composer check                    # 144 tests + openapi + mcp
+composer check                    # 154 tests + openapi + mcp
 npm run check --prefix frontend   # 65 tests
 ```
