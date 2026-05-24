@@ -10,6 +10,7 @@ export function EntityRecordsPage() {
   const entityTypeQuery = useEntityType(toEntityTypeId(entityTypeId))
   const {
     items,
+    recordLabels,
     total,
     isLoading,
     isError,
@@ -42,6 +43,7 @@ export function EntityRecordsPage() {
         entityTypeName={entityTypeQuery.data?.name ?? null}
         entityTypeSlug={entityTypeQuery.data?.slug ?? null}
         items={items}
+        recordLabels={recordLabels}
         total={total}
         isLoading={isLoading}
         isError={isError}

@@ -5,6 +5,7 @@ import { Button, EmptyState, Stack, Text } from '@/shared/ui'
 export interface EntityListPanelProps {
   entityTypeId: number
   items: Entity[]
+  recordLabels: Record<string, string>
   isLoading: boolean
   isError: boolean
   errorTitle: string | null
@@ -16,6 +17,7 @@ export interface EntityListPanelProps {
 export function EntityListPanel({
   entityTypeId,
   items,
+  recordLabels,
   isLoading,
   isError,
   errorTitle,
@@ -57,10 +59,10 @@ export function EntityListPanel({
         >
           <Stack gap="xs">
             <Text as="span" variant="heading-sm">
-              Record #{String(item.id)}
+              {recordLabels[String(item.id)] ?? `Record #${String(item.id)}`}
             </Text>
             <Text as="span" muted>
-              Entity type ID {String(item.entityTypeId)}
+              #{String(item.id)}
             </Text>
           </Stack>
           <div className="flex items-center gap-inline-sm">

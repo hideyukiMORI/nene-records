@@ -4,8 +4,9 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { EntityRecordsPage } from '@/pages/entity-records/EntityRecordsPage'
 import { EntityTypesPage } from '@/pages/entity-types/EntityTypesPage'
-import { resetEntityStore } from '@tests/msw/handlers/entity'
+import { resetEntityStore, seedEntities } from '@tests/msw/handlers/entity'
 import { resetEntityTypeStore, seedEntityTypes } from '@tests/msw/handlers/entity-type'
+import { resetTextFieldStore, seedTextFields } from '@tests/msw/handlers/text-field'
 import { mswServer } from '@tests/msw/server'
 import { renderWithProviders } from '@tests/render/render-with-providers'
 
@@ -28,6 +29,7 @@ describe('EntityRecordsPage', () => {
     mswServer.resetHandlers()
     resetEntityTypeStore()
     resetEntityStore()
+    resetTextFieldStore()
     cleanup()
   })
 
@@ -74,6 +76,31 @@ describe('EntityRecordsPage', () => {
       expect(screen.queryByText('Record #1')).not.toBeInTheDocument()
       expect(screen.getByText('No records yet')).toBeInTheDocument()
     })
+  })
+
+  it('shows title text field value as the record label', async () => {
+    seedEntityTypes([{ id: 1, name: 'Article', slug: 'article' }])
+    seedEntities([
+      {
+        id: 1,
+        entity_type_id: 1,
+        is_deleted: false,
+        deleted_at: null,
+      },
+    ])
+    seedTextFields([
+      {
+        id: 1,
+        entity_id: 1,
+        field_key: 'title',
+        value: 'My article',
+      },
+    ])
+
+    renderRecordsPage()
+
+    expect(await screen.findByText('My article')).toBeInTheDocument()
+    expect(screen.getByText('#1')).toBeInTheDocument()
   })
 
   it('links from entity types page to records', async () => {
