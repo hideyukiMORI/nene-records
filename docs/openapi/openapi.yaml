@@ -3,7 +3,7 @@ info:
   title: NeNe Records API
   version: 0.1.0
   description: >
-    NeNe Records public API contract — entity_types, field_defs, entities, tags, entity_tags, text_fields, int_fields, enum_fields, bool_fields, and datetime_fields CRUD (MVP + Phase 2 registry + Phase 3 tags).
+    NeNe Records public API contract — entity_types, field_defs, entities, tags, entity_tags, entity_relations, text_fields, int_fields, enum_fields, bool_fields, and datetime_fields CRUD (MVP + Phase 2 registry + Phase 3 tags/relations).
 servers:
   - url: http://localhost:8080
     description: Local development server
@@ -30,6 +30,8 @@ tags:
     description: Tag definitions for entity classification.
   - name: EntityTags
     description: Tags attached to entity instances.
+  - name: EntityRelations
+    description: Typed relation links between entity instances.
 paths:
   /health:
     get:
@@ -415,6 +417,100 @@ paths:
           description: Tag detached.
         '404':
           $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/entities/{entityId}/relations:
+    get:
+      tags:
+        - EntityRelations
+      summary: List relations attached to entity
+      operationId: listEntityRelations
+      parameters:
+        - $ref: '#/components/parameters/EntityIdPath'
+        - name: field_key
+          in: query
+          required: true
+          schema:
+            type: string
+            minLength: 1
+      responses:
+        '200':
+          description: Relations for the given field key.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntityRelationListResponse'
+              examples:
+                ok:
+                  value:
+                    items: []
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - EntityRelations
+      summary: Attach relation target to entity
+      operationId: attachEntityRelation
+      parameters:
+        - $ref: '#/components/parameters/EntityIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AttachEntityRelationRequest'
+            examples:
+              ok:
+                value:
+                  field_key: author
+                  target_entity_id: 2
+      responses:
+        '201':
+          description: Relation attached.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntityRelationItemResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/entities/{entityId}/relations/{targetEntityId}:
+    delete:
+      tags:
+        - EntityRelations
+      summary: Detach relation target from entity
+      operationId: detachEntityRelation
+      parameters:
+        - $ref: '#/components/parameters/EntityIdPath'
+        - name: targetEntityId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+        - name: field_key
+          in: query
+          required: true
+          schema:
+            type: string
+            minLength: 1
+      responses:
+        '204':
+          description: Relation detached.
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
         '500':
           $ref: '#/components/responses/InternalServerError'
   /api/v1/field-defs:
@@ -1938,6 +2034,16 @@ components:
             - enum
             - bool
             - datetime
+            - relation
+        target_entity_type_id:
+          type: integer
+          format: int64
+          minimum: 1
+        cardinality:
+          type: string
+          enum:
+            - one
+            - many
     CreateFieldDefRequest:
       type: object
       required:
@@ -1960,6 +2066,16 @@ components:
             - enum
             - bool
             - datetime
+            - relation
+        target_entity_type_id:
+          type: integer
+          format: int64
+          minimum: 1
+        cardinality:
+          type: string
+          enum:
+            - one
+            - many
       additionalProperties: false
     UpdateFieldDefRequest:
       $ref: '#/components/schemas/CreateFieldDefRequest'
@@ -1978,6 +2094,43 @@ components:
           type: integer
         offset:
           type: integer
+      additionalProperties: false
+    EntityRelationListResponse:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/EntityRelationItemResponse'
+    EntityRelationItemResponse:
+      type: object
+      required:
+        - field_key
+        - target_entity_id
+      properties:
+        field_key:
+          type: string
+        target_entity_id:
+          type: integer
+          format: int64
+          minimum: 1
+      additionalProperties: false
+    AttachEntityRelationRequest:
+      type: object
+      required:
+        - field_key
+        - target_entity_id
+      properties:
+        field_key:
+          type: string
+          minLength: 1
+        target_entity_id:
+          type: integer
+          format: int64
+          minimum: 1
+      additionalProperties: false
     TextFieldResponse:
       type: object
       required:

@@ -21,6 +21,8 @@ final readonly class ListFieldDefsUseCase implements ListFieldDefsUseCaseInterfa
                 entityTypeId: $fieldDef->entityTypeId,
                 fieldKey: $fieldDef->fieldKey,
                 dataType: $fieldDef->dataType,
+                targetEntityTypeId: $fieldDef->targetEntityTypeId,
+                cardinality: $fieldDef->cardinality,
             ),
             $rows,
         );

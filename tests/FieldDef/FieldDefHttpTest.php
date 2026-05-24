@@ -147,6 +147,30 @@ final class FieldDefHttpTest extends TestCase
         self::assertSame('int', $payload['data_type']);
     }
 
+    public function testPostFieldDefWithRelationDataTypeCreatesDefinition(): void
+    {
+        $articleTypeId = $this->entityTypes->save(new EntityType(name: 'Article', slug: 'article'));
+        $authorTypeId = $this->entityTypes->save(new EntityType(name: 'Author', slug: 'author'));
+
+        $body = $this->factory->createStream(json_encode([
+            'entity_type_id' => $articleTypeId,
+            'field_key' => 'author',
+            'data_type' => 'relation',
+            'target_entity_type_id' => $authorTypeId,
+            'cardinality' => 'one',
+        ], JSON_THROW_ON_ERROR));
+
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('POST', 'https://example.test/api/v1/field-defs')->withBody($body),
+        );
+        $payload = $this->decodeJson($response);
+
+        self::assertSame(201, $response->getStatusCode());
+        self::assertSame('relation', $payload['data_type']);
+        self::assertSame($authorTypeId, $payload['target_entity_type_id']);
+        self::assertSame('one', $payload['cardinality']);
+    }
+
     public function testPostInvalidDataTypeReturns422(): void
     {
         $typeId = $this->entityTypes->save(new EntityType(name: 'Article', slug: 'article'));

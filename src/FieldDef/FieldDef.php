@@ -15,6 +15,8 @@ final readonly class FieldDef
         public ?int $id = null,
         public bool $isDeleted = false,
         public ?DateTimeImmutable $deletedAt = null,
+        public ?int $targetEntityTypeId = null,
+        public ?string $cardinality = null,
     ) {
     }
 }

@@ -35,6 +35,6 @@ Last updated: 2026-05-24
 ## Verification
 
 ```bash
-composer check                    # 130 tests
+composer check                    # 137 tests
 npm run check --prefix frontend   # 59 tests
 ```

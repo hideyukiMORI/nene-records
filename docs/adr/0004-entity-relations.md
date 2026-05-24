@@ -75,7 +75,7 @@ On attach:
 4. Target entity exists and is not soft-deleted.
 5. `target.entity_type_id === field_def.target_entity_type_id`.
 6. Duplicate `(source, target, field_key)` → **409**.
-7. `cardinality === 'one'` and a link already exists for `(source, field_key)` → replace existing target or **409** (pick one in implementation; document in OpenAPI).
+7. `cardinality === 'one'` and a link already exists for `(source, field_key)` → **replace** the existing target (same field, new target).
 
 Self-reference and cycles are **not** blocked in Phase 3a.
 
