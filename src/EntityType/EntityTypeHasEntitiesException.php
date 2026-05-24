@@ -8,10 +8,10 @@ use RuntimeException;
 
 final class EntityTypeHasEntitiesException extends RuntimeException
 {
-    public function __construct(int $entityTypeId, int $count)
+    public function __construct(int $entityTypeId)
     {
         parent::__construct(
-            "Entity type #{$entityTypeId} cannot be deleted because it has {$count} record(s). Delete all records first.",
+            "Entity type #{$entityTypeId} cannot be deleted because it still has records. Delete all records first.",
         );
     }
 }

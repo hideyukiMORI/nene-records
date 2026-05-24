@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace NeNeRecords\EntityType;
 
-use NeNeRecords\Entity\EntityListCriteria;
 use NeNeRecords\Entity\EntityRepositoryInterface;
 
 final readonly class DeleteEntityTypeUseCase implements DeleteEntityTypeUseCaseInterface
@@ -23,10 +22,8 @@ final readonly class DeleteEntityTypeUseCase implements DeleteEntityTypeUseCaseI
             throw new EntityTypeNotFoundException($input->id);
         }
 
-        $count = $this->entities->countByCriteria(new EntityListCriteria(entityTypeId: $input->id));
-
-        if ($count > 0) {
-            throw new EntityTypeHasEntitiesException($input->id, $count);
+        if ($this->entities->existsByEntityTypeId($input->id)) {
+            throw new EntityTypeHasEntitiesException($input->id);
         }
 
         $this->entityTypes->delete($input->id);

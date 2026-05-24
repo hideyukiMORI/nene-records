@@ -95,6 +95,17 @@ final class InMemoryEntityRepository implements EntityRepositoryInterface
         return false;
     }
 
+    public function existsByEntityTypeId(int $entityTypeId): bool
+    {
+        foreach ($this->entities as $entity) {
+            if ($entity->entityTypeId === $entityTypeId) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /** @return list<Entity> */
     public function findAll(int $limit, int $offset): array
     {

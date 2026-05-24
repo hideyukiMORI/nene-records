@@ -12,6 +12,9 @@ interface EntityRepositoryInterface
 
     public function existsBySlug(string $slug, int $entityTypeId, ?int $excludeId = null): bool;
 
+    /** Returns true if ANY entity (including soft-deleted) belongs to this entity type. */
+    public function existsByEntityTypeId(int $entityTypeId): bool;
+
     /** @return list<Entity> */
     public function findAll(int $limit, int $offset): array;
 

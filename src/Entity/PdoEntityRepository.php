@@ -69,6 +69,16 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
         return $row !== null;
     }
 
+    public function existsByEntityTypeId(int $entityTypeId): bool
+    {
+        $row = $this->query->fetchOne(
+            'SELECT id FROM entities WHERE entity_type_id = ? LIMIT 1',
+            [$entityTypeId],
+        );
+
+        return $row !== null;
+    }
+
     /** @return list<Entity> */
     public function findAll(int $limit, int $offset): array
     {
