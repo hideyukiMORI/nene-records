@@ -12,33 +12,34 @@ New contributors and AI agents: read [`handoff-2026-05-24-workspace-switch.md`](
 
 | Issue | Branch | Summary |
 | --- | --- | --- |
-| #4 | `docs/4-workspace-handoff` | Workspace switch handoff and product vision |
+| #9 | `feat/9-field-defs-registry` | Phase 2: `field_defs` schema registry API |
 
 ## Up Next
 
 | Issue | Summary |
 | --- | --- |
-| #1 | MVP: `entity_types` + `entities` + `text_fields` CRUD vertical slice |
+| — | Phase 2 follow-up: int / enum / bool / datetime field types |
 
 ## Recently Completed
 
 | Issue | Summary |
 | --- | --- |
+| #1 | MVP entity CRUD vertical slice (merged PR #8) |
+| #6 | Frontend/backend coding standards (merged PR #7) |
+| #4 | Workspace handoff + product vision (merged PR #5) |
 | #2 | NENE2 governance inheritance (merged PR #3) |
 | — | Repository bootstrap (`README`, MIT license) |
 
 ## Handoff Notes
 
-- Phase 0 governance complete. Phase 1 runtime scaffold starts in Issue #1.
-- Framework reference: `hideyukimori/nene2` via Composer; see `docs/inheritance-from-nene2.md`.
-- NENE2 sibling in workspace is optional; see handoff §1.
+- **Phase 1 complete.** `composer check`, `composer openapi` available.
+- Phase 2 starts with ADR 0002 + `field_defs` registry (Issue #9).
+- Framework reference: `hideyukimori/nene2` via Composer path `../NENE2`; see `docs/inheritance-from-nene2.md`.
 
 ## Verification Commands
-
-Not yet available — add after Phase 1 scaffold:
 
 ```bash
 composer check
 composer openapi
-composer mcp
+composer migrations:migrate   # requires .env with SQLite
 ```

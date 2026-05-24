@@ -21,12 +21,16 @@ use NeNeRecords\Entity\UpdateEntityHandler;
 use NeNeRecords\Entity\UpdateEntityUseCase;
 use NeNeRecords\EntityType\EntityType;
 use NeNeRecords\EntityType\EntityTypeNotFoundExceptionHandler;
+use NeNeRecords\FieldDef\FieldDef;
 use NeNeRecords\Tests\Entity\InMemoryEntityRepository;
 use NeNeRecords\Tests\EntityType\InMemoryEntityTypeRepository;
+use NeNeRecords\Tests\FieldDef\InMemoryFieldDefRepository;
 use NeNeRecords\TextField\CreateTextFieldHandler;
 use NeNeRecords\TextField\CreateTextFieldUseCase;
 use NeNeRecords\TextField\DeleteTextFieldHandler;
 use NeNeRecords\TextField\DeleteTextFieldUseCase;
+use NeNeRecords\TextField\FieldKeyNotRegisteredExceptionHandler;
+use NeNeRecords\TextField\FieldTypeMismatchExceptionHandler;
 use NeNeRecords\TextField\GetTextFieldByIdHandler;
 use NeNeRecords\TextField\GetTextFieldByIdUseCase;
 use NeNeRecords\TextField\ListTextFieldsHandler;
@@ -45,6 +49,7 @@ final class TextFieldHttpTest extends TestCase
     private Psr17Factory $factory;
     private InMemoryEntityTypeRepository $entityTypes;
     private InMemoryEntityRepository $entities;
+    private InMemoryFieldDefRepository $fieldDefs;
     private InMemoryTextFieldRepository $textFields;
     private RequestHandlerInterface $application;
 
@@ -55,6 +60,7 @@ final class TextFieldHttpTest extends TestCase
         $this->factory = new Psr17Factory();
         $this->entityTypes = new InMemoryEntityTypeRepository();
         $this->entities = new InMemoryEntityRepository();
+        $this->fieldDefs = new InMemoryFieldDefRepository();
         $this->textFields = new InMemoryTextFieldRepository();
 
         $jsonResponse = new JsonResponseFactory($this->factory, $this->factory);
@@ -71,8 +77,8 @@ final class TextFieldHttpTest extends TestCase
         $textFieldRegistrar = new TextFieldRouteRegistrar(
             new ListTextFieldsHandler(new ListTextFieldsUseCase($this->textFields), $jsonResponse),
             new GetTextFieldByIdHandler(new GetTextFieldByIdUseCase($this->textFields), $jsonResponse),
-            new CreateTextFieldHandler(new CreateTextFieldUseCase($this->textFields, $this->entities), $jsonResponse),
-            new UpdateTextFieldHandler(new UpdateTextFieldUseCase($this->textFields), $jsonResponse),
+            new CreateTextFieldHandler(new CreateTextFieldUseCase($this->textFields, $this->entities, $this->fieldDefs), $jsonResponse),
+            new UpdateTextFieldHandler(new UpdateTextFieldUseCase($this->textFields, $this->entities, $this->fieldDefs), $jsonResponse),
             new DeleteTextFieldHandler(new DeleteTextFieldUseCase($this->textFields), $this->factory),
         );
 
@@ -83,6 +89,8 @@ final class TextFieldHttpTest extends TestCase
                 new EntityTypeNotFoundExceptionHandler($problemDetails),
                 new EntityNotFoundExceptionHandler($problemDetails),
                 new TextFieldNotFoundExceptionHandler($problemDetails),
+                new FieldKeyNotRegisteredExceptionHandler($problemDetails),
+                new FieldTypeMismatchExceptionHandler($problemDetails),
             ],
             routeRegistrars: [$entityRegistrar, $textFieldRegistrar],
         ))->create();
@@ -91,6 +99,8 @@ final class TextFieldHttpTest extends TestCase
     public function testPostTextFieldCreatesFieldAndReturns201WithLocation(): void
     {
         $typeId = $this->entityTypes->save(new EntityType(name: 'Item', slug: 'item'));
+        $this->fieldDefs->save(new FieldDef(entityTypeId: $typeId, fieldKey: 'title', dataType: 'text'));
+
         $bodyEntity = $this->factory->createStream(json_encode(['entity_type_id' => $typeId], JSON_THROW_ON_ERROR));
 
         $entityResponse = $this->application->handle(
@@ -118,9 +128,63 @@ final class TextFieldHttpTest extends TestCase
         self::assertSame('Hello Field', $payload['value']);
     }
 
+    public function testPostUnregisteredFieldKeyReturns422(): void
+    {
+        $typeId = $this->entityTypes->save(new EntityType(name: 'Item', slug: 'item'));
+        $bodyEntity = $this->factory->createStream(json_encode(['entity_type_id' => $typeId], JSON_THROW_ON_ERROR));
+
+        $entityResponse = $this->application->handle(
+            $this->factory->createServerRequest('POST', 'https://example.test/api/v1/entities')->withBody($bodyEntity),
+        );
+        $entityId = (int) $this->decodeJson($entityResponse)['id'];
+
+        $bodyTf = $this->factory->createStream(json_encode([
+            'entity_id' => $entityId,
+            'field_key' => 'title',
+            'value' => 'Hello Field',
+        ], JSON_THROW_ON_ERROR));
+
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('POST', 'https://example.test/api/v1/text-fields')->withBody($bodyTf),
+        );
+        $payload = $this->decodeJson($response);
+
+        self::assertSame(422, $response->getStatusCode());
+        self::assertStringEndsWith('field-key-not-registered', (string) $payload['type']);
+    }
+
+    public function testPostMismatchedFieldTypeReturns422(): void
+    {
+        $typeId = $this->entityTypes->save(new EntityType(name: 'Item', slug: 'item'));
+        $this->fieldDefs->save(new FieldDef(entityTypeId: $typeId, fieldKey: 'count', dataType: 'int'));
+
+        $bodyEntity = $this->factory->createStream(json_encode(['entity_type_id' => $typeId], JSON_THROW_ON_ERROR));
+
+        $entityResponse = $this->application->handle(
+            $this->factory->createServerRequest('POST', 'https://example.test/api/v1/entities')->withBody($bodyEntity),
+        );
+        $entityId = (int) $this->decodeJson($entityResponse)['id'];
+
+        $bodyTf = $this->factory->createStream(json_encode([
+            'entity_id' => $entityId,
+            'field_key' => 'count',
+            'value' => '1',
+        ], JSON_THROW_ON_ERROR));
+
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('POST', 'https://example.test/api/v1/text-fields')->withBody($bodyTf),
+        );
+        $payload = $this->decodeJson($response);
+
+        self::assertSame(422, $response->getStatusCode());
+        self::assertStringEndsWith('field-type-mismatch', (string) $payload['type']);
+    }
+
     public function testAfterDeleteGetTextFieldReturns404(): void
     {
         $typeId = $this->entityTypes->save(new EntityType(name: 'Item', slug: 'item'));
+        $this->fieldDefs->save(new FieldDef(entityTypeId: $typeId, fieldKey: 'body', dataType: 'text'));
+
         $bodyEntity = $this->factory->createStream(json_encode(['entity_type_id' => $typeId], JSON_THROW_ON_ERROR));
 
         $entityResponse = $this->application->handle(
