@@ -38,6 +38,7 @@ export function EntityRecordsPage() {
         </Text>
       </Stack>
       <ManageEntitiesView
+        entityTypeId={entityTypeId}
         entityTypeName={entityTypeQuery.data?.name ?? null}
         entityTypeSlug={entityTypeQuery.data?.slug ?? null}
         items={items}

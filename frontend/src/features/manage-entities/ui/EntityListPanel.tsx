@@ -1,7 +1,9 @@
+import { Link } from 'react-router-dom'
 import type { Entity } from '@/entities/entity'
 import { Button, EmptyState, Stack, Text } from '@/shared/ui'
 
 export interface EntityListPanelProps {
+  entityTypeId: number
   items: Entity[]
   isLoading: boolean
   isError: boolean
@@ -12,6 +14,7 @@ export interface EntityListPanelProps {
 }
 
 export function EntityListPanel({
+  entityTypeId,
   items,
   isLoading,
   isError,
@@ -60,16 +63,23 @@ export function EntityListPanel({
               Entity type ID {String(item.entityTypeId)}
             </Text>
           </Stack>
-          <Button
-            variant="danger"
-            size="sm"
-            disabled={isDeleting}
-            onClick={() => {
-              onDelete(item)
-            }}
-          >
-            Delete
-          </Button>
+          <div className="flex items-center gap-inline-sm">
+            <Link to={`/entity-types/${String(entityTypeId)}/entities/${String(item.id)}`}>
+              <Button variant="secondary" size="sm">
+                Edit
+              </Button>
+            </Link>
+            <Button
+              variant="danger"
+              size="sm"
+              disabled={isDeleting}
+              onClick={() => {
+                onDelete(item)
+              }}
+            >
+              Delete
+            </Button>
+          </div>
         </li>
       ))}
     </ul>
