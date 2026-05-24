@@ -45,6 +45,9 @@ use NeNeRecords\IntField\IntFieldServiceProvider;
 use NeNeRecords\PublicRecord\PublicEntityTypeNotFoundExceptionHandler;
 use NeNeRecords\PublicRecord\PublicRecordNotFoundExceptionHandler;
 use NeNeRecords\PublicRecord\PublicRecordServiceProvider;
+use NeNeRecords\Setting\SettingKeyNotFoundExceptionHandler;
+use NeNeRecords\Setting\SettingServiceProvider;
+use NeNeRecords\Setting\SettingValueInvalidExceptionHandler;
 use NeNeRecords\Tag\TagNotFoundExceptionHandler;
 use NeNeRecords\Tag\TagServiceProvider;
 use NeNeRecords\Tag\TagSlugConflictExceptionHandler;
@@ -75,7 +78,8 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
             ->addProvider(new EntityTagServiceProvider())
             ->addProvider(new EntityRelationServiceProvider())
             ->addProvider(new AnalyticsServiceProvider())
-            ->addProvider(new PublicRecordServiceProvider());
+            ->addProvider(new PublicRecordServiceProvider())
+            ->addProvider(new SettingServiceProvider());
 
         $builder
             ->set(
@@ -94,6 +98,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $entityRelation = $container->get('nene-records.route_registrar.entity_relation');
                     $analytics = $container->get('nene-records.route_registrar.analytics');
                     $publicRecord = $container->get('nene-records.route_registrar.public_record');
+                    $setting = $container->get('nene-records.route_registrar.setting');
 
                     if (
                         !is_callable($entityType)
@@ -109,6 +114,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         || !is_callable($entityRelation)
                         || !is_callable($analytics)
                         || !is_callable($publicRecord)
+                        || !is_callable($setting)
                     ) {
                         throw new LogicException('Route registrar service is invalid.');
                     }
@@ -127,6 +133,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $entityRelation,
                         $analytics,
                         $publicRecord,
+                        $setting,
                     ];
                 },
             )
@@ -164,6 +171,8 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $relationNotAttached = $container->get(RelationNotAttachedExceptionHandler::class);
                     $publicEntityTypeNotFound = $container->get(PublicEntityTypeNotFoundExceptionHandler::class);
                     $publicRecordNotFound = $container->get(PublicRecordNotFoundExceptionHandler::class);
+                    $settingKeyNotFound = $container->get(SettingKeyNotFoundExceptionHandler::class);
+                    $settingValueInvalid = $container->get(SettingValueInvalidExceptionHandler::class);
 
                     foreach ([
                         $entityTypeNotFound,
@@ -197,6 +206,8 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $relationNotAttached,
                         $publicEntityTypeNotFound,
                         $publicRecordNotFound,
+                        $settingKeyNotFound,
+                        $settingValueInvalid,
                     ] as $handler) {
                         if (!$handler instanceof DomainExceptionHandlerInterface) {
                             throw new LogicException('Exception handler service is invalid.');
@@ -235,6 +246,8 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $relationNotAttached,
                         $publicEntityTypeNotFound,
                         $publicRecordNotFound,
+                        $settingKeyNotFound,
+                        $settingValueInvalid,
                     ];
                 },
             );

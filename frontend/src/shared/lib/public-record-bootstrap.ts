@@ -1,3 +1,5 @@
+import type { PublicSettingListDto } from '@/entities/setting/api-types'
+
 const BOOTSTRAP_SCRIPT_ID = 'nene-records-public-record-bootstrap'
 
 export interface PublicRecordBootstrapFieldListDto {
@@ -30,6 +32,7 @@ export interface PublicRecordBootstrapDto {
   dateTimeFields: PublicRecordBootstrapFieldListDto
   entityRelations: PublicRecordBootstrapRelationQuery[]
   relationTextFieldsByEntityTypeId: Record<string, PublicRecordBootstrapFieldListDto>
+  publicSettings?: PublicSettingListDto
 }
 
 export function readPublicRecordBootstrap(): PublicRecordBootstrapDto | null {

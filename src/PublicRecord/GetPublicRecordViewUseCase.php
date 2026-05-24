@@ -17,6 +17,9 @@ use NeNeRecords\FieldDef\FieldDef;
 use NeNeRecords\FieldDef\FieldDefRepositoryInterface;
 use NeNeRecords\IntField\IntField;
 use NeNeRecords\IntField\IntFieldRepositoryInterface;
+use NeNeRecords\Setting\ListPublicSettingsUseCaseInterface;
+use NeNeRecords\Setting\SettingEntry;
+use NeNeRecords\Setting\SettingHttpMapper;
 use NeNeRecords\TextField\TextField;
 use NeNeRecords\TextField\TextFieldRepositoryInterface;
 
@@ -36,6 +39,7 @@ final readonly class GetPublicRecordViewUseCase implements GetPublicRecordViewUs
         private BoolFieldRepositoryInterface $boolFields,
         private DateTimeFieldRepositoryInterface $dateTimeFields,
         private EntityRelationRepositoryInterface $entityRelations,
+        private ListPublicSettingsUseCaseInterface $publicSettings,
     ) {
     }
 
@@ -139,6 +143,14 @@ final readonly class GetPublicRecordViewUseCase implements GetPublicRecordViewUs
             relationQueries: $this->buildRelationQueries($fieldDefRows, $entityId),
             relationTextFieldRowsByEntityTypeId: $relationTextFieldsByEntityTypeId,
         );
+
+        $publicSettingsOutput = $this->publicSettings->execute();
+        $bootstrap['publicSettings'] = [
+            'items' => array_map(
+                static fn (SettingEntry $entry) => SettingHttpMapper::entryToPublicArray($entry),
+                $publicSettingsOutput->items,
+            ),
+        ];
 
         return new GetPublicRecordViewOutput(
             entityTypeSlug: $input->entityTypeSlug,

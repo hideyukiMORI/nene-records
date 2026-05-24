@@ -36,6 +36,8 @@ tags:
     description: HTTP access log aggregation and reporting.
   - name: PublicConsumer
     description: Aggregated read-only views for public consumer pages and MCP.
+  - name: Settings
+    description: Site-wide settings registry with revision history.
 paths:
   /health:
     get:
@@ -1592,6 +1594,90 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /api/v1/settings:
+    get:
+      tags:
+        - Settings
+      summary: List settings
+      description: Returns all registered settings with effective values for admin use.
+      operationId: listSettings
+      responses:
+        '200':
+          description: Setting list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SettingListResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/settings/{key}:
+    put:
+      tags:
+        - Settings
+      summary: Update setting value
+      description: Updates a setting value and appends a revision record atomically.
+      operationId: updateSettingByKey
+      parameters:
+        - $ref: '#/components/parameters/SettingKeyPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSettingRequest'
+      responses:
+        '200':
+          description: Updated setting value.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SettingValueResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/settings/{key}/revisions:
+    get:
+      tags:
+        - Settings
+      summary: List setting revisions
+      description: Returns paginated revision history for a setting key.
+      operationId: listSettingRevisions
+      parameters:
+        - $ref: '#/components/parameters/SettingKeyPath'
+        - $ref: '#/components/parameters/LimitQuery'
+        - $ref: '#/components/parameters/OffsetQuery'
+      responses:
+        '200':
+          description: Paginated revision list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SettingRevisionListResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/public/settings:
+    get:
+      tags:
+        - Settings
+      summary: List public settings
+      description: Returns effective values for settings marked as public.
+      operationId: listPublicSettings
+      responses:
+        '200':
+          description: Public setting list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicSettingListResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /api/v1/public/entity-types/{slug}/records/{entityId}:
     get:
       tags:
@@ -1768,6 +1854,14 @@ components:
         format: int64
         minimum: 1
       example: 1
+    SettingKeyPath:
+      name: key
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: '^[a-z][a-z0-9_]*$'
+      example: site_name
   responses:
     NotFound:
       description: Resource not found.
@@ -2584,6 +2678,137 @@ components:
           type: number
           minimum: 0
       additionalProperties: false
+    SettingListResponse:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/SettingAdminItemResponse'
+      additionalProperties: false
+    SettingAdminItemResponse:
+      type: object
+      required:
+        - setting_key
+        - label
+        - data_type
+        - is_public
+        - value
+      properties:
+        setting_key:
+          type: string
+          pattern: '^[a-z][a-z0-9_]*$'
+        label:
+          type: string
+        data_type:
+          type: string
+          enum: [text, markdown, bool, url]
+        default_value:
+          type: string
+          nullable: true
+        is_public:
+          type: boolean
+        value:
+          type: string
+        updated_at:
+          type: string
+          format: date-time
+          nullable: true
+      additionalProperties: false
+    PublicSettingListResponse:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/PublicSettingItemResponse'
+      additionalProperties: false
+    PublicSettingItemResponse:
+      type: object
+      required:
+        - setting_key
+        - value
+      properties:
+        setting_key:
+          type: string
+          pattern: '^[a-z][a-z0-9_]*$'
+        value:
+          type: string
+      additionalProperties: false
+    UpdateSettingRequest:
+      type: object
+      required:
+        - value
+      properties:
+        value:
+          type: string
+      additionalProperties: false
+    SettingValueResponse:
+      type: object
+      required:
+        - setting_key
+        - value
+        - updated_at
+      properties:
+        setting_key:
+          type: string
+          pattern: '^[a-z][a-z0-9_]*$'
+        value:
+          type: string
+        updated_at:
+          type: string
+          format: date-time
+      additionalProperties: false
+    SettingRevisionListResponse:
+      type: object
+      required:
+        - items
+        - limit
+        - offset
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/SettingRevisionResponse'
+        limit:
+          type: integer
+        offset:
+          type: integer
+      additionalProperties: false
+    SettingRevisionResponse:
+      type: object
+      required:
+        - id
+        - setting_key
+        - action
+        - created_at
+      properties:
+        id:
+          type: integer
+          minimum: 1
+        setting_key:
+          type: string
+          pattern: '^[a-z][a-z0-9_]*$'
+        value:
+          type: string
+          nullable: true
+        previous_value:
+          type: string
+          nullable: true
+        action:
+          type: string
+          enum: [created, updated, deleted, restored]
+        actor_user_id:
+          type: integer
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+      additionalProperties: false
     PublicRecordViewResponse:
       type: object
       required:
@@ -2600,6 +2825,7 @@ components:
         - dateTimeFields
         - entityRelations
         - relationTextFieldsByEntityTypeId
+        - publicSettings
       properties:
         entityTypeSlug:
           type: string
@@ -2634,6 +2860,8 @@ components:
           type: object
           additionalProperties:
             $ref: '#/components/schemas/TextFieldListResponse'
+        publicSettings:
+          $ref: '#/components/schemas/PublicSettingListResponse'
       additionalProperties: false
     PublicRecordRelationQuery:
       type: object

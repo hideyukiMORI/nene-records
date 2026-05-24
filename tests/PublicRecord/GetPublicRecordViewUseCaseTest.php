@@ -11,6 +11,7 @@ use NeNeRecords\PublicRecord\GetPublicRecordViewInput;
 use NeNeRecords\PublicRecord\GetPublicRecordViewUseCase;
 use NeNeRecords\PublicRecord\PublicEntityTypeNotFoundException;
 use NeNeRecords\PublicRecord\PublicRecordNotFoundException;
+use NeNeRecords\Setting\ListPublicSettingsUseCase;
 use NeNeRecords\Tests\BoolField\InMemoryBoolFieldRepository;
 use NeNeRecords\Tests\DateTimeField\InMemoryDateTimeFieldRepository;
 use NeNeRecords\Tests\Entity\InMemoryEntityRepository;
@@ -19,6 +20,7 @@ use NeNeRecords\Tests\EntityType\InMemoryEntityTypeRepository;
 use NeNeRecords\Tests\EnumField\InMemoryEnumFieldRepository;
 use NeNeRecords\Tests\FieldDef\InMemoryFieldDefRepository;
 use NeNeRecords\Tests\IntField\InMemoryIntFieldRepository;
+use NeNeRecords\Tests\Setting\InMemorySettingRepository;
 use NeNeRecords\Tests\TextField\InMemoryTextFieldRepository;
 use NeNeRecords\TextField\TextField;
 use PHPUnit\Framework\TestCase;
@@ -54,6 +56,7 @@ final class GetPublicRecordViewUseCaseTest extends TestCase
             new InMemoryBoolFieldRepository(),
             new InMemoryDateTimeFieldRepository(),
             new InMemoryEntityRelationRepository(),
+            new ListPublicSettingsUseCase(new InMemorySettingRepository()),
         );
 
         $output = $useCase->execute(new GetPublicRecordViewInput('article', 10));
@@ -64,6 +67,7 @@ final class GetPublicRecordViewUseCaseTest extends TestCase
         self::assertSame(10, $output->bootstrap['entityId']);
         self::assertSame('Hello', $output->bootstrap['textFields']['items'][0]['value']);
         self::assertSame(42, $output->bootstrap['intFields']['items'][0]['value']);
+        self::assertArrayHasKey('publicSettings', $output->bootstrap);
     }
 
     public function testThrowsWhenEntityTypeMissing(): void
@@ -78,6 +82,7 @@ final class GetPublicRecordViewUseCaseTest extends TestCase
             new InMemoryBoolFieldRepository(),
             new InMemoryDateTimeFieldRepository(),
             new InMemoryEntityRelationRepository(),
+            new ListPublicSettingsUseCase(new InMemorySettingRepository()),
         );
 
         $this->expectException(PublicEntityTypeNotFoundException::class);
@@ -100,6 +105,7 @@ final class GetPublicRecordViewUseCaseTest extends TestCase
             new InMemoryBoolFieldRepository(),
             new InMemoryDateTimeFieldRepository(),
             new InMemoryEntityRelationRepository(),
+            new ListPublicSettingsUseCase(new InMemorySettingRepository()),
         );
 
         $this->expectException(PublicRecordNotFoundException::class);
