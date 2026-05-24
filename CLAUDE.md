@@ -28,12 +28,9 @@ Claude Code / AI agent guide for this repository. Cursor summaries live in `.cur
 
 Flexible entity platform — lighter and more typed than WordPress post meta. Admin frontend for schema UX; API for persistence, auth, and contracts; MCP for AI operations.
 
-## Verification (when scaffolded)
+## Verification
 
 ```bash
-composer check
-composer openapi
-composer mcp
+composer check                    # 178 tests + PHPStan + CS-Fixer + OpenAPI + MCP
+npm run check --prefix frontend   # type-check + lint + test + storybook
 ```
-
-Until then: `git diff --check` for doc-only changes.

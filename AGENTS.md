@@ -4,7 +4,7 @@ This file is the entry point for AI agents working on NeNe Records.
 
 ## Read First
 
-- **Workspace handoff (2026-05-24):** `docs/todo/handoff-2026-05-24-workspace-switch.md`
+- **Current work & status:** `docs/todo/current.md` — M1 完了、M2 Up Next
 - **Product vision:** `docs/explanation/product-vision.md`
 - Inheritance map: `docs/inheritance-from-nene2.md`
 - Human and AI collaboration: `docs/CONTRIBUTING.md`
@@ -15,7 +15,7 @@ This file is the entry point for AI agents working on NeNe Records.
 - Commit messages: `docs/development/commit-conventions.md`
 - AI tool policy: `docs/integrations/ai-tools.md`
 - Roadmap: `docs/roadmap.md`
-- Current work: `docs/todo/current.md`
+- Milestones: `docs/milestones/2026-06-cms-mid-term.md`
 
 ## Operating Rules
 
