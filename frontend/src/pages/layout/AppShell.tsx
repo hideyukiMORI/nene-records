@@ -23,6 +23,9 @@ export function AppShell() {
               <NavLink to="/entity-types" className={navLinkClass}>
                 Entity types
               </NavLink>
+              <NavLink to="/tags" className={navLinkClass}>
+                Tags
+              </NavLink>
             </Stack>
           </nav>
         </div>
