@@ -6,18 +6,19 @@ Last updated: 2026-05-24
 
 | Issue | Summary |
 | --- | --- |
-| #52 | Record 詳細 relation attach/detach UI（blocked by #51） |
+| — | （なし） |
 
 ## In Progress
 
 | Issue | Summary |
 | --- | --- |
-| #51 | entity relations API + field_defs relation 型（Phase 3a） |
+| #52 | Record 詳細 relation attach/detach UI |
 
 ## Recently Completed
 
 | Issue | Summary |
 | --- | --- |
+| #51 | entity relations API + field_defs relation 型 (PR #54) |
 | #48 | Records 一覧 tag フィルタ UI (PR #49) |
 | #46 | Record tag attach/detach UI (PR #47) |
 | #44 | Tag CRUD Admin UI (PR #45) |
@@ -29,7 +30,8 @@ Last updated: 2026-05-24
 
 - **API（済）:** tags CRUD, entity_tags, entities `?tags=` フィルタ
 - **Admin UI（済）:** Tag CRUD (#44), Record tag attach/detach (#46), Records 一覧 tag フィルタ (#48)
-- **Relations（進行中）:** ADR 0004 確定 → backend #51 → Admin UI #52
+- **Relations（進行中）:** Admin UI #52
+- **Relations API（済）:** field_defs relation 型、entity_relations、attach/detach/list (#51)
 - **Relations 後続:** list filter `?relation.{field_key}=`, inverse, MCP
 
 ## Verification
