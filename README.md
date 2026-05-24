@@ -32,6 +32,7 @@ NeNe Records inherits NENE2 engineering discipline:
 | Workflow | [`docs/workflow.md`](./docs/workflow.md) |
 | Commit conventions | [`docs/development/commit-conventions.md`](./docs/development/commit-conventions.md) |
 | Coding standards | [`docs/development/coding-standards.md`](./docs/development/coding-standards.md) |
+| Docker development | [`docs/development/docker.md`](./docs/development/docker.md) |
 | Full contributing guide | [`docs/CONTRIBUTING.md`](./docs/CONTRIBUTING.md) |
 
 **Rules in brief:** GitHub Issue-driven work, `type/issue-number-summary` branches, Conventional Commits (Japanese description, English type), PR with verification and self-review checklist, no direct commits to `main`.
@@ -39,6 +40,8 @@ NeNe Records inherits NENE2 engineering discipline:
 ## Status
 
 Early planning. See [Issues](https://github.com/hideyukiMORI/nene-records/issues).
+
+Local development stack: **`docker compose up --build`** — see [`docs/development/docker.md`](./docs/development/docker.md).
 
 - [#1](https://github.com/hideyukiMORI/nene-records/issues/1) — MVP entity CRUD vertical slice
 - [#2](https://github.com/hideyukiMORI/nene-records/issues/2) — NENE2 governance inheritance
