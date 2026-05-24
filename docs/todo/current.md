@@ -12,19 +12,21 @@ New contributors and AI agents: read [`handoff-2026-05-24-workspace-switch.md`](
 
 | Issue | Branch | Summary |
 | --- | --- | --- |
-| #24 | `feat/24-entity-type-editor` | Entity type 作成・一覧・削除 UI |
+| #26 | `feat/26-entity-records-ui` | Entity（Record）一覧・作成・削除 UI |
 
 ## Up Next
 
 | Issue | Summary |
 | --- | --- |
 | TBD | Entity type 編集（PUT） |
-| TBD | Record CRUD screens |
+| TBD | text_fields / field value 編集 UI |
+| TBD | GitHub Actions frontend CI |
 
 ## Recently Completed
 
 | Issue | Summary |
 | --- | --- |
+| #24 | Entity type 作成・一覧・削除 UI (PR #25) |
 | #22 | Docker compose — MySQL + phpMyAdmin darkwolf + Mailpit (PR #23) |
 | #20 | Phase 4 Admin React scaffold (PR #21) |
 | #18 | Frontend design system / Storybook policy (PR #19) |
@@ -40,7 +42,7 @@ New contributors and AI agents: read [`handoff-2026-05-24-workspace-switch.md`](
 - **127 tests** via `composer check`.
 - ADRs: 0002 (field defs), 0003 (tags).
 - **Docker:** `docker compose up --build` → API `:8080`, phpMyAdmin `:8081`, Mailpit `:8025`. See `docs/development/docker.md`.
-- **Phase 4 scaffold:** `frontend/` — React + Tailwind theme + Storybook + `entities/entity-type`.
+- **Phase 4:** `frontend/` — entity types + entity records admin UI; route `/entity-types/:entityTypeId/entities`.
 - Run admin UI: `npm run dev --prefix frontend` (API on :8080 via Docker or PHP built-in).
 
 ## Verification Commands
