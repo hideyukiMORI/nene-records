@@ -1,0 +1,17 @@
+---
+description: NeNe Records PHP 実装時のモダン PHP / API 契約ルール
+globs: "**/*.php"
+alwaysApply: false
+---
+
+# Modern PHP
+
+- 新規 PHP ファイルは `declare(strict_types=1);` を付け、PSR-12 を基本にする（NENE2 継承）。
+- Controller は薄く保ち、入力解釈、UseCase 呼び出し、Response 生成に集中する。
+- UseCase / Domain は HTTP、DB、テンプレート、CLI、frontend build から独立させる。
+- 配列のまま境界を越えず、DTO、value object、enum、readonly property を優先する。
+- エンティティスキーマとフィールド型は API 境界で検証する。フロントのみのスキーマ定義に依存しない。
+- OpenAPI で表現する public API 契約と実装のズレを避ける。
+- MCP 連携は DB 直結ではなく、OpenAPI 経由の HTTP API を通す。
+- アプリ固有 Problem Details の type は `https://nene-records.dev/problems/{problem-name}` を使う。
+- 正本は `docs/development/coding-standards.md` と NENE2 `docs/development/coding-standards.md`。
