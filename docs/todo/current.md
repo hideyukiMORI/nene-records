@@ -12,18 +12,20 @@ New contributors and AI agents: read [`handoff-2026-05-24-workspace-switch.md`](
 
 | Issue | Branch | Summary |
 | --- | --- | --- |
-| — | — | _(none — Phase 4 planning)_ |
+| #22 | `feat/22-docker-dev-environment` | Docker compose (MySQL + phpMyAdmin + Mailpit) |
 
 ## Up Next
 
 | Issue | Summary |
 | --- | --- |
-| TBD | **Phase 4:** Admin React frontend scaffold |
+| #20 / PR #21 | Phase 4 Admin React scaffold |
+| TBD | Entity type editor UI |
 
 ## Recently Completed
 
 | Issue | Summary |
 | --- | --- |
+| #18 | Frontend design system / Storybook policy (merged PR #19) |
 | #16 | Tags, entity_tags, entity list filters (merged PR #17, ADR 0003) — **Phase 3 complete** |
 | #14 | enum/bool/datetime fields (merged PR #15) — Phase 2 complete |
 | #11 | int_fields CRUD (merged PR #12) |
@@ -35,14 +37,17 @@ New contributors and AI agents: read [`handoff-2026-05-24-workspace-switch.md`](
 - **Phase 3 complete.** Tags + entity tag attach/detach + filtered entity list with `total`.
 - **127 tests** via `composer check`.
 - ADRs: 0002 (field defs), 0003 (tags).
-- Phase 4 admin UI: see `docs/development/frontend-standards.md`.
+- **Docker:** `docker compose up --build` → API `:8080`, phpMyAdmin `:8081`, Mailpit `:8025`. See `docs/development/docker.md`.
+- Phase 4 admin UI: PR #21 / `docs/development/frontend-standards.md`.
 
 ## Verification Commands
 
 ```bash
 composer check
 composer openapi
-composer migrations:migrate   # requires .env with SQLite
+docker compose up --build          # API + MySQL + phpMyAdmin + Mailpit
+curl http://localhost:8080/health
+npm run check --prefix frontend    # after Phase 4 scaffold merge
 ```
 
 ## Example queries (Phase 3)
