@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace NeNeRecords\EntityType;
 
 use NeNeRecords\Entity\EntityRepositoryInterface;
+use NeNeRecords\EntityArchive\EntityArchiveRepositoryInterface;
 
 final readonly class DeleteEntityTypeUseCase implements DeleteEntityTypeUseCaseInterface
 {
     public function __construct(
         private EntityTypeRepositoryInterface $entityTypes,
         private EntityRepositoryInterface $entities,
+        private EntityArchiveRepositoryInterface $entityArchive,
     ) {
     }
 
@@ -22,10 +24,11 @@ final readonly class DeleteEntityTypeUseCase implements DeleteEntityTypeUseCaseI
             throw new EntityTypeNotFoundException($input->id);
         }
 
-        if ($this->entities->existsByEntityTypeId($input->id)) {
+        if ($this->entities->existsActiveByEntityTypeId($input->id)) {
             throw new EntityTypeHasEntitiesException($input->id);
         }
 
+        $this->entityArchive->archiveAndPurgeSoftDeleted($entityType);
         $this->entityTypes->delete($input->id);
     }
 }

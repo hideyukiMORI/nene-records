@@ -95,10 +95,10 @@ final class InMemoryEntityRepository implements EntityRepositoryInterface
         return false;
     }
 
-    public function existsByEntityTypeId(int $entityTypeId): bool
+    public function existsActiveByEntityTypeId(int $entityTypeId): bool
     {
         foreach ($this->entities as $entity) {
-            if ($entity->entityTypeId === $entityTypeId) {
+            if ($entity->entityTypeId === $entityTypeId && !$entity->isDeleted) {
                 return true;
             }
         }

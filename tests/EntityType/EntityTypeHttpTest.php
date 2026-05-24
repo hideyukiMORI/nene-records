@@ -23,6 +23,7 @@ use NeNeRecords\EntityType\ListEntityTypesUseCase;
 use NeNeRecords\EntityType\UpdateEntityTypeHandler;
 use NeNeRecords\EntityType\UpdateEntityTypeUseCase;
 use NeNeRecords\Tests\Entity\InMemoryEntityRepository;
+use NeNeRecords\Tests\EntityArchive\InMemoryEntityArchiveRepository;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
@@ -45,12 +46,13 @@ final class EntityTypeHttpTest extends TestCase
         $problemDetails = new ProblemDetailsResponseFactory($this->factory, $this->factory);
 
         $entityRepository = new InMemoryEntityRepository();
+        $archiveRepository = new InMemoryEntityArchiveRepository();
 
         $registrar = new EntityTypeRouteRegistrar(
             new GetEntityTypeByIdHandler(new GetEntityTypeByIdUseCase($this->repository), $jsonResponse),
             new CreateEntityTypeHandler(new CreateEntityTypeUseCase($this->repository), $jsonResponse),
             new UpdateEntityTypeHandler(new UpdateEntityTypeUseCase($this->repository), $jsonResponse),
-            new DeleteEntityTypeHandler(new DeleteEntityTypeUseCase($this->repository, $entityRepository), $this->factory),
+            new DeleteEntityTypeHandler(new DeleteEntityTypeUseCase($this->repository, $entityRepository, $archiveRepository), $this->factory),
             new ListEntityTypesHandler(new ListEntityTypesUseCase($this->repository), $jsonResponse),
         );
 
