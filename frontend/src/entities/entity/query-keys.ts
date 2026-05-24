@@ -1,10 +1,13 @@
 import type { EntityId } from './ids'
 
+export type EntityRelationFilters = Record<string, number>
+
 export interface EntityListParams {
   entityTypeId: number
   limit: number
   offset: number
   tagSlugs?: string[]
+  relationFilters?: EntityRelationFilters
 }
 
 export const entityKeys = {

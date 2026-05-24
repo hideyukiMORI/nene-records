@@ -1,4 +1,5 @@
 import { http, HttpResponse } from 'msw'
+import { getEntityRelationLinks } from './entity-relation'
 import { getEntityTagLinks } from './entity-tag'
 import { getTagBySlug } from './tag'
 
@@ -41,6 +42,62 @@ function getEntityIdsMatchingTagSlugs(slugs: string[]): Set<number> {
   return entityIds
 }
 
+function parseRelationFiltersFromSearchParams(
+  searchParams: URLSearchParams,
+): Record<string, number> {
+  const filters: Record<string, number> = {}
+
+  searchParams.forEach((value, key) => {
+    let fieldKey: string | null = null
+
+    if (key.startsWith('relation.')) {
+      fieldKey = key.slice('relation.'.length)
+    } else if (key.startsWith('relation_')) {
+      fieldKey = key.slice('relation_'.length)
+    }
+
+    if (fieldKey === null || fieldKey === '') {
+      return
+    }
+
+    const trimmed = value.trim()
+
+    if (trimmed === '' || !/^\d+$/.test(trimmed)) {
+      return
+    }
+
+    const targetEntityId = Number(trimmed)
+
+    if (targetEntityId > 0) {
+      filters[fieldKey] = targetEntityId
+    }
+  })
+
+  return filters
+}
+
+function entityMatchesRelationFilters(
+  entityId: number,
+  relationFilters: Record<string, number>,
+): boolean {
+  const links = getEntityRelationLinks()
+
+  for (const [fieldKey, targetEntityId] of Object.entries(relationFilters)) {
+    const hasLink = links.some(
+      (link) =>
+        link.source_entity_id === entityId &&
+        link.field_key === fieldKey &&
+        link.target_entity_id === targetEntityId,
+    )
+
+    if (!hasLink) {
+      return false
+    }
+  }
+
+  return true
+}
+
 export const entityHandlers = [
   http.get('/api/v1/entities', ({ request }) => {
     const url = new URL(request.url)
@@ -64,6 +121,12 @@ export const entityHandlers = [
     if (tagSlugs.length > 0) {
       const matchingEntityIds = getEntityIdsMatchingTagSlugs(tagSlugs)
       filtered = filtered.filter((item) => matchingEntityIds.has(item.id))
+    }
+
+    const relationFilters = parseRelationFiltersFromSearchParams(url.searchParams)
+
+    if (Object.keys(relationFilters).length > 0) {
+      filtered = filtered.filter((item) => entityMatchesRelationFilters(item.id, relationFilters))
     }
 
     return HttpResponse.json({

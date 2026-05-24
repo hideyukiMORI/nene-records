@@ -49,7 +49,7 @@ export function EntityListPanel({
         title={isFilterActive ? 'No matching records' : 'No records yet'}
         description={
           isFilterActive
-            ? 'Try clearing the tag filter or selecting different tags.'
+            ? 'Try clearing the filters or selecting different criteria.'
             : 'Create your first record using the button above.'
         }
       />

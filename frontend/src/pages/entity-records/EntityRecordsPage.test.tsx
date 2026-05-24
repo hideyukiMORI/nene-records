@@ -5,8 +5,10 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { EntityRecordsPage } from '@/pages/entity-records/EntityRecordsPage'
 import { EntityTypesPage } from '@/pages/entity-types/EntityTypesPage'
 import { resetEntityStore, seedEntities } from '@tests/msw/handlers/entity'
+import { resetEntityRelationStore, seedEntityRelations } from '@tests/msw/handlers/entity-relation'
 import { resetEntityTagStore, seedEntityTags } from '@tests/msw/handlers/entity-tag'
 import { resetEntityTypeStore, seedEntityTypes } from '@tests/msw/handlers/entity-type'
+import { resetFieldDefStore, seedFieldDefs } from '@tests/msw/handlers/field-def'
 import { resetTagStore, seedTags } from '@tests/msw/handlers/tag'
 import { resetTextFieldStore, seedTextFields } from '@tests/msw/handlers/text-field'
 import { mswServer } from '@tests/msw/server'
@@ -32,6 +34,8 @@ describe('EntityRecordsPage', () => {
     resetEntityTypeStore()
     resetEntityStore()
     resetEntityTagStore()
+    resetEntityRelationStore()
+    resetFieldDefStore()
     resetTagStore()
     resetTextFieldStore()
     cleanup()
@@ -156,6 +160,87 @@ describe('EntityRecordsPage', () => {
     expect(await screen.findByText('Record #1')).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'Featured' }))
+
+    await waitFor(() => {
+      expect(screen.getByText('No matching records')).toBeInTheDocument()
+    })
+  })
+
+  it('filters records by selected relation target', async () => {
+    seedEntityTypes([
+      { id: 1, name: 'Article', slug: 'article' },
+      { id: 2, name: 'Author', slug: 'author' },
+    ])
+    seedFieldDefs([
+      {
+        id: 1,
+        entity_type_id: 1,
+        field_key: 'author',
+        data_type: 'relation',
+        target_entity_type_id: 2,
+        cardinality: 'one',
+      },
+    ])
+    seedEntities([
+      { id: 1, entity_type_id: 1, is_deleted: false, deleted_at: null },
+      { id: 2, entity_type_id: 1, is_deleted: false, deleted_at: null },
+      { id: 10, entity_type_id: 2, is_deleted: false, deleted_at: null },
+      { id: 11, entity_type_id: 2, is_deleted: false, deleted_at: null },
+    ])
+    seedEntityRelations([
+      { source_entity_id: 1, target_entity_id: 10, field_key: 'author' },
+      { source_entity_id: 2, target_entity_id: 11, field_key: 'author' },
+    ])
+
+    const user = userEvent.setup()
+    renderRecordsPage()
+
+    expect(await screen.findByText('Record #1')).toBeInTheDocument()
+    expect(screen.getByText('Record #2')).toBeInTheDocument()
+
+    await user.selectOptions(await screen.findByLabelText('author'), '10')
+
+    await waitFor(() => {
+      expect(screen.getByText('Record #1')).toBeInTheDocument()
+      expect(screen.queryByText('Record #2')).not.toBeInTheDocument()
+      expect(screen.getByText('1 record')).toBeInTheDocument()
+    })
+
+    await user.click(screen.getByRole('button', { name: 'Clear' }))
+
+    await waitFor(() => {
+      expect(screen.getByText('Record #1')).toBeInTheDocument()
+      expect(screen.getByText('Record #2')).toBeInTheDocument()
+      expect(screen.getByText('2 records')).toBeInTheDocument()
+    })
+  })
+
+  it('shows empty state when no records match the relation filter', async () => {
+    seedEntityTypes([
+      { id: 1, name: 'Article', slug: 'article' },
+      { id: 2, name: 'Author', slug: 'author' },
+    ])
+    seedFieldDefs([
+      {
+        id: 1,
+        entity_type_id: 1,
+        field_key: 'author',
+        data_type: 'relation',
+        target_entity_type_id: 2,
+        cardinality: 'one',
+      },
+    ])
+    seedEntities([
+      { id: 1, entity_type_id: 1, is_deleted: false, deleted_at: null },
+      { id: 10, entity_type_id: 2, is_deleted: false, deleted_at: null },
+    ])
+
+    const user = userEvent.setup()
+    renderRecordsPage()
+
+    expect(await screen.findByText('Record #1')).toBeInTheDocument()
+
+    await user.selectOptions(await screen.findByLabelText('author'), '10')
 
     await waitFor(() => {
       expect(screen.getByText('No matching records')).toBeInTheDocument()

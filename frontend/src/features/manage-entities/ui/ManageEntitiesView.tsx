@@ -1,8 +1,10 @@
-import type { Entity } from '@/entities/entity'
+import type { Entity, EntityRelationFilters } from '@/entities/entity'
+import type { RelationFieldDef } from '@/entities/field-def'
 import type { Tag } from '@/entities/tag'
 import { ConfirmDialog, Stack, Text } from '@/shared/ui'
 import { EntityCreatePanel } from './EntityCreatePanel'
 import { EntityListPanel } from './EntityListPanel'
+import { EntityRelationFilterPanel } from './EntityRelationFilterPanel'
 import { EntityTagFilterPanel } from './EntityTagFilterPanel'
 
 export interface ManageEntitiesViewProps {
@@ -13,7 +15,9 @@ export interface ManageEntitiesViewProps {
   recordLabels: Record<string, string>
   total: number
   availableTags: Tag[]
+  relationFieldDefs: RelationFieldDef[]
   selectedTagSlugs: string[]
+  selectedRelationFilters: EntityRelationFilters
   isFilterActive: boolean
   isLoading: boolean
   isError: boolean
@@ -25,6 +29,8 @@ export interface ManageEntitiesViewProps {
   onRetry: () => void
   onToggleTagSlug: (slug: string) => void
   onClearTagFilter: () => void
+  onSelectRelationFilter: (fieldKey: string, targetEntityId: number | undefined) => void
+  onClearRelationFilters: () => void
   onCreate: () => Promise<void>
   onRequestDelete: (entity: Entity) => void
   onCancelDelete: () => void
@@ -39,7 +45,9 @@ export function ManageEntitiesView({
   recordLabels,
   total,
   availableTags,
+  relationFieldDefs,
   selectedTagSlugs,
+  selectedRelationFilters,
   isFilterActive,
   isLoading,
   isError,
@@ -51,6 +59,8 @@ export function ManageEntitiesView({
   onRetry,
   onToggleTagSlug,
   onClearTagFilter,
+  onSelectRelationFilter,
+  onClearRelationFilters,
   onCreate,
   onRequestDelete,
   onCancelDelete,
@@ -77,6 +87,12 @@ export function ManageEntitiesView({
           selectedTagSlugs={selectedTagSlugs}
           onToggleTagSlug={onToggleTagSlug}
           onClear={onClearTagFilter}
+        />
+        <EntityRelationFilterPanel
+          relationFieldDefs={relationFieldDefs}
+          selectedFilters={selectedRelationFilters}
+          onSelectTarget={onSelectRelationFilter}
+          onClear={onClearRelationFilters}
         />
         <Stack gap="sm">
           <Text as="h2" variant="heading-sm">

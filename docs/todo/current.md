@@ -6,7 +6,7 @@ Last updated: 2026-05-24
 
 | Issue | Summary |
 | --- | --- |
-| — | （なし） |
+| — | inverse relation UI / Consumer view relation links |
 
 ## In Progress
 
@@ -18,6 +18,8 @@ Last updated: 2026-05-24
 
 | Issue | Summary |
 | --- | --- |
+| #59 | Records 一覧 relation フィルタ UI (PR #60) |
+| #57 | entities 一覧 relation フィルタ API (PR #58) |
 | #52 | Record 詳細 relation attach/detach UI |
 | #51 | entity relations API + field_defs relation 型 (PR #54) |
 | #48 | Records 一覧 tag フィルタ UI (PR #49) |
@@ -31,12 +33,12 @@ Last updated: 2026-05-24
 
 - **API（済）:** tags CRUD, entity_tags, entities `?tags=` フィルタ
 - **Admin UI（済）:** Tag CRUD (#44), Record tag attach/detach (#46), Records 一覧 tag フィルタ (#48)
-- **Relations（済）:** API #51, Admin UI #52
-- **Relations 後続:** list filter `?relation.{field_key}=`, inverse, MCP
+- **Relations（済）:** API #51, Admin UI #52, list filter API #57, list filter UI #59
+- **Relations 後続:** inverse, Consumer view relation links, MCP
 
 ## Verification
 
 ```bash
-composer check                    # 137 tests
-npm run check --prefix frontend   # 61 tests
+composer check                    # 144 tests
+npm run check --prefix frontend   # 63 tests
 ```

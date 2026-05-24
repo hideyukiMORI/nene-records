@@ -24,6 +24,11 @@ export function useEntityList(
       if (params.tagSlugs !== undefined && params.tagSlugs.length > 0) {
         search.set('tags', params.tagSlugs.join(','))
       }
+      if (params.relationFilters !== undefined) {
+        for (const [fieldKey, targetEntityId] of Object.entries(params.relationFilters)) {
+          search.set(`relation.${fieldKey}`, String(targetEntityId))
+        }
+      }
       const dto = await apiClient.get<EntityListDto>(
         `/api/v1/entities?${search.toString()}`,
         signal,
@@ -46,10 +51,12 @@ export function useEntity(id: EntityId): UseQueryResult<Entity, AppError> {
 export function defaultEntityListParams(
   entityTypeId: number,
   tagSlugs: string[] = [],
+  relationFilters: EntityListParams['relationFilters'] = {},
 ): EntityListParams {
   return {
     entityTypeId,
     tagSlugs,
+    relationFilters,
     ...DEFAULT_LIST_PARAMS,
   }
 }
