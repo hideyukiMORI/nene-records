@@ -10,6 +10,8 @@ final readonly class CreateFieldDefInput
         public int $entityTypeId,
         public string $fieldKey,
         public string $dataType,
+        public ?int $targetEntityTypeId = null,
+        public ?string $cardinality = null,
     ) {
     }
 }

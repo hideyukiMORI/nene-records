@@ -18,6 +18,12 @@ use NeNeRecords\DateTimeField\FieldKeyNotRegisteredExceptionHandler as DateTimeF
 use NeNeRecords\DateTimeField\FieldTypeMismatchExceptionHandler as DateTimeFieldTypeMismatchExceptionHandler;
 use NeNeRecords\Entity\EntityNotFoundExceptionHandler;
 use NeNeRecords\Entity\EntityServiceProvider;
+use NeNeRecords\EntityRelation\EntityRelationServiceProvider;
+use NeNeRecords\EntityRelation\FieldKeyNotRegisteredExceptionHandler as EntityRelationFieldKeyNotRegisteredExceptionHandler;
+use NeNeRecords\EntityRelation\FieldTypeMismatchExceptionHandler as EntityRelationFieldTypeMismatchExceptionHandler;
+use NeNeRecords\EntityRelation\RelationAlreadyAttachedExceptionHandler;
+use NeNeRecords\EntityRelation\RelationNotAttachedExceptionHandler;
+use NeNeRecords\EntityRelation\RelationTargetTypeMismatchExceptionHandler;
 use NeNeRecords\EntityTag\EntityTagAlreadyAttachedExceptionHandler;
 use NeNeRecords\EntityTag\EntityTagNotAttachedExceptionHandler;
 use NeNeRecords\EntityTag\EntityTagServiceProvider;
@@ -62,7 +68,8 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
             ->addProvider(new BoolFieldServiceProvider())
             ->addProvider(new DateTimeFieldServiceProvider())
             ->addProvider(new TagServiceProvider())
-            ->addProvider(new EntityTagServiceProvider());
+            ->addProvider(new EntityTagServiceProvider())
+            ->addProvider(new EntityRelationServiceProvider());
 
         $builder
             ->set(
@@ -78,6 +85,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $datetimeField = $container->get('nene-records.route_registrar.datetime_field');
                     $tag = $container->get('nene-records.route_registrar.tag');
                     $entityTag = $container->get('nene-records.route_registrar.entity_tag');
+                    $entityRelation = $container->get('nene-records.route_registrar.entity_relation');
 
                     if (
                         !is_callable($entityType)
@@ -90,6 +98,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         || !is_callable($datetimeField)
                         || !is_callable($tag)
                         || !is_callable($entityTag)
+                        || !is_callable($entityRelation)
                     ) {
                         throw new LogicException('Route registrar service is invalid.');
                     }
@@ -105,6 +114,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $datetimeField,
                         $tag,
                         $entityTag,
+                        $entityRelation,
                     ];
                 },
             )
@@ -135,6 +145,11 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $tagSlugConflict = $container->get(TagSlugConflictExceptionHandler::class);
                     $entityTagAlreadyAttached = $container->get(EntityTagAlreadyAttachedExceptionHandler::class);
                     $entityTagNotAttached = $container->get(EntityTagNotAttachedExceptionHandler::class);
+                    $entityRelationFieldKeyNotRegistered = $container->get(EntityRelationFieldKeyNotRegisteredExceptionHandler::class);
+                    $entityRelationFieldTypeMismatch = $container->get(EntityRelationFieldTypeMismatchExceptionHandler::class);
+                    $relationTargetTypeMismatch = $container->get(RelationTargetTypeMismatchExceptionHandler::class);
+                    $relationAlreadyAttached = $container->get(RelationAlreadyAttachedExceptionHandler::class);
+                    $relationNotAttached = $container->get(RelationNotAttachedExceptionHandler::class);
 
                     foreach ([
                         $entityTypeNotFound,
@@ -161,6 +176,11 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $tagSlugConflict,
                         $entityTagAlreadyAttached,
                         $entityTagNotAttached,
+                        $entityRelationFieldKeyNotRegistered,
+                        $entityRelationFieldTypeMismatch,
+                        $relationTargetTypeMismatch,
+                        $relationAlreadyAttached,
+                        $relationNotAttached,
                     ] as $handler) {
                         if (!$handler instanceof DomainExceptionHandlerInterface) {
                             throw new LogicException('Exception handler service is invalid.');
@@ -192,6 +212,11 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $tagSlugConflict,
                         $entityTagAlreadyAttached,
                         $entityTagNotAttached,
+                        $entityRelationFieldKeyNotRegistered,
+                        $entityRelationFieldTypeMismatch,
+                        $relationTargetTypeMismatch,
+                        $relationAlreadyAttached,
+                        $relationNotAttached,
                     ];
                 },
             );

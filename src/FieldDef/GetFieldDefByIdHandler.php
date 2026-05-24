@@ -28,11 +28,13 @@ final readonly class GetFieldDefByIdHandler
 
         $output = $this->useCase->execute(new GetFieldDefByIdInput($id));
 
-        return $this->response->create([
-            'id' => $output->id,
-            'entity_type_id' => $output->entityTypeId,
-            'field_key' => $output->fieldKey,
-            'data_type' => $output->dataType,
-        ]);
+        return $this->response->create(FieldDefHttpMapper::toResponse(
+            id: $output->id,
+            entityTypeId: $output->entityTypeId,
+            fieldKey: $output->fieldKey,
+            dataType: $output->dataType,
+            targetEntityTypeId: $output->targetEntityTypeId,
+            cardinality: $output->cardinality,
+        ));
     }
 }

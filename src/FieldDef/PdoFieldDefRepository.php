@@ -19,7 +19,7 @@ final readonly class PdoFieldDefRepository implements FieldDefRepositoryInterfac
     {
         $row = $this->query->fetchOne(
             <<<'SQL'
-                SELECT id, entity_type_id, field_key, data_type, is_deleted, deleted_at
+                SELECT id, entity_type_id, field_key, data_type, target_entity_type_id, cardinality, is_deleted, deleted_at
                 FROM field_defs
                 WHERE id = ? AND is_deleted = 0
                 SQL,
@@ -37,7 +37,7 @@ final readonly class PdoFieldDefRepository implements FieldDefRepositoryInterfac
     {
         $row = $this->query->fetchOne(
             <<<'SQL'
-                SELECT id, entity_type_id, field_key, data_type, is_deleted, deleted_at
+                SELECT id, entity_type_id, field_key, data_type, target_entity_type_id, cardinality, is_deleted, deleted_at
                 FROM field_defs
                 WHERE entity_type_id = ? AND field_key = ? AND is_deleted = 0
                 SQL,
@@ -57,7 +57,7 @@ final readonly class PdoFieldDefRepository implements FieldDefRepositoryInterfac
         if ($entityTypeId !== null) {
             $rows = $this->query->fetchAll(
                 <<<'SQL'
-                    SELECT id, entity_type_id, field_key, data_type, is_deleted, deleted_at
+                    SELECT id, entity_type_id, field_key, data_type, target_entity_type_id, cardinality, is_deleted, deleted_at
                     FROM field_defs
                     WHERE is_deleted = 0 AND entity_type_id = ?
                     ORDER BY id ASC
@@ -68,7 +68,7 @@ final readonly class PdoFieldDefRepository implements FieldDefRepositoryInterfac
         } else {
             $rows = $this->query->fetchAll(
                 <<<'SQL'
-                    SELECT id, entity_type_id, field_key, data_type, is_deleted, deleted_at
+                    SELECT id, entity_type_id, field_key, data_type, target_entity_type_id, cardinality, is_deleted, deleted_at
                     FROM field_defs
                     WHERE is_deleted = 0
                     ORDER BY id ASC
@@ -84,8 +84,17 @@ final readonly class PdoFieldDefRepository implements FieldDefRepositoryInterfac
     public function save(FieldDef $fieldDef): int
     {
         $this->query->execute(
-            'INSERT INTO field_defs (entity_type_id, field_key, data_type) VALUES (?, ?, ?)',
-            [$fieldDef->entityTypeId, $fieldDef->fieldKey, $fieldDef->dataType],
+            <<<'SQL'
+                INSERT INTO field_defs (entity_type_id, field_key, data_type, target_entity_type_id, cardinality)
+                VALUES (?, ?, ?, ?, ?)
+                SQL,
+            [
+                $fieldDef->entityTypeId,
+                $fieldDef->fieldKey,
+                $fieldDef->dataType,
+                $fieldDef->targetEntityTypeId,
+                $fieldDef->cardinality,
+            ],
         );
 
         return $this->query->lastInsertId();
@@ -102,10 +111,17 @@ final readonly class PdoFieldDefRepository implements FieldDefRepositoryInterfac
         $this->query->execute(
             <<<'SQL'
                 UPDATE field_defs
-                SET entity_type_id = ?, field_key = ?, data_type = ?
+                SET entity_type_id = ?, field_key = ?, data_type = ?, target_entity_type_id = ?, cardinality = ?
                 WHERE id = ? AND is_deleted = 0
                 SQL,
-            [$fieldDef->entityTypeId, $fieldDef->fieldKey, $fieldDef->dataType, $id],
+            [
+                $fieldDef->entityTypeId,
+                $fieldDef->fieldKey,
+                $fieldDef->dataType,
+                $fieldDef->targetEntityTypeId,
+                $fieldDef->cardinality,
+                $id,
+            ],
         );
     }
 
@@ -126,6 +142,7 @@ final readonly class PdoFieldDefRepository implements FieldDefRepositoryInterfac
     {
         $deletedRaw = $row['deleted_at'] ?? null;
         $deletedAt = ($deletedRaw !== null && $deletedRaw !== '') ? new DateTimeImmutable((string) $deletedRaw) : null;
+        $targetEntityTypeIdRaw = $row['target_entity_type_id'] ?? null;
 
         return new FieldDef(
             entityTypeId: (int) $row['entity_type_id'],
@@ -134,6 +151,10 @@ final readonly class PdoFieldDefRepository implements FieldDefRepositoryInterfac
             id: (int) $row['id'],
             isDeleted: (bool) (int) $row['is_deleted'],
             deletedAt: $deletedAt,
+            targetEntityTypeId: $targetEntityTypeIdRaw === null ? null : (int) $targetEntityTypeIdRaw,
+            cardinality: ($row['cardinality'] ?? null) !== null && $row['cardinality'] !== ''
+                ? (string) $row['cardinality']
+                : null,
         );
     }
 }

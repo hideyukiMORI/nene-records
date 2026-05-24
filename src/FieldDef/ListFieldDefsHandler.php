@@ -40,12 +40,14 @@ final readonly class ListFieldDefsHandler
         return $this->response->create(
             (new PaginationResponse(
                 items: array_map(
-                    static fn (ListFieldDefItem $item) => [
-                        'id' => $item->id,
-                        'entity_type_id' => $item->entityTypeId,
-                        'field_key' => $item->fieldKey,
-                        'data_type' => $item->dataType,
-                    ],
+                    static fn (ListFieldDefItem $item) => FieldDefHttpMapper::toResponse(
+                        id: $item->id,
+                        entityTypeId: $item->entityTypeId,
+                        fieldKey: $item->fieldKey,
+                        dataType: $item->dataType,
+                        targetEntityTypeId: $item->targetEntityTypeId,
+                        cardinality: $item->cardinality,
+                    ),
                     $output->items,
                 ),
                 limit: $output->limit,

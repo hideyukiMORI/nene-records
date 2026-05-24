@@ -27,6 +27,14 @@ final readonly class UpdateFieldDefUseCase implements UpdateFieldDefUseCaseInter
             throw new EntityTypeNotFoundException($input->entityTypeId);
         }
 
+        if ($input->dataType === 'relation') {
+            $targetEntityTypeId = $input->targetEntityTypeId;
+
+            if ($targetEntityTypeId === null || $this->entityTypes->findById($targetEntityTypeId) === null) {
+                throw new EntityTypeNotFoundException($targetEntityTypeId ?? 0);
+            }
+        }
+
         $existing = $this->fieldDefs->findByEntityTypeIdAndFieldKey($input->entityTypeId, $input->fieldKey);
 
         if ($existing !== null && $existing->id !== $input->id) {
@@ -38,6 +46,8 @@ final readonly class UpdateFieldDefUseCase implements UpdateFieldDefUseCaseInter
             fieldKey: $input->fieldKey,
             dataType: $input->dataType,
             id: $input->id,
+            targetEntityTypeId: $input->targetEntityTypeId,
+            cardinality: $input->cardinality,
         );
         $this->fieldDefs->update($updated);
 
@@ -46,6 +56,8 @@ final readonly class UpdateFieldDefUseCase implements UpdateFieldDefUseCaseInter
             entityTypeId: $input->entityTypeId,
             fieldKey: $input->fieldKey,
             dataType: $input->dataType,
+            targetEntityTypeId: $input->targetEntityTypeId,
+            cardinality: $input->cardinality,
         );
     }
 }
