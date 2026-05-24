@@ -12,25 +12,27 @@ New contributors and AI agents: read [`handoff-2026-05-24-workspace-switch.md`](
 
 | Issue | Branch | Summary |
 | --- | --- | --- |
-| #22 | `feat/22-docker-dev-environment` | Docker compose (MySQL + phpMyAdmin + Mailpit) |
+| TBD | — | Entity type editor UI |
 
 ## Up Next
 
 | Issue | Summary |
 | --- | --- |
-| #20 / PR #21 | Phase 4 Admin React scaffold |
-| TBD | Entity type editor UI |
+| TBD | Record CRUD screens |
+| TBD | GitHub Actions frontend CI |
 
 ## Recently Completed
 
 | Issue | Summary |
 | --- | --- |
-| #18 | Frontend design system / Storybook policy (merged PR #19) |
-| #16 | Tags, entity_tags, entity list filters (merged PR #17, ADR 0003) — **Phase 3 complete** |
-| #14 | enum/bool/datetime fields (merged PR #15) — Phase 2 complete |
-| #11 | int_fields CRUD (merged PR #12) |
-| #9 | field_defs schema registry (merged PR #10, ADR 0002) |
-| #1 | MVP entity CRUD (merged PR #8) — Phase 1 |
+| #22 | Docker compose — MySQL + phpMyAdmin darkwolf + Mailpit (PR #23) |
+| #20 | Phase 4 Admin React scaffold (PR #21) |
+| #18 | Frontend design system / Storybook policy (PR #19) |
+| #16 | Tags, entity_tags, entity list filters (PR #17, ADR 0003) — **Phase 3 complete** |
+| #14 | enum/bool/datetime fields (PR #15) — Phase 2 complete |
+| #11 | int_fields CRUD (PR #12) |
+| #9 | field_defs schema registry (PR #10, ADR 0002) |
+| #1 | MVP entity CRUD (PR #8) — Phase 1 |
 
 ## Handoff Notes
 
@@ -38,16 +40,17 @@ New contributors and AI agents: read [`handoff-2026-05-24-workspace-switch.md`](
 - **127 tests** via `composer check`.
 - ADRs: 0002 (field defs), 0003 (tags).
 - **Docker:** `docker compose up --build` → API `:8080`, phpMyAdmin `:8081`, Mailpit `:8025`. See `docs/development/docker.md`.
-- Phase 4 admin UI: PR #21 / `docs/development/frontend-standards.md`.
+- **Phase 4 scaffold:** `frontend/` — React + Tailwind theme + Storybook + `entities/entity-type`.
+- Run admin UI: `npm run dev --prefix frontend` (API on :8080 via Docker or PHP built-in).
 
 ## Verification Commands
 
 ```bash
 composer check
 composer openapi
-docker compose up --build          # API + MySQL + phpMyAdmin + Mailpit
+docker compose up --build
 curl http://localhost:8080/health
-npm run check --prefix frontend    # after Phase 4 scaffold merge
+npm run check --prefix frontend
 ```
 
 ## Example queries (Phase 3)
