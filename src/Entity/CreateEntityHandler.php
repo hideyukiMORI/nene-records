@@ -34,17 +34,25 @@ final readonly class CreateEntityHandler
             $errors[] = new ValidationError('entity_type_id', 'Entity type id is required and must be a positive integer.', 'required');
         }
 
+        $rawStatus = $body['status'] ?? null;
+        $status = is_string($rawStatus) && EntityStatus::isValid($rawStatus) ? $rawStatus : EntityStatus::DRAFT;
+
         if ($errors !== []) {
             throw new ValidationException($errors);
         }
 
         /** @var int $entityTypeId */
-        $output = $this->useCase->execute(new CreateEntityInput(entityTypeId: $entityTypeId));
+        $output = $this->useCase->execute(new CreateEntityInput(
+            entityTypeId: $entityTypeId,
+            status: $status,
+        ));
 
         return $this->response->create(
             [
                 'id' => $output->id,
                 'entity_type_id' => $output->entityTypeId,
+                'status' => $output->status,
+                'published_at' => $output->publishedAtIso,
                 'is_deleted' => $output->isDeleted,
                 'deleted_at' => $output->deletedAtIso,
             ],

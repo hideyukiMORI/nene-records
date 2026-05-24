@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeNeRecords\Entity;
 
 use DateTimeImmutable;
+use DateTimeInterface;
 use LogicException;
 use Nene2\Database\DatabaseQueryExecutorInterface;
 
@@ -19,7 +20,7 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
     {
         $row = $this->query->fetchOne(
             <<<'SQL'
-                SELECT id, entity_type_id, is_deleted, deleted_at
+                SELECT id, entity_type_id, status, published_at, is_deleted, deleted_at
                 FROM entities
                 WHERE id = ? AND is_deleted = 0
                 SQL,
@@ -48,7 +49,7 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
 
         $rows = $this->query->fetchAll(
             <<<SQL
-                SELECT e.id, e.entity_type_id, e.is_deleted, e.deleted_at
+                SELECT e.id, e.entity_type_id, e.status, e.published_at, e.is_deleted, e.deleted_at
                 FROM entities e
                 WHERE {$where}
                 ORDER BY e.id ASC
@@ -89,6 +90,11 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
             $params[] = $criteria->entityTypeId;
         }
 
+        if ($criteria->status !== null) {
+            $conditions[] = 'e.status = ?';
+            $params[] = $criteria->status;
+        }
+
         if ($criteria->tagSlugs !== []) {
             $placeholders = implode(', ', array_fill(0, count($criteria->tagSlugs), '?'));
             $conditions[] = <<<SQL
@@ -123,9 +129,11 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
 
     public function save(Entity $entity): int
     {
+        $publishedAt = $entity->publishedAt?->format(DateTimeInterface::ATOM);
+
         $this->query->execute(
-            'INSERT INTO entities (entity_type_id) VALUES (?)',
-            [$entity->entityTypeId],
+            'INSERT INTO entities (entity_type_id, status, published_at) VALUES (?, ?, ?)',
+            [$entity->entityTypeId, $entity->status, $publishedAt],
         );
 
         return $this->query->lastInsertId();
@@ -139,13 +147,15 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
             throw new LogicException('Entity id must be set before update.');
         }
 
+        $publishedAt = $entity->publishedAt?->format(DateTimeInterface::ATOM);
+
         $this->query->execute(
             <<<'SQL'
                 UPDATE entities
-                SET entity_type_id = ?
+                SET entity_type_id = ?, status = ?, published_at = ?
                 WHERE id = ? AND is_deleted = 0
                 SQL,
-            [$entity->entityTypeId, $id],
+            [$entity->entityTypeId, $entity->status, $publishedAt, $id],
         );
     }
 
@@ -167,9 +177,14 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
         $deletedRaw = $row['deleted_at'] ?? null;
         $deletedAt = ($deletedRaw !== null && $deletedRaw !== '') ? new DateTimeImmutable((string) $deletedRaw) : null;
 
+        $publishedRaw = $row['published_at'] ?? null;
+        $publishedAt = ($publishedRaw !== null && $publishedRaw !== '') ? new DateTimeImmutable((string) $publishedRaw) : null;
+
         return new Entity(
             id: (int) $row['id'],
             entityTypeId: (int) $row['entity_type_id'],
+            status: (string) ($row['status'] ?? EntityStatus::DRAFT),
+            publishedAt: $publishedAt,
             isDeleted: (bool) (int) $row['is_deleted'],
             deletedAt: $deletedAt,
         );

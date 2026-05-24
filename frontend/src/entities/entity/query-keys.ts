@@ -1,4 +1,5 @@
 import type { EntityId } from './ids'
+import type { EntityStatus } from './model'
 
 export type EntityRelationFilters = Record<string, number>
 
@@ -6,6 +7,7 @@ export interface EntityListParams {
   entityTypeId: number
   limit: number
   offset: number
+  status?: EntityStatus
   tagSlugs?: string[]
   relationFilters?: EntityRelationFilters
 }

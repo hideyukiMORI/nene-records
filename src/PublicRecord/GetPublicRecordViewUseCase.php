@@ -9,6 +9,7 @@ use NeNeRecords\BoolField\BoolFieldRepositoryInterface;
 use NeNeRecords\DateTimeField\DateTimeField;
 use NeNeRecords\DateTimeField\DateTimeFieldRepositoryInterface;
 use NeNeRecords\Entity\EntityRepositoryInterface;
+use NeNeRecords\Entity\EntityStatus;
 use NeNeRecords\EntityRelation\EntityRelationRepositoryInterface;
 use NeNeRecords\EntityType\EntityTypeRepositoryInterface;
 use NeNeRecords\EnumField\EnumField;
@@ -58,6 +59,7 @@ final readonly class GetPublicRecordViewUseCase implements GetPublicRecordViewUs
             || $entity->id === null
             || $entity->isDeleted
             || $entity->entityTypeId !== $entityType->id
+            || $entity->status !== EntityStatus::PUBLISHED
         ) {
             throw new PublicRecordNotFoundException($input->entityTypeSlug, $input->entityId);
         }

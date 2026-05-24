@@ -2,8 +2,8 @@ import { useMutation, useQueryClient, type UseMutationResult } from '@tanstack/r
 import { apiClient, AppError } from '@/shared/api/client'
 import type { EntityDto } from './api-types'
 import type { EntityId } from './ids'
-import { mapCreateInputToDto, mapEntityDtoToModel } from './mapper'
-import type { CreateEntityInput, Entity } from './model'
+import { mapCreateInputToDto, mapEntityDtoToModel, mapUpdateInputToDto } from './mapper'
+import type { CreateEntityInput, Entity, UpdateEntityInput } from './model'
 import { entityKeys } from './query-keys'
 
 export function useCreateEntity(): UseMutationResult<Entity, AppError, CreateEntityInput> {
@@ -27,6 +27,24 @@ export function useCreateEntity(): UseMutationResult<Entity, AppError, CreateEnt
           )
         },
       })
+    },
+  })
+}
+
+export function useUpdateEntity(): UseMutationResult<Entity, AppError, UpdateEntityInput> {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (input) => {
+      const dto = await apiClient.put<EntityDto>(
+        `/api/v1/entities/${String(input.id)}`,
+        mapUpdateInputToDto(input),
+      )
+      return mapEntityDtoToModel(dto)
+    },
+    onSuccess: async (data) => {
+      queryClient.setQueryData(entityKeys.detail(data.id), data)
+      await queryClient.invalidateQueries({ queryKey: entityKeys.lists() })
     },
   })
 }

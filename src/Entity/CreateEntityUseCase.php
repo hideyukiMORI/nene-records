@@ -21,11 +21,17 @@ final readonly class CreateEntityUseCase implements CreateEntityUseCaseInterface
             throw new EntityTypeNotFoundException($input->entityTypeId);
         }
 
-        $id = $this->entities->save(new Entity(id: null, entityTypeId: $input->entityTypeId));
+        $id = $this->entities->save(new Entity(
+            id: null,
+            entityTypeId: $input->entityTypeId,
+            status: $input->status,
+        ));
 
         return new CreateEntityOutput(
             id: $id,
             entityTypeId: $input->entityTypeId,
+            status: $input->status,
+            publishedAtIso: null,
             isDeleted: false,
             deletedAtIso: null,
         );

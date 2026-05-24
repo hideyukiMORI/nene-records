@@ -30,6 +30,9 @@ final readonly class ListEntitiesHandler
         $entityTypeId = QueryStringParser::int($request, 'entity_type_id');
         $relationFilters = EntityRelationQueryParser::parseRelationFilters($request->getQueryParams());
 
+        $rawStatus = $request->getQueryParams()['status'] ?? null;
+        $status = is_string($rawStatus) && EntityStatus::isValid($rawStatus) ? $rawStatus : null;
+
         $output = $this->useCase->execute(new ListEntitiesInput(
             limit: $pagination->limit,
             offset: $pagination->offset,
@@ -37,6 +40,7 @@ final readonly class ListEntitiesHandler
                 entityTypeId: $entityTypeId,
                 tagSlugs: $tagSlugs,
                 relationFilters: $relationFilters,
+                status: $status,
             ),
         ));
 
@@ -46,6 +50,8 @@ final readonly class ListEntitiesHandler
                     static fn (ListEntityItem $item) => [
                         'id' => $item->id,
                         'entity_type_id' => $item->entityTypeId,
+                        'status' => $item->status,
+                        'published_at' => $item->publishedAtIso,
                         'is_deleted' => $item->isDeleted,
                         'deleted_at' => $item->deletedAtIso,
                     ],

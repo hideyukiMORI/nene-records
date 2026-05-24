@@ -29,6 +29,8 @@ final readonly class ListEntitiesUseCase implements ListEntitiesUseCaseInterface
             return new ListEntityItem(
                 id: $entityId,
                 entityTypeId: $entity->entityTypeId,
+                status: $entity->status,
+                publishedAtIso: $entity->publishedAt?->format(DateTimeInterface::ATOM),
                 isDeleted: $entity->isDeleted,
                 deletedAtIso: $entity->deletedAt?->format(DateTimeInterface::ATOM),
             );

@@ -13,6 +13,7 @@ use Nene2\Http\RuntimeApplicationFactory;
 use Nene2\View\HtmlResponseFactory;
 use Nene2\View\NativePhpViewRenderer;
 use NeNeRecords\Entity\Entity;
+use NeNeRecords\Entity\EntityStatus;
 use NeNeRecords\EntityType\EntityType;
 use NeNeRecords\FieldDef\FieldDef;
 use NeNeRecords\PublicRecord\GetPublicRecordViewHandler;
@@ -55,7 +56,7 @@ final class PublicRecordHttpTest extends TestCase
             new EntityType(name: 'Article', slug: 'article', id: 1),
         ]);
         $entities = new InMemoryEntityRepository([
-            new Entity(id: 10, entityTypeId: 1),
+            new Entity(id: 10, entityTypeId: 1, status: EntityStatus::PUBLISHED),
         ]);
         $fieldDefs = new InMemoryFieldDefRepository([
             new FieldDef(entityTypeId: 1, fieldKey: 'title', dataType: 'text', id: 1),

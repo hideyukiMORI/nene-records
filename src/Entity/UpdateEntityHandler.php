@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NeNeRecords\Entity;
 
+use DateTimeImmutable;
 use Nene2\Http\JsonRequestBodyParser;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Routing\Router;
@@ -42,16 +43,29 @@ final readonly class UpdateEntityHandler
             $errors[] = new ValidationError('entity_type_id', 'Entity type id is required and must be a positive integer.', 'required');
         }
 
+        $rawStatus = $body['status'] ?? null;
+        $status = is_string($rawStatus) && EntityStatus::isValid($rawStatus) ? $rawStatus : EntityStatus::DRAFT;
+
+        $rawPublishedAt = $body['published_at'] ?? null;
+        $publishedAt = is_string($rawPublishedAt) ? (DateTimeImmutable::createFromFormat(DATE_ATOM, $rawPublishedAt) ?: null) : null;
+
         if ($errors !== []) {
             throw new ValidationException($errors);
         }
 
         /** @var int $entityTypeId */
-        $output = $this->useCase->execute(new UpdateEntityInput(id: $id, entityTypeId: $entityTypeId));
+        $output = $this->useCase->execute(new UpdateEntityInput(
+            id: $id,
+            entityTypeId: $entityTypeId,
+            status: $status,
+            publishedAt: $publishedAt,
+        ));
 
         return $this->response->create([
             'id' => $output->id,
             'entity_type_id' => $output->entityTypeId,
+            'status' => $output->status,
+            'published_at' => $output->publishedAtIso,
             'is_deleted' => $output->isDeleted,
             'deleted_at' => $output->deletedAtIso,
         ]);

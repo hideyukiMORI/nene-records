@@ -23,6 +23,11 @@ $postCount = 50;
  * @param array<string, mixed>|null $body
  * @return array<string, mixed>
  */
+/**
+ * @param non-empty-string $method
+ * @param array<string, mixed>|null $body
+ * @return array<string, mixed>
+ */
 function api(string $method, string $path, ?array $body = null): array
 {
     global $baseUrl;

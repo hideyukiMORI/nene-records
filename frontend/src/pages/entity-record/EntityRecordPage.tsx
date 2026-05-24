@@ -4,6 +4,7 @@ import {
   EditEntityTextFieldsView,
   useEditEntityTextFieldsPage,
 } from '@/features/edit-entity-text-fields'
+import { EntityStatusPanel } from '@/features/manage-entity-status'
 import { ManageEntityTagsView, useManageEntityTagsPage } from '@/features/manage-entity-tags'
 import { ManageEntityRelationsView } from '@/features/manage-entity-relations'
 import { InverseEntityRelationsView } from '@/features/inverse-entity-relations'
@@ -56,6 +57,7 @@ export function EntityRecordPage() {
           {entityTypeQuery.data?.name ?? 'Record'}
         </Text>
       </Stack>
+      {entity !== null && <EntityStatusPanel entity={entity} />}
       <EditEntityTextFieldsView
         entity={entity}
         textFieldDefs={textFieldDefs}

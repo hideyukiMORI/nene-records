@@ -209,12 +209,18 @@ paths:
       tags:
         - Entities
       summary: List entities
-      description: Returns non-deleted entities, optionally filtered by entity type, tags, and relation fields.
+      description: Returns non-deleted entities, optionally filtered by entity type, status, tags, and relation fields.
       operationId: listEntities
       parameters:
         - $ref: '#/components/parameters/LimitQuery'
         - $ref: '#/components/parameters/OffsetQuery'
         - $ref: '#/components/parameters/EntityTypeIdQuery'
+        - name: status
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/EntityStatus'
+          description: Filter by publish status.
         - $ref: '#/components/parameters/TagsQuery'
         - $ref: '#/components/parameters/TagQuery'
         - $ref: '#/components/parameters/RelationFilterQuery'
@@ -264,6 +270,8 @@ paths:
                   value:
                     id: 1
                     entity_type_id: 1
+                    status: draft
+                    published_at: null
                     is_deleted: false
                     deleted_at: null
         '404':
@@ -292,6 +300,8 @@ paths:
                   value:
                     id: 1
                     entity_type_id: 1
+                    status: draft
+                    published_at: null
                     is_deleted: false
                     deleted_at: null
         '404':
@@ -327,6 +337,8 @@ paths:
                   value:
                     id: 1
                     entity_type_id: 2
+                    status: published
+                    published_at: '2026-05-24T10:00:00+00:00'
                     is_deleted: false
                     deleted_at: null
         '404':
@@ -2080,11 +2092,19 @@ components:
           type: integer
         offset:
           type: integer
+    EntityStatus:
+      type: string
+      enum:
+        - draft
+        - published
+        - archived
     EntityResponse:
       type: object
       required:
         - id
         - entity_type_id
+        - status
+        - published_at
         - is_deleted
         - deleted_at
       properties:
@@ -2094,6 +2114,13 @@ components:
         entity_type_id:
           type: integer
           format: int64
+        status:
+          $ref: '#/components/schemas/EntityStatus'
+        published_at:
+          type:
+            - string
+            - 'null'
+          format: date-time
         is_deleted:
           type: boolean
         deleted_at:
@@ -2110,6 +2137,8 @@ components:
           type: integer
           format: int64
           minimum: 1
+        status:
+          $ref: '#/components/schemas/EntityStatus'
       additionalProperties: false
     UpdateEntityRequest:
       type: object
@@ -2120,6 +2149,13 @@ components:
           type: integer
           format: int64
           minimum: 1
+        status:
+          $ref: '#/components/schemas/EntityStatus'
+        published_at:
+          type:
+            - string
+            - 'null'
+          format: date-time
       additionalProperties: false
     EntityListResponse:
       type: object

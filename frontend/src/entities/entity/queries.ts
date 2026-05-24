@@ -21,6 +21,9 @@ export function useEntityList(
         offset: String(params.offset),
         entity_type_id: String(params.entityTypeId),
       })
+      if (params.status !== undefined) {
+        search.set('status', params.status)
+      }
       if (params.tagSlugs !== undefined && params.tagSlugs.length > 0) {
         search.set('tags', params.tagSlugs.join(','))
       }
