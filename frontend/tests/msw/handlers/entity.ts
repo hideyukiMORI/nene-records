@@ -3,9 +3,13 @@ import { getEntityRelationLinks } from './entity-relation'
 import { getEntityTagLinks } from './entity-tag'
 import { getTagBySlug } from './tag'
 
+export type EntityStatusDto = 'draft' | 'published' | 'archived'
+
 interface EntityRecord {
   id: number
   entity_type_id: number
+  status: EntityStatusDto
+  published_at: string | null
   is_deleted: boolean
   deleted_at: string | null
 }
@@ -18,8 +22,21 @@ export function resetEntityStore(): void {
   items = []
 }
 
-export function seedEntities(seed: EntityRecord[]): void {
-  items = [...seed]
+export function seedEntities(
+  seed: Array<{
+    id: number
+    entity_type_id: number
+    status?: EntityStatusDto
+    published_at?: string | null
+    is_deleted: boolean
+    deleted_at: string | null
+  }>,
+): void {
+  items = seed.map((item) => ({
+    ...item,
+    status: item.status ?? 'draft',
+    published_at: item.published_at ?? null,
+  }))
   nextId = Math.max(0, ...seed.map((item) => item.id)) + 1
 }
 
@@ -105,6 +122,7 @@ export const entityHandlers = [
     const offset = Number(url.searchParams.get('offset') ?? '0')
     const entityTypeIdParam = url.searchParams.get('entity_type_id')
     const entityTypeId = entityTypeIdParam === null ? null : Number(entityTypeIdParam)
+    const statusParam = url.searchParams.get('status')
     const tagsParam = url.searchParams.get('tags')
     const tagSlugs =
       tagsParam === null
@@ -117,6 +135,10 @@ export const entityHandlers = [
     const active = items.filter((item) => !item.is_deleted)
     let filtered =
       entityTypeId === null ? active : active.filter((item) => item.entity_type_id === entityTypeId)
+
+    if (statusParam !== null) {
+      filtered = filtered.filter((item) => item.status === statusParam)
+    }
 
     if (tagSlugs.length > 0) {
       const matchingEntityIds = getEntityIdsMatchingTagSlugs(tagSlugs)
@@ -155,7 +177,7 @@ export const entityHandlers = [
     return HttpResponse.json(item)
   }),
   http.post('/api/v1/entities', async ({ request }) => {
-    const body = (await request.json()) as { entity_type_id?: number }
+    const body = (await request.json()) as { entity_type_id?: number; status?: EntityStatusDto }
 
     if (typeof body.entity_type_id !== 'number' || body.entity_type_id < 1) {
       return HttpResponse.json(
@@ -173,12 +195,57 @@ export const entityHandlers = [
     const created: EntityRecord = {
       id: nextId++,
       entity_type_id: body.entity_type_id,
+      status: body.status ?? 'draft',
+      published_at: null,
       is_deleted: false,
       deleted_at: null,
     }
     items = [...items, created]
 
     return HttpResponse.json(created, { status: 201 })
+  }),
+  http.put('/api/v1/entities/:id', async ({ params, request }) => {
+    const id = Number(params.id)
+    const body = (await request.json()) as {
+      entity_type_id?: number
+      status?: EntityStatusDto
+      published_at?: string | null
+    }
+    const index = items.findIndex((item) => item.id === id && !item.is_deleted)
+
+    if (index === -1) {
+      return HttpResponse.json(
+        {
+          type: 'https://nene-records.dev/problems/not-found',
+          title: 'Not found',
+          status: 404,
+          instance: `/api/v1/entities/${String(id)}`,
+        },
+        { status: 404 },
+      )
+    }
+
+    const existing = items[index]
+    if (existing === undefined) {
+      return new HttpResponse(null, { status: 500 })
+    }
+    const newStatus = body.status ?? existing.status
+    const newPublishedAt =
+      body.published_at !== undefined
+        ? body.published_at
+        : newStatus === 'published' && existing.published_at === null
+          ? new Date().toISOString()
+          : existing.published_at
+
+    const updated: EntityRecord = {
+      ...existing,
+      entity_type_id: body.entity_type_id ?? existing.entity_type_id,
+      status: newStatus,
+      published_at: newPublishedAt,
+    }
+    items = items.map((item, i) => (i === index ? updated : item))
+
+    return HttpResponse.json(updated)
   }),
   http.delete('/api/v1/entities/:id', ({ params }) => {
     const id = Number(params.id)

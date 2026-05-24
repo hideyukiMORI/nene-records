@@ -20,7 +20,10 @@ export function usePublicBrowseEntityRecordsPage(entityTypeSlug: string, offset:
 
   const entityTypeId = entityType !== undefined ? Number(entityType.id) : 0
   const listParams = useMemo(
-    () => defaultEntityListParams(entityTypeId, [], {}, offset),
+    () => ({
+      ...defaultEntityListParams(entityTypeId, [], {}, offset),
+      status: 'published' as const,
+    }),
     [entityTypeId, offset],
   )
   const entityListQuery = useEntityList(listParams, { enabled: entityTypeId > 0 })

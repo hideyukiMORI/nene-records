@@ -46,12 +46,14 @@ describe('PublicBrowsePage', () => {
       {
         id: 1,
         entity_type_id: 1,
+        status: 'published',
         is_deleted: false,
         deleted_at: null,
       },
       {
         id: 2,
         entity_type_id: 1,
+        status: 'published',
         is_deleted: false,
         deleted_at: null,
       },
@@ -97,6 +99,7 @@ describe('PublicBrowsePage', () => {
       {
         id: 1,
         entity_type_id: 1,
+        status: 'published',
         is_deleted: false,
         deleted_at: null,
       },
@@ -126,6 +129,7 @@ describe('PublicBrowsePage', () => {
       Array.from({ length: 21 }, (_, index) => ({
         id: index + 1,
         entity_type_id: 1,
+        status: 'published' as const,
         is_deleted: false,
         deleted_at: null,
       })),

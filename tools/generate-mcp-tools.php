@@ -202,7 +202,7 @@ $tools = [
     readTool(
         'listEntities',
         'List Entities',
-        'List entity records with optional entity_type_id, tag, and relation filters.',
+        'List entity records with optional entity_type_id, status, tag, and relation filters.',
         'listEntities',
         'GET',
         '/api/v1/entities',
@@ -212,6 +212,11 @@ $tools = [
                 'type' => 'integer',
                 'minimum' => 1,
                 'description' => 'Filter by entity type id.',
+            ],
+            'status' => [
+                'type' => 'string',
+                'enum' => ['draft', 'published', 'archived'],
+                'description' => 'Filter by publish status.',
             ],
             'tags' => [
                 'type' => 'string',
@@ -280,6 +285,11 @@ $tools = [
                 'type' => 'integer',
                 'minimum' => 1,
             ],
+            'status' => [
+                'type' => 'string',
+                'enum' => ['draft', 'published', 'archived'],
+                'description' => 'Initial publish status (default: draft).',
+            ],
         ],
         null,
         ['entity_type_id'],
@@ -329,10 +339,20 @@ $tools = [
                 'type' => 'integer',
                 'minimum' => 1,
             ],
+            'status' => [
+                'type' => 'string',
+                'enum' => ['draft', 'published', 'archived'],
+                'description' => 'Publish status.',
+            ],
+            'published_at' => [
+                'type' => 'string',
+                'format' => 'date-time',
+                'description' => 'Override published_at timestamp (ISO 8601). Auto-set on first publish if omitted.',
+            ],
         ],
         '#/components/schemas/EntityResponse',
         ['id', 'entity_type_id'],
-        'Update an entity record entity type id.',
+        'Update an entity record entity type id and publish status.',
     ),
     idTool(
         'deleteEntityById',

@@ -1,6 +1,15 @@
 import { Link } from 'react-router-dom'
-import type { Entity } from '@/entities/entity'
+import type { Entity, EntityStatus } from '@/entities/entity'
 import { Button, EmptyState, Stack, Text } from '@/shared/ui'
+
+const STATUS_BADGE_CLASS: Record<EntityStatus, string> = {
+  draft:
+    'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-yellow-100 text-yellow-800',
+  published:
+    'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-green-100 text-green-800',
+  archived:
+    'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-600',
+}
 
 export interface EntityListPanelProps {
   entityTypeId: number
@@ -64,9 +73,12 @@ export function EntityListPanel({
           className="flex items-center justify-between gap-inline-md rounded-md border border-border bg-surface-raised px-inline-md py-stack-sm shadow-sm"
         >
           <Stack gap="xs">
-            <Text as="span" variant="heading-sm">
-              {recordLabels[String(item.id)] ?? `Record #${String(item.id)}`}
-            </Text>
+            <div className="flex items-center gap-inline-sm">
+              <Text as="span" variant="heading-sm">
+                {recordLabels[String(item.id)] ?? `Record #${String(item.id)}`}
+              </Text>
+              <span className={STATUS_BADGE_CLASS[item.status]}>{item.status}</span>
+            </div>
             <Text as="span" muted>
               #{String(item.id)}
             </Text>

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeNeRecords\Tests\PublicRecord;
 
 use NeNeRecords\Entity\Entity;
+use NeNeRecords\Entity\EntityStatus;
 use NeNeRecords\EntityType\EntityType;
 use NeNeRecords\FieldDef\FieldDef;
 use NeNeRecords\PublicRecord\GetPublicRecordViewInput;
@@ -33,7 +34,7 @@ final class GetPublicRecordViewUseCaseTest extends TestCase
             new EntityType(name: 'Article', slug: 'article', id: 1),
         ]);
         $entities = new InMemoryEntityRepository([
-            new Entity(id: 10, entityTypeId: 1),
+            new Entity(id: 10, entityTypeId: 1, status: EntityStatus::PUBLISHED),
         ]);
         $fieldDefs = new InMemoryFieldDefRepository([
             new FieldDef(entityTypeId: 1, fieldKey: 'title', dataType: 'text', id: 1),

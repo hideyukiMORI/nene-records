@@ -31,6 +31,8 @@ final readonly class GetEntityByIdHandler
         return $this->response->create([
             'id' => $output->id,
             'entity_type_id' => $output->entityTypeId,
+            'status' => $output->status,
+            'published_at' => $output->publishedAtIso,
             'is_deleted' => $output->isDeleted,
             'deleted_at' => $output->deletedAtIso,
         ]);

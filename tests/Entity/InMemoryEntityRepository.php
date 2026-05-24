@@ -81,6 +81,10 @@ final class InMemoryEntityRepository implements EntityRepositoryInterface
                 continue;
             }
 
+            if ($criteria->status !== null && $entity->status !== $criteria->status) {
+                continue;
+            }
+
             if ($criteria->tagSlugs !== []) {
                 $entityId = $entity->id ?? 0;
                 $entityTagSlugs = $this->tagSlugsByEntityId[$entityId] ?? [];
@@ -130,6 +134,8 @@ final class InMemoryEntityRepository implements EntityRepositoryInterface
         $this->entities[$id] = new Entity(
             id: $id,
             entityTypeId: $entity->entityTypeId,
+            status: $entity->status,
+            publishedAt: $entity->publishedAt,
         );
 
         return $id;
@@ -157,6 +163,7 @@ final class InMemoryEntityRepository implements EntityRepositoryInterface
         $this->entities[$id] = new Entity(
             id: $id,
             entityTypeId: $entity->entityTypeId,
+            status: $entity->status,
             isDeleted: true,
             deletedAt: new DateTimeImmutable('@1700000000'),
         );

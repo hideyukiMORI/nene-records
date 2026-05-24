@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NeNeRecords\Entity;
 
+use DateTimeImmutable;
 use DateTimeInterface;
 use LogicException;
 use NeNeRecords\EntityType\EntityTypeNotFoundException;
@@ -35,9 +36,17 @@ final readonly class UpdateEntityUseCase implements UpdateEntityUseCaseInterface
             throw new EntityTypeNotFoundException($input->entityTypeId);
         }
 
+        // Auto-set published_at when transitioning to published for the first time.
+        $publishedAt = $input->publishedAt ?? $existing->publishedAt;
+        if ($input->status === EntityStatus::PUBLISHED && $publishedAt === null) {
+            $publishedAt = new DateTimeImmutable();
+        }
+
         $updated = new Entity(
             id: $entityId,
             entityTypeId: $input->entityTypeId,
+            status: $input->status,
+            publishedAt: $publishedAt,
             isDeleted: $existing->isDeleted,
             deletedAt: $existing->deletedAt,
         );
@@ -47,6 +56,8 @@ final readonly class UpdateEntityUseCase implements UpdateEntityUseCaseInterface
         return new UpdateEntityOutput(
             id: $entityId,
             entityTypeId: $input->entityTypeId,
+            status: $input->status,
+            publishedAtIso: $publishedAt?->format(DateTimeInterface::ATOM),
             isDeleted: $existing->isDeleted,
             deletedAtIso: $existing->deletedAt?->format(DateTimeInterface::ATOM),
         );
