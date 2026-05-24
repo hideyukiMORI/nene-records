@@ -6,6 +6,7 @@ import { FieldDefListPanel } from './FieldDefListPanel'
 
 export interface ManageFieldDefsViewProps {
   entityTypeSlug: string | null
+  canManageSchema: boolean
   items: FieldDef[]
   isLoading: boolean
   isError: boolean
@@ -29,6 +30,7 @@ export interface ManageFieldDefsViewProps {
 
 export function ManageFieldDefsView({
   entityTypeSlug,
+  canManageSchema,
   items,
   isLoading,
   isError,
@@ -57,12 +59,14 @@ export function ManageFieldDefsView({
             Schema for {entityTypeSlug}
           </Text>
         ) : null}
-        <FieldDefCreateForm
-          isSubmitting={isCreating}
-          serverErrorTitle={createErrorTitle}
-          onSubmit={onCreate}
-        />
-        {editTarget !== null ? (
+        {canManageSchema ? (
+          <FieldDefCreateForm
+            isSubmitting={isCreating}
+            serverErrorTitle={createErrorTitle}
+            onSubmit={onCreate}
+          />
+        ) : null}
+        {canManageSchema && editTarget !== null ? (
           <FieldDefEditForm
             fieldDef={editTarget}
             isSubmitting={isUpdating}
@@ -77,6 +81,7 @@ export function ManageFieldDefsView({
           </Text>
           <FieldDefListPanel
             items={items}
+            canManageSchema={canManageSchema}
             isLoading={isLoading}
             isError={isError}
             errorTitle={errorTitle}

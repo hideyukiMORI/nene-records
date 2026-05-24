@@ -1,4 +1,4 @@
-import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import { cleanup, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
@@ -7,6 +7,7 @@ import { resetFieldDefStore, seedFieldDefs } from '@tests/msw/handlers/field-def
 import { resetEntityTypeStore, seedEntityTypes } from '@tests/msw/handlers/entity-type'
 import { mswServer } from '@tests/msw/server'
 import { renderWithProviders } from '@tests/render/render-with-providers'
+import { clearAuthSession, seedAdminSession } from '@tests/helpers/auth-session'
 
 function renderFieldDefsPage(entityTypeId = 1) {
   return renderWithProviders(
@@ -31,10 +32,15 @@ describe('FieldDefsPage', () => {
     mswServer.listen()
   })
 
+  beforeEach(() => {
+    seedAdminSession()
+  })
+
   afterEach(() => {
     mswServer.resetHandlers()
     resetEntityTypeStore()
     resetFieldDefStore()
+    clearAuthSession()
     cleanup()
   })
 

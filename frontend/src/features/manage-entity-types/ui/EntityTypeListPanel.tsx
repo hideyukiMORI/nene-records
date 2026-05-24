@@ -4,6 +4,7 @@ import { Button, EmptyState, Stack, Text } from '@/shared/ui'
 
 export interface EntityTypeListPanelProps {
   items: EntityType[]
+  canManageSchema: boolean
   isLoading: boolean
   isError: boolean
   errorTitle: string | null
@@ -15,6 +16,7 @@ export interface EntityTypeListPanelProps {
 
 export function EntityTypeListPanel({
   items,
+  canManageSchema,
   isLoading,
   isError,
   errorTitle,
@@ -64,35 +66,41 @@ export function EntityTypeListPanel({
             </Text>
           </Stack>
           <div className="flex items-center gap-inline-sm">
-            <Link to={`/entity-types/${String(item.id)}/fields`}>
-              <Button variant="secondary" size="sm">
-                Fields
-              </Button>
-            </Link>
+            {canManageSchema ? (
+              <Link to={`/entity-types/${String(item.id)}/fields`}>
+                <Button variant="secondary" size="sm">
+                  Fields
+                </Button>
+              </Link>
+            ) : null}
             <Link to={`/entity-types/${String(item.id)}/entities`}>
               <Button variant="secondary" size="sm">
                 Records
               </Button>
             </Link>
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => {
-                onEdit(item)
-              }}
-            >
-              Edit
-            </Button>
-            <Button
-              variant="danger"
-              size="sm"
-              disabled={isDeleting}
-              onClick={() => {
-                onDelete(item)
-              }}
-            >
-              Delete
-            </Button>
+            {canManageSchema ? (
+              <>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => {
+                    onEdit(item)
+                  }}
+                >
+                  Edit
+                </Button>
+                <Button
+                  variant="danger"
+                  size="sm"
+                  disabled={isDeleting}
+                  onClick={() => {
+                    onDelete(item)
+                  }}
+                >
+                  Delete
+                </Button>
+              </>
+            ) : null}
           </div>
         </li>
       ))}

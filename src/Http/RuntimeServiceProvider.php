@@ -29,6 +29,7 @@ use NeNeRecords\Analytics\AccessLogMiddleware;
 use NeNeRecords\ApplicationServiceProvider;
 use NeNeRecords\Auth\AdminApiAuthMiddleware;
 use NeNeRecords\Auth\AuthServiceProvider;
+use NeNeRecords\Auth\CapabilityMiddleware;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -285,6 +286,7 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
                     }
 
                     $authMiddleware[] = new AdminApiAuthMiddleware($problemDetails, $tokenVerifier);
+                    $authMiddleware[] = new CapabilityMiddleware($problemDetails);
 
                     return new RuntimeApplicationFactory(
                         $responseFactory,

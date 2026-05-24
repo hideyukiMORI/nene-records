@@ -1,4 +1,4 @@
-import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import { cleanup, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
@@ -6,6 +6,7 @@ import { TagsPage } from '@/pages/tags/TagsPage'
 import { resetTagStore } from '@tests/msw/handlers/tag'
 import { mswServer } from '@tests/msw/server'
 import { renderWithProviders } from '@tests/render/render-with-providers'
+import { clearAuthSession, seedAdminSession } from '@tests/helpers/auth-session'
 
 function renderTagsPage() {
   return renderWithProviders(
@@ -36,9 +37,14 @@ describe('TagsPage', () => {
     mswServer.listen()
   })
 
+  beforeEach(() => {
+    seedAdminSession()
+  })
+
   afterEach(() => {
     mswServer.resetHandlers()
     resetTagStore()
+    clearAuthSession()
     cleanup()
   })
 

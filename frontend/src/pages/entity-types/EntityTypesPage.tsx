@@ -1,7 +1,9 @@
 import { ManageEntityTypesView, useManageEntityTypesPage } from '@/features/manage-entity-types'
+import { currentUserHasCapability } from '@/entities/auth'
 import { Stack, Text } from '@/shared/ui'
 
 export function EntityTypesPage() {
+  const canManageSchema = currentUserHasCapability('manage_schema')
   const {
     items,
     isLoading,
@@ -32,6 +34,7 @@ export function EntityTypesPage() {
       </Text>
       <ManageEntityTypesView
         items={items}
+        canManageSchema={canManageSchema}
         isLoading={isLoading}
         isError={isError}
         errorTitle={errorTitle}

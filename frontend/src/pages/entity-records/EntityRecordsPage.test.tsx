@@ -1,4 +1,4 @@
-import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import { cleanup, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
@@ -13,6 +13,7 @@ import { resetTagStore, seedTags } from '@tests/msw/handlers/tag'
 import { resetTextFieldStore, seedTextFields } from '@tests/msw/handlers/text-field'
 import { mswServer } from '@tests/msw/server'
 import { renderWithProviders } from '@tests/render/render-with-providers'
+import { clearAuthSession, seedAdminSession } from '@tests/helpers/auth-session'
 
 function renderRecordsPage(entityTypeId = 1) {
   return renderWithProviders(
@@ -29,6 +30,10 @@ describe('EntityRecordsPage', () => {
     mswServer.listen()
   })
 
+  beforeEach(() => {
+    seedAdminSession()
+  })
+
   afterEach(() => {
     mswServer.resetHandlers()
     resetEntityTypeStore()
@@ -38,6 +43,7 @@ describe('EntityRecordsPage', () => {
     resetFieldDefStore()
     resetTagStore()
     resetTextFieldStore()
+    clearAuthSession()
     cleanup()
   })
 

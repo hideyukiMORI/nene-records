@@ -1,5 +1,5 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
-import { authStore } from '@/entities/auth'
+import { authStore, currentUserHasCapability } from '@/entities/auth'
 import { Button, Stack, Text } from '@/shared/ui'
 
 const navLinkClass = ({ isActive }: { isActive: boolean }): string =>
@@ -17,6 +17,8 @@ export function AppShell() {
   }
 
   const session = authStore.getSession()
+  const canManageTags = currentUserHasCapability('manage_tags')
+  const canReadSettings = currentUserHasCapability('read_settings')
 
   return (
     <div className="min-h-screen bg-surface font-sans text-text-primary">
@@ -33,12 +35,16 @@ export function AppShell() {
               <NavLink to="/entity-types" className={navLinkClass}>
                 Entity types
               </NavLink>
-              <NavLink to="/tags" className={navLinkClass}>
-                Tags
-              </NavLink>
-              <NavLink to="/settings" className={navLinkClass}>
-                Settings
-              </NavLink>
+              {canManageTags ? (
+                <NavLink to="/tags" className={navLinkClass}>
+                  Tags
+                </NavLink>
+              ) : null}
+              {canReadSettings ? (
+                <NavLink to="/settings" className={navLinkClass}>
+                  Settings
+                </NavLink>
+              ) : null}
               <NavLink to="/view" className={navLinkClass}>
                 Public site
               </NavLink>

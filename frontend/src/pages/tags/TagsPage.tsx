@@ -1,7 +1,10 @@
+import { Navigate } from 'react-router-dom'
 import { ManageTagsView, useManageTagsPage } from '@/features/manage-tags'
+import { currentUserHasCapability } from '@/entities/auth'
 import { Stack, Text } from '@/shared/ui'
 
 export function TagsPage() {
+  const canManageTags = currentUserHasCapability('manage_tags')
   const {
     items,
     isLoading,
@@ -23,6 +26,10 @@ export function TagsPage() {
     confirmDelete,
     isDeleting,
   } = useManageTagsPage()
+
+  if (!canManageTags) {
+    return <Navigate to="/forbidden" replace />
+  }
 
   return (
     <Stack gap="md">
