@@ -8,11 +8,20 @@ import { textFieldKeys, type TextFieldListParams } from './query-keys'
 
 const DEFAULT_LIST_PARAMS = { limit: 100, offset: 0 } as const
 
+export function defaultTextFieldListParamsForEntityType(entityTypeId: number): TextFieldListParams {
+  return {
+    entityTypeId,
+    ...DEFAULT_LIST_PARAMS,
+  }
+}
+
 export function useTextFieldList(
   params: TextFieldListParams = DEFAULT_LIST_PARAMS,
+  options?: { enabled?: boolean },
 ): UseQueryResult<TextFieldList, AppError> {
   return useQuery({
     queryKey: textFieldKeys.list(params),
+    enabled: options?.enabled ?? true,
     queryFn: async ({ signal }) => {
       const search = new URLSearchParams({
         limit: String(params.limit),
@@ -20,6 +29,8 @@ export function useTextFieldList(
       })
       if (params.entityId !== undefined) {
         search.set('entity_id', String(params.entityId))
+      } else if (params.entityTypeId !== undefined) {
+        search.set('entity_type_id', String(params.entityTypeId))
       }
       const dto = await apiClient.get<TextFieldListDto>(
         `/api/v1/text-fields?${search.toString()}`,

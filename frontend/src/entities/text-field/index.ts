@@ -4,4 +4,4 @@ export type { CreateTextFieldInput, TextField, TextFieldList, UpdateTextFieldInp
 export { textFieldKeys } from './query-keys'
 export type { TextFieldListParams } from './query-keys'
 export { useCreateTextField, useUpdateTextField } from './mutations'
-export { useTextField, useTextFieldList } from './queries'
+export { defaultTextFieldListParamsForEntityType, useTextField, useTextFieldList } from './queries'

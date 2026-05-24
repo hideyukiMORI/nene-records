@@ -7,13 +7,13 @@ import {
   type Entity,
   type EntityId,
 } from '@/entities/entity'
-import { useTextFieldList } from '@/entities/text-field'
+import { defaultTextFieldListParamsForEntityType, useTextFieldList } from '@/entities/text-field'
 import { getRecordDisplayLabel } from '@/shared/lib/get-record-display-label'
 
 export function useManageEntitiesPage(entityTypeId: number) {
   const listParams = defaultEntityListParams(entityTypeId)
   const listQuery = useEntityList(listParams)
-  const textFieldQuery = useTextFieldList()
+  const textFieldQuery = useTextFieldList(defaultTextFieldListParamsForEntityType(entityTypeId))
   const createMutation = useCreateEntity()
   const deleteMutation = useDeleteEntity()
   const [deleteTarget, setDeleteTarget] = useState<Entity | null>(null)

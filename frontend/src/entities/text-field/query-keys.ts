@@ -4,6 +4,7 @@ export interface TextFieldListParams {
   limit: number
   offset: number
   entityId?: number
+  entityTypeId?: number
 }
 
 export const textFieldKeys = {

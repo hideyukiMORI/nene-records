@@ -61,7 +61,7 @@ final class TextFieldHttpTest extends TestCase
         $this->entityTypes = new InMemoryEntityTypeRepository();
         $this->entities = new InMemoryEntityRepository();
         $this->fieldDefs = new InMemoryFieldDefRepository();
-        $this->textFields = new InMemoryTextFieldRepository();
+        $this->textFields = new InMemoryTextFieldRepository([], $this->entities);
 
         $jsonResponse = new JsonResponseFactory($this->factory, $this->factory);
         $problemDetails = new ProblemDetailsResponseFactory($this->factory, $this->factory);
@@ -271,6 +271,53 @@ final class TextFieldHttpTest extends TestCase
         self::assertSame($entityAId, $payload['items'][0]['entity_id']);
         self::assertSame('title', $payload['items'][0]['field_key']);
         self::assertSame('Entity A title', $payload['items'][0]['value']);
+    }
+
+    public function testListTextFieldsFiltersByEntityTypeId(): void
+    {
+        $typeAId = $this->entityTypes->save(new EntityType(name: 'Type A', slug: 'type-a'));
+        $typeBId = $this->entityTypes->save(new EntityType(name: 'Type B', slug: 'type-b'));
+        $this->fieldDefs->save(new FieldDef(entityTypeId: $typeAId, fieldKey: 'title', dataType: 'text'));
+        $this->fieldDefs->save(new FieldDef(entityTypeId: $typeBId, fieldKey: 'title', dataType: 'text'));
+
+        $entityAId = $this->createEntity($typeAId);
+        $entityBId = $this->createEntity($typeBId);
+
+        $this->createTextField($entityAId, 'title', 'Type A title');
+        $this->createTextField($entityBId, 'title', 'Type B title');
+
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('GET', "https://example.test/api/v1/text-fields?entity_type_id={$typeAId}"),
+        );
+        $payload = $this->decodeJson($response);
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertCount(1, $payload['items']);
+        self::assertSame($entityAId, $payload['items'][0]['entity_id']);
+        self::assertSame('Type A title', $payload['items'][0]['value']);
+    }
+
+    private function createEntity(int $entityTypeId): int
+    {
+        $bodyEntity = $this->factory->createStream(json_encode(['entity_type_id' => $entityTypeId], JSON_THROW_ON_ERROR));
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('POST', 'https://example.test/api/v1/entities')->withBody($bodyEntity),
+        );
+
+        return (int) $this->decodeJson($response)['id'];
+    }
+
+    private function createTextField(int $entityId, string $fieldKey, string $value): void
+    {
+        $body = $this->factory->createStream(json_encode([
+            'entity_id' => $entityId,
+            'field_key' => $fieldKey,
+            'value' => $value,
+        ], JSON_THROW_ON_ERROR));
+
+        $this->application->handle(
+            $this->factory->createServerRequest('POST', 'https://example.test/api/v1/text-fields')->withBody($body),
+        );
     }
 
     /**
