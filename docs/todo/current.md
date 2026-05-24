@@ -12,14 +12,14 @@ New contributors and AI agents: read [`handoff-2026-05-24-workspace-switch.md`](
 
 | Issue | Branch | Summary |
 | --- | --- | --- |
-| TBD | — | Entity type editor UI |
+| #24 | `feat/24-entity-type-editor` | Entity type 作成・一覧・削除 UI |
 
 ## Up Next
 
 | Issue | Summary |
 | --- | --- |
+| TBD | Entity type 編集（PUT） |
 | TBD | Record CRUD screens |
-| TBD | GitHub Actions frontend CI |
 
 ## Recently Completed
 

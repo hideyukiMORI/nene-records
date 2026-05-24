@@ -7,6 +7,7 @@ export interface TextProps {
   muted?: boolean
   children: React.ReactNode
   className?: string
+  id?: string
 }
 
 const variantClasses: Record<TextVariant, string> = {
@@ -22,6 +23,7 @@ export function Text({
   muted = false,
   children,
   className,
+  id,
 }: TextProps) {
   const classes = [
     'font-sans',
@@ -32,5 +34,9 @@ export function Text({
     .filter(Boolean)
     .join(' ')
 
-  return <Component className={classes}>{children}</Component>
+  return (
+    <Component id={id} className={classes}>
+      {children}
+    </Component>
+  )
 }
