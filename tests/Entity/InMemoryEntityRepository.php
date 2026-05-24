@@ -17,6 +17,9 @@ final class InMemoryEntityRepository implements EntityRepositoryInterface
     /** @var array<int, list<string>> entityId => tag slugs */
     private array $tagSlugsByEntityId;
 
+    /** @var array<int, array<string, list<int>>> entityId => fieldKey => target entity ids */
+    private array $relationsByEntityId;
+
     private int $nextId;
 
     /** @param list<Entity> $seed */
@@ -24,6 +27,7 @@ final class InMemoryEntityRepository implements EntityRepositoryInterface
     {
         $this->entities = [];
         $this->tagSlugsByEntityId = [];
+        $this->relationsByEntityId = [];
         $this->nextId = 1;
 
         foreach ($seed as $entity) {
@@ -39,6 +43,11 @@ final class InMemoryEntityRepository implements EntityRepositoryInterface
     public function setTagSlugsForEntity(int $entityId, array $tagSlugs): void
     {
         $this->tagSlugsByEntityId[$entityId] = $tagSlugs;
+    }
+
+    public function setRelationForEntity(int $entityId, string $fieldKey, int $targetEntityId): void
+    {
+        $this->relationsByEntityId[$entityId][$fieldKey][] = $targetEntityId;
     }
 
     public function findById(int $id): ?Entity
@@ -86,6 +95,18 @@ final class InMemoryEntityRepository implements EntityRepositoryInterface
 
                 if (!$matches) {
                     continue;
+                }
+            }
+
+            if ($criteria->relationFilters !== []) {
+                $entityId = $entity->id ?? 0;
+
+                foreach ($criteria->relationFilters as $fieldKey => $targetEntityId) {
+                    $linkedTargetIds = $this->relationsByEntityId[$entityId][$fieldKey] ?? [];
+
+                    if (!in_array($targetEntityId, $linkedTargetIds, true)) {
+                        continue 2;
+                    }
                 }
             }
 

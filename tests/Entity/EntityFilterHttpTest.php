@@ -46,6 +46,9 @@ final class EntityFilterHttpTest extends TestCase
         $this->entities->setTagSlugsForEntity(1, ['featured']);
         $this->entities->setTagSlugsForEntity(2, ['draft']);
         $this->entities->setTagSlugsForEntity(3, ['featured']);
+        $this->entities->setRelationForEntity(1, 'author', 10);
+        $this->entities->setRelationForEntity(1, 'category', 20);
+        $this->entities->setRelationForEntity(2, 'author', 10);
 
         $jsonResponse = new JsonResponseFactory($this->factory, $this->factory);
         $problemDetails = new ProblemDetailsResponseFactory($this->factory, $this->factory);
@@ -103,6 +106,33 @@ final class EntityFilterHttpTest extends TestCase
         $payload = $this->decodeJson($response);
 
         self::assertSame(3, $payload['total']);
+    }
+
+    public function testListEntitiesFilteredByRelationFieldKey(): void
+    {
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/api/v1/entities?relation.author=10'),
+        );
+        $payload = $this->decodeJson($response);
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame(2, $payload['total']);
+        self::assertSame([1, 2], array_column($payload['items'], 'id'));
+    }
+
+    public function testListEntitiesRelationFiltersUseAndSemantics(): void
+    {
+        $response = $this->application->handle(
+            $this->factory->createServerRequest(
+                'GET',
+                'https://example.test/api/v1/entities?relation.author=10&relation.category=20',
+            ),
+        );
+        $payload = $this->decodeJson($response);
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame(1, $payload['total']);
+        self::assertSame(1, $payload['items'][0]['id']);
     }
 
     /**

@@ -104,6 +104,20 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
             }
         }
 
+        foreach ($criteria->relationFilters as $fieldKey => $targetEntityId) {
+            $conditions[] = <<<'SQL'
+                EXISTS (
+                    SELECT 1
+                    FROM entity_relations er
+                    WHERE er.source_entity_id = e.id
+                      AND er.field_key = ?
+                      AND er.target_entity_id = ?
+                )
+                SQL;
+            $params[] = $fieldKey;
+            $params[] = $targetEntityId;
+        }
+
         return [implode(' AND ', $conditions), $params];
     }
 

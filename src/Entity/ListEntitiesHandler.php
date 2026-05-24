@@ -28,6 +28,7 @@ final readonly class ListEntitiesHandler
         $tagSlugs = array_values(array_unique([...$tagsFromTags, ...$tagsFromTag]));
 
         $entityTypeId = QueryStringParser::int($request, 'entity_type_id');
+        $relationFilters = EntityRelationQueryParser::parseRelationFilters($request->getQueryParams());
 
         $output = $this->useCase->execute(new ListEntitiesInput(
             limit: $pagination->limit,
@@ -35,6 +36,7 @@ final readonly class ListEntitiesHandler
             criteria: new EntityListCriteria(
                 entityTypeId: $entityTypeId,
                 tagSlugs: $tagSlugs,
+                relationFilters: $relationFilters,
             ),
         ));
 
