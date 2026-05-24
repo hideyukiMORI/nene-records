@@ -1,18 +1,17 @@
-import { Link } from 'react-router-dom'
-import type { EntityType } from '@/entities/entity-type'
+import type { Entity } from '@/entities/entity'
 import { Button, EmptyState, Stack, Text } from '@/shared/ui'
 
-export interface EntityTypeListPanelProps {
-  items: EntityType[]
+export interface EntityListPanelProps {
+  items: Entity[]
   isLoading: boolean
   isError: boolean
   errorTitle: string | null
   isDeleting: boolean
   onRetry: () => void
-  onDelete: (entityType: EntityType) => void
+  onDelete: (entity: Entity) => void
 }
 
-export function EntityTypeListPanel({
+export function EntityListPanel({
   items,
   isLoading,
   isError,
@@ -20,15 +19,15 @@ export function EntityTypeListPanel({
   isDeleting,
   onRetry,
   onDelete,
-}: EntityTypeListPanelProps) {
+}: EntityListPanelProps) {
   if (isLoading) {
-    return <Text muted>Loading entity types…</Text>
+    return <Text muted>Loading records…</Text>
   }
 
   if (isError) {
     return (
       <Stack gap="sm">
-        <Text variant="heading-sm">Could not load entity types</Text>
+        <Text variant="heading-sm">Could not load records</Text>
         <Text muted>{errorTitle ?? 'Unknown error'}</Text>
         <Button variant="secondary" onClick={onRetry}>
           Retry
@@ -40,8 +39,8 @@ export function EntityTypeListPanel({
   if (items.length === 0) {
     return (
       <EmptyState
-        title="No entity types yet"
-        description="Create your first entity type using the form above."
+        title="No records yet"
+        description="Create your first record using the button above."
       />
     )
   }
@@ -55,29 +54,22 @@ export function EntityTypeListPanel({
         >
           <Stack gap="xs">
             <Text as="span" variant="heading-sm">
-              {item.name}
+              Record #{String(item.id)}
             </Text>
             <Text as="span" muted>
-              {item.slug}
+              Entity type ID {String(item.entityTypeId)}
             </Text>
           </Stack>
-          <div className="flex items-center gap-inline-sm">
-            <Link to={`/entity-types/${String(item.id)}/entities`}>
-              <Button variant="secondary" size="sm">
-                Records
-              </Button>
-            </Link>
-            <Button
-              variant="danger"
-              size="sm"
-              disabled={isDeleting}
-              onClick={() => {
-                onDelete(item)
-              }}
-            >
-              Delete
-            </Button>
-          </div>
+          <Button
+            variant="danger"
+            size="sm"
+            disabled={isDeleting}
+            onClick={() => {
+              onDelete(item)
+            }}
+          >
+            Delete
+          </Button>
         </li>
       ))}
     </ul>

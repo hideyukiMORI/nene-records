@@ -1,10 +1,19 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import { cleanup, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { MemoryRouter } from 'react-router-dom'
 import { EntityTypesPage } from '@/pages/entity-types/EntityTypesPage'
 import { resetEntityTypeStore } from '@tests/msw/handlers/entity-type'
 import { mswServer } from '@tests/msw/server'
 import { renderWithProviders } from '@tests/render/render-with-providers'
+
+function renderEntityTypesPage() {
+  return renderWithProviders(
+    <MemoryRouter>
+      <EntityTypesPage />
+    </MemoryRouter>,
+  )
+}
 
 function getCreateForm(): HTMLElement {
   const form = screen.getByRole('heading', { name: 'Create entity type' }).closest('form')
@@ -31,7 +40,7 @@ describe('EntityTypesPage', () => {
 
   it('creates an entity type and lists it', async () => {
     const user = userEvent.setup()
-    renderWithProviders(<EntityTypesPage />)
+    renderEntityTypesPage()
 
     await waitFor(() => {
       expect(screen.getByText('No entity types yet')).toBeInTheDocument()
@@ -50,7 +59,7 @@ describe('EntityTypesPage', () => {
 
   it('shows validation errors for invalid slug', async () => {
     const user = userEvent.setup()
-    renderWithProviders(<EntityTypesPage />)
+    renderEntityTypesPage()
 
     await user.type(screen.getByLabelText('Name'), 'Bad Slug')
     await user.type(screen.getByLabelText('Slug'), 'Bad Slug')
@@ -64,7 +73,7 @@ describe('EntityTypesPage', () => {
 
   it('deletes an entity type after confirmation', async () => {
     const user = userEvent.setup()
-    renderWithProviders(<EntityTypesPage />)
+    renderEntityTypesPage()
 
     await user.type(screen.getByLabelText('Name'), 'Page')
     await user.type(screen.getByLabelText('Slug'), 'page')

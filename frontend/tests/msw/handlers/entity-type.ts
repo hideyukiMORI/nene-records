@@ -68,6 +68,24 @@ export const entityTypeHandlers = [
 
     return HttpResponse.json(created, { status: 201 })
   }),
+  http.get('/api/v1/entity-types/:id', ({ params }) => {
+    const id = Number(params.id)
+    const item = items.find((entry) => entry.id === id)
+
+    if (item === undefined) {
+      return HttpResponse.json(
+        {
+          type: 'https://nene-records.dev/problems/not-found',
+          title: 'Not found',
+          status: 404,
+          instance: `/api/v1/entity-types/${String(id)}`,
+        },
+        { status: 404 },
+      )
+    }
+
+    return HttpResponse.json(item)
+  }),
   http.delete('/api/v1/entity-types/:id', ({ params }) => {
     const id = Number(params.id)
     const exists = items.some((item) => item.id === id)
