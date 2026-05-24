@@ -1,0 +1,64 @@
+# NeNe Records
+
+> API-first flexible entity platform on NENE2. Define entity types and typed fields from an admin UI; persist via JSON API; expose to humans, SPAs, and AI agents through OpenAPI and MCP.
+
+## Project
+
+- Repository: https://github.com/hideyukiMORI/nene-records
+- Framework: NENE2 (https://github.com/hideyukiMORI/NENE2) — PHP 8.4 micro-framework
+- License: MIT
+
+## Documentation
+
+- [AGENTS.md](./AGENTS.md) — AI agent entry point and operating rules
+- [docs/explanation/product-vision.md](./docs/explanation/product-vision.md) — product direction
+- [docs/workflow.md](./docs/workflow.md) — contribution workflow
+- [docs/development/coding-standards.md](./docs/development/coding-standards.md) — coding standards
+- [docs/development/backend-standards.md](./docs/development/backend-standards.md) — backend patterns
+- [docs/development/frontend-standards.md](./docs/development/frontend-standards.md) — frontend patterns
+- [docs/inheritance-from-nene2.md](./docs/inheritance-from-nene2.md) — NENE2 inheritance map
+- [docs/roadmap.md](./docs/roadmap.md) — roadmap
+- [docs/todo/current.md](./docs/todo/current.md) — current tasks
+
+## API
+
+- OpenAPI 3.1 contract: [docs/openapi/openapi.yaml](./docs/openapi/openapi.yaml)
+- Base URL (local): http://localhost:8080
+- Auth: Bearer JWT via `POST /api/v1/auth/login`
+
+### Key endpoints
+
+- `GET  /api/v1/entity-types` — list entity types
+- `POST /api/v1/entity-types` — create entity type (Admin)
+- `GET  /api/v1/entity-types/{id}/entities` — list entities
+- `POST /api/v1/entity-types/{id}/entities` — create entity (Admin)
+- `GET  /api/v1/public/entity-types/{slug}/records` — public record list
+- `GET  /api/v1/public/entity-types/{slug}/records/{entitySlug}` — public record detail
+- `GET  /api/v1/settings` — site settings (public)
+- `PUT  /api/v1/admin/settings` — update site settings (Admin)
+
+## MCP Tools
+
+60+ MCP tools auto-generated from OpenAPI. Tool catalog: [tools/mcp-tools.json](./tools/mcp-tools.json)
+
+Categories: entity-types, entities, field-defs, text-fields, int-fields, bool-fields, enum-fields, datetime-fields, tags, entity-relations, settings, analytics, auth, public-records
+
+## Architecture
+
+```
+Admin frontend (React 19 + Vite)  ──┐
+Consumer views                    ──┼──→  NeNe Records API (NENE2)  ──→  MySQL / SQLite
+AI clients via MCP                ──┘
+```
+
+### Backend (src/)
+Clean Architecture: Use Cases → Repositories → PDO. One service provider per domain.
+Entity domains: Entity, EntityType, FieldDef, *Field, Tag, EntityRelation, Setting, PublicRecord, Analytics, Auth.
+
+### Frontend (frontend/src/)
+Feature-Sliced Design: app / pages / features / entities / shared.
+React Query for server state; TailwindCSS v4 design tokens.
+
+### Database
+MySQL 8.4 (production), SQLite (tests). Phinx migrations in `database/migrations/`.
+Schema snapshots in `database/schema/`.

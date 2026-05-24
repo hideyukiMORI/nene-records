@@ -1,5 +1,11 @@
 # NeNe Records
 
+[![Backend CI](https://github.com/hideyukiMORI/nene-records/actions/workflows/backend-ci.yml/badge.svg)](https://github.com/hideyukiMORI/nene-records/actions/workflows/backend-ci.yml)
+[![Frontend CI](https://github.com/hideyukiMORI/nene-records/actions/workflows/frontend-ci.yml/badge.svg)](https://github.com/hideyukiMORI/nene-records/actions/workflows/frontend-ci.yml)
+[![PHP 8.4](https://img.shields.io/badge/PHP-8.4-777BB4?logo=php)](https://www.php.net/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
+[![OpenAPI](https://img.shields.io/badge/OpenAPI-3.1-85EA2D?logo=swagger)](./docs/openapi/openapi.yaml)
+
 API-first flexible entity platform built on [NENE2](https://github.com/hideyukiMORI/NENE2).
 
 NeNe Records lets you define entity types and typed fields from the admin frontend, persist them through a thin JSON API, and expose the same operations to humans, SPAs, and AI agents via OpenAPI and MCP.
@@ -10,14 +16,34 @@ NeNe Records lets you define entity types and typed fields from the admin fronte
 - **Readable**: explicit schema registry, typed value tables, OpenAPI contracts
 - **Secure**: auth and validation at the API boundary; MCP tools never touch the database directly
 - **Replaceable layers**: swap the API runtime, admin UI, or consumer views independently
+- **AI-native**: 60+ MCP tools expose every API operation to AI clients
+
+## Quick Start
+
+```bash
+git clone https://github.com/hideyukiMORI/nene-records.git
+cd nene-records
+cp .env.example .env
+docker compose up --build -d
+# Admin UI → http://localhost:8080
+```
+
+Default credentials (local only): `admin@nene-records.local` / `nene1234`
+
+> See [`docs/development/docker.md`](./docs/development/docker.md) for full setup details.
 
 ## Architecture
 
 ```
 Admin frontend (React)  ──┐
-Consumer views          ──┼──→  NeNe Records API (NENE2)  ──→  Database
+Consumer views          ──┼──→  NeNe Records API (NENE2)  ──→  MySQL / SQLite
 AI clients (MCP)        ──┘
 ```
+
+- **Backend**: PHP 8.4, NENE2 framework, Clean Architecture (Use Cases / Repositories)
+- **Frontend**: React 19, TypeScript, Vite, TailwindCSS v4, React Query
+- **API contract**: OpenAPI 3.1 ([`docs/openapi/openapi.yaml`](./docs/openapi/openapi.yaml))
+- **MCP**: 60+ tools auto-generated from OpenAPI
 
 ## Contributing
 
@@ -26,7 +52,6 @@ NeNe Records inherits NENE2 engineering discipline:
 | Topic | Document |
 | --- | --- |
 | **Product vision** | [`docs/explanation/product-vision.md`](./docs/explanation/product-vision.md) |
-| **Workspace handoff** | [`docs/todo/handoff-2026-05-24-workspace-switch.md`](./docs/todo/handoff-2026-05-24-workspace-switch.md) |
 | **Start here (agents)** | [`AGENTS.md`](./AGENTS.md) |
 | NENE2 inheritance map | [`docs/inheritance-from-nene2.md`](./docs/inheritance-from-nene2.md) |
 | Workflow | [`docs/workflow.md`](./docs/workflow.md) |
@@ -36,15 +61,6 @@ NeNe Records inherits NENE2 engineering discipline:
 | Full contributing guide | [`docs/CONTRIBUTING.md`](./docs/CONTRIBUTING.md) |
 
 **Rules in brief:** GitHub Issue-driven work, `type/issue-number-summary` branches, Conventional Commits (Japanese description, English type), PR with verification and self-review checklist, no direct commits to `main`.
-
-## Status
-
-Early planning. See [Issues](https://github.com/hideyukiMORI/nene-records/issues).
-
-Local development stack: **`docker compose up --build`** — see [`docs/development/docker.md`](./docs/development/docker.md).
-
-- [#1](https://github.com/hideyukiMORI/nene-records/issues/1) — MVP entity CRUD vertical slice
-- [#2](https://github.com/hideyukiMORI/nene-records/issues/2) — NENE2 governance inheritance
 
 ## Related
 
