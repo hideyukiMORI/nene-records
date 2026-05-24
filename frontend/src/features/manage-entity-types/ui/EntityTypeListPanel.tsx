@@ -62,6 +62,11 @@ export function EntityTypeListPanel({
             </Text>
           </Stack>
           <div className="flex items-center gap-inline-sm">
+            <Link to={`/entity-types/${String(item.id)}/fields`}>
+              <Button variant="secondary" size="sm">
+                Fields
+              </Button>
+            </Link>
             <Link to={`/entity-types/${String(item.id)}/entities`}>
               <Button variant="secondary" size="sm">
                 Records
