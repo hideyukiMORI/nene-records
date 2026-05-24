@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeNeRecords\PublicRecord;
 
 use DateTimeImmutable;
+use DateTimeZone;
 
 final readonly class PublicFieldDisplayFormatter
 {
@@ -36,6 +37,6 @@ final readonly class PublicFieldDisplayFormatter
             return $iso;
         }
 
-        return $parsed->format('Y-m-d H:i:s') . ' UTC';
+        return $parsed->setTimezone(new DateTimeZone('UTC'))->format('Y-m-d H:i:s') . ' UTC';
     }
 }
