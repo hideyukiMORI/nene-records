@@ -16,7 +16,8 @@ final readonly class ListEntitiesUseCase implements ListEntitiesUseCaseInterface
 
     public function execute(ListEntitiesInput $input): ListEntitiesOutput
     {
-        $rows = $this->entities->findAll($input->limit, $input->offset);
+        $rows = $this->entities->findByCriteria($input->criteria, $input->limit, $input->offset);
+        $total = $this->entities->countByCriteria($input->criteria);
 
         $items = array_map(static function (Entity $entity): ListEntityItem {
             $entityId = $entity->id;
@@ -37,6 +38,7 @@ final readonly class ListEntitiesUseCase implements ListEntitiesUseCaseInterface
             items: $items,
             limit: $input->limit,
             offset: $input->offset,
+            total: $total,
         );
     }
 }

@@ -2,14 +2,13 @@
 
 declare(strict_types=1);
 
-namespace NeNeRecords\Entity;
+namespace NeNeRecords\Tag;
 
-final readonly class ListEntitiesInput
+final readonly class ListTagsInput
 {
     public function __construct(
         public int $limit = 20,
         public int $offset = 0,
-        public EntityListCriteria $criteria = new EntityListCriteria(),
     ) {
     }
 }

@@ -1,0 +1,6 @@
+CREATE TABLE tags (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    slug VARCHAR(255) NOT NULL,
+    name VARCHAR(255) NOT NULL
+);
+CREATE UNIQUE INDEX tags_slug ON tags (slug);

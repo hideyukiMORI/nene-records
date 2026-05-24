@@ -36,18 +36,75 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
     /** @return list<Entity> */
     public function findAll(int $limit, int $offset): array
     {
+        return $this->findByCriteria(new EntityListCriteria(), $limit, $offset);
+    }
+
+    /** @return list<Entity> */
+    public function findByCriteria(EntityListCriteria $criteria, int $limit, int $offset): array
+    {
+        [$where, $params] = $this->buildCriteriaWhere($criteria);
+        $params[] = $limit;
+        $params[] = $offset;
+
         $rows = $this->query->fetchAll(
-            <<<'SQL'
-                SELECT id, entity_type_id, is_deleted, deleted_at
-                FROM entities
-                WHERE is_deleted = 0
-                ORDER BY id ASC
+            <<<SQL
+                SELECT e.id, e.entity_type_id, e.is_deleted, e.deleted_at
+                FROM entities e
+                WHERE {$where}
+                ORDER BY e.id ASC
                 LIMIT ? OFFSET ?
                 SQL,
-            [$limit, $offset],
+            $params,
         );
 
         return array_map(fn (array $row) => $this->mapRow($row), $rows);
+    }
+
+    public function countByCriteria(EntityListCriteria $criteria): int
+    {
+        [$where, $params] = $this->buildCriteriaWhere($criteria);
+
+        $row = $this->query->fetchOne(
+            <<<SQL
+                SELECT COUNT(*) AS total
+                FROM entities e
+                WHERE {$where}
+                SQL,
+            $params,
+        );
+
+        return (int) ($row['total'] ?? 0);
+    }
+
+    /**
+     * @return array{0: string, 1: list<mixed>}
+     */
+    private function buildCriteriaWhere(EntityListCriteria $criteria): array
+    {
+        $conditions = ['e.is_deleted = 0'];
+        $params = [];
+
+        if ($criteria->entityTypeId !== null) {
+            $conditions[] = 'e.entity_type_id = ?';
+            $params[] = $criteria->entityTypeId;
+        }
+
+        if ($criteria->tagSlugs !== []) {
+            $placeholders = implode(', ', array_fill(0, count($criteria->tagSlugs), '?'));
+            $conditions[] = <<<SQL
+                EXISTS (
+                    SELECT 1
+                    FROM entity_tags et
+                    INNER JOIN tags t ON t.id = et.tag_id
+                    WHERE et.entity_id = e.id AND t.slug IN ({$placeholders})
+                )
+                SQL;
+            foreach ($criteria->tagSlugs as $slug) {
+                $params[] = $slug;
+            }
+        }
+
+        return [implode(' AND ', $conditions), $params];
     }
 
     public function save(Entity $entity): int

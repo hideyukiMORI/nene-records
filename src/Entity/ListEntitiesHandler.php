@@ -7,6 +7,7 @@ namespace NeNeRecords\Entity;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\PaginationQueryParser;
 use Nene2\Http\PaginationResponse;
+use Nene2\Http\QueryStringParser;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -22,7 +23,20 @@ final readonly class ListEntitiesHandler
     {
         $pagination = PaginationQueryParser::parse($request);
 
-        $output = $this->useCase->execute(new ListEntitiesInput($pagination->limit, $pagination->offset));
+        $tagsFromTags = QueryStringParser::commaSeparated($request, 'tags') ?? [];
+        $tagsFromTag = QueryStringParser::commaSeparated($request, 'tag') ?? [];
+        $tagSlugs = array_values(array_unique([...$tagsFromTags, ...$tagsFromTag]));
+
+        $entityTypeId = QueryStringParser::int($request, 'entity_type_id');
+
+        $output = $this->useCase->execute(new ListEntitiesInput(
+            limit: $pagination->limit,
+            offset: $pagination->offset,
+            criteria: new EntityListCriteria(
+                entityTypeId: $entityTypeId,
+                tagSlugs: $tagSlugs,
+            ),
+        ));
 
         return $this->response->create(
             (new PaginationResponse(
@@ -37,6 +51,7 @@ final readonly class ListEntitiesHandler
                 ),
                 limit: $output->limit,
                 offset: $output->offset,
+                total: $output->total,
             ))->toArray(),
         );
     }
