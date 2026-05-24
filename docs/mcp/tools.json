@@ -1,3 +1,110 @@
 {
-  "tools": []
+  "version": 1,
+  "source": "docs/openapi/openapi.yaml",
+  "tools": [
+    {
+      "name": "listEntityRelations",
+      "title": "List Entity Relations",
+      "description": "List relation targets attached to a source entity for a given relation field key.",
+      "safety": "read",
+      "source": {
+        "type": "openapi",
+        "operationId": "listEntityRelations",
+        "method": "GET",
+        "path": "/api/v1/entities/{entityId}/relations"
+      },
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["entityId", "field_key"],
+        "properties": {
+          "entityId": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Source entity id."
+          },
+          "field_key": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Relation field key registered on the source entity type."
+          }
+        }
+      },
+      "responseSchemaRef": "#/components/schemas/EntityRelationListResponse"
+    },
+    {
+      "name": "attachEntityRelation",
+      "title": "Attach Entity Relation",
+      "description": "Attach a target entity to a source entity via a typed relation field. For cardinality=one fields, replaces the existing target.",
+      "safety": "write",
+      "source": {
+        "type": "openapi",
+        "operationId": "attachEntityRelation",
+        "method": "POST",
+        "path": "/api/v1/entities/{entityId}/relations"
+      },
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["entityId", "field_key", "target_entity_id"],
+        "properties": {
+          "entityId": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Source entity id."
+          },
+          "field_key": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Relation field key on the source entity type."
+          },
+          "target_entity_id": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Target entity id to link."
+          }
+        }
+      },
+      "responseSchemaRef": null
+    },
+    {
+      "name": "listEntitiesByRelationTarget",
+      "title": "List Entities By Relation Target",
+      "description": "List source entities whose relation field points to a target entity. Pass entity_type_id and one query parameter per relation filter using the form relation_{fieldKey} (e.g. relation_author=5). Multiple relation_{fieldKey} parameters are combined with AND.",
+      "safety": "read",
+      "source": {
+        "type": "openapi",
+        "operationId": "listEntities",
+        "method": "GET",
+        "path": "/api/v1/entities"
+      },
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "entity_type_id": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Entity type id of records to list."
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 20
+          },
+          "offset": {
+            "type": "integer",
+            "minimum": 0,
+            "default": 0
+          }
+        },
+        "additionalProperties": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Relation filter query param. Use key relation_{fieldKey} with the target entity id as value."
+        }
+      },
+      "responseSchemaRef": "#/components/schemas/EntityListResponse"
+    }
+  ]
 }

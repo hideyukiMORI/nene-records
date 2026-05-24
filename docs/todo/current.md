@@ -6,13 +6,13 @@ Last updated: 2026-05-24
 
 | Issue | Summary |
 | --- | --- |
-| — | MCP relation tools |
+| — | Phase 5: 全 API MCP カタログ拡充 |
 
 ## In Progress
 
 | Issue | Summary |
 | --- | --- |
-| — | （なし） |
+| #65 | MCP relation tools カタログ |
 
 ## Recently Completed
 
@@ -41,6 +41,6 @@ Last updated: 2026-05-24
 ## Verification
 
 ```bash
-composer check                    # 144 tests
+composer check                    # 144 tests + openapi + mcp
 npm run check --prefix frontend   # 65 tests
 ```
