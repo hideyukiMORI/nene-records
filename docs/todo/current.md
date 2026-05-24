@@ -6,13 +6,13 @@ Last updated: 2026-05-24
 
 | Issue | Summary |
 | --- | --- |
-| TBD | entity-to-entity relations（要設計） |
+| #52 | Record 詳細 relation attach/detach UI（blocked by #51） |
 
 ## In Progress
 
 | Issue | Summary |
 | --- | --- |
-| — | （なし） |
+| #51 | entity relations API + field_defs relation 型（Phase 3a） |
 
 ## Recently Completed
 
@@ -25,11 +25,12 @@ Last updated: 2026-05-24
 | #40 | field_def 編集 UI (PR #41) |
 | #38 | Consumer views (PR #39) |
 
-## Phase 3 Tags / Query
+## Phase 3 Tags / Query / Relations
 
 - **API（済）:** tags CRUD, entity_tags, entities `?tags=` フィルタ
 - **Admin UI（済）:** Tag CRUD (#44), Record tag attach/detach (#46), Records 一覧 tag フィルタ (#48)
-- **未着手:** relations モデル
+- **Relations（進行中）:** ADR 0004 確定 → backend #51 → Admin UI #52
+- **Relations 後続:** list filter `?relation.{field_key}=`, inverse, MCP
 
 ## Verification
 
