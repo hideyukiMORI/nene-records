@@ -12,12 +12,13 @@ Last updated: 2026-05-24
 
 | Issue | Summary |
 | --- | --- |
-| #48 | Records 一覧 tag フィルタ UI |
+| — | （なし） |
 
 ## Recently Completed
 
 | Issue | Summary |
 | --- | --- |
+| #48 | Records 一覧 tag フィルタ UI (PR #49) |
 | #46 | Record tag attach/detach UI (PR #47) |
 | #44 | Tag CRUD Admin UI (PR #45) |
 | #42 | text-fields entity_type_id フィルタ (PR #43) |
@@ -27,8 +28,7 @@ Last updated: 2026-05-24
 ## Phase 3 Tags / Query
 
 - **API（済）:** tags CRUD, entity_tags, entities `?tags=` フィルタ
-- **Admin UI（済）:** Tag CRUD (#44), Record tag attach/detach (#46)
-- **Admin UI（進行中）:** Records 一覧 tag フィルタ (#48)
+- **Admin UI（済）:** Tag CRUD (#44), Record tag attach/detach (#46), Records 一覧 tag フィルタ (#48)
 - **未着手:** relations モデル
 
 ## Verification
