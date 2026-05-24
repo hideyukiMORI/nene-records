@@ -1,4 +1,6 @@
 import { http, HttpResponse } from 'msw'
+import { getEntityTagLinks } from './entity-tag'
+import { getTagBySlug } from './tag'
 
 interface EntityRecord {
   id: number
@@ -24,6 +26,21 @@ export function getActiveEntities(): EntityRecord[] {
   return items.filter((item) => !item.is_deleted)
 }
 
+function getEntityIdsMatchingTagSlugs(slugs: string[]): Set<number> {
+  const tagIds = new Set(
+    slugs.map((slug) => getTagBySlug(slug)?.id).filter((id): id is number => id !== undefined),
+  )
+  const entityIds = new Set<number>()
+
+  for (const link of getEntityTagLinks()) {
+    if (tagIds.has(link.tag_id)) {
+      entityIds.add(link.entity_id)
+    }
+  }
+
+  return entityIds
+}
+
 export const entityHandlers = [
   http.get('/api/v1/entities', ({ request }) => {
     const url = new URL(request.url)
@@ -31,10 +48,23 @@ export const entityHandlers = [
     const offset = Number(url.searchParams.get('offset') ?? '0')
     const entityTypeIdParam = url.searchParams.get('entity_type_id')
     const entityTypeId = entityTypeIdParam === null ? null : Number(entityTypeIdParam)
+    const tagsParam = url.searchParams.get('tags')
+    const tagSlugs =
+      tagsParam === null
+        ? []
+        : tagsParam
+            .split(',')
+            .map((slug) => slug.trim())
+            .filter((slug) => slug.length > 0)
 
     const active = items.filter((item) => !item.is_deleted)
-    const filtered =
+    let filtered =
       entityTypeId === null ? active : active.filter((item) => item.entity_type_id === entityTypeId)
+
+    if (tagSlugs.length > 0) {
+      const matchingEntityIds = getEntityIdsMatchingTagSlugs(tagSlugs)
+      filtered = filtered.filter((item) => matchingEntityIds.has(item.id))
+    }
 
     return HttpResponse.json({
       items: filtered.slice(offset, offset + limit),

@@ -5,7 +5,9 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { EntityRecordsPage } from '@/pages/entity-records/EntityRecordsPage'
 import { EntityTypesPage } from '@/pages/entity-types/EntityTypesPage'
 import { resetEntityStore, seedEntities } from '@tests/msw/handlers/entity'
+import { resetEntityTagStore, seedEntityTags } from '@tests/msw/handlers/entity-tag'
 import { resetEntityTypeStore, seedEntityTypes } from '@tests/msw/handlers/entity-type'
+import { resetTagStore, seedTags } from '@tests/msw/handlers/tag'
 import { resetTextFieldStore, seedTextFields } from '@tests/msw/handlers/text-field'
 import { mswServer } from '@tests/msw/server'
 import { renderWithProviders } from '@tests/render/render-with-providers'
@@ -29,6 +31,8 @@ describe('EntityRecordsPage', () => {
     mswServer.resetHandlers()
     resetEntityTypeStore()
     resetEntityStore()
+    resetEntityTagStore()
+    resetTagStore()
     resetTextFieldStore()
     cleanup()
   })
@@ -101,6 +105,61 @@ describe('EntityRecordsPage', () => {
 
     expect(await screen.findByText('My article')).toBeInTheDocument()
     expect(screen.getByText('#1')).toBeInTheDocument()
+  })
+
+  it('filters records by selected tags', async () => {
+    seedEntityTypes([{ id: 1, name: 'Article', slug: 'article' }])
+    seedTags([
+      { id: 1, name: 'Featured', slug: 'featured' },
+      { id: 2, name: 'Draft', slug: 'draft' },
+    ])
+    seedEntities([
+      { id: 1, entity_type_id: 1, is_deleted: false, deleted_at: null },
+      { id: 2, entity_type_id: 1, is_deleted: false, deleted_at: null },
+    ])
+    seedEntityTags([
+      { entity_id: 1, tag_id: 1 },
+      { entity_id: 2, tag_id: 2 },
+    ])
+
+    const user = userEvent.setup()
+    renderRecordsPage()
+
+    expect(await screen.findByText('Record #1')).toBeInTheDocument()
+    expect(screen.getByText('Record #2')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Featured' }))
+
+    await waitFor(() => {
+      expect(screen.getByText('Record #1')).toBeInTheDocument()
+      expect(screen.queryByText('Record #2')).not.toBeInTheDocument()
+      expect(screen.getByText('1 record')).toBeInTheDocument()
+    })
+
+    await user.click(screen.getByRole('button', { name: 'Clear' }))
+
+    await waitFor(() => {
+      expect(screen.getByText('Record #1')).toBeInTheDocument()
+      expect(screen.getByText('Record #2')).toBeInTheDocument()
+      expect(screen.getByText('2 records')).toBeInTheDocument()
+    })
+  })
+
+  it('shows empty state when no records match the tag filter', async () => {
+    seedEntityTypes([{ id: 1, name: 'Article', slug: 'article' }])
+    seedTags([{ id: 1, name: 'Featured', slug: 'featured' }])
+    seedEntities([{ id: 1, entity_type_id: 1, is_deleted: false, deleted_at: null }])
+
+    const user = userEvent.setup()
+    renderRecordsPage()
+
+    expect(await screen.findByText('Record #1')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Featured' }))
+
+    await waitFor(() => {
+      expect(screen.getByText('No matching records')).toBeInTheDocument()
+    })
   })
 
   it('links from entity types page to records', async () => {

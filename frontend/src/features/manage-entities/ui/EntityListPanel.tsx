@@ -10,6 +10,7 @@ export interface EntityListPanelProps {
   isError: boolean
   errorTitle: string | null
   isDeleting: boolean
+  isFilterActive: boolean
   onRetry: () => void
   onDelete: (entity: Entity) => void
 }
@@ -22,6 +23,7 @@ export function EntityListPanel({
   isError,
   errorTitle,
   isDeleting,
+  isFilterActive,
   onRetry,
   onDelete,
 }: EntityListPanelProps) {
@@ -44,8 +46,12 @@ export function EntityListPanel({
   if (items.length === 0) {
     return (
       <EmptyState
-        title="No records yet"
-        description="Create your first record using the button above."
+        title={isFilterActive ? 'No matching records' : 'No records yet'}
+        description={
+          isFilterActive
+            ? 'Try clearing the tag filter or selecting different tags.'
+            : 'Create your first record using the button above.'
+        }
       />
     )
   }

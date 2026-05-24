@@ -17,6 +17,10 @@ export function seedEntityTags(seed: EntityTagLink[]): void {
   links = [...seed]
 }
 
+export function getEntityTagLinks(): EntityTagLink[] {
+  return links
+}
+
 export const entityTagHandlers = [
   http.get('/api/v1/entities/:entityId/tags', ({ params }) => {
     const entityId = Number(params.entityId)
