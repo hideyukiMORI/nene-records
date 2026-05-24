@@ -11,6 +11,7 @@ const DATA_TYPE_LABELS: Record<FieldDef['dataType'], string> = {
 
 export interface FieldDefListPanelProps {
   items: FieldDef[]
+  canManageSchema: boolean
   isLoading: boolean
   isError: boolean
   errorTitle: string | null
@@ -22,6 +23,7 @@ export interface FieldDefListPanelProps {
 
 export function FieldDefListPanel({
   items,
+  canManageSchema,
   isLoading,
   isError,
   errorTitle,
@@ -71,25 +73,29 @@ export function FieldDefListPanel({
             </Text>
           </Stack>
           <div className="flex items-center gap-inline-sm">
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => {
-                onEdit(item)
-              }}
-            >
-              Edit
-            </Button>
-            <Button
-              variant="danger"
-              size="sm"
-              disabled={isDeleting}
-              onClick={() => {
-                onDelete(item)
-              }}
-            >
-              Delete
-            </Button>
+            {canManageSchema ? (
+              <>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => {
+                    onEdit(item)
+                  }}
+                >
+                  Edit
+                </Button>
+                <Button
+                  variant="danger"
+                  size="sm"
+                  disabled={isDeleting}
+                  onClick={() => {
+                    onDelete(item)
+                  }}
+                >
+                  Delete
+                </Button>
+              </>
+            ) : null}
           </div>
         </li>
       ))}

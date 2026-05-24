@@ -24,11 +24,17 @@ final readonly class LoginUseCase
             throw new InvalidCredentialsException();
         }
 
+        $role = Role::tryFrom($user->role);
+
+        if ($role === null) {
+            throw new InvalidCredentialsException();
+        }
+
         $expiresAt = time() + self::TOKEN_TTL_SECONDS;
 
         $token = $this->tokenIssuer->issue([
             'sub' => $user->email,
-            'role' => $user->role,
+            'role' => $role->value,
             'iat' => time(),
             'exp' => $expiresAt,
         ]);
@@ -37,7 +43,7 @@ final readonly class LoginUseCase
             token: $token,
             expiresAt: $expiresAt,
             email: $user->email,
-            role: $user->role,
+            role: $role->value,
         );
     }
 }

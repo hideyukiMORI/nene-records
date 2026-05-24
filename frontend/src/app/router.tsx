@@ -7,6 +7,7 @@ import { EntityRecordPage } from '@/pages/entity-record/EntityRecordPage'
 import { EntityRecordsPage } from '@/pages/entity-records/EntityRecordsPage'
 import { EntityTypesPage } from '@/pages/entity-types/EntityTypesPage'
 import { FieldDefsPage } from '@/pages/field-defs/FieldDefsPage'
+import { ForbiddenPage } from '@/pages/forbidden/ForbiddenPage'
 import { HomePage } from '@/pages/home/HomePage'
 import { AppShell } from '@/pages/layout/AppShell'
 import { LoginPage } from '@/pages/login/LoginPage'
@@ -26,6 +27,14 @@ const router = createBrowserRouter([
   {
     path: '/login',
     element: <LoginPage />,
+  },
+  {
+    path: '/forbidden',
+    element: (
+      <RequireAuth>
+        <ForbiddenPage />
+      </RequireAuth>
+    ),
   },
   {
     path: '/',

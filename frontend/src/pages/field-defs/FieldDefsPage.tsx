@@ -1,11 +1,13 @@
-import { Link, useParams } from 'react-router-dom'
+import { Link, Navigate, useParams } from 'react-router-dom'
 import { toEntityTypeId, useEntityType } from '@/entities/entity-type'
+import { currentUserHasCapability } from '@/entities/auth'
 import { ManageFieldDefsView, useManageFieldDefsPage } from '@/features/manage-field-defs'
 import { Button, Stack, Text } from '@/shared/ui'
 
 export function FieldDefsPage() {
   const { entityTypeId: entityTypeIdParam } = useParams()
   const entityTypeId = Number(entityTypeIdParam)
+  const canManageSchema = currentUserHasCapability('manage_schema')
 
   const entityTypeQuery = useEntityType(toEntityTypeId(entityTypeId))
   const {
@@ -30,6 +32,10 @@ export function FieldDefsPage() {
     isDeleting,
   } = useManageFieldDefsPage(entityTypeId)
 
+  if (!canManageSchema) {
+    return <Navigate to="/forbidden" replace />
+  }
+
   return (
     <Stack gap="md">
       <Stack gap="sm">
@@ -44,6 +50,7 @@ export function FieldDefsPage() {
       </Stack>
       <ManageFieldDefsView
         entityTypeSlug={entityTypeQuery.data?.slug ?? null}
+        canManageSchema={canManageSchema}
         items={items}
         isLoading={isLoading}
         isError={isError}

@@ -10,10 +10,12 @@ import { Button, Input, Stack, Text } from '@/shared/ui'
 function SettingField({
   item,
   isSaving,
+  canManageSettings,
   onSave,
 }: {
   item: SettingItem
   isSaving: boolean
+  canManageSettings: boolean
   onSave: (settingKey: string, value: string) => Promise<void>
 }) {
   const [value, setValue] = useState(item.value)
@@ -30,7 +32,7 @@ function SettingField({
           <textarea
             id={inputId}
             value={value}
-            disabled={isSaving}
+            disabled={isSaving || !canManageSettings}
             rows={4}
             onChange={(event) => {
               setValue(event.target.value)
@@ -46,22 +48,24 @@ function SettingField({
           id={inputId}
           label={item.label}
           value={value}
-          disabled={isSaving}
+          disabled={isSaving || !canManageSettings}
           onChange={(event) => {
             setValue(event.target.value)
           }}
         />
       )}
-      <Button
-        variant="secondary"
-        size="sm"
-        disabled={isSaving || value === item.value}
-        onClick={() => {
-          void onSave(item.settingKey, value)
-        }}
-      >
-        {isSaving ? 'Saving…' : 'Save'}
-      </Button>
+      {canManageSettings ? (
+        <Button
+          variant="secondary"
+          size="sm"
+          disabled={isSaving || value === item.value}
+          onClick={() => {
+            void onSave(item.settingKey, value)
+          }}
+        >
+          {isSaving ? 'Saving…' : 'Save'}
+        </Button>
+      ) : null}
     </Stack>
   )
 }
@@ -95,7 +99,7 @@ function SettingRevisionsPanel({ settingKey }: { settingKey: string }) {
   )
 }
 
-export function ManageSiteSettingsView() {
+export function ManageSiteSettingsView({ canManageSettings }: { canManageSettings: boolean }) {
   const listQuery = useSettingList()
   const updateMutation = useUpdateSetting()
   const [expandedKey, setExpandedKey] = useState<string | null>(null)
@@ -136,6 +140,7 @@ export function ManageSiteSettingsView() {
               key={`${item.settingKey}:${item.updatedAt ?? 'default'}`}
               item={item}
               isSaving={updateMutation.isPending}
+              canManageSettings={canManageSettings}
               onSave={saveSetting}
             />
             <Button

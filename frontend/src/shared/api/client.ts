@@ -35,6 +35,9 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
       authStore.clearSession()
       window.location.href = '/login'
     }
+    if (response.status === 403) {
+      window.location.href = '/forbidden'
+    }
     throw await parseProblemDetails(response)
   }
 

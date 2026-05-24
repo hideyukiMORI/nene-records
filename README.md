@@ -28,7 +28,10 @@ docker compose up --build -d
 # Admin UI → http://localhost:8080
 ```
 
-Default credentials (local only): `admin@nene-records.local` / `nene1234`
+Default credentials (local only):
+
+- Admin: `admin@nene-records.local` / `nene1234`
+- Editor: `editor@nene-records.local` / `nene1234`
 
 > See [`docs/development/docker.md`](./docs/development/docker.md) for full setup details.
 

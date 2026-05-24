@@ -6,6 +6,7 @@ import { EntityTypeListPanel } from './EntityTypeListPanel'
 
 export interface ManageEntityTypesViewProps {
   items: EntityType[]
+  canManageSchema: boolean
   isLoading: boolean
   isError: boolean
   errorTitle: string | null
@@ -29,6 +30,7 @@ export interface ManageEntityTypesViewProps {
 
 export function ManageEntityTypesView({
   items,
+  canManageSchema,
   isLoading,
   isError,
   errorTitle,
@@ -52,12 +54,14 @@ export function ManageEntityTypesView({
   return (
     <>
       <Stack gap="lg">
-        <EntityTypeCreateForm
-          isSubmitting={isCreating}
-          serverErrorTitle={createErrorTitle}
-          onSubmit={onCreate}
-        />
-        {editTarget !== null ? (
+        {canManageSchema ? (
+          <EntityTypeCreateForm
+            isSubmitting={isCreating}
+            serverErrorTitle={createErrorTitle}
+            onSubmit={onCreate}
+          />
+        ) : null}
+        {canManageSchema && editTarget !== null ? (
           <EntityTypeEditForm
             entityType={editTarget}
             isSubmitting={isUpdating}
@@ -72,6 +76,7 @@ export function ManageEntityTypesView({
           </Text>
           <EntityTypeListPanel
             items={items}
+            canManageSchema={canManageSchema}
             isLoading={isLoading}
             isError={isError}
             errorTitle={errorTitle}
