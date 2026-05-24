@@ -6,7 +6,7 @@ Last updated: 2026-05-24
 
 | Issue | Summary |
 | --- | --- |
-| — | Phase 5: 全 API MCP カタログ拡充 |
+| — | Analytics / access log API（Phase 5 残） |
 
 ## In Progress
 
@@ -18,6 +18,7 @@ Last updated: 2026-05-24
 
 | Issue | Summary |
 | --- | --- |
+| #67 | 全 API MCP カタログ 53 ツール (PR #68) |
 | #65 | MCP relation tools カタログ (PR #66) |
 | #63 | Consumer view relation リンク表示 (PR #64) |
 | #61 | Record 詳細 inverse relation 参照元一覧 UI (PR #62) |
@@ -36,8 +37,9 @@ Last updated: 2026-05-24
 
 - **API（済）:** tags CRUD, entity_tags, entities `?tags=` フィルタ
 - **Admin UI（済）:** Tag CRUD (#44), Record tag attach/detach (#46), Records 一覧 tag フィルタ (#48)
-- **Relations（済）:** API #51, Admin UI #52, list filter #57/#59, inverse UI #61, Consumer view #63, MCP #65
-- **Relations 後続:** detach MCP（upstream 待ち）、Phase 5 全 API MCP 化
+- **Relations（済）:** Phase 3 一式 + MCP #65/#67
+- **Phase 5（一部済）:** MCP 全 API カタログ（53 tools, `composer mcp:generate`）
+- **Phase 5 残:** Analytics / access log、detachEntityRelation MCP（upstream 待ち）
 
 ## Verification
 

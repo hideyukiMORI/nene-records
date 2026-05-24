@@ -1,110 +1,1754 @@
 {
-  "version": 1,
-  "source": "docs/openapi/openapi.yaml",
-  "tools": [
-    {
-      "name": "listEntityRelations",
-      "title": "List Entity Relations",
-      "description": "List relation targets attached to a source entity for a given relation field key.",
-      "safety": "read",
-      "source": {
-        "type": "openapi",
-        "operationId": "listEntityRelations",
-        "method": "GET",
-        "path": "/api/v1/entities/{entityId}/relations"
-      },
-      "inputSchema": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": ["entityId", "field_key"],
-        "properties": {
-          "entityId": {
-            "type": "integer",
-            "minimum": 1,
-            "description": "Source entity id."
-          },
-          "field_key": {
-            "type": "string",
-            "minLength": 1,
-            "description": "Relation field key registered on the source entity type."
-          }
-        }
-      },
-      "responseSchemaRef": "#/components/schemas/EntityRelationListResponse"
-    },
-    {
-      "name": "attachEntityRelation",
-      "title": "Attach Entity Relation",
-      "description": "Attach a target entity to a source entity via a typed relation field. For cardinality=one fields, replaces the existing target.",
-      "safety": "write",
-      "source": {
-        "type": "openapi",
-        "operationId": "attachEntityRelation",
-        "method": "POST",
-        "path": "/api/v1/entities/{entityId}/relations"
-      },
-      "inputSchema": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": ["entityId", "field_key", "target_entity_id"],
-        "properties": {
-          "entityId": {
-            "type": "integer",
-            "minimum": 1,
-            "description": "Source entity id."
-          },
-          "field_key": {
-            "type": "string",
-            "minLength": 1,
-            "description": "Relation field key on the source entity type."
-          },
-          "target_entity_id": {
-            "type": "integer",
-            "minimum": 1,
-            "description": "Target entity id to link."
-          }
-        }
-      },
-      "responseSchemaRef": null
-    },
-    {
-      "name": "listEntitiesByRelationTarget",
-      "title": "List Entities By Relation Target",
-      "description": "List source entities whose relation field points to a target entity. Pass entity_type_id and one query parameter per relation filter using the form relation_{fieldKey} (e.g. relation_author=5). Multiple relation_{fieldKey} parameters are combined with AND.",
-      "safety": "read",
-      "source": {
-        "type": "openapi",
-        "operationId": "listEntities",
-        "method": "GET",
-        "path": "/api/v1/entities"
-      },
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "entity_type_id": {
-            "type": "integer",
-            "minimum": 1,
-            "description": "Entity type id of records to list."
-          },
-          "limit": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 100,
-            "default": 20
-          },
-          "offset": {
-            "type": "integer",
-            "minimum": 0,
-            "default": 0
-          }
+    "version": 1,
+    "source": "docs/openapi/openapi.yaml",
+    "tools": [
+        {
+            "name": "getHealth",
+            "title": "Health",
+            "description": "Operational health check for the NeNe Records API runtime.",
+            "safety": "read",
+            "source": {
+                "type": "openapi",
+                "operationId": "getHealth",
+                "method": "GET",
+                "path": "/health"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": [],
+                "additionalProperties": false
+            },
+            "responseSchemaRef": "#/components/schemas/HealthResponse"
         },
-        "additionalProperties": {
-          "type": "integer",
-          "minimum": 1,
-          "description": "Relation filter query param. Use key relation_{fieldKey} with the target entity id as value."
+        {
+            "name": "listEntityTypes",
+            "title": "List Entity Types",
+            "description": "List entity type schema definitions with pagination.",
+            "safety": "read",
+            "source": {
+                "type": "openapi",
+                "operationId": "listEntityTypes",
+                "method": "GET",
+                "path": "/api/v1/entity-types"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "limit": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 100,
+                        "default": 20
+                    },
+                    "offset": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "default": 0
+                    }
+                },
+                "additionalProperties": false
+            },
+            "responseSchemaRef": "#/components/schemas/EntityTypeListResponse"
+        },
+        {
+            "name": "createEntityType",
+            "title": "Create Entity Type",
+            "description": "Create a new entity type with a unique slug.",
+            "safety": "write",
+            "source": {
+                "type": "openapi",
+                "operationId": "createEntityType",
+                "method": "POST",
+                "path": "/api/v1/entity-types"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "slug": {
+                        "type": "string",
+                        "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                    }
+                },
+                "required": [
+                    "name",
+                    "slug"
+                ],
+                "additionalProperties": false
+            },
+            "responseSchemaRef": null
+        },
+        {
+            "name": "getEntityTypeById",
+            "title": "Get Entity Type",
+            "description": "Get an entity type by id.",
+            "safety": "read",
+            "source": {
+                "type": "openapi",
+                "operationId": "getEntityTypeById",
+                "method": "GET",
+                "path": "/api/v1/entity-types/{id}"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Resource id."
+                    }
+                },
+                "required": [
+                    "id"
+                ],
+                "additionalProperties": false
+            },
+            "responseSchemaRef": "#/components/schemas/EntityTypeResponse"
+        },
+        {
+            "name": "updateEntityTypeById",
+            "title": "Update Entity Type",
+            "description": "Replace an entity type name and slug.",
+            "safety": "write",
+            "source": {
+                "type": "openapi",
+                "operationId": "updateEntityType",
+                "method": "PUT",
+                "path": "/api/v1/entity-types/{id}"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Resource id."
+                    },
+                    "name": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "slug": {
+                        "type": "string",
+                        "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                    }
+                },
+                "required": [
+                    "id",
+                    "name",
+                    "slug"
+                ],
+                "additionalProperties": false
+            },
+            "responseSchemaRef": "#/components/schemas/EntityTypeResponse"
+        },
+        {
+            "name": "deleteEntityTypeById",
+            "title": "Delete Entity Type",
+            "description": "Permanently delete an entity type.",
+            "safety": "destructive",
+            "source": {
+                "type": "openapi",
+                "operationId": "deleteEntityType",
+                "method": "DELETE",
+                "path": "/api/v1/entity-types/{id}"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Resource id."
+                    }
+                },
+                "required": [
+                    "id"
+                ],
+                "additionalProperties": false
+            },
+            "responseSchemaRef": null
+        },
+        {
+            "name": "listEntities",
+            "title": "List Entities",
+            "description": "List entity records with optional entity_type_id, tag, and relation filters.",
+            "safety": "read",
+            "source": {
+                "type": "openapi",
+                "operationId": "listEntities",
+                "method": "GET",
+                "path": "/api/v1/entities"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "limit": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 100,
+                        "default": 20
+                    },
+                    "offset": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "default": 0
+                    },
+                    "entity_type_id": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Filter by entity type id."
+                    },
+                    "tags": {
+                        "type": "string",
+                        "description": "Comma-separated tag slugs (OR semantics)."
+                    },
+                    "tag": {
+                        "type": "string",
+                        "description": "Alias for a single tag slug or comma-separated slugs."
+                    }
+                },
+                "additionalProperties": true
+            },
+            "responseSchemaRef": "#/components/schemas/EntityListResponse"
+        },
+        {
+            "name": "listEntitiesByTag",
+            "title": "List Entities By Tag",
+            "description": "List entities matching any of the given tag slugs. Alias for listEntities with tags/tag query params.",
+            "safety": "read",
+            "source": {
+                "type": "openapi",
+                "operationId": "listEntities",
+                "method": "GET",
+                "path": "/api/v1/entities"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "limit": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 100,
+                        "default": 20
+                    },
+                    "offset": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "default": 0
+                    },
+                    "entity_type_id": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Optional entity type id filter."
+                    },
+                    "tags": {
+                        "type": "string",
+                        "description": "Comma-separated tag slugs."
+                    }
+                },
+                "additionalProperties": false
+            },
+            "responseSchemaRef": "#/components/schemas/EntityListResponse"
+        },
+        {
+            "name": "listEntitiesByRelationTarget",
+            "title": "List Entities By Relation Target",
+            "description": "List source entities whose relation field points to a target entity. Pass entity_type_id and query params named relation_{fieldKey} (e.g. relation_author=5). Multiple relation filters are ANDed.",
+            "safety": "read",
+            "source": {
+                "type": "openapi",
+                "operationId": "listEntities",
+                "method": "GET",
+                "path": "/api/v1/entities"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "entity_type_id": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Entity type id of records to list."
+                    },
+                    "limit": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 100,
+                        "default": 20
+                    },
+                    "offset": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "default": 0
+                    }
+                },
+                "additionalProperties": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "description": "Relation filter query param. Use key relation_{fieldKey} with the target entity id as value."
+                }
+            },
+            "responseSchemaRef": "#/components/schemas/EntityListResponse"
+        },
+        {
+            "name": "createEntity",
+            "title": "Create Entity",
+            "description": "Create a new entity record for an entity type.",
+            "safety": "write",
+            "source": {
+                "type": "openapi",
+                "operationId": "createEntity",
+                "method": "POST",
+                "path": "/api/v1/entities"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "entity_type_id": {
+                        "type": "integer",
+                        "minimum": 1
+                    }
+                },
+                "required": [
+                    "entity_type_id"
+                ],
+                "additionalProperties": false
+            },
+            "responseSchemaRef": null
+        },
+        {
+            "name": "getEntityById",
+            "title": "Get Entity",
+            "description": "Get an entity record by id.",
+            "safety": "read",
+            "source": {
+                "type": "openapi",
+                "operationId": "getEntityById",
+                "method": "GET",
+                "path": "/api/v1/entities/{id}"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Resource id."
+                    }
+                },
+                "required": [
+                    "id"
+                ],
+                "additionalProperties": false
+            },
+            "responseSchemaRef": "#/components/schemas/EntityResponse"
+        },
+        {
+            "name": "updateEntityById",
+            "title": "Update Entity",
+            "description": "Update an entity record entity type id.",
+            "safety": "write",
+            "source": {
+                "type": "openapi",
+                "operationId": "updateEntity",
+                "method": "PUT",
+                "path": "/api/v1/entities/{id}"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Resource id."
+                    },
+                    "entity_type_id": {
+                        "type": "integer",
+                        "minimum": 1
+                    }
+                },
+                "required": [
+                    "id",
+                    "entity_type_id"
+                ],
+                "additionalProperties": false
+            },
+            "responseSchemaRef": "#/components/schemas/EntityResponse"
+        },
+        {
+            "name": "deleteEntityById",
+            "title": "Delete Entity",
+            "description": "Soft-delete an entity record.",
+            "safety": "destructive",
+            "source": {
+                "type": "openapi",
+                "operationId": "deleteEntity",
+                "method": "DELETE",
+                "path": "/api/v1/entities/{id}"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Resource id."
+                    }
+                },
+                "required": [
+                    "id"
+                ],
+                "additionalProperties": false
+            },
+            "responseSchemaRef": null
+        },
+        {
+            "name": "listEntityTags",
+            "title": "List Entity Tags",
+            "description": "List tags attached to an entity.",
+            "safety": "read",
+            "source": {
+                "type": "openapi",
+                "operationId": "listEntityTags",
+                "method": "GET",
+                "path": "/api/v1/entities/{entityId}/tags"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "entityId": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Entity id."
+                    }
+                },
+                "required": [
+                    "entityId"
+                ],
+                "additionalProperties": false
+            },
+            "responseSchemaRef": "#/components/schemas/EntityTagListResponse"
+        },
+        {
+            "name": "attachEntityTag",
+            "title": "Attach Entity Tag",
+            "description": "Attach a tag to an entity by tag id.",
+            "safety": "write",
+            "source": {
+                "type": "openapi",
+                "operationId": "attachEntityTag",
+                "method": "POST",
+                "path": "/api/v1/entities/{entityId}/tags"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "entityId": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Entity id."
+                    },
+                    "tag_id": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Tag id to attach."
+                    }
+                },
+                "required": [
+                    "entityId",
+                    "tag_id"
+                ],
+                "additionalProperties": false
+            },
+            "responseSchemaRef": null
+        },
+        {
+            "name": "detachEntityTag",
+            "title": "Detach Entity Tag",
+            "description": "Detach a tag from an entity.",
+            "safety": "destructive",
+            "source": {
+                "type": "openapi",
+                "operationId": "detachEntityTag",
+                "method": "DELETE",
+                "path": "/api/v1/entities/{entityId}/tags/{tagId}"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "entityId": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Entity id."
+                    },
+                    "tagId": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Tag id to detach."
+                    }
+                },
+                "required": [
+                    "entityId",
+                    "tagId"
+                ],
+                "additionalProperties": false
+            },
+            "responseSchemaRef": null
+        },
+        {
+            "name": "listEntityRelations",
+            "title": "List Entity Relations",
+            "description": "List relation targets attached to a source entity for a given relation field key.",
+            "safety": "read",
+            "source": {
+                "type": "openapi",
+                "operationId": "listEntityRelations",
+                "method": "GET",
+                "path": "/api/v1/entities/{entityId}/relations"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "entityId": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Source entity id."
+                    },
+                    "field_key": {
+                        "type": "string",
+                        "minLength": 1,
+                        "description": "Relation field key registered on the source entity type."
+                    }
+                },
+                "required": [
+                    "entityId",
+                    "field_key"
+                ],
+                "additionalProperties": false
+            },
+            "responseSchemaRef": "#/components/schemas/EntityRelationListResponse"
+        },
+        {
+            "name": "attachEntityRelation",
+            "title": "Attach Entity Relation",
+            "description": "Attach a target entity to a source entity via a typed relation field. For cardinality=one fields, replaces the existing target.",
+            "safety": "write",
+            "source": {
+                "type": "openapi",
+                "operationId": "attachEntityRelation",
+                "method": "POST",
+                "path": "/api/v1/entities/{entityId}/relations"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "entityId": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Source entity id."
+                    },
+                    "field_key": {
+                        "type": "string",
+                        "minLength": 1,
+                        "description": "Relation field key on the source entity type."
+                    },
+                    "target_entity_id": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Target entity id to link."
+                    }
+                },
+                "required": [
+                    "entityId",
+                    "field_key",
+                    "target_entity_id"
+                ],
+                "additionalProperties": false
+            },
+            "responseSchemaRef": null
+        },
+        {
+            "name": "listFieldDefs",
+            "title": "List Field Definitions",
+            "description": "List registered field definitions, optionally filtered by entity type.",
+            "safety": "read",
+            "source": {
+                "type": "openapi",
+                "operationId": "listFieldDefs",
+                "method": "GET",
+                "path": "/api/v1/field-defs"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "limit": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 100,
+                        "default": 20
+                    },
+                    "offset": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "default": 0
+                    },
+                    "entity_type_id": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Filter by entity type id."
+                    }
+                },
+                "additionalProperties": false
+            },
+            "responseSchemaRef": "#/components/schemas/FieldDefListResponse"
+        },
+        {
+            "name": "createFieldDef",
+            "title": "Create Field Definition",
+            "description": "Register a field key and data type for an entity type.",
+            "safety": "write",
+            "source": {
+                "type": "openapi",
+                "operationId": "createFieldDef",
+                "method": "POST",
+                "path": "/api/v1/field-defs"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "entity_type_id": {
+                        "type": "integer",
+                        "minimum": 1
+                    },
+                    "field_key": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "data_type": {
+                        "type": "string",
+                        "enum": [
+                            "text",
+                            "int",
+                            "enum",
+                            "bool",
+                            "datetime",
+                            "relation"
+                        ]
+                    },
+                    "target_entity_type_id": {
+                        "type": "integer",
+                        "minimum": 1
+                    },
+                    "cardinality": {
+                        "type": "string",
+                        "enum": [
+                            "one",
+                            "many"
+                        ]
+                    }
+                },
+                "required": [
+                    "entity_type_id",
+                    "field_key",
+                    "data_type"
+                ],
+                "additionalProperties": false
+            },
+            "responseSchemaRef": null
+        },
+        {
+            "name": "getFieldDefById",
+            "title": "Get Field Definition",
+            "description": "Get a field definition by id.",
+            "safety": "read",
+            "source": {
+                "type": "openapi",
+                "operationId": "getFieldDefById",
+                "method": "GET",
+                "path": "/api/v1/field-defs/{id}"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Resource id."
+                    }
+                },
+                "required": [
+                    "id"
+                ],
+                "additionalProperties": false
+            },
+            "responseSchemaRef": "#/components/schemas/FieldDefResponse"
+        },
+        {
+            "name": "updateFieldDefById",
+            "title": "Update Field Definition",
+            "description": "Replace a field definition.",
+            "safety": "write",
+            "source": {
+                "type": "openapi",
+                "operationId": "updateFieldDef",
+                "method": "PUT",
+                "path": "/api/v1/field-defs/{id}"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Resource id."
+                    },
+                    "entity_type_id": {
+                        "type": "integer",
+                        "minimum": 1
+                    },
+                    "field_key": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "data_type": {
+                        "type": "string",
+                        "enum": [
+                            "text",
+                            "int",
+                            "enum",
+                            "bool",
+                            "datetime",
+                            "relation"
+                        ]
+                    },
+                    "target_entity_type_id": {
+                        "type": "integer",
+                        "minimum": 1
+                    },
+                    "cardinality": {
+                        "type": "string",
+                        "enum": [
+                            "one",
+                            "many"
+                        ]
+                    }
+                },
+                "required": [
+                    "id",
+                    "entity_type_id",
+                    "field_key",
+                    "data_type"
+                ],
+                "additionalProperties": false
+            },
+            "responseSchemaRef": "#/components/schemas/FieldDefResponse"
+        },
+        {
+            "name": "deleteFieldDefById",
+            "title": "Delete Field Definition",
+            "description": "Soft-delete a field definition.",
+            "safety": "destructive",
+            "source": {
+                "type": "openapi",
+                "operationId": "deleteFieldDef",
+                "method": "DELETE",
+                "path": "/api/v1/field-defs/{id}"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Resource id."
+                    }
+                },
+                "required": [
+                    "id"
+                ],
+                "additionalProperties": false
+            },
+            "responseSchemaRef": null
+        },
+        {
+            "name": "listTags",
+            "title": "List Tags",
+            "description": "List tag definitions with pagination.",
+            "safety": "read",
+            "source": {
+                "type": "openapi",
+                "operationId": "listTags",
+                "method": "GET",
+                "path": "/api/v1/tags"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "limit": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 100,
+                        "default": 20
+                    },
+                    "offset": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "default": 0
+                    }
+                },
+                "additionalProperties": false
+            },
+            "responseSchemaRef": "#/components/schemas/TagListResponse"
+        },
+        {
+            "name": "createTag",
+            "title": "Create Tag",
+            "description": "Create a new tag with a unique slug.",
+            "safety": "write",
+            "source": {
+                "type": "openapi",
+                "operationId": "createTag",
+                "method": "POST",
+                "path": "/api/v1/tags"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "slug": {
+                        "type": "string",
+                        "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                    }
+                },
+                "required": [
+                    "name",
+                    "slug"
+                ],
+                "additionalProperties": false
+            },
+            "responseSchemaRef": null
+        },
+        {
+            "name": "getTagById",
+            "title": "Get Tag",
+            "description": "Get a tag by id.",
+            "safety": "read",
+            "source": {
+                "type": "openapi",
+                "operationId": "getTagById",
+                "method": "GET",
+                "path": "/api/v1/tags/{id}"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Resource id."
+                    }
+                },
+                "required": [
+                    "id"
+                ],
+                "additionalProperties": false
+            },
+            "responseSchemaRef": "#/components/schemas/TagResponse"
+        },
+        {
+            "name": "updateTagById",
+            "title": "Update Tag",
+            "description": "Replace a tag name and slug.",
+            "safety": "write",
+            "source": {
+                "type": "openapi",
+                "operationId": "updateTag",
+                "method": "PUT",
+                "path": "/api/v1/tags/{id}"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Resource id."
+                    },
+                    "name": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "slug": {
+                        "type": "string",
+                        "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                    }
+                },
+                "required": [
+                    "id",
+                    "name",
+                    "slug"
+                ],
+                "additionalProperties": false
+            },
+            "responseSchemaRef": "#/components/schemas/TagResponse"
+        },
+        {
+            "name": "deleteTagById",
+            "title": "Delete Tag",
+            "description": "Permanently delete a tag.",
+            "safety": "destructive",
+            "source": {
+                "type": "openapi",
+                "operationId": "deleteTag",
+                "method": "DELETE",
+                "path": "/api/v1/tags/{id}"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Resource id."
+                    }
+                },
+                "required": [
+                    "id"
+                ],
+                "additionalProperties": false
+            },
+            "responseSchemaRef": null
+        },
+        {
+            "name": "listTextFields",
+            "title": "List Text Fields",
+            "description": "List text field values with optional entity or entity type filters.",
+            "safety": "read",
+            "source": {
+                "type": "openapi",
+                "operationId": "listTextFields",
+                "method": "GET",
+                "path": "/api/v1/text-fields"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "limit": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 100,
+                        "default": 20
+                    },
+                    "offset": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "default": 0
+                    },
+                    "entity_id": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Filter by entity id."
+                    },
+                    "entity_type_id": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Filter by entity type id."
+                    }
+                },
+                "additionalProperties": false
+            },
+            "responseSchemaRef": "#/components/schemas/TextFieldListResponse"
+        },
+        {
+            "name": "createTextField",
+            "title": "Create Text Field",
+            "description": "Create a text field value on an entity.",
+            "safety": "write",
+            "source": {
+                "type": "openapi",
+                "operationId": "createTextField",
+                "method": "POST",
+                "path": "/api/v1/text-fields"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "entity_id": {
+                        "type": "integer",
+                        "minimum": 1
+                    },
+                    "field_key": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "value": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "entity_id",
+                    "field_key",
+                    "value"
+                ],
+                "additionalProperties": false
+            },
+            "responseSchemaRef": null
+        },
+        {
+            "name": "getTextFieldById",
+            "title": "Get Text Field",
+            "description": "Get a text field value by id.",
+            "safety": "read",
+            "source": {
+                "type": "openapi",
+                "operationId": "getTextFieldById",
+                "method": "GET",
+                "path": "/api/v1/text-fields/{id}"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Resource id."
+                    }
+                },
+                "required": [
+                    "id"
+                ],
+                "additionalProperties": false
+            },
+            "responseSchemaRef": "#/components/schemas/TextFieldResponse"
+        },
+        {
+            "name": "updateTextFieldById",
+            "title": "Update Text Field",
+            "description": "Replace a text field value.",
+            "safety": "write",
+            "source": {
+                "type": "openapi",
+                "operationId": "updateTextField",
+                "method": "PUT",
+                "path": "/api/v1/text-fields/{id}"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Resource id."
+                    },
+                    "field_key": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "value": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "id",
+                    "field_key",
+                    "value"
+                ],
+                "additionalProperties": false
+            },
+            "responseSchemaRef": "#/components/schemas/TextFieldResponse"
+        },
+        {
+            "name": "deleteTextFieldById",
+            "title": "Delete Text Field",
+            "description": "Soft-delete a text field value.",
+            "safety": "destructive",
+            "source": {
+                "type": "openapi",
+                "operationId": "deleteTextField",
+                "method": "DELETE",
+                "path": "/api/v1/text-fields/{id}"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Resource id."
+                    }
+                },
+                "required": [
+                    "id"
+                ],
+                "additionalProperties": false
+            },
+            "responseSchemaRef": null
+        },
+        {
+            "name": "listIntFields",
+            "title": "List Int Fields",
+            "description": "List int field values with optional entity or entity type filters.",
+            "safety": "read",
+            "source": {
+                "type": "openapi",
+                "operationId": "listIntFields",
+                "method": "GET",
+                "path": "/api/v1/int-fields"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "limit": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 100,
+                        "default": 20
+                    },
+                    "offset": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "default": 0
+                    },
+                    "entity_id": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Filter by entity id."
+                    },
+                    "entity_type_id": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Filter by entity type id."
+                    }
+                },
+                "additionalProperties": false
+            },
+            "responseSchemaRef": "#/components/schemas/IntFieldListResponse"
+        },
+        {
+            "name": "createIntField",
+            "title": "Create Int Field",
+            "description": "Create a int field value on an entity.",
+            "safety": "write",
+            "source": {
+                "type": "openapi",
+                "operationId": "createIntField",
+                "method": "POST",
+                "path": "/api/v1/int-fields"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "entity_id": {
+                        "type": "integer",
+                        "minimum": 1
+                    },
+                    "field_key": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "value": {
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "entity_id",
+                    "field_key",
+                    "value"
+                ],
+                "additionalProperties": false
+            },
+            "responseSchemaRef": null
+        },
+        {
+            "name": "getIntFieldById",
+            "title": "Get Int Field",
+            "description": "Get a int field value by id.",
+            "safety": "read",
+            "source": {
+                "type": "openapi",
+                "operationId": "getIntFieldById",
+                "method": "GET",
+                "path": "/api/v1/int-fields/{id}"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Resource id."
+                    }
+                },
+                "required": [
+                    "id"
+                ],
+                "additionalProperties": false
+            },
+            "responseSchemaRef": "#/components/schemas/IntFieldResponse"
+        },
+        {
+            "name": "updateIntFieldById",
+            "title": "Update Int Field",
+            "description": "Replace a int field value.",
+            "safety": "write",
+            "source": {
+                "type": "openapi",
+                "operationId": "updateIntField",
+                "method": "PUT",
+                "path": "/api/v1/int-fields/{id}"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Resource id."
+                    },
+                    "field_key": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "value": {
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "id",
+                    "field_key",
+                    "value"
+                ],
+                "additionalProperties": false
+            },
+            "responseSchemaRef": "#/components/schemas/IntFieldResponse"
+        },
+        {
+            "name": "deleteIntFieldById",
+            "title": "Delete Int Field",
+            "description": "Soft-delete a int field value.",
+            "safety": "destructive",
+            "source": {
+                "type": "openapi",
+                "operationId": "deleteIntField",
+                "method": "DELETE",
+                "path": "/api/v1/int-fields/{id}"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Resource id."
+                    }
+                },
+                "required": [
+                    "id"
+                ],
+                "additionalProperties": false
+            },
+            "responseSchemaRef": null
+        },
+        {
+            "name": "listEnumFields",
+            "title": "List Enum Fields",
+            "description": "List enum field values with optional entity or entity type filters.",
+            "safety": "read",
+            "source": {
+                "type": "openapi",
+                "operationId": "listEnumFields",
+                "method": "GET",
+                "path": "/api/v1/enum-fields"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "limit": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 100,
+                        "default": 20
+                    },
+                    "offset": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "default": 0
+                    },
+                    "entity_id": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Filter by entity id."
+                    },
+                    "entity_type_id": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Filter by entity type id."
+                    }
+                },
+                "additionalProperties": false
+            },
+            "responseSchemaRef": "#/components/schemas/EnumFieldListResponse"
+        },
+        {
+            "name": "createEnumField",
+            "title": "Create Enum Field",
+            "description": "Create a enum field value on an entity.",
+            "safety": "write",
+            "source": {
+                "type": "openapi",
+                "operationId": "createEnumField",
+                "method": "POST",
+                "path": "/api/v1/enum-fields"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "entity_id": {
+                        "type": "integer",
+                        "minimum": 1
+                    },
+                    "field_key": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "value": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "entity_id",
+                    "field_key",
+                    "value"
+                ],
+                "additionalProperties": false
+            },
+            "responseSchemaRef": null
+        },
+        {
+            "name": "getEnumFieldById",
+            "title": "Get Enum Field",
+            "description": "Get a enum field value by id.",
+            "safety": "read",
+            "source": {
+                "type": "openapi",
+                "operationId": "getEnumFieldById",
+                "method": "GET",
+                "path": "/api/v1/enum-fields/{id}"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Resource id."
+                    }
+                },
+                "required": [
+                    "id"
+                ],
+                "additionalProperties": false
+            },
+            "responseSchemaRef": "#/components/schemas/EnumFieldResponse"
+        },
+        {
+            "name": "updateEnumFieldById",
+            "title": "Update Enum Field",
+            "description": "Replace a enum field value.",
+            "safety": "write",
+            "source": {
+                "type": "openapi",
+                "operationId": "updateEnumField",
+                "method": "PUT",
+                "path": "/api/v1/enum-fields/{id}"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Resource id."
+                    },
+                    "field_key": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "value": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "id",
+                    "field_key",
+                    "value"
+                ],
+                "additionalProperties": false
+            },
+            "responseSchemaRef": "#/components/schemas/EnumFieldResponse"
+        },
+        {
+            "name": "deleteEnumFieldById",
+            "title": "Delete Enum Field",
+            "description": "Soft-delete a enum field value.",
+            "safety": "destructive",
+            "source": {
+                "type": "openapi",
+                "operationId": "deleteEnumField",
+                "method": "DELETE",
+                "path": "/api/v1/enum-fields/{id}"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Resource id."
+                    }
+                },
+                "required": [
+                    "id"
+                ],
+                "additionalProperties": false
+            },
+            "responseSchemaRef": null
+        },
+        {
+            "name": "listBoolFields",
+            "title": "List Bool Fields",
+            "description": "List bool field values with optional entity or entity type filters.",
+            "safety": "read",
+            "source": {
+                "type": "openapi",
+                "operationId": "listBoolFields",
+                "method": "GET",
+                "path": "/api/v1/bool-fields"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "limit": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 100,
+                        "default": 20
+                    },
+                    "offset": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "default": 0
+                    },
+                    "entity_id": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Filter by entity id."
+                    },
+                    "entity_type_id": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Filter by entity type id."
+                    }
+                },
+                "additionalProperties": false
+            },
+            "responseSchemaRef": "#/components/schemas/BoolFieldListResponse"
+        },
+        {
+            "name": "createBoolField",
+            "title": "Create Bool Field",
+            "description": "Create a bool field value on an entity.",
+            "safety": "write",
+            "source": {
+                "type": "openapi",
+                "operationId": "createBoolField",
+                "method": "POST",
+                "path": "/api/v1/bool-fields"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "entity_id": {
+                        "type": "integer",
+                        "minimum": 1
+                    },
+                    "field_key": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "value": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "entity_id",
+                    "field_key",
+                    "value"
+                ],
+                "additionalProperties": false
+            },
+            "responseSchemaRef": null
+        },
+        {
+            "name": "getBoolFieldById",
+            "title": "Get Bool Field",
+            "description": "Get a bool field value by id.",
+            "safety": "read",
+            "source": {
+                "type": "openapi",
+                "operationId": "getBoolFieldById",
+                "method": "GET",
+                "path": "/api/v1/bool-fields/{id}"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Resource id."
+                    }
+                },
+                "required": [
+                    "id"
+                ],
+                "additionalProperties": false
+            },
+            "responseSchemaRef": "#/components/schemas/BoolFieldResponse"
+        },
+        {
+            "name": "updateBoolFieldById",
+            "title": "Update Bool Field",
+            "description": "Replace a bool field value.",
+            "safety": "write",
+            "source": {
+                "type": "openapi",
+                "operationId": "updateBoolField",
+                "method": "PUT",
+                "path": "/api/v1/bool-fields/{id}"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Resource id."
+                    },
+                    "field_key": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "value": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "id",
+                    "field_key",
+                    "value"
+                ],
+                "additionalProperties": false
+            },
+            "responseSchemaRef": "#/components/schemas/BoolFieldResponse"
+        },
+        {
+            "name": "deleteBoolFieldById",
+            "title": "Delete Bool Field",
+            "description": "Soft-delete a bool field value.",
+            "safety": "destructive",
+            "source": {
+                "type": "openapi",
+                "operationId": "deleteBoolField",
+                "method": "DELETE",
+                "path": "/api/v1/bool-fields/{id}"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Resource id."
+                    }
+                },
+                "required": [
+                    "id"
+                ],
+                "additionalProperties": false
+            },
+            "responseSchemaRef": null
+        },
+        {
+            "name": "listDateTimeFields",
+            "title": "List DateTime Fields",
+            "description": "List datetime field values with optional entity or entity type filters.",
+            "safety": "read",
+            "source": {
+                "type": "openapi",
+                "operationId": "listDateTimeFields",
+                "method": "GET",
+                "path": "/api/v1/datetime-fields"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "limit": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 100,
+                        "default": 20
+                    },
+                    "offset": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "default": 0
+                    },
+                    "entity_id": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Filter by entity id."
+                    },
+                    "entity_type_id": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Filter by entity type id."
+                    }
+                },
+                "additionalProperties": false
+            },
+            "responseSchemaRef": "#/components/schemas/DateTimeFieldListResponse"
+        },
+        {
+            "name": "createDateTimeField",
+            "title": "Create DateTime Field",
+            "description": "Create a datetime field value on an entity.",
+            "safety": "write",
+            "source": {
+                "type": "openapi",
+                "operationId": "createDateTimeField",
+                "method": "POST",
+                "path": "/api/v1/datetime-fields"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "entity_id": {
+                        "type": "integer",
+                        "minimum": 1
+                    },
+                    "field_key": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "value": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "entity_id",
+                    "field_key",
+                    "value"
+                ],
+                "additionalProperties": false
+            },
+            "responseSchemaRef": null
+        },
+        {
+            "name": "getDateTimeFieldById",
+            "title": "Get DateTime Field",
+            "description": "Get a datetime field value by id.",
+            "safety": "read",
+            "source": {
+                "type": "openapi",
+                "operationId": "getDateTimeFieldById",
+                "method": "GET",
+                "path": "/api/v1/datetime-fields/{id}"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Resource id."
+                    }
+                },
+                "required": [
+                    "id"
+                ],
+                "additionalProperties": false
+            },
+            "responseSchemaRef": "#/components/schemas/DateTimeFieldResponse"
+        },
+        {
+            "name": "updateDateTimeFieldById",
+            "title": "Update DateTime Field",
+            "description": "Replace a datetime field value.",
+            "safety": "write",
+            "source": {
+                "type": "openapi",
+                "operationId": "updateDateTimeField",
+                "method": "PUT",
+                "path": "/api/v1/datetime-fields/{id}"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Resource id."
+                    },
+                    "field_key": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "value": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "id",
+                    "field_key",
+                    "value"
+                ],
+                "additionalProperties": false
+            },
+            "responseSchemaRef": "#/components/schemas/DateTimeFieldResponse"
+        },
+        {
+            "name": "deleteDateTimeFieldById",
+            "title": "Delete DateTime Field",
+            "description": "Soft-delete a datetime field value.",
+            "safety": "destructive",
+            "source": {
+                "type": "openapi",
+                "operationId": "deleteDateTimeField",
+                "method": "DELETE",
+                "path": "/api/v1/datetime-fields/{id}"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "description": "Resource id."
+                    }
+                },
+                "required": [
+                    "id"
+                ],
+                "additionalProperties": false
+            },
+            "responseSchemaRef": null
         }
-      },
-      "responseSchemaRef": "#/components/schemas/EntityListResponse"
-    }
-  ]
+    ]
 }
