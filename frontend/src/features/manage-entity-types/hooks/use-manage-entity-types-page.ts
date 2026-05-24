@@ -47,13 +47,18 @@ export function useManageEntityTypesPage() {
     [editTarget, updateMutation],
   )
 
-  const requestDelete = useCallback((entityType: EntityType) => {
-    setDeleteTarget(entityType)
-  }, [])
+  const requestDelete = useCallback(
+    (entityType: EntityType) => {
+      deleteMutation.reset()
+      setDeleteTarget(entityType)
+    },
+    [deleteMutation],
+  )
 
   const cancelDelete = useCallback(() => {
+    deleteMutation.reset()
     setDeleteTarget(null)
-  }, [])
+  }, [deleteMutation])
 
   const confirmDelete = useCallback(async () => {
     if (deleteTarget === null) {
