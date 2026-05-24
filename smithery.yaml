@@ -1,0 +1,57 @@
+# NeNe Records — Smithery MCP configuration
+# https://smithery.ai/docs/build/project-config/smithery.yaml
+#
+# NeNe Records exposes 60+ MCP tools that cover the full API surface:
+# entity types, entities, field definitions, typed field values,
+# tags, entity relations, site settings, analytics, auth, and public records.
+#
+# Prerequisites:
+#   1. git clone https://github.com/hideyukiMORI/nene-records.git
+#   2. cd nene-records && cp .env.example .env
+#   3. docker compose up -d app
+#   4. Set NENE2_LOCAL_JWT_SECRET in .env to enable write tools and Bearer auth.
+
+startCommand:
+  type: stdio
+  configSchema:
+    type: object
+    properties:
+      apiBaseUrl:
+        type: string
+        description: >
+          Base URL of the running NeNe Records application.
+          Use "http://app" when the app is running via "docker compose up -d app"
+          (the MCP server container shares the same Docker network).
+          Use "http://host.docker.internal:8080" if the app is running directly on the host.
+        default: http://app
+      jwtSecret:
+        type: string
+        description: >
+          Value of NENE2_LOCAL_JWT_SECRET in your .env file.
+          Required to enable write tools and Bearer-authenticated Admin endpoints.
+      machineApiKey:
+        type: string
+        description: >
+          Value of NENE2_MACHINE_API_KEY in your .env file.
+          Required to access machine-client endpoints.
+    required: []
+  commandFunction: |-
+    (config) => {
+      const apiBaseUrl = config.apiBaseUrl || 'http://app';
+      const args = [
+        'compose', 'run', '--rm', '-T',
+        '-e', 'NENE2_LOCAL_API_BASE_URL=' + apiBaseUrl,
+      ];
+
+      if (config.jwtSecret) {
+        args.push('-e', 'NENE2_LOCAL_JWT_SECRET=' + config.jwtSecret);
+      }
+
+      if (config.machineApiKey) {
+        args.push('-e', 'NENE2_MACHINE_API_KEY=' + config.machineApiKey);
+      }
+
+      args.push('app', 'php', 'vendor/hideyukimori/nene2/tools/local-mcp-server.php');
+
+      return { command: 'docker', args };
+    }
