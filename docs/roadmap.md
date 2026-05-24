@@ -78,6 +78,20 @@ Goal: replaceable public presentation patterns.
 - list/detail view templates or SPA shells
 - API-only consumer examples
 
+Tracked: Issues #38, #63, #72, #75 — public bootstrap, `/view`, site settings (#80).
+
+## Phase 7: CMS Hardening (Mid-Term)
+
+Goal: operate as a small headless CMS — auth, publish workflow, media, SEO, revisions.
+
+Policy: same API-first boundary; no WordPress compatibility.
+
+- **M1 Usable Blog CMS:** Markdown consumer (#78), publish status, users/auth, public slugs
+- **M2 Team-Ready:** roles, entity revisions, image/file upload, navigation, per-record SEO
+- **M3 Platform:** full-text search, scheduled publish, webhooks, import/export
+
+Tracked by `docs/milestones/2026-06-cms-mid-term.md` (Issue #82).
+
 ## Non-Goals
 
 - Rebuilding Laravel/Symfony-style full-stack framework features in this repo
