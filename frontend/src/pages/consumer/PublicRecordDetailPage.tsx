@@ -13,16 +13,16 @@ function PublicRecordDetailContent({
   entityTypeName,
   entityTypeId,
   entityId,
+  entityTypeSlugById,
 }: {
   entityTypeSlug: string
   entityTypeName: string
   entityTypeId: number
   entityId: number
+  entityTypeSlugById: Record<number, string>
 }) {
-  const { entity, fields, isLoading, isError, errorTitle, refetch } = usePublicViewEntityRecordPage(
-    entityTypeId,
-    entityId,
-  )
+  const { entity, fieldRows, isLoading, isError, errorTitle, refetch } =
+    usePublicViewEntityRecordPage(entityTypeId, entityId)
 
   return (
     <Stack gap="md">
@@ -38,7 +38,8 @@ function PublicRecordDetailContent({
       </Stack>
       <PublicRecordDetailView
         entity={entity}
-        fields={fields}
+        fieldRows={fieldRows}
+        entityTypeSlugById={entityTypeSlugById}
         isLoading={isLoading}
         isError={isError}
         errorTitle={errorTitle}
@@ -58,6 +59,13 @@ export function PublicRecordDetailPage() {
   const entityType = useMemo(
     () => findEntityTypeBySlug(entityTypeQuery.data?.items ?? [], entityTypeSlug),
     [entityTypeQuery.data?.items, entityTypeSlug],
+  )
+  const entityTypeSlugById = useMemo(
+    (): Record<number, string> =>
+      Object.fromEntries(
+        (entityTypeQuery.data?.items ?? []).map((item) => [Number(item.id), item.slug]),
+      ),
+    [entityTypeQuery.data?.items],
   )
 
   if (entityTypeQuery.isLoading) {
@@ -79,6 +87,7 @@ export function PublicRecordDetailPage() {
       entityTypeName={entityType.name}
       entityTypeId={Number(entityType.id)}
       entityId={entityId}
+      entityTypeSlugById={entityTypeSlugById}
     />
   )
 }
