@@ -50,6 +50,7 @@ final class PdoEntityRepositoryTest extends TestCase
             $projectRoot . '/database/schema/entities.sql',
             $projectRoot . '/database/schema/tags.sql',
             $projectRoot . '/database/schema/entity_tags.sql',
+            $projectRoot . '/database/schema/entity_relations.sql',
             $projectRoot . '/database/schema/text_fields.sql',
         ];
 
@@ -210,5 +211,43 @@ final class PdoEntityRepositoryTest extends TestCase
 
         self::assertCount(2, $list);
         self::assertSame(2, $repository->countByCriteria($criteria));
+    }
+
+    public function testFindByCriteriaFiltersByRelationFieldWithAndSemantics(): void
+    {
+        $typeId = $this->insertEntityTypeId();
+
+        $repository = new PdoEntityRepository($this->executor);
+        $entityA = $repository->save(new Entity(id: null, entityTypeId: $typeId));
+        $entityB = $repository->save(new Entity(id: null, entityTypeId: $typeId));
+        $repository->save(new Entity(id: null, entityTypeId: $typeId));
+        $targetAuthor = $repository->save(new Entity(id: null, entityTypeId: $typeId));
+        $targetCategory = $repository->save(new Entity(id: null, entityTypeId: $typeId));
+
+        $this->executor->execute(
+            'INSERT INTO entity_relations (source_entity_id, target_entity_id, field_key) VALUES (?, ?, ?)',
+            [$entityA, $targetAuthor, 'author'],
+        );
+        $this->executor->execute(
+            'INSERT INTO entity_relations (source_entity_id, target_entity_id, field_key) VALUES (?, ?, ?)',
+            [$entityA, $targetCategory, 'category'],
+        );
+        $this->executor->execute(
+            'INSERT INTO entity_relations (source_entity_id, target_entity_id, field_key) VALUES (?, ?, ?)',
+            [$entityB, $targetAuthor, 'author'],
+        );
+
+        $singleFilter = new EntityListCriteria(relationFilters: ['author' => $targetAuthor]);
+        $singleList = $repository->findByCriteria($singleFilter, 10, 0);
+
+        self::assertCount(2, $singleList);
+        self::assertSame(2, $repository->countByCriteria($singleFilter));
+
+        $andFilter = new EntityListCriteria(relationFilters: ['author' => $targetAuthor, 'category' => $targetCategory]);
+        $andList = $repository->findByCriteria($andFilter, 10, 0);
+
+        self::assertCount(1, $andList);
+        self::assertSame($entityA, $andList[0]->id);
+        self::assertSame(1, $repository->countByCriteria($andFilter));
     }
 }

@@ -203,7 +203,7 @@ paths:
       tags:
         - Entities
       summary: List entities
-      description: Returns non-deleted entities, optionally filtered by entity type and tags.
+      description: Returns non-deleted entities, optionally filtered by entity type, tags, and relation fields.
       operationId: listEntities
       parameters:
         - $ref: '#/components/parameters/LimitQuery'
@@ -211,6 +211,7 @@ paths:
         - $ref: '#/components/parameters/EntityTypeIdQuery'
         - $ref: '#/components/parameters/TagsQuery'
         - $ref: '#/components/parameters/TagQuery'
+        - $ref: '#/components/parameters/RelationFilterQuery'
       responses:
         '200':
           description: Paginated entity list.
@@ -1651,6 +1652,19 @@ components:
       schema:
         type: string
       example: featured
+    RelationFilterQuery:
+      name: relation.{field_key}
+      in: query
+      required: false
+      description: |
+        Filter entities linked via a relation field. Use one query parameter per field key,
+        for example `relation.author=5`. Multiple relation filters are combined with AND.
+        PHP query parsing may expose these keys as `relation_{field_key}` in the parameter array.
+      schema:
+        type: integer
+        format: int64
+        minimum: 1
+      example: 5
     EntityIdPath:
       name: entityId
       in: path
