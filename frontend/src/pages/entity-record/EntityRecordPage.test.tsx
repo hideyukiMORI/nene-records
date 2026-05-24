@@ -11,7 +11,7 @@ import { resetEnumFieldStore } from '@tests/msw/handlers/enum-field'
 import { resetFieldDefStore, seedFieldDefs } from '@tests/msw/handlers/field-def'
 import { resetIntFieldStore } from '@tests/msw/handlers/int-field'
 import { resetTextFieldStore, seedTextFields } from '@tests/msw/handlers/text-field'
-import { resetEntityRelationStore } from '@tests/msw/handlers/entity-relation'
+import { resetEntityRelationStore, seedEntityRelations } from '@tests/msw/handlers/entity-relation'
 import { resetEntityTagStore } from '@tests/msw/handlers/entity-tag'
 import { resetTagStore, seedTags } from '@tests/msw/handlers/tag'
 import { mswServer } from '@tests/msw/server'
@@ -317,5 +317,48 @@ describe('EntityRecordPage', () => {
       expect(screen.getByText('Bob')).toBeInTheDocument()
       expect(screen.getByText('#3')).toBeInTheDocument()
     })
+  })
+
+  it('shows source records that reference this target via inverse relations', async () => {
+    seedEntityTypes([
+      { id: 1, name: 'Article', slug: 'article' },
+      { id: 2, name: 'Author', slug: 'author' },
+    ])
+    seedFieldDefs([
+      {
+        id: 1,
+        entity_type_id: 1,
+        field_key: 'author',
+        data_type: 'relation',
+        target_entity_type_id: 2,
+        cardinality: 'one',
+      },
+    ])
+    seedEntities([
+      { id: 1, entity_type_id: 1, is_deleted: false, deleted_at: null },
+      { id: 2, entity_type_id: 2, is_deleted: false, deleted_at: null },
+      { id: 3, entity_type_id: 1, is_deleted: false, deleted_at: null },
+      { id: 4, entity_type_id: 2, is_deleted: false, deleted_at: null },
+    ])
+    seedEntityRelations([
+      { source_entity_id: 1, target_entity_id: 2, field_key: 'author' },
+      { source_entity_id: 3, target_entity_id: 4, field_key: 'author' },
+    ])
+    seedTextFields([
+      { id: 1, entity_id: 1, field_key: 'title', value: 'My article' },
+      { id: 2, entity_id: 2, field_key: 'title', value: 'Alice' },
+      { id: 3, entity_id: 3, field_key: 'title', value: 'Other article' },
+    ])
+
+    renderEntityRecordPage(2, 2)
+
+    expect(await screen.findByRole('heading', { name: 'Referenced by' })).toBeInTheDocument()
+    expect(await screen.findByText('Article · author')).toBeInTheDocument()
+    expect(await screen.findByText('My article')).toBeInTheDocument()
+    expect(screen.queryByText('Other article')).not.toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Open' })).toHaveAttribute(
+      'href',
+      '/entity-types/1/entities/1',
+    )
   })
 })

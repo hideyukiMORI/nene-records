@@ -17,8 +17,10 @@ export function useFieldDefList(
       const search = new URLSearchParams({
         limit: String(params.limit),
         offset: String(params.offset),
-        entity_type_id: String(params.entityTypeId),
       })
+      if (params.entityTypeId !== undefined) {
+        search.set('entity_type_id', String(params.entityTypeId))
+      }
       const dto = await apiClient.get<FieldDefListDto>(
         `/api/v1/field-defs?${search.toString()}`,
         signal,
@@ -42,5 +44,14 @@ export function defaultFieldDefListParams(entityTypeId: number): FieldDefListPar
   return {
     entityTypeId,
     ...DEFAULT_LIST_PARAMS,
+  }
+}
+
+export function allFieldDefListParams(
+  params: { limit?: number; offset?: number } = {},
+): FieldDefListParams {
+  return {
+    limit: params.limit ?? 100,
+    offset: params.offset ?? 0,
   }
 }

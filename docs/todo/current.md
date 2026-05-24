@@ -6,13 +6,13 @@ Last updated: 2026-05-24
 
 | Issue | Summary |
 | --- | --- |
-| — | inverse relation UI / Consumer view relation links |
+| — | Consumer view relation links |
 
 ## In Progress
 
 | Issue | Summary |
 | --- | --- |
-| — | （なし） |
+| #61 | Record 詳細 inverse relation 参照元一覧 UI |
 
 ## Recently Completed
 
