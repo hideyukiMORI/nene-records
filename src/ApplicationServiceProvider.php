@@ -16,8 +16,12 @@ use NeNeRecords\EntityType\EntityTypeSlugConflictExceptionHandler;
 use NeNeRecords\FieldDef\FieldDefConflictExceptionHandler;
 use NeNeRecords\FieldDef\FieldDefNotFoundExceptionHandler;
 use NeNeRecords\FieldDef\FieldDefServiceProvider;
-use NeNeRecords\TextField\FieldKeyNotRegisteredExceptionHandler;
-use NeNeRecords\TextField\FieldTypeMismatchExceptionHandler;
+use NeNeRecords\IntField\FieldKeyNotRegisteredExceptionHandler as IntFieldKeyNotRegisteredExceptionHandler;
+use NeNeRecords\IntField\FieldTypeMismatchExceptionHandler as IntFieldTypeMismatchExceptionHandler;
+use NeNeRecords\IntField\IntFieldNotFoundExceptionHandler;
+use NeNeRecords\IntField\IntFieldServiceProvider;
+use NeNeRecords\TextField\FieldKeyNotRegisteredExceptionHandler as TextFieldKeyNotRegisteredExceptionHandler;
+use NeNeRecords\TextField\FieldTypeMismatchExceptionHandler as TextFieldTypeMismatchExceptionHandler;
 use NeNeRecords\TextField\TextFieldNotFoundExceptionHandler;
 use NeNeRecords\TextField\TextFieldServiceProvider;
 use Psr\Container\ContainerInterface;
@@ -34,7 +38,8 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
             ->addProvider(new EntityTypeServiceProvider())
             ->addProvider(new FieldDefServiceProvider())
             ->addProvider(new EntityServiceProvider())
-            ->addProvider(new TextFieldServiceProvider());
+            ->addProvider(new TextFieldServiceProvider())
+            ->addProvider(new IntFieldServiceProvider());
 
         $builder
             ->set(
@@ -44,17 +49,19 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $fieldDef = $container->get('nene-records.route_registrar.field_def');
                     $entity = $container->get('nene-records.route_registrar.entity');
                     $textField = $container->get('nene-records.route_registrar.text_field');
+                    $intField = $container->get('nene-records.route_registrar.int_field');
 
                     if (
                         !is_callable($entityType)
                         || !is_callable($fieldDef)
                         || !is_callable($entity)
                         || !is_callable($textField)
+                        || !is_callable($intField)
                     ) {
                         throw new LogicException('Route registrar service is invalid.');
                     }
 
-                    return [$entityType, $fieldDef, $entity, $textField];
+                    return [$entityType, $fieldDef, $entity, $textField, $intField];
                 },
             )
             ->set(
@@ -66,8 +73,11 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $fieldDefConflict = $container->get(FieldDefConflictExceptionHandler::class);
                     $entityNotFound = $container->get(EntityNotFoundExceptionHandler::class);
                     $textFieldNotFound = $container->get(TextFieldNotFoundExceptionHandler::class);
-                    $fieldKeyNotRegistered = $container->get(FieldKeyNotRegisteredExceptionHandler::class);
-                    $fieldTypeMismatch = $container->get(FieldTypeMismatchExceptionHandler::class);
+                    $textFieldKeyNotRegistered = $container->get(TextFieldKeyNotRegisteredExceptionHandler::class);
+                    $textFieldTypeMismatch = $container->get(TextFieldTypeMismatchExceptionHandler::class);
+                    $intFieldNotFound = $container->get(IntFieldNotFoundExceptionHandler::class);
+                    $intFieldKeyNotRegistered = $container->get(IntFieldKeyNotRegisteredExceptionHandler::class);
+                    $intFieldTypeMismatch = $container->get(IntFieldTypeMismatchExceptionHandler::class);
 
                     foreach ([
                         $entityTypeNotFound,
@@ -76,8 +86,11 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $fieldDefConflict,
                         $entityNotFound,
                         $textFieldNotFound,
-                        $fieldKeyNotRegistered,
-                        $fieldTypeMismatch,
+                        $textFieldKeyNotRegistered,
+                        $textFieldTypeMismatch,
+                        $intFieldNotFound,
+                        $intFieldKeyNotRegistered,
+                        $intFieldTypeMismatch,
                     ] as $handler) {
                         if (!$handler instanceof DomainExceptionHandlerInterface) {
                             throw new LogicException('Exception handler service is invalid.');
@@ -91,8 +104,11 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $fieldDefConflict,
                         $entityNotFound,
                         $textFieldNotFound,
-                        $fieldKeyNotRegistered,
-                        $fieldTypeMismatch,
+                        $textFieldKeyNotRegistered,
+                        $textFieldTypeMismatch,
+                        $intFieldNotFound,
+                        $intFieldKeyNotRegistered,
+                        $intFieldTypeMismatch,
                     ];
                 },
             );

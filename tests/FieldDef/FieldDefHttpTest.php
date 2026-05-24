@@ -127,6 +127,45 @@ final class FieldDefHttpTest extends TestCase
         self::assertStringEndsWith('not-found', (string) $payload['type']);
     }
 
+    public function testPostFieldDefWithIntDataTypeCreatesDefinition(): void
+    {
+        $typeId = $this->entityTypes->save(new EntityType(name: 'Article', slug: 'article'));
+
+        $body = $this->factory->createStream(json_encode([
+            'entity_type_id' => $typeId,
+            'field_key' => 'count',
+            'data_type' => 'int',
+        ], JSON_THROW_ON_ERROR));
+
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('POST', 'https://example.test/api/v1/field-defs')->withBody($body),
+        );
+        $payload = $this->decodeJson($response);
+
+        self::assertSame(201, $response->getStatusCode());
+        self::assertSame('count', $payload['field_key']);
+        self::assertSame('int', $payload['data_type']);
+    }
+
+    public function testPostInvalidDataTypeReturns422(): void
+    {
+        $typeId = $this->entityTypes->save(new EntityType(name: 'Article', slug: 'article'));
+
+        $body = $this->factory->createStream(json_encode([
+            'entity_type_id' => $typeId,
+            'field_key' => 'score',
+            'data_type' => 'float',
+        ], JSON_THROW_ON_ERROR));
+
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('POST', 'https://example.test/api/v1/field-defs')->withBody($body),
+        );
+        $payload = $this->decodeJson($response);
+
+        self::assertSame(422, $response->getStatusCode());
+        self::assertStringEndsWith('validation-failed', (string) $payload['type']);
+    }
+
     public function testGetFieldDefByIdReturnsDefinition(): void
     {
         $typeId = $this->entityTypes->save(new EntityType(name: 'Article', slug: 'article'));

@@ -12,29 +12,29 @@ New contributors and AI agents: read [`handoff-2026-05-24-workspace-switch.md`](
 
 | Issue | Branch | Summary |
 | --- | --- | --- |
-| #9 | `feat/9-field-defs-registry` | Phase 2: `field_defs` schema registry API |
+| #11 | `feat/11-int-fields` | Phase 2: `int_fields` CRUD + `data_type=int` |
 
 ## Up Next
 
 | Issue | Summary |
 | --- | --- |
-| — | Phase 2 follow-up: int / enum / bool / datetime field types |
+| — | Phase 2: enum / bool / datetime field types |
 
 ## Recently Completed
 
 | Issue | Summary |
 | --- | --- |
+| #9 | field_defs schema registry (merged PR #10, ADR 0002) |
 | #1 | MVP entity CRUD vertical slice (merged PR #8) |
 | #6 | Frontend/backend coding standards (merged PR #7) |
 | #4 | Workspace handoff + product vision (merged PR #5) |
 | #2 | NENE2 governance inheritance (merged PR #3) |
-| — | Repository bootstrap (`README`, MIT license) |
 
 ## Handoff Notes
 
-- **Phase 1 complete.** `composer check`, `composer openapi` available.
-- Phase 2 starts with ADR 0002 + `field_defs` registry (Issue #9).
-- Framework reference: `hideyukimori/nene2` via Composer path `../NENE2`; see `docs/inheritance-from-nene2.md`.
+- Phase 1 complete. Phase 2 in progress — registry (#9) done; typed field tables expanding.
+- ADR 0002: `docs/adr/0002-entity-model-and-field-defs.md`
+- Framework: `hideyukimori/nene2` via Composer path `../NENE2`
 
 ## Verification Commands
 
