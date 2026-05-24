@@ -12,12 +12,13 @@ Last updated: 2026-05-24
 
 | Issue | Summary |
 | --- | --- |
-| #72 | Consumer Views Phase 6 強化 |
+| — | （なし） |
 
 ## Recently Completed
 
 | Issue | Summary |
 | --- | --- |
+| #72 | Consumer Views Phase 6 強化 (PR #73) |
 | #69 | Analytics / access log API (PR #70) |
 | #67 | 全 API MCP カタログ 53 ツール (PR #68) |
 | #65 | MCP relation tools カタログ (PR #66) |
@@ -39,12 +40,13 @@ Last updated: 2026-05-24
 - **API（済）:** tags CRUD, entity_tags, entities `?tags=` フィルタ
 - **Admin UI（済）:** Tag CRUD (#44), Record tag attach/detach (#46), Records 一覧 tag フィルタ (#48)
 - **Relations（済）:** Phase 3 一式 + MCP #65/#67
-- **Phase 5（一部済）:** MCP 全 API カタログ（54 tools, `composer mcp:generate`）、Analytics / access log (#69)
+- **Phase 5（一部済）:** MCP 全 API カタログ（54 tools）、Analytics / access log (#69)
 - **Phase 5 残:** detachEntityRelation MCP（upstream 待ち）
+- **Phase 6（一部済）:** Consumer Views #38/#63/#72 — `/view` index, pagination, consumer theme, API 例
 
 ## Verification
 
 ```bash
 composer check                    # 154 tests + openapi + mcp
-npm run check --prefix frontend   # 65 tests
+npm run check --prefix frontend   # 68 tests
 ```
