@@ -8,9 +8,13 @@ import { entityKeys, type EntityListParams } from './query-keys'
 
 const DEFAULT_LIST_PARAMS = { limit: 20, offset: 0 } as const
 
-export function useEntityList(params: EntityListParams): UseQueryResult<EntityList, AppError> {
+export function useEntityList(
+  params: EntityListParams,
+  options?: { enabled?: boolean },
+): UseQueryResult<EntityList, AppError> {
   return useQuery({
     queryKey: entityKeys.list(params),
+    enabled: options?.enabled ?? true,
     queryFn: async ({ signal }) => {
       const search = new URLSearchParams({
         limit: String(params.limit),

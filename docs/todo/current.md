@@ -8,7 +8,12 @@ Last updated: 2026-05-24
 | --- | --- |
 | TBD | Records 一覧ラベル取得の API 最適化（entity_type 単位 batch 等） |
 | TBD | field_def 編集（PUT） |
-| TBD | Consumer views / public site |
+
+## In Progress
+
+| Issue | Summary |
+| --- | --- |
+| #38 | Consumer views — `/view/:slug` 一覧・詳細、PublicShell、MSW テスト |
 
 ## Recently Completed
 
