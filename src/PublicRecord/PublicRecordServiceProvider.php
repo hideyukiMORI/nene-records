@@ -21,6 +21,7 @@ use NeNeRecords\EnumField\EnumFieldRepositoryInterface;
 use NeNeRecords\FieldDef\FieldDefRepositoryInterface;
 use NeNeRecords\Http\RuntimeServiceProvider;
 use NeNeRecords\IntField\IntFieldRepositoryInterface;
+use NeNeRecords\Setting\ListPublicSettingsUseCaseInterface;
 use NeNeRecords\TextField\TextFieldRepositoryInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -77,6 +78,7 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
                     $boolFields = $container->get(BoolFieldRepositoryInterface::class);
                     $dateTimeFields = $container->get(DateTimeFieldRepositoryInterface::class);
                     $entityRelations = $container->get(EntityRelationRepositoryInterface::class);
+                    $publicSettings = $container->get(ListPublicSettingsUseCaseInterface::class);
 
                     if (!$entityTypes instanceof EntityTypeRepositoryInterface) {
                         throw new LogicException('Entity type repository service is invalid.');
@@ -114,6 +116,10 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
                         throw new LogicException('Entity relation repository service is invalid.');
                     }
 
+                    if (!$publicSettings instanceof ListPublicSettingsUseCaseInterface) {
+                        throw new LogicException('ListPublicSettings use case service is invalid.');
+                    }
+
                     return new GetPublicRecordViewUseCase(
                         $entityTypes,
                         $entities,
@@ -124,6 +130,7 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
                         $boolFields,
                         $dateTimeFields,
                         $entityRelations,
+                        $publicSettings,
                     );
                 },
             )
@@ -148,11 +155,16 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
                 RenderPublicRecordViewHandler::class,
                 static function (ContainerInterface $container): RenderPublicRecordViewHandler {
                     $useCase = $container->get(GetPublicRecordViewUseCaseInterface::class);
+                    $publicSettings = $container->get(ListPublicSettingsUseCaseInterface::class);
                     $html = $container->get(HtmlResponseFactory::class);
                     $config = $container->get(AppConfig::class);
 
                     if (!$useCase instanceof GetPublicRecordViewUseCaseInterface) {
                         throw new LogicException('GetPublicRecordView use case service is invalid.');
+                    }
+
+                    if (!$publicSettings instanceof ListPublicSettingsUseCaseInterface) {
+                        throw new LogicException('ListPublicSettings use case service is invalid.');
                     }
 
                     if (!$html instanceof HtmlResponseFactory) {
@@ -163,7 +175,7 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
                         throw new LogicException('Application config service is invalid.');
                     }
 
-                    return new RenderPublicRecordViewHandler($useCase, $html, $config);
+                    return new RenderPublicRecordViewHandler($useCase, $publicSettings, $html, $config);
                 },
             )
             ->set(

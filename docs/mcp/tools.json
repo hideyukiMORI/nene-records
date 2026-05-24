@@ -992,6 +992,109 @@
             "responseSchemaRef": null
         },
         {
+            "name": "listSettings",
+            "title": "List Settings",
+            "description": "List all site settings with effective values for admin use.",
+            "safety": "read",
+            "source": {
+                "type": "openapi",
+                "operationId": "listSettings",
+                "method": "GET",
+                "path": "/api/v1/settings"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": [],
+                "additionalProperties": false
+            },
+            "responseSchemaRef": "#/components/schemas/SettingListResponse"
+        },
+        {
+            "name": "listPublicSettings",
+            "title": "List Public Settings",
+            "description": "List public site settings for consumer pages.",
+            "safety": "read",
+            "source": {
+                "type": "openapi",
+                "operationId": "listPublicSettings",
+                "method": "GET",
+                "path": "/api/v1/public/settings"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": [],
+                "additionalProperties": false
+            },
+            "responseSchemaRef": "#/components/schemas/PublicSettingListResponse"
+        },
+        {
+            "name": "updateSettingByKey",
+            "title": "Update Setting",
+            "description": "Update a site setting value by key.",
+            "safety": "write",
+            "source": {
+                "type": "openapi",
+                "operationId": "updateSettingByKey",
+                "method": "PUT",
+                "path": "/api/v1/settings/{key}"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "pattern": "^[a-z][a-z0-9_]*$",
+                        "description": "Setting key."
+                    },
+                    "value": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "key",
+                    "value"
+                ],
+                "additionalProperties": false
+            },
+            "responseSchemaRef": "#/components/schemas/SettingValueResponse"
+        },
+        {
+            "name": "listSettingRevisions",
+            "title": "List Setting Revisions",
+            "description": "List paginated revision history for a setting key.",
+            "safety": "read",
+            "source": {
+                "type": "openapi",
+                "operationId": "listSettingRevisions",
+                "method": "GET",
+                "path": "/api/v1/settings/{key}/revisions"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "pattern": "^[a-z][a-z0-9_]*$",
+                        "description": "Setting key."
+                    },
+                    "limit": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 100
+                    },
+                    "offset": {
+                        "type": "integer",
+                        "minimum": 0
+                    }
+                },
+                "required": [
+                    "key"
+                ],
+                "additionalProperties": false
+            },
+            "responseSchemaRef": "#/components/schemas/SettingRevisionListResponse"
+        },
+        {
             "name": "listTextFields",
             "title": "List Text Fields",
             "description": "List text field values with optional entity or entity type filters.",

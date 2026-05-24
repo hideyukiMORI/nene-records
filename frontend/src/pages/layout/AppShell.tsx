@@ -26,6 +26,9 @@ export function AppShell() {
               <NavLink to="/tags" className={navLinkClass}>
                 Tags
               </NavLink>
+              <NavLink to="/settings" className={navLinkClass}>
+                Settings
+              </NavLink>
               <NavLink to="/view" className={navLinkClass}>
                 Public site
               </NavLink>

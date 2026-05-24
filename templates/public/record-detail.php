@@ -3,7 +3,10 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><?= $e($pageTitle) ?> — <?= $e($entityTypeName) ?></title>
+    <?php if ($metaDescription !== ''): ?>
+      <meta name="description" content="<?= $e($metaDescription) ?>" />
+    <?php endif; ?>
+    <title><?= $e($pageTitle) ?> — <?= $e($siteName) ?></title>
     <?php if ($includeViteClient): ?>
       <script type="module" src="<?= $e($viteUrl) ?>/@vite/client"></script>
     <?php endif; ?>

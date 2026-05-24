@@ -624,6 +624,63 @@ $tools = [
         ['id'],
         'Permanently delete a tag.',
     ),
+    readTool(
+        'listSettings',
+        'List Settings',
+        'List all site settings with effective values for admin use.',
+        'listSettings',
+        'GET',
+        '/api/v1/settings',
+        [],
+        '#/components/schemas/SettingListResponse',
+    ),
+    readTool(
+        'listPublicSettings',
+        'List Public Settings',
+        'List public site settings for consumer pages.',
+        'listPublicSettings',
+        'GET',
+        '/api/v1/public/settings',
+        [],
+        '#/components/schemas/PublicSettingListResponse',
+    ),
+    readTool(
+        'updateSettingByKey',
+        'Update Setting',
+        'Update a site setting value by key.',
+        'updateSettingByKey',
+        'PUT',
+        '/api/v1/settings/{key}',
+        [
+            'key' => [
+                'type' => 'string',
+                'pattern' => '^[a-z][a-z0-9_]*$',
+                'description' => 'Setting key.',
+            ],
+            'value' => ['type' => 'string'],
+        ],
+        '#/components/schemas/SettingValueResponse',
+        ['key', 'value'],
+    ),
+    readTool(
+        'listSettingRevisions',
+        'List Setting Revisions',
+        'List paginated revision history for a setting key.',
+        'listSettingRevisions',
+        'GET',
+        '/api/v1/settings/{key}/revisions',
+        [
+            'key' => [
+                'type' => 'string',
+                'pattern' => '^[a-z][a-z0-9_]*$',
+                'description' => 'Setting key.',
+            ],
+            'limit' => ['type' => 'integer', 'minimum' => 1, 'maximum' => 100],
+            'offset' => ['type' => 'integer', 'minimum' => 0],
+        ],
+        '#/components/schemas/SettingRevisionListResponse',
+        ['key'],
+    ),
 ];
 
 /** @return list<array<string, mixed>> */

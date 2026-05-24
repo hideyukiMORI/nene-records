@@ -22,6 +22,8 @@ import { fieldDefKeys } from '@/entities/field-def/query-keys'
 import type { IntFieldListDto } from '@/entities/int-field/api-types'
 import { mapIntFieldListDtoToModel } from '@/entities/int-field/mapper'
 import { intFieldKeys } from '@/entities/int-field/query-keys'
+import { mapPublicSettingListDtoToModel } from '@/entities/setting/mapper'
+import { settingKeys } from '@/entities/setting/query-keys'
 import type { TextFieldListDto } from '@/entities/text-field/api-types'
 import { mapTextFieldListDtoToModel } from '@/entities/text-field/mapper'
 import { textFieldKeys } from '@/entities/text-field/query-keys'
@@ -99,6 +101,13 @@ export function seedPublicRecordViewCache(
         ...FIELD_VALUE_LIST_PARAMS,
       }),
       mapTextFieldListDtoToModel(payload as TextFieldListDto),
+    )
+  }
+
+  if (bootstrap.publicSettings !== undefined) {
+    queryClient.setQueryData(
+      settingKeys.publicList(),
+      mapPublicSettingListDtoToModel(bootstrap.publicSettings),
     )
   }
 }

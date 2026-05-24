@@ -7,6 +7,7 @@ namespace NeNeRecords\PublicRecord;
 use Nene2\Config\AppConfig;
 use Nene2\Routing\Router;
 use Nene2\View\HtmlResponseFactory;
+use NeNeRecords\Setting\ListPublicSettingsUseCaseInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -14,6 +15,7 @@ final readonly class RenderPublicRecordViewHandler
 {
     public function __construct(
         private GetPublicRecordViewUseCaseInterface $useCase,
+        private ListPublicSettingsUseCaseInterface $publicSettings,
         private HtmlResponseFactory $html,
         private AppConfig $config,
     ) {
@@ -30,6 +32,7 @@ final readonly class RenderPublicRecordViewHandler
         }
 
         $output = $this->useCase->execute(new GetPublicRecordViewInput($slug, $entityId));
+        $siteSettings = $this->resolveSiteSettings();
 
         $bootstrapJson = json_encode(
             $output->bootstrap,
@@ -48,9 +51,28 @@ final readonly class RenderPublicRecordViewHandler
             'entityTypeName' => $output->entityTypeName,
             'entityId' => $output->entityId,
             'displayFields' => $output->displayFields,
+            'siteName' => $siteSettings['site_name'],
+            'metaDescription' => $siteSettings['default_meta_description'],
             'bootstrapJson' => $bootstrapJson,
             'includeViteClient' => $this->config->debug,
             'viteUrl' => rtrim($viteUrl, '/'),
         ]);
+    }
+
+    /** @return array{site_name: string, default_meta_description: string} */
+    private function resolveSiteSettings(): array
+    {
+        $settings = [
+            'site_name' => 'NeNe Records',
+            'default_meta_description' => '',
+        ];
+
+        foreach ($this->publicSettings->execute()->items as $entry) {
+            if (array_key_exists($entry->def->settingKey, $settings)) {
+                $settings[$entry->def->settingKey] = $entry->effectiveValue;
+            }
+        }
+
+        return $settings;
     }
 }

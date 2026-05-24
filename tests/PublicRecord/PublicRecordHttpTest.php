@@ -21,6 +21,7 @@ use NeNeRecords\PublicRecord\PublicEntityTypeNotFoundExceptionHandler;
 use NeNeRecords\PublicRecord\PublicRecordNotFoundExceptionHandler;
 use NeNeRecords\PublicRecord\PublicRecordRouteRegistrar;
 use NeNeRecords\PublicRecord\RenderPublicRecordViewHandler;
+use NeNeRecords\Setting\ListPublicSettingsUseCase;
 use NeNeRecords\Tests\BoolField\InMemoryBoolFieldRepository;
 use NeNeRecords\Tests\DateTimeField\InMemoryDateTimeFieldRepository;
 use NeNeRecords\Tests\Entity\InMemoryEntityRepository;
@@ -29,6 +30,7 @@ use NeNeRecords\Tests\EntityType\InMemoryEntityTypeRepository;
 use NeNeRecords\Tests\EnumField\InMemoryEnumFieldRepository;
 use NeNeRecords\Tests\FieldDef\InMemoryFieldDefRepository;
 use NeNeRecords\Tests\IntField\InMemoryIntFieldRepository;
+use NeNeRecords\Tests\Setting\InMemorySettingRepository;
 use NeNeRecords\Tests\TextField\InMemoryTextFieldRepository;
 use NeNeRecords\TextField\TextField;
 use Nyholm\Psr7\Factory\Psr17Factory;
@@ -64,6 +66,8 @@ final class PublicRecordHttpTest extends TestCase
             new TextField(entityId: 10, fieldKey: 'body', value: "Line one\nLine two", id: 2),
         ], $entities);
 
+        $publicSettings = new ListPublicSettingsUseCase(new InMemorySettingRepository());
+
         $useCase = new GetPublicRecordViewUseCase(
             $entityTypes,
             $entities,
@@ -74,6 +78,7 @@ final class PublicRecordHttpTest extends TestCase
             new InMemoryBoolFieldRepository(),
             new InMemoryDateTimeFieldRepository(),
             new InMemoryEntityRelationRepository(),
+            $publicSettings,
         );
 
         $jsonResponse = new JsonResponseFactory($this->factory, $this->factory);
@@ -100,7 +105,7 @@ final class PublicRecordHttpTest extends TestCase
 
         $registrar = new PublicRecordRouteRegistrar(
             new GetPublicRecordViewHandler($useCase, $jsonResponse),
-            new RenderPublicRecordViewHandler($useCase, $htmlResponse, $config),
+            new RenderPublicRecordViewHandler($useCase, $publicSettings, $htmlResponse, $config),
         );
 
         $this->application = (new RuntimeApplicationFactory(
