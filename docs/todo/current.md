@@ -12,13 +12,13 @@ New contributors and AI agents: read [`handoff-2026-05-24-workspace-switch.md`](
 
 | Issue | Branch | Summary |
 | --- | --- | --- |
-| — | — | _(none — Phase 3 planning)_ |
+| #16 | `feat/16-tags-and-entity-filters` | Tags CRUD, entity tag attach/detach/list, filtered entity list API |
 
 ## Up Next
 
 | Issue | Summary |
 | --- | --- |
-| TBD | **Phase 3:** relations, tags, filtered list/search API |
+| TBD | **Phase 3:** relations, search API extensions |
 
 ## Recently Completed
 
@@ -35,8 +35,9 @@ New contributors and AI agents: read [`handoff-2026-05-24-workspace-switch.md`](
 ## Handoff Notes
 
 - **Phase 2 complete.** Typed fields: text, int, enum, bool, datetime + `field_defs` registry.
-- **112 tests** via `composer check` (PHPUnit + PHPStan + CS + OpenAPI).
+- **Issue #16 in progress:** `tags`, `entity_tags`, filtered `GET /entities`.
 - ADR 0002: `docs/adr/0002-entity-model-and-field-defs.md`
+- ADR 0003: `docs/adr/0003-tags-and-entity-tags.md`
 - Phase 4 admin frontend not started; see `docs/development/frontend-standards.md`.
 
 ## Verification Commands

@@ -2,16 +2,15 @@
 
 declare(strict_types=1);
 
-namespace NeNeRecords\Entity;
+namespace NeNeRecords\Tag;
 
-final readonly class ListEntitiesOutput
+final readonly class ListTagsOutput
 {
-    /** @param list<ListEntityItem> $items */
+    /** @param list<ListTagItem> $items */
     public function __construct(
         public array $items,
         public int $limit,
         public int $offset,
-        public int $total,
     ) {
     }
 }

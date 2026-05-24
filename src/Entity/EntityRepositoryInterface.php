@@ -11,6 +11,11 @@ interface EntityRepositoryInterface
     /** @return list<Entity> */
     public function findAll(int $limit, int $offset): array;
 
+    /** @return list<Entity> */
+    public function findByCriteria(EntityListCriteria $criteria, int $limit, int $offset): array;
+
+    public function countByCriteria(EntityListCriteria $criteria): int;
+
     public function save(Entity $entity): int;
 
     public function update(Entity $entity): void;

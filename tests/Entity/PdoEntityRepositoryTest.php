@@ -8,6 +8,7 @@ use Nene2\Config\DatabaseConfig;
 use Nene2\Database\PdoConnectionFactory;
 use Nene2\Database\PdoDatabaseQueryExecutor;
 use NeNeRecords\Entity\Entity;
+use NeNeRecords\Entity\EntityListCriteria;
 use NeNeRecords\Entity\PdoEntityRepository;
 use PHPUnit\Framework\TestCase;
 
@@ -47,6 +48,8 @@ final class PdoEntityRepositoryTest extends TestCase
         $paths = [
             $projectRoot . '/database/schema/entity_types.sql',
             $projectRoot . '/database/schema/entities.sql',
+            $projectRoot . '/database/schema/tags.sql',
+            $projectRoot . '/database/schema/entity_tags.sql',
             $projectRoot . '/database/schema/text_fields.sql',
         ];
 
@@ -169,5 +172,43 @@ final class PdoEntityRepositoryTest extends TestCase
         self::assertCount(2, $list);
         self::assertSame(3, $list[0]->id);
         self::assertSame(4, $list[1]->id);
+    }
+
+    public function testFindByCriteriaFiltersByEntityTypeId(): void
+    {
+        $typeA = $this->insertEntityTypeId();
+        $this->executor->execute("INSERT INTO entity_types (name, slug) VALUES ('Other', 'other')");
+        $typeB = 2;
+
+        $repository = new PdoEntityRepository($this->executor);
+        $repository->save(new Entity(id: null, entityTypeId: $typeA));
+        $repository->save(new Entity(id: null, entityTypeId: $typeB));
+
+        $list = $repository->findByCriteria(new EntityListCriteria(entityTypeId: $typeB), 10, 0);
+
+        self::assertCount(1, $list);
+        self::assertSame($typeB, $list[0]->entityTypeId);
+        self::assertSame(1, $repository->countByCriteria(new EntityListCriteria(entityTypeId: $typeB)));
+    }
+
+    public function testFindByCriteriaFiltersByTagSlugsWithOrSemantics(): void
+    {
+        $typeId = $this->insertEntityTypeId();
+
+        $repository = new PdoEntityRepository($this->executor);
+        $entityA = $repository->save(new Entity(id: null, entityTypeId: $typeId));
+        $entityB = $repository->save(new Entity(id: null, entityTypeId: $typeId));
+        $repository->save(new Entity(id: null, entityTypeId: $typeId));
+
+        $this->executor->execute("INSERT INTO tags (slug, name) VALUES ('featured', 'Featured')");
+        $this->executor->execute("INSERT INTO tags (slug, name) VALUES ('draft', 'Draft')");
+        $this->executor->execute('INSERT INTO entity_tags (entity_id, tag_id) VALUES (?, 1)', [$entityA]);
+        $this->executor->execute('INSERT INTO entity_tags (entity_id, tag_id) VALUES (?, 2)', [$entityB]);
+
+        $criteria = new EntityListCriteria(tagSlugs: ['featured', 'draft']);
+        $list = $repository->findByCriteria($criteria, 10, 0);
+
+        self::assertCount(2, $list);
+        self::assertSame(2, $repository->countByCriteria($criteria));
     }
 }
