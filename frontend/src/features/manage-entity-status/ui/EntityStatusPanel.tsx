@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { Entity, EntityStatus } from '@/entities/entity'
 import { useUpdateEntity } from '@/entities/entity'
-import { Button, Stack, Text } from '@/shared/ui'
+import { Button, Input, Stack, Text } from '@/shared/ui'
 
 const STATUS_LABELS: Record<EntityStatus, string> = {
   draft: 'Draft',
@@ -26,18 +26,23 @@ const NEXT_STATUSES: Record<EntityStatus, EntityStatus[]> = {
 
 interface EntityStatusPanelProps {
   entity: Entity
+  entityTypeSlug?: string
 }
 
-export function EntityStatusPanel({ entity }: EntityStatusPanelProps) {
+export function EntityStatusPanel({ entity, entityTypeSlug }: EntityStatusPanelProps) {
   const updateMutation = useUpdateEntity()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [slugInput, setSlugInput] = useState(entity.slug ?? '')
+  const [slugSaved, setSlugSaved] = useState(false)
 
   const changeStatus = async (nextStatus: EntityStatus) => {
     setErrorMessage(null)
+    setSlugSaved(false)
     try {
       await updateMutation.mutateAsync({
         id: Number(entity.id),
         entityTypeId: entity.entityTypeId,
+        slug: slugInput !== '' ? slugInput : null,
         status: nextStatus,
       })
     } catch {
@@ -45,7 +50,27 @@ export function EntityStatusPanel({ entity }: EntityStatusPanelProps) {
     }
   }
 
+  const saveSlug = async () => {
+    setErrorMessage(null)
+    setSlugSaved(false)
+    try {
+      await updateMutation.mutateAsync({
+        id: Number(entity.id),
+        entityTypeId: entity.entityTypeId,
+        slug: slugInput !== '' ? slugInput : null,
+        status: entity.status,
+      })
+      setSlugSaved(true)
+    } catch {
+      setErrorMessage('Failed to save slug. It may already be used by another record.')
+    }
+  }
+
   const currentStatus = entity.status
+  const publicUrl =
+    entityTypeSlug !== undefined && (entity.slug ?? slugInput) !== ''
+      ? `/view/${entityTypeSlug}/${entity.slug ?? slugInput}`
+      : null
 
   return (
     <Stack gap="sm">
@@ -60,6 +85,38 @@ export function EntityStatusPanel({ entity }: EntityStatusPanelProps) {
           </Text>
         )}
       </div>
+
+      <Stack gap="xs">
+        <label htmlFor="entity-slug" className="text-sm font-medium text-text-primary">
+          Slug
+        </label>
+        <div className="flex items-center gap-inline-sm">
+          <Input
+            id="entity-slug"
+            value={slugInput}
+            onChange={(e) => {
+              setSlugInput(e.target.value)
+              setSlugSaved(false)
+            }}
+            placeholder="e.g. hello-world"
+          />
+          <Button variant="secondary" size="sm" onClick={() => void saveSlug()}>
+            Save slug
+          </Button>
+        </div>
+        {slugSaved && <Text muted>Saved.</Text>}
+        {publicUrl !== null && (
+          <a
+            href={publicUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-blue-600 underline hover:text-blue-800"
+          >
+            {publicUrl}
+          </a>
+        )}
+      </Stack>
+
       <div className="flex flex-wrap gap-inline-sm">
         {NEXT_STATUSES[currentStatus].map((nextStatus) => (
           <Button

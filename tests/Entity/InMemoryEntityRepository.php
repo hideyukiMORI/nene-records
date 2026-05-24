@@ -61,6 +61,40 @@ final class InMemoryEntityRepository implements EntityRepositoryInterface
         return $entity;
     }
 
+    public function findBySlug(string $slug, int $entityTypeId): ?Entity
+    {
+        foreach ($this->entities as $entity) {
+            if ($entity->isDeleted) {
+                continue;
+            }
+
+            if ($entity->slug === $slug && $entity->entityTypeId === $entityTypeId) {
+                return $entity;
+            }
+        }
+
+        return null;
+    }
+
+    public function existsBySlug(string $slug, int $entityTypeId, ?int $excludeId = null): bool
+    {
+        foreach ($this->entities as $entity) {
+            if ($entity->isDeleted) {
+                continue;
+            }
+
+            if ($entity->slug === $slug && $entity->entityTypeId === $entityTypeId) {
+                if ($excludeId !== null && $entity->id === $excludeId) {
+                    continue;
+                }
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /** @return list<Entity> */
     public function findAll(int $limit, int $offset): array
     {
@@ -134,6 +168,7 @@ final class InMemoryEntityRepository implements EntityRepositoryInterface
         $this->entities[$id] = new Entity(
             id: $id,
             entityTypeId: $entity->entityTypeId,
+            slug: $entity->slug,
             status: $entity->status,
             publishedAt: $entity->publishedAt,
         );

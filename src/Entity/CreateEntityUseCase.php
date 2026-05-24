@@ -21,19 +21,38 @@ final readonly class CreateEntityUseCase implements CreateEntityUseCaseInterface
             throw new EntityTypeNotFoundException($input->entityTypeId);
         }
 
+        $slug = $this->normalizeSlug($input->slug);
+
+        if ($slug !== null && $this->entities->existsBySlug($slug, $input->entityTypeId)) {
+            throw new DuplicateEntitySlugException($slug);
+        }
+
         $id = $this->entities->save(new Entity(
             id: null,
             entityTypeId: $input->entityTypeId,
+            slug: $slug,
             status: $input->status,
         ));
 
         return new CreateEntityOutput(
             id: $id,
             entityTypeId: $input->entityTypeId,
+            slug: $slug,
             status: $input->status,
             publishedAtIso: null,
             isDeleted: false,
             deletedAtIso: null,
         );
+    }
+
+    private function normalizeSlug(?string $slug): ?string
+    {
+        if ($slug === null) {
+            return null;
+        }
+
+        $normalized = trim($slug);
+
+        return $normalized !== '' ? $normalized : null;
     }
 }

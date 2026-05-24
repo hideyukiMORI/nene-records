@@ -34,7 +34,7 @@ final class GetPublicRecordViewUseCaseTest extends TestCase
             new EntityType(name: 'Article', slug: 'article', id: 1),
         ]);
         $entities = new InMemoryEntityRepository([
-            new Entity(id: 10, entityTypeId: 1, status: EntityStatus::PUBLISHED),
+            new Entity(id: 10, entityTypeId: 1, slug: 'hello-world', status: EntityStatus::PUBLISHED),
         ]);
         $fieldDefs = new InMemoryFieldDefRepository([
             new FieldDef(entityTypeId: 1, fieldKey: 'title', dataType: 'text', id: 1),
@@ -60,7 +60,7 @@ final class GetPublicRecordViewUseCaseTest extends TestCase
             new ListPublicSettingsUseCase(new InMemorySettingRepository()),
         );
 
-        $output = $useCase->execute(new GetPublicRecordViewInput('article', 10));
+        $output = $useCase->execute(new GetPublicRecordViewInput('article', 'hello-world'));
 
         self::assertSame('article', $output->entityTypeSlug);
         self::assertSame('Hello', $output->pageTitle);
@@ -87,7 +87,7 @@ final class GetPublicRecordViewUseCaseTest extends TestCase
         );
 
         $this->expectException(PublicEntityTypeNotFoundException::class);
-        $useCase->execute(new GetPublicRecordViewInput('missing', 1));
+        $useCase->execute(new GetPublicRecordViewInput('missing', 'some-slug'));
     }
 
     public function testThrowsWhenRecordMissing(): void
@@ -110,6 +110,6 @@ final class GetPublicRecordViewUseCaseTest extends TestCase
         );
 
         $this->expectException(PublicRecordNotFoundException::class);
-        $useCase->execute(new GetPublicRecordViewInput('article', 99));
+        $useCase->execute(new GetPublicRecordViewInput('article', 'nonexistent'));
     }
 }

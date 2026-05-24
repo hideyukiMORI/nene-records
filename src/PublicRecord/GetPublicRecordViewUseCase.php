@@ -52,16 +52,15 @@ final readonly class GetPublicRecordViewUseCase implements GetPublicRecordViewUs
             throw new PublicEntityTypeNotFoundException($input->entityTypeSlug);
         }
 
-        $entity = $this->entities->findById($input->entityId);
+        $entity = $this->entities->findBySlug($input->entitySlug, $entityType->id);
 
         if (
             $entity === null
             || $entity->id === null
             || $entity->isDeleted
-            || $entity->entityTypeId !== $entityType->id
             || $entity->status !== EntityStatus::PUBLISHED
         ) {
-            throw new PublicRecordNotFoundException($input->entityTypeSlug, $input->entityId);
+            throw new PublicRecordNotFoundException($input->entityTypeSlug, $input->entitySlug);
         }
 
         $entityTypeId = $entityType->id;
@@ -158,6 +157,7 @@ final readonly class GetPublicRecordViewUseCase implements GetPublicRecordViewUs
             entityTypeSlug: $input->entityTypeSlug,
             entityTypeName: $entityType->name,
             entityId: $entityId,
+            entitySlug: $input->entitySlug,
             pageTitle: $pageTitle,
             bootstrap: $bootstrap,
             displayFields: $displayFields,

@@ -20,7 +20,7 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
     {
         $row = $this->query->fetchOne(
             <<<'SQL'
-                SELECT id, entity_type_id, status, published_at, is_deleted, deleted_at
+                SELECT id, entity_type_id, slug, status, published_at, is_deleted, deleted_at
                 FROM entities
                 WHERE id = ? AND is_deleted = 0
                 SQL,
@@ -32,6 +32,41 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
         }
 
         return $this->mapRow($row);
+    }
+
+    public function findBySlug(string $slug, int $entityTypeId): ?Entity
+    {
+        $row = $this->query->fetchOne(
+            <<<'SQL'
+                SELECT id, entity_type_id, slug, status, published_at, is_deleted, deleted_at
+                FROM entities
+                WHERE slug = ? AND entity_type_id = ? AND is_deleted = 0
+                SQL,
+            [$slug, $entityTypeId],
+        );
+
+        if ($row === null) {
+            return null;
+        }
+
+        return $this->mapRow($row);
+    }
+
+    public function existsBySlug(string $slug, int $entityTypeId, ?int $excludeId = null): bool
+    {
+        if ($excludeId !== null) {
+            $row = $this->query->fetchOne(
+                'SELECT id FROM entities WHERE slug = ? AND entity_type_id = ? AND id != ? AND is_deleted = 0',
+                [$slug, $entityTypeId, $excludeId],
+            );
+        } else {
+            $row = $this->query->fetchOne(
+                'SELECT id FROM entities WHERE slug = ? AND entity_type_id = ? AND is_deleted = 0',
+                [$slug, $entityTypeId],
+            );
+        }
+
+        return $row !== null;
     }
 
     /** @return list<Entity> */
@@ -49,7 +84,7 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
 
         $rows = $this->query->fetchAll(
             <<<SQL
-                SELECT e.id, e.entity_type_id, e.status, e.published_at, e.is_deleted, e.deleted_at
+                SELECT e.id, e.entity_type_id, e.slug, e.status, e.published_at, e.is_deleted, e.deleted_at
                 FROM entities e
                 WHERE {$where}
                 ORDER BY e.id ASC
@@ -132,8 +167,8 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
         $publishedAt = $entity->publishedAt?->format(DateTimeInterface::ATOM);
 
         $this->query->execute(
-            'INSERT INTO entities (entity_type_id, status, published_at) VALUES (?, ?, ?)',
-            [$entity->entityTypeId, $entity->status, $publishedAt],
+            'INSERT INTO entities (entity_type_id, slug, status, published_at) VALUES (?, ?, ?, ?)',
+            [$entity->entityTypeId, $entity->slug, $entity->status, $publishedAt],
         );
 
         return $this->query->lastInsertId();
@@ -152,10 +187,10 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
         $this->query->execute(
             <<<'SQL'
                 UPDATE entities
-                SET entity_type_id = ?, status = ?, published_at = ?
+                SET entity_type_id = ?, slug = ?, status = ?, published_at = ?
                 WHERE id = ? AND is_deleted = 0
                 SQL,
-            [$entity->entityTypeId, $entity->status, $publishedAt, $id],
+            [$entity->entityTypeId, $entity->slug, $entity->status, $publishedAt, $id],
         );
     }
 
@@ -180,9 +215,13 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
         $publishedRaw = $row['published_at'] ?? null;
         $publishedAt = ($publishedRaw !== null && $publishedRaw !== '') ? new DateTimeImmutable((string) $publishedRaw) : null;
 
+        $slugRaw = $row['slug'] ?? null;
+        $slug = ($slugRaw !== null && $slugRaw !== '') ? (string) $slugRaw : null;
+
         return new Entity(
             id: (int) $row['id'],
             entityTypeId: (int) $row['entity_type_id'],
+            slug: $slug,
             status: (string) ($row['status'] ?? EntityStatus::DRAFT),
             publishedAt: $publishedAt,
             isDeleted: (bool) (int) $row['is_deleted'],

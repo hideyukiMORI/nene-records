@@ -3,6 +3,7 @@ export type EntityStatusDto = 'draft' | 'published' | 'archived'
 export interface EntityDto {
   id: number
   entity_type_id: number
+  slug: string | null
   status: EntityStatusDto
   published_at: string | null
   is_deleted: boolean
@@ -18,11 +19,13 @@ export interface EntityListDto {
 
 export interface CreateEntityDto {
   entity_type_id: number
+  slug?: string | null
   status?: EntityStatusDto
 }
 
 export interface UpdateEntityDto {
   entity_type_id: number
+  slug?: string | null
   status: EntityStatusDto
   published_at?: string | null
 }

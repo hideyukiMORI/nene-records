@@ -8,6 +8,10 @@ interface EntityRepositoryInterface
 {
     public function findById(int $id): ?Entity;
 
+    public function findBySlug(string $slug, int $entityTypeId): ?Entity;
+
+    public function existsBySlug(string $slug, int $entityTypeId, ?int $excludeId = null): bool;
+
     /** @return list<Entity> */
     public function findAll(int $limit, int $offset): array;
 

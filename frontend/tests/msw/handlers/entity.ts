@@ -8,6 +8,7 @@ export type EntityStatusDto = 'draft' | 'published' | 'archived'
 interface EntityRecord {
   id: number
   entity_type_id: number
+  slug: string | null
   status: EntityStatusDto
   published_at: string | null
   is_deleted: boolean
@@ -26,6 +27,7 @@ export function seedEntities(
   seed: Array<{
     id: number
     entity_type_id: number
+    slug?: string | null
     status?: EntityStatusDto
     published_at?: string | null
     is_deleted: boolean
@@ -34,6 +36,7 @@ export function seedEntities(
 ): void {
   items = seed.map((item) => ({
     ...item,
+    slug: item.slug ?? null,
     status: item.status ?? 'draft',
     published_at: item.published_at ?? null,
   }))
@@ -177,7 +180,11 @@ export const entityHandlers = [
     return HttpResponse.json(item)
   }),
   http.post('/api/v1/entities', async ({ request }) => {
-    const body = (await request.json()) as { entity_type_id?: number; status?: EntityStatusDto }
+    const body = (await request.json()) as {
+      entity_type_id?: number
+      slug?: string | null
+      status?: EntityStatusDto
+    }
 
     if (typeof body.entity_type_id !== 'number' || body.entity_type_id < 1) {
       return HttpResponse.json(
@@ -195,6 +202,7 @@ export const entityHandlers = [
     const created: EntityRecord = {
       id: nextId++,
       entity_type_id: body.entity_type_id,
+      slug: body.slug ?? null,
       status: body.status ?? 'draft',
       published_at: null,
       is_deleted: false,
@@ -208,6 +216,7 @@ export const entityHandlers = [
     const id = Number(params.id)
     const body = (await request.json()) as {
       entity_type_id?: number
+      slug?: string | null
       status?: EntityStatusDto
       published_at?: string | null
     }
@@ -240,6 +249,7 @@ export const entityHandlers = [
     const updated: EntityRecord = {
       ...existing,
       entity_type_id: body.entity_type_id ?? existing.entity_type_id,
+      slug: body.slug !== undefined ? body.slug : existing.slug,
       status: newStatus,
       published_at: newPublishedAt,
     }

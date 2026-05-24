@@ -285,6 +285,11 @@ $tools = [
                 'type' => 'integer',
                 'minimum' => 1,
             ],
+            'slug' => [
+                'type' => 'string',
+                'minLength' => 1,
+                'description' => 'URL slug (unique per entity type).',
+            ],
             'status' => [
                 'type' => 'string',
                 'enum' => ['draft', 'published', 'archived'],
@@ -311,21 +316,21 @@ $tools = [
         'Aggregated bootstrap payload for a public consumer record detail page.',
         'getPublicRecordView',
         'GET',
-        '/api/v1/public/entity-types/{slug}/records/{entityId}',
+        '/api/v1/public/entity-types/{slug}/records/{entitySlug}',
         [
             'slug' => [
                 'type' => 'string',
                 'minLength' => 1,
                 'description' => 'Entity type slug.',
             ],
-            'entityId' => [
-                'type' => 'integer',
-                'minimum' => 1,
-                'description' => 'Entity instance id.',
+            'entitySlug' => [
+                'type' => 'string',
+                'minLength' => 1,
+                'description' => 'Entity slug.',
             ],
         ],
         '#/components/schemas/PublicRecordViewResponse',
-        ['slug', 'entityId'],
+        ['slug', 'entitySlug'],
     ),
     idTool(
         'updateEntityById',
@@ -338,6 +343,11 @@ $tools = [
             'entity_type_id' => [
                 'type' => 'integer',
                 'minimum' => 1,
+            ],
+            'slug' => [
+                'type' => 'string',
+                'minLength' => 1,
+                'description' => 'URL slug (unique per entity type).',
             ],
             'status' => [
                 'type' => 'string',

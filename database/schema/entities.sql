@@ -1,6 +1,7 @@
 CREATE TABLE entities (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     entity_type_id INTEGER UNSIGNED NOT NULL,
+    slug VARCHAR(255) NULL,
     status VARCHAR(16) NOT NULL DEFAULT 'draft',
     published_at DATETIME NULL,
     is_deleted BOOLEAN NOT NULL DEFAULT 0,
@@ -9,3 +10,4 @@ CREATE TABLE entities (
 );
 CREATE INDEX entities_entity_type_id ON entities (entity_type_id);
 CREATE INDEX entities_status ON entities (status);
+CREATE UNIQUE INDEX entities_entity_type_id_slug ON entities (entity_type_id, slug);

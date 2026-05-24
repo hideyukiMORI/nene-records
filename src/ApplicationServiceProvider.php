@@ -18,6 +18,7 @@ use NeNeRecords\DateTimeField\DateTimeFieldNotFoundExceptionHandler;
 use NeNeRecords\DateTimeField\DateTimeFieldServiceProvider;
 use NeNeRecords\DateTimeField\FieldKeyNotRegisteredExceptionHandler as DateTimeFieldKeyNotRegisteredExceptionHandler;
 use NeNeRecords\DateTimeField\FieldTypeMismatchExceptionHandler as DateTimeFieldTypeMismatchExceptionHandler;
+use NeNeRecords\Entity\DuplicateEntitySlugExceptionHandler;
 use NeNeRecords\Entity\EntityNotFoundExceptionHandler;
 use NeNeRecords\Entity\EntityServiceProvider;
 use NeNeRecords\EntityRelation\EntityRelationServiceProvider;
@@ -149,6 +150,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $fieldDefNotFound = $container->get(FieldDefNotFoundExceptionHandler::class);
                     $fieldDefConflict = $container->get(FieldDefConflictExceptionHandler::class);
                     $entityNotFound = $container->get(EntityNotFoundExceptionHandler::class);
+                    $duplicateEntitySlug = $container->get(DuplicateEntitySlugExceptionHandler::class);
                     $textFieldNotFound = $container->get(TextFieldNotFoundExceptionHandler::class);
                     $textFieldKeyNotRegistered = $container->get(TextFieldKeyNotRegisteredExceptionHandler::class);
                     $textFieldTypeMismatch = $container->get(TextFieldTypeMismatchExceptionHandler::class);
@@ -185,6 +187,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $fieldDefNotFound,
                         $fieldDefConflict,
                         $entityNotFound,
+                        $duplicateEntitySlug,
                         $textFieldNotFound,
                         $textFieldKeyNotRegistered,
                         $textFieldTypeMismatch,
@@ -226,6 +229,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $fieldDefNotFound,
                         $fieldDefConflict,
                         $entityNotFound,
+                        $duplicateEntitySlug,
                         $textFieldNotFound,
                         $textFieldKeyNotRegistered,
                         $textFieldTypeMismatch,

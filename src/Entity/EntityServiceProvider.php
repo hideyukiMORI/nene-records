@@ -187,6 +187,18 @@ final readonly class EntityServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(
+                DuplicateEntitySlugExceptionHandler::class,
+                static function (ContainerInterface $c): DuplicateEntitySlugExceptionHandler {
+                    $problemDetails = $c->get(ProblemDetailsResponseFactory::class);
+
+                    if (!$problemDetails instanceof ProblemDetailsResponseFactory) {
+                        throw new LogicException('Problem details response factory service is invalid.');
+                    }
+
+                    return new DuplicateEntitySlugExceptionHandler($problemDetails);
+                },
+            )
+            ->set(
                 EntityNotFoundExceptionHandler::class,
                 static function (ContainerInterface $c): EntityNotFoundExceptionHandler {
                     $problemDetails = $c->get(ProblemDetailsResponseFactory::class);
