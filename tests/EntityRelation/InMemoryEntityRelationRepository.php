@@ -18,6 +18,33 @@ final class InMemoryEntityRelationRepository implements EntityRelationRepository
     }
 
     /** @return list<EntityRelationListItem> */
+    public function findByEntityId(int $entityId): array
+    {
+        $items = [];
+
+        foreach ($this->attachments as $key => $_attached) {
+            [$sourceEntityId, $targetEntityId, $attachedFieldKey] = explode(':', $key, 3);
+
+            if ((int) $sourceEntityId !== $entityId) {
+                continue;
+            }
+
+            $items[] = new EntityRelationListItem(
+                fieldKey: $attachedFieldKey,
+                targetEntityId: (int) $targetEntityId,
+            );
+        }
+
+        usort(
+            $items,
+            static fn (EntityRelationListItem $a, EntityRelationListItem $b): int =>
+                $a->fieldKey <=> $b->fieldKey ?: $a->targetEntityId <=> $b->targetEntityId,
+        );
+
+        return $items;
+    }
+
+    /** @return list<EntityRelationListItem> */
     public function findByEntityIdAndFieldKey(int $entityId, string $fieldKey): array
     {
         $items = [];

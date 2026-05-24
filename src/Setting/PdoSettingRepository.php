@@ -136,15 +136,23 @@ final readonly class PdoSettingRepository implements SettingRepositoryInterface
         return $stored;
     }
 
-    /** @param list<SettingDef> $defs
+    /**
+     * @param list<SettingDef> $defs
      * @return list<SettingEntry>
      */
     private function buildEntries(array $defs): array
     {
+        $allValues = $this->findAllValues();
+        $valuesByKey = [];
+
+        foreach ($allValues as $value) {
+            $valuesByKey[$value->settingKey] = $value;
+        }
+
         $entries = [];
 
         foreach ($defs as $def) {
-            $stored = $this->findValueByKey($def->settingKey);
+            $stored = $valuesByKey[$def->settingKey] ?? null;
             $entries[] = new SettingEntry(
                 def: $def,
                 effectiveValue: $this->resolveEffectiveValue($def, $stored),
@@ -153,6 +161,17 @@ final readonly class PdoSettingRepository implements SettingRepositoryInterface
         }
 
         return $entries;
+    }
+
+    /** @return list<SettingValue> */
+    private function findAllValues(): array
+    {
+        $rows = $this->query->fetchAll(
+            'SELECT id, setting_key, value, is_deleted, deleted_at, created_by, updated_by, created_at, updated_at
+             FROM setting_values',
+        );
+
+        return array_map($this->mapValue(...), $rows);
     }
 
     private function resolveEffectiveValue(SettingDef $def, ?SettingValue $stored): string

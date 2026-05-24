@@ -14,6 +14,28 @@ final readonly class PdoEntityRelationRepository implements EntityRelationReposi
     }
 
     /** @return list<EntityRelationListItem> */
+    public function findByEntityId(int $entityId): array
+    {
+        $rows = $this->query->fetchAll(
+            <<<'SQL'
+                SELECT field_key, target_entity_id
+                FROM entity_relations
+                WHERE source_entity_id = ?
+                ORDER BY field_key ASC, target_entity_id ASC
+                SQL,
+            [$entityId],
+        );
+
+        return array_map(
+            static fn (array $row) => new EntityRelationListItem(
+                fieldKey: (string) $row['field_key'],
+                targetEntityId: (int) $row['target_entity_id'],
+            ),
+            $rows,
+        );
+    }
+
+    /** @return list<EntityRelationListItem> */
     public function findByEntityIdAndFieldKey(int $entityId, string $fieldKey): array
     {
         $rows = $this->query->fetchAll(
