@@ -12,30 +12,32 @@ New contributors and AI agents: read [`handoff-2026-05-24-workspace-switch.md`](
 
 | Issue | Branch | Summary |
 | --- | --- | --- |
-| #14 | `feat/14-enum-bool-datetime-fields` | enum_fields / bool_fields / datetime_fields CRUD + field_defs data_type expansion |
+| — | — | _(none — Phase 3 planning)_ |
 
 ## Up Next
 
 | Issue | Summary |
 | --- | --- |
-| TBD | Phase 2: next typed field or registry follow-up |
+| TBD | **Phase 3:** relations, tags, filtered list/search API |
 
 ## Recently Completed
 
 | Issue | Summary |
 | --- | --- |
-| #11 | int_fields CRUD + data_type=int (merged PR #12) |
+| #14 | enum/bool/datetime fields CRUD (merged PR #15) — **Phase 2 complete** |
+| #11 | int_fields CRUD (merged PR #12) |
 | #9 | field_defs schema registry (merged PR #10, ADR 0002) |
-| #1 | MVP entity CRUD vertical slice (merged PR #8) |
+| #1 | MVP entity CRUD vertical slice (merged PR #8) — Phase 1 |
 | #6 | Frontend/backend coding standards (merged PR #7) |
 | #4 | Workspace handoff + product vision (merged PR #5) |
 | #2 | NENE2 governance inheritance (merged PR #3) |
 
 ## Handoff Notes
 
-- Phase 1 complete. Phase 2 in progress — registry (#9) done; typed field tables expanding.
+- **Phase 2 complete.** Typed fields: text, int, enum, bool, datetime + `field_defs` registry.
+- **112 tests** via `composer check` (PHPUnit + PHPStan + CS + OpenAPI).
 - ADR 0002: `docs/adr/0002-entity-model-and-field-defs.md`
-- Framework: `hideyukimori/nene2` via Composer path `../NENE2`
+- Phase 4 admin frontend not started; see `docs/development/frontend-standards.md`.
 
 ## Verification Commands
 
