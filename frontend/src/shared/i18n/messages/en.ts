@@ -133,6 +133,17 @@ export const en = {
   'admin.fieldDefs.dataType.enum': 'Enum',
   'admin.fieldDefs.dataType.bool': 'Boolean',
   'admin.fieldDefs.dataType.datetime': 'Date & time',
+  'admin.fieldDefs.dataType.image': 'Image',
+
+  // ── Media upload ─────────────────────────────────────────────────────────
+  'admin.media.panelTitle': 'Media',
+  'admin.media.uploadButton': 'Upload image',
+  'admin.media.uploading': 'Uploading…',
+  'admin.media.uploadSuccess': 'Uploaded — URL copied to clipboard.',
+  'admin.media.uploadError': 'Upload failed.',
+  'admin.media.imagePreview': 'Image preview',
+  'admin.media.noImage': 'No image selected',
+  'admin.media.urlLabel': 'Image URL',
 
   // ── Tags ─────────────────────────────────────────────────────────────────
   'admin.tags.pageTitle': 'Tags',

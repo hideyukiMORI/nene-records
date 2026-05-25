@@ -1,4 +1,12 @@
-export const FIELD_DATA_TYPES = ['text', 'int', 'enum', 'bool', 'datetime', 'relation'] as const
+export const FIELD_DATA_TYPES = [
+  'text',
+  'int',
+  'enum',
+  'bool',
+  'datetime',
+  'image',
+  'relation',
+] as const
 
 export type FieldDataType = (typeof FIELD_DATA_TYPES)[number]
 

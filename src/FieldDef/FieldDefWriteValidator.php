@@ -9,7 +9,7 @@ use Nene2\Validation\ValidationError;
 final readonly class FieldDefWriteValidator
 {
     /** @var list<string> */
-    public const ALLOWED_DATA_TYPES = ['text', 'int', 'enum', 'bool', 'datetime', 'relation'];
+    public const ALLOWED_DATA_TYPES = ['text', 'int', 'enum', 'bool', 'datetime', 'image', 'relation'];
 
     /** @var list<string> */
     public const ALLOWED_CARDINALITIES = ['one', 'many'];
@@ -41,7 +41,7 @@ final readonly class FieldDefWriteValidator
         } elseif (!in_array($dataType, self::ALLOWED_DATA_TYPES, true)) {
             $errors[] = new ValidationError(
                 'data_type',
-                'Data type must be one of: text, int, enum, bool, datetime, relation.',
+                'Data type must be one of: text, int, enum, bool, datetime, image, relation.',
                 'invalid',
             );
         }

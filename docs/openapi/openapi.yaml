@@ -1786,6 +1786,46 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /api/v1/media:
+    post:
+      tags:
+        - Media
+      summary: Upload media file
+      description: Accepts a multipart/form-data upload and returns the stored media URL. Allowed types — JPEG, PNG, GIF, WebP, SVG, PDF. Maximum size — 10 MiB.
+      operationId: uploadMedia
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          description: Media uploaded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MediaResponse'
+              examples:
+                ok:
+                  value:
+                    id: 1
+                    url: /media/2026/05/abc123.jpg
+                    original_name: photo.jpg
+                    mime_type: image/jpeg
+                    size: 204800
+        '413':
+          $ref: '#/components/responses/PayloadTooLarge'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /api/v1/analytics/access-stats:
     get:
       tags:
@@ -2032,6 +2072,12 @@ components:
                 status: 422
                 detail: The field key is registered with a different data type.
                 instance: /api/v1/text-fields
+    PayloadTooLarge:
+      description: Uploaded file exceeds size limit.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
     ValidationFailed:
       description: Validation failed.
       content:
@@ -2171,6 +2217,30 @@ components:
         - draft
         - published
         - archived
+    MediaResponse:
+      type: object
+      required:
+        - id
+        - url
+        - original_name
+        - mime_type
+        - size
+      properties:
+        id:
+          type: integer
+          format: int64
+        url:
+          type: string
+          minLength: 1
+        original_name:
+          type: string
+          minLength: 1
+        mime_type:
+          type: string
+          minLength: 1
+        size:
+          type: integer
+          minimum: 0
     EntityResponse:
       type: object
       required:
@@ -2368,6 +2438,7 @@ components:
             - enum
             - bool
             - datetime
+            - image
             - relation
         target_entity_type_id:
           type: integer

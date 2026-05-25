@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { FieldDataType, FieldDef } from '@/entities/field-def'
 import { useTranslation } from '@/shared/i18n'
 import { Button, EmptyState, Input, Stack, Text } from '@/shared/ui'
+import { ImageFieldInput } from './ImageFieldInput'
 
 export interface EntityTextFieldsFormProps {
   fieldDefs: FieldDef[]
@@ -56,6 +57,21 @@ export function EntityTextFieldsForm({
         {fieldDefs.map((fieldDef) => {
           const fieldId = `record-field-${fieldDef.fieldKey}`
           const label = `${fieldDef.fieldKey} (${fieldDef.dataType})`
+
+          if (fieldDef.dataType === 'image') {
+            return (
+              <ImageFieldInput
+                key={fieldDef.fieldKey}
+                id={fieldId}
+                label={label}
+                value={values[fieldDef.fieldKey] ?? ''}
+                disabled={isSubmitting}
+                onChange={(url) => {
+                  setValues((current) => ({ ...current, [fieldDef.fieldKey]: url }))
+                }}
+              />
+            )
+          }
 
           if (fieldDef.dataType === 'bool') {
             return (

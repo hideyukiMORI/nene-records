@@ -46,6 +46,9 @@ use NeNeRecords\IntField\FieldKeyNotRegisteredExceptionHandler as IntFieldKeyNot
 use NeNeRecords\IntField\FieldTypeMismatchExceptionHandler as IntFieldTypeMismatchExceptionHandler;
 use NeNeRecords\IntField\IntFieldNotFoundExceptionHandler;
 use NeNeRecords\IntField\IntFieldServiceProvider;
+use NeNeRecords\Media\MediaInvalidTypeExceptionHandler;
+use NeNeRecords\Media\MediaServiceProvider;
+use NeNeRecords\Media\MediaTooLargeExceptionHandler;
 use NeNeRecords\PublicRecord\PublicEntityTypeNotFoundExceptionHandler;
 use NeNeRecords\PublicRecord\PublicRecordNotFoundExceptionHandler;
 use NeNeRecords\PublicRecord\PublicRecordServiceProvider;
@@ -83,6 +86,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
             ->addProvider(new EntityTagServiceProvider())
             ->addProvider(new EntityRelationServiceProvider())
             ->addProvider(new AnalyticsServiceProvider())
+            ->addProvider(new MediaServiceProvider())
             ->addProvider(new PublicRecordServiceProvider())
             ->addProvider(new SettingServiceProvider());
 
@@ -102,6 +106,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $tag = $container->get('nene-records.route_registrar.tag');
                     $entityTag = $container->get('nene-records.route_registrar.entity_tag');
                     $entityRelation = $container->get('nene-records.route_registrar.entity_relation');
+                    $media = $container->get('nene-records.route_registrar.media');
                     $analytics = $container->get('nene-records.route_registrar.analytics');
                     $publicRecord = $container->get('nene-records.route_registrar.public_record');
                     $setting = $container->get('nene-records.route_registrar.setting');
@@ -120,6 +125,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         || !is_callable($tag)
                         || !is_callable($entityTag)
                         || !is_callable($entityRelation)
+                        || !is_callable($media)
                         || !is_callable($analytics)
                         || !is_callable($publicRecord)
                         || !is_callable($setting)
@@ -142,6 +148,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $tag,
                         $entityTag,
                         $entityRelation,
+                        $media,
                         $analytics,
                         $publicRecord,
                         $setting,
@@ -187,6 +194,8 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $settingKeyNotFound = $container->get(SettingKeyNotFoundExceptionHandler::class);
                     $settingValueInvalid = $container->get(SettingValueInvalidExceptionHandler::class);
                     $invalidCredentials = $container->get(InvalidCredentialsExceptionHandler::class);
+                    $mediaInvalidType = $container->get(MediaInvalidTypeExceptionHandler::class);
+                    $mediaTooLarge = $container->get(MediaTooLargeExceptionHandler::class);
 
                     foreach ([
                         $entityTypeNotFound,
@@ -225,6 +234,8 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $settingKeyNotFound,
                         $settingValueInvalid,
                         $invalidCredentials,
+                        $mediaInvalidType,
+                        $mediaTooLarge,
                     ] as $handler) {
                         if (!$handler instanceof DomainExceptionHandlerInterface) {
                             throw new LogicException('Exception handler service is invalid.');
@@ -268,6 +279,8 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $settingKeyNotFound,
                         $settingValueInvalid,
                         $invalidCredentials,
+                        $mediaInvalidType,
+                        $mediaTooLarge,
                     ];
                 },
             );
