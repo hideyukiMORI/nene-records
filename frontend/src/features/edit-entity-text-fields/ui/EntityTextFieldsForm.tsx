@@ -3,6 +3,7 @@ import type { FieldDataType, FieldDef } from '@/entities/field-def'
 import { useTranslation } from '@/shared/i18n'
 import { Button, EmptyState, Input, Stack, Text } from '@/shared/ui'
 import { ImageFieldInput } from './ImageFieldInput'
+import { MarkdownFieldInput } from './MarkdownFieldInput'
 
 export interface EntityTextFieldsFormProps {
   fieldDefs: FieldDef[]
@@ -68,6 +69,21 @@ export function EntityTextFieldsForm({
                 disabled={isSubmitting}
                 onChange={(url) => {
                   setValues((current) => ({ ...current, [fieldDef.fieldKey]: url }))
+                }}
+              />
+            )
+          }
+
+          if (fieldDef.dataType === 'markdown') {
+            return (
+              <MarkdownFieldInput
+                key={fieldDef.fieldKey}
+                id={fieldId}
+                label={label}
+                value={values[fieldDef.fieldKey] ?? ''}
+                disabled={isSubmitting}
+                onChange={(val) => {
+                  setValues((current) => ({ ...current, [fieldDef.fieldKey]: val }))
                 }}
               />
             )

@@ -73,7 +73,7 @@ final readonly class GetPublicRecordViewUseCase implements GetPublicRecordViewUs
             $fieldDefRows,
         )));
 
-        $textFieldRows = (in_array('text', $dataTypes, true) || in_array('image', $dataTypes, true))
+        $textFieldRows = (in_array('text', $dataTypes, true) || in_array('markdown', $dataTypes, true) || in_array('image', $dataTypes, true))
             ? $this->textFields->findByEntityId($entityId, self::FIELD_VALUE_LIMIT, 0)
             : [];
         $intFieldRows = in_array('int', $dataTypes, true)
@@ -230,7 +230,7 @@ final readonly class GetPublicRecordViewUseCase implements GetPublicRecordViewUs
             }
 
             $raw = match ($fieldDef->dataType) {
-                'text', 'image' => $this->findTextValue($textFieldRows, $fieldDef->fieldKey),
+                'text', 'markdown', 'image' => $this->findTextValue($textFieldRows, $fieldDef->fieldKey),
                 'int' => $this->findIntValue($intFieldRows, $fieldDef->fieldKey),
                 'enum' => $this->findEnumValue($enumFieldRows, $fieldDef->fieldKey),
                 'bool' => $this->findBoolValue($boolFieldRows, $fieldDef->fieldKey),

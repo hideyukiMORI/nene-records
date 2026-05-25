@@ -135,6 +135,7 @@ export function useEditEntityTextFieldsPage(entityTypeId: number, entityId: numb
       editableFieldDefs.map((fieldDef) => {
         switch (fieldDef.dataType) {
           case 'text':
+          case 'markdown':
           case 'image': {
             const existing = textFieldsForEntity.find((item) => item.fieldKey === fieldDef.fieldKey)
             return [fieldDef.fieldKey, existing?.value ?? '']
@@ -181,6 +182,7 @@ export function useEditEntityTextFieldsPage(entityTypeId: number, entityId: numb
 
         switch (fieldDef.dataType) {
           case 'text':
+          case 'markdown':
           case 'image': {
             const existing = textFieldsForEntity.find((item) => item.fieldKey === fieldDef.fieldKey)
 

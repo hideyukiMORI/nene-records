@@ -123,11 +123,13 @@ export const ja: Partial<MessageCatalog> = {
   'admin.fieldDefs.delete.title': 'フィールドを削除しますか？',
   'admin.fieldDefs.delete.description': '「{{fieldKey}}」がスキーマから削除されます。',
   'admin.fieldDefs.dataType.text': 'テキスト',
+  'admin.fieldDefs.dataType.markdown': 'Markdown',
   'admin.fieldDefs.dataType.int': '整数',
   'admin.fieldDefs.dataType.enum': '列挙型',
   'admin.fieldDefs.dataType.bool': 'ブール値',
   'admin.fieldDefs.dataType.datetime': '日時',
   'admin.fieldDefs.dataType.image': '画像',
+  'admin.fieldDefs.dataType.relation': 'リレーション',
 
   // ── Media upload ─────────────────────────────────────────────────────────
   'admin.media.panelTitle': 'メディア',
@@ -138,6 +140,11 @@ export const ja: Partial<MessageCatalog> = {
   'admin.media.imagePreview': '画像プレビュー',
   'admin.media.noImage': '画像が選択されていません',
   'admin.media.urlLabel': '画像 URL',
+
+  // ── Markdown editor ───────────────────────────────────────────────────────
+  'admin.markdownEditor.preview': 'プレビュー',
+  'admin.markdownEditor.write': '編集',
+  'admin.markdownEditor.empty': 'プレビューする内容がありません。',
 
   // ── Tags ─────────────────────────────────────────────────────────────────
   'admin.tags.pageTitle': 'タグ',
