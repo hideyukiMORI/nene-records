@@ -6,7 +6,7 @@ namespace NeNeRecords\EntityTag;
 
 final readonly class ListEntityTagsOutput
 {
-    /** @param list<EntityTagListItem> $items */
+    /** @param list<ListEntityTagItem> $items */
     public function __construct(
         public array $items,
     ) {

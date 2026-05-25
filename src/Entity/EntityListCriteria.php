@@ -14,7 +14,7 @@ final readonly class EntityListCriteria
         public ?int $entityTypeId = null,
         public array $tagSlugs = [],
         public array $relationFilters = [],
-        public ?string $status = null,
+        public ?EntityStatus $status = null,
     ) {
     }
 }

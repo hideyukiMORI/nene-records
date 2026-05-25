@@ -9,7 +9,7 @@ final readonly class CreateEntityInput
     public function __construct(
         public int $entityTypeId,
         public ?string $slug = null,
-        public string $status = EntityStatus::DRAFT,
+        public EntityStatus $status = EntityStatus::Draft,
     ) {
     }
 }

@@ -4,13 +4,10 @@ declare(strict_types=1);
 
 namespace NeNeRecords\Setting;
 
-final class SettingRevisionAction
+enum SettingRevisionAction: string
 {
-    public const CREATED = 'created';
-
-    public const UPDATED = 'updated';
-
-    public const DELETED = 'deleted';
-
-    public const RESTORED = 'restored';
+    case Created = 'created';
+    case Updated = 'updated';
+    case Deleted = 'deleted';
+    case Restored = 'restored';
 }

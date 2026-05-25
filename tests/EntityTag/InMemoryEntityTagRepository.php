@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace NeNeRecords\Tests\EntityTag;
 
-use NeNeRecords\EntityTag\EntityTagListItem;
 use NeNeRecords\EntityTag\EntityTagRepositoryInterface;
+use NeNeRecords\EntityTag\ListEntityTagItem;
 
 final class InMemoryEntityTagRepository implements EntityTagRepositoryInterface
 {
     /** @var array<string, true> "entityId:tagId" => attached */
     private array $attachments;
 
-    /** @var array<int, EntityTagListItem> tagId => item */
+    /** @var array<int, ListEntityTagItem> tagId => item */
     private array $tagsById;
 
     public function __construct()
@@ -23,10 +23,10 @@ final class InMemoryEntityTagRepository implements EntityTagRepositoryInterface
 
     public function seedTag(int $id, string $slug, string $name): void
     {
-        $this->tagsById[$id] = new EntityTagListItem(id: $id, slug: $slug, name: $name);
+        $this->tagsById[$id] = new ListEntityTagItem(id: $id, slug: $slug, name: $name);
     }
 
-    /** @return list<EntityTagListItem> */
+    /** @return list<ListEntityTagItem> */
     public function findTagsByEntityId(int $entityId): array
     {
         $items = [];
@@ -45,7 +45,7 @@ final class InMemoryEntityTagRepository implements EntityTagRepositoryInterface
             }
         }
 
-        usort($items, static fn (EntityTagListItem $a, EntityTagListItem $b): int => $a->id <=> $b->id);
+        usort($items, static fn (ListEntityTagItem $a, ListEntityTagItem $b): int => $a->id <=> $b->id);
 
         return $items;
     }

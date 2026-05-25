@@ -12,7 +12,7 @@ final readonly class UpdateEntityInput
         public int $id,
         public int $entityTypeId,
         public ?string $slug = null,
-        public string $status = EntityStatus::DRAFT,
+        public EntityStatus $status = EntityStatus::Draft,
         public ?DateTimeImmutable $publishedAt = null,
     ) {
     }

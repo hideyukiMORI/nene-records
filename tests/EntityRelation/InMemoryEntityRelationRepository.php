@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace NeNeRecords\Tests\EntityRelation;
 
-use NeNeRecords\EntityRelation\EntityRelationListItem;
 use NeNeRecords\EntityRelation\EntityRelationRepositoryInterface;
+use NeNeRecords\EntityRelation\ListEntityRelationItem;
 
 final class InMemoryEntityRelationRepository implements EntityRelationRepositoryInterface
 {
@@ -17,7 +17,7 @@ final class InMemoryEntityRelationRepository implements EntityRelationRepository
         $this->attachments = [];
     }
 
-    /** @return list<EntityRelationListItem> */
+    /** @return list<ListEntityRelationItem> */
     public function findByEntityId(int $entityId): array
     {
         $items = [];
@@ -29,7 +29,7 @@ final class InMemoryEntityRelationRepository implements EntityRelationRepository
                 continue;
             }
 
-            $items[] = new EntityRelationListItem(
+            $items[] = new ListEntityRelationItem(
                 fieldKey: $attachedFieldKey,
                 targetEntityId: (int) $targetEntityId,
             );
@@ -37,14 +37,14 @@ final class InMemoryEntityRelationRepository implements EntityRelationRepository
 
         usort(
             $items,
-            static fn (EntityRelationListItem $a, EntityRelationListItem $b): int =>
+            static fn (ListEntityRelationItem $a, ListEntityRelationItem $b): int =>
                 $a->fieldKey <=> $b->fieldKey ?: $a->targetEntityId <=> $b->targetEntityId,
         );
 
         return $items;
     }
 
-    /** @return list<EntityRelationListItem> */
+    /** @return list<ListEntityRelationItem> */
     public function findByEntityIdAndFieldKey(int $entityId, string $fieldKey): array
     {
         $items = [];
@@ -56,13 +56,13 @@ final class InMemoryEntityRelationRepository implements EntityRelationRepository
                 continue;
             }
 
-            $items[] = new EntityRelationListItem(
+            $items[] = new ListEntityRelationItem(
                 fieldKey: $fieldKey,
                 targetEntityId: (int) $targetEntityId,
             );
         }
 
-        usort($items, static fn (EntityRelationListItem $a, EntityRelationListItem $b): int => $a->targetEntityId <=> $b->targetEntityId);
+        usort($items, static fn (ListEntityRelationItem $a, ListEntityRelationItem $b): int => $a->targetEntityId <=> $b->targetEntityId);
 
         return $items;
     }

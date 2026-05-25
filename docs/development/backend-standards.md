@@ -249,6 +249,8 @@ List operations use `List{Entity}Item` inside `List{Entity}sOutput` — same as 
 
 ## Naming conventions
 
+> **Full naming rules**: [`naming-conventions.md`](./naming-conventions.md) — this section is a quick reference; the dedicated document is the source of truth for every naming decision.
+
 | Artifact | Pattern | Example |
 | --- | --- | --- |
 | Namespace | `NeNeRecords\{Domain}\` | `NeNeRecords\EntityType\CreateEntityTypeHandler` |

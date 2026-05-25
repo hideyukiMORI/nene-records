@@ -34,7 +34,7 @@ final class GetPublicRecordViewUseCaseTest extends TestCase
             new EntityType(name: 'Article', slug: 'article', id: 1),
         ]);
         $entities = new InMemoryEntityRepository([
-            new Entity(id: 10, entityTypeId: 1, slug: 'hello-world', status: EntityStatus::PUBLISHED),
+            new Entity(id: 10, entityTypeId: 1, slug: 'hello-world', status: EntityStatus::Published),
         ]);
         $fieldDefs = new InMemoryFieldDefRepository([
             new FieldDef(entityTypeId: 1, fieldKey: 'title', dataType: 'text', id: 1),

@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient, type UseMutationResult } from '@tanstack/react-query'
 import { apiClient, AppError } from '@/shared/api/client'
 import type { SettingValueDto } from './api-types'
-import { mapSettingValueDtoToModel, mapUpdateSettingInputToDto } from './mapper'
+import { mapSettingValueDtoToModel, mapUpdateInputToDto } from './mapper'
 import type { SettingKey, UpdateSettingInput } from './model'
 import { settingKeys } from './query-keys'
 
@@ -16,7 +16,7 @@ export function useUpdateSetting(): UseMutationResult<
     mutationFn: async ({ settingKey, input }) => {
       const dto = await apiClient.put<SettingValueDto>(
         `/api/v1/settings/${encodeURIComponent(settingKey)}`,
-        mapUpdateSettingInputToDto(input),
+        mapUpdateInputToDto(input),
       )
       return mapSettingValueDtoToModel(dto)
     },

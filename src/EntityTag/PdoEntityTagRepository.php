@@ -13,7 +13,7 @@ final readonly class PdoEntityTagRepository implements EntityTagRepositoryInterf
     ) {
     }
 
-    /** @return list<EntityTagListItem> */
+    /** @return list<ListEntityTagItem> */
     public function findTagsByEntityId(int $entityId): array
     {
         $rows = $this->query->fetchAll(
@@ -28,7 +28,7 @@ final readonly class PdoEntityTagRepository implements EntityTagRepositoryInterf
         );
 
         return array_map(
-            static fn (array $row) => new EntityTagListItem(
+            static fn (array $row) => new ListEntityTagItem(
                 id: (int) $row['id'],
                 slug: (string) $row['slug'],
                 name: (string) $row['name'],

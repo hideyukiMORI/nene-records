@@ -38,7 +38,7 @@ final readonly class CreateEntityHandler
         $slug = is_string($rawSlug) && trim($rawSlug) !== '' ? trim($rawSlug) : null;
 
         $rawStatus = $body['status'] ?? null;
-        $status = is_string($rawStatus) && EntityStatus::isValid($rawStatus) ? $rawStatus : EntityStatus::DRAFT;
+        $status = is_string($rawStatus) ? EntityStatus::tryFrom($rawStatus) ?? EntityStatus::Draft : EntityStatus::Draft;
 
         if ($errors !== []) {
             throw new ValidationException($errors);

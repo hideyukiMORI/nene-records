@@ -6,7 +6,7 @@ namespace NeNeRecords\EntityRelation;
 
 final readonly class ListEntityRelationsOutput
 {
-    /** @param list<EntityRelationListItem> $items */
+    /** @param list<ListEntityRelationItem> $items */
     public function __construct(
         public array $items,
     ) {

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace NeNeRecords\EntityTag;
 
-final readonly class EntityTagListItem
+final readonly class ListEntityTagItem
 {
     public function __construct(
         public int $id,

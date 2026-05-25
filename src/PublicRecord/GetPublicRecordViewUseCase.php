@@ -10,8 +10,8 @@ use NeNeRecords\DateTimeField\DateTimeField;
 use NeNeRecords\DateTimeField\DateTimeFieldRepositoryInterface;
 use NeNeRecords\Entity\EntityRepositoryInterface;
 use NeNeRecords\Entity\EntityStatus;
-use NeNeRecords\EntityRelation\EntityRelationListItem;
 use NeNeRecords\EntityRelation\EntityRelationRepositoryInterface;
+use NeNeRecords\EntityRelation\ListEntityRelationItem;
 use NeNeRecords\EntityType\EntityTypeRepositoryInterface;
 use NeNeRecords\EnumField\EnumField;
 use NeNeRecords\EnumField\EnumFieldRepositoryInterface;
@@ -59,7 +59,7 @@ final readonly class GetPublicRecordViewUseCase implements GetPublicRecordViewUs
             $entity === null
             || $entity->id === null
             || $entity->isDeleted
-            || $entity->status !== EntityStatus::PUBLISHED
+            || $entity->status !== EntityStatus::Published
         ) {
             throw new PublicRecordNotFoundException($input->entityTypeSlug, $input->entitySlug);
         }
@@ -182,7 +182,7 @@ final readonly class GetPublicRecordViewUseCase implements GetPublicRecordViewUs
      * @param list<DateTimeField> $dateTimeFieldRows
      * @param array<int, string> $entityTypeSlugById
      * @param array<int, list<TextField>> $relationTextFieldsByEntityTypeId
-     * @param array<string, list<EntityRelationListItem>> $relationsByFieldKey
+     * @param array<string, list<ListEntityRelationItem>> $relationsByFieldKey
      * @return list<PublicRecordViewDisplayField>
      */
     private function buildDisplayFields(
@@ -249,7 +249,7 @@ final readonly class GetPublicRecordViewUseCase implements GetPublicRecordViewUs
     }
 
     /**
-     * @param array<string, list<EntityRelationListItem>> $relationsByFieldKey
+     * @param array<string, list<ListEntityRelationItem>> $relationsByFieldKey
      * @return list<array{fieldKey: string, items: list<array{field_key: string, target_entity_id: int}>}>
      */
     private function buildRelationQueries(array $relationsByFieldKey): array

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace NeNeRecords\EntityRelation;
 
-final readonly class EntityRelationListItem
+final readonly class ListEntityRelationItem
 {
     public function __construct(
         public string $fieldKey,

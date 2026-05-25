@@ -72,6 +72,6 @@ final class PdoSettingRepositoryTest extends TestCase
 
         $revisions = $repository->findRevisionsByKey('site_name', 10, 0);
         self::assertCount(1, $revisions);
-        self::assertSame(SettingRevisionAction::CREATED, $revisions[0]->action);
+        self::assertSame(SettingRevisionAction::Created, $revisions[0]->action);
     }
 }

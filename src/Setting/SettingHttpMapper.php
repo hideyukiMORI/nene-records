@@ -49,7 +49,7 @@ final readonly class SettingHttpMapper
             'setting_key' => $revision->settingKey,
             'value' => $revision->value,
             'previous_value' => $revision->previousValue,
-            'action' => $revision->action,
+            'action' => $revision->action->value,
             'actor_user_id' => $revision->actorUserId,
             'created_at' => $revision->createdAt,
         ];

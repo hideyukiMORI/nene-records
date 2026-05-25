@@ -47,7 +47,7 @@ final readonly class UpdateEntityHandler
         $slug = is_string($rawSlug) && trim($rawSlug) !== '' ? trim($rawSlug) : null;
 
         $rawStatus = $body['status'] ?? null;
-        $status = is_string($rawStatus) && EntityStatus::isValid($rawStatus) ? $rawStatus : EntityStatus::DRAFT;
+        $status = is_string($rawStatus) ? EntityStatus::tryFrom($rawStatus) ?? EntityStatus::Draft : EntityStatus::Draft;
 
         $rawPublishedAt = $body['published_at'] ?? null;
         $publishedAt = is_string($rawPublishedAt) ? (DateTimeImmutable::createFromFormat(DATE_ATOM, $rawPublishedAt) ?: null) : null;

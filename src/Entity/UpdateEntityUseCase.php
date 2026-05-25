@@ -44,7 +44,7 @@ final readonly class UpdateEntityUseCase implements UpdateEntityUseCaseInterface
 
         // Auto-set published_at when transitioning to published for the first time.
         $publishedAt = $input->publishedAt ?? $existing->publishedAt;
-        if ($input->status === EntityStatus::PUBLISHED && $publishedAt === null) {
+        if ($input->status === EntityStatus::Published && $publishedAt === null) {
             $publishedAt = new DateTimeImmutable();
         }
 
@@ -64,7 +64,7 @@ final readonly class UpdateEntityUseCase implements UpdateEntityUseCaseInterface
             id: $entityId,
             entityTypeId: $input->entityTypeId,
             slug: $slug,
-            status: $input->status,
+            status: $input->status->value,
             publishedAtIso: $publishedAt?->format(DateTimeInterface::ATOM),
             isDeleted: $existing->isDeleted,
             deletedAtIso: $existing->deletedAt?->format(DateTimeInterface::ATOM),

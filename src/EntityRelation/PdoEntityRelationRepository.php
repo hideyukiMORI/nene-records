@@ -13,7 +13,7 @@ final readonly class PdoEntityRelationRepository implements EntityRelationReposi
     ) {
     }
 
-    /** @return list<EntityRelationListItem> */
+    /** @return list<ListEntityRelationItem> */
     public function findByEntityId(int $entityId): array
     {
         $rows = $this->query->fetchAll(
@@ -27,7 +27,7 @@ final readonly class PdoEntityRelationRepository implements EntityRelationReposi
         );
 
         return array_map(
-            static fn (array $row) => new EntityRelationListItem(
+            static fn (array $row) => new ListEntityRelationItem(
                 fieldKey: (string) $row['field_key'],
                 targetEntityId: (int) $row['target_entity_id'],
             ),
@@ -35,7 +35,7 @@ final readonly class PdoEntityRelationRepository implements EntityRelationReposi
         );
     }
 
-    /** @return list<EntityRelationListItem> */
+    /** @return list<ListEntityRelationItem> */
     public function findByEntityIdAndFieldKey(int $entityId, string $fieldKey): array
     {
         $rows = $this->query->fetchAll(
@@ -49,7 +49,7 @@ final readonly class PdoEntityRelationRepository implements EntityRelationReposi
         );
 
         return array_map(
-            static fn (array $row) => new EntityRelationListItem(
+            static fn (array $row) => new ListEntityRelationItem(
                 fieldKey: (string) $row['field_key'],
                 targetEntityId: (int) $row['target_entity_id'],
             ),
