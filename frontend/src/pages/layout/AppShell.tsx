@@ -1,5 +1,6 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import { authStore, currentUserHasCapability } from '@/entities/auth'
+import { LOCALES, SUPPORTED_LOCALE_IDS, useTranslation } from '@/shared/i18n'
 import { Button, Stack, Text } from '@/shared/ui'
 
 const navLinkClass = ({ isActive }: { isActive: boolean }): string =>
@@ -10,6 +11,7 @@ const navLinkClass = ({ isActive }: { isActive: boolean }): string =>
 
 export function AppShell() {
   const navigate = useNavigate()
+  const { t, locale, setLocale } = useTranslation()
 
   const handleLogout = () => {
     authStore.clearSession()
@@ -30,23 +32,23 @@ export function AppShell() {
           <nav aria-label="Main">
             <Stack direction="horizontal" gap="sm">
               <NavLink to="/" className={navLinkClass} end>
-                Home
+                {t('admin.nav.home')}
               </NavLink>
               <NavLink to="/entity-types" className={navLinkClass}>
-                Entity types
+                {t('admin.nav.entityTypes')}
               </NavLink>
               {canManageTags ? (
                 <NavLink to="/tags" className={navLinkClass}>
-                  Tags
+                  {t('admin.nav.tags')}
                 </NavLink>
               ) : null}
               {canReadSettings ? (
                 <NavLink to="/settings" className={navLinkClass}>
-                  Settings
+                  {t('admin.nav.settings')}
                 </NavLink>
               ) : null}
               <NavLink to="/view" className={navLinkClass}>
-                Public site
+                {t('admin.nav.publicSite')}
               </NavLink>
             </Stack>
           </nav>
@@ -56,8 +58,22 @@ export function AppShell() {
                 {session.email}
               </Text>
             )}
+            <select
+              aria-label="Language"
+              value={locale}
+              onChange={(e) => {
+                setLocale(e.target.value as typeof locale)
+              }}
+              className="rounded-md border border-border bg-surface-raised px-inline-sm py-stack-xs font-sans text-caption text-text-primary shadow-sm focus-visible:outline-none focus-visible:shadow-focus"
+            >
+              {SUPPORTED_LOCALE_IDS.map((id) => (
+                <option key={id} value={id}>
+                  {LOCALES[id].label}
+                </option>
+              ))}
+            </select>
             <Button variant="ghost" size="sm" onClick={handleLogout}>
-              ログアウト
+              {t('admin.nav.logout')}
             </Button>
           </Stack>
         </div>

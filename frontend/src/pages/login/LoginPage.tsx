@@ -1,6 +1,7 @@
 import { useState, type SyntheticEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useLogin } from '@/entities/auth'
+import { useTranslation } from '@/shared/i18n'
 import { Button, Input, Stack, Text } from '@/shared/ui'
 
 export function LoginPage() {
@@ -8,6 +9,7 @@ export function LoginPage() {
   const [password, setPassword] = useState('')
   const navigate = useNavigate()
   const login = useLogin()
+  const { t } = useTranslation()
 
   const handleSubmit = (e: SyntheticEvent) => {
     e.preventDefault()
@@ -27,9 +29,9 @@ export function LoginPage() {
         <Stack gap="lg">
           <Stack gap="xs">
             <Text as="h1" variant="heading-md">
-              NeNe Records Admin
+              {t('admin.auth.appTitle')}
             </Text>
-            <Text muted>サインインしてください</Text>
+            <Text muted>{t('admin.auth.subtitle')}</Text>
           </Stack>
 
           {login.isError && (
@@ -37,7 +39,7 @@ export function LoginPage() {
               role="alert"
               className="rounded-md border border-red-200 bg-red-50 px-inline-sm py-stack-xs text-sm text-red-700"
             >
-              メールアドレスまたはパスワードが正しくありません
+              {t('admin.auth.invalidCredentials')}
             </div>
           )}
 
@@ -45,7 +47,7 @@ export function LoginPage() {
             <Stack gap="md">
               <Stack gap="xs">
                 <label htmlFor="email" className="text-sm font-medium text-text-primary">
-                  メールアドレス
+                  {t('admin.auth.emailLabel')}
                 </label>
                 <Input
                   id="email"
@@ -54,14 +56,14 @@ export function LoginPage() {
                   onChange={(e) => {
                     setEmail(e.target.value)
                   }}
-                  placeholder="admin@example.com"
+                  placeholder={t('admin.auth.emailPlaceholder')}
                   required
                 />
               </Stack>
 
               <Stack gap="xs">
                 <label htmlFor="password" className="text-sm font-medium text-text-primary">
-                  パスワード
+                  {t('admin.auth.passwordLabel')}
                 </label>
                 <Input
                   id="password"
@@ -70,13 +72,13 @@ export function LoginPage() {
                   onChange={(e) => {
                     setPassword(e.target.value)
                   }}
-                  placeholder="••••••••"
+                  placeholder={t('admin.auth.passwordPlaceholder')}
                   required
                 />
               </Stack>
 
               <Button type="submit" disabled={login.isPending} className="w-full">
-                {login.isPending ? 'サインイン中…' : 'サインイン'}
+                {login.isPending ? t('admin.auth.signingIn') : t('admin.auth.signIn')}
               </Button>
             </Stack>
           </form>

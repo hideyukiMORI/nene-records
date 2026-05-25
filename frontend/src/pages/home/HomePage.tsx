@@ -1,17 +1,18 @@
 import { Link } from 'react-router-dom'
+import { useTranslation } from '@/shared/i18n'
 import { Stack, Text } from '@/shared/ui'
 
 export function HomePage() {
+  const { t } = useTranslation()
+
   return (
     <Stack gap="md">
       <Text as="h1" variant="heading-md">
-        Admin dashboard
+        {t('admin.home.title')}
       </Text>
-      <Text muted>
-        Phase 4 scaffold is running. Use Entity types to verify API integration via TanStack Query.
-      </Text>
+      <Text muted>{t('admin.home.description')}</Text>
       <Link to="/view" className="text-body font-medium text-accent hover:text-accent-hover">
-        Open public site →
+        {t('admin.home.openPublicSite')}
       </Link>
     </Stack>
   )

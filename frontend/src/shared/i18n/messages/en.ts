@@ -1,0 +1,184 @@
+/**
+ * English message catalog — source of truth.
+ *
+ * Key naming: admin.{feature}.{element} | common.{element}
+ * Param interpolation: {{paramName}}
+ *
+ * All other locales are `Partial<MessageCatalog>` and fall back to these values.
+ */
+
+export const en = {
+  // ── Common ──────────────────────────────────────────────────────────────
+  'common.actions.edit': 'Edit',
+  'common.actions.delete': 'Delete',
+  'common.actions.cancel': 'Cancel',
+  'common.actions.retry': 'Retry',
+  'common.actions.confirm': 'Confirm',
+  'common.actions.save': 'Save changes',
+  'common.actions.saving': 'Saving…',
+  'common.actions.create': 'Create',
+  'common.actions.creating': 'Creating…',
+  'common.actions.add': 'Add',
+  'common.actions.adding': 'Adding…',
+  'common.actions.remove': 'Remove',
+  'common.actions.deleting': 'Deleting…',
+  'common.actions.backToHome': 'Back to home',
+
+  'common.field.name': 'Name',
+  'common.field.slug': 'Slug',
+
+  'common.error.unknown': 'Unknown error',
+  'common.error.unauthorized': 'Authentication required. Please sign in.',
+  'common.error.forbidden': 'You do not have permission to perform this action.',
+  'common.error.notFound': 'The requested resource was not found.',
+  'common.error.conflict': 'A conflict occurred. The resource may already exist.',
+  'common.error.validation': 'The submitted data is invalid.',
+  'common.error.rateLimit': 'Too many requests. Please wait and try again.',
+  'common.error.serverError': 'A server error occurred. Please try again later.',
+
+  'common.dialog.close': 'Close dialog',
+
+  // ── Admin nav ────────────────────────────────────────────────────────────
+  'admin.nav.home': 'Home',
+  'admin.nav.entityTypes': 'Entity types',
+  'admin.nav.tags': 'Tags',
+  'admin.nav.settings': 'Settings',
+  'admin.nav.publicSite': 'Public site',
+  'admin.nav.logout': 'Log out',
+
+  // ── Auth (Login page) ────────────────────────────────────────────────────
+  'admin.auth.appTitle': 'NeNe Records Admin',
+  'admin.auth.subtitle': 'Sign in to continue',
+  'admin.auth.emailLabel': 'Email',
+  'admin.auth.emailPlaceholder': 'admin@example.com',
+  'admin.auth.passwordLabel': 'Password',
+  'admin.auth.passwordPlaceholder': '••••••••',
+  'admin.auth.signIn': 'Sign in',
+  'admin.auth.signingIn': 'Signing in…',
+  'admin.auth.invalidCredentials': 'Invalid email or password',
+
+  // ── Forbidden page ───────────────────────────────────────────────────────
+  'admin.forbidden.title': 'Access denied',
+  'admin.forbidden.description':
+    'You are signed in, but your account does not have permission to perform this action.',
+
+  // ── Home page ────────────────────────────────────────────────────────────
+  'admin.home.title': 'Admin dashboard',
+  'admin.home.description':
+    'Phase 4 scaffold is running. Use Entity types to verify API integration via TanStack Query.',
+  'admin.home.openPublicSite': 'Open public site →',
+
+  // ── Entity types ─────────────────────────────────────────────────────────
+  'admin.entityTypes.pageTitle': 'Entity types',
+  'admin.entityTypes.existingList.title': 'Existing types',
+  'admin.entityTypes.existingList.loading': 'Loading entity types…',
+  'admin.entityTypes.existingList.error': 'Could not load entity types',
+  'admin.entityTypes.existingList.empty.title': 'No entity types yet',
+  'admin.entityTypes.existingList.empty.description':
+    'Create your first entity type using the form above.',
+  'admin.entityTypes.createForm.title': 'Create entity type',
+  'admin.entityTypes.createForm.submit': 'Create entity type',
+  'admin.entityTypes.createForm.submitting': 'Creating…',
+  'admin.entityTypes.editForm.title': 'Edit entity type',
+  'admin.entityTypes.editForm.save': 'Save changes',
+  'admin.entityTypes.editForm.saving': 'Saving…',
+  'admin.entityTypes.delete.title': 'Delete entity type?',
+  'admin.entityTypes.delete.description': '"{{name}}" will be removed. This cannot be undone.',
+  'admin.entityTypes.actions.fields': 'Fields',
+  'admin.entityTypes.actions.records': 'Records',
+  'admin.entityTypes.actions.backToTypes': 'Back to entity types',
+
+  // ── Entity records ───────────────────────────────────────────────────────
+  'admin.entityRecords.backToTypes': 'Back to entity types',
+  'admin.entityRecords.backToRecords': 'Back to records',
+  'admin.entityRecords.recordCount.one': '{{count}} record',
+  'admin.entityRecords.recordCount.other': '{{count}} records',
+  'admin.entityRecords.list.title': '{{name}} records',
+  'admin.entityRecords.list.titleDefault': 'Records',
+  'admin.entityRecords.list.loading': 'Loading records…',
+  'admin.entityRecords.list.error': 'Could not load records',
+  'admin.entityRecords.list.empty.title': 'No records yet',
+  'admin.entityRecords.list.empty.description': 'Create your first record using the button above.',
+  'admin.entityRecords.list.emptyFiltered.title': 'No matching records',
+  'admin.entityRecords.list.emptyFiltered.description':
+    'Try clearing the filters or selecting different criteria.',
+  'admin.entityRecords.create.title': 'Create record',
+  'admin.entityRecords.create.description':
+    'Records are created for this entity type. Field values will be editable in a later phase.',
+  'admin.entityRecords.create.submit': 'Create record',
+  'admin.entityRecords.create.submitting': 'Creating…',
+  'admin.entityRecords.delete.title': 'Delete record?',
+  'admin.entityRecords.delete.description': 'Record #{{id}} will be soft-deleted.',
+
+  // ── Field definitions ────────────────────────────────────────────────────
+  'admin.fieldDefs.pageTitle': 'Fields',
+  'admin.fieldDefs.schemaFor': 'Schema for {{slug}}',
+  'admin.fieldDefs.list.title': 'Field definitions',
+  'admin.fieldDefs.list.loading': 'Loading fields…',
+  'admin.fieldDefs.list.error': 'Could not load fields',
+  'admin.fieldDefs.list.empty.title': 'No fields yet',
+  'admin.fieldDefs.list.empty.description': 'Add your first field definition using the form above.',
+  'admin.fieldDefs.createForm.title': 'Add field',
+  'admin.fieldDefs.createForm.fieldKeyLabel': 'Field key',
+  'admin.fieldDefs.createForm.dataTypeLabel': 'Data type',
+  'admin.fieldDefs.createForm.submit': 'Add field',
+  'admin.fieldDefs.createForm.submitting': 'Adding…',
+  'admin.fieldDefs.editForm.title': 'Edit field',
+  'admin.fieldDefs.editForm.save': 'Save changes',
+  'admin.fieldDefs.editForm.saving': 'Saving…',
+  'admin.fieldDefs.delete.title': 'Delete field?',
+  'admin.fieldDefs.delete.description': '"{{fieldKey}}" will be removed from the schema.',
+  'admin.fieldDefs.dataType.text': 'Text',
+  'admin.fieldDefs.dataType.int': 'Integer',
+  'admin.fieldDefs.dataType.enum': 'Enum',
+  'admin.fieldDefs.dataType.bool': 'Boolean',
+  'admin.fieldDefs.dataType.datetime': 'Date & time',
+
+  // ── Tags ─────────────────────────────────────────────────────────────────
+  'admin.tags.pageTitle': 'Tags',
+  'admin.tags.list.title': 'Existing tags',
+  'admin.tags.list.loading': 'Loading tags…',
+  'admin.tags.list.error': 'Could not load tags',
+  'admin.tags.list.empty.title': 'No tags yet',
+  'admin.tags.list.empty.description': 'Create your first tag using the form above.',
+  'admin.tags.createForm.title': 'Create tag',
+  'admin.tags.createForm.submit': 'Create tag',
+  'admin.tags.createForm.submitting': 'Creating…',
+  'admin.tags.editForm.title': 'Edit tag',
+  'admin.tags.editForm.save': 'Save changes',
+  'admin.tags.editForm.saving': 'Saving…',
+  'admin.tags.delete.title': 'Delete tag?',
+  'admin.tags.delete.description':
+    '"{{name}}" will be removed. Attached records keep their data but lose this tag.',
+
+  // ── Entity tags (tags attached to a record) ──────────────────────────────
+  'admin.entityTags.title': 'Tags',
+  'admin.entityTags.loading': 'Loading tags…',
+  'admin.entityTags.error': 'Could not load tags',
+  'admin.entityTags.noAttached': 'No tags attached yet.',
+  'admin.entityTags.noAvailable': 'No tags available',
+  'admin.entityTags.selectPlaceholder': 'Select tag…',
+  'admin.entityTags.addLabel': 'Add tag',
+  'admin.entityTags.addSubmit': 'Add tag',
+  'admin.entityTags.adding': 'Adding…',
+  'admin.entityTags.remove': 'Remove',
+
+  // ── Settings ──────────────────────────────────────────────────────────────
+  'admin.settings.pageTitle': 'Site settings',
+  'admin.settings.description':
+    'Configure site name, tagline, default meta description, and footer content for public pages.',
+  'admin.settings.loading': 'Loading settings…',
+  'admin.settings.error': 'Could not load site settings.',
+  'admin.settings.save': 'Save',
+  'admin.settings.saving': 'Saving…',
+  'admin.settings.visibility.public': 'Public',
+  'admin.settings.visibility.adminOnly': 'Admin only',
+  'admin.settings.history.show': 'Show history',
+  'admin.settings.history.hide': 'Hide history',
+  'admin.settings.history.loading': 'Loading history…',
+  'admin.settings.history.error': 'Could not load revision history.',
+  'admin.settings.history.empty': 'No revisions yet.',
+} as const
+
+/** Complete message catalog type — derived from the English source of truth. */
+export type MessageCatalog = typeof en

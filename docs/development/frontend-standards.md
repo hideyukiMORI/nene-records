@@ -802,6 +802,72 @@ The browser is **hostile context**. Treat all rendered user content and all clie
 
 ---
 
+## Internationalisation (i18n)
+
+> Full naming and key conventions: [`naming-conventions.md`](./naming-conventions.md).
+
+### Locales
+
+6 locales matching the NENE2 docs locale set: `en` (default), `ja`, `fr`, `zh-Hans`, `pt-BR`, `de`.
+Locale ID mapping to NENE2 docs is tracked in `shared/i18n/locales.ts`.
+
+### Infrastructure
+
+| Module | Purpose |
+| --- | --- |
+| `shared/i18n/locales.ts` | `SupportedLocale` union + `LocaleMeta` (label, dir) |
+| `shared/i18n/messages/en.ts` | `MessageCatalog` type + complete English catalog (source of truth) |
+| `shared/i18n/messages/{locale}.ts` | `Partial<MessageCatalog>` — missing keys fall back to `en` |
+| `shared/i18n/i18n-context.tsx` | `I18nProvider` — locale detection, persistence, context |
+| `shared/i18n/use-translation.ts` | `useTranslation()` hook |
+| `shared/i18n/translate.ts` | Pure `translate()` function + `MessageKey` type |
+| `shared/i18n/map-problem-details.ts` | `AppError` status → `MessageKey` mapping |
+| `shared/i18n/test-helpers.tsx` | `renderWithI18n(locale)`, `withI18n(locale)` Storybook decorator |
+
+### Rules
+
+- **No hardcoded user-facing strings** in Admin UI components → `t('admin.nav.home')`.
+- Key naming: `admin.{feature}.{element}` or `common.{element}`.
+- `en.ts` is the authoritative source; add new keys there first.
+- Other locales use `Partial<MessageCatalog>` — missing keys display English at runtime.
+- Locale detection order: `localStorage['nene-locale']` → `navigator.language` → `en`.
+- Locale selector lives in `AppShell` header.
+
+### Key naming
+
+| Prefix | Usage |
+| --- | --- |
+| `common.actions.*` | Generic verbs (edit, delete, cancel, save…) |
+| `common.field.*` | Generic field labels (name, slug) |
+| `common.error.*` | HTTP status → user message |
+| `common.dialog.*` | Shared dialog chrome |
+| `admin.nav.*` | Main navigation |
+| `admin.auth.*` | Login page |
+| `admin.forbidden.*` | 403 page |
+| `admin.home.*` | Dashboard |
+| `admin.{feature}.*` | Feature-specific labels (entityTypes, entityRecords, fieldDefs, tags, settings…) |
+
+### Param interpolation
+
+```ts
+t('admin.entityTypes.delete.description', { name: entityType.name })
+// en.ts: '"{{name}}" will be removed. This cannot be undone.'
+```
+
+### Testing
+
+```ts
+// Vitest
+import { renderWithI18n } from '@/shared/i18n/test-helpers'
+const { getByText } = renderWithI18n(<MyComponent />, { locale: 'ja' })
+
+// Storybook
+import { withI18n } from '@/shared/i18n/test-helpers'
+export const decorators = [withI18n('ja')]
+```
+
+---
+
 ## Accessibility
 
 - **WCAG 2.2 Level AA** for admin UI.
