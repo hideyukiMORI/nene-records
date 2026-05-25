@@ -218,6 +218,16 @@ export const en = {
   'admin.entityRevisions.error': 'Could not load revision history.',
   'admin.entityRevisions.empty': 'No revisions yet.',
 
+  // ── Entity SEO ────────────────────────────────────────────────────────────
+  'admin.entitySeo.title': 'SEO',
+  'admin.entitySeo.metaTitle': 'Meta title',
+  'admin.entitySeo.metaTitle.placeholder': 'Override page title for search engines…',
+  'admin.entitySeo.metaDescription': 'Meta description',
+  'admin.entitySeo.metaDescription.placeholder': 'Override meta description for search engines…',
+  'admin.entitySeo.save': 'Save SEO',
+  'admin.entitySeo.saving': 'Saving…',
+  'admin.entitySeo.saveSuccess': 'SEO settings saved.',
+
   // ── Settings ──────────────────────────────────────────────────────────────
   'admin.settings.pageTitle': 'Site settings',
   'admin.settings.description':

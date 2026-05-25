@@ -16,6 +16,8 @@ final readonly class Entity
         public ?DateTimeImmutable $publishedAt = null,
         public bool $isDeleted = false,
         public ?DateTimeImmutable $deletedAt = null,
+        public ?string $metaTitle = null,
+        public ?string $metaDescription = null,
     ) {
     }
 }

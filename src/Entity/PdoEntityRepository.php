@@ -20,7 +20,7 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
     {
         $row = $this->query->fetchOne(
             <<<'SQL'
-                SELECT id, entity_type_id, slug, status, published_at, is_deleted, deleted_at
+                SELECT id, entity_type_id, slug, status, published_at, is_deleted, deleted_at, meta_title, meta_description
                 FROM entities
                 WHERE id = ? AND is_deleted = 0
                 SQL,
@@ -38,7 +38,7 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
     {
         $row = $this->query->fetchOne(
             <<<'SQL'
-                SELECT id, entity_type_id, slug, status, published_at, is_deleted, deleted_at
+                SELECT id, entity_type_id, slug, status, published_at, is_deleted, deleted_at, meta_title, meta_description
                 FROM entities
                 WHERE slug = ? AND entity_type_id = ? AND is_deleted = 0
                 SQL,
@@ -94,7 +94,7 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
 
         $rows = $this->query->fetchAll(
             <<<SQL
-                SELECT e.id, e.entity_type_id, e.slug, e.status, e.published_at, e.is_deleted, e.deleted_at
+                SELECT e.id, e.entity_type_id, e.slug, e.status, e.published_at, e.is_deleted, e.deleted_at, e.meta_title, e.meta_description
                 FROM entities e
                 WHERE {$where}
                 ORDER BY e.id ASC
@@ -193,8 +193,8 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
         $now = date('Y-m-d H:i:s');
 
         $this->query->execute(
-            'INSERT INTO entities (entity_type_id, slug, status, published_at) VALUES (?, ?, ?, ?)',
-            [$entity->entityTypeId, $entity->slug, $entity->status->value, $publishedAt],
+            'INSERT INTO entities (entity_type_id, slug, status, published_at, meta_title, meta_description) VALUES (?, ?, ?, ?, ?, ?)',
+            [$entity->entityTypeId, $entity->slug, $entity->status->value, $publishedAt, $entity->metaTitle, $entity->metaDescription],
         );
 
         $id = $this->query->lastInsertId();
@@ -223,10 +223,10 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
         $this->query->execute(
             <<<'SQL'
                 UPDATE entities
-                SET entity_type_id = ?, slug = ?, status = ?, published_at = ?
+                SET entity_type_id = ?, slug = ?, status = ?, published_at = ?, meta_title = ?, meta_description = ?
                 WHERE id = ? AND is_deleted = 0
                 SQL,
-            [$entity->entityTypeId, $entity->slug, $entity->status->value, $publishedAt, $id],
+            [$entity->entityTypeId, $entity->slug, $entity->status->value, $publishedAt, $entity->metaTitle, $entity->metaDescription, $id],
         );
 
         $this->query->execute(
@@ -303,6 +303,12 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
         $slugRaw = $row['slug'] ?? null;
         $slug = ($slugRaw !== null && $slugRaw !== '') ? (string) $slugRaw : null;
 
+        $metaTitleRaw = $row['meta_title'] ?? null;
+        $metaTitle = ($metaTitleRaw !== null && $metaTitleRaw !== '') ? (string) $metaTitleRaw : null;
+
+        $metaDescriptionRaw = $row['meta_description'] ?? null;
+        $metaDescription = ($metaDescriptionRaw !== null && $metaDescriptionRaw !== '') ? (string) $metaDescriptionRaw : null;
+
         return new Entity(
             id: (int) $row['id'],
             entityTypeId: (int) $row['entity_type_id'],
@@ -311,6 +317,8 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
             publishedAt: $publishedAt,
             isDeleted: (bool) (int) $row['is_deleted'],
             deletedAt: $deletedAt,
+            metaTitle: $metaTitle,
+            metaDescription: $metaDescription,
         );
     }
 }

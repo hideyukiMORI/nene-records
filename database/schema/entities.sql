@@ -4,6 +4,8 @@ CREATE TABLE entities (
     slug VARCHAR(255) NULL,
     status VARCHAR(16) NOT NULL DEFAULT 'draft',
     published_at DATETIME NULL,
+    meta_title VARCHAR(255) NULL,
+    meta_description TEXT NULL,
     is_deleted BOOLEAN NOT NULL DEFAULT 0,
     deleted_at DATETIME NULL,
     FOREIGN KEY (entity_type_id) REFERENCES entity_types (id) ON DELETE RESTRICT ON UPDATE NO ACTION

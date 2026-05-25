@@ -202,6 +202,8 @@ final class InMemoryEntityRepository implements EntityRepositoryInterface
             slug: $entity->slug,
             status: $entity->status,
             publishedAt: $entity->publishedAt,
+            metaTitle: $entity->metaTitle,
+            metaDescription: $entity->metaDescription,
         );
 
         $this->revisions[] = new \NeNeRecords\Entity\EntityRevision(

@@ -14,6 +14,8 @@ final readonly class UpdateEntityInput
         public ?string $slug = null,
         public EntityStatus $status = EntityStatus::Draft,
         public ?DateTimeImmutable $publishedAt = null,
+        public ?string $metaTitle = null,
+        public ?string $metaDescription = null,
     ) {
     }
 }

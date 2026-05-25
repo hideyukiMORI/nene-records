@@ -71,6 +71,8 @@ final readonly class PublicRecordViewHttpMapper
                 'entity_type_id' => $entity->entityTypeId,
                 'is_deleted' => $entity->isDeleted,
                 'deleted_at' => $entity->deletedAt?->format(\DateTimeInterface::ATOM),
+                'meta_title' => $entity->metaTitle,
+                'meta_description' => $entity->metaDescription,
             ],
             'fieldDefs' => [
                 'items' => array_map(

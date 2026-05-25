@@ -4,7 +4,11 @@ import {
   EditEntityTextFieldsView,
   useEditEntityTextFieldsPage,
 } from '@/features/edit-entity-text-fields'
-import { EntityRevisionsPanel, EntityStatusPanel } from '@/features/manage-entity-status'
+import {
+  EntityRevisionsPanel,
+  EntitySeoPanel,
+  EntityStatusPanel,
+} from '@/features/manage-entity-status'
 import { ManageEntityTagsView, useManageEntityTagsPage } from '@/features/manage-entity-tags'
 import { ManageEntityRelationsView } from '@/features/manage-entity-relations'
 import { InverseEntityRelationsView } from '@/features/inverse-entity-relations'
@@ -95,6 +99,7 @@ export function EntityRecordPage() {
       />
       <ManageEntityRelationsView entityId={entityId} entityTypeId={entityTypeId} />
       <InverseEntityRelationsView entityId={entityId} entityTypeId={entityTypeId} />
+      {entity !== null && <EntitySeoPanel entity={entity} />}
       <EntityRevisionsPanel entityId={entityId} />
     </Stack>
   )
