@@ -49,6 +49,8 @@ use NeNeRecords\IntField\IntFieldServiceProvider;
 use NeNeRecords\Media\MediaInvalidTypeExceptionHandler;
 use NeNeRecords\Media\MediaServiceProvider;
 use NeNeRecords\Media\MediaTooLargeExceptionHandler;
+use NeNeRecords\NavigationItem\NavigationItemNotFoundExceptionHandler;
+use NeNeRecords\NavigationItem\NavigationItemServiceProvider;
 use NeNeRecords\PublicRecord\PublicEntityTypeNotFoundExceptionHandler;
 use NeNeRecords\PublicRecord\PublicRecordNotFoundExceptionHandler;
 use NeNeRecords\PublicRecord\PublicRecordServiceProvider;
@@ -88,7 +90,8 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
             ->addProvider(new AnalyticsServiceProvider())
             ->addProvider(new MediaServiceProvider())
             ->addProvider(new PublicRecordServiceProvider())
-            ->addProvider(new SettingServiceProvider());
+            ->addProvider(new SettingServiceProvider())
+            ->addProvider(new NavigationItemServiceProvider());
 
         $builder
             ->set(
@@ -110,6 +113,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $analytics = $container->get('nene-records.route_registrar.analytics');
                     $publicRecord = $container->get('nene-records.route_registrar.public_record');
                     $setting = $container->get('nene-records.route_registrar.setting');
+                    $navigationItem = $container->get('nene-records.route_registrar.navigation_item');
                     $auth = $container->get('nene-records.route_registrar.auth');
 
                     if (
@@ -129,6 +133,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         || !is_callable($analytics)
                         || !is_callable($publicRecord)
                         || !is_callable($setting)
+                        || !is_callable($navigationItem)
                         || !is_callable($auth)
                     ) {
                         throw new LogicException('Route registrar service is invalid.');
@@ -152,6 +157,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $analytics,
                         $publicRecord,
                         $setting,
+                        $navigationItem,
                     ];
                 },
             )
@@ -196,6 +202,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $invalidCredentials = $container->get(InvalidCredentialsExceptionHandler::class);
                     $mediaInvalidType = $container->get(MediaInvalidTypeExceptionHandler::class);
                     $mediaTooLarge = $container->get(MediaTooLargeExceptionHandler::class);
+                    $navigationItemNotFound = $container->get(NavigationItemNotFoundExceptionHandler::class);
 
                     foreach ([
                         $entityTypeNotFound,
@@ -236,6 +243,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $invalidCredentials,
                         $mediaInvalidType,
                         $mediaTooLarge,
+                        $navigationItemNotFound,
                     ] as $handler) {
                         if (!$handler instanceof DomainExceptionHandlerInterface) {
                             throw new LogicException('Exception handler service is invalid.');
@@ -281,6 +289,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $invalidCredentials,
                         $mediaInvalidType,
                         $mediaTooLarge,
+                        $navigationItemNotFound,
                     ];
                 },
             );

@@ -33,6 +33,7 @@ final readonly class AdminApiAuthMiddleware implements MiddlewareInterface
     /** @var list<string> */
     private const ADMIN_ONLY_PREFIXES = [
         '/api/v1/settings',
+        '/api/v1/navigation-items',
     ];
 
     public function __construct(

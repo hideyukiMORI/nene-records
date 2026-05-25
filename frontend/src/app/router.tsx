@@ -11,6 +11,7 @@ import { ForbiddenPage } from '@/pages/forbidden/ForbiddenPage'
 import { HomePage } from '@/pages/home/HomePage'
 import { AppShell } from '@/pages/layout/AppShell'
 import { LoginPage } from '@/pages/login/LoginPage'
+import { NavigationPage } from '@/pages/navigation/NavigationPage'
 import { SiteSettingsPage } from '@/pages/settings/SiteSettingsPage'
 import { TagsPage } from '@/pages/tags/TagsPage'
 import { RequireAuth } from '@/shared/auth/RequireAuth'
@@ -43,6 +44,7 @@ const router = createBrowserRouter([
       { index: true, element: <HomePage /> },
       { path: 'entity-types', element: <EntityTypesPage /> },
       { path: 'tags', element: <TagsPage /> },
+      { path: 'navigation', element: <NavigationPage /> },
       { path: 'settings', element: <SiteSettingsPage /> },
       { path: 'entity-types/:entityTypeId/fields', element: <FieldDefsPage /> },
       { path: 'entity-types/:entityTypeId/entities', element: <EntityRecordsPage /> },

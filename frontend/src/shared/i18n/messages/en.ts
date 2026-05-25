@@ -42,6 +42,7 @@ export const en = {
   'admin.nav.home': 'Home',
   'admin.nav.entityTypes': 'Entity types',
   'admin.nav.tags': 'Tags',
+  'admin.nav.navigation': 'Navigation',
   'admin.nav.settings': 'Settings',
   'admin.nav.publicSite': 'Public site',
   'admin.nav.logout': 'Log out',
@@ -254,6 +255,27 @@ export const en = {
   'admin.settings.history.loading': 'Loading history…',
   'admin.settings.history.error': 'Could not load revision history.',
   'admin.settings.history.empty': 'No revisions yet.',
+
+  // ── Navigation items ─────────────────────────────────────────────────────
+  'admin.navigation.pageTitle': 'Navigation',
+  'admin.navigation.description': 'Manage the navigation links shown in the public site header.',
+  'admin.navigation.loading': 'Loading navigation items…',
+  'admin.navigation.error': 'Could not load navigation items.',
+  'admin.navigation.empty': 'No navigation items yet.',
+  'admin.navigation.add': 'Add link',
+  'admin.navigation.save': 'Save',
+  'admin.navigation.saving': 'Saving…',
+  'admin.navigation.delete': 'Delete',
+  'admin.navigation.deleting': 'Deleting…',
+  'admin.navigation.cancel': 'Cancel',
+  'admin.navigation.label': 'Label',
+  'admin.navigation.url': 'URL',
+  'admin.navigation.displayOrder': 'Display order',
+  'admin.navigation.form.labelPlaceholder': 'e.g. Blog',
+  'admin.navigation.form.urlPlaceholder': 'e.g. /blog',
+  'admin.navigation.createSuccess': 'Navigation item created.',
+  'admin.navigation.updateSuccess': 'Navigation item updated.',
+  'admin.navigation.deleteSuccess': 'Navigation item deleted.',
 } as const
 
 /** Complete message catalog type — derived from the English source of truth. */
