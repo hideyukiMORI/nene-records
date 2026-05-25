@@ -1,4 +1,5 @@
 import type { FieldDataType, FieldDef } from '@/entities/field-def'
+import { useTranslation } from '@/shared/i18n'
 import { ConfirmDialog, Stack, Text } from '@/shared/ui'
 import { FieldDefCreateForm } from './FieldDefCreateForm'
 import { FieldDefEditForm } from './FieldDefEditForm'
@@ -51,12 +52,14 @@ export function ManageFieldDefsView({
   onCancelDelete,
   onConfirmDelete,
 }: ManageFieldDefsViewProps) {
+  const { t } = useTranslation()
+
   return (
     <>
       <Stack gap="lg">
         {entityTypeSlug !== null ? (
           <Text as="p" muted>
-            Schema for {entityTypeSlug}
+            {t('admin.fieldDefs.schemaFor', { slug: entityTypeSlug })}
           </Text>
         ) : null}
         {canManageSchema ? (
@@ -77,7 +80,7 @@ export function ManageFieldDefsView({
         ) : null}
         <Stack gap="sm">
           <Text as="h2" variant="heading-sm">
-            Field definitions
+            {t('admin.fieldDefs.list.title')}
           </Text>
           <FieldDefListPanel
             items={items}
@@ -94,13 +97,14 @@ export function ManageFieldDefsView({
       </Stack>
       <ConfirmDialog
         open={deleteTarget !== null}
-        title="Delete field?"
+        title={t('admin.fieldDefs.delete.title')}
         description={
           deleteTarget !== null
-            ? `"${deleteTarget.fieldKey}" will be removed from the schema.`
+            ? t('admin.fieldDefs.delete.description', { fieldKey: deleteTarget.fieldKey })
             : undefined
         }
-        confirmLabel={isDeleting ? 'Deleting…' : 'Delete'}
+        confirmLabel={isDeleting ? t('common.actions.deleting') : t('common.actions.delete')}
+        cancelLabel={t('common.actions.cancel')}
         isPending={isDeleting}
         onCancel={onCancelDelete}
         onConfirm={() => {

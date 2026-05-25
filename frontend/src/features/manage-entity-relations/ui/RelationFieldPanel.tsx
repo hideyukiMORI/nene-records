@@ -1,4 +1,5 @@
 import type { RelationFieldDef } from '@/entities/field-def'
+import { useTranslation } from '@/shared/i18n'
 import { Button, Stack, Text } from '@/shared/ui'
 import { useRelationFieldPanel } from '../hooks/use-relation-field-panel'
 
@@ -8,6 +9,7 @@ export interface RelationFieldPanelProps {
 }
 
 export function RelationFieldPanel({ entityId, fieldDef }: RelationFieldPanelProps) {
+  const { t } = useTranslation()
   const {
     attachedRelations,
     targetLabels,
@@ -25,20 +27,23 @@ export function RelationFieldPanel({ entityId, fieldDef }: RelationFieldPanelPro
     refetch,
   } = useRelationFieldPanel(entityId, fieldDef)
 
-  const attachLabel = fieldDef.cardinality === 'one' ? 'Set target' : 'Add target'
+  const attachLabel =
+    fieldDef.cardinality === 'one' ? t('admin.relations.setTarget') : t('admin.relations.addTarget')
   const selectId = `relation-target-${fieldDef.fieldKey}`
 
   if (isLoading) {
-    return <Text muted>Loading {fieldDef.fieldKey}…</Text>
+    return <Text muted>{t('admin.relations.loadingField', { fieldKey: fieldDef.fieldKey })}</Text>
   }
 
   if (isError) {
     return (
       <Stack gap="sm">
-        <Text variant="heading-sm">Could not load {fieldDef.fieldKey}</Text>
-        <Text muted>{errorTitle ?? 'Unknown error'}</Text>
+        <Text variant="heading-sm">
+          {t('admin.relations.fieldError', { fieldKey: fieldDef.fieldKey })}
+        </Text>
+        <Text muted>{errorTitle ?? t('common.error.unknown')}</Text>
         <Button variant="secondary" onClick={() => void refetch()}>
-          Retry
+          {t('common.actions.retry')}
         </Button>
       </Stack>
     )
@@ -51,11 +56,14 @@ export function RelationFieldPanel({ entityId, fieldDef }: RelationFieldPanelPro
           {fieldDef.fieldKey}
         </Text>
         <Text muted>
-          relation · {fieldDef.cardinality} · target type #{String(fieldDef.targetEntityTypeId)}
+          {t('admin.relations.relationType', {
+            cardinality: fieldDef.cardinality,
+            targetTypeId: fieldDef.targetEntityTypeId,
+          })}
         </Text>
       </Stack>
       {attachedRelations.length === 0 ? (
-        <Text muted>No targets linked yet.</Text>
+        <Text muted>{t('admin.relations.noTargets')}</Text>
       ) : (
         <ul className="flex flex-col gap-stack-sm">
           {attachedRelations.map((relation) => (
@@ -66,7 +74,7 @@ export function RelationFieldPanel({ entityId, fieldDef }: RelationFieldPanelPro
               <Stack gap="xs">
                 <Text as="span" variant="heading-sm">
                   {targetLabels[String(relation.targetEntityId)] ??
-                    `Record #${String(relation.targetEntityId)}`}
+                    t('admin.entityRecord.id', { id: relation.targetEntityId })}
                 </Text>
                 <Text as="span" muted>
                   #{String(relation.targetEntityId)}
@@ -80,7 +88,7 @@ export function RelationFieldPanel({ entityId, fieldDef }: RelationFieldPanelPro
                   void detachTarget(relation)
                 }}
               >
-                Remove
+                {t('admin.relations.remove')}
               </Button>
             </li>
           ))}
@@ -101,11 +109,13 @@ export function RelationFieldPanel({ entityId, fieldDef }: RelationFieldPanelPro
             className="rounded-md border border-border bg-surface-raised px-inline-md py-stack-sm font-sans text-body text-text-primary shadow-sm focus-visible:outline-none focus-visible:shadow-focus disabled:cursor-not-allowed disabled:opacity-50"
           >
             <option value="">
-              {availableTargetIds.length === 0 ? 'No targets available' : 'Select target…'}
+              {availableTargetIds.length === 0
+                ? t('admin.relations.noTargetsAvailable')
+                : t('admin.relations.selectTarget')}
             </option>
             {availableTargetIds.map((targetId) => (
               <option key={String(targetId)} value={String(targetId)}>
-                {targetLabels[String(targetId)] ?? `Record #${String(targetId)}`}
+                {targetLabels[String(targetId)] ?? t('admin.entityRecord.id', { id: targetId })}
               </option>
             ))}
           </select>
@@ -118,7 +128,7 @@ export function RelationFieldPanel({ entityId, fieldDef }: RelationFieldPanelPro
             void attachTarget()
           }}
         >
-          {isAttaching ? 'Saving…' : attachLabel}
+          {isAttaching ? t('admin.relations.saving') : attachLabel}
         </Button>
       </Stack>
     </Stack>

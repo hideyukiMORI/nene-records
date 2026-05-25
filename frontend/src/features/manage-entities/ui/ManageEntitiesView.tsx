@@ -1,6 +1,7 @@
 import type { Entity, EntityRelationFilters } from '@/entities/entity'
 import type { RelationFieldDef } from '@/entities/field-def'
 import type { Tag } from '@/entities/tag'
+import { useTranslation } from '@/shared/i18n'
 import { ConfirmDialog, Stack, Text } from '@/shared/ui'
 import { EntityCreatePanel } from './EntityCreatePanel'
 import { EntityListPanel } from './EntityListPanel'
@@ -66,6 +67,11 @@ export function ManageEntitiesView({
   onCancelDelete,
   onConfirmDelete,
 }: ManageEntitiesViewProps) {
+  const { t } = useTranslation()
+
+  const recordCountKey =
+    total === 1 ? 'admin.entityRecords.recordCount.one' : 'admin.entityRecords.recordCount.other'
+
   return (
     <>
       <Stack gap="lg">
@@ -74,7 +80,7 @@ export function ManageEntitiesView({
             {entityTypeSlug ?? '…'}
           </Text>
           <Text as="p" muted>
-            {total} record{total === 1 ? '' : 's'}
+            {t(recordCountKey, { count: total })}
           </Text>
         </Stack>
         <EntityCreatePanel
@@ -96,7 +102,9 @@ export function ManageEntitiesView({
         />
         <Stack gap="sm">
           <Text as="h2" variant="heading-sm">
-            {entityTypeName !== null ? `${entityTypeName} records` : 'Records'}
+            {entityTypeName !== null
+              ? t('admin.entityRecords.list.title', { name: entityTypeName })
+              : t('admin.entityRecords.list.titleDefault')}
           </Text>
           <EntityListPanel
             entityTypeId={entityTypeId}
@@ -114,13 +122,14 @@ export function ManageEntitiesView({
       </Stack>
       <ConfirmDialog
         open={deleteTarget !== null}
-        title="Delete record?"
+        title={t('admin.entityRecords.delete.title')}
         description={
           deleteTarget !== null
-            ? `Record #${String(deleteTarget.id)} will be soft-deleted.`
+            ? t('admin.entityRecords.delete.description', { id: deleteTarget.id })
             : undefined
         }
-        confirmLabel={isDeleting ? 'Deleting…' : 'Delete'}
+        confirmLabel={isDeleting ? t('common.actions.deleting') : t('common.actions.delete')}
+        cancelLabel={t('common.actions.cancel')}
         isPending={isDeleting}
         onCancel={onCancelDelete}
         onConfirm={() => {

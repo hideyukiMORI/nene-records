@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import type { EntityType } from '@/entities/entity-type'
+import { useTranslation } from '@/shared/i18n'
 import { Button, EmptyState, Stack, Text } from '@/shared/ui'
 
 export interface EntityTypeListPanelProps {
@@ -25,17 +26,19 @@ export function EntityTypeListPanel({
   onEdit,
   onDelete,
 }: EntityTypeListPanelProps) {
+  const { t } = useTranslation()
+
   if (isLoading) {
-    return <Text muted>Loading entity types…</Text>
+    return <Text muted>{t('admin.entityTypes.existingList.loading')}</Text>
   }
 
   if (isError) {
     return (
       <Stack gap="sm">
-        <Text variant="heading-sm">Could not load entity types</Text>
-        <Text muted>{errorTitle ?? 'Unknown error'}</Text>
+        <Text variant="heading-sm">{t('admin.entityTypes.existingList.error')}</Text>
+        <Text muted>{errorTitle ?? t('common.error.unknown')}</Text>
         <Button variant="secondary" onClick={onRetry}>
-          Retry
+          {t('common.actions.retry')}
         </Button>
       </Stack>
     )
@@ -44,8 +47,8 @@ export function EntityTypeListPanel({
   if (items.length === 0) {
     return (
       <EmptyState
-        title="No entity types yet"
-        description="Create your first entity type using the form above."
+        title={t('admin.entityTypes.existingList.empty.title')}
+        description={t('admin.entityTypes.existingList.empty.description')}
       />
     )
   }
@@ -69,13 +72,13 @@ export function EntityTypeListPanel({
             {canManageSchema ? (
               <Link to={`/entity-types/${String(item.id)}/fields`}>
                 <Button variant="secondary" size="sm">
-                  Fields
+                  {t('admin.entityTypes.actions.fields')}
                 </Button>
               </Link>
             ) : null}
             <Link to={`/entity-types/${String(item.id)}/entities`}>
               <Button variant="secondary" size="sm">
-                Records
+                {t('admin.entityTypes.actions.records')}
               </Button>
             </Link>
             {canManageSchema ? (
@@ -87,7 +90,7 @@ export function EntityTypeListPanel({
                     onEdit(item)
                   }}
                 >
-                  Edit
+                  {t('common.actions.edit')}
                 </Button>
                 <Button
                   variant="danger"
@@ -97,7 +100,7 @@ export function EntityTypeListPanel({
                     onDelete(item)
                   }}
                 >
-                  Delete
+                  {t('common.actions.delete')}
                 </Button>
               </>
             ) : null}

@@ -1,4 +1,5 @@
 import { Controller } from 'react-hook-form'
+import { useTranslation } from '@/shared/i18n'
 import { Button, Input, Stack, Text } from '@/shared/ui'
 import { useCreateEntityTypeForm } from '../hooks/use-create-entity-type-form'
 
@@ -13,6 +14,7 @@ export function EntityTypeCreateForm({
   serverErrorTitle,
   onSubmit,
 }: EntityTypeCreateFormProps) {
+  const { t } = useTranslation()
   const {
     control,
     handleSubmit,
@@ -32,7 +34,7 @@ export function EntityTypeCreateForm({
     >
       <Stack gap="md">
         <Text as="h2" variant="heading-sm">
-          Create entity type
+          {t('admin.entityTypes.createForm.title')}
         </Text>
         <Controller
           name="name"
@@ -40,7 +42,7 @@ export function EntityTypeCreateForm({
           render={({ field }) => (
             <Input
               id="entity-type-name"
-              label="Name"
+              label={t('common.field.name')}
               error={errors.name?.message}
               autoComplete="off"
               disabled={isSubmitting}
@@ -56,7 +58,7 @@ export function EntityTypeCreateForm({
           render={({ field }) => (
             <Input
               id="entity-type-slug"
-              label="Slug"
+              label={t('common.field.slug')}
               error={errors.slug?.message}
               autoComplete="off"
               disabled={isSubmitting}
@@ -68,7 +70,9 @@ export function EntityTypeCreateForm({
         />
         {serverErrorTitle !== null ? <Text muted>{serverErrorTitle}</Text> : null}
         <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? 'Creating…' : 'Create entity type'}
+          {isSubmitting
+            ? t('admin.entityTypes.createForm.submitting')
+            : t('admin.entityTypes.createForm.submit')}
         </Button>
       </Stack>
     </form>

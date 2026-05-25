@@ -1,5 +1,6 @@
 import { Controller } from 'react-hook-form'
 import type { EntityType } from '@/entities/entity-type'
+import { useTranslation } from '@/shared/i18n'
 import { Button, Input, Stack, Text } from '@/shared/ui'
 import { useEditEntityTypeForm } from '../hooks/use-create-entity-type-form'
 
@@ -18,6 +19,7 @@ export function EntityTypeEditForm({
   onSubmit,
   onCancel,
 }: EntityTypeEditFormProps) {
+  const { t } = useTranslation()
   const {
     control,
     handleSubmit,
@@ -39,7 +41,7 @@ export function EntityTypeEditForm({
     >
       <Stack gap="md">
         <Text as="h2" variant="heading-sm">
-          Edit entity type
+          {t('admin.entityTypes.editForm.title')}
         </Text>
         <Controller
           name="name"
@@ -47,7 +49,7 @@ export function EntityTypeEditForm({
           render={({ field }) => (
             <Input
               id="entity-type-edit-name"
-              label="Name"
+              label={t('common.field.name')}
               error={errors.name?.message}
               autoComplete="off"
               disabled={isSubmitting}
@@ -63,7 +65,7 @@ export function EntityTypeEditForm({
           render={({ field }) => (
             <Input
               id="entity-type-edit-slug"
-              label="Slug"
+              label={t('common.field.slug')}
               error={errors.slug?.message}
               autoComplete="off"
               disabled={isSubmitting}
@@ -76,10 +78,12 @@ export function EntityTypeEditForm({
         {serverErrorTitle !== null ? <Text muted>{serverErrorTitle}</Text> : null}
         <div className="flex items-center gap-inline-sm">
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? 'Saving…' : 'Save changes'}
+            {isSubmitting
+              ? t('admin.entityTypes.editForm.saving')
+              : t('admin.entityTypes.editForm.save')}
           </Button>
           <Button type="button" variant="secondary" disabled={isSubmitting} onClick={onCancel}>
-            Cancel
+            {t('common.actions.cancel')}
           </Button>
         </div>
       </Stack>

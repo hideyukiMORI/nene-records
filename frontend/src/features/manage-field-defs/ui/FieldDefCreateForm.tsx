@@ -1,14 +1,16 @@
 import { Controller } from 'react-hook-form'
 import { FIELD_DATA_TYPES, type FieldDataType } from '@/entities/field-def'
+import { useTranslation } from '@/shared/i18n'
+import type { MessageKey } from '@/shared/i18n'
 import { Button, Input, Stack, Text } from '@/shared/ui'
 import { useCreateFieldDefForm } from '../hooks/use-create-field-def-form'
 
-const DATA_TYPE_LABELS: Record<FieldDataType, string> = {
-  text: 'Text',
-  int: 'Integer',
-  enum: 'Enum',
-  bool: 'Boolean',
-  datetime: 'Date & time',
+const DATA_TYPE_LABEL_KEYS: Record<FieldDataType, MessageKey> = {
+  text: 'admin.fieldDefs.dataType.text',
+  int: 'admin.fieldDefs.dataType.int',
+  enum: 'admin.fieldDefs.dataType.enum',
+  bool: 'admin.fieldDefs.dataType.bool',
+  datetime: 'admin.fieldDefs.dataType.datetime',
 }
 
 export interface FieldDefCreateFormProps {
@@ -22,6 +24,7 @@ export function FieldDefCreateForm({
   serverErrorTitle,
   onSubmit,
 }: FieldDefCreateFormProps) {
+  const { t } = useTranslation()
   const {
     control,
     handleSubmit,
@@ -41,7 +44,7 @@ export function FieldDefCreateForm({
     >
       <Stack gap="md">
         <Text as="h2" variant="heading-sm">
-          Add field
+          {t('admin.fieldDefs.createForm.title')}
         </Text>
         <Controller
           name="fieldKey"
@@ -49,7 +52,7 @@ export function FieldDefCreateForm({
           render={({ field }) => (
             <Input
               id="field-def-key"
-              label="Field key"
+              label={t('admin.fieldDefs.createForm.fieldKeyLabel')}
               error={errors.fieldKey?.message}
               autoComplete="off"
               disabled={isSubmitting}
@@ -68,7 +71,7 @@ export function FieldDefCreateForm({
                 htmlFor="field-def-data-type"
                 className="font-sans text-body font-medium text-text-primary"
               >
-                Data type
+                {t('admin.fieldDefs.createForm.dataTypeLabel')}
               </label>
               <select
                 id="field-def-data-type"
@@ -80,7 +83,7 @@ export function FieldDefCreateForm({
               >
                 {FIELD_DATA_TYPES.map((dataType) => (
                   <option key={dataType} value={dataType}>
-                    {DATA_TYPE_LABELS[dataType]}
+                    {t(DATA_TYPE_LABEL_KEYS[dataType])}
                   </option>
                 ))}
               </select>
@@ -94,7 +97,9 @@ export function FieldDefCreateForm({
         />
         {serverErrorTitle !== null ? <Text muted>{serverErrorTitle}</Text> : null}
         <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? 'Adding…' : 'Add field'}
+          {isSubmitting
+            ? t('admin.fieldDefs.createForm.submitting')
+            : t('admin.fieldDefs.createForm.submit')}
         </Button>
       </Stack>
     </form>

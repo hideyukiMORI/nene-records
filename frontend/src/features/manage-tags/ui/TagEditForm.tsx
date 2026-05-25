@@ -1,5 +1,6 @@
 import { Controller } from 'react-hook-form'
 import type { Tag } from '@/entities/tag'
+import { useTranslation } from '@/shared/i18n'
 import { Button, Input, Stack, Text } from '@/shared/ui'
 import { useEditTagForm } from '../hooks/use-create-tag-form'
 
@@ -18,6 +19,7 @@ export function TagEditForm({
   onSubmit,
   onCancel,
 }: TagEditFormProps) {
+  const { t } = useTranslation()
   const {
     control,
     handleSubmit,
@@ -39,7 +41,7 @@ export function TagEditForm({
     >
       <Stack gap="md">
         <Text as="h2" variant="heading-sm">
-          Edit tag
+          {t('admin.tags.editForm.title')}
         </Text>
         <Controller
           name="name"
@@ -47,7 +49,7 @@ export function TagEditForm({
           render={({ field }) => (
             <Input
               id="tag-edit-name"
-              label="Name"
+              label={t('common.field.name')}
               error={errors.name?.message}
               autoComplete="off"
               disabled={isSubmitting}
@@ -63,7 +65,7 @@ export function TagEditForm({
           render={({ field }) => (
             <Input
               id="tag-edit-slug"
-              label="Slug"
+              label={t('common.field.slug')}
               error={errors.slug?.message}
               autoComplete="off"
               disabled={isSubmitting}
@@ -76,10 +78,10 @@ export function TagEditForm({
         {serverErrorTitle !== null ? <Text muted>{serverErrorTitle}</Text> : null}
         <div className="flex items-center gap-inline-sm">
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? 'Saving…' : 'Save changes'}
+            {isSubmitting ? t('admin.tags.editForm.saving') : t('admin.tags.editForm.save')}
           </Button>
           <Button type="button" variant="secondary" disabled={isSubmitting} onClick={onCancel}>
-            Cancel
+            {t('common.actions.cancel')}
           </Button>
         </div>
       </Stack>

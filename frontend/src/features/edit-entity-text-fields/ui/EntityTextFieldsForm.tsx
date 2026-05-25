@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { FieldDataType, FieldDef } from '@/entities/field-def'
+import { useTranslation } from '@/shared/i18n'
 import { Button, EmptyState, Input, Stack, Text } from '@/shared/ui'
 
 export interface EntityTextFieldsFormProps {
@@ -28,13 +29,14 @@ export function EntityTextFieldsForm({
   serverErrorTitle,
   onSubmit,
 }: EntityTextFieldsFormProps) {
+  const { t } = useTranslation()
   const [values, setValues] = useState(defaultValues)
 
   if (fieldDefs.length === 0) {
     return (
       <EmptyState
-        title="No editable fields defined"
-        description="Add field definitions for this entity type first."
+        title={t('admin.entityRecord.textFields.noFields.title')}
+        description={t('admin.entityRecord.textFields.noFields.description')}
       />
     )
   }
@@ -49,7 +51,7 @@ export function EntityTextFieldsForm({
     >
       <Stack gap="md">
         <Text as="h2" variant="heading-sm">
-          Field values
+          {t('admin.entityRecord.textFields.title')}
         </Text>
         {fieldDefs.map((fieldDef) => {
           const fieldId = `record-field-${fieldDef.fieldKey}`
@@ -98,7 +100,9 @@ export function EntityTextFieldsForm({
         })}
         {serverErrorTitle !== null ? <Text muted>{serverErrorTitle}</Text> : null}
         <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? 'Saving…' : 'Save values'}
+          {isSubmitting
+            ? t('admin.entityRecord.textFields.saving')
+            : t('admin.entityRecord.textFields.save')}
         </Button>
       </Stack>
     </form>

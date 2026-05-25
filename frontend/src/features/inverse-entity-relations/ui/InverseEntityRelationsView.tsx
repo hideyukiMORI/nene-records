@@ -1,3 +1,4 @@
+import { useTranslation } from '@/shared/i18n'
 import { Stack, Text } from '@/shared/ui'
 import { useInverseRelationFieldDefs } from '../hooks/use-inverse-relation-field-defs'
 import { InverseRelationPanel } from './InverseRelationPanel'
@@ -11,18 +12,19 @@ export function InverseEntityRelationsView({
   entityId,
   entityTypeId,
 }: InverseEntityRelationsViewProps) {
+  const { t } = useTranslation()
   const { inverseFieldDefs, isLoading, isError, errorTitle } =
     useInverseRelationFieldDefs(entityTypeId)
 
   if (isLoading) {
-    return <Text muted>Loading referenced-by relations…</Text>
+    return <Text muted>{t('admin.inverseRelations.loadingPanel', { panelTitle: '…' })}</Text>
   }
 
   if (isError) {
     return (
       <Stack gap="sm">
-        <Text variant="heading-sm">Could not load referenced-by relations</Text>
-        <Text muted>{errorTitle ?? 'Unknown error'}</Text>
+        <Text variant="heading-sm">{t('admin.inverseRelations.title')}</Text>
+        <Text muted>{errorTitle ?? t('common.error.unknown')}</Text>
       </Stack>
     )
   }
@@ -34,7 +36,7 @@ export function InverseEntityRelationsView({
   return (
     <Stack gap="lg">
       <Text as="h2" variant="heading-sm">
-        Referenced by
+        {t('admin.inverseRelations.title')}
       </Text>
       {inverseFieldDefs.map((fieldDef) => (
         <InverseRelationPanel

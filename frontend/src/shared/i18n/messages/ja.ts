@@ -157,6 +157,56 @@ export const ja: Partial<MessageCatalog> = {
   'admin.entityTags.adding': '追加中…',
   'admin.entityTags.remove': '削除',
 
+  // ── Entity record detail ──────────────────────────────────────────────────
+  'admin.entityRecord.backToRecords': 'レコードに戻る',
+  'admin.entityRecord.loading': 'レコードを読み込み中…',
+  'admin.entityRecord.error': 'レコードを読み込めませんでした',
+  'admin.entityRecord.notFound': 'レコードが見つかりません。',
+  'admin.entityRecord.id': 'レコード #{{id}}',
+  'admin.entityRecord.textFields.title': 'フィールド値',
+  'admin.entityRecord.textFields.noFields.title': '編集可能なフィールドがありません',
+  'admin.entityRecord.textFields.noFields.description':
+    'まずこのエンティティタイプのフィールド定義を追加してください。',
+  'admin.entityRecord.textFields.saving': '保存中…',
+  'admin.entityRecord.textFields.save': '値を保存',
+
+  // ── Entity status panel ───────────────────────────────────────────────────
+  'admin.entityStatus.panelTitle': '公開ステータス',
+  'admin.entityStatus.slugLabel': 'スラッグ',
+  'admin.entityStatus.slugPlaceholder': '例: hello-world',
+  'admin.entityStatus.saveSlug': 'スラッグを保存',
+  'admin.entityStatus.slugSaved': '保存しました。',
+  'admin.entityStatus.publish': '公開',
+  'admin.entityStatus.publishedAt': '{{date}} に公開',
+  'admin.entityStatus.updateError': 'ステータスの更新に失敗しました。',
+  'admin.entityStatus.slugError':
+    'スラッグの保存に失敗しました。既に別のレコードで使用されている可能性があります。',
+  'admin.entityStatus.status.draft': '下書き',
+  'admin.entityStatus.status.published': '公開済み',
+  'admin.entityStatus.status.archived': 'アーカイブ済み',
+
+  // ── Relations (outgoing) ──────────────────────────────────────────────────
+  'admin.relations.title': 'リレーション',
+  'admin.relations.loadingField': '{{fieldKey}} を読み込み中…',
+  'admin.relations.fieldError': '{{fieldKey}} を読み込めませんでした',
+  'admin.relations.noTargets': 'ターゲットがまだリンクされていません。',
+  'admin.relations.noTargetsAvailable': '利用可能なターゲットがありません',
+  'admin.relations.selectTarget': 'ターゲットを選択…',
+  'admin.relations.setTarget': 'ターゲットを設定',
+  'admin.relations.addTarget': 'ターゲットを追加',
+  'admin.relations.remove': '削除',
+  'admin.relations.saving': '保存中…',
+  'admin.relations.relationType':
+    'リレーション · {{cardinality}} · ターゲットタイプ #{{targetTypeId}}',
+
+  // ── Relations (inverse) ───────────────────────────────────────────────────
+  'admin.inverseRelations.title': '参照元',
+  'admin.inverseRelations.loadingPanel': '{{panelTitle}} を読み込み中…',
+  'admin.inverseRelations.panelError': '{{panelTitle}} を読み込めませんでした',
+  'admin.inverseRelations.noReferences':
+    '{{fieldKey}} 経由でこのターゲットを参照するレコードはありません。',
+  'admin.inverseRelations.open': '開く',
+
   // ── Settings ──────────────────────────────────────────────────────────────
   'admin.settings.pageTitle': 'サイト設定',
   'admin.settings.description':

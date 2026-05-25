@@ -1,13 +1,9 @@
 import { useState } from 'react'
 import type { Entity, EntityStatus } from '@/entities/entity'
 import { useUpdateEntity } from '@/entities/entity'
+import { useTranslation } from '@/shared/i18n'
+import type { MessageKey } from '@/shared/i18n'
 import { Button, Input, Stack, Text } from '@/shared/ui'
-
-const STATUS_LABELS: Record<EntityStatus, string> = {
-  draft: 'Draft',
-  published: 'Published',
-  archived: 'Archived',
-}
 
 const STATUS_BADGE_CLASS: Record<EntityStatus, string> = {
   draft:
@@ -24,12 +20,19 @@ const NEXT_STATUSES: Record<EntityStatus, EntityStatus[]> = {
   archived: ['draft', 'published'],
 }
 
+const STATUS_LABEL_KEYS: Record<EntityStatus, MessageKey> = {
+  draft: 'admin.entityStatus.status.draft',
+  published: 'admin.entityStatus.status.published',
+  archived: 'admin.entityStatus.status.archived',
+}
+
 interface EntityStatusPanelProps {
   entity: Entity
   entityTypeSlug?: string
 }
 
 export function EntityStatusPanel({ entity, entityTypeSlug }: EntityStatusPanelProps) {
+  const { t } = useTranslation()
   const updateMutation = useUpdateEntity()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [slugInput, setSlugInput] = useState(entity.slug ?? '')
@@ -46,7 +49,7 @@ export function EntityStatusPanel({ entity, entityTypeSlug }: EntityStatusPanelP
         status: nextStatus,
       })
     } catch {
-      setErrorMessage('Failed to update status.')
+      setErrorMessage(t('admin.entityStatus.updateError'))
     }
   }
 
@@ -62,7 +65,7 @@ export function EntityStatusPanel({ entity, entityTypeSlug }: EntityStatusPanelP
       })
       setSlugSaved(true)
     } catch {
-      setErrorMessage('Failed to save slug. It may already be used by another record.')
+      setErrorMessage(t('admin.entityStatus.slugError'))
     }
   }
 
@@ -75,20 +78,24 @@ export function EntityStatusPanel({ entity, entityTypeSlug }: EntityStatusPanelP
   return (
     <Stack gap="sm">
       <Text as="h2" variant="heading-sm">
-        Publish status
+        {t('admin.entityStatus.panelTitle')}
       </Text>
       <div className="flex flex-wrap items-center gap-inline-md">
-        <span className={STATUS_BADGE_CLASS[currentStatus]}>{STATUS_LABELS[currentStatus]}</span>
+        <span className={STATUS_BADGE_CLASS[currentStatus]}>
+          {t(STATUS_LABEL_KEYS[currentStatus])}
+        </span>
         {entity.publishedAt !== null && (
           <Text as="span" muted>
-            Published {new Date(entity.publishedAt).toLocaleDateString('ja-JP')}
+            {t('admin.entityStatus.publishedAt', {
+              date: new Date(entity.publishedAt).toLocaleDateString(),
+            })}
           </Text>
         )}
       </div>
 
       <Stack gap="xs">
         <label htmlFor="entity-slug" className="text-sm font-medium text-text-primary">
-          Slug
+          {t('admin.entityStatus.slugLabel')}
         </label>
         <div className="flex items-center gap-inline-sm">
           <Input
@@ -98,13 +105,13 @@ export function EntityStatusPanel({ entity, entityTypeSlug }: EntityStatusPanelP
               setSlugInput(e.target.value)
               setSlugSaved(false)
             }}
-            placeholder="e.g. hello-world"
+            placeholder={t('admin.entityStatus.slugPlaceholder')}
           />
           <Button variant="secondary" size="sm" onClick={() => void saveSlug()}>
-            Save slug
+            {t('admin.entityStatus.saveSlug')}
           </Button>
         </div>
-        {slugSaved && <Text muted>Saved.</Text>}
+        {slugSaved && <Text muted>{t('admin.entityStatus.slugSaved')}</Text>}
         {publicUrl !== null && (
           <a
             href={publicUrl}
@@ -128,7 +135,9 @@ export function EntityStatusPanel({ entity, entityTypeSlug }: EntityStatusPanelP
               void changeStatus(nextStatus)
             }}
           >
-            {nextStatus === 'published' ? 'Publish' : STATUS_LABELS[nextStatus]}
+            {nextStatus === 'published'
+              ? t('admin.entityStatus.publish')
+              : t(STATUS_LABEL_KEYS[nextStatus])}
           </Button>
         ))}
       </div>
