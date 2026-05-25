@@ -1,9 +1,13 @@
 import { useQuery, type UseQueryResult } from '@tanstack/react-query'
 import { apiClient, AppError } from '@/shared/api/client'
-import type { EntityDto, EntityListDto } from './api-types'
+import type { EntityDto, EntityListDto, EntityRevisionListDto } from './api-types'
 import type { EntityId } from './ids'
-import { mapEntityDtoToModel, mapEntityListDtoToModel } from './mapper'
-import type { Entity, EntityList } from './model'
+import {
+  mapEntityDtoToModel,
+  mapEntityListDtoToModel,
+  mapEntityRevisionListDtoToModel,
+} from './mapper'
+import type { Entity, EntityList, EntityRevisionList } from './model'
 import { entityKeys, type EntityListParams } from './query-keys'
 
 const DEFAULT_LIST_PARAMS = { limit: 20, offset: 0 } as const
@@ -48,6 +52,29 @@ export function useEntity(id: EntityId): UseQueryResult<Entity, AppError> {
       const dto = await apiClient.get<EntityDto>(`/api/v1/entities/${String(id)}`, signal)
       return mapEntityDtoToModel(dto)
     },
+  })
+}
+
+const DEFAULT_REVISION_PARAMS = { limit: 20, offset: 0 } as const
+
+export function useEntityRevisions(
+  id: EntityId,
+  params: { limit: number; offset: number } = DEFAULT_REVISION_PARAMS,
+): UseQueryResult<EntityRevisionList, AppError> {
+  return useQuery({
+    queryKey: [...entityKeys.revisions(id), params],
+    queryFn: async ({ signal }) => {
+      const search = new URLSearchParams({
+        limit: String(params.limit),
+        offset: String(params.offset),
+      })
+      const dto = await apiClient.get<EntityRevisionListDto>(
+        `/api/v1/entities/${String(id)}/revisions?${search.toString()}`,
+        signal,
+      )
+      return mapEntityRevisionListDtoToModel(dto)
+    },
+    enabled: id > 0,
   })
 }
 

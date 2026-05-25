@@ -23,6 +23,9 @@ interface EntityRepositoryInterface
 
     public function countByCriteria(EntityListCriteria $criteria): int;
 
+    /** @return list<EntityRevision> */
+    public function findRevisionsByEntityId(int $entityId, int $limit, int $offset): array;
+
     public function save(Entity $entity): int;
 
     public function update(Entity $entity): void;

@@ -4,10 +4,12 @@ export type {
   CreateEntityInput,
   Entity,
   EntityList,
+  EntityRevision,
+  EntityRevisionList,
   EntityStatus,
   UpdateEntityInput,
 } from './model'
 export { entityKeys } from './query-keys'
 export type { EntityListParams, EntityRelationFilters } from './query-keys'
 export { useCreateEntity, useDeleteEntity, useUpdateEntity } from './mutations'
-export { defaultEntityListParams, useEntity, useEntityList } from './queries'
+export { defaultEntityListParams, useEntity, useEntityList, useEntityRevisions } from './queries'

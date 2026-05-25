@@ -29,7 +29,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-final class EntityHttpTest extends TestCase
+final class EntityRevisionHttpTest extends TestCase
 {
     private Psr17Factory $factory;
     private InMemoryEntityTypeRepository $entityTypes;
@@ -69,62 +69,101 @@ final class EntityHttpTest extends TestCase
         ))->create();
     }
 
-    public function testPostEntityCreatesEntityAndReturns201WithLocation(): void
+    public function testCreateEntityProducesCreatedRevision(): void
     {
         $typeId = $this->entityTypes->save(new EntityType(name: 'Doc', slug: 'doc'));
-
-        $body = $this->factory->createStream(json_encode(['entity_type_id' => $typeId], JSON_THROW_ON_ERROR));
-        $response = $this->application->handle(
-            $this->factory->createServerRequest('POST', 'https://example.test/api/v1/entities')->withBody($body),
-        );
-        $payload = $this->decodeJson($response);
-
-        self::assertSame(201, $response->getStatusCode());
-        self::assertStringStartsWith('/api/v1/entities/', $response->getHeaderLine('Location'));
-        self::assertSame($typeId, $payload['entity_type_id']);
-        self::assertFalse($payload['is_deleted']);
-        self::assertIsInt($payload['id']);
-    }
-
-    public function testAfterDeleteGetEntityReturns404(): void
-    {
-        $typeId = $this->entityTypes->save(new EntityType(name: 'Thing', slug: 'thing'));
 
         $body = $this->factory->createStream(json_encode(['entity_type_id' => $typeId], JSON_THROW_ON_ERROR));
         $createResponse = $this->application->handle(
             $this->factory->createServerRequest('POST', 'https://example.test/api/v1/entities')->withBody($body),
         );
         $created = $this->decodeJson($createResponse);
-        $id = (int) $created['id'];
+        $entityId = (int) $created['id'];
 
         self::assertSame(201, $createResponse->getStatusCode());
 
-        $getBefore = $this->application->handle(
-            $this->factory->createServerRequest('GET', "https://example.test/api/v1/entities/{$id}"),
+        $revisionsResponse = $this->application->handle(
+            $this->factory->createServerRequest('GET', "https://example.test/api/v1/entities/{$entityId}/revisions"),
         );
-        self::assertSame(200, $getBefore->getStatusCode());
+        $payload = $this->decodeJson($revisionsResponse);
 
-        $del = $this->application->handle(
-            $this->factory->createServerRequest('DELETE', "https://example.test/api/v1/entities/{$id}"),
-        );
-        self::assertSame(204, $del->getStatusCode());
-
-        $getAfter = $this->application->handle(
-            $this->factory->createServerRequest('GET', "https://example.test/api/v1/entities/{$id}"),
-        );
-        $payload = $this->decodeJson($getAfter);
-
-        self::assertSame(404, $getAfter->getStatusCode());
-        self::assertStringEndsWith('not-found', (string) $payload['type']);
+        self::assertSame(200, $revisionsResponse->getStatusCode());
+        self::assertCount(1, $payload['items']);
+        self::assertSame('created', $payload['items'][0]['action']);
+        self::assertSame('draft', $payload['items'][0]['status']);
+        self::assertNull($payload['items'][0]['previous_status']);
     }
 
-    /**
-     * @return array<string, mixed>
-     */
+    public function testUpdateEntityProducesUpdatedRevision(): void
+    {
+        $typeId = $this->entityTypes->save(new EntityType(name: 'Doc', slug: 'doc'));
+
+        $body = $this->factory->createStream(json_encode(['entity_type_id' => $typeId], JSON_THROW_ON_ERROR));
+        $createResponse = $this->application->handle(
+            $this->factory->createServerRequest('POST', 'https://example.test/api/v1/entities')->withBody($body),
+        );
+        $created = $this->decodeJson($createResponse);
+        $entityId = (int) $created['id'];
+
+        $updateBody = $this->factory->createStream(json_encode([
+            'entity_type_id' => $typeId,
+            'status' => 'published',
+            'slug' => 'my-doc',
+        ], JSON_THROW_ON_ERROR));
+        $this->application->handle(
+            $this->factory->createServerRequest('PUT', "https://example.test/api/v1/entities/{$entityId}")->withBody($updateBody),
+        );
+
+        $revisionsResponse = $this->application->handle(
+            $this->factory->createServerRequest('GET', "https://example.test/api/v1/entities/{$entityId}/revisions"),
+        );
+        $payload = $this->decodeJson($revisionsResponse);
+
+        self::assertSame(200, $revisionsResponse->getStatusCode());
+        // Newest first: updated, created
+        self::assertCount(2, $payload['items']);
+        self::assertSame('updated', $payload['items'][0]['action']);
+        self::assertSame('published', $payload['items'][0]['status']);
+        self::assertSame('draft', $payload['items'][0]['previous_status']);
+        self::assertSame('my-doc', $payload['items'][0]['slug']);
+    }
+
+    public function testDeleteEntityProducesDeletedRevision(): void
+    {
+        $typeId = $this->entityTypes->save(new EntityType(name: 'Doc', slug: 'doc'));
+
+        $body = $this->factory->createStream(json_encode(['entity_type_id' => $typeId], JSON_THROW_ON_ERROR));
+        $createResponse = $this->application->handle(
+            $this->factory->createServerRequest('POST', 'https://example.test/api/v1/entities')->withBody($body),
+        );
+        $created = $this->decodeJson($createResponse);
+        $entityId = (int) $created['id'];
+
+        $this->application->handle(
+            $this->factory->createServerRequest('DELETE', "https://example.test/api/v1/entities/{$entityId}"),
+        );
+
+        // After soft delete the entity is gone, but revisions were recorded before deletion.
+        // We check the in-memory store directly.
+        $revisions = $this->entities->findRevisionsByEntityId($entityId, 20, 0);
+
+        self::assertCount(2, $revisions);
+        self::assertSame('deleted', $revisions[0]->action->value);
+    }
+
+    public function testGetRevisionsForNonExistentEntityReturns404(): void
+    {
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/api/v1/entities/9999/revisions'),
+        );
+
+        self::assertSame(404, $response->getStatusCode());
+    }
+
+    /** @return array<string, mixed> */
     private function decodeJson(ResponseInterface $response): array
     {
         $payload = json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
-
         self::assertIsArray($payload);
 
         return $payload;

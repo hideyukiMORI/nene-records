@@ -48,6 +48,7 @@ final class PdoEntityRepositoryTest extends TestCase
         $paths = [
             $projectRoot . '/database/schema/entity_types.sql',
             $projectRoot . '/database/schema/entities.sql',
+            $projectRoot . '/database/schema/entity_revisions.sql',
             $projectRoot . '/database/schema/tags.sql',
             $projectRoot . '/database/schema/entity_tags.sql',
             $projectRoot . '/database/schema/entity_relations.sql',

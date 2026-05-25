@@ -1,6 +1,20 @@
-import type { CreateEntityDto, EntityDto, EntityListDto, UpdateEntityDto } from './api-types'
+import type {
+  CreateEntityDto,
+  EntityDto,
+  EntityListDto,
+  EntityRevisionDto,
+  EntityRevisionListDto,
+  UpdateEntityDto,
+} from './api-types'
 import { toEntityId } from './ids'
-import type { CreateEntityInput, Entity, EntityList, UpdateEntityInput } from './model'
+import type {
+  CreateEntityInput,
+  Entity,
+  EntityList,
+  EntityRevision,
+  EntityRevisionList,
+  UpdateEntityInput,
+} from './model'
 
 export function mapEntityDtoToModel(dto: EntityDto): Entity {
   return {
@@ -37,5 +51,27 @@ export function mapUpdateInputToDto(input: UpdateEntityInput): UpdateEntityDto {
     ...(input.slug !== undefined ? { slug: input.slug } : {}),
     status: input.status,
     ...(input.publishedAt !== undefined ? { published_at: input.publishedAt } : {}),
+  }
+}
+
+export function mapEntityRevisionDtoToModel(dto: EntityRevisionDto): EntityRevision {
+  return {
+    id: dto.id,
+    entityId: dto.entity_id,
+    action: dto.action,
+    status: dto.status,
+    previousStatus: dto.previous_status,
+    slug: dto.slug,
+    previousSlug: dto.previous_slug,
+    actorUserId: dto.actor_user_id,
+    createdAt: dto.created_at,
+  }
+}
+
+export function mapEntityRevisionListDtoToModel(dto: EntityRevisionListDto): EntityRevisionList {
+  return {
+    items: dto.items.map(mapEntityRevisionDtoToModel),
+    limit: dto.limit,
+    offset: dto.offset,
   }
 }

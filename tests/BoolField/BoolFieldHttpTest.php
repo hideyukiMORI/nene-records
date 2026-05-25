@@ -31,6 +31,8 @@ use NeNeRecords\Entity\GetEntityByIdHandler;
 use NeNeRecords\Entity\GetEntityByIdUseCase;
 use NeNeRecords\Entity\ListEntitiesHandler;
 use NeNeRecords\Entity\ListEntitiesUseCase;
+use NeNeRecords\Entity\ListEntityRevisionsHandler;
+use NeNeRecords\Entity\ListEntityRevisionsUseCase;
 use NeNeRecords\Entity\UpdateEntityHandler;
 use NeNeRecords\Entity\UpdateEntityUseCase;
 use NeNeRecords\EntityType\EntityType;
@@ -72,6 +74,7 @@ final class BoolFieldHttpTest extends TestCase
             new UpdateEntityHandler(new UpdateEntityUseCase($this->entities, $this->entityTypes), $jsonResponse),
             new DeleteEntityHandler(new DeleteEntityUseCase($this->entities), $this->factory),
             new ListEntitiesHandler(new ListEntitiesUseCase($this->entities), $jsonResponse),
+            new ListEntityRevisionsHandler(new ListEntityRevisionsUseCase($this->entities), $jsonResponse),
         );
 
         $intFieldRegistrar = new BoolFieldRouteRegistrar(

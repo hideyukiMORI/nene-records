@@ -20,7 +20,11 @@ final class InMemoryEntityRepository implements EntityRepositoryInterface
     /** @var array<int, array<string, list<int>>> entityId => fieldKey => target entity ids */
     private array $relationsByEntityId;
 
+    /** @var list<\NeNeRecords\Entity\EntityRevision> */
+    private array $revisions;
+
     private int $nextId;
+    private int $nextRevisionId;
 
     /** @param list<Entity> $seed */
     public function __construct(array $seed = [])
@@ -28,7 +32,9 @@ final class InMemoryEntityRepository implements EntityRepositoryInterface
         $this->entities = [];
         $this->tagSlugsByEntityId = [];
         $this->relationsByEntityId = [];
+        $this->revisions = [];
         $this->nextId = 1;
+        $this->nextRevisionId = 1;
 
         foreach ($seed as $entity) {
             $id = $entity->id;
@@ -172,6 +178,20 @@ final class InMemoryEntityRepository implements EntityRepositoryInterface
         return count($this->findByCriteria($criteria, PHP_INT_MAX, 0));
     }
 
+    /** @return list<\NeNeRecords\Entity\EntityRevision> */
+    public function findRevisionsByEntityId(int $entityId, int $limit, int $offset): array
+    {
+        $filtered = array_values(array_filter(
+            $this->revisions,
+            static fn (\NeNeRecords\Entity\EntityRevision $r): bool => $r->entityId === $entityId,
+        ));
+
+        // Newest first
+        $filtered = array_reverse($filtered);
+
+        return array_slice($filtered, $offset, $limit);
+    }
+
     public function save(Entity $entity): int
     {
         $id = $this->nextId++;
@@ -182,6 +202,18 @@ final class InMemoryEntityRepository implements EntityRepositoryInterface
             slug: $entity->slug,
             status: $entity->status,
             publishedAt: $entity->publishedAt,
+        );
+
+        $this->revisions[] = new \NeNeRecords\Entity\EntityRevision(
+            entityId: $id,
+            action: \NeNeRecords\Entity\EntityRevisionAction::Created,
+            status: $entity->status->value,
+            previousStatus: null,
+            slug: $entity->slug,
+            previousSlug: null,
+            actorUserId: null,
+            createdAt: date('Y-m-d H:i:s'),
+            id: $this->nextRevisionId++,
         );
 
         return $id;
@@ -195,7 +227,20 @@ final class InMemoryEntityRepository implements EntityRepositoryInterface
             return;
         }
 
+        $existing = $this->entities[$id];
         $this->entities[$id] = $entity;
+
+        $this->revisions[] = new \NeNeRecords\Entity\EntityRevision(
+            entityId: $id,
+            action: \NeNeRecords\Entity\EntityRevisionAction::Updated,
+            status: $entity->status->value,
+            previousStatus: $existing->status->value,
+            slug: $entity->slug,
+            previousSlug: $existing->slug,
+            actorUserId: null,
+            createdAt: date('Y-m-d H:i:s'),
+            id: $this->nextRevisionId++,
+        );
     }
 
     public function softDelete(int $id): void
@@ -212,6 +257,18 @@ final class InMemoryEntityRepository implements EntityRepositoryInterface
             status: $entity->status,
             isDeleted: true,
             deletedAt: new DateTimeImmutable('@1700000000'),
+        );
+
+        $this->revisions[] = new \NeNeRecords\Entity\EntityRevision(
+            entityId: $id,
+            action: \NeNeRecords\Entity\EntityRevisionAction::Deleted,
+            status: $entity->status->value,
+            previousStatus: $entity->status->value,
+            slug: $entity->slug,
+            previousSlug: $entity->slug,
+            actorUserId: null,
+            createdAt: date('Y-m-d H:i:s'),
+            id: $this->nextRevisionId++,
         );
     }
 }

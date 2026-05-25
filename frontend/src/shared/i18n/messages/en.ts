@@ -210,6 +210,14 @@ export const en = {
   'admin.inverseRelations.noReferences': 'No records reference this target via {{fieldKey}}.',
   'admin.inverseRelations.open': 'Open',
 
+  // ── Entity revisions ─────────────────────────────────────────────────────
+  'admin.entityRevisions.title': 'Change history',
+  'admin.entityRevisions.show': 'Show history',
+  'admin.entityRevisions.hide': 'Hide history',
+  'admin.entityRevisions.loading': 'Loading history…',
+  'admin.entityRevisions.error': 'Could not load revision history.',
+  'admin.entityRevisions.empty': 'No revisions yet.',
+
   // ── Settings ──────────────────────────────────────────────────────────────
   'admin.settings.pageTitle': 'Site settings',
   'admin.settings.description':

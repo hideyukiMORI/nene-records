@@ -211,6 +211,35 @@ final readonly class EntityServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(
+                ListEntityRevisionsUseCaseInterface::class,
+                static function (ContainerInterface $c): ListEntityRevisionsUseCaseInterface {
+                    $repository = $c->get(EntityRepositoryInterface::class);
+
+                    if (!$repository instanceof EntityRepositoryInterface) {
+                        throw new LogicException('Entity repository service is invalid.');
+                    }
+
+                    return new ListEntityRevisionsUseCase($repository);
+                },
+            )
+            ->set(
+                ListEntityRevisionsHandler::class,
+                static function (ContainerInterface $c): ListEntityRevisionsHandler {
+                    $useCase = $c->get(ListEntityRevisionsUseCaseInterface::class);
+                    $response = $c->get(JsonResponseFactory::class);
+
+                    if (!$useCase instanceof ListEntityRevisionsUseCaseInterface) {
+                        throw new LogicException('ListEntityRevisions use case service is invalid.');
+                    }
+
+                    if (!$response instanceof JsonResponseFactory) {
+                        throw new LogicException('JSON response factory service is invalid.');
+                    }
+
+                    return new ListEntityRevisionsHandler($useCase, $response);
+                },
+            )
+            ->set(
                 'nene-records.route_registrar.entity',
                 static function (ContainerInterface $c): EntityRouteRegistrar {
                     $get = $c->get(GetEntityByIdHandler::class);
@@ -218,6 +247,7 @@ final readonly class EntityServiceProvider implements ServiceProviderInterface
                     $update = $c->get(UpdateEntityHandler::class);
                     $delete = $c->get(DeleteEntityHandler::class);
                     $list = $c->get(ListEntitiesHandler::class);
+                    $listRevisions = $c->get(ListEntityRevisionsHandler::class);
 
                     if (!$get instanceof GetEntityByIdHandler) {
                         throw new LogicException('GetEntityById handler service is invalid.');
@@ -239,7 +269,11 @@ final readonly class EntityServiceProvider implements ServiceProviderInterface
                         throw new LogicException('ListEntities handler service is invalid.');
                     }
 
-                    return new EntityRouteRegistrar($get, $create, $update, $delete, $list);
+                    if (!$listRevisions instanceof ListEntityRevisionsHandler) {
+                        throw new LogicException('ListEntityRevisions handler service is invalid.');
+                    }
+
+                    return new EntityRouteRegistrar($get, $create, $update, $delete, $list, $listRevisions);
                 },
             );
     }
