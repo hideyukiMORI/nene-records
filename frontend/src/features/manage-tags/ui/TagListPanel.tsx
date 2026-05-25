@@ -1,4 +1,5 @@
 import type { Tag } from '@/entities/tag'
+import { useTranslation } from '@/shared/i18n'
 import { Button, EmptyState, Stack, Text } from '@/shared/ui'
 
 export interface TagListPanelProps {
@@ -22,17 +23,19 @@ export function TagListPanel({
   onEdit,
   onDelete,
 }: TagListPanelProps) {
+  const { t } = useTranslation()
+
   if (isLoading) {
-    return <Text muted>Loading tags…</Text>
+    return <Text muted>{t('admin.tags.list.loading')}</Text>
   }
 
   if (isError) {
     return (
       <Stack gap="sm">
-        <Text variant="heading-sm">Could not load tags</Text>
-        <Text muted>{errorTitle ?? 'Unknown error'}</Text>
+        <Text variant="heading-sm">{t('admin.tags.list.error')}</Text>
+        <Text muted>{errorTitle ?? t('common.error.unknown')}</Text>
         <Button variant="secondary" onClick={onRetry}>
-          Retry
+          {t('common.actions.retry')}
         </Button>
       </Stack>
     )
@@ -40,7 +43,10 @@ export function TagListPanel({
 
   if (items.length === 0) {
     return (
-      <EmptyState title="No tags yet" description="Create your first tag using the form above." />
+      <EmptyState
+        title={t('admin.tags.list.empty.title')}
+        description={t('admin.tags.list.empty.description')}
+      />
     )
   }
 
@@ -67,7 +73,7 @@ export function TagListPanel({
                 onEdit(item)
               }}
             >
-              Edit
+              {t('common.actions.edit')}
             </Button>
             <Button
               variant="danger"
@@ -77,7 +83,7 @@ export function TagListPanel({
                 onDelete(item)
               }}
             >
-              Delete
+              {t('common.actions.delete')}
             </Button>
           </div>
         </li>

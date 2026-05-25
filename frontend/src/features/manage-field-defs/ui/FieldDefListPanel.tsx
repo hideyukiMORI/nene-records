@@ -1,12 +1,15 @@
 import type { FieldDef } from '@/entities/field-def'
+import { useTranslation } from '@/shared/i18n'
+import type { MessageKey } from '@/shared/i18n'
+import type { FieldDataType } from '@/entities/field-def'
 import { Button, EmptyState, Stack, Text } from '@/shared/ui'
 
-const DATA_TYPE_LABELS: Record<FieldDef['dataType'], string> = {
-  text: 'Text',
-  int: 'Integer',
-  enum: 'Enum',
-  bool: 'Boolean',
-  datetime: 'Date & time',
+const DATA_TYPE_LABEL_KEYS: Record<FieldDataType, MessageKey> = {
+  text: 'admin.fieldDefs.dataType.text',
+  int: 'admin.fieldDefs.dataType.int',
+  enum: 'admin.fieldDefs.dataType.enum',
+  bool: 'admin.fieldDefs.dataType.bool',
+  datetime: 'admin.fieldDefs.dataType.datetime',
 }
 
 export interface FieldDefListPanelProps {
@@ -32,17 +35,19 @@ export function FieldDefListPanel({
   onEdit,
   onDelete,
 }: FieldDefListPanelProps) {
+  const { t } = useTranslation()
+
   if (isLoading) {
-    return <Text muted>Loading fields…</Text>
+    return <Text muted>{t('admin.fieldDefs.list.loading')}</Text>
   }
 
   if (isError) {
     return (
       <Stack gap="sm">
-        <Text variant="heading-sm">Could not load fields</Text>
-        <Text muted>{errorTitle ?? 'Unknown error'}</Text>
+        <Text variant="heading-sm">{t('admin.fieldDefs.list.error')}</Text>
+        <Text muted>{errorTitle ?? t('common.error.unknown')}</Text>
         <Button variant="secondary" onClick={onRetry}>
-          Retry
+          {t('common.actions.retry')}
         </Button>
       </Stack>
     )
@@ -51,8 +56,8 @@ export function FieldDefListPanel({
   if (items.length === 0) {
     return (
       <EmptyState
-        title="No fields yet"
-        description="Add your first field definition using the form above."
+        title={t('admin.fieldDefs.list.empty.title')}
+        description={t('admin.fieldDefs.list.empty.description')}
       />
     )
   }
@@ -69,7 +74,7 @@ export function FieldDefListPanel({
               {item.fieldKey}
             </Text>
             <Text as="span" muted>
-              {DATA_TYPE_LABELS[item.dataType]}
+              {t(DATA_TYPE_LABEL_KEYS[item.dataType])}
             </Text>
           </Stack>
           <div className="flex items-center gap-inline-sm">
@@ -82,7 +87,7 @@ export function FieldDefListPanel({
                     onEdit(item)
                   }}
                 >
-                  Edit
+                  {t('common.actions.edit')}
                 </Button>
                 <Button
                   variant="danger"
@@ -92,7 +97,7 @@ export function FieldDefListPanel({
                     onDelete(item)
                   }}
                 >
-                  Delete
+                  {t('common.actions.delete')}
                 </Button>
               </>
             ) : null}

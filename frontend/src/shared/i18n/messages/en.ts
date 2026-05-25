@@ -163,6 +163,53 @@ export const en = {
   'admin.entityTags.adding': 'Adding…',
   'admin.entityTags.remove': 'Remove',
 
+  // ── Entity record detail ──────────────────────────────────────────────────
+  'admin.entityRecord.backToRecords': 'Back to records',
+  'admin.entityRecord.loading': 'Loading record…',
+  'admin.entityRecord.error': 'Could not load record',
+  'admin.entityRecord.notFound': 'Record not found.',
+  'admin.entityRecord.id': 'Record #{{id}}',
+  'admin.entityRecord.textFields.title': 'Field values',
+  'admin.entityRecord.textFields.noFields.title': 'No editable fields defined',
+  'admin.entityRecord.textFields.noFields.description':
+    'Add field definitions for this entity type first.',
+  'admin.entityRecord.textFields.saving': 'Saving…',
+  'admin.entityRecord.textFields.save': 'Save values',
+
+  // ── Entity status panel ───────────────────────────────────────────────────
+  'admin.entityStatus.panelTitle': 'Publish status',
+  'admin.entityStatus.slugLabel': 'Slug',
+  'admin.entityStatus.slugPlaceholder': 'e.g. hello-world',
+  'admin.entityStatus.saveSlug': 'Save slug',
+  'admin.entityStatus.slugSaved': 'Saved.',
+  'admin.entityStatus.publish': 'Publish',
+  'admin.entityStatus.publishedAt': 'Published {{date}}',
+  'admin.entityStatus.updateError': 'Failed to update status.',
+  'admin.entityStatus.slugError': 'Failed to save slug. It may already be used by another record.',
+  'admin.entityStatus.status.draft': 'Draft',
+  'admin.entityStatus.status.published': 'Published',
+  'admin.entityStatus.status.archived': 'Archived',
+
+  // ── Relations (outgoing) ──────────────────────────────────────────────────
+  'admin.relations.title': 'Relations',
+  'admin.relations.loadingField': 'Loading {{fieldKey}}…',
+  'admin.relations.fieldError': 'Could not load {{fieldKey}}',
+  'admin.relations.noTargets': 'No targets linked yet.',
+  'admin.relations.noTargetsAvailable': 'No targets available',
+  'admin.relations.selectTarget': 'Select target…',
+  'admin.relations.setTarget': 'Set target',
+  'admin.relations.addTarget': 'Add target',
+  'admin.relations.remove': 'Remove',
+  'admin.relations.saving': 'Saving…',
+  'admin.relations.relationType': 'relation · {{cardinality}} · target type #{{targetTypeId}}',
+
+  // ── Relations (inverse / referenced-by) ──────────────────────────────────
+  'admin.inverseRelations.title': 'Referenced by',
+  'admin.inverseRelations.loadingPanel': 'Loading {{panelTitle}}…',
+  'admin.inverseRelations.panelError': 'Could not load {{panelTitle}}',
+  'admin.inverseRelations.noReferences': 'No records reference this target via {{fieldKey}}.',
+  'admin.inverseRelations.open': 'Open',
+
   // ── Settings ──────────────────────────────────────────────────────────────
   'admin.settings.pageTitle': 'Site settings',
   'admin.settings.description':

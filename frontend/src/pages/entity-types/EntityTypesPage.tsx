@@ -1,8 +1,10 @@
 import { ManageEntityTypesView, useManageEntityTypesPage } from '@/features/manage-entity-types'
 import { currentUserHasCapability } from '@/entities/auth'
+import { useTranslation } from '@/shared/i18n'
 import { Stack, Text } from '@/shared/ui'
 
 export function EntityTypesPage() {
+  const { t } = useTranslation()
   const canManageSchema = currentUserHasCapability('manage_schema')
   const {
     items,
@@ -30,7 +32,7 @@ export function EntityTypesPage() {
   return (
     <Stack gap="md">
       <Text as="h1" variant="heading-md">
-        Entity types
+        {t('admin.entityTypes.pageTitle')}
       </Text>
       <ManageEntityTypesView
         items={items}

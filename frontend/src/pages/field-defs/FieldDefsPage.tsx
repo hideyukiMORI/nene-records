@@ -2,9 +2,11 @@ import { Link, Navigate, useParams } from 'react-router-dom'
 import { toEntityTypeId, useEntityType } from '@/entities/entity-type'
 import { currentUserHasCapability } from '@/entities/auth'
 import { ManageFieldDefsView, useManageFieldDefsPage } from '@/features/manage-field-defs'
+import { useTranslation } from '@/shared/i18n'
 import { Button, Stack, Text } from '@/shared/ui'
 
 export function FieldDefsPage() {
+  const { t } = useTranslation()
   const { entityTypeId: entityTypeIdParam } = useParams()
   const entityTypeId = Number(entityTypeIdParam)
   const canManageSchema = currentUserHasCapability('manage_schema')
@@ -41,11 +43,11 @@ export function FieldDefsPage() {
       <Stack gap="sm">
         <Link to="/entity-types">
           <Button variant="secondary" size="sm">
-            Back to entity types
+            {t('admin.entityTypes.actions.backToTypes')}
           </Button>
         </Link>
         <Text as="h1" variant="heading-md">
-          {entityTypeQuery.data?.name ?? 'Fields'}
+          {entityTypeQuery.data?.name ?? t('admin.fieldDefs.pageTitle')}
         </Text>
       </Stack>
       <ManageFieldDefsView

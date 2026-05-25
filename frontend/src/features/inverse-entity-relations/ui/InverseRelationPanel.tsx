@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import type { RelationFieldDef } from '@/entities/field-def'
+import { useTranslation } from '@/shared/i18n'
 import { Button, Stack, Text } from '@/shared/ui'
 import { useInverseRelationPanel } from '../hooks/use-inverse-relation-panel'
 
@@ -9,6 +10,7 @@ export interface InverseRelationPanelProps {
 }
 
 export function InverseRelationPanel({ fieldDef, targetEntityId }: InverseRelationPanelProps) {
+  const { t } = useTranslation()
   const { sourceEntityTypeName, items, isLoading, isError, errorTitle, refetch } =
     useInverseRelationPanel(fieldDef, targetEntityId)
 
@@ -18,16 +20,16 @@ export function InverseRelationPanel({ fieldDef, targetEntityId }: InverseRelati
       : fieldDef.fieldKey
 
   if (isLoading) {
-    return <Text muted>Loading {panelTitle}…</Text>
+    return <Text muted>{t('admin.inverseRelations.loadingPanel', { panelTitle })}</Text>
   }
 
   if (isError) {
     return (
       <Stack gap="sm">
-        <Text variant="heading-sm">Could not load {panelTitle}</Text>
-        <Text muted>{errorTitle ?? 'Unknown error'}</Text>
+        <Text variant="heading-sm">{t('admin.inverseRelations.panelError', { panelTitle })}</Text>
+        <Text muted>{errorTitle ?? t('common.error.unknown')}</Text>
         <Button variant="secondary" onClick={() => void refetch()}>
-          Retry
+          {t('common.actions.retry')}
         </Button>
       </Stack>
     )
@@ -39,7 +41,9 @@ export function InverseRelationPanel({ fieldDef, targetEntityId }: InverseRelati
         {panelTitle}
       </Text>
       {items.length === 0 ? (
-        <Text muted>No records reference this target via {fieldDef.fieldKey}.</Text>
+        <Text muted>
+          {t('admin.inverseRelations.noReferences', { fieldKey: fieldDef.fieldKey })}
+        </Text>
       ) : (
         <ul className="flex flex-col gap-stack-sm">
           {items.map((item) => (
@@ -59,7 +63,7 @@ export function InverseRelationPanel({ fieldDef, targetEntityId }: InverseRelati
                 to={`/entity-types/${String(fieldDef.entityTypeId)}/entities/${String(item.id)}`}
               >
                 <Button variant="secondary" size="sm">
-                  Open
+                  {t('admin.inverseRelations.open')}
                 </Button>
               </Link>
             </li>

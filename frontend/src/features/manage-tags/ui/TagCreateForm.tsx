@@ -1,4 +1,5 @@
 import { Controller } from 'react-hook-form'
+import { useTranslation } from '@/shared/i18n'
 import { Button, Input, Stack, Text } from '@/shared/ui'
 import { useCreateTagForm } from '../hooks/use-create-tag-form'
 
@@ -9,6 +10,7 @@ export interface TagCreateFormProps {
 }
 
 export function TagCreateForm({ isSubmitting, serverErrorTitle, onSubmit }: TagCreateFormProps) {
+  const { t } = useTranslation()
   const {
     control,
     handleSubmit,
@@ -28,7 +30,7 @@ export function TagCreateForm({ isSubmitting, serverErrorTitle, onSubmit }: TagC
     >
       <Stack gap="md">
         <Text as="h2" variant="heading-sm">
-          Create tag
+          {t('admin.tags.createForm.title')}
         </Text>
         <Controller
           name="name"
@@ -36,7 +38,7 @@ export function TagCreateForm({ isSubmitting, serverErrorTitle, onSubmit }: TagC
           render={({ field }) => (
             <Input
               id="tag-name"
-              label="Name"
+              label={t('common.field.name')}
               error={errors.name?.message}
               autoComplete="off"
               disabled={isSubmitting}
@@ -52,7 +54,7 @@ export function TagCreateForm({ isSubmitting, serverErrorTitle, onSubmit }: TagC
           render={({ field }) => (
             <Input
               id="tag-slug"
-              label="Slug"
+              label={t('common.field.slug')}
               error={errors.slug?.message}
               autoComplete="off"
               disabled={isSubmitting}
@@ -64,7 +66,7 @@ export function TagCreateForm({ isSubmitting, serverErrorTitle, onSubmit }: TagC
         />
         {serverErrorTitle !== null ? <Text muted>{serverErrorTitle}</Text> : null}
         <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? 'Creating…' : 'Create tag'}
+          {isSubmitting ? t('admin.tags.createForm.submitting') : t('admin.tags.createForm.submit')}
         </Button>
       </Stack>
     </form>

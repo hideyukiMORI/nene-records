@@ -8,9 +8,11 @@ import { EntityStatusPanel } from '@/features/manage-entity-status'
 import { ManageEntityTagsView, useManageEntityTagsPage } from '@/features/manage-entity-tags'
 import { ManageEntityRelationsView } from '@/features/manage-entity-relations'
 import { InverseEntityRelationsView } from '@/features/inverse-entity-relations'
+import { useTranslation } from '@/shared/i18n'
 import { Button, Stack, Text } from '@/shared/ui'
 
 export function EntityRecordPage() {
+  const { t } = useTranslation()
   const { entityTypeId: entityTypeIdParam, entityId: entityIdParam } = useParams()
   const entityTypeId = Number(entityTypeIdParam)
   const entityId = Number(entityIdParam)
@@ -50,11 +52,11 @@ export function EntityRecordPage() {
       <Stack gap="sm">
         <Link to={`/entity-types/${String(entityTypeId)}/entities`}>
           <Button variant="secondary" size="sm">
-            Back to records
+            {t('admin.entityRecord.backToRecords')}
           </Button>
         </Link>
         <Text as="h1" variant="heading-md">
-          {entityTypeQuery.data?.name ?? 'Record'}
+          {entityTypeQuery.data?.name ?? t('admin.entityRecords.list.titleDefault')}
         </Text>
       </Stack>
       {entity !== null && (

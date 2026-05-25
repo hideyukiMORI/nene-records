@@ -1,5 +1,6 @@
 import type { FieldDef } from '@/entities/field-def'
 import type { Entity } from '@/entities/entity'
+import { useTranslation } from '@/shared/i18n'
 import { Button, Stack, Text } from '@/shared/ui'
 import { EntityTextFieldsForm } from './EntityTextFieldsForm'
 
@@ -28,30 +29,32 @@ export function EditEntityTextFieldsView({
   onRetry,
   onSave,
 }: EditEntityTextFieldsViewProps) {
+  const { t } = useTranslation()
+
   if (isLoading) {
-    return <Text muted>Loading record…</Text>
+    return <Text muted>{t('admin.entityRecord.loading')}</Text>
   }
 
   if (isError) {
     return (
       <Stack gap="sm">
-        <Text variant="heading-sm">Could not load record</Text>
-        <Text muted>{errorTitle ?? 'Unknown error'}</Text>
+        <Text variant="heading-sm">{t('admin.entityRecord.error')}</Text>
+        <Text muted>{errorTitle ?? t('common.error.unknown')}</Text>
         <Button variant="secondary" onClick={onRetry}>
-          Retry
+          {t('common.actions.retry')}
         </Button>
       </Stack>
     )
   }
 
   if (entity === null) {
-    return <Text muted>Record not found.</Text>
+    return <Text muted>{t('admin.entityRecord.notFound')}</Text>
   }
 
   return (
     <Stack gap="lg">
       <Text as="p" muted>
-        Record #{String(entity.id)}
+        {t('admin.entityRecord.id', { id: entity.id })}
       </Text>
       <EntityTextFieldsForm
         key={JSON.stringify(initialValues)}

@@ -1,4 +1,5 @@
 import type { Tag } from '@/entities/tag'
+import { useTranslation } from '@/shared/i18n'
 import { ConfirmDialog, Stack, Text } from '@/shared/ui'
 import { TagCreateForm } from './TagCreateForm'
 import { TagEditForm } from './TagEditForm'
@@ -47,6 +48,8 @@ export function ManageTagsView({
   onCancelDelete,
   onConfirmDelete,
 }: ManageTagsViewProps) {
+  const { t } = useTranslation()
+
   return (
     <>
       <Stack gap="lg">
@@ -66,7 +69,7 @@ export function ManageTagsView({
         ) : null}
         <Stack gap="sm">
           <Text as="h2" variant="heading-sm">
-            Existing tags
+            {t('admin.tags.list.title')}
           </Text>
           <TagListPanel
             items={items}
@@ -82,13 +85,13 @@ export function ManageTagsView({
       </Stack>
       <ConfirmDialog
         open={deleteTarget !== null}
-        title="Delete tag?"
+        title={t('admin.tags.delete.title')}
         description={
           deleteTarget !== null
-            ? `"${deleteTarget.name}" will be removed. Attached records keep their data but lose this tag.`
+            ? t('admin.tags.delete.description', { name: deleteTarget.name })
             : undefined
         }
-        confirmLabel={isDeleting ? 'Deleting…' : 'Delete'}
+        confirmLabel={isDeleting ? t('common.actions.deleting') : t('common.actions.delete')}
         isPending={isDeleting}
         onCancel={onCancelDelete}
         onConfirm={() => {

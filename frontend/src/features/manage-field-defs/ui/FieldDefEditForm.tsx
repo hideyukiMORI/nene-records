@@ -1,14 +1,16 @@
 import { Controller } from 'react-hook-form'
 import { FIELD_DATA_TYPES, type FieldDataType, type FieldDef } from '@/entities/field-def'
+import { useTranslation } from '@/shared/i18n'
+import type { MessageKey } from '@/shared/i18n'
 import { Button, Input, Stack, Text } from '@/shared/ui'
 import { useEditFieldDefForm } from '../hooks/use-create-field-def-form'
 
-const DATA_TYPE_LABELS: Record<FieldDataType, string> = {
-  text: 'Text',
-  int: 'Integer',
-  enum: 'Enum',
-  bool: 'Boolean',
-  datetime: 'Date & time',
+const DATA_TYPE_LABEL_KEYS: Record<FieldDataType, MessageKey> = {
+  text: 'admin.fieldDefs.dataType.text',
+  int: 'admin.fieldDefs.dataType.int',
+  enum: 'admin.fieldDefs.dataType.enum',
+  bool: 'admin.fieldDefs.dataType.bool',
+  datetime: 'admin.fieldDefs.dataType.datetime',
 }
 
 export interface FieldDefEditFormProps {
@@ -26,6 +28,7 @@ export function FieldDefEditForm({
   onSubmit,
   onCancel,
 }: FieldDefEditFormProps) {
+  const { t } = useTranslation()
   const {
     control,
     handleSubmit,
@@ -47,7 +50,7 @@ export function FieldDefEditForm({
     >
       <Stack gap="md">
         <Text as="h2" variant="heading-sm">
-          Edit field
+          {t('admin.fieldDefs.editForm.title')}
         </Text>
         <Controller
           name="fieldKey"
@@ -55,7 +58,7 @@ export function FieldDefEditForm({
           render={({ field }) => (
             <Input
               id="field-def-edit-key"
-              label="Field key"
+              label={t('admin.fieldDefs.createForm.fieldKeyLabel')}
               error={errors.fieldKey?.message}
               autoComplete="off"
               disabled={isSubmitting}
@@ -74,7 +77,7 @@ export function FieldDefEditForm({
                 htmlFor="field-def-edit-data-type"
                 className="font-sans text-body font-medium text-text-primary"
               >
-                Data type
+                {t('admin.fieldDefs.createForm.dataTypeLabel')}
               </label>
               <select
                 id="field-def-edit-data-type"
@@ -86,7 +89,7 @@ export function FieldDefEditForm({
               >
                 {FIELD_DATA_TYPES.map((dataType) => (
                   <option key={dataType} value={dataType}>
-                    {DATA_TYPE_LABELS[dataType]}
+                    {t(DATA_TYPE_LABEL_KEYS[dataType])}
                   </option>
                 ))}
               </select>
@@ -101,10 +104,12 @@ export function FieldDefEditForm({
         {serverErrorTitle !== null ? <Text muted>{serverErrorTitle}</Text> : null}
         <div className="flex items-center gap-inline-sm">
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? 'Saving…' : 'Save changes'}
+            {isSubmitting
+              ? t('admin.fieldDefs.editForm.saving')
+              : t('admin.fieldDefs.editForm.save')}
           </Button>
           <Button type="button" variant="secondary" disabled={isSubmitting} onClick={onCancel}>
-            Cancel
+            {t('common.actions.cancel')}
           </Button>
         </div>
       </Stack>

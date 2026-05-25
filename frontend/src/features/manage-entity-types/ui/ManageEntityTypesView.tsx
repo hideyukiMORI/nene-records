@@ -1,4 +1,5 @@
 import type { EntityType } from '@/entities/entity-type'
+import { useTranslation } from '@/shared/i18n'
 import { ConfirmDialog, Stack, Text } from '@/shared/ui'
 import { EntityTypeCreateForm } from './EntityTypeCreateForm'
 import { EntityTypeEditForm } from './EntityTypeEditForm'
@@ -51,6 +52,8 @@ export function ManageEntityTypesView({
   onCancelDelete,
   onConfirmDelete,
 }: ManageEntityTypesViewProps) {
+  const { t } = useTranslation()
+
   return (
     <>
       <Stack gap="lg">
@@ -72,7 +75,7 @@ export function ManageEntityTypesView({
         ) : null}
         <Stack gap="sm">
           <Text as="h2" variant="heading-sm">
-            Existing types
+            {t('admin.entityTypes.existingList.title')}
           </Text>
           <EntityTypeListPanel
             items={items}
@@ -89,14 +92,15 @@ export function ManageEntityTypesView({
       </Stack>
       <ConfirmDialog
         open={deleteTarget !== null}
-        title="Delete entity type?"
+        title={t('admin.entityTypes.delete.title')}
         description={
           deleteTarget !== null
-            ? `"${deleteTarget.name}" will be removed. This cannot be undone.`
+            ? t('admin.entityTypes.delete.description', { name: deleteTarget.name })
             : undefined
         }
         errorDetail={deleteErrorDetail}
-        confirmLabel={isDeleting ? 'Deleting…' : 'Delete'}
+        confirmLabel={isDeleting ? t('common.actions.deleting') : t('common.actions.delete')}
+        cancelLabel={t('common.actions.cancel')}
         isPending={isDeleting}
         onCancel={onCancelDelete}
         onConfirm={() => {

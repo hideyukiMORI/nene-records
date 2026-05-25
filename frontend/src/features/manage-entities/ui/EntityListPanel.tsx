@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import type { Entity, EntityStatus } from '@/entities/entity'
+import { useTranslation } from '@/shared/i18n'
 import { Button, EmptyState, Stack, Text } from '@/shared/ui'
 
 const STATUS_BADGE_CLASS: Record<EntityStatus, string> = {
@@ -36,17 +37,19 @@ export function EntityListPanel({
   onRetry,
   onDelete,
 }: EntityListPanelProps) {
+  const { t } = useTranslation()
+
   if (isLoading) {
-    return <Text muted>Loading records…</Text>
+    return <Text muted>{t('admin.entityRecords.list.loading')}</Text>
   }
 
   if (isError) {
     return (
       <Stack gap="sm">
-        <Text variant="heading-sm">Could not load records</Text>
-        <Text muted>{errorTitle ?? 'Unknown error'}</Text>
+        <Text variant="heading-sm">{t('admin.entityRecords.list.error')}</Text>
+        <Text muted>{errorTitle ?? t('common.error.unknown')}</Text>
         <Button variant="secondary" onClick={onRetry}>
-          Retry
+          {t('common.actions.retry')}
         </Button>
       </Stack>
     )
@@ -55,11 +58,15 @@ export function EntityListPanel({
   if (items.length === 0) {
     return (
       <EmptyState
-        title={isFilterActive ? 'No matching records' : 'No records yet'}
+        title={
+          isFilterActive
+            ? t('admin.entityRecords.list.emptyFiltered.title')
+            : t('admin.entityRecords.list.empty.title')
+        }
         description={
           isFilterActive
-            ? 'Try clearing the filters or selecting different criteria.'
-            : 'Create your first record using the button above.'
+            ? t('admin.entityRecords.list.emptyFiltered.description')
+            : t('admin.entityRecords.list.empty.description')
         }
       />
     )
@@ -75,9 +82,11 @@ export function EntityListPanel({
           <Stack gap="xs">
             <div className="flex items-center gap-inline-sm">
               <Text as="span" variant="heading-sm">
-                {recordLabels[String(item.id)] ?? `Record #${String(item.id)}`}
+                {recordLabels[String(item.id)] ?? t('admin.entityRecord.id', { id: item.id })}
               </Text>
-              <span className={STATUS_BADGE_CLASS[item.status]}>{item.status}</span>
+              <span className={STATUS_BADGE_CLASS[item.status]}>
+                {t(`admin.entityStatus.status.${item.status}`)}
+              </span>
             </div>
             <Text as="span" muted>
               #{String(item.id)}
@@ -86,7 +95,7 @@ export function EntityListPanel({
           <div className="flex items-center gap-inline-sm">
             <Link to={`/entity-types/${String(entityTypeId)}/entities/${String(item.id)}`}>
               <Button variant="secondary" size="sm">
-                Edit
+                {t('common.actions.edit')}
               </Button>
             </Link>
             <Button
@@ -97,7 +106,7 @@ export function EntityListPanel({
                 onDelete(item)
               }}
             >
-              Delete
+              {t('common.actions.delete')}
             </Button>
           </div>
         </li>

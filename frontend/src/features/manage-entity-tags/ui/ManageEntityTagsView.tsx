@@ -1,5 +1,6 @@
 import type { EntityTag } from '@/entities/entity-tag'
 import type { Tag } from '@/entities/tag'
+import { useTranslation } from '@/shared/i18n'
 import { Button, Stack, Text } from '@/shared/ui'
 
 export interface ManageEntityTagsViewProps {
@@ -33,17 +34,19 @@ export function ManageEntityTagsView({
   onAttach,
   onDetach,
 }: ManageEntityTagsViewProps) {
+  const { t } = useTranslation()
+
   if (isLoading) {
-    return <Text muted>Loading tags…</Text>
+    return <Text muted>{t('admin.entityTags.loading')}</Text>
   }
 
   if (isError) {
     return (
       <Stack gap="sm">
-        <Text variant="heading-sm">Could not load tags</Text>
-        <Text muted>{errorTitle ?? 'Unknown error'}</Text>
+        <Text variant="heading-sm">{t('admin.entityTags.error')}</Text>
+        <Text muted>{errorTitle ?? t('common.error.unknown')}</Text>
         <Button variant="secondary" onClick={onRetry}>
-          Retry
+          {t('common.actions.retry')}
         </Button>
       </Stack>
     )
@@ -52,10 +55,10 @@ export function ManageEntityTagsView({
   return (
     <Stack gap="md">
       <Text as="h2" variant="heading-sm">
-        Tags
+        {t('admin.entityTags.title')}
       </Text>
       {attachedTags.length === 0 ? (
-        <Text muted>No tags attached yet.</Text>
+        <Text muted>{t('admin.entityTags.noAttached')}</Text>
       ) : (
         <ul className="flex flex-col gap-stack-sm">
           {attachedTags.map((tag) => (
@@ -79,7 +82,7 @@ export function ManageEntityTagsView({
                   void onDetach(tag)
                 }}
               >
-                Remove
+                {t('admin.entityTags.remove')}
               </Button>
             </li>
           ))}
@@ -91,7 +94,7 @@ export function ManageEntityTagsView({
             htmlFor="entity-tag-select"
             className="font-sans text-body font-medium text-text-primary"
           >
-            Add tag
+            {t('admin.entityTags.addLabel')}
           </label>
           <select
             id="entity-tag-select"
@@ -103,7 +106,9 @@ export function ManageEntityTagsView({
             className="rounded-md border border-border bg-surface-raised px-inline-md py-stack-sm font-sans text-body text-text-primary shadow-sm focus-visible:outline-none focus-visible:shadow-focus disabled:cursor-not-allowed disabled:opacity-50"
           >
             <option value="">
-              {availableTags.length === 0 ? 'No tags available' : 'Select tag…'}
+              {availableTags.length === 0
+                ? t('admin.entityTags.noAvailable')
+                : t('admin.entityTags.selectPlaceholder')}
             </option>
             {availableTags.map((tag) => (
               <option key={String(tag.id)} value={String(tag.id)}>
@@ -120,7 +125,7 @@ export function ManageEntityTagsView({
             void onAttach()
           }}
         >
-          {isAttaching ? 'Adding…' : 'Add tag'}
+          {isAttaching ? t('admin.entityTags.adding') : t('admin.entityTags.addSubmit')}
         </Button>
       </Stack>
     </Stack>

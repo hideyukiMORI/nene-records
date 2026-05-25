@@ -1,9 +1,11 @@
 import { Navigate } from 'react-router-dom'
 import { ManageTagsView, useManageTagsPage } from '@/features/manage-tags'
 import { currentUserHasCapability } from '@/entities/auth'
+import { useTranslation } from '@/shared/i18n'
 import { Stack, Text } from '@/shared/ui'
 
 export function TagsPage() {
+  const { t } = useTranslation()
   const canManageTags = currentUserHasCapability('manage_tags')
   const {
     items,
@@ -34,7 +36,7 @@ export function TagsPage() {
   return (
     <Stack gap="md">
       <Text as="h1" variant="heading-md">
-        Tags
+        {t('admin.tags.pageTitle')}
       </Text>
       <ManageTagsView
         items={items}

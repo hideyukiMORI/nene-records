@@ -1,3 +1,4 @@
+import { useTranslation } from '@/shared/i18n'
 import { Button, Stack, Text } from '@/shared/ui'
 
 export interface EntityCreatePanelProps {
@@ -11,14 +12,14 @@ export function EntityCreatePanel({
   serverErrorTitle,
   onCreate,
 }: EntityCreatePanelProps) {
+  const { t } = useTranslation()
+
   return (
     <Stack gap="sm">
       <Text as="h2" variant="heading-sm">
-        Create record
+        {t('admin.entityRecords.create.title')}
       </Text>
-      <Text muted>
-        Records are created for this entity type. Field values will be editable in a later phase.
-      </Text>
+      <Text muted>{t('admin.entityRecords.create.description')}</Text>
       {serverErrorTitle !== null ? <Text muted>{serverErrorTitle}</Text> : null}
       <div>
         <Button
@@ -27,7 +28,9 @@ export function EntityCreatePanel({
             void onCreate()
           }}
         >
-          {isSubmitting ? 'Creating…' : 'Create record'}
+          {isSubmitting
+            ? t('admin.entityRecords.create.submitting')
+            : t('admin.entityRecords.create.submit')}
         </Button>
       </div>
     </Stack>
