@@ -1,5 +1,7 @@
 # Impressions from Claude — NeNe Records
 
+> **Historical snapshot (2026-05-24).** Several observations below are outdated — auth, CI, N+1, and timezone fixes landed on M1 completion day and M2 began with roles (#108). See [`docs/todo/current.md`](./todo/current.md) for current status.
+
 *Written by Claude Sonnet 4.6 on 2026-05-24, after a full session reviewing the codebase,
 architecture, development culture, and today's live coding work.*
 

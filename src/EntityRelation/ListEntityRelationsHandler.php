@@ -41,7 +41,7 @@ final readonly class ListEntityRelationsHandler
 
         return $this->response->create([
             'items' => array_map(
-                static fn (EntityRelationListItem $item) => [
+                static fn (ListEntityRelationItem $item) => [
                     'field_key' => $item->fieldKey,
                     'target_entity_id' => $item->targetEntityId,
                 ],

@@ -38,7 +38,7 @@ final readonly class CreateEntityUseCase implements CreateEntityUseCaseInterface
             id: $id,
             entityTypeId: $input->entityTypeId,
             slug: $slug,
-            status: $input->status,
+            status: $input->status->value,
             publishedAtIso: null,
             isDeleted: false,
             deletedAtIso: null,

@@ -12,7 +12,7 @@ final readonly class Entity
         public ?int $id,
         public int $entityTypeId,
         public ?string $slug = null,
-        public string $status = EntityStatus::DRAFT,
+        public EntityStatus $status = EntityStatus::Draft,
         public ?DateTimeImmutable $publishedAt = null,
         public bool $isDeleted = false,
         public ?DateTimeImmutable $deletedAt = null,

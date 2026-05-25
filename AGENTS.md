@@ -4,7 +4,7 @@ This file is the entry point for AI agents working on NeNe Records.
 
 ## Read First
 
-- **Current work & status:** `docs/todo/current.md` — M1 完了、M2 Up Next
+- **Current work & status:** `docs/todo/current.md` — M1 完了、M2 進行中（#108 Roles 完了、#109 i18n 基盤 Up Next）
 - **Product vision:** `docs/explanation/product-vision.md`
 - Inheritance map: `docs/inheritance-from-nene2.md`
 - Human and AI collaboration: `docs/CONTRIBUTING.md`

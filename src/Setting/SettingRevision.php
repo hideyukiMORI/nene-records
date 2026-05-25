@@ -10,7 +10,7 @@ final readonly class SettingRevision
         public string $settingKey,
         public ?string $value,
         public ?string $previousValue,
-        public string $action,
+        public SettingRevisionAction $action,
         public ?int $actorUserId,
         public string $createdAt,
         public ?int $id = null,

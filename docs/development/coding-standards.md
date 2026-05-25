@@ -6,6 +6,7 @@ NeNe Records coding standards split by surface. **Full policies live in the dedi
 | --- | --- |
 | **PHP / API / database** | [`backend-standards.md`](./backend-standards.md) |
 | **React / TypeScript admin & consumer** | [`frontend-standards.md`](./frontend-standards.md) |
+| **Naming conventions (PHP + TypeScript)** | [`naming-conventions.md`](./naming-conventions.md) |
 | **NENE2 inheritance map** | [`../inheritance-from-nene2.md`](../inheritance-from-nene2.md) |
 
 **Framework baseline:** [NENE2 coding standards](https://github.com/hideyukiMORI/NENE2/blob/main/docs/development/coding-standards.md) — NeNe Records deviates only where local docs or ADRs say so.

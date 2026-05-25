@@ -95,8 +95,8 @@ final readonly class PdoSettingRepository implements SettingRepositoryInterface
         $existing = $this->findValueByKey($settingKey);
         $previousEffective = $this->resolveEffectiveValue($def, $existing);
         $action = $existing === null || $existing->isDeleted
-            ? SettingRevisionAction::CREATED
-            : SettingRevisionAction::UPDATED;
+            ? SettingRevisionAction::Created
+            : SettingRevisionAction::Updated;
         $now = date('Y-m-d H:i:s');
 
         $this->query->execute(
@@ -106,7 +106,7 @@ final readonly class PdoSettingRepository implements SettingRepositoryInterface
                 $settingKey,
                 $normalized,
                 $previousEffective === $normalized ? null : $previousEffective,
-                $action,
+                $action->value,
                 $actorUserId,
                 $now,
             ],
@@ -219,7 +219,7 @@ final readonly class PdoSettingRepository implements SettingRepositoryInterface
             settingKey: (string) $row['setting_key'],
             value: $row['value'] !== null ? (string) $row['value'] : null,
             previousValue: $row['previous_value'] !== null ? (string) $row['previous_value'] : null,
-            action: (string) $row['action'],
+            action: SettingRevisionAction::from((string) $row['action']),
             actorUserId: $row['actor_user_id'] !== null ? (int) $row['actor_user_id'] : null,
             createdAt: (string) $row['created_at'],
             id: (int) $row['id'],

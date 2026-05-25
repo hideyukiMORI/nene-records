@@ -6,10 +6,10 @@ namespace NeNeRecords\EntityRelation;
 
 interface EntityRelationRepositoryInterface
 {
-    /** @return list<EntityRelationListItem> */
+    /** @return list<ListEntityRelationItem> */
     public function findByEntityId(int $entityId): array;
 
-    /** @return list<EntityRelationListItem> */
+    /** @return list<ListEntityRelationItem> */
     public function findByEntityIdAndFieldKey(int $entityId, string $fieldKey): array;
 
     public function isAttached(int $sourceEntityId, int $targetEntityId, string $fieldKey): bool;

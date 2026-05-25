@@ -98,8 +98,8 @@ final class InMemorySettingRepository implements SettingRepositoryInterface
         $existing = $this->findValueByKey($settingKey);
         $previousEffective = $this->resolveEffectiveValue($def, $existing);
         $action = $existing === null || $existing->isDeleted
-            ? SettingRevisionAction::CREATED
-            : SettingRevisionAction::UPDATED;
+            ? SettingRevisionAction::Created
+            : SettingRevisionAction::Updated;
         $now = date('Y-m-d H:i:s');
 
         $this->revisions[] = new SettingRevision(

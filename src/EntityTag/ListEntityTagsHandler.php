@@ -31,7 +31,7 @@ final readonly class ListEntityTagsHandler
 
         return $this->response->create([
             'items' => array_map(
-                static fn (EntityTagListItem $item) => [
+                static fn (ListEntityTagItem $item) => [
                     'id' => $item->id,
                     'slug' => $item->slug,
                     'name' => $item->name,

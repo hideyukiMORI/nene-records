@@ -137,7 +137,7 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
 
         if ($criteria->status !== null) {
             $conditions[] = 'e.status = ?';
-            $params[] = $criteria->status;
+            $params[] = $criteria->status->value;
         }
 
         if ($criteria->tagSlugs !== []) {
@@ -178,7 +178,7 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
 
         $this->query->execute(
             'INSERT INTO entities (entity_type_id, slug, status, published_at) VALUES (?, ?, ?, ?)',
-            [$entity->entityTypeId, $entity->slug, $entity->status, $publishedAt],
+            [$entity->entityTypeId, $entity->slug, $entity->status->value, $publishedAt],
         );
 
         return $this->query->lastInsertId();
@@ -200,7 +200,7 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
                 SET entity_type_id = ?, slug = ?, status = ?, published_at = ?
                 WHERE id = ? AND is_deleted = 0
                 SQL,
-            [$entity->entityTypeId, $entity->slug, $entity->status, $publishedAt, $id],
+            [$entity->entityTypeId, $entity->slug, $entity->status->value, $publishedAt, $id],
         );
     }
 
@@ -232,7 +232,7 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
             id: (int) $row['id'],
             entityTypeId: (int) $row['entity_type_id'],
             slug: $slug,
-            status: (string) ($row['status'] ?? EntityStatus::DRAFT),
+            status: EntityStatus::from((string) ($row['status'] ?? EntityStatus::Draft->value)),
             publishedAt: $publishedAt,
             isDeleted: (bool) (int) $row['is_deleted'],
             deletedAt: $deletedAt,

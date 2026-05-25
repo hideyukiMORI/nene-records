@@ -69,7 +69,7 @@ export function mapSettingRevisionListDtoToModel(dto: SettingRevisionListDto): S
   }
 }
 
-export function mapUpdateSettingInputToDto(input: UpdateSettingInput): UpdateSettingRequestDto {
+export function mapUpdateInputToDto(input: UpdateSettingInput): UpdateSettingRequestDto {
   return { value: input.value }
 }
 

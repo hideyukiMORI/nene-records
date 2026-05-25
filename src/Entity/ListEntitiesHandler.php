@@ -31,7 +31,7 @@ final readonly class ListEntitiesHandler
         $relationFilters = EntityRelationQueryParser::parseRelationFilters($request->getQueryParams());
 
         $rawStatus = $request->getQueryParams()['status'] ?? null;
-        $status = is_string($rawStatus) && EntityStatus::isValid($rawStatus) ? $rawStatus : null;
+        $status = is_string($rawStatus) ? EntityStatus::tryFrom($rawStatus) : null;
 
         $output = $this->useCase->execute(new ListEntitiesInput(
             limit: $pagination->limit,

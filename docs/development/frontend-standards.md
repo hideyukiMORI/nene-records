@@ -660,6 +660,8 @@ Optional: `shared/ui/theme/ThemeGallery.stories.tsx` — documents all tokens vi
 
 ## Component conventions
 
+> **Full naming rules**: [`naming-conventions.md`](./naming-conventions.md) — this section summarises key patterns; the dedicated document is the source of truth.
+
 ### Files and exports
 
 - One primary component per file; named exports only.

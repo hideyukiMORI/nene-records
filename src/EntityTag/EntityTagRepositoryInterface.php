@@ -6,7 +6,7 @@ namespace NeNeRecords\EntityTag;
 
 interface EntityTagRepositoryInterface
 {
-    /** @return list<EntityTagListItem> */
+    /** @return list<ListEntityTagItem> */
     public function findTagsByEntityId(int $entityId): array;
 
     public function isAttached(int $entityId, int $tagId): bool;

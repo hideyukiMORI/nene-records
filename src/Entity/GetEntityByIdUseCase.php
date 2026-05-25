@@ -32,7 +32,7 @@ final readonly class GetEntityByIdUseCase implements GetEntityByIdUseCaseInterfa
             id: $entityId,
             entityTypeId: $entity->entityTypeId,
             slug: $entity->slug,
-            status: $entity->status,
+            status: $entity->status->value,
             publishedAtIso: $entity->publishedAt?->format(DateTimeInterface::ATOM),
             isDeleted: $entity->isDeleted,
             deletedAtIso: $entity->deletedAt?->format(DateTimeInterface::ATOM),
