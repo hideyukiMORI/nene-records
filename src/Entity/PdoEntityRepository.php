@@ -172,16 +172,40 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
         return [implode(' AND ', $conditions), $params];
     }
 
+    /** @return list<EntityRevision> */
+    public function findRevisionsByEntityId(int $entityId, int $limit, int $offset): array
+    {
+        $rows = $this->query->fetchAll(
+            'SELECT id, entity_id, action, status, previous_status, slug, previous_slug, actor_user_id, created_at
+             FROM entity_revisions
+             WHERE entity_id = ?
+             ORDER BY id DESC
+             LIMIT ? OFFSET ?',
+            [$entityId, $limit, $offset],
+        );
+
+        return array_map($this->mapRevision(...), $rows);
+    }
+
     public function save(Entity $entity): int
     {
         $publishedAt = $entity->publishedAt?->format(DateTimeInterface::ATOM);
+        $now = date('Y-m-d H:i:s');
 
         $this->query->execute(
             'INSERT INTO entities (entity_type_id, slug, status, published_at) VALUES (?, ?, ?, ?)',
             [$entity->entityTypeId, $entity->slug, $entity->status->value, $publishedAt],
         );
 
-        return $this->query->lastInsertId();
+        $id = $this->query->lastInsertId();
+
+        $this->query->execute(
+            'INSERT INTO entity_revisions (entity_id, action, status, previous_status, slug, previous_slug, actor_user_id, created_at)
+             VALUES (?, ?, ?, NULL, ?, NULL, NULL, ?)',
+            [$id, EntityRevisionAction::Created->value, $entity->status->value, $entity->slug, $now],
+        );
+
+        return $id;
     }
 
     public function update(Entity $entity): void
@@ -192,6 +216,8 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
             throw new LogicException('Entity id must be set before update.');
         }
 
+        $existing = $this->findById($id);
+        $now = date('Y-m-d H:i:s');
         $publishedAt = $entity->publishedAt?->format(DateTimeInterface::ATOM);
 
         $this->query->execute(
@@ -202,10 +228,27 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
                 SQL,
             [$entity->entityTypeId, $entity->slug, $entity->status->value, $publishedAt, $id],
         );
+
+        $this->query->execute(
+            'INSERT INTO entity_revisions (entity_id, action, status, previous_status, slug, previous_slug, actor_user_id, created_at)
+             VALUES (?, ?, ?, ?, ?, ?, NULL, ?)',
+            [
+                $id,
+                EntityRevisionAction::Updated->value,
+                $entity->status->value,
+                $existing?->status->value,
+                $entity->slug,
+                $existing?->slug,
+                $now,
+            ],
+        );
     }
 
     public function softDelete(int $id): void
     {
+        $existing = $this->findById($id);
+        $now = date('Y-m-d H:i:s');
+
         $this->query->execute(
             <<<'SQL'
                 UPDATE entities
@@ -213,6 +256,38 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
                 WHERE id = ? AND is_deleted = 0
                 SQL,
             [$id],
+        );
+
+        if ($existing !== null) {
+            $this->query->execute(
+                'INSERT INTO entity_revisions (entity_id, action, status, previous_status, slug, previous_slug, actor_user_id, created_at)
+                 VALUES (?, ?, ?, ?, ?, ?, NULL, ?)',
+                [
+                    $id,
+                    EntityRevisionAction::Deleted->value,
+                    $existing->status->value,
+                    $existing->status->value,
+                    $existing->slug,
+                    $existing->slug,
+                    $now,
+                ],
+            );
+        }
+    }
+
+    /** @param array<string, mixed> $row */
+    private function mapRevision(array $row): EntityRevision
+    {
+        return new EntityRevision(
+            entityId: (int) $row['entity_id'],
+            action: EntityRevisionAction::from((string) $row['action']),
+            status: (string) $row['status'],
+            previousStatus: $row['previous_status'] !== null ? (string) $row['previous_status'] : null,
+            slug: $row['slug'] !== null ? (string) $row['slug'] : null,
+            previousSlug: $row['previous_slug'] !== null ? (string) $row['previous_slug'] : null,
+            actorUserId: $row['actor_user_id'] !== null ? (int) $row['actor_user_id'] : null,
+            createdAt: (string) $row['created_at'],
+            id: (int) $row['id'],
         );
     }
 

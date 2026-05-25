@@ -18,4 +18,5 @@ export const entityKeys = {
   list: (params: EntityListParams) => [...entityKeys.lists(), params] as const,
   details: () => [...entityKeys.all, 'detail'] as const,
   detail: (id: EntityId) => [...entityKeys.details(), id] as const,
+  revisions: (id: EntityId) => [...entityKeys.detail(id), 'revisions'] as const,
 }

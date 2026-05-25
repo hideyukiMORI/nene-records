@@ -393,6 +393,28 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /api/v1/entities/{id}/revisions:
+    get:
+      tags:
+        - Entities
+      summary: List entity revisions
+      description: Returns paginated revision history for an entity record.
+      operationId: listEntityRevisions
+      parameters:
+        - $ref: '#/components/parameters/IdPath'
+        - $ref: '#/components/parameters/LimitQuery'
+        - $ref: '#/components/parameters/OffsetQuery'
+      responses:
+        '200':
+          description: Paginated revision list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntityRevisionListResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /api/v1/entities/{entityId}/tags:
     get:
       tags:
@@ -2853,6 +2875,60 @@ components:
         value:
           type: string
         updated_at:
+          type: string
+          format: date-time
+      additionalProperties: false
+    EntityRevisionListResponse:
+      type: object
+      required:
+        - items
+        - limit
+        - offset
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/EntityRevisionResponse'
+        limit:
+          type: integer
+        offset:
+          type: integer
+      additionalProperties: false
+    EntityRevisionResponse:
+      type: object
+      required:
+        - id
+        - entity_id
+        - action
+        - status
+        - created_at
+      properties:
+        id:
+          type: integer
+          minimum: 1
+        entity_id:
+          type: integer
+          minimum: 1
+        action:
+          type: string
+          enum: [created, updated, deleted, restored]
+        status:
+          type: string
+          enum: [draft, published, archived]
+        previous_status:
+          type: string
+          nullable: true
+          enum: [draft, published, archived]
+        slug:
+          type: string
+          nullable: true
+        previous_slug:
+          type: string
+          nullable: true
+        actor_user_id:
+          type: integer
+          nullable: true
+        created_at:
           type: string
           format: date-time
       additionalProperties: false

@@ -207,6 +207,14 @@ export const ja: Partial<MessageCatalog> = {
     '{{fieldKey}} 経由でこのターゲットを参照するレコードはありません。',
   'admin.inverseRelations.open': '開く',
 
+  // ── Entity revisions ─────────────────────────────────────────────────────
+  'admin.entityRevisions.title': '変更履歴',
+  'admin.entityRevisions.show': '履歴を表示',
+  'admin.entityRevisions.hide': '履歴を非表示',
+  'admin.entityRevisions.loading': '履歴を読み込み中…',
+  'admin.entityRevisions.error': '変更履歴を読み込めませんでした。',
+  'admin.entityRevisions.empty': 'まだ変更履歴がありません。',
+
   // ── Settings ──────────────────────────────────────────────────────────────
   'admin.settings.pageTitle': 'サイト設定',
   'admin.settings.description':

@@ -29,3 +29,21 @@ export interface UpdateEntityDto {
   status: EntityStatusDto
   published_at?: string | null
 }
+
+export interface EntityRevisionDto {
+  id: number
+  entity_id: number
+  action: 'created' | 'updated' | 'deleted' | 'restored'
+  status: string
+  previous_status: string | null
+  slug: string | null
+  previous_slug: string | null
+  actor_user_id: number | null
+  created_at: string
+}
+
+export interface EntityRevisionListDto {
+  items: EntityRevisionDto[]
+  limit: number
+  offset: number
+}

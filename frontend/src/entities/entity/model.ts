@@ -32,3 +32,23 @@ export interface UpdateEntityInput {
   status: EntityStatus
   publishedAt?: string | null
 }
+
+export type EntityRevisionAction = 'created' | 'updated' | 'deleted' | 'restored'
+
+export interface EntityRevision {
+  id: number
+  entityId: number
+  action: EntityRevisionAction
+  status: string
+  previousStatus: string | null
+  slug: string | null
+  previousSlug: string | null
+  actorUserId: number | null
+  createdAt: string
+}
+
+export interface EntityRevisionList {
+  items: EntityRevision[]
+  limit: number
+  offset: number
+}

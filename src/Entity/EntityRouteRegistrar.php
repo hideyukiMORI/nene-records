@@ -15,6 +15,7 @@ final readonly class EntityRouteRegistrar
         private UpdateEntityHandler $updateHandler,
         private DeleteEntityHandler $deleteHandler,
         private ListEntitiesHandler $listHandler,
+        private ListEntityRevisionsHandler $listRevisionsHandler,
     ) {
     }
 
@@ -25,11 +26,16 @@ final readonly class EntityRouteRegistrar
         $updateHandler = $this->updateHandler;
         $deleteHandler = $this->deleteHandler;
         $listHandler = $this->listHandler;
+        $listRevisionsHandler = $this->listRevisionsHandler;
 
         $router->get('/api/v1/entities', static fn (ServerRequestInterface $request) => $listHandler->handle($request));
         $router->get('/api/v1/entities/{id}', static fn (ServerRequestInterface $request) => $getHandler->handle($request));
         $router->post('/api/v1/entities', static fn (ServerRequestInterface $request) => $createHandler->handle($request));
         $router->put('/api/v1/entities/{id}', static fn (ServerRequestInterface $request) => $updateHandler->handle($request));
         $router->delete('/api/v1/entities/{id}', static fn (ServerRequestInterface $request) => $deleteHandler->handle($request));
+        $router->get(
+            '/api/v1/entities/{id}/revisions',
+            static fn (ServerRequestInterface $request) => $listRevisionsHandler->handle($request),
+        );
     }
 }
