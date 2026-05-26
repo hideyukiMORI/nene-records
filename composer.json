@@ -6,7 +6,8 @@
     "require": {
         "php": ">=8.4.1 <9.0",
         "hideyukimori/nene2": "@dev",
-        "league/commonmark": "^2.7"
+        "league/commonmark": "^2.7",
+        "symfony/mailer": "^8.0"
     },
     "repositories": [
         {
