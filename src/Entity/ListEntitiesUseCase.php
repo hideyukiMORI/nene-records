@@ -34,6 +34,7 @@ final readonly class ListEntitiesUseCase implements ListEntitiesUseCaseInterface
                 publishedAtIso: $entity->publishedAt?->format(DateTimeInterface::ATOM),
                 isDeleted: $entity->isDeleted,
                 deletedAtIso: $entity->deletedAt?->format(DateTimeInterface::ATOM),
+                scheduledAtIso: $entity->scheduledAt?->format(DateTimeInterface::ATOM),
             );
         }, $rows);
 

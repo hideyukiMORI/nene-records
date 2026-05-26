@@ -20,6 +20,12 @@ use NeNeRecords\Entity\ListEntitiesHandler;
 use NeNeRecords\Entity\ListEntitiesUseCase;
 use NeNeRecords\Entity\ListEntityRevisionsHandler;
 use NeNeRecords\Entity\ListEntityRevisionsUseCase;
+use NeNeRecords\Entity\ProcessScheduledPublishHandler;
+use NeNeRecords\Entity\ProcessScheduledPublishUseCase;
+use NeNeRecords\Entity\ScheduleEntityHandler;
+use NeNeRecords\Entity\ScheduleEntityUseCase;
+use NeNeRecords\Entity\UnscheduleEntityHandler;
+use NeNeRecords\Entity\UnscheduleEntityUseCase;
 use NeNeRecords\Entity\UpdateEntityHandler;
 use NeNeRecords\Entity\UpdateEntityUseCase;
 use NeNeRecords\EntityType\EntityType;
@@ -59,6 +65,9 @@ final class EntityRevisionHttpTest extends TestCase
             new ListEntitiesHandler(new ListEntitiesUseCase($this->entities), $jsonResponse),
             new ListEntityRevisionsHandler(new ListEntityRevisionsUseCase($this->entities), $jsonResponse),
             new ExportEntitiesHandler($this->entities, new InMemoryTextFieldRepository(), $this->factory),
+            new ScheduleEntityHandler(new ScheduleEntityUseCase($this->entities), $jsonResponse),
+            new UnscheduleEntityHandler(new UnscheduleEntityUseCase($this->entities), $this->factory),
+            new ProcessScheduledPublishHandler(new ProcessScheduledPublishUseCase($this->entities), $jsonResponse),
         );
 
         $this->application = (new RuntimeApplicationFactory(

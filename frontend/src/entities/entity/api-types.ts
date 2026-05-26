@@ -1,4 +1,4 @@
-export type EntityStatusDto = 'draft' | 'published' | 'archived'
+export type EntityStatusDto = 'draft' | 'published' | 'archived' | 'scheduled'
 
 export interface EntityDto {
   id: number
@@ -6,6 +6,7 @@ export interface EntityDto {
   slug: string | null
   status: EntityStatusDto
   published_at: string | null
+  scheduled_at: string | null
   is_deleted: boolean
   deleted_at: string | null
   meta_title: string | null
@@ -30,8 +31,19 @@ export interface UpdateEntityDto {
   slug?: string | null
   status: EntityStatusDto
   published_at?: string | null
+  scheduled_at?: string | null
   meta_title?: string | null
   meta_description?: string | null
+}
+
+export interface ScheduleEntityDto {
+  scheduled_at: string
+}
+
+export interface ScheduleEntityResponseDto {
+  id: number
+  status: EntityStatusDto
+  scheduled_at: string
 }
 
 export interface EntityRevisionDto {

@@ -4,6 +4,7 @@ import type {
   EntityListDto,
   EntityRevisionDto,
   EntityRevisionListDto,
+  ScheduleEntityResponseDto,
   UpdateEntityDto,
 } from './api-types'
 import { toEntityId } from './ids'
@@ -13,6 +14,7 @@ import type {
   EntityList,
   EntityRevision,
   EntityRevisionList,
+  ScheduleEntityOutput,
   UpdateEntityInput,
 } from './model'
 
@@ -23,10 +25,21 @@ export function mapEntityDtoToModel(dto: EntityDto): Entity {
     slug: dto.slug,
     status: dto.status,
     publishedAt: dto.published_at,
+    scheduledAt: dto.scheduled_at,
     isDeleted: dto.is_deleted,
     deletedAt: dto.deleted_at,
     metaTitle: dto.meta_title,
     metaDescription: dto.meta_description,
+  }
+}
+
+export function mapScheduleResponseDtoToOutput(
+  dto: ScheduleEntityResponseDto,
+): ScheduleEntityOutput {
+  return {
+    id: dto.id,
+    status: dto.status,
+    scheduledAt: dto.scheduled_at,
   }
 }
 

@@ -1,9 +1,20 @@
 import { useMutation, useQueryClient, type UseMutationResult } from '@tanstack/react-query'
 import { apiClient, AppError } from '@/shared/api/client'
-import type { EntityDto } from './api-types'
+import type { EntityDto, ScheduleEntityResponseDto } from './api-types'
 import type { EntityId } from './ids'
-import { mapCreateInputToDto, mapEntityDtoToModel, mapUpdateInputToDto } from './mapper'
-import type { CreateEntityInput, Entity, UpdateEntityInput } from './model'
+import {
+  mapCreateInputToDto,
+  mapEntityDtoToModel,
+  mapScheduleResponseDtoToOutput,
+  mapUpdateInputToDto,
+} from './mapper'
+import type {
+  CreateEntityInput,
+  Entity,
+  ScheduleEntityInput,
+  ScheduleEntityOutput,
+  UpdateEntityInput,
+} from './model'
 import { entityKeys } from './query-keys'
 
 export function useCreateEntity(): UseMutationResult<Entity, AppError, CreateEntityInput> {
@@ -73,6 +84,42 @@ export function useDeleteEntity(): UseMutationResult<
           )
         },
       })
+    },
+  })
+}
+
+export function useScheduleEntity(): UseMutationResult<
+  ScheduleEntityOutput,
+  AppError,
+  ScheduleEntityInput
+> {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (input) => {
+      const dto = await apiClient.post<ScheduleEntityResponseDto>(
+        `/api/v1/entities/${String(input.id)}/schedule`,
+        { scheduled_at: input.scheduledAt },
+      )
+      return mapScheduleResponseDtoToOutput(dto)
+    },
+    onSuccess: async (_data, variables) => {
+      queryClient.removeQueries({ queryKey: entityKeys.detail(variables.id) })
+      await queryClient.invalidateQueries({ queryKey: entityKeys.lists() })
+    },
+  })
+}
+
+export function useUnscheduleEntity(): UseMutationResult<void, AppError, { id: EntityId }> {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({ id }) => {
+      await apiClient.delete(`/api/v1/entities/${String(id)}/schedule`)
+    },
+    onSuccess: async (_data, variables) => {
+      queryClient.removeQueries({ queryKey: entityKeys.detail(variables.id) })
+      await queryClient.invalidateQueries({ queryKey: entityKeys.lists() })
     },
   })
 }

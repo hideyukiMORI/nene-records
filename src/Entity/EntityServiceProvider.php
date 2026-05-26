@@ -257,6 +257,93 @@ final readonly class EntityServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(
+                ScheduleEntityUseCaseInterface::class,
+                static function (ContainerInterface $c): ScheduleEntityUseCaseInterface {
+                    $repository = $c->get(EntityRepositoryInterface::class);
+
+                    if (!$repository instanceof EntityRepositoryInterface) {
+                        throw new LogicException('Entity repository service is invalid.');
+                    }
+
+                    return new ScheduleEntityUseCase($repository);
+                },
+            )
+            ->set(
+                ScheduleEntityHandler::class,
+                static function (ContainerInterface $c): ScheduleEntityHandler {
+                    $useCase = $c->get(ScheduleEntityUseCaseInterface::class);
+                    $response = $c->get(JsonResponseFactory::class);
+
+                    if (!$useCase instanceof ScheduleEntityUseCaseInterface) {
+                        throw new LogicException('ScheduleEntity use case service is invalid.');
+                    }
+
+                    if (!$response instanceof JsonResponseFactory) {
+                        throw new LogicException('JSON response factory service is invalid.');
+                    }
+
+                    return new ScheduleEntityHandler($useCase, $response);
+                },
+            )
+            ->set(
+                UnscheduleEntityUseCaseInterface::class,
+                static function (ContainerInterface $c): UnscheduleEntityUseCaseInterface {
+                    $repository = $c->get(EntityRepositoryInterface::class);
+
+                    if (!$repository instanceof EntityRepositoryInterface) {
+                        throw new LogicException('Entity repository service is invalid.');
+                    }
+
+                    return new UnscheduleEntityUseCase($repository);
+                },
+            )
+            ->set(
+                UnscheduleEntityHandler::class,
+                static function (ContainerInterface $c): UnscheduleEntityHandler {
+                    $useCase = $c->get(UnscheduleEntityUseCaseInterface::class);
+                    $responseFactory = $c->get(ResponseFactoryInterface::class);
+
+                    if (!$useCase instanceof UnscheduleEntityUseCaseInterface) {
+                        throw new LogicException('UnscheduleEntity use case service is invalid.');
+                    }
+
+                    if (!$responseFactory instanceof ResponseFactoryInterface) {
+                        throw new LogicException('Response factory service is invalid.');
+                    }
+
+                    return new UnscheduleEntityHandler($useCase, $responseFactory);
+                },
+            )
+            ->set(
+                ProcessScheduledPublishUseCaseInterface::class,
+                static function (ContainerInterface $c): ProcessScheduledPublishUseCaseInterface {
+                    $repository = $c->get(EntityRepositoryInterface::class);
+
+                    if (!$repository instanceof EntityRepositoryInterface) {
+                        throw new LogicException('Entity repository service is invalid.');
+                    }
+
+                    return new ProcessScheduledPublishUseCase($repository);
+                },
+            )
+            ->set(
+                ProcessScheduledPublishHandler::class,
+                static function (ContainerInterface $c): ProcessScheduledPublishHandler {
+                    $useCase = $c->get(ProcessScheduledPublishUseCaseInterface::class);
+                    $response = $c->get(JsonResponseFactory::class);
+
+                    if (!$useCase instanceof ProcessScheduledPublishUseCaseInterface) {
+                        throw new LogicException('ProcessScheduledPublish use case service is invalid.');
+                    }
+
+                    if (!$response instanceof JsonResponseFactory) {
+                        throw new LogicException('JSON response factory service is invalid.');
+                    }
+
+                    return new ProcessScheduledPublishHandler($useCase, $response);
+                },
+            )
+            ->set(
                 ExportEntitiesHandler::class,
                 static function (ContainerInterface $c): ExportEntitiesHandler {
                     $entities = $c->get(EntityRepositoryInterface::class);
@@ -288,6 +375,9 @@ final readonly class EntityServiceProvider implements ServiceProviderInterface
                     $list = $c->get(ListEntitiesHandler::class);
                     $listRevisions = $c->get(ListEntityRevisionsHandler::class);
                     $export = $c->get(ExportEntitiesHandler::class);
+                    $schedule = $c->get(ScheduleEntityHandler::class);
+                    $unschedule = $c->get(UnscheduleEntityHandler::class);
+                    $processScheduled = $c->get(ProcessScheduledPublishHandler::class);
 
                     if (!$get instanceof GetEntityByIdHandler) {
                         throw new LogicException('GetEntityById handler service is invalid.');
@@ -317,7 +407,19 @@ final readonly class EntityServiceProvider implements ServiceProviderInterface
                         throw new LogicException('ExportEntities handler service is invalid.');
                     }
 
-                    return new EntityRouteRegistrar($get, $create, $update, $delete, $list, $listRevisions, $export);
+                    if (!$schedule instanceof ScheduleEntityHandler) {
+                        throw new LogicException('ScheduleEntity handler service is invalid.');
+                    }
+
+                    if (!$unschedule instanceof UnscheduleEntityHandler) {
+                        throw new LogicException('UnscheduleEntity handler service is invalid.');
+                    }
+
+                    if (!$processScheduled instanceof ProcessScheduledPublishHandler) {
+                        throw new LogicException('ProcessScheduledPublish handler service is invalid.');
+                    }
+
+                    return new EntityRouteRegistrar($get, $create, $update, $delete, $list, $listRevisions, $export, $schedule, $unschedule, $processScheduled);
                 },
             );
     }

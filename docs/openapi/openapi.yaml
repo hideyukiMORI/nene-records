@@ -315,6 +315,7 @@ paths:
                     entity_type_id: 1
                     status: draft
                     published_at: null
+                    scheduled_at: null
                     is_deleted: false
                     deleted_at: null
                     meta_title: null
@@ -398,6 +399,7 @@ paths:
                     entity_type_id: 1
                     status: draft
                     published_at: null
+                    scheduled_at: null
                     is_deleted: false
                     deleted_at: null
                     meta_title: null
@@ -437,6 +439,7 @@ paths:
                     entity_type_id: 2
                     status: published
                     published_at: '2026-05-24T10:00:00+00:00'
+                    scheduled_at: null
                     is_deleted: false
                     deleted_at: null
                     meta_title: null
@@ -481,6 +484,74 @@ paths:
                 $ref: '#/components/schemas/EntityRevisionListResponse'
         '404':
           $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/entities/{id}/schedule:
+    post:
+      tags:
+        - Entities
+      summary: Schedule entity for future publish
+      description: Sets the entity status to `scheduled` and stores the future publish datetime.
+      operationId: scheduleEntity
+      parameters:
+        - $ref: '#/components/parameters/IdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScheduleEntityRequest'
+            examples:
+              schedule:
+                value:
+                  scheduled_at: '2026-06-01T09:00:00+09:00'
+      responses:
+        '200':
+          description: Entity scheduled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduleEntityResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Entities
+      summary: Cancel scheduled publish
+      description: Cancels the scheduled publish and reverts the entity status to `draft`.
+      operationId: unscheduleEntity
+      parameters:
+        - $ref: '#/components/parameters/IdPath'
+      responses:
+        '204':
+          description: Schedule cancelled.
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/entities/process-scheduled:
+    post:
+      tags:
+        - Entities
+      summary: Process scheduled publishes
+      description: Publishes all entities whose `scheduled_at` has passed. Intended for cron job invocation.
+      operationId: processScheduledPublish
+      responses:
+        '200':
+          description: Result of the batch publish.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcessScheduledPublishResponse'
+              examples:
+                ok:
+                  value:
+                    published_count: 2
+                    published_ids: [10, 11]
         '500':
           $ref: '#/components/responses/InternalServerError'
   /api/v1/entities/{entityId}/tags:
@@ -2480,6 +2551,7 @@ components:
         - draft
         - published
         - archived
+        - scheduled
     MediaResponse:
       type: object
       required:
@@ -2512,6 +2584,7 @@ components:
         - slug
         - status
         - published_at
+        - scheduled_at
         - is_deleted
         - deleted_at
         - meta_title
@@ -2531,6 +2604,11 @@ components:
         status:
           $ref: '#/components/schemas/EntityStatus'
         published_at:
+          type:
+            - string
+            - 'null'
+          format: date-time
+        scheduled_at:
           type:
             - string
             - 'null'
@@ -2585,6 +2663,11 @@ components:
             - string
             - 'null'
           format: date-time
+        scheduled_at:
+          type:
+            - string
+            - 'null'
+          format: date-time
         meta_title:
           type:
             - string
@@ -2595,6 +2678,45 @@ components:
             - string
             - 'null'
       additionalProperties: false
+    ScheduleEntityRequest:
+      type: object
+      required:
+        - scheduled_at
+      properties:
+        scheduled_at:
+          type: string
+          format: date-time
+          description: Future ISO 8601 datetime when the entity will be auto-published.
+      additionalProperties: false
+    ScheduleEntityResponse:
+      type: object
+      required:
+        - id
+        - status
+        - scheduled_at
+      properties:
+        id:
+          type: integer
+          format: int64
+        status:
+          $ref: '#/components/schemas/EntityStatus'
+        scheduled_at:
+          type: string
+          format: date-time
+    ProcessScheduledPublishResponse:
+      type: object
+      required:
+        - published_count
+        - published_ids
+      properties:
+        published_count:
+          type: integer
+          minimum: 0
+        published_ids:
+          type: array
+          items:
+            type: integer
+            format: int64
     EntityListResponse:
       type: object
       required:
