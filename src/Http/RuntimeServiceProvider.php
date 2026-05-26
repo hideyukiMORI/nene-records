@@ -289,17 +289,16 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
                     $authMiddleware[] = new CapabilityMiddleware($problemDetails);
 
                     return new RuntimeApplicationFactory(
-                        $responseFactory,
-                        $streamFactory,
-                        $logger,
-                        $config->machineApiKey,
-                        $exceptionHandlers,
-                        $requestIdHolder,
-                        $routeRegistrars,
-                        $authMiddleware,
-                        [],
-                        null,
-                        $config->debug,
+                        responseFactory: $responseFactory,
+                        streamFactory: $streamFactory,
+                        logger: $logger,
+                        machineApiKey: $config->machineApiKey,
+                        domainExceptionHandlers: $exceptionHandlers,
+                        requestIdHolder: $requestIdHolder,
+                        routeRegistrars: $routeRegistrars,
+                        authMiddleware: $authMiddleware,
+                        debug: $config->debug,
+                        requestMaxBodyBytes: 10 * 1024 * 1024, // 10 MiB — required for media uploads
                     );
                 },
             )

@@ -127,6 +127,17 @@ export const ja: Partial<MessageCatalog> = {
   'admin.fieldDefs.dataType.enum': '列挙型',
   'admin.fieldDefs.dataType.bool': 'ブール値',
   'admin.fieldDefs.dataType.datetime': '日時',
+  'admin.fieldDefs.dataType.image': '画像',
+
+  // ── Media upload ─────────────────────────────────────────────────────────
+  'admin.media.panelTitle': 'メディア',
+  'admin.media.uploadButton': '画像をアップロード',
+  'admin.media.uploading': 'アップロード中…',
+  'admin.media.uploadSuccess': 'アップロード完了 — URL をクリップボードにコピーしました。',
+  'admin.media.uploadError': 'アップロードに失敗しました。',
+  'admin.media.imagePreview': '画像プレビュー',
+  'admin.media.noImage': '画像が選択されていません',
+  'admin.media.urlLabel': '画像 URL',
 
   // ── Tags ─────────────────────────────────────────────────────────────────
   'admin.tags.pageTitle': 'タグ',

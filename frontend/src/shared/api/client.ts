@@ -61,6 +61,35 @@ export const apiClient = {
   delete(path: string): Promise<undefined> {
     return request<undefined>(path, { method: 'DELETE' })
   },
+  async upload<T>(path: string, formData: FormData): Promise<T> {
+    const base = env.apiBaseUrl.replace(/\/$/, '')
+    const url = `${base}${path}`
+    const headers: Record<string, string> = {}
+    const token = authStore.getToken()
+    if (token !== null) {
+      headers['Authorization'] = `Bearer ${token}`
+    }
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers,
+      body: formData,
+      credentials: 'include',
+    })
+
+    if (!response.ok) {
+      if (response.status === 401 && !path.includes('/auth/login')) {
+        authStore.clearSession()
+        window.location.href = '/login'
+      }
+      if (response.status === 403) {
+        window.location.href = '/forbidden'
+      }
+      throw await parseProblemDetails(response)
+    }
+
+    return (await response.json()) as T
+  },
 }
 
 export { AppError }
