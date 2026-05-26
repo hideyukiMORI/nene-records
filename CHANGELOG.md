@@ -6,6 +6,19 @@ NeNe Records does not yet follow Semantic Versioning — entries are grouped by 
 
 ---
 
+## [M6 — コメント機能] — 2026-05-27
+
+### Added
+- Comment submission API — `POST /api/v1/entities/{id}/comments` (公開); submitted comments are stored with `is_approved=false` and await moderation (#202, PR #204)
+- Public comment list API — `GET /api/v1/entities/{id}/comments` returns approved comments only, ordered by `created_at ASC`; `author_email` omitted from public response (#202, PR #204)
+- Admin comment management API — `GET /api/v1/admin/comments`, `PATCH /api/v1/admin/comments/{id}/approve`, `DELETE /api/v1/admin/comments/{id}`; requires `ManageSettings` capability (#202, PR #204)
+- Comment public UI — `CommentSection` component on public record detail pages: approved comment list + form (name, email, body) with pending-moderation message (#203, PR #204)
+- Comment admin UI — `/admin/comments` page with pending/approved badges, approve button, delete confirmation; accessible from AppShell Appearance section (#203, PR #204)
+- `IconMessageCircle` SVG icon (#203, PR #204)
+- i18n: admin and public comment keys in `en.ts` / `ja.ts` (#203, PR #204)
+
+---
+
 ## [M5 — ユーザー管理・メディアライブラリ] — 2026-05-27
 
 ### Added
