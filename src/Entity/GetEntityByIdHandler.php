@@ -34,6 +34,7 @@ final readonly class GetEntityByIdHandler
             'slug' => $output->slug,
             'status' => $output->status,
             'published_at' => $output->publishedAtIso,
+            'scheduled_at' => $output->scheduledAtIso,
             'is_deleted' => $output->isDeleted,
             'deleted_at' => $output->deletedAtIso,
             'meta_title' => $output->metaTitle,

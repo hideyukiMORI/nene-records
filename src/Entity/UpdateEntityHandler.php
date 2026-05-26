@@ -52,6 +52,9 @@ final readonly class UpdateEntityHandler
         $rawPublishedAt = $body['published_at'] ?? null;
         $publishedAt = is_string($rawPublishedAt) ? (DateTimeImmutable::createFromFormat(DATE_ATOM, $rawPublishedAt) ?: null) : null;
 
+        $rawScheduledAt = $body['scheduled_at'] ?? null;
+        $scheduledAt = is_string($rawScheduledAt) ? (DateTimeImmutable::createFromFormat(DATE_ATOM, $rawScheduledAt) ?: null) : null;
+
         $rawMetaTitle = $body['meta_title'] ?? null;
         $metaTitle = is_string($rawMetaTitle) && trim($rawMetaTitle) !== '' ? trim($rawMetaTitle) : null;
 
@@ -71,6 +74,7 @@ final readonly class UpdateEntityHandler
             publishedAt: $publishedAt,
             metaTitle: $metaTitle,
             metaDescription: $metaDescription,
+            scheduledAt: $scheduledAt,
         ));
 
         return $this->response->create([
@@ -79,6 +83,7 @@ final readonly class UpdateEntityHandler
             'slug' => $output->slug,
             'status' => $output->status,
             'published_at' => $output->publishedAtIso,
+            'scheduled_at' => $output->scheduledAtIso,
             'is_deleted' => $output->isDeleted,
             'deleted_at' => $output->deletedAtIso,
             'meta_title' => $output->metaTitle,

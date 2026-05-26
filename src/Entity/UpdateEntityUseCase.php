@@ -50,6 +50,9 @@ final readonly class UpdateEntityUseCase implements UpdateEntityUseCaseInterface
             $publishedAt = new DateTimeImmutable();
         }
 
+        // scheduled_at is only preserved when status is scheduled; clear otherwise.
+        $scheduledAt = $input->status === EntityStatus::Scheduled ? $input->scheduledAt : null;
+
         $updated = new Entity(
             id: $entityId,
             entityTypeId: $input->entityTypeId,
@@ -60,6 +63,7 @@ final readonly class UpdateEntityUseCase implements UpdateEntityUseCaseInterface
             deletedAt: $existing->deletedAt,
             metaTitle: $input->metaTitle,
             metaDescription: $input->metaDescription,
+            scheduledAt: $scheduledAt,
         );
 
         $this->entities->update($updated);
@@ -76,6 +80,7 @@ final readonly class UpdateEntityUseCase implements UpdateEntityUseCaseInterface
             deletedAtIso: $existing->deletedAt?->format(DateTimeInterface::ATOM),
             metaTitle: $input->metaTitle,
             metaDescription: $input->metaDescription,
+            scheduledAtIso: $scheduledAt?->format(DateTimeInterface::ATOM),
         );
     }
 

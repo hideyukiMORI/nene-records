@@ -8,7 +8,7 @@ Last updated: 2026-05-26
 
 **M2 — Team-Ready CMS: 完了** — P1/P2 バックログ全消化
 
-**M3 — P1 完了・P2 進行中** — 全文検索 API（#131）・Admin UI リデザイン＋レスポンシブ（#128）・エクスポート API（#132 マージ済み）・ファイルフィールド（#134 マージ済み）・Webhook（#136 レビュー中）
+**M3 — 全 P1〜P3 実装完了・マージ進行中** — 全文検索 API（#131）・エクスポート API（#132）・Webhook（#136 マージ済み）・予約公開（#138 レビュー中）・Draft preview token（#141 レビュー中）・Public cache/ETag（#143 レビュー中）
 
 229 tests / PHPStan Max / CS-Fixer / OpenAPI / MCP バリデーション — 全グリーン。
 Backend CI + Frontend CI (GitHub Actions) 稼働中。
@@ -23,7 +23,10 @@ Backend CI + Frontend CI (GitHub Actions) 稼働中。
 | P1 | Full-text search API | #129 | #131 | ✅ マージ済み |
 | P1 | Export API (CSV/JSON) | #130 | #132 | ✅ マージ済み |
 | P2 | File field + upload | #133 | #134 | ✅ マージ済み |
-| P2 | Webhook / event hooks | #135 | #136 | 🔄 レビュー中 |
+| P2 | Webhook / event hooks | #135 | #136 | ✅ マージ済み |
+| P3 | Scheduled publish | #137 | #138 | 🔄 レビュー中 |
+| P3 | Draft preview tokens | #139 | #141 | 🔄 レビュー中 |
+| P3 | Public cache / ETag | #142 | #143 | 🔄 レビュー中 |
 
 ---
 
@@ -66,20 +69,12 @@ Backend CI + Frontend CI (GitHub Actions) 稼働中。
 
 ---
 
-## M3 P2 完了（マージ済み / レビュー中）
+## M3 完了（マージ済み）
 
 | Issue | PR | Summary |
 | --- | --- | --- |
 | #133 | #134 | feat: ファイルフィールド + image 以外のメディアアップロード対応 |
 | #135 | #136 | feat: Webhook / イベントフック（エンティティ変更時の外部通知） |
-
-## Up Next — M3 P3（検討中）
-
-| 優先 | 項目 | 説明 |
-| --- | --- | --- |
-| — | Scheduled publish | 公開日時指定・自動公開 |
-| — | Multi-language content | フィールド値の多言語化 |
-| — | Rate limiting | API レート制限 |
 
 ---
 

@@ -1,6 +1,6 @@
 import type { EntityId } from './ids'
 
-export type EntityStatus = 'draft' | 'published' | 'archived'
+export type EntityStatus = 'draft' | 'published' | 'archived' | 'scheduled'
 
 export interface Entity {
   id: EntityId
@@ -8,6 +8,7 @@ export interface Entity {
   slug: string | null
   status: EntityStatus
   publishedAt: string | null
+  scheduledAt: string | null
   isDeleted: boolean
   deletedAt: string | null
   metaTitle: string | null
@@ -33,8 +34,20 @@ export interface UpdateEntityInput {
   slug?: string | null
   status: EntityStatus
   publishedAt?: string | null
+  scheduledAt?: string | null
   metaTitle?: string | null
   metaDescription?: string | null
+}
+
+export interface ScheduleEntityInput {
+  id: number
+  scheduledAt: string
+}
+
+export interface ScheduleEntityOutput {
+  id: number
+  status: EntityStatus
+  scheduledAt: string
 }
 
 export type EntityRevisionAction = 'created' | 'updated' | 'deleted' | 'restored'

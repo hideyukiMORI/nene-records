@@ -213,6 +213,12 @@ export const ja: Partial<MessageCatalog> = {
   'admin.entityStatus.status.draft': '下書き',
   'admin.entityStatus.status.published': '公開済み',
   'admin.entityStatus.status.archived': 'アーカイブ済み',
+  'admin.entityStatus.status.scheduled': '予約済み',
+  'admin.entityStatus.schedule': '予約公開',
+  'admin.entityStatus.cancelSchedule': '予約をキャンセル',
+  'admin.entityStatus.confirmSchedule': '予約を確定',
+  'admin.entityStatus.scheduledAt': '{{date}} に公開予定',
+  'admin.entityStatus.scheduleError': '予約に失敗しました。日時は未来である必要があります。',
 
   // ── Relations (outgoing) ──────────────────────────────────────────────────
   'admin.relations.title': 'リレーション',

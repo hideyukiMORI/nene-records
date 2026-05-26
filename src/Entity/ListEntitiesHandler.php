@@ -57,6 +57,7 @@ final readonly class ListEntitiesHandler
                         'slug' => $item->slug,
                         'status' => $item->status,
                         'published_at' => $item->publishedAtIso,
+                        'scheduled_at' => $item->scheduledAtIso,
                         'is_deleted' => $item->isDeleted,
                         'deleted_at' => $item->deletedAtIso,
                     ],

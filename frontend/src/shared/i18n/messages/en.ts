@@ -218,6 +218,12 @@ export const en = {
   'admin.entityStatus.status.draft': 'Draft',
   'admin.entityStatus.status.published': 'Published',
   'admin.entityStatus.status.archived': 'Archived',
+  'admin.entityStatus.status.scheduled': 'Scheduled',
+  'admin.entityStatus.schedule': 'Schedule',
+  'admin.entityStatus.cancelSchedule': 'Cancel schedule',
+  'admin.entityStatus.confirmSchedule': 'Set schedule',
+  'admin.entityStatus.scheduledAt': 'Scheduled for {{date}}',
+  'admin.entityStatus.scheduleError': 'Failed to schedule. The date must be in the future.',
 
   // ── Relations (outgoing) ──────────────────────────────────────────────────
   'admin.relations.title': 'Relations',

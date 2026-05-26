@@ -16,6 +16,7 @@ final readonly class GetEntityByIdOutput
         public ?string $deletedAtIso,
         public ?string $metaTitle = null,
         public ?string $metaDescription = null,
+        public ?string $scheduledAtIso = null,
     ) {
     }
 }

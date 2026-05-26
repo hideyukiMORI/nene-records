@@ -178,6 +178,29 @@ final class InMemoryEntityRepository implements EntityRepositoryInterface
         return count($this->findByCriteria($criteria, PHP_INT_MAX, 0));
     }
 
+    /** @return list<Entity> */
+    public function findDueScheduled(): array
+    {
+        $now = new DateTimeImmutable();
+        $result = [];
+
+        foreach ($this->entities as $entity) {
+            if ($entity->isDeleted) {
+                continue;
+            }
+
+            if ($entity->status !== \NeNeRecords\Entity\EntityStatus::Scheduled) {
+                continue;
+            }
+
+            if ($entity->scheduledAt !== null && $entity->scheduledAt <= $now) {
+                $result[] = $entity;
+            }
+        }
+
+        return $result;
+    }
+
     /** @return list<\NeNeRecords\Entity\EntityRevision> */
     public function findRevisionsByEntityId(int $entityId, int $limit, int $offset): array
     {
@@ -204,6 +227,7 @@ final class InMemoryEntityRepository implements EntityRepositoryInterface
             publishedAt: $entity->publishedAt,
             metaTitle: $entity->metaTitle,
             metaDescription: $entity->metaDescription,
+            scheduledAt: $entity->scheduledAt,
         );
 
         $this->revisions[] = new \NeNeRecords\Entity\EntityRevision(

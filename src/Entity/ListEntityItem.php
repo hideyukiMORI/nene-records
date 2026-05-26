@@ -14,6 +14,7 @@ final readonly class ListEntityItem
         public ?string $publishedAtIso,
         public bool $isDeleted,
         public ?string $deletedAtIso,
+        public ?string $scheduledAtIso = null,
     ) {
     }
 }
