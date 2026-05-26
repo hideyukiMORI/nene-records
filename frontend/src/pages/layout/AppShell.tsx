@@ -356,7 +356,7 @@ export function AppShell() {
 
       {/* ── Footer (fixed bottom-right) ─────────────────────────────────── */}
       <footer className="fixed bottom-0 right-0 px-4 py-2">
-        <p className="font-sans text-caption text-text-muted">Powered by NENE2 · © 2026 AYANE</p>
+        <p className="font-sans text-tiny text-text-muted">Powered by NENE2 · © 2026 AYANE</p>
       </footer>
     </div>
   )
