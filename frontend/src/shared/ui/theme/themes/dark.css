@@ -1,5 +1,5 @@
-/* Dark theme overrides — applied when <html data-theme="dark"> */
-[data-theme='dark'] {
+/* Default Dark — applied when <html data-admin-theme="default-dark"> */
+[data-admin-theme='default-dark'] {
   /* ── Surfaces ──────────────────────────────────────────────────────────── */
   --color-surface: oklch(13% 0.01 265);
   --color-surface-raised: oklch(17% 0.01 265);

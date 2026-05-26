@@ -54,7 +54,7 @@ function NavItem({ to, end, icon, label, onClick }: NavItemProps) {
 export function AppShell() {
   const navigate = useNavigate()
   const { t, locale, setLocale } = useTranslation()
-  const { theme, toggleTheme } = useTheme()
+  const { themeVariant, toggleVariant, canToggleVariant } = useTheme()
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   // Prevent body scroll when drawer is open
@@ -321,17 +321,21 @@ export function AppShell() {
               ))}
             </select>
 
-            {/* Theme toggle */}
-            <button
-              type="button"
-              onClick={toggleTheme}
-              aria-label={
-                theme === 'dark' ? t('admin.theme.toggleLight') : t('admin.theme.toggleDark')
-              }
-              className="flex shrink-0 items-center justify-center rounded-md border border-sidebar-border bg-sidebar-active-bg p-1.5 text-sidebar-text transition-colors hover:bg-sidebar-hover-bg hover:text-sidebar-active-text"
-            >
-              {theme === 'dark' ? <IconSun size={15} /> : <IconMoon size={15} />}
-            </button>
+            {/* Theme toggle — both variants available のみ表示 */}
+            {canToggleVariant ? (
+              <button
+                type="button"
+                onClick={toggleVariant}
+                aria-label={
+                  themeVariant === 'dark'
+                    ? t('admin.theme.toggleLight')
+                    : t('admin.theme.toggleDark')
+                }
+                className="flex shrink-0 items-center justify-center rounded-md border border-sidebar-border bg-sidebar-active-bg p-1.5 text-sidebar-text transition-colors hover:bg-sidebar-hover-bg hover:text-sidebar-active-text"
+              >
+                {themeVariant === 'dark' ? <IconSun size={15} /> : <IconMoon size={15} />}
+              </button>
+            ) : null}
 
             {/* Logout */}
             <button
