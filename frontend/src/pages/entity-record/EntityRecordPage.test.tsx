@@ -77,7 +77,7 @@ describe('EntityRecordPage', () => {
     })
 
     await user.type(screen.getByLabelText('title (text)'), 'Hello world')
-    await user.click(screen.getByRole('button', { name: 'Save values' }))
+    await user.click(screen.getByRole('button', { name: 'Save' }))
 
     await waitFor(() => {
       expect(screen.getByLabelText('title (text)')).toHaveValue('Hello world')
@@ -104,7 +104,7 @@ describe('EntityRecordPage', () => {
     })
 
     await user.type(screen.getByLabelText('title (text)'), 'First title')
-    await user.click(screen.getByRole('button', { name: 'Save values' }))
+    await user.click(screen.getByRole('button', { name: 'Save' }))
 
     await waitFor(() => {
       expect(screen.getByLabelText('title (text)')).toHaveValue('First title')
@@ -112,7 +112,7 @@ describe('EntityRecordPage', () => {
 
     await user.clear(screen.getByLabelText('title (text)'))
     await user.type(screen.getByLabelText('title (text)'), 'Updated title')
-    await user.click(screen.getByRole('button', { name: 'Save values' }))
+    await user.click(screen.getByRole('button', { name: 'Save' }))
 
     await waitFor(() => {
       expect(screen.getByLabelText('title (text)')).toHaveValue('Updated title')
@@ -132,7 +132,7 @@ describe('EntityRecordPage', () => {
 
     renderEntityRecordPage()
 
-    expect(await screen.findByText('No editable fields defined')).toBeInTheDocument()
+    expect(await screen.findByText('No fields defined yet')).toBeInTheDocument()
   })
 
   it('creates int field values on save', async () => {
@@ -155,7 +155,7 @@ describe('EntityRecordPage', () => {
     })
 
     await user.type(screen.getByLabelText('count (int)'), '42')
-    await user.click(screen.getByRole('button', { name: 'Save values' }))
+    await user.click(screen.getByRole('button', { name: 'Save' }))
 
     await waitFor(() => {
       expect(screen.getByLabelText('count (int)')).toHaveValue(42)
@@ -182,7 +182,7 @@ describe('EntityRecordPage', () => {
     })
 
     await user.click(screen.getByLabelText('enabled (bool)'))
-    await user.click(screen.getByRole('button', { name: 'Save values' }))
+    await user.click(screen.getByRole('button', { name: 'Save' }))
 
     await waitFor(() => {
       expect(screen.getByLabelText('enabled (bool)')).toBeChecked()

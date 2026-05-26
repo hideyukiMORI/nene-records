@@ -17,11 +17,13 @@ import {
 } from '@/entities/field-def'
 import { useTagList } from '@/entities/tag'
 import { defaultTextFieldListParamsForEntityType, useTextFieldList } from '@/entities/text-field'
+import { useTranslation } from '@/shared/i18n'
 import { getRecordDisplayLabel } from '@/shared/lib/get-record-display-label'
 
 const PAGE_LIMIT = 20
 
 export function useManageEntitiesPage(entityTypeId: number) {
+  const { t } = useTranslation()
   const [selectedTagSlugs, setSelectedTagSlugs] = useState<string[]>([])
   const [selectedRelationFilters, setSelectedRelationFilters] = useState<EntityRelationFilters>({})
   const [searchQuery, setSearchQuery] = useState('')
@@ -59,10 +61,14 @@ export function useManageEntitiesPage(entityTypeId: number) {
     return Object.fromEntries(
       items.map((entity) => [
         String(entity.id),
-        getRecordDisplayLabel(Number(entity.id), textFields, `Record #${String(entity.id)}`),
+        getRecordDisplayLabel(
+          Number(entity.id),
+          textFields,
+          t('admin.entityRecord.id', { id: entity.id }),
+        ),
       ]),
     )
-  }, [items, textFieldQuery.data?.items])
+  }, [items, t, textFieldQuery.data?.items])
 
   const toggleTagSlug = useCallback((slug: string) => {
     setSelectedTagSlugs((current) =>

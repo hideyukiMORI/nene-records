@@ -58,14 +58,14 @@ describe('EntityRecordsPage', () => {
 
     await waitFor(() => {
       expect(screen.getByRole('heading', { name: 'Article' })).toBeInTheDocument()
-      expect(screen.getByText('No records yet')).toBeInTheDocument()
+      expect(screen.getByText('No content yet')).toBeInTheDocument()
     })
 
-    await user.click(screen.getByRole('button', { name: 'Create record' }))
+    await user.click(screen.getByRole('button', { name: 'Create' }))
 
     await waitFor(() => {
-      expect(screen.getByText('Record #1')).toBeInTheDocument()
-      expect(screen.getByText('1 record')).toBeInTheDocument()
+      expect(screen.getByText('Item #1')).toBeInTheDocument()
+      expect(screen.getByText('1 item')).toBeInTheDocument()
     })
   })
 
@@ -74,10 +74,10 @@ describe('EntityRecordsPage', () => {
     const user = userEvent.setup()
     renderRecordsPage()
 
-    await user.click(screen.getByRole('button', { name: 'Create record' }))
+    await user.click(screen.getByRole('button', { name: 'Create' }))
 
     await waitFor(() => {
-      expect(screen.getByText('Record #1')).toBeInTheDocument()
+      expect(screen.getByText('Item #1')).toBeInTheDocument()
     })
 
     await user.click(screen.getByRole('button', { name: 'Delete' }))
@@ -87,8 +87,8 @@ describe('EntityRecordsPage', () => {
     await user.click(within(dialog).getByRole('button', { name: 'Delete' }))
 
     await waitFor(() => {
-      expect(screen.queryByText('Record #1')).not.toBeInTheDocument()
-      expect(screen.getByText('No records yet')).toBeInTheDocument()
+      expect(screen.queryByText('Item #1')).not.toBeInTheDocument()
+      expect(screen.getByText('No content yet')).toBeInTheDocument()
     })
   })
 
@@ -135,23 +135,23 @@ describe('EntityRecordsPage', () => {
     const user = userEvent.setup()
     renderRecordsPage()
 
-    expect(await screen.findByText('Record #1')).toBeInTheDocument()
-    expect(screen.getByText('Record #2')).toBeInTheDocument()
+    expect(await screen.findByText('Item #1')).toBeInTheDocument()
+    expect(screen.getByText('Item #2')).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'Featured' }))
 
     await waitFor(() => {
-      expect(screen.getByText('Record #1')).toBeInTheDocument()
-      expect(screen.queryByText('Record #2')).not.toBeInTheDocument()
-      expect(screen.getByText('1 record')).toBeInTheDocument()
+      expect(screen.getByText('Item #1')).toBeInTheDocument()
+      expect(screen.queryByText('Item #2')).not.toBeInTheDocument()
+      expect(screen.getByText('1 item')).toBeInTheDocument()
     })
 
     await user.click(screen.getByRole('button', { name: 'Clear' }))
 
     await waitFor(() => {
-      expect(screen.getByText('Record #1')).toBeInTheDocument()
-      expect(screen.getByText('Record #2')).toBeInTheDocument()
-      expect(screen.getByText('2 records')).toBeInTheDocument()
+      expect(screen.getByText('Item #1')).toBeInTheDocument()
+      expect(screen.getByText('Item #2')).toBeInTheDocument()
+      expect(screen.getByText('2 items')).toBeInTheDocument()
     })
   })
 
@@ -163,12 +163,12 @@ describe('EntityRecordsPage', () => {
     const user = userEvent.setup()
     renderRecordsPage()
 
-    expect(await screen.findByText('Record #1')).toBeInTheDocument()
+    expect(await screen.findByText('Item #1')).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'Featured' }))
 
     await waitFor(() => {
-      expect(screen.getByText('No matching records')).toBeInTheDocument()
+      expect(screen.getByText('No matching items')).toBeInTheDocument()
     })
   })
 
@@ -201,23 +201,23 @@ describe('EntityRecordsPage', () => {
     const user = userEvent.setup()
     renderRecordsPage()
 
-    expect(await screen.findByText('Record #1')).toBeInTheDocument()
-    expect(screen.getByText('Record #2')).toBeInTheDocument()
+    expect(await screen.findByText('Item #1')).toBeInTheDocument()
+    expect(screen.getByText('Item #2')).toBeInTheDocument()
 
     await user.selectOptions(await screen.findByLabelText('author'), '10')
 
     await waitFor(() => {
-      expect(screen.getByText('Record #1')).toBeInTheDocument()
-      expect(screen.queryByText('Record #2')).not.toBeInTheDocument()
-      expect(screen.getByText('1 record')).toBeInTheDocument()
+      expect(screen.getByText('Item #1')).toBeInTheDocument()
+      expect(screen.queryByText('Item #2')).not.toBeInTheDocument()
+      expect(screen.getByText('1 item')).toBeInTheDocument()
     })
 
     await user.click(screen.getByRole('button', { name: 'Clear' }))
 
     await waitFor(() => {
-      expect(screen.getByText('Record #1')).toBeInTheDocument()
-      expect(screen.getByText('Record #2')).toBeInTheDocument()
-      expect(screen.getByText('2 records')).toBeInTheDocument()
+      expect(screen.getByText('Item #1')).toBeInTheDocument()
+      expect(screen.getByText('Item #2')).toBeInTheDocument()
+      expect(screen.getByText('2 items')).toBeInTheDocument()
     })
   })
 
@@ -244,12 +244,12 @@ describe('EntityRecordsPage', () => {
     const user = userEvent.setup()
     renderRecordsPage()
 
-    expect(await screen.findByText('Record #1')).toBeInTheDocument()
+    expect(await screen.findByText('Item #1')).toBeInTheDocument()
 
     await user.selectOptions(await screen.findByLabelText('author'), '10')
 
     await waitFor(() => {
-      expect(screen.getByText('No matching records')).toBeInTheDocument()
+      expect(screen.getByText('No matching items')).toBeInTheDocument()
     })
   })
 
@@ -266,17 +266,17 @@ describe('EntityRecordsPage', () => {
 
     await user.type(screen.getByLabelText('Name'), 'Article')
     await user.type(screen.getByLabelText('Slug'), 'article')
-    const form = screen.getByRole('heading', { name: 'Create entity type' }).closest('form')
+    const form = screen.getByRole('heading', { name: 'Create content type' }).closest('form')
     if (form === null) {
-      throw new Error('Create entity type form not found')
+      throw new Error('Create content type form not found')
     }
-    await user.click(within(form).getByRole('button', { name: 'Create entity type' }))
+    await user.click(within(form).getByRole('button', { name: 'Create content type' }))
 
     await waitFor(() => {
       expect(screen.getByText('Article')).toBeInTheDocument()
     })
 
-    await user.click(screen.getByRole('link', { name: 'Records' }))
+    await user.click(screen.getByRole('link', { name: 'Contents' }))
 
     await waitFor(() => {
       expect(screen.getByRole('heading', { name: 'Article' })).toBeInTheDocument()
