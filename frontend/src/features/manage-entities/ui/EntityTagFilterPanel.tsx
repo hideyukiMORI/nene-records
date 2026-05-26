@@ -1,4 +1,5 @@
 import type { Tag } from '@/entities/tag'
+import { useTranslation } from '@/shared/i18n'
 import { Button, Stack, Text } from '@/shared/ui'
 
 export interface EntityTagFilterPanelProps {
@@ -14,6 +15,8 @@ export function EntityTagFilterPanel({
   onToggleTagSlug,
   onClear,
 }: EntityTagFilterPanelProps) {
+  const { t } = useTranslation()
+
   if (tags.length === 0) {
     return null
   }
@@ -22,11 +25,11 @@ export function EntityTagFilterPanel({
     <Stack gap="sm">
       <Stack direction="horizontal" gap="sm">
         <Text as="h2" variant="heading-sm">
-          Filter by tag
+          {t('admin.entityRecords.tagFilter.label')}
         </Text>
         {selectedTagSlugs.length > 0 ? (
           <Button variant="secondary" size="sm" onClick={onClear}>
-            Clear
+            {t('admin.entityRecords.tagFilter.clear')}
           </Button>
         ) : null}
       </Stack>
@@ -50,7 +53,7 @@ export function EntityTagFilterPanel({
         })}
       </div>
       {selectedTagSlugs.length > 0 ? (
-        <Text muted>Showing records with any selected tag.</Text>
+        <Text muted>{t('admin.entityRecords.tagFilter.hint')}</Text>
       ) : null}
     </Stack>
   )

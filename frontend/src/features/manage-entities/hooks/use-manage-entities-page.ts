@@ -19,22 +19,25 @@ import { useTagList } from '@/entities/tag'
 import { defaultTextFieldListParamsForEntityType, useTextFieldList } from '@/entities/text-field'
 import { getRecordDisplayLabel } from '@/shared/lib/get-record-display-label'
 
+const PAGE_LIMIT = 20
+
 export function useManageEntitiesPage(entityTypeId: number) {
   const [selectedTagSlugs, setSelectedTagSlugs] = useState<string[]>([])
   const [selectedRelationFilters, setSelectedRelationFilters] = useState<EntityRelationFilters>({})
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedStatus, setSelectedStatus] = useState<EntityStatus | undefined>(undefined)
+  const [page, setPage] = useState(0)
   const listParams = useMemo(
     () =>
       defaultEntityListParams(
         entityTypeId,
         selectedTagSlugs,
         selectedRelationFilters,
-        0,
+        page * PAGE_LIMIT,
         searchQuery,
         selectedStatus,
       ),
-    [entityTypeId, selectedRelationFilters, selectedTagSlugs, searchQuery, selectedStatus],
+    [entityTypeId, page, selectedRelationFilters, selectedTagSlugs, searchQuery, selectedStatus],
   )
   const listQuery = useEntityList(listParams)
   const tagListQuery = useTagList({ limit: 100, offset: 0 })
@@ -65,10 +68,12 @@ export function useManageEntitiesPage(entityTypeId: number) {
     setSelectedTagSlugs((current) =>
       current.includes(slug) ? current.filter((item) => item !== slug) : [...current, slug],
     )
+    setPage(0)
   }, [])
 
   const clearTagFilter = useCallback(() => {
     setSelectedTagSlugs([])
+    setPage(0)
   }, [])
 
   const setRelationFilter = useCallback((fieldKey: string, targetEntityId: number | undefined) => {
@@ -79,10 +84,22 @@ export function useManageEntitiesPage(entityTypeId: number) {
 
       return { ...current, [fieldKey]: targetEntityId }
     })
+    setPage(0)
   }, [])
 
   const clearRelationFilters = useCallback(() => {
     setSelectedRelationFilters({})
+    setPage(0)
+  }, [])
+
+  const setStatus = useCallback((status: EntityStatus | undefined) => {
+    setSelectedStatus(status)
+    setPage(0)
+  }, [])
+
+  const setSearch = useCallback((q: string) => {
+    setSearchQuery(q)
+    setPage(0)
   }, [])
 
   const createEntity = useCallback(async () => {
@@ -112,18 +129,35 @@ export function useManageEntitiesPage(entityTypeId: number) {
   const errorTitle =
     listQuery.error?.title ?? textFieldQuery.error?.title ?? fieldDefQuery.error?.title ?? null
 
+  const total = listQuery.data?.total ?? 0
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_LIMIT))
+
   return {
     items,
     recordLabels,
-    total: listQuery.data?.total ?? 0,
+    total,
+    page,
+    totalPages,
+    prevPage:
+      page > 0
+        ? () => {
+            setPage((p) => p - 1)
+          }
+        : undefined,
+    nextPage:
+      page < totalPages - 1
+        ? () => {
+            setPage((p) => p + 1)
+          }
+        : undefined,
     availableTags: tagListQuery.data?.items ?? [],
     relationFieldDefs,
     selectedTagSlugs,
     selectedRelationFilters,
     selectedStatus,
-    setStatus: setSelectedStatus,
+    setStatus,
     searchQuery,
-    setSearchQuery,
+    setSearchQuery: setSearch,
     toggleTagSlug,
     clearTagFilter,
     setRelationFilter,

@@ -121,6 +121,12 @@ export const ja: Partial<MessageCatalog> = {
   'admin.entityRecords.delete.description': 'レコード #{{id}} がソフト削除されます。',
   'admin.entityRecords.statusFilter.label': 'ステータスで絞り込む',
   'admin.entityRecords.statusFilter.all': 'すべて',
+  'admin.entityRecords.tagFilter.label': 'タグで絞り込む',
+  'admin.entityRecords.tagFilter.clear': 'クリア',
+  'admin.entityRecords.tagFilter.hint': '選択中のいずれかのタグを持つレコードを表示しています。',
+  'admin.entityRecords.pagination.prev': '← 前へ',
+  'admin.entityRecords.pagination.next': '次へ →',
+  'admin.entityRecords.pagination.page': '{{page}} / {{total}} ページ',
 
   // ── Field definitions ────────────────────────────────────────────────────
   'admin.fieldDefs.pageTitle': 'フィールド',

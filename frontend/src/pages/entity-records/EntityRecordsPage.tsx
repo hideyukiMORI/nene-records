@@ -14,6 +14,10 @@ export function EntityRecordsPage() {
     items,
     recordLabels,
     total,
+    page,
+    totalPages,
+    prevPage,
+    nextPage,
     availableTags,
     relationFieldDefs,
     selectedTagSlugs,
@@ -60,6 +64,8 @@ export function EntityRecordsPage() {
         items={items}
         recordLabels={recordLabels}
         total={total}
+        page={page}
+        totalPages={totalPages}
         availableTags={availableTags}
         relationFieldDefs={relationFieldDefs}
         selectedTagSlugs={selectedTagSlugs}
@@ -79,6 +85,8 @@ export function EntityRecordsPage() {
         }}
         onStatusChange={setStatus}
         onSearchChange={setSearchQuery}
+        onPrevPage={prevPage}
+        onNextPage={nextPage}
         onToggleTagSlug={toggleTagSlug}
         onClearTagFilter={clearTagFilter}
         onSelectRelationFilter={setRelationFilter}
