@@ -16,7 +16,7 @@ final readonly class PdoEntityTypeRepository implements EntityTypeRepositoryInte
     public function findById(int $id): ?EntityType
     {
         $row = $this->query->fetchOne(
-            'SELECT id, name, slug, is_pinned, labels FROM entity_types WHERE id = ?',
+            'SELECT id, name, slug, is_pinned, labels, permalink_pattern FROM entity_types WHERE id = ?',
             [$id],
         );
 
@@ -30,7 +30,7 @@ final readonly class PdoEntityTypeRepository implements EntityTypeRepositoryInte
     public function findBySlug(string $slug): ?EntityType
     {
         $row = $this->query->fetchOne(
-            'SELECT id, name, slug, is_pinned, labels FROM entity_types WHERE slug = ?',
+            'SELECT id, name, slug, is_pinned, labels, permalink_pattern FROM entity_types WHERE slug = ?',
             [$slug],
         );
 
@@ -45,7 +45,7 @@ final readonly class PdoEntityTypeRepository implements EntityTypeRepositoryInte
     public function findAll(int $limit, int $offset): array
     {
         $rows = $this->query->fetchAll(
-            'SELECT id, name, slug, is_pinned, labels FROM entity_types ORDER BY id ASC LIMIT ? OFFSET ?',
+            'SELECT id, name, slug, is_pinned, labels, permalink_pattern FROM entity_types ORDER BY id ASC LIMIT ? OFFSET ?',
             [$limit, $offset],
         );
 
@@ -55,12 +55,13 @@ final readonly class PdoEntityTypeRepository implements EntityTypeRepositoryInte
     public function save(EntityType $entityType): int
     {
         $this->query->execute(
-            'INSERT INTO entity_types (name, slug, is_pinned, labels) VALUES (?, ?, ?, ?)',
+            'INSERT INTO entity_types (name, slug, is_pinned, labels, permalink_pattern) VALUES (?, ?, ?, ?, ?)',
             [
                 $entityType->name,
                 $entityType->slug,
                 $entityType->isPinned ? 1 : 0,
                 $entityType->labels !== null ? json_encode($entityType->labels, JSON_UNESCAPED_UNICODE) : null,
+                $entityType->permalinkPattern,
             ],
         );
 
@@ -70,12 +71,13 @@ final readonly class PdoEntityTypeRepository implements EntityTypeRepositoryInte
     public function update(EntityType $entityType): void
     {
         $this->query->execute(
-            'UPDATE entity_types SET name = ?, slug = ?, is_pinned = ?, labels = ? WHERE id = ?',
+            'UPDATE entity_types SET name = ?, slug = ?, is_pinned = ?, labels = ?, permalink_pattern = ? WHERE id = ?',
             [
                 $entityType->name,
                 $entityType->slug,
                 $entityType->isPinned ? 1 : 0,
                 $entityType->labels !== null ? json_encode($entityType->labels, JSON_UNESCAPED_UNICODE) : null,
+                $entityType->permalinkPattern,
                 $entityType->id,
             ],
         );
@@ -99,12 +101,17 @@ final readonly class PdoEntityTypeRepository implements EntityTypeRepositoryInte
             }
         }
 
+        $permalinkPattern = isset($row['permalink_pattern']) && is_string($row['permalink_pattern']) && $row['permalink_pattern'] !== ''
+            ? $row['permalink_pattern']
+            : null;
+
         return new EntityType(
             name: (string) $row['name'],
             slug: (string) $row['slug'],
             isPinned: (bool) $row['is_pinned'],
             id: (int) $row['id'],
             labels: $labels,
+            permalinkPattern: $permalinkPattern,
         );
     }
 }

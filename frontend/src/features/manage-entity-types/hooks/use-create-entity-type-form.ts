@@ -19,6 +19,8 @@ export const editEntityTypeFormSchema = createEntityTypeFormSchema.extend({
   labelZhHans: z.string().optional(),
   labelPtBr: z.string().optional(),
   labelDe: z.string().optional(),
+  /** null = use default pattern (/{type}/{id}); empty string treated as null */
+  permalinkPattern: z.string().nullable().optional(),
 })
 
 export type EditEntityTypeFormValues = z.infer<typeof editEntityTypeFormSchema>

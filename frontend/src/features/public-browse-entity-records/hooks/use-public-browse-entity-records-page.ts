@@ -4,11 +4,14 @@ import { useEntityTypeList } from '@/entities/entity-type'
 import { defaultTextFieldListParamsForEntityType, useTextFieldList } from '@/entities/text-field'
 import { findEntityTypeBySlug } from '@/shared/lib/find-entity-type-by-slug'
 import { getRecordDisplayLabel } from '@/shared/lib/get-record-display-label'
+import { resolvePermalink } from '@/shared/lib/resolve-permalink'
 import { PUBLIC_BROWSE_PAGE_SIZE } from '../lib/public-browse-pagination'
 
 export interface PublicRecordListItem {
   id: number
   label: string
+  /** Resolved public URL for this record based on the entity type's permalink pattern */
+  publicUrl: string
 }
 
 export function usePublicBrowseEntityRecordsPage(entityTypeSlug: string, offset: number) {
@@ -36,12 +39,27 @@ export function usePublicBrowseEntityRecordsPage(entityTypeSlug: string, offset:
   const items = useMemo((): PublicRecordListItem[] => {
     const entities = entityListQuery.data?.items ?? []
     const textFields = textFieldQuery.data?.items ?? []
+    const pattern = entityType?.permalinkPattern
 
-    return entities.map((entity) => ({
-      id: Number(entity.id),
-      label: getRecordDisplayLabel(Number(entity.id), textFields, `Record #${String(entity.id)}`),
-    }))
-  }, [entityListQuery.data?.items, textFieldQuery.data?.items])
+    return entities.map((entity) => {
+      const id = Number(entity.id)
+      return {
+        id,
+        label: getRecordDisplayLabel(id, textFields, `Record #${String(id)}`),
+        publicUrl: resolvePermalink(pattern, {
+          typeSlug: entityTypeSlug,
+          entitySlug: entity.slug ?? null,
+          entityId: id,
+          publishedAt: entity.publishedAt ?? null,
+        }),
+      }
+    })
+  }, [
+    entityListQuery.data?.items,
+    textFieldQuery.data?.items,
+    entityType?.permalinkPattern,
+    entityTypeSlug,
+  ])
 
   const isLoading =
     entityTypeQuery.isLoading ||

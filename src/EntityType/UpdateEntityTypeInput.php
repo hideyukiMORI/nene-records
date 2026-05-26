@@ -15,6 +15,7 @@ final readonly class UpdateEntityTypeInput
         public string $slug,
         public bool $isPinned = false,
         public ?array $labels = null,
+        public ?string $permalinkPattern = null,
     ) {
     }
 }

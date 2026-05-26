@@ -15,6 +15,7 @@ final readonly class ListEntityTypeItem
         public string $slug,
         public bool $isPinned,
         public ?array $labels = null,
+        public ?string $permalinkPattern = null,
     ) {
     }
 }

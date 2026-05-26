@@ -86,7 +86,7 @@ export function PublicRecordListView({
             className="rounded-md border border-border bg-surface-raised px-inline-md py-stack-sm shadow-sm"
           >
             <Link
-              to={`/${entityTypeSlug}/${String(item.id)}`}
+              to={item.publicUrl}
               className="font-sans text-heading-sm font-semibold text-text-primary hover:text-accent"
             >
               {item.label}

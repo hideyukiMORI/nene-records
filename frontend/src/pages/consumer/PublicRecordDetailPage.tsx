@@ -6,7 +6,9 @@ import {
   usePublicViewEntityRecordPage,
 } from '@/features/public-view-entity-record'
 import { findEntityTypeBySlug } from '@/shared/lib/find-entity-type-by-slug'
+import { extractEntityKeyFromSplat } from '@/shared/lib/resolve-permalink'
 import { Button, EmptyState, Stack, Text } from '@/shared/ui'
+import { useEntityIdBySlug } from './hooks/use-entity-id-by-slug'
 
 function PublicRecordDetailContent({
   entityTypeSlug,
@@ -51,9 +53,43 @@ function PublicRecordDetailContent({
   )
 }
 
+/** Resolved splat → entityId, then renders content */
+function PublicRecordDetailBySlug({
+  entityTypeSlug,
+  entityTypeName,
+  entityTypeId,
+  entitySlug,
+  entityTypeSlugById,
+}: {
+  entityTypeSlug: string
+  entityTypeName: string
+  entityTypeId: number
+  entitySlug: string
+  entityTypeSlugById: Record<number, string>
+}) {
+  const { entityId, isLoading, isError } = useEntityIdBySlug(entityTypeId, entitySlug)
+
+  if (isLoading) return <Text muted>Loading…</Text>
+  if (isError || entityId === null) {
+    return (
+      <EmptyState title="Record not found" description={`No record with slug "${entitySlug}".`} />
+    )
+  }
+
+  return (
+    <PublicRecordDetailContent
+      entityTypeSlug={entityTypeSlug}
+      entityTypeName={entityTypeName}
+      entityTypeId={entityTypeId}
+      entityId={entityId}
+      entityTypeSlugById={entityTypeSlugById}
+    />
+  )
+}
+
 export function PublicRecordDetailPage() {
-  const { entityTypeSlug = '', entityId: entityIdParam = '' } = useParams()
-  const entityId = Number(entityIdParam)
+  // React Router v6: splat param is '*'
+  const { entityTypeSlug = '', '*': splat = '' } = useParams()
 
   const entityTypeQuery = useEntityTypeList({ limit: 100, offset: 0 })
   const entityType = useMemo(
@@ -81,12 +117,27 @@ export function PublicRecordDetailPage() {
     )
   }
 
+  const entityTypeId = Number(entityType.id)
+  const key = extractEntityKeyFromSplat(entityType.permalinkPattern, splat)
+
+  if (key.kind === 'id') {
+    return (
+      <PublicRecordDetailContent
+        entityTypeSlug={entityTypeSlug}
+        entityTypeName={entityType.name}
+        entityTypeId={entityTypeId}
+        entityId={key.id}
+        entityTypeSlugById={entityTypeSlugById}
+      />
+    )
+  }
+
   return (
-    <PublicRecordDetailContent
+    <PublicRecordDetailBySlug
       entityTypeSlug={entityTypeSlug}
       entityTypeName={entityType.name}
-      entityTypeId={Number(entityType.id)}
-      entityId={entityId}
+      entityTypeId={entityTypeId}
+      entitySlug={key.slug}
       entityTypeSlugById={entityTypeSlugById}
     />
   )

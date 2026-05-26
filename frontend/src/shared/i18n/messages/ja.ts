@@ -117,6 +117,14 @@ export const ja: Partial<MessageCatalog> = {
   'admin.entityTypes.editForm.labels.title': '言語別の表示名',
   'admin.entityTypes.editForm.labels.description':
     '言語ごとに表示名を上書きできます。空白のままにすると、ベース名が使用されます。',
+  'admin.entityTypes.editForm.permalink.title': 'パーマリンク',
+  'admin.entityTypes.editForm.permalink.description':
+    'このコンテンツタイプの公開 URL の構造を選択してください。',
+  'admin.entityTypes.editForm.permalink.custom': 'カスタム構造',
+  'admin.entityTypes.editForm.permalink.customPlaceholder': '例: /{type}/{year}/{month}/{slug}',
+  'admin.entityTypes.editForm.permalink.customHelp':
+    '使用できるトークン: {type}、{slug}、{id}、{year}、{month}、{day}',
+  'admin.entityTypes.editForm.permalink.example': '例: {{example}}',
   'admin.entityTypes.delete.title': 'コンテンツタイプを削除しますか？',
   'admin.entityTypes.delete.description': '「{{name}}」が削除されます。この操作は元に戻せません。',
   'admin.entityTypes.actions.fields': 'フィールド',
