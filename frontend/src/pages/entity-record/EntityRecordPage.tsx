@@ -81,7 +81,7 @@ function EntityRecordContent({
   return (
     <Stack gap="md">
       <Stack gap="sm">
-        <Link to={`/${entityType.slug}`}>
+        <Link to={`/admin/${entityType.slug}`}>
           <Button variant="secondary" size="sm">
             {t('admin.entityRecord.backToRecords')}
           </Button>

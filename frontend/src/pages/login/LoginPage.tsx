@@ -17,7 +17,7 @@ export function LoginPage() {
       { email, password },
       {
         onSuccess: () => {
-          void navigate('/')
+          void navigate('/admin')
         },
       },
     )

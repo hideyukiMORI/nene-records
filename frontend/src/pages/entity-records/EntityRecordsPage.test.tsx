@@ -17,11 +17,11 @@ import { clearAuthSession, seedAdminSession } from '@tests/helpers/auth-session'
 
 function renderRecordsPage(entityTypeSlug = 'article') {
   return renderWithProviders(
-    <MemoryRouter initialEntries={[`/${entityTypeSlug}`]}>
+    <MemoryRouter initialEntries={[`/admin/${entityTypeSlug}`]}>
       <Routes>
-        <Route path="/:entityTypeSlug" element={<EntityRecordsPage />} />
+        <Route path="/admin/:entityTypeSlug" element={<EntityRecordsPage />} />
         <Route
-          path="/:entityTypeSlug/:entityId"
+          path="/admin/:entityTypeSlug/:entityId"
           element={<div data-testid="entity-edit-page">Edit page</div>}
         />
       </Routes>
@@ -258,10 +258,10 @@ describe('EntityRecordsPage', () => {
   it('links from entity types page to records', async () => {
     const user = userEvent.setup()
     renderWithProviders(
-      <MemoryRouter initialEntries={['/entity-types']}>
+      <MemoryRouter initialEntries={['/admin/entity-types']}>
         <Routes>
-          <Route path="/entity-types" element={<EntityTypesPage />} />
-          <Route path="/:entityTypeSlug" element={<EntityRecordsPage />} />
+          <Route path="/admin/entity-types" element={<EntityTypesPage />} />
+          <Route path="/admin/:entityTypeSlug" element={<EntityRecordsPage />} />
         </Routes>
       </MemoryRouter>,
     )

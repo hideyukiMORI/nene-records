@@ -14,9 +14,9 @@ import { renderWithProviders } from '@tests/render/render-with-providers'
 
 function renderDetailPage(entityTypeSlug = 'article', entityId = 1) {
   return renderWithProviders(
-    <MemoryRouter initialEntries={[`/view/${entityTypeSlug}/${String(entityId)}`]}>
+    <MemoryRouter initialEntries={[`/${entityTypeSlug}/${String(entityId)}`]}>
       <Routes>
-        <Route path="/view/:entityTypeSlug/:entityId" element={<PublicRecordDetailPage />} />
+        <Route path="/:entityTypeSlug/:entityId" element={<PublicRecordDetailPage />} />
       </Routes>
     </MemoryRouter>,
   )
@@ -126,7 +126,7 @@ describe('PublicRecordDetailPage', () => {
     expect(await screen.findByText('author')).toBeInTheDocument()
 
     const authorLink = screen.getByRole('link', { name: 'Alice' })
-    expect(authorLink).toHaveAttribute('href', '/view/author/2')
+    expect(authorLink).toHaveAttribute('href', '/author/2')
   })
 
   it('renders body text fields as markdown', async () => {

@@ -95,7 +95,7 @@ export function EntityListPanel({
             </Text>
           </Stack>
           <div className="flex items-center gap-inline-sm">
-            <Link to={`/${entityTypeSlug}/${String(item.id)}`}>
+            <Link to={`/admin/${entityTypeSlug}/${String(item.id)}`}>
               <Button variant="secondary" size="sm">
                 {t('common.actions.edit')}
               </Button>

@@ -59,7 +59,7 @@ function FieldDefsContent({ entityType }: { entityType: EntityType }) {
   return (
     <Stack gap="md">
       <Stack gap="sm">
-        <Link to="/entity-types">
+        <Link to="/admin/entity-types">
           <Button variant="secondary" size="sm">
             {t('admin.entityTypes.actions.backToTypes')}
           </Button>

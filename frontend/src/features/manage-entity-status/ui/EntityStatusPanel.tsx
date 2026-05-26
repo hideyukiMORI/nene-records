@@ -143,7 +143,7 @@ export function EntityStatusPanel({ entity, entityTypeSlug }: EntityStatusPanelP
   const currentStatus = entity.status
   const publicUrl =
     entityTypeSlug !== undefined && (entity.slug ?? slugInput) !== ''
-      ? `/view/${entityTypeSlug}/${entity.slug ?? slugInput}`
+      ? `/${entityTypeSlug}/${entity.slug ?? slugInput}`
       : null
 
   return (

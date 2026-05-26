@@ -12,7 +12,7 @@ export function ForbiddenPage() {
       </Text>
       <Text muted>{t('admin.forbidden.description')}</Text>
       <Stack direction="horizontal" gap="sm">
-        <Link to="/">
+        <Link to="/admin">
           <Button variant="secondary">{t('common.actions.backToHome')}</Button>
         </Link>
       </Stack>

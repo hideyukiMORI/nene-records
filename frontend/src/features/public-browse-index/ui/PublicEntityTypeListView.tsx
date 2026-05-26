@@ -50,13 +50,13 @@ export function PublicEntityTypeListView({
           className="rounded-md border border-border bg-surface-raised px-inline-md py-stack-sm shadow-sm"
         >
           <Link
-            to={`/view/${item.slug}`}
+            to={`/${item.slug}`}
             className="font-sans text-heading-sm font-semibold text-text-primary hover:text-accent"
           >
             {item.name}
           </Link>
           <Text as="p" muted className="mt-stack-xs">
-            /view/{item.slug}
+            /{item.slug}
           </Text>
         </li>
       ))}

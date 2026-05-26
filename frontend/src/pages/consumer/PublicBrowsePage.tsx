@@ -41,7 +41,7 @@ export function PublicBrowsePage() {
   return (
     <Stack gap="md">
       <Stack gap="sm">
-        <Link to="/view">
+        <Link to="/">
           <Button variant="secondary" size="sm">
             All types
           </Button>
