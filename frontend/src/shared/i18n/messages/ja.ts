@@ -41,6 +41,8 @@ export const ja: Partial<MessageCatalog> = {
   'admin.nav.logout': 'ログアウト',
   'admin.theme.toggleDark': 'ダークモードに切り替え',
   'admin.theme.toggleLight': 'ライトモードに切り替え',
+  'admin.nav.openMenu': 'ナビゲーションメニューを開く',
+  'admin.nav.closeMenu': 'ナビゲーションメニューを閉じる',
 
   // ── Auth ─────────────────────────────────────────────────────────────────
   'admin.auth.appTitle': 'NeNe Records Admin',
