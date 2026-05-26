@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace NeNeRecords\Setting;
+namespace NeNeRecords\NavigationItem;
 
 use Nene2\Http\ConditionalGetHelper;
 use Nene2\Http\JsonResponseFactory;
@@ -10,12 +10,12 @@ use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-final readonly class ListPublicSettingsHandler
+final readonly class ListPublicNavigationItemsHandler
 {
     private const CACHE_CONTROL = 'public, max-age=300, stale-while-revalidate=3600';
 
     public function __construct(
-        private ListPublicSettingsUseCaseInterface $useCase,
+        private ListNavigationItemsUseCaseInterface $useCase,
         private JsonResponseFactory $response,
         private ResponseFactoryInterface $responseFactory,
     ) {
@@ -27,7 +27,7 @@ final readonly class ListPublicSettingsHandler
 
         $data = [
             'items' => array_map(
-                static fn (SettingEntry $entry) => SettingHttpMapper::entryToPublicArray($entry),
+                static fn (NavigationItem $item) => NavigationItemHttpMapper::toArray($item),
                 $output->items,
             ),
         ];

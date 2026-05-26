@@ -105,7 +105,7 @@ final class PublicRecordHttpTest extends TestCase
         );
 
         $registrar = new PublicRecordRouteRegistrar(
-            new GetPublicRecordViewHandler($useCase, $jsonResponse),
+            new GetPublicRecordViewHandler($useCase, $jsonResponse, $this->factory),
             new RenderPublicRecordViewHandler($useCase, $publicSettings, $htmlResponse, $config),
         );
 

@@ -1877,10 +1877,27 @@ paths:
       responses:
         '200':
           description: Public setting list.
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+              example: public, max-age=300, stale-while-revalidate=3600
+            ETag:
+              schema:
+                type: string
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PublicSettingListResponse'
+        '304':
+          description: Not Modified — ETag matched, use cached response.
+          headers:
+            ETag:
+              schema:
+                type: string
+            Cache-Control:
+              schema:
+                type: string
         '500':
           $ref: '#/components/responses/InternalServerError'
   /api/v1/public/entity-types/{slug}/records/{entitySlug}:
@@ -1911,10 +1928,27 @@ paths:
       responses:
         '200':
           description: Aggregated public record view bootstrap payload.
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+              example: public, max-age=60, stale-while-revalidate=300
+            ETag:
+              schema:
+                type: string
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PublicRecordViewResponse'
+        '304':
+          description: Not Modified — ETag matched, use cached response.
+          headers:
+            ETag:
+              schema:
+                type: string
+            Cache-Control:
+              schema:
+                type: string
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -2154,10 +2188,27 @@ paths:
       responses:
         '200':
           description: Navigation item list.
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+              example: public, max-age=300, stale-while-revalidate=3600
+            ETag:
+              schema:
+                type: string
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/NavigationItemListResponse'
+        '304':
+          description: Not Modified — ETag matched, use cached response.
+          headers:
+            ETag:
+              schema:
+                type: string
+            Cache-Control:
+              schema:
+                type: string
         '500':
           $ref: '#/components/responses/InternalServerError'
   /api/v1/entities/{id}/preview-token:

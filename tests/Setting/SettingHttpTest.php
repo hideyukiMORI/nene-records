@@ -58,7 +58,7 @@ final class SettingHttpTest extends TestCase
 
         $registrar = new SettingRouteRegistrar(
             new ListSettingsHandler(new ListSettingsUseCase($this->repository), $jsonResponse),
-            new ListPublicSettingsHandler(new ListPublicSettingsUseCase($this->repository), $jsonResponse),
+            new ListPublicSettingsHandler(new ListPublicSettingsUseCase($this->repository), $jsonResponse, $this->factory),
             new UpdateSettingHandler(new InMemoryUpdateSettingUseCase($this->repository), $jsonResponse),
             new ListSettingRevisionsHandler(new ListSettingRevisionsUseCase($this->repository), $jsonResponse),
         );

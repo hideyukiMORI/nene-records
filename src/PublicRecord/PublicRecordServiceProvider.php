@@ -139,6 +139,7 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
                 static function (ContainerInterface $container): GetPublicRecordViewHandler {
                     $useCase = $container->get(GetPublicRecordViewUseCaseInterface::class);
                     $response = $container->get(JsonResponseFactory::class);
+                    $responseFactory = $container->get(ResponseFactoryInterface::class);
 
                     if (!$useCase instanceof GetPublicRecordViewUseCaseInterface) {
                         throw new LogicException('GetPublicRecordView use case service is invalid.');
@@ -148,7 +149,11 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
                         throw new LogicException('JSON response factory service is invalid.');
                     }
 
-                    return new GetPublicRecordViewHandler($useCase, $response);
+                    if (!$responseFactory instanceof ResponseFactoryInterface) {
+                        throw new LogicException('Response factory service is invalid.');
+                    }
+
+                    return new GetPublicRecordViewHandler($useCase, $response, $responseFactory);
                 },
             )
             ->set(

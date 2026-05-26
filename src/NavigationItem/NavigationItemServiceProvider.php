@@ -11,6 +11,7 @@ use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use Psr\Container\ContainerInterface;
+use Psr\Http\Message\ResponseFactoryInterface;
 
 final readonly class NavigationItemServiceProvider implements ServiceProviderInterface
 {
@@ -158,15 +159,42 @@ final readonly class NavigationItemServiceProvider implements ServiceProviderInt
                 },
             )
             ->set(
+                ListPublicNavigationItemsHandler::class,
+                static function (ContainerInterface $container): ListPublicNavigationItemsHandler {
+                    $useCase = $container->get(ListNavigationItemsUseCaseInterface::class);
+                    $response = $container->get(JsonResponseFactory::class);
+                    $responseFactory = $container->get(ResponseFactoryInterface::class);
+
+                    if (!$useCase instanceof ListNavigationItemsUseCaseInterface) {
+                        throw new LogicException('ListNavigationItems use case service is invalid.');
+                    }
+
+                    if (!$response instanceof JsonResponseFactory) {
+                        throw new LogicException('JSON response factory service is invalid.');
+                    }
+
+                    if (!$responseFactory instanceof ResponseFactoryInterface) {
+                        throw new LogicException('Response factory service is invalid.');
+                    }
+
+                    return new ListPublicNavigationItemsHandler($useCase, $response, $responseFactory);
+                },
+            )
+            ->set(
                 'nene-records.route_registrar.navigation_item',
                 static function (ContainerInterface $container): NavigationItemRouteRegistrar {
                     $list = $container->get(ListNavigationItemsHandler::class);
+                    $listPublic = $container->get(ListPublicNavigationItemsHandler::class);
                     $create = $container->get(CreateNavigationItemHandler::class);
                     $update = $container->get(UpdateNavigationItemHandler::class);
                     $delete = $container->get(DeleteNavigationItemHandler::class);
 
                     if (!$list instanceof ListNavigationItemsHandler) {
                         throw new LogicException('ListNavigationItems handler service is invalid.');
+                    }
+
+                    if (!$listPublic instanceof ListPublicNavigationItemsHandler) {
+                        throw new LogicException('ListPublicNavigationItems handler service is invalid.');
                     }
 
                     if (!$create instanceof CreateNavigationItemHandler) {
@@ -181,7 +209,7 @@ final readonly class NavigationItemServiceProvider implements ServiceProviderInt
                         throw new LogicException('DeleteNavigationItem handler service is invalid.');
                     }
 
-                    return new NavigationItemRouteRegistrar($list, $create, $update, $delete);
+                    return new NavigationItemRouteRegistrar($list, $listPublic, $create, $update, $delete);
                 },
             );
     }
