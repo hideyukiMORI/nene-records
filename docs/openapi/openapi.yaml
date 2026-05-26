@@ -40,6 +40,8 @@ tags:
     description: Aggregated read-only views for public consumer pages and MCP.
   - name: Settings
     description: Site-wide settings registry with revision history.
+  - name: NavigationItems
+    description: Ordered navigation link management for the public site header.
 paths:
   /api/v1/auth/login:
     post:
@@ -1822,8 +1824,114 @@ paths:
                     size: 204800
         '413':
           $ref: '#/components/responses/PayloadTooLarge'
+  /api/v1/navigation-items:
+    get:
+      tags:
+        - NavigationItems
+      summary: List navigation items
+      description: Returns all navigation items ordered by display_order, then id.
+      operationId: listNavigationItems
+      responses:
+        '200':
+          description: Navigation item list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NavigationItemListResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - NavigationItems
+      summary: Create navigation item
+      description: Creates a new navigation item.
+      operationId: createNavigationItem
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateNavigationItemRequest'
+      responses:
+        '201':
+          description: Created navigation item.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NavigationItemResponse'
         '422':
           $ref: '#/components/responses/ValidationFailed'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/navigation-items/{id}:
+    put:
+      tags:
+        - NavigationItems
+      summary: Update navigation item
+      description: Updates an existing navigation item by ID.
+      operationId: updateNavigationItem
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Navigation item ID.
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateNavigationItemRequest'
+      responses:
+        '200':
+          description: Updated navigation item.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NavigationItemResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - NavigationItems
+      summary: Delete navigation item
+      description: Permanently deletes a navigation item by ID.
+      operationId: deleteNavigationItem
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Navigation item ID.
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '204':
+          description: Deleted successfully.
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/public/navigation-items:
+    get:
+      tags:
+        - PublicConsumer
+      summary: List public navigation items
+      description: Returns all navigation items for the public site header. No authentication required.
+      operationId: listPublicNavigationItems
+      responses:
+        '200':
+          description: Navigation item list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NavigationItemListResponse'
         '500':
           $ref: '#/components/responses/InternalServerError'
   /api/v1/analytics/access-stats:
@@ -3179,4 +3287,77 @@ components:
         role:
           type: string
           minLength: 1
+      additionalProperties: false
+    NavigationItemResponse:
+      type: object
+      required:
+        - id
+        - label
+        - url
+        - display_order
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: integer
+          minimum: 1
+        label:
+          type: string
+          minLength: 1
+        url:
+          type: string
+          minLength: 1
+        display_order:
+          type: integer
+          minimum: 0
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      additionalProperties: false
+    NavigationItemListResponse:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/NavigationItemResponse'
+      additionalProperties: false
+    CreateNavigationItemRequest:
+      type: object
+      required:
+        - label
+        - url
+      properties:
+        label:
+          type: string
+          minLength: 1
+        url:
+          type: string
+          minLength: 1
+        display_order:
+          type: integer
+          minimum: 0
+          default: 0
+      additionalProperties: false
+    UpdateNavigationItemRequest:
+      type: object
+      required:
+        - label
+        - url
+      properties:
+        label:
+          type: string
+          minLength: 1
+        url:
+          type: string
+          minLength: 1
+        display_order:
+          type: integer
+          minimum: 0
+          default: 0
       additionalProperties: false

@@ -21,6 +21,7 @@ export function AppShell() {
   const session = authStore.getSession()
   const canManageTags = currentUserHasCapability('manage_tags')
   const canReadSettings = currentUserHasCapability('read_settings')
+  const canManageSettings = currentUserHasCapability('manage_settings')
 
   return (
     <div className="min-h-screen bg-surface font-sans text-text-primary">
@@ -40,6 +41,11 @@ export function AppShell() {
               {canManageTags ? (
                 <NavLink to="/tags" className={navLinkClass}>
                   {t('admin.nav.tags')}
+                </NavLink>
+              ) : null}
+              {canManageSettings ? (
+                <NavLink to="/navigation" className={navLinkClass}>
+                  {t('admin.nav.navigation')}
                 </NavLink>
               ) : null}
               {canReadSettings ? (

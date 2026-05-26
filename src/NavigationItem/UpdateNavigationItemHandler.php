@@ -1,0 +1,58 @@
+<?php
+
+declare(strict_types=1);
+
+namespace NeNeRecords\NavigationItem;
+
+use Nene2\Http\JsonRequestBodyParser;
+use Nene2\Http\JsonResponseFactory;
+use Nene2\Routing\Router;
+use Nene2\Validation\ValidationError;
+use Nene2\Validation\ValidationException;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+
+final readonly class UpdateNavigationItemHandler
+{
+    public function __construct(
+        private UpdateNavigationItemUseCaseInterface $useCase,
+        private JsonResponseFactory $response,
+    ) {
+    }
+
+    public function handle(ServerRequestInterface $request): ResponseInterface
+    {
+        $parameters = $request->getAttribute(Router::PARAMETERS_ATTRIBUTE, []);
+        $id = (int) ($parameters['id'] ?? 0);
+
+        $body = JsonRequestBodyParser::parse($request);
+        $errors = [];
+
+        $label = trim((string) ($body['label'] ?? ''));
+        $url = trim((string) ($body['url'] ?? ''));
+        $displayOrder = isset($body['display_order']) && is_int($body['display_order'])
+            ? $body['display_order']
+            : 0;
+
+        if ($label === '') {
+            $errors[] = new ValidationError('label', 'Label is required.', 'required');
+        }
+
+        if ($url === '') {
+            $errors[] = new ValidationError('url', 'URL is required.', 'required');
+        }
+
+        if ($errors !== []) {
+            throw new ValidationException($errors);
+        }
+
+        $output = $this->useCase->execute(new UpdateNavigationItemInput(
+            id: $id,
+            label: $label,
+            url: $url,
+            displayOrder: $displayOrder,
+        ));
+
+        return $this->response->create(NavigationItemHttpMapper::toArray($output->item));
+    }
+}
