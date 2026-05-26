@@ -325,6 +325,62 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
         return array_map(fn (array $row) => $this->mapRow($row), $rows);
     }
 
+    public function findRecentPublished(int $limit): array
+    {
+        $rows = $this->query->fetchAll(
+            <<<SQL
+                SELECT id, entity_type_id, slug, status, published_at, scheduled_at, is_deleted, deleted_at, meta_title, meta_description
+                FROM entities
+                WHERE status = 'published' AND is_deleted = 0
+                ORDER BY published_at DESC
+                LIMIT ?
+                SQL,
+            [$limit],
+        );
+
+        return array_map(fn (array $row) => $this->mapRow($row), $rows);
+    }
+
+    public function countPublishedGroupedByEntityType(): array
+    {
+        $rows = $this->query->fetchAll(
+            <<<'SQL'
+                SELECT entity_type_id, COUNT(*) AS cnt
+                FROM entities
+                WHERE status = 'published' AND is_deleted = 0
+                GROUP BY entity_type_id
+                SQL,
+            [],
+        );
+
+        $result = [];
+        foreach ($rows as $row) {
+            $result[(int) $row['entity_type_id']] = (int) $row['cnt'];
+        }
+
+        return $result;
+    }
+
+    public function countDraftGroupedByEntityType(): array
+    {
+        $rows = $this->query->fetchAll(
+            <<<'SQL'
+                SELECT entity_type_id, COUNT(*) AS cnt
+                FROM entities
+                WHERE status = 'draft' AND is_deleted = 0
+                GROUP BY entity_type_id
+                SQL,
+            [],
+        );
+
+        $result = [];
+        foreach ($rows as $row) {
+            $result[(int) $row['entity_type_id']] = (int) $row['cnt'];
+        }
+
+        return $result;
+    }
+
     /** @param array<string, mixed> $row */
     private function mapRow(array $row): Entity
     {

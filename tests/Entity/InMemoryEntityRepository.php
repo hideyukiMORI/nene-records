@@ -201,6 +201,52 @@ final class InMemoryEntityRepository implements EntityRepositoryInterface
         return $result;
     }
 
+    /** @return list<Entity> */
+    public function findRecentPublished(int $limit): array
+    {
+        $published = array_values(array_filter(
+            $this->entities,
+            static fn (Entity $e): bool => !$e->isDeleted && $e->status === \NeNeRecords\Entity\EntityStatus::Published,
+        ));
+
+        usort(
+            $published,
+            static fn (Entity $a, Entity $b): int => ($b->publishedAt <=> $a->publishedAt),
+        );
+
+        return array_slice($published, 0, $limit);
+    }
+
+    /** @return array<int, int> */
+    public function countPublishedGroupedByEntityType(): array
+    {
+        $result = [];
+        foreach ($this->entities as $entity) {
+            if ($entity->isDeleted || $entity->status !== \NeNeRecords\Entity\EntityStatus::Published) {
+                continue;
+            }
+            $typeId = $entity->entityTypeId;
+            $result[$typeId] = ($result[$typeId] ?? 0) + 1;
+        }
+
+        return $result;
+    }
+
+    /** @return array<int, int> */
+    public function countDraftGroupedByEntityType(): array
+    {
+        $result = [];
+        foreach ($this->entities as $entity) {
+            if ($entity->isDeleted || $entity->status !== \NeNeRecords\Entity\EntityStatus::Draft) {
+                continue;
+            }
+            $typeId = $entity->entityTypeId;
+            $result[$typeId] = ($result[$typeId] ?? 0) + 1;
+        }
+
+        return $result;
+    }
+
     /** @return list<\NeNeRecords\Entity\EntityRevision> */
     public function findRevisionsByEntityId(int $entityId, int $limit, int $offset): array
     {

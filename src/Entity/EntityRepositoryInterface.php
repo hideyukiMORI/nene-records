@@ -26,6 +26,15 @@ interface EntityRepositoryInterface
     /** @return list<Entity> */
     public function findDueScheduled(): array;
 
+    /** @return list<Entity> Most recently published entities, ordered by published_at DESC. */
+    public function findRecentPublished(int $limit): array;
+
+    /** @return array<int, int> entityTypeId => published count */
+    public function countPublishedGroupedByEntityType(): array;
+
+    /** @return array<int, int> entityTypeId => draft count */
+    public function countDraftGroupedByEntityType(): array;
+
     /** @return list<EntityRevision> */
     public function findRevisionsByEntityId(int $entityId, int $limit, int $offset): array;
 

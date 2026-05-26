@@ -2286,6 +2286,40 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /api/v1/dashboard:
+    get:
+      tags:
+        - Dashboard
+      summary: Get dashboard summary
+      description: Returns an aggregated summary for the admin dashboard — recent published entities, today/month access counts, and published/draft counts per entity type.
+      operationId: getDashboardSummary
+      responses:
+        '200':
+          description: Dashboard summary.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardSummaryResponse'
+              examples:
+                ok:
+                  value:
+                    recent_published:
+                      - id: 10
+                        entity_type_id: 1
+                        entity_type_name: Article
+                        entity_type_slug: article
+                        slug: hello-world
+                        published_at: '2026-05-25T10:00:00+00:00'
+                    today_access_count: 42
+                    this_month_access_count: 1234
+                    entity_type_summary:
+                      - entity_type_id: 1
+                        entity_type_name: Article
+                        entity_type_slug: article
+                        published_count: 5
+                        draft_count: 2
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /api/v1/analytics/access-stats:
     get:
       tags:
@@ -3878,6 +3912,83 @@ components:
           nullable: true
         is_active:
           type: boolean
+      additionalProperties: false
+    DashboardSummaryResponse:
+      type: object
+      required:
+        - recent_published
+        - today_access_count
+        - this_month_access_count
+        - entity_type_summary
+      properties:
+        recent_published:
+          type: array
+          items:
+            $ref: '#/components/schemas/DashboardRecentEntity'
+        today_access_count:
+          type: integer
+          minimum: 0
+        this_month_access_count:
+          type: integer
+          minimum: 0
+        entity_type_summary:
+          type: array
+          items:
+            $ref: '#/components/schemas/DashboardEntityTypeSummary'
+      additionalProperties: false
+    DashboardRecentEntity:
+      type: object
+      required:
+        - id
+        - entity_type_id
+        - entity_type_name
+        - entity_type_slug
+        - slug
+        - published_at
+      properties:
+        id:
+          type: integer
+          format: int64
+          minimum: 1
+        entity_type_id:
+          type: integer
+          format: int64
+          minimum: 1
+        entity_type_name:
+          type: string
+        entity_type_slug:
+          type: string
+        slug:
+          type: string
+          nullable: true
+        published_at:
+          type: string
+          format: date-time
+          nullable: true
+      additionalProperties: false
+    DashboardEntityTypeSummary:
+      type: object
+      required:
+        - entity_type_id
+        - entity_type_name
+        - entity_type_slug
+        - published_count
+        - draft_count
+      properties:
+        entity_type_id:
+          type: integer
+          format: int64
+          minimum: 1
+        entity_type_name:
+          type: string
+        entity_type_slug:
+          type: string
+        published_count:
+          type: integer
+          minimum: 0
+        draft_count:
+          type: integer
+          minimum: 0
       additionalProperties: false
     GeneratePreviewTokenResponse:
       type: object

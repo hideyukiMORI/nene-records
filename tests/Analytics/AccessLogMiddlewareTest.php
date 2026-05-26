@@ -86,6 +86,16 @@ final class AccessLogMiddlewareTest extends TestCase
                     throw new \RuntimeException('db down');
                 }
 
+                public function countByDate(DateTimeImmutable $date): int
+                {
+                    return 0;
+                }
+
+                public function countByYearMonth(int $year, int $month): int
+                {
+                    return 0;
+                }
+
                 public function aggregateByDate(DateTimeImmutable $from, DateTimeImmutable $to): array
                 {
                     return [];

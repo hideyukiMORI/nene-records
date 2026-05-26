@@ -66,6 +66,15 @@ export const ja: Partial<MessageCatalog> = {
   'admin.home.description':
     'Phase 4 スキャフォールドが実行中です。エンティティタイプを使用して TanStack Query 経由の API 連携を確認してください。',
   'admin.home.openPublicSite': 'パブリックサイトを開く →',
+  'admin.home.dashboard.todayAccess': '本日のアクセス数',
+  'admin.home.dashboard.monthAccess': '今月のアクセス数',
+  'admin.home.dashboard.recentPublished': '最近公開されたコンテンツ',
+  'admin.home.dashboard.entityTypeSummary': 'コンテンツ集計',
+  'admin.home.dashboard.published': '公開済み',
+  'admin.home.dashboard.draft': '下書き',
+  'admin.home.dashboard.loading': 'ダッシュボードを読み込み中…',
+  'admin.home.dashboard.error': 'ダッシュボードを読み込めませんでした',
+  'admin.home.dashboard.noRecentPublished': '最近公開されたコンテンツはありません。',
 
   // ── Entity types ─────────────────────────────────────────────────────────
   'admin.entityTypes.pageTitle': 'エンティティタイプ',

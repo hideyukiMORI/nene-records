@@ -14,6 +14,7 @@ use NeNeRecords\BoolField\BoolFieldNotFoundExceptionHandler;
 use NeNeRecords\BoolField\BoolFieldServiceProvider;
 use NeNeRecords\BoolField\FieldKeyNotRegisteredExceptionHandler as BoolFieldKeyNotRegisteredExceptionHandler;
 use NeNeRecords\BoolField\FieldTypeMismatchExceptionHandler as BoolFieldTypeMismatchExceptionHandler;
+use NeNeRecords\Dashboard\DashboardServiceProvider;
 use NeNeRecords\DateTimeField\DateTimeFieldNotFoundExceptionHandler;
 use NeNeRecords\DateTimeField\DateTimeFieldServiceProvider;
 use NeNeRecords\DateTimeField\FieldKeyNotRegisteredExceptionHandler as DateTimeFieldKeyNotRegisteredExceptionHandler;
@@ -97,7 +98,8 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
             ->addProvider(new SettingServiceProvider())
             ->addProvider(new NavigationItemServiceProvider())
             ->addProvider(new WebhookServiceProvider())
-            ->addProvider(new PreviewTokenServiceProvider());
+            ->addProvider(new PreviewTokenServiceProvider())
+            ->addProvider(new DashboardServiceProvider());
 
         $builder
             ->set(
@@ -122,6 +124,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $navigationItem = $container->get('nene-records.route_registrar.navigation_item');
                     $webhook = $container->get('nene-records.route_registrar.webhook');
                     $previewToken = $container->get('nene-records.route_registrar.preview_token');
+                    $dashboard = $container->get('nene-records.route_registrar.dashboard');
                     $auth = $container->get('nene-records.route_registrar.auth');
 
                     if (
@@ -144,6 +147,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         || !is_callable($navigationItem)
                         || !is_callable($webhook)
                         || !is_callable($previewToken)
+                        || !is_callable($dashboard)
                         || !is_callable($auth)
                     ) {
                         throw new LogicException('Route registrar service is invalid.');
@@ -170,6 +174,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $navigationItem,
                         $webhook,
                         $previewToken,
+                        $dashboard,
                     ];
                 },
             )
