@@ -12,6 +12,7 @@ import { HomePage } from '@/pages/home/HomePage'
 import { AppShell } from '@/pages/layout/AppShell'
 import { LoginPage } from '@/pages/login/LoginPage'
 import { NavigationPage } from '@/pages/navigation/NavigationPage'
+import { NotFoundPage } from '@/pages/not-found/NotFoundPage'
 import { SiteSettingsPage } from '@/pages/settings/SiteSettingsPage'
 import { WebhooksPage } from '@/pages/webhooks/WebhooksPage'
 import { TagsPage } from '@/pages/tags/TagsPage'
@@ -41,6 +42,7 @@ const router = createBrowserRouter([
   {
     path: '/admin',
     element: <AdminShell />,
+    errorElement: <NotFoundPage />,
     children: [
       { index: true, element: <HomePage /> },
       { path: 'entity-types', element: <EntityTypesPage /> },
@@ -61,11 +63,16 @@ const router = createBrowserRouter([
   {
     path: '/',
     element: <PublicShell />,
+    errorElement: <NotFoundPage />,
     children: [
       { index: true, element: <PublicIndexPage /> },
       { path: ':entityTypeSlug', element: <PublicBrowsePage /> },
       { path: ':entityTypeSlug/:entityId', element: <PublicRecordDetailPage /> },
     ],
+  },
+  {
+    path: '*',
+    element: <NotFoundPage />,
   },
 ])
 

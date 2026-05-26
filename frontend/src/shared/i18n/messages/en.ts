@@ -70,6 +70,12 @@ export const en = {
   'admin.forbidden.description':
     'You are signed in, but your account does not have permission to perform this action.',
 
+  // ── Not found page ───────────────────────────────────────────────────────
+  'admin.notFound.title': 'Page not found',
+  'admin.notFound.description': 'The page you are looking for does not exist.',
+  'admin.notFound.errorTitle': 'Something went wrong',
+  'admin.notFound.errorDescription': 'An unexpected error occurred.',
+
   // ── Home page ────────────────────────────────────────────────────────────
   'admin.home.title': 'Dashboard',
   'admin.home.description': 'Welcome to NeNe Records.',

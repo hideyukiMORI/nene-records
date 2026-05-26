@@ -63,6 +63,12 @@ export const ja: Partial<MessageCatalog> = {
   'admin.forbidden.description':
     'サインインしていますが、このアクションを実行する権限がありません。',
 
+  // ── Not found ────────────────────────────────────────────────────────────
+  'admin.notFound.title': 'ページが見つかりません',
+  'admin.notFound.description': 'お探しのページは存在しません。',
+  'admin.notFound.errorTitle': 'エラーが発生しました',
+  'admin.notFound.errorDescription': '予期しないエラーが発生しました。',
+
   // ── Home ─────────────────────────────────────────────────────────────────
   'admin.home.title': 'ダッシュボード',
   'admin.home.description': 'NeNe Records へようこそ。',
