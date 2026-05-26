@@ -10,6 +10,7 @@ final readonly class CreateEntityTypeOutput
         public int $id,
         public string $name,
         public string $slug,
+        public bool $isPinned,
     ) {
     }
 }

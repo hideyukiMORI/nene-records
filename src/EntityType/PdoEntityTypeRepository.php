@@ -16,7 +16,7 @@ final readonly class PdoEntityTypeRepository implements EntityTypeRepositoryInte
     public function findById(int $id): ?EntityType
     {
         $row = $this->query->fetchOne(
-            'SELECT id, name, slug FROM entity_types WHERE id = ?',
+            'SELECT id, name, slug, is_pinned FROM entity_types WHERE id = ?',
             [$id],
         );
 
@@ -27,6 +27,7 @@ final readonly class PdoEntityTypeRepository implements EntityTypeRepositoryInte
         return new EntityType(
             name: (string) $row['name'],
             slug: (string) $row['slug'],
+            isPinned: (bool) $row['is_pinned'],
             id: (int) $row['id'],
         );
     }
@@ -34,7 +35,7 @@ final readonly class PdoEntityTypeRepository implements EntityTypeRepositoryInte
     public function findBySlug(string $slug): ?EntityType
     {
         $row = $this->query->fetchOne(
-            'SELECT id, name, slug FROM entity_types WHERE slug = ?',
+            'SELECT id, name, slug, is_pinned FROM entity_types WHERE slug = ?',
             [$slug],
         );
 
@@ -45,6 +46,7 @@ final readonly class PdoEntityTypeRepository implements EntityTypeRepositoryInte
         return new EntityType(
             name: (string) $row['name'],
             slug: (string) $row['slug'],
+            isPinned: (bool) $row['is_pinned'],
             id: (int) $row['id'],
         );
     }
@@ -53,7 +55,7 @@ final readonly class PdoEntityTypeRepository implements EntityTypeRepositoryInte
     public function findAll(int $limit, int $offset): array
     {
         $rows = $this->query->fetchAll(
-            'SELECT id, name, slug FROM entity_types ORDER BY id ASC LIMIT ? OFFSET ?',
+            'SELECT id, name, slug, is_pinned FROM entity_types ORDER BY id ASC LIMIT ? OFFSET ?',
             [$limit, $offset],
         );
 
@@ -61,6 +63,7 @@ final readonly class PdoEntityTypeRepository implements EntityTypeRepositoryInte
             static fn (array $row) => new EntityType(
                 name: (string) $row['name'],
                 slug: (string) $row['slug'],
+                isPinned: (bool) $row['is_pinned'],
                 id: (int) $row['id'],
             ),
             $rows,
@@ -70,8 +73,8 @@ final readonly class PdoEntityTypeRepository implements EntityTypeRepositoryInte
     public function save(EntityType $entityType): int
     {
         $this->query->execute(
-            'INSERT INTO entity_types (name, slug) VALUES (?, ?)',
-            [$entityType->name, $entityType->slug],
+            'INSERT INTO entity_types (name, slug, is_pinned) VALUES (?, ?, ?)',
+            [$entityType->name, $entityType->slug, $entityType->isPinned ? 1 : 0],
         );
 
         return $this->query->lastInsertId();
@@ -80,8 +83,8 @@ final readonly class PdoEntityTypeRepository implements EntityTypeRepositoryInte
     public function update(EntityType $entityType): void
     {
         $this->query->execute(
-            'UPDATE entity_types SET name = ?, slug = ? WHERE id = ?',
-            [$entityType->name, $entityType->slug, $entityType->id],
+            'UPDATE entity_types SET name = ?, slug = ?, is_pinned = ? WHERE id = ?',
+            [$entityType->name, $entityType->slug, $entityType->isPinned ? 1 : 0, $entityType->id],
         );
     }
 

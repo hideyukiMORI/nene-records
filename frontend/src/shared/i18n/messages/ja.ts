@@ -91,6 +91,8 @@ export const ja: Partial<MessageCatalog> = {
   'admin.entityTypes.editForm.title': 'コンテンツタイプを編集',
   'admin.entityTypes.editForm.save': '変更を保存',
   'admin.entityTypes.editForm.saving': '保存中…',
+  'admin.entityTypes.editForm.isPinned': 'サイドバーに表示',
+  'admin.entityTypes.editForm.isPinnedDescription': 'サイドバーにピン留めして、すぐアクセスできるようにします。',
   'admin.entityTypes.delete.title': 'コンテンツタイプを削除しますか？',
   'admin.entityTypes.delete.description': '「{{name}}」が削除されます。この操作は元に戻せません。',
   'admin.entityTypes.actions.fields': 'フィールド',

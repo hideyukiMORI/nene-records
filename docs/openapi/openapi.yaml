@@ -2680,6 +2680,7 @@ components:
         - id
         - name
         - slug
+        - is_pinned
       properties:
         id:
           type: integer
@@ -2688,6 +2689,8 @@ components:
           type: string
         slug:
           type: string
+        is_pinned:
+          type: boolean
     CreateEntityTypeRequest:
       type: object
       required:
@@ -2700,6 +2703,8 @@ components:
         slug:
           type: string
           pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$'
+        is_pinned:
+          type: boolean
       additionalProperties: false
     UpdateEntityTypeRequest:
       $ref: '#/components/schemas/CreateEntityTypeRequest'

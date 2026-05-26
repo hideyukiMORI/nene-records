@@ -1,12 +1,13 @@
 import { Controller } from 'react-hook-form'
 import { useTranslation } from '@/shared/i18n'
 import { Button, Input, Stack, Text } from '@/shared/ui'
+import type { CreateEntityTypeFormValues } from '../hooks/use-create-entity-type-form'
 import { useCreateEntityTypeForm } from '../hooks/use-create-entity-type-form'
 
 export interface EntityTypeCreateFormProps {
   isSubmitting: boolean
   serverErrorTitle: string | null
-  onSubmit: (values: { name: string; slug: string }) => Promise<void>
+  onSubmit: (values: CreateEntityTypeFormValues) => Promise<void>
 }
 
 export function EntityTypeCreateForm({

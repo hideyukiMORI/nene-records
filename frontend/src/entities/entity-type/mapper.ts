@@ -17,6 +17,7 @@ export function mapEntityTypeDtoToModel(dto: EntityTypeDto): EntityType {
     id: toEntityTypeId(dto.id),
     name: dto.name,
     slug: dto.slug,
+    isPinned: dto.is_pinned,
   }
 }
 
@@ -32,6 +33,7 @@ export function mapCreateInputToDto(input: CreateEntityTypeInput): CreateEntityT
   return {
     name: input.name,
     slug: input.slug,
+    is_pinned: input.isPinned ?? false,
   }
 }
 

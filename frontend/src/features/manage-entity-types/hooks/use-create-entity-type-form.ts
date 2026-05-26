@@ -8,6 +8,7 @@ export const createEntityTypeFormSchema = z.object({
     .string()
     .trim()
     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Use lowercase letters, numbers, and hyphens'),
+  isPinned: z.boolean().default(false),
 })
 
 export type CreateEntityTypeFormValues = z.infer<typeof createEntityTypeFormSchema>
@@ -18,6 +19,7 @@ export function useCreateEntityTypeForm() {
     defaultValues: {
       name: '',
       slug: '',
+      isPinned: false,
     },
   })
 }

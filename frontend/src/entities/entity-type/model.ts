@@ -4,6 +4,7 @@ export interface EntityType {
   id: EntityTypeId
   name: string
   slug: string
+  isPinned: boolean
 }
 
 export interface EntityTypeList {
@@ -15,6 +16,7 @@ export interface EntityTypeList {
 export interface CreateEntityTypeInput {
   name: string
   slug: string
+  isPinned?: boolean
 }
 
 export type UpdateEntityTypeInput = CreateEntityTypeInput
