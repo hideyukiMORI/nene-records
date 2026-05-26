@@ -68,6 +68,15 @@ use NeNeRecords\TextField\FieldKeyNotRegisteredExceptionHandler as TextFieldKeyN
 use NeNeRecords\TextField\FieldTypeMismatchExceptionHandler as TextFieldTypeMismatchExceptionHandler;
 use NeNeRecords\TextField\TextFieldNotFoundExceptionHandler;
 use NeNeRecords\TextField\TextFieldServiceProvider;
+use NeNeRecords\User\CannotDeleteSelfExceptionHandler;
+use NeNeRecords\User\InvalidCurrentPasswordExceptionHandler;
+use NeNeRecords\User\InvalidUserRoleExceptionHandler;
+use NeNeRecords\User\UserEmailConflictExceptionHandler;
+use NeNeRecords\User\UserNotFoundExceptionHandler;
+use NeNeRecords\User\UserServiceProvider;
+use NeNeRecords\UserInvite\InvalidInviteTokenExceptionHandler;
+use NeNeRecords\UserInvite\InvalidPasswordResetTokenExceptionHandler;
+use NeNeRecords\UserInvite\UserInviteServiceProvider;
 use NeNeRecords\Webhook\WebhookNotFoundExceptionHandler;
 use NeNeRecords\Webhook\WebhookServiceProvider;
 use Psr\Container\ContainerInterface;
@@ -100,7 +109,9 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
             ->addProvider(new NavigationItemServiceProvider())
             ->addProvider(new WebhookServiceProvider())
             ->addProvider(new PreviewTokenServiceProvider())
-            ->addProvider(new DashboardServiceProvider());
+            ->addProvider(new DashboardServiceProvider())
+            ->addProvider(new UserServiceProvider())
+            ->addProvider(new UserInviteServiceProvider());
 
         $builder
             ->set(
@@ -126,6 +137,8 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $webhook = $container->get('nene-records.route_registrar.webhook');
                     $previewToken = $container->get('nene-records.route_registrar.preview_token');
                     $dashboard = $container->get('nene-records.route_registrar.dashboard');
+                    $user = $container->get('nene-records.route_registrar.user');
+                    $userInvite = $container->get('nene-records.route_registrar.user_invite');
                     $auth = $container->get('nene-records.route_registrar.auth');
 
                     if (
@@ -149,6 +162,8 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         || !is_callable($webhook)
                         || !is_callable($previewToken)
                         || !is_callable($dashboard)
+                        || !is_callable($user)
+                        || !is_callable($userInvite)
                         || !is_callable($auth)
                     ) {
                         throw new LogicException('Route registrar service is invalid.');
@@ -176,6 +191,8 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $webhook,
                         $previewToken,
                         $dashboard,
+                        $user,
+                        $userInvite,
                     ];
                 },
             )
@@ -224,6 +241,13 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $navigationItemNotFound = $container->get(NavigationItemNotFoundExceptionHandler::class);
                     $webhookNotFound = $container->get(WebhookNotFoundExceptionHandler::class);
                     $previewTokenNotFound = $container->get(PreviewTokenNotFoundExceptionHandler::class);
+                    $userNotFound = $container->get(UserNotFoundExceptionHandler::class);
+                    $userEmailConflict = $container->get(UserEmailConflictExceptionHandler::class);
+                    $cannotDeleteSelf = $container->get(CannotDeleteSelfExceptionHandler::class);
+                    $invalidUserRole = $container->get(InvalidUserRoleExceptionHandler::class);
+                    $invalidCurrentPassword = $container->get(InvalidCurrentPasswordExceptionHandler::class);
+                    $invalidInviteToken = $container->get(InvalidInviteTokenExceptionHandler::class);
+                    $invalidResetToken = $container->get(InvalidPasswordResetTokenExceptionHandler::class);
 
                     foreach ([
                         $entityTypeNotFound,
@@ -268,6 +292,13 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $navigationItemNotFound,
                         $webhookNotFound,
                         $previewTokenNotFound,
+                        $userNotFound,
+                        $userEmailConflict,
+                        $cannotDeleteSelf,
+                        $invalidUserRole,
+                        $invalidCurrentPassword,
+                        $invalidInviteToken,
+                        $invalidResetToken,
                     ] as $handler) {
                         if (!$handler instanceof DomainExceptionHandlerInterface) {
                             throw new LogicException('Exception handler service is invalid.');
@@ -317,6 +348,13 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $navigationItemNotFound,
                         $webhookNotFound,
                         $previewTokenNotFound,
+                        $userNotFound,
+                        $userEmailConflict,
+                        $cannotDeleteSelf,
+                        $invalidUserRole,
+                        $invalidCurrentPassword,
+                        $invalidInviteToken,
+                        $invalidResetToken,
                     ];
                 },
             );

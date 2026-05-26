@@ -1,27 +1,28 @@
 import { useEffect, useState } from 'react'
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
-import { authStore, currentUserHasCapability } from '@/entities/auth'
+import { authStore, currentUserHasCapability, currentUserIsAdmin } from '@/entities/auth'
 import { getLocalizedEntityTypeName, usePinnedEntityTypes } from '@/entities/entity-type'
 import { LOCALES, SUPPORTED_LOCALE_IDS, useTranslation } from '@/shared/i18n'
 import { useTheme } from '@/shared/theme'
 import { ToastProvider } from '@/shared/ui'
 import {
-  IconHome,
-  IconLayers,
-  IconTag,
-  IconLink,
-  IconLayout,
-  IconWebhook,
-  IconSettings,
-  IconGlobe,
-  IconSun,
-  IconMoon,
-  IconLogOut,
-  IconMenu,
-  IconX,
   IconChevronRight,
   IconFileText,
+  IconGlobe,
+  IconHome,
   IconImage,
+  IconLayers,
+  IconLayout,
+  IconLink,
+  IconLogOut,
+  IconMenu,
+  IconMoon,
+  IconSettings,
+  IconSun,
+  IconTag,
+  IconUsers,
+  IconWebhook,
+  IconX,
 } from '@/shared/ui/icons/Icons'
 
 interface NavItemProps {
@@ -80,6 +81,7 @@ export function AppShell() {
   const canManageTags = currentUserHasCapability('manage_tags')
   const canReadSettings = currentUserHasCapability('read_settings')
   const canManageSettings = currentUserHasCapability('manage_settings')
+  const isAdmin = currentUserIsAdmin()
 
   const [appearanceOpen, setAppearanceOpen] = useState(true)
   const [advancedOpen, setAdvancedOpen] = useState(false)
@@ -184,6 +186,16 @@ export function AppShell() {
                     to="/admin/tags"
                     icon={<IconTag size={16} />}
                     label={t('admin.nav.tags')}
+                    onClick={closeSidebar}
+                  />
+                </li>
+              ) : null}
+              {isAdmin ? (
+                <li>
+                  <NavItem
+                    to="/admin/users"
+                    icon={<IconUsers size={16} />}
+                    label={t('admin.nav.users')}
                     onClick={closeSidebar}
                   />
                 </li>

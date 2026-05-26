@@ -1,4 +1,5 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { AcceptInvitePage } from '@/pages/accept-invite/AcceptInvitePage'
 import { PublicBrowsePage } from '@/pages/consumer/PublicBrowsePage'
 import { PublicIndexPage } from '@/pages/consumer/PublicIndexPage'
 import { PublicRecordDetailPage } from '@/pages/consumer/PublicRecordDetailPage'
@@ -11,10 +12,12 @@ import { ForbiddenPage } from '@/pages/forbidden/ForbiddenPage'
 import { HomePage } from '@/pages/home/HomePage'
 import { AppShell } from '@/pages/layout/AppShell'
 import { LoginPage } from '@/pages/login/LoginPage'
+import { MediaPage } from '@/pages/media/MediaPage'
 import { NavigationPage } from '@/pages/navigation/NavigationPage'
 import { NotFoundPage } from '@/pages/not-found/NotFoundPage'
-import { MediaPage } from '@/pages/media/MediaPage'
+import { ResetPasswordPage } from '@/pages/reset-password/ResetPasswordPage'
 import { SiteSettingsPage } from '@/pages/settings/SiteSettingsPage'
+import { UsersPage } from '@/pages/users/UsersPage'
 import { WebhooksPage } from '@/pages/webhooks/WebhooksPage'
 import { TagsPage } from '@/pages/tags/TagsPage'
 import { RequireAuth } from '@/shared/auth/RequireAuth'
@@ -31,6 +34,14 @@ const router = createBrowserRouter([
   {
     path: '/login',
     element: <LoginPage />,
+  },
+  {
+    path: '/admin/accept-invite',
+    element: <AcceptInvitePage />,
+  },
+  {
+    path: '/admin/reset-password',
+    element: <ResetPasswordPage />,
   },
   {
     path: '/forbidden',
@@ -52,6 +63,7 @@ const router = createBrowserRouter([
       { path: 'media', element: <MediaPage /> },
       { path: 'webhooks', element: <WebhooksPage /> },
       { path: 'settings', element: <SiteSettingsPage /> },
+      { path: 'users', element: <UsersPage /> },
       { path: 'entity-types/:entityTypeSlug/fields', element: <FieldDefsPage /> },
       // Legacy long-form routes kept for schema management links
       { path: 'entity-types/:entityTypeSlug/entities', element: <EntityRecordsPage /> },
