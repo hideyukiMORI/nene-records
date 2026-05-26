@@ -46,6 +46,8 @@ export const en = {
   'admin.nav.settings': 'Settings',
   'admin.nav.publicSite': 'Public site',
   'admin.nav.logout': 'Log out',
+  'admin.theme.toggleDark': 'Switch to dark mode',
+  'admin.theme.toggleLight': 'Switch to light mode',
 
   // ── Auth (Login page) ────────────────────────────────────────────────────
   'admin.auth.appTitle': 'NeNe Records Admin',

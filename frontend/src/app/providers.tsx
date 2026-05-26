@@ -3,6 +3,7 @@ import { useState, type ReactNode } from 'react'
 import { seedPublicRecordViewCache } from '@/shared/lib/seed-public-record-view-cache'
 import { AppError } from '@/shared/api/client'
 import { I18nProvider } from '@/shared/i18n'
+import { ThemeProvider } from '@/shared/theme'
 import { AuthGate } from './auth-gate'
 import { RootErrorBoundary } from './root-error-boundary'
 
@@ -30,12 +31,14 @@ export function AppProviders({ children }: { children: ReactNode }) {
   const [queryClient] = useState(createAppQueryClient)
 
   return (
-    <I18nProvider>
-      <QueryClientProvider client={queryClient}>
-        <RootErrorBoundary>
-          <AuthGate>{children}</AuthGate>
-        </RootErrorBoundary>
-      </QueryClientProvider>
-    </I18nProvider>
+    <ThemeProvider>
+      <I18nProvider>
+        <QueryClientProvider client={queryClient}>
+          <RootErrorBoundary>
+            <AuthGate>{children}</AuthGate>
+          </RootErrorBoundary>
+        </QueryClientProvider>
+      </I18nProvider>
+    </ThemeProvider>
   )
 }
