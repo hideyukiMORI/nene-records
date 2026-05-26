@@ -6,74 +6,7 @@ import {
   type SettingItem,
 } from '@/entities/setting'
 import { useTranslation } from '@/shared/i18n'
-import { Button, Input, Stack, Text } from '@/shared/ui'
-
-function SettingField({
-  item,
-  isSaving,
-  canManageSettings,
-  onSave,
-}: {
-  item: SettingItem
-  isSaving: boolean
-  canManageSettings: boolean
-  onSave: (settingKey: string, value: string) => Promise<void>
-}) {
-  const { t } = useTranslation()
-  const [value, setValue] = useState(item.value)
-
-  const inputId = `setting-${item.settingKey}`
-
-  return (
-    <Stack gap="sm">
-      {item.dataType === 'markdown' ? (
-        <div className="flex flex-col gap-stack-xs">
-          <label htmlFor={inputId} className="font-sans text-body font-medium text-text-primary">
-            {item.label}
-          </label>
-          <textarea
-            id={inputId}
-            value={value}
-            disabled={isSaving || !canManageSettings}
-            rows={4}
-            onChange={(event) => {
-              setValue(event.target.value)
-            }}
-            className="rounded-md border border-border bg-surface-raised px-inline-md py-stack-sm font-sans text-body text-text-primary shadow-sm focus-visible:outline-none focus-visible:shadow-focus disabled:cursor-not-allowed disabled:opacity-50"
-          />
-          <Text muted variant="caption">
-            Markdown ·{' '}
-            {item.isPublic
-              ? t('admin.settings.visibility.public')
-              : t('admin.settings.visibility.adminOnly')}
-          </Text>
-        </div>
-      ) : (
-        <Input
-          id={inputId}
-          label={item.label}
-          value={value}
-          disabled={isSaving || !canManageSettings}
-          onChange={(event) => {
-            setValue(event.target.value)
-          }}
-        />
-      )}
-      {canManageSettings ? (
-        <Button
-          variant="secondary"
-          size="sm"
-          disabled={isSaving || value === item.value}
-          onClick={() => {
-            void onSave(item.settingKey, value)
-          }}
-        >
-          {isSaving ? t('admin.settings.saving') : t('admin.settings.save')}
-        </Button>
-      ) : null}
-    </Stack>
-  )
-}
+import { Button, Stack, Text } from '@/shared/ui'
 
 function SettingRevisionsPanel({ settingKey }: { settingKey: string }) {
   const { t } = useTranslation()
@@ -102,6 +35,118 @@ function SettingRevisionsPanel({ settingKey }: { settingKey: string }) {
         </Text>
       ))}
     </Stack>
+  )
+}
+
+function SettingCard({
+  item,
+  isSaving,
+  canManageSettings,
+  onSave,
+  isExpanded,
+  onToggle,
+}: {
+  item: SettingItem
+  isSaving: boolean
+  canManageSettings: boolean
+  onSave: (settingKey: string, value: string) => Promise<void>
+  isExpanded: boolean
+  onToggle: () => void
+}) {
+  const { t } = useTranslation()
+  const [value, setValue] = useState(item.value)
+  const inputId = `setting-${item.settingKey}`
+  const dirty = value !== item.value
+
+  const inputClass =
+    'rounded-md border border-border bg-surface px-inline-sm py-stack-sm font-sans text-body text-text-primary shadow-sm focus-visible:outline-none focus-visible:shadow-focus disabled:cursor-not-allowed disabled:opacity-50'
+
+  return (
+    <section className="rounded-md border border-border bg-surface-raised p-inline-md shadow-sm">
+      {/* ── Header row: label + history toggle ── */}
+      <div className="mb-stack-sm flex items-center justify-between gap-inline-md">
+        <label htmlFor={inputId} className="font-sans text-body font-medium text-text-primary">
+          {item.label}
+        </label>
+        <button
+          type="button"
+          onClick={onToggle}
+          className="shrink-0 font-sans text-caption text-text-muted transition-colors hover:text-text-primary"
+        >
+          {isExpanded ? t('admin.settings.history.hide') : t('admin.settings.history.show')}
+        </button>
+      </div>
+
+      {/* ── Field ── */}
+      {item.dataType === 'markdown' ? (
+        /* Markdown: textarea stacked, save right-aligned below */
+        <div className="flex flex-col gap-stack-sm">
+          <Text muted variant="caption">
+            Markdown ·{' '}
+            {item.isPublic
+              ? t('admin.settings.visibility.public')
+              : t('admin.settings.visibility.adminOnly')}
+          </Text>
+          <textarea
+            id={inputId}
+            value={value}
+            disabled={isSaving || !canManageSettings}
+            rows={4}
+            onChange={(e) => {
+              setValue(e.target.value)
+            }}
+            className={`w-full resize-y ${inputClass}`}
+          />
+          {canManageSettings ? (
+            <div className="flex justify-end">
+              <Button
+                variant="secondary"
+                size="sm"
+                disabled={isSaving || !dirty}
+                onClick={() => {
+                  void onSave(item.settingKey, value)
+                }}
+              >
+                {isSaving ? t('admin.settings.saving') : t('admin.settings.save')}
+              </Button>
+            </div>
+          ) : null}
+        </div>
+      ) : (
+        /* Text: input + save button inline */
+        <div className="flex items-center gap-stack-sm">
+          <input
+            id={inputId}
+            type="text"
+            value={value}
+            disabled={isSaving || !canManageSettings}
+            onChange={(e) => {
+              setValue(e.target.value)
+            }}
+            className={`flex-1 ${inputClass}`}
+          />
+          {canManageSettings ? (
+            <Button
+              variant="secondary"
+              size="sm"
+              disabled={isSaving || !dirty}
+              onClick={() => {
+                void onSave(item.settingKey, value)
+              }}
+            >
+              {isSaving ? t('admin.settings.saving') : t('admin.settings.save')}
+            </Button>
+          ) : null}
+        </div>
+      )}
+
+      {/* ── History panel ── */}
+      {isExpanded ? (
+        <div className="mt-stack-md border-t border-border pt-stack-sm">
+          <SettingRevisionsPanel settingKey={item.settingKey} />
+        </div>
+      ) : null}
+    </section>
   )
 }
 
@@ -136,36 +181,19 @@ export function ManageSiteSettingsView({ canManageSettings }: { canManageSetting
   }
 
   return (
-    <Stack gap="lg">
+    <Stack gap="md">
       {items.map((item) => (
-        <section
-          key={item.settingKey}
-          className="rounded-md border border-border bg-surface-raised p-inline-md shadow-sm"
-        >
-          <Stack gap="md">
-            <SettingField
-              key={`${item.settingKey}:${item.updatedAt ?? 'default'}`}
-              item={item}
-              isSaving={updateMutation.isPending}
-              canManageSettings={canManageSettings}
-              onSave={saveSetting}
-            />
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => {
-                setExpandedKey((current) => (current === item.settingKey ? null : item.settingKey))
-              }}
-            >
-              {expandedKey === item.settingKey
-                ? t('admin.settings.history.hide')
-                : t('admin.settings.history.show')}
-            </Button>
-            {expandedKey === item.settingKey ? (
-              <SettingRevisionsPanel settingKey={item.settingKey} />
-            ) : null}
-          </Stack>
-        </section>
+        <SettingCard
+          key={`${item.settingKey}:${item.updatedAt ?? 'default'}`}
+          item={item}
+          isSaving={updateMutation.isPending}
+          canManageSettings={canManageSettings}
+          onSave={saveSetting}
+          isExpanded={expandedKey === item.settingKey}
+          onToggle={() => {
+            setExpandedKey((cur) => (cur === item.settingKey ? null : item.settingKey))
+          }}
+        />
       ))}
     </Stack>
   )
