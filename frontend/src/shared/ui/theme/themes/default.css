@@ -82,3 +82,8 @@
   --z-modal: 200;
   --z-toast: 300;
 }
+
+@utility text-tiny {
+  font-size: 0.625rem;
+  line-height: 1.25;
+}
