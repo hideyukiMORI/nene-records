@@ -334,6 +334,8 @@ export const en = {
   'admin.entitySeo.saveSuccess': 'SEO settings saved.',
 
   // ── Settings ──────────────────────────────────────────────────────────────
+  'admin.settings.appearance.title': 'Appearance',
+
   'admin.settings.pageTitle': 'Site settings',
   'admin.settings.description':
     'Configure site name, tagline, default meta description, and footer content for public pages.',

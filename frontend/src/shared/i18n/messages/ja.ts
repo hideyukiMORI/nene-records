@@ -335,6 +335,8 @@ export const ja: Partial<MessageCatalog> = {
   'admin.entitySeo.saveSuccess': 'SEO 設定を保存しました。',
 
   // ── Settings ──────────────────────────────────────────────────────────────
+  'admin.settings.appearance.title': '外観',
+
   'admin.settings.pageTitle': 'サイト設定',
   'admin.settings.description':
     'パブリックページのサイト名、タグライン、デフォルトメタ説明、フッターコンテンツを設定します。',
