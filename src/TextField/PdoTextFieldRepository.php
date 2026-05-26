@@ -17,7 +17,7 @@ final readonly class PdoTextFieldRepository implements TextFieldRepositoryInterf
     public function findById(int $id): ?TextField
     {
         $row = $this->query->fetchOne(
-            'SELECT id, entity_id, field_key, value FROM text_fields WHERE id = ? AND is_deleted = 0',
+            'SELECT id, entity_id, field_key, locale, value FROM text_fields WHERE id = ? AND is_deleted = 0',
             [$id],
         );
 
@@ -25,78 +25,80 @@ final readonly class PdoTextFieldRepository implements TextFieldRepositoryInterf
             return null;
         }
 
-        return new TextField(
-            entityId: (int) $row['entity_id'],
-            fieldKey: (string) $row['field_key'],
-            value: (string) $row['value'],
-            id: (int) $row['id'],
-        );
+        return $this->mapRow($row);
     }
 
     /** @return list<TextField> */
-    public function findAll(int $limit, int $offset): array
+    public function findAll(int $limit, int $offset, ?string $locale = null): array
     {
-        $rows = $this->query->fetchAll(
-            'SELECT id, entity_id, field_key, value FROM text_fields WHERE is_deleted = 0 ORDER BY id ASC LIMIT ? OFFSET ?',
-            [$limit, $offset],
-        );
+        if ($locale !== null) {
+            $rows = $this->query->fetchAll(
+                'SELECT id, entity_id, field_key, locale, value FROM text_fields WHERE is_deleted = 0 AND locale = ? ORDER BY id ASC LIMIT ? OFFSET ?',
+                [$locale, $limit, $offset],
+            );
+        } else {
+            $rows = $this->query->fetchAll(
+                'SELECT id, entity_id, field_key, locale, value FROM text_fields WHERE is_deleted = 0 ORDER BY id ASC LIMIT ? OFFSET ?',
+                [$limit, $offset],
+            );
+        }
 
-        return array_map(
-            static fn (array $row) => new TextField(
-                entityId: (int) $row['entity_id'],
-                fieldKey: (string) $row['field_key'],
-                value: (string) $row['value'],
-                id: (int) $row['id'],
-            ),
-            $rows,
-        );
+        return array_map(fn (array $row) => $this->mapRow($row), $rows);
     }
 
     /** @return list<TextField> */
-    public function findByEntityId(int $entityId, int $limit, int $offset): array
+    public function findByEntityId(int $entityId, int $limit, int $offset, ?string $locale = null): array
     {
-        $rows = $this->query->fetchAll(
-            'SELECT id, entity_id, field_key, value FROM text_fields WHERE entity_id = ? AND is_deleted = 0 ORDER BY id ASC LIMIT ? OFFSET ?',
-            [$entityId, $limit, $offset],
-        );
+        if ($locale !== null) {
+            $rows = $this->query->fetchAll(
+                'SELECT id, entity_id, field_key, locale, value FROM text_fields WHERE entity_id = ? AND locale = ? AND is_deleted = 0 ORDER BY id ASC LIMIT ? OFFSET ?',
+                [$entityId, $locale, $limit, $offset],
+            );
+        } else {
+            $rows = $this->query->fetchAll(
+                'SELECT id, entity_id, field_key, locale, value FROM text_fields WHERE entity_id = ? AND is_deleted = 0 ORDER BY id ASC LIMIT ? OFFSET ?',
+                [$entityId, $limit, $offset],
+            );
+        }
 
-        return array_map(
-            static fn (array $row) => new TextField(
-                entityId: (int) $row['entity_id'],
-                fieldKey: (string) $row['field_key'],
-                value: (string) $row['value'],
-                id: (int) $row['id'],
-            ),
-            $rows,
-        );
+        return array_map(fn (array $row) => $this->mapRow($row), $rows);
     }
 
     /** @return list<TextField> */
-    public function findByEntityTypeId(int $entityTypeId, int $limit, int $offset): array
+    public function findByEntityTypeId(int $entityTypeId, int $limit, int $offset, ?string $locale = null): array
     {
-        $rows = $this->query->fetchAll(
-            <<<'SQL'
-            SELECT tf.id, tf.entity_id, tf.field_key, tf.value
-            FROM text_fields tf
-            INNER JOIN entities e ON e.id = tf.entity_id
-            WHERE tf.is_deleted = 0
-              AND e.is_deleted = 0
-              AND e.entity_type_id = ?
-            ORDER BY tf.id ASC
-            LIMIT ? OFFSET ?
-            SQL,
-            [$entityTypeId, $limit, $offset],
-        );
+        if ($locale !== null) {
+            $rows = $this->query->fetchAll(
+                <<<'SQL'
+                SELECT tf.id, tf.entity_id, tf.field_key, tf.locale, tf.value
+                FROM text_fields tf
+                INNER JOIN entities e ON e.id = tf.entity_id
+                WHERE tf.is_deleted = 0
+                  AND e.is_deleted = 0
+                  AND e.entity_type_id = ?
+                  AND tf.locale = ?
+                ORDER BY tf.id ASC
+                LIMIT ? OFFSET ?
+                SQL,
+                [$entityTypeId, $locale, $limit, $offset],
+            );
+        } else {
+            $rows = $this->query->fetchAll(
+                <<<'SQL'
+                SELECT tf.id, tf.entity_id, tf.field_key, tf.locale, tf.value
+                FROM text_fields tf
+                INNER JOIN entities e ON e.id = tf.entity_id
+                WHERE tf.is_deleted = 0
+                  AND e.is_deleted = 0
+                  AND e.entity_type_id = ?
+                ORDER BY tf.id ASC
+                LIMIT ? OFFSET ?
+                SQL,
+                [$entityTypeId, $limit, $offset],
+            );
+        }
 
-        return array_map(
-            static fn (array $row) => new TextField(
-                entityId: (int) $row['entity_id'],
-                fieldKey: (string) $row['field_key'],
-                value: (string) $row['value'],
-                id: (int) $row['id'],
-            ),
-            $rows,
-        );
+        return array_map(fn (array $row) => $this->mapRow($row), $rows);
     }
 
     /** @param list<int> $entityIds @return list<TextField> */
@@ -108,26 +110,18 @@ final readonly class PdoTextFieldRepository implements TextFieldRepositoryInterf
 
         $placeholders = implode(', ', array_fill(0, count($entityIds), '?'));
         $rows = $this->query->fetchAll(
-            "SELECT id, entity_id, field_key, value FROM text_fields WHERE entity_id IN ({$placeholders}) AND is_deleted = 0 ORDER BY entity_id ASC, id ASC",
+            "SELECT id, entity_id, field_key, locale, value FROM text_fields WHERE entity_id IN ({$placeholders}) AND is_deleted = 0 ORDER BY entity_id ASC, id ASC",
             $entityIds,
         );
 
-        return array_map(
-            static fn (array $row) => new TextField(
-                entityId: (int) $row['entity_id'],
-                fieldKey: (string) $row['field_key'],
-                value: (string) $row['value'],
-                id: (int) $row['id'],
-            ),
-            $rows,
-        );
+        return array_map(fn (array $row) => $this->mapRow($row), $rows);
     }
 
     public function save(TextField $textField): int
     {
         $this->query->execute(
-            'INSERT INTO text_fields (entity_id, field_key, value) VALUES (?, ?, ?)',
-            [$textField->entityId, $textField->fieldKey, $textField->value],
+            'INSERT INTO text_fields (entity_id, field_key, locale, value) VALUES (?, ?, ?, ?)',
+            [$textField->entityId, $textField->fieldKey, $textField->locale, $textField->value],
         );
 
         return $this->query->lastInsertId();
@@ -140,8 +134,8 @@ final readonly class PdoTextFieldRepository implements TextFieldRepositoryInterf
         }
 
         $affected = $this->query->execute(
-            'UPDATE text_fields SET field_key = ?, value = ? WHERE id = ? AND is_deleted = 0',
-            [$textField->fieldKey, $textField->value, $textField->id],
+            'UPDATE text_fields SET field_key = ?, locale = ?, value = ? WHERE id = ? AND is_deleted = 0',
+            [$textField->fieldKey, $textField->locale, $textField->value, $textField->id],
         );
 
         if ($affected === 0) {
@@ -159,5 +153,19 @@ final readonly class PdoTextFieldRepository implements TextFieldRepositoryInterf
         if ($affected === 0) {
             throw new TextFieldNotFoundException($id);
         }
+    }
+
+    /** @param array<string, mixed> $row */
+    private function mapRow(array $row): TextField
+    {
+        $localeRaw = $row['locale'] ?? null;
+
+        return new TextField(
+            entityId: (int) $row['entity_id'],
+            fieldKey: (string) $row['field_key'],
+            value: (string) $row['value'],
+            id: (int) $row['id'],
+            locale: ($localeRaw !== null && $localeRaw !== '') ? (string) $localeRaw : null,
+        );
     }
 }

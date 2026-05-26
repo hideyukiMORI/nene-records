@@ -11,6 +11,7 @@ final readonly class ListTextFieldsInput
         public ?int $entityTypeId = null,
         public int $limit = 20,
         public int $offset = 0,
+        public ?string $locale = null,
     ) {
     }
 }

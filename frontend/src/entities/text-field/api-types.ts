@@ -3,6 +3,7 @@ export interface TextFieldDto {
   entity_id: number
   field_key: string
   value: string
+  locale: string | null
 }
 
 export interface TextFieldListDto {
@@ -15,9 +16,11 @@ export interface CreateTextFieldDto {
   entity_id: number
   field_key: string
   value: string
+  locale?: string | null
 }
 
 export interface UpdateTextFieldDto {
   field_key: string
   value: string
+  locale?: string | null
 }

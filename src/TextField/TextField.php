@@ -11,6 +11,7 @@ final readonly class TextField
         public string $fieldKey,
         public string $value,
         public ?int $id = null,
+        public ?string $locale = null,
     ) {
     }
 }

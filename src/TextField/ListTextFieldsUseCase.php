@@ -18,13 +18,15 @@ final readonly class ListTextFieldsUseCase implements ListTextFieldsUseCaseInter
                 $input->entityId,
                 $input->limit,
                 $input->offset,
+                $input->locale,
             ),
             $input->entityTypeId !== null => $this->textFields->findByEntityTypeId(
                 $input->entityTypeId,
                 $input->limit,
                 $input->offset,
+                $input->locale,
             ),
-            default => $this->textFields->findAll($input->limit, $input->offset),
+            default => $this->textFields->findAll($input->limit, $input->offset, $input->locale),
         };
 
         $items = array_map(
@@ -33,6 +35,7 @@ final readonly class ListTextFieldsUseCase implements ListTextFieldsUseCaseInter
                 entityId: $textField->entityId,
                 fieldKey: $textField->fieldKey,
                 value: $textField->value,
+                locale: $textField->locale,
             ),
             $rows,
         );
