@@ -9,6 +9,7 @@ export interface PublicRecordDetailViewProps {
   entity: Entity | null
   fieldRows: PublicFieldRow[]
   entityTypeSlugById: Record<number, string>
+  entityTypePatternById: Record<number, string | null | undefined>
   isLoading: boolean
   isError: boolean
   errorTitle: string | null
@@ -19,6 +20,7 @@ export function PublicRecordDetailView({
   entity,
   fieldRows,
   entityTypeSlugById,
+  entityTypePatternById,
   isLoading,
   isError,
   errorTitle,
@@ -58,6 +60,7 @@ export function PublicRecordDetailView({
               entityId={Number(entity.id)}
               fieldDef={row.fieldDef}
               entityTypeSlugById={entityTypeSlugById}
+              entityTypePatternById={entityTypePatternById}
             />
           )
         }

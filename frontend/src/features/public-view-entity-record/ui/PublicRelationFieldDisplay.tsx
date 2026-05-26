@@ -7,17 +7,20 @@ export interface PublicRelationFieldDisplayProps {
   entityId: number
   fieldDef: RelationFieldDef
   entityTypeSlugById: Record<number, string>
+  entityTypePatternById: Record<number, string | null | undefined>
 }
 
 export function PublicRelationFieldDisplay({
   entityId,
   fieldDef,
   entityTypeSlugById,
+  entityTypePatternById,
 }: PublicRelationFieldDisplayProps) {
   const { targets, isLoading, isError, errorTitle, refetch } = usePublicRelationFieldDisplay(
     entityId,
     fieldDef,
     entityTypeSlugById,
+    entityTypePatternById,
   )
 
   if (isLoading) {
