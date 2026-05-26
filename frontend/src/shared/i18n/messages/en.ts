@@ -142,6 +142,8 @@ export const en = {
   'admin.entityRecords.list.emptyFiltered.title': 'No matching items',
   'admin.entityRecords.list.emptyFiltered.description':
     'Try clearing the filters or selecting different criteria.',
+  'admin.entityRecords.list.item.createdAt': 'Created {{date}}',
+  'admin.entityRecords.list.item.updatedAt': 'Updated {{date}}',
   'admin.entityRecords.search.placeholder': 'Search…',
   'admin.entityRecords.search.clear': 'Clear search',
   'admin.entityRecords.create.newButton': 'New item',

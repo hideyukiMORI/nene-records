@@ -8,6 +8,8 @@ CREATE TABLE entities (
     meta_title VARCHAR(255) NULL,
     meta_description TEXT NULL,
     is_deleted BOOLEAN NOT NULL DEFAULT 0,
+    created_at DATETIME NULL,
+    updated_at DATETIME NULL,
     deleted_at DATETIME NULL,
     FOREIGN KEY (entity_type_id) REFERENCES entity_types (id) ON DELETE RESTRICT ON UPDATE NO ACTION
 );

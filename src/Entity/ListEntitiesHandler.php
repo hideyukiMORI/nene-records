@@ -68,6 +68,8 @@ final readonly class ListEntitiesHandler
                         'scheduled_at' => $item->scheduledAtIso,
                         'is_deleted' => $item->isDeleted,
                         'deleted_at' => $item->deletedAtIso,
+                        'created_at' => $item->createdAtIso,
+                        'updated_at' => $item->updatedAtIso,
                     ],
                     $output->items,
                 ),

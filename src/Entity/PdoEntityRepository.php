@@ -20,7 +20,7 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
     {
         $row = $this->query->fetchOne(
             <<<'SQL'
-                SELECT id, entity_type_id, slug, status, published_at, scheduled_at, is_deleted, deleted_at, meta_title, meta_description
+                SELECT id, entity_type_id, slug, status, published_at, scheduled_at, is_deleted, created_at, updated_at, deleted_at, meta_title, meta_description
                 FROM entities
                 WHERE id = ? AND is_deleted = 0
                 SQL,
@@ -38,7 +38,7 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
     {
         $row = $this->query->fetchOne(
             <<<'SQL'
-                SELECT id, entity_type_id, slug, status, published_at, scheduled_at, is_deleted, deleted_at, meta_title, meta_description
+                SELECT id, entity_type_id, slug, status, published_at, scheduled_at, is_deleted, created_at, updated_at, deleted_at, meta_title, meta_description
                 FROM entities
                 WHERE slug = ? AND entity_type_id = ? AND is_deleted = 0
                 SQL,
@@ -99,7 +99,7 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
 
         $rows = $this->query->fetchAll(
             <<<SQL
-                SELECT e.id, e.entity_type_id, e.slug, e.status, e.published_at, e.scheduled_at, e.is_deleted, e.deleted_at, e.meta_title, e.meta_description
+                SELECT e.id, e.entity_type_id, e.slug, e.status, e.published_at, e.scheduled_at, e.is_deleted, e.created_at, e.updated_at, e.deleted_at, e.meta_title, e.meta_description
                 FROM entities e
                 {$titleJoin}
                 WHERE {$where}
@@ -230,8 +230,8 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
         $now = date('Y-m-d H:i:s');
 
         $this->query->execute(
-            'INSERT INTO entities (entity_type_id, slug, status, published_at, scheduled_at, meta_title, meta_description) VALUES (?, ?, ?, ?, ?, ?, ?)',
-            [$entity->entityTypeId, $entity->slug, $entity->status->value, $publishedAt, $scheduledAt, $entity->metaTitle, $entity->metaDescription],
+            'INSERT INTO entities (entity_type_id, slug, status, published_at, scheduled_at, created_at, updated_at, meta_title, meta_description) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [$entity->entityTypeId, $entity->slug, $entity->status->value, $publishedAt, $scheduledAt, $now, $now, $entity->metaTitle, $entity->metaDescription],
         );
 
         $id = $this->query->lastInsertId();
@@ -261,10 +261,10 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
         $this->query->execute(
             <<<'SQL'
                 UPDATE entities
-                SET entity_type_id = ?, slug = ?, status = ?, published_at = ?, scheduled_at = ?, meta_title = ?, meta_description = ?
+                SET entity_type_id = ?, slug = ?, status = ?, published_at = ?, scheduled_at = ?, updated_at = ?, meta_title = ?, meta_description = ?
                 WHERE id = ? AND is_deleted = 0
                 SQL,
-            [$entity->entityTypeId, $entity->slug, $entity->status->value, $publishedAt, $scheduledAt, $entity->metaTitle, $entity->metaDescription, $id],
+            [$entity->entityTypeId, $entity->slug, $entity->status->value, $publishedAt, $scheduledAt, $now, $entity->metaTitle, $entity->metaDescription, $id],
         );
 
         $this->query->execute(
@@ -334,7 +334,7 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
     {
         $rows = $this->query->fetchAll(
             <<<'SQL'
-                SELECT id, entity_type_id, slug, status, published_at, scheduled_at, is_deleted, deleted_at, meta_title, meta_description
+                SELECT id, entity_type_id, slug, status, published_at, scheduled_at, is_deleted, created_at, updated_at, deleted_at, meta_title, meta_description
                 FROM entities
                 WHERE status = 'scheduled' AND scheduled_at <= CURRENT_TIMESTAMP AND is_deleted = 0
                 SQL,
@@ -348,7 +348,7 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
     {
         $rows = $this->query->fetchAll(
             <<<SQL
-                SELECT id, entity_type_id, slug, status, published_at, scheduled_at, is_deleted, deleted_at, meta_title, meta_description
+                SELECT id, entity_type_id, slug, status, published_at, scheduled_at, is_deleted, created_at, updated_at, deleted_at, meta_title, meta_description
                 FROM entities
                 WHERE status = 'published' AND is_deleted = 0
                 ORDER BY published_at DESC
@@ -412,6 +412,12 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
         $scheduledRaw = $row['scheduled_at'] ?? null;
         $scheduledAt = ($scheduledRaw !== null && $scheduledRaw !== '') ? new DateTimeImmutable((string) $scheduledRaw) : null;
 
+        $createdRaw = $row['created_at'] ?? null;
+        $createdAt = ($createdRaw !== null && $createdRaw !== '') ? new DateTimeImmutable((string) $createdRaw) : null;
+
+        $updatedRaw = $row['updated_at'] ?? null;
+        $updatedAt = ($updatedRaw !== null && $updatedRaw !== '') ? new DateTimeImmutable((string) $updatedRaw) : null;
+
         $slugRaw = $row['slug'] ?? null;
         $slug = ($slugRaw !== null && $slugRaw !== '') ? (string) $slugRaw : null;
 
@@ -428,6 +434,8 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
             status: EntityStatus::from((string) ($row['status'] ?? EntityStatus::Draft->value)),
             publishedAt: $publishedAt,
             isDeleted: (bool) (int) $row['is_deleted'],
+            createdAt: $createdAt,
+            updatedAt: $updatedAt,
             deletedAt: $deletedAt,
             metaTitle: $metaTitle,
             metaDescription: $metaDescription,

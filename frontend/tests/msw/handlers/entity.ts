@@ -13,6 +13,8 @@ interface EntityRecord {
   published_at: string | null
   is_deleted: boolean
   deleted_at: string | null
+  created_at: string | null
+  updated_at: string | null
 }
 
 let nextId = 1
@@ -32,6 +34,8 @@ export function seedEntities(
     published_at?: string | null
     is_deleted: boolean
     deleted_at: string | null
+    created_at?: string | null
+    updated_at?: string | null
   }>,
 ): void {
   items = seed.map((item) => ({
@@ -39,6 +43,8 @@ export function seedEntities(
     slug: item.slug ?? null,
     status: item.status ?? 'draft',
     published_at: item.published_at ?? null,
+    created_at: item.created_at ?? null,
+    updated_at: item.updated_at ?? null,
   }))
   nextId = Math.max(0, ...seed.map((item) => item.id)) + 1
 }
@@ -199,6 +205,7 @@ export const entityHandlers = [
       )
     }
 
+    const now = new Date().toISOString()
     const created: EntityRecord = {
       id: nextId++,
       entity_type_id: body.entity_type_id,
@@ -207,6 +214,8 @@ export const entityHandlers = [
       published_at: null,
       is_deleted: false,
       deleted_at: null,
+      created_at: now,
+      updated_at: now,
     }
     items = [...items, created]
 
@@ -252,6 +261,7 @@ export const entityHandlers = [
       slug: body.slug !== undefined ? body.slug : existing.slug,
       status: newStatus,
       published_at: newPublishedAt,
+      updated_at: new Date().toISOString(),
     }
     items = items.map((item, i) => (i === index ? updated : item))
 

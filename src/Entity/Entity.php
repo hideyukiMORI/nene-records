@@ -15,6 +15,8 @@ final readonly class Entity
         public EntityStatus $status = EntityStatus::Draft,
         public ?DateTimeImmutable $publishedAt = null,
         public bool $isDeleted = false,
+        public ?DateTimeImmutable $createdAt = null,
+        public ?DateTimeImmutable $updatedAt = null,
         public ?DateTimeImmutable $deletedAt = null,
         public ?string $metaTitle = null,
         public ?string $metaDescription = null,

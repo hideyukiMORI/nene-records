@@ -2783,6 +2783,8 @@ components:
         - deleted_at
         - meta_title
         - meta_description
+        - created_at
+        - updated_at
       properties:
         id:
           type: integer
@@ -2823,6 +2825,16 @@ components:
           type:
             - string
             - 'null'
+        created_at:
+          type:
+            - string
+            - 'null'
+          format: date-time
+        updated_at:
+          type:
+            - string
+            - 'null'
+          format: date-time
     CreateEntityRequest:
       type: object
       required:
