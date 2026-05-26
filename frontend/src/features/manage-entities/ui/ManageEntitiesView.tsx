@@ -18,6 +18,8 @@ export interface ManageEntitiesViewProps {
   items: Entity[]
   recordLabels: Record<string, string>
   total: number
+  page: number
+  totalPages: number
   availableTags: Tag[]
   relationFieldDefs: RelationFieldDef[]
   selectedTagSlugs: string[]
@@ -39,6 +41,8 @@ export interface ManageEntitiesViewProps {
   onClearRelationFilters: () => void
   onStatusChange: (status: EntityStatus | undefined) => void
   onSearchChange: (q: string) => void
+  onPrevPage: (() => void) | undefined
+  onNextPage: (() => void) | undefined
   onCreate: () => Promise<void>
   onRequestDelete: (entity: Entity) => void
   onCancelDelete: () => void
@@ -52,6 +56,8 @@ export function ManageEntitiesView({
   items,
   recordLabels,
   total,
+  page,
+  totalPages,
   availableTags,
   relationFieldDefs,
   selectedTagSlugs,
@@ -73,6 +79,8 @@ export function ManageEntitiesView({
   onClearRelationFilters,
   onStatusChange,
   onSearchChange,
+  onPrevPage,
+  onNextPage,
   onCreate,
   onRequestDelete,
   onCancelDelete,
@@ -97,14 +105,14 @@ export function ManageEntitiesView({
           </Stack>
           <div className="flex shrink-0 gap-2">
             <a
-              href={buildExportUrl(entityTypeId, 'csv', searchQuery)}
+              href={buildExportUrl(entityTypeId, 'csv', searchQuery, selectedStatus)}
               download="records.csv"
               className="inline-flex items-center gap-1.5 rounded-md border border-border bg-surface-raised px-inline-sm py-stack-xs font-sans text-caption text-text-muted shadow-sm transition-colors hover:text-text-primary"
             >
               ↓ CSV
             </a>
             <a
-              href={buildExportUrl(entityTypeId, 'json', searchQuery)}
+              href={buildExportUrl(entityTypeId, 'json', searchQuery, selectedStatus)}
               download="records.json"
               className="inline-flex items-center gap-1.5 rounded-md border border-border bg-surface-raised px-inline-sm py-stack-xs font-sans text-caption text-text-muted shadow-sm transition-colors hover:text-text-primary"
             >
@@ -206,6 +214,32 @@ export function ManageEntitiesView({
             onRetry={onRetry}
             onDelete={onRequestDelete}
           />
+          {totalPages > 1 || page > 0 ? (
+            <div className="flex items-center justify-between gap-inline-md pt-stack-xs">
+              <Button
+                variant="secondary"
+                size="sm"
+                disabled={onPrevPage === undefined}
+                onClick={onPrevPage}
+              >
+                {t('admin.entityRecords.pagination.prev')}
+              </Button>
+              <Text muted>
+                {t('admin.entityRecords.pagination.page', {
+                  page: page + 1,
+                  total: totalPages,
+                })}
+              </Text>
+              <Button
+                variant="secondary"
+                size="sm"
+                disabled={onNextPage === undefined}
+                onClick={onNextPage}
+              >
+                {t('admin.entityRecords.pagination.next')}
+              </Button>
+            </div>
+          ) : null}
         </Stack>
       </Stack>
       <ConfirmDialog

@@ -128,6 +128,12 @@ export const en = {
   'admin.entityRecords.delete.description': 'Record #{{id}} will be soft-deleted.',
   'admin.entityRecords.statusFilter.label': 'Filter by status',
   'admin.entityRecords.statusFilter.all': 'All',
+  'admin.entityRecords.tagFilter.label': 'Filter by tag',
+  'admin.entityRecords.tagFilter.clear': 'Clear',
+  'admin.entityRecords.tagFilter.hint': 'Showing records with any selected tag.',
+  'admin.entityRecords.pagination.prev': '← Prev',
+  'admin.entityRecords.pagination.next': 'Next →',
+  'admin.entityRecords.pagination.page': 'Page {{page}} / {{total}}',
 
   // ── Field definitions ────────────────────────────────────────────────────
   'admin.fieldDefs.pageTitle': 'Fields',

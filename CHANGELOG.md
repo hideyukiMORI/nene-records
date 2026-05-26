@@ -6,6 +6,18 @@ NeNe Records does not yet follow Semantic Versioning — entries are grouped by 
 
 ---
 
+## [M4 — 機能拡充・使い勝手改善] — 2026-05-26
+
+### Added
+- Admin dashboard — `/api/v1/dashboard` returning recent published entities, today / month access counts, entity type summary (#145, PR #148)
+- IP-based API rate limiting — `ThrottleMiddleware` + `PdoRateLimitStorage`; 120 req/60s default; `429 Too Many Requests` + `Retry-After` / `X-RateLimit-*` headers (#146, PR #149)
+- Multi-language content — `locale` column on `text_fields`; locale filtering on list / create / update APIs (#147, PR #150)
+- Entity list status filter — All / Draft / Published / Scheduled / Archived toggle buttons on the records management screen (#151, PR #153)
+- Locale switcher on field edit screen — Default + per-locale buttons; free-text locale input; locale-aware create / update mutations (#152, PR #153)
+- `scheduled` status badge (blue) on entity list items — previously missing
+
+---
+
 ## [M3 Complete — Headless CMS Platform] — 2026-05-26
 
 ### Added
