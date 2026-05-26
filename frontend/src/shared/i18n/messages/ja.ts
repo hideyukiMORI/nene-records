@@ -491,9 +491,42 @@ export const ja: Partial<MessageCatalog> = {
   'admin.resetPassword.success': 'パスワードがリセットされました。サインインできます。',
   'admin.resetPassword.invalidToken': 'このリセットリンクは無効または期限切れです。',
 
+  // ── Comments (admin) ────────────────────────────────────────────────────
+  'admin.nav.comments': 'コメント',
+  'admin.comments.pageTitle': 'コメント',
+  'admin.comments.description': '読者のコメントを確認・モデレートします。',
+  'admin.comments.loading': 'コメントを読み込み中…',
+  'admin.comments.loadError': 'コメントを読み込めませんでした。',
+  'admin.comments.empty': 'コメントはまだありません',
+  'admin.comments.empty.description': '読者から送信されたコメントがここに表示されます。',
+  'admin.comments.entityId': 'エンティティ #{{id}}',
+  'admin.comments.approved': '承認済み',
+  'admin.comments.pending': '承認待ち',
+  'admin.comments.approve': '承認',
+  'admin.comments.delete': '削除',
+  'admin.comments.approveSuccess': 'コメントを承認しました。',
+  'admin.comments.deleteSuccess': 'コメントを削除しました。',
+  'admin.comments.deleteConfirmTitle': 'コメントを削除しますか？',
+  'admin.comments.deleteConfirmDescription':
+    '{{name}} のコメントを削除しますか？この操作は元に戻せません。',
+
   // ── Public consumer pages ────────────────────────────────────────────────
   'public.record.notFound.title': 'レコードが見つかりません',
   'public.record.notFound.description': 'スラッグ "{{slug}}" のレコードが見つかりません。',
   'public.entityType.notFound.title': '見つかりません',
   'public.entityType.notFound.description': '"{{slug}}" の公開コンテンツが見つかりません。',
+
+  // ── Public comments ──────────────────────────────────────────────────────
+  'public.comments.title': 'コメント',
+  'public.comments.loading': 'コメントを読み込み中…',
+  'public.comments.loadError': 'コメントを読み込めませんでした。',
+  'public.comments.empty': 'まだコメントがありません。最初のコメントを投稿してください！',
+  'public.comments.form.title': 'コメントを書く',
+  'public.comments.form.authorName': 'お名前',
+  'public.comments.form.authorEmail': 'メールアドレス',
+  'public.comments.form.body': 'コメント',
+  'public.comments.form.submit': '送信',
+  'public.comments.form.submitting': '送信中…',
+  'public.comments.form.success': 'コメントを送信しました。承認後に表示されます。',
+  'public.comments.form.error': 'コメントを送信できませんでした。もう一度お試しください。',
 }

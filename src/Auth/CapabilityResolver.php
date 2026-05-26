@@ -72,6 +72,11 @@ final class CapabilityResolver
             return Capability::ManageSettings;
         }
 
+        // Admin comment management endpoints require ManageSettings
+        if (str_starts_with($path, '/api/v1/admin/comments')) {
+            return Capability::ManageSettings;
+        }
+
         foreach (self::CONTENT_MUTATION_PREFIXES as $prefix) {
             if (str_starts_with($path, $prefix) && self::isMutationMethod($method)) {
                 return Capability::EditContent;

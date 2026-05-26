@@ -14,6 +14,9 @@ use NeNeRecords\BoolField\BoolFieldNotFoundExceptionHandler;
 use NeNeRecords\BoolField\BoolFieldServiceProvider;
 use NeNeRecords\BoolField\FieldKeyNotRegisteredExceptionHandler as BoolFieldKeyNotRegisteredExceptionHandler;
 use NeNeRecords\BoolField\FieldTypeMismatchExceptionHandler as BoolFieldTypeMismatchExceptionHandler;
+use NeNeRecords\Comment\CommentNotFoundExceptionHandler;
+use NeNeRecords\Comment\CommentRouteRegistrar;
+use NeNeRecords\Comment\CommentServiceProvider;
 use NeNeRecords\Dashboard\DashboardServiceProvider;
 use NeNeRecords\DateTimeField\DateTimeFieldNotFoundExceptionHandler;
 use NeNeRecords\DateTimeField\DateTimeFieldServiceProvider;
@@ -111,7 +114,8 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
             ->addProvider(new PreviewTokenServiceProvider())
             ->addProvider(new DashboardServiceProvider())
             ->addProvider(new UserServiceProvider())
-            ->addProvider(new UserInviteServiceProvider());
+            ->addProvider(new UserInviteServiceProvider())
+            ->addProvider(new CommentServiceProvider());
 
         $builder
             ->set(
@@ -140,6 +144,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $user = $container->get('nene-records.route_registrar.user');
                     $userInvite = $container->get('nene-records.route_registrar.user_invite');
                     $auth = $container->get('nene-records.route_registrar.auth');
+                    $comment = $container->get(CommentRouteRegistrar::class);
 
                     if (
                         !is_callable($entityType)
@@ -165,6 +170,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         || !is_callable($user)
                         || !is_callable($userInvite)
                         || !is_callable($auth)
+                        || !is_callable($comment)
                     ) {
                         throw new LogicException('Route registrar service is invalid.');
                     }
@@ -193,6 +199,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $dashboard,
                         $user,
                         $userInvite,
+                        $comment,
                     ];
                 },
             )
@@ -248,6 +255,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $invalidCurrentPassword = $container->get(InvalidCurrentPasswordExceptionHandler::class);
                     $invalidInviteToken = $container->get(InvalidInviteTokenExceptionHandler::class);
                     $invalidResetToken = $container->get(InvalidPasswordResetTokenExceptionHandler::class);
+                    $commentNotFound = $container->get(CommentNotFoundExceptionHandler::class);
 
                     foreach ([
                         $entityTypeNotFound,
@@ -299,6 +307,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $invalidCurrentPassword,
                         $invalidInviteToken,
                         $invalidResetToken,
+                        $commentNotFound,
                     ] as $handler) {
                         if (!$handler instanceof DomainExceptionHandlerInterface) {
                             throw new LogicException('Exception handler service is invalid.');
@@ -355,6 +364,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $invalidCurrentPassword,
                         $invalidInviteToken,
                         $invalidResetToken,
+                        $commentNotFound,
                     ];
                 },
             );

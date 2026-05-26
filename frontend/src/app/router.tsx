@@ -17,6 +17,7 @@ import { NavigationPage } from '@/pages/navigation/NavigationPage'
 import { NotFoundPage } from '@/pages/not-found/NotFoundPage'
 import { ResetPasswordPage } from '@/pages/reset-password/ResetPasswordPage'
 import { SiteSettingsPage } from '@/pages/settings/SiteSettingsPage'
+import { CommentsPage } from '@/pages/comments/CommentsPage'
 import { UsersPage } from '@/pages/users/UsersPage'
 import { WebhooksPage } from '@/pages/webhooks/WebhooksPage'
 import { TagsPage } from '@/pages/tags/TagsPage'
@@ -59,6 +60,7 @@ const router = createBrowserRouter([
       { index: true, element: <HomePage /> },
       { path: 'entity-types', element: <EntityTypesPage /> },
       { path: 'tags', element: <TagsPage /> },
+      { path: 'comments', element: <CommentsPage /> },
       { path: 'navigation', element: <NavigationPage /> },
       { path: 'media', element: <MediaPage /> },
       { path: 'webhooks', element: <WebhooksPage /> },
