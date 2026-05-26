@@ -16,7 +16,7 @@ function renderDetailPage(entityTypeSlug = 'article', entityId = 1) {
   return renderWithProviders(
     <MemoryRouter initialEntries={[`/${entityTypeSlug}/${String(entityId)}`]}>
       <Routes>
-        <Route path="/:entityTypeSlug/:entityId" element={<PublicRecordDetailPage />} />
+        <Route path="/:entityTypeSlug/*" element={<PublicRecordDetailPage />} />
       </Routes>
     </MemoryRouter>,
   )

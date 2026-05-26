@@ -2707,6 +2707,15 @@ components:
           type: string
         is_pinned:
           type: boolean
+        permalink_pattern:
+          type: string
+          nullable: true
+          description: 'URL pattern for public records. Tokens: {type} {slug} {id} {year} {month} {day}. Null = default "/{type}/{id}".'
+          example: '/{type}/{slug}'
+        previous_permalink_pattern:
+          type: string
+          nullable: true
+          description: 'Previous URL pattern, automatically saved when permalink_pattern changes. Used to redirect old URLs.'
     CreateEntityTypeRequest:
       type: object
       required:
@@ -2723,7 +2732,28 @@ components:
           type: boolean
       additionalProperties: false
     UpdateEntityTypeRequest:
-      $ref: '#/components/schemas/CreateEntityTypeRequest'
+      type: object
+      required:
+        - name
+        - slug
+      properties:
+        name:
+          type: string
+          minLength: 1
+        slug:
+          type: string
+          pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$'
+        is_pinned:
+          type: boolean
+        labels:
+          type: object
+          additionalProperties:
+            type: string
+        permalink_pattern:
+          type: string
+          nullable: true
+          description: 'URL pattern. Must contain {slug} or {id}. Must start with /.'
+      additionalProperties: false
     EntityTypeListResponse:
       type: object
       required:

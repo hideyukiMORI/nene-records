@@ -19,6 +19,8 @@ export function mapEntityTypeDtoToModel(dto: EntityTypeDto): EntityType {
     slug: dto.slug,
     isPinned: dto.is_pinned,
     labels: dto.labels && Object.keys(dto.labels).length > 0 ? dto.labels : undefined,
+    permalinkPattern: dto.permalink_pattern ?? null,
+    previousPermalinkPattern: dto.previous_permalink_pattern ?? null,
   }
 }
 
@@ -44,5 +46,6 @@ export function mapUpdateInputToDto(input: UpdateEntityTypeInput): UpdateEntityT
     slug: input.slug,
     is_pinned: input.isPinned ?? false,
     labels: input.labels,
+    permalink_pattern: input.permalinkPattern,
   }
 }

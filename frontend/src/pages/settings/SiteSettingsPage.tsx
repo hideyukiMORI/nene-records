@@ -1,5 +1,5 @@
 import { ManageSiteSettingsView } from '@/features/manage-settings'
-import { AppearanceView } from '@/features/manage-appearance'
+import { AppearanceView, PermalinkSettingsView } from '@/features/manage-appearance'
 import { currentUserHasCapability } from '@/entities/auth'
 import { useTranslation } from '@/shared/i18n'
 import { Stack, Text } from '@/shared/ui'
@@ -16,6 +16,7 @@ export function SiteSettingsPage() {
         <Text muted>{t('admin.settings.description')}</Text>
       </Stack>
       <AppearanceView />
+      <PermalinkSettingsView />
       <ManageSiteSettingsView canManageSettings={canManageSettings} />
     </Stack>
   )

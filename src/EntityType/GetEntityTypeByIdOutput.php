@@ -15,6 +15,8 @@ final readonly class GetEntityTypeByIdOutput
         public string $slug,
         public bool $isPinned,
         public ?array $labels = null,
+        public ?string $permalinkPattern = null,
+        public ?string $previousPermalinkPattern = null,
     ) {
     }
 }

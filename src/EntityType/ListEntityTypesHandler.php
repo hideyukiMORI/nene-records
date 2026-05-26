@@ -28,11 +28,13 @@ final readonly class ListEntityTypesHandler
             (new PaginationResponse(
                 items: array_map(
                     static fn (ListEntityTypeItem $item) => [
-                        'id' => $item->id,
-                        'name' => $item->name,
-                        'slug' => $item->slug,
-                        'is_pinned' => $item->isPinned,
-                        'labels' => $item->labels ?? new \stdClass(),
+                        'id'                          => $item->id,
+                        'name'                        => $item->name,
+                        'slug'                        => $item->slug,
+                        'is_pinned'                   => $item->isPinned,
+                        'labels'                      => $item->labels ?? new \stdClass(),
+                        'permalink_pattern'           => $item->permalinkPattern,
+                        'previous_permalink_pattern'  => $item->previousPermalinkPattern,
                     ],
                     $output->items,
                 ),

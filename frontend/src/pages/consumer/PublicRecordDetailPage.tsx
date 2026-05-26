@@ -1,12 +1,44 @@
 import { useMemo } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, Navigate, useLocation, useParams } from 'react-router-dom'
+import { toEntityId, useEntity } from '@/entities/entity'
 import { useEntityTypeList } from '@/entities/entity-type'
 import {
   PublicRecordDetailView,
   usePublicViewEntityRecordPage,
 } from '@/features/public-view-entity-record'
 import { findEntityTypeBySlug } from '@/shared/lib/find-entity-type-by-slug'
+import {
+  DEFAULT_PERMALINK_PATTERN,
+  extractEntityKeyFromSplat,
+  resolvePermalink,
+} from '@/shared/lib/resolve-permalink'
 import { Button, EmptyState, Stack, Text } from '@/shared/ui'
+import { useEntityIdBySlug } from './hooks/use-entity-id-by-slug'
+
+// ── Canonical redirect helper ─────────────────────────────────────────────────
+
+/**
+ * Compare the current URL to the entity's canonical URL.
+ * Returns the canonical URL if they differ (→ redirect needed), otherwise null.
+ */
+function useCanonicalRedirect(
+  pattern: string | null | undefined,
+  entityTypeSlug: string,
+  entityId: number,
+  entitySlug: string | null,
+  publishedAt: string | null,
+): string | null {
+  const { pathname } = useLocation()
+  const canonical = resolvePermalink(pattern ?? DEFAULT_PERMALINK_PATTERN, {
+    typeSlug: entityTypeSlug,
+    entitySlug,
+    entityId,
+    publishedAt,
+  })
+  return pathname !== canonical ? canonical : null
+}
+
+// ── Content renderer (entity already resolved to a numeric ID) ────────────────
 
 function PublicRecordDetailContent({
   entityTypeSlug,
@@ -14,15 +46,30 @@ function PublicRecordDetailContent({
   entityTypeId,
   entityId,
   entityTypeSlugById,
+  currentPattern,
 }: {
   entityTypeSlug: string
   entityTypeName: string
   entityTypeId: number
   entityId: number
   entityTypeSlugById: Record<number, string>
+  currentPattern: string | null | undefined
 }) {
   const { entity, fieldRows, isLoading, isError, errorTitle, refetch } =
     usePublicViewEntityRecordPage(entityTypeId, entityId)
+
+  // Redirect if the current URL doesn't match the canonical URL for this entity.
+  // This handles pattern changes (e.g. /{type}/{id} → /{type}/{slug}) transparently.
+  const redirect = useCanonicalRedirect(
+    currentPattern,
+    entityTypeSlug,
+    entityId,
+    entity?.slug ?? null,
+    entity?.publishedAt ?? null,
+  )
+  if (!isLoading && !isError && entity !== null && redirect !== null) {
+    return <Navigate to={redirect} replace />
+  }
 
   return (
     <Stack gap="md">
@@ -51,9 +98,155 @@ function PublicRecordDetailContent({
   )
 }
 
+// ── Slug → ID resolver with old-pattern fallback ──────────────────────────────
+
+/**
+ * Resolves a slug (from the current pattern) to an entity ID.
+ * If not found, tries the previous permalink pattern's key as a fallback.
+ * Returns null when neither lookup finds anything.
+ */
+function useEntityIdWithFallback(
+  entityTypeId: number,
+  currentSlug: string,
+  previousPattern: string | null | undefined,
+  splat: string,
+): { entityId: number | null; isLoading: boolean; isError: boolean } {
+  // Primary: look up by slug
+  const primary = useEntityIdBySlug(entityTypeId, currentSlug)
+
+  // Fallback key from previous pattern (only when primary fails)
+  const previousKey = useMemo(
+    () => (previousPattern != null ? extractEntityKeyFromSplat(previousPattern, splat) : null),
+    [previousPattern, splat],
+  )
+  const fallbackId = previousKey?.kind === 'id' ? previousKey.id : null
+  const fallbackSlug = previousKey?.kind === 'slug' ? previousKey.slug : ''
+
+  // Fetch the fallback entity by ID (only when primary slug not found and fallback is ID-based)
+  const fallbackEntityQuery = useEntity(toEntityId(fallbackId ?? 0), {
+    enabled: primary.entityId === null && !primary.isLoading && fallbackId !== null,
+  })
+
+  // Fallback slug lookup (only when primary slug not found and fallback is slug-based)
+  const fallbackSlugQuery = useEntityIdBySlug(entityTypeId, fallbackSlug)
+  // Only use fallback slug result when primary has finished and returned nothing
+  const useFallbackSlug =
+    primary.entityId === null && !primary.isLoading && previousKey?.kind === 'slug'
+
+  if (primary.isLoading) return { entityId: null, isLoading: true, isError: false }
+  if (primary.entityId !== null)
+    return { entityId: primary.entityId, isLoading: false, isError: false }
+
+  // Primary failed — check fallback
+  if (fallbackId !== null) {
+    if (fallbackEntityQuery.isLoading) return { entityId: null, isLoading: true, isError: false }
+    if (fallbackEntityQuery.data !== undefined) {
+      return { entityId: Number(fallbackEntityQuery.data.id), isLoading: false, isError: false }
+    }
+    return { entityId: null, isLoading: false, isError: false }
+  }
+
+  if (useFallbackSlug) {
+    if (fallbackSlugQuery.isLoading) return { entityId: null, isLoading: true, isError: false }
+    if (fallbackSlugQuery.entityId !== null) {
+      return { entityId: fallbackSlugQuery.entityId, isLoading: false, isError: false }
+    }
+  }
+
+  return { entityId: null, isLoading: false, isError: primary.isError }
+}
+
+// ── Slug-based entry (uses hook above) ───────────────────────────────────────
+
+function PublicRecordDetailBySlug({
+  entityTypeSlug,
+  entityTypeName,
+  entityTypeId,
+  entitySlug,
+  entityTypeSlugById,
+  currentPattern,
+  previousPattern,
+  splat,
+}: {
+  entityTypeSlug: string
+  entityTypeName: string
+  entityTypeId: number
+  entitySlug: string
+  entityTypeSlugById: Record<number, string>
+  currentPattern: string | null | undefined
+  previousPattern: string | null | undefined
+  splat: string
+}) {
+  const { entityId, isLoading, isError } = useEntityIdWithFallback(
+    entityTypeId,
+    entitySlug,
+    previousPattern,
+    splat,
+  )
+
+  if (isLoading) return <Text muted>Loading…</Text>
+  if (isError || entityId === null) {
+    return (
+      <EmptyState title="Record not found" description={`No record with slug "${entitySlug}".`} />
+    )
+  }
+
+  return (
+    <PublicRecordDetailContent
+      entityTypeSlug={entityTypeSlug}
+      entityTypeName={entityTypeName}
+      entityTypeId={entityTypeId}
+      entityId={entityId}
+      entityTypeSlugById={entityTypeSlugById}
+      currentPattern={currentPattern}
+    />
+  )
+}
+
+// ── ID-based entry with old-pattern fallback ──────────────────────────────────
+
+/**
+ * Fetch the entity by ID with a fallback to the previous slug-pattern key.
+ * Covers the case where the old URL used /{type}/{id} but the new pattern is slug-based.
+ */
+// Note: when the current pattern is ID-based but an old URL uses a slug
+// (e.g. /posts/my-article), extractEntityKeyFromSplat returns kind:'slug' so
+// it goes to PublicRecordDetailBySlug, not here. This component only handles
+// the case where the current key is already a numeric ID.
+// The canonical-URL redirect in PublicRecordDetailContent handles any pattern
+// changes that keep the same key type (id→id or slug→slug).
+function PublicRecordDetailById({
+  entityTypeSlug,
+  entityTypeName,
+  entityTypeId,
+  entityId,
+  entityTypeSlugById,
+  currentPattern,
+}: {
+  entityTypeSlug: string
+  entityTypeName: string
+  entityTypeId: number
+  entityId: number
+  entityTypeSlugById: Record<number, string>
+  currentPattern: string | null | undefined
+}) {
+  return (
+    <PublicRecordDetailContent
+      entityTypeSlug={entityTypeSlug}
+      entityTypeName={entityTypeName}
+      entityTypeId={entityTypeId}
+      entityId={entityId}
+      entityTypeSlugById={entityTypeSlugById}
+      currentPattern={currentPattern}
+    />
+  )
+}
+
+// ── Page root ─────────────────────────────────────────────────────────────────
+
 export function PublicRecordDetailPage() {
-  const { entityTypeSlug = '', entityId: entityIdParam = '' } = useParams()
-  const entityId = Number(entityIdParam)
+  // React Router v6: splat param is '*'
+  const { entityTypeSlug = '', '*': splat = '' } = useParams()
 
   const entityTypeQuery = useEntityTypeList({ limit: 100, offset: 0 })
   const entityType = useMemo(
@@ -81,13 +274,32 @@ export function PublicRecordDetailPage() {
     )
   }
 
+  const entityTypeId = Number(entityType.id)
+  const key = extractEntityKeyFromSplat(entityType.permalinkPattern, splat)
+
+  if (key.kind === 'id') {
+    return (
+      <PublicRecordDetailById
+        entityTypeSlug={entityTypeSlug}
+        entityTypeName={entityType.name}
+        entityTypeId={entityTypeId}
+        entityId={key.id}
+        entityTypeSlugById={entityTypeSlugById}
+        currentPattern={entityType.permalinkPattern}
+      />
+    )
+  }
+
   return (
-    <PublicRecordDetailContent
+    <PublicRecordDetailBySlug
       entityTypeSlug={entityTypeSlug}
       entityTypeName={entityType.name}
-      entityTypeId={Number(entityType.id)}
-      entityId={entityId}
+      entityTypeId={entityTypeId}
+      entitySlug={key.slug}
       entityTypeSlugById={entityTypeSlugById}
+      currentPattern={entityType.permalinkPattern}
+      previousPattern={entityType.previousPermalinkPattern}
+      splat={splat}
     />
   )
 }

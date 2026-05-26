@@ -7,6 +7,14 @@ export interface EntityType {
   isPinned: boolean
   /** Locale-keyed display names. Empty object / undefined = no overrides. */
   labels?: Record<string, string>
+  /**
+   * URL pattern for public records.
+   * Tokens: {type} {slug} {id} {year} {month} {day}
+   * Undefined/null = use default "/{type}/{id}".
+   */
+  permalinkPattern?: string | null
+  /** Previous URL pattern — saved when permalink_pattern changes. Used to redirect old URLs. */
+  previousPermalinkPattern?: string | null
 }
 
 export interface EntityTypeList {
@@ -26,4 +34,5 @@ export interface UpdateEntityTypeInput {
   slug: string
   isPinned?: boolean
   labels?: Record<string, string>
+  permalinkPattern?: string | null
 }

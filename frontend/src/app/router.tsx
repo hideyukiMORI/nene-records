@@ -67,7 +67,9 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <PublicIndexPage /> },
       { path: ':entityTypeSlug', element: <PublicBrowsePage /> },
-      { path: ':entityTypeSlug/:entityId', element: <PublicRecordDetailPage /> },
+      // Wildcard captures any permalink pattern after the entity type slug
+      // e.g. /posts/42, /posts/my-article, /posts/2024/01/my-article
+      { path: ':entityTypeSlug/*', element: <PublicRecordDetailPage /> },
     ],
   },
   {

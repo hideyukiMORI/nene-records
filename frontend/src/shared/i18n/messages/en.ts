@@ -123,6 +123,16 @@ export const en = {
   'admin.entityTypes.editForm.labels.title': 'Display names',
   'admin.entityTypes.editForm.labels.description':
     'Optionally override the display name for each language. Leave blank to use the base name.',
+  'admin.entityTypes.editForm.permalink.title': 'Permalink',
+  'admin.entityTypes.editForm.permalink.description':
+    'Choose the URL structure for public records of this content type.',
+  'admin.entityTypes.editForm.permalink.custom': 'Custom structure',
+  'admin.entityTypes.editForm.permalink.customPlaceholder': 'e.g. /{type}/{year}/{month}/{slug}',
+  'admin.entityTypes.editForm.permalink.customHelp':
+    'Available tokens: {type}, {slug}, {id}, {year}, {month}, {day}',
+  'admin.entityTypes.editForm.permalink.example': 'Example: {{example}}',
+  'admin.entityTypes.editForm.permalink.noTypeWarning':
+    'Pattern does not include {type} — URLs from different content types may collide.',
   'admin.entityTypes.delete.title': 'Delete content type?',
   'admin.entityTypes.delete.description': '"{{name}}" will be removed. This cannot be undone.',
   'admin.entityTypes.actions.fields': 'Fields',
@@ -335,6 +345,9 @@ export const en = {
 
   // ── Settings ──────────────────────────────────────────────────────────────
   'admin.settings.appearance.title': 'Appearance',
+  'admin.settings.permalink.title': 'Permalinks',
+  'admin.settings.permalink.description':
+    'Choose the URL structure for each content type. Changes take effect immediately; old URLs redirect automatically.',
 
   'admin.settings.pageTitle': 'Site settings',
   'admin.settings.description':

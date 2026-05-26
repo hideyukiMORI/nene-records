@@ -7,8 +7,10 @@ namespace NeNeRecords\EntityType;
 final readonly class EntityType
 {
     /**
-     * @param array<string, string>|null $labels Locale-keyed display names, e.g. {"ja":"投稿","fr":"Articles"}.
-     *                                            Null means no overrides; `$name` is used as fallback.
+     * @param array<string, string>|null $labels             Locale-keyed display names.
+     * @param string|null                $permalinkPattern   URL pattern for public records.
+     *                                                        Tokens: {type} {slug} {id} {year} {month} {day}
+     *                                                        Null = use default "/{type}/{id}".
      */
     public function __construct(
         public string $name,
@@ -16,6 +18,8 @@ final readonly class EntityType
         public bool $isPinned = false,
         public ?int $id = null,
         public ?array $labels = null,
+        public ?string $permalinkPattern = null,
+        public ?string $previousPermalinkPattern = null,
     ) {
     }
 }

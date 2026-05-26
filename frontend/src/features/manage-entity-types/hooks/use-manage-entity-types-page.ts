@@ -43,6 +43,11 @@ export function useManageEntityTypesPage() {
       }
 
       const labels = formValuesToLabels(values)
+
+      // Normalize: empty string → null (use backend default)
+      const rawPermalink = values.permalinkPattern
+      const permalinkPattern = rawPermalink === '' || rawPermalink == null ? null : rawPermalink
+
       await updateMutation.mutateAsync({
         id: editTarget.id,
         input: {
@@ -50,6 +55,7 @@ export function useManageEntityTypesPage() {
           slug: values.slug,
           isPinned: values.isPinned,
           labels: Object.keys(labels).length > 0 ? labels : undefined,
+          permalinkPattern,
         },
       })
       setEditTarget(null)

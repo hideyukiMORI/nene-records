@@ -27,7 +27,15 @@ final class InMemoryEntityTypeRepository implements EntityTypeRepositoryInterfac
         foreach ($seed as $entityType) {
             if ($entityType->id !== null) {
                 $id = $entityType->id;
-                $stored = new EntityType(name: $entityType->name, slug: $entityType->slug, isPinned: $entityType->isPinned, id: $id);
+                $stored = new EntityType(
+                    name: $entityType->name,
+                    slug: $entityType->slug,
+                    isPinned: $entityType->isPinned,
+                    id: $id,
+                    labels: $entityType->labels,
+                    permalinkPattern: $entityType->permalinkPattern,
+                    previousPermalinkPattern: $entityType->previousPermalinkPattern,
+                );
                 $this->byId[$id] = $stored;
                 $this->slugToId[$stored->slug] = $id;
                 $this->nextId = max($this->nextId, $id + 1);
@@ -63,7 +71,15 @@ final class InMemoryEntityTypeRepository implements EntityTypeRepositoryInterfac
     public function save(EntityType $entityType): int
     {
         $id = $this->nextId++;
-        $stored = new EntityType(name: $entityType->name, slug: $entityType->slug, isPinned: $entityType->isPinned, id: $id);
+        $stored = new EntityType(
+            name: $entityType->name,
+            slug: $entityType->slug,
+            isPinned: $entityType->isPinned,
+            id: $id,
+            labels: $entityType->labels,
+            permalinkPattern: $entityType->permalinkPattern,
+            previousPermalinkPattern: $entityType->previousPermalinkPattern,
+        );
         $this->byId[$id] = $stored;
         $this->slugToId[$stored->slug] = $id;
 

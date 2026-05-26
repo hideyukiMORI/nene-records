@@ -54,9 +54,13 @@ export function useEntityList(
   })
 }
 
-export function useEntity(id: EntityId): UseQueryResult<Entity, AppError> {
+export function useEntity(
+  id: EntityId,
+  options?: { enabled?: boolean },
+): UseQueryResult<Entity, AppError> {
   return useQuery({
     queryKey: entityKeys.detail(id),
+    enabled: options?.enabled ?? true,
     queryFn: async ({ signal }) => {
       const dto = await apiClient.get<EntityDto>(`/api/v1/entities/${String(id)}`, signal)
       return mapEntityDtoToModel(dto)
