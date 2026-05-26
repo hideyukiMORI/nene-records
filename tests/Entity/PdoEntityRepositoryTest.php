@@ -171,9 +171,10 @@ final class PdoEntityRepositoryTest extends TestCase
 
         $list = $repository->findAll(2, 2);
 
+        // findAll は id DESC 順（新しい順）。ids: 5,4,3,2,1 → offset=2,limit=2 → [3,2]
         self::assertCount(2, $list);
         self::assertSame(3, $list[0]->id);
-        self::assertSame(4, $list[1]->id);
+        self::assertSame(2, $list[1]->id);
     }
 
     public function testFindByCriteriaFiltersByEntityTypeId(): void
