@@ -12,6 +12,7 @@ use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use Psr\Container\ContainerInterface;
+use Psr\Http\Message\ResponseFactoryInterface;
 
 final readonly class SettingServiceProvider implements ServiceProviderInterface
 {
@@ -100,6 +101,7 @@ final readonly class SettingServiceProvider implements ServiceProviderInterface
                 static function (ContainerInterface $container): ListPublicSettingsHandler {
                     $useCase = $container->get(ListPublicSettingsUseCaseInterface::class);
                     $response = $container->get(JsonResponseFactory::class);
+                    $responseFactory = $container->get(ResponseFactoryInterface::class);
 
                     if (!$useCase instanceof ListPublicSettingsUseCaseInterface) {
                         throw new LogicException('ListPublicSettings use case service is invalid.');
@@ -109,7 +111,11 @@ final readonly class SettingServiceProvider implements ServiceProviderInterface
                         throw new LogicException('JSON response factory service is invalid.');
                     }
 
-                    return new ListPublicSettingsHandler($useCase, $response);
+                    if (!$responseFactory instanceof ResponseFactoryInterface) {
+                        throw new LogicException('Response factory service is invalid.');
+                    }
+
+                    return new ListPublicSettingsHandler($useCase, $response, $responseFactory);
                 },
             )
             ->set(

@@ -11,6 +11,7 @@ final readonly class NavigationItemRouteRegistrar
 {
     public function __construct(
         private ListNavigationItemsHandler $listHandler,
+        private ListPublicNavigationItemsHandler $listPublicHandler,
         private CreateNavigationItemHandler $createHandler,
         private UpdateNavigationItemHandler $updateHandler,
         private DeleteNavigationItemHandler $deleteHandler,
@@ -20,6 +21,7 @@ final readonly class NavigationItemRouteRegistrar
     public function __invoke(Router $router): void
     {
         $list = $this->listHandler;
+        $listPublic = $this->listPublicHandler;
         $create = $this->createHandler;
         $update = $this->updateHandler;
         $delete = $this->deleteHandler;
@@ -43,7 +45,7 @@ final readonly class NavigationItemRouteRegistrar
         // Public endpoint (no auth required via ALWAYS_OPEN_PREFIXES)
         $router->get(
             '/api/v1/public/navigation-items',
-            static fn (ServerRequestInterface $request) => $list->handle($request),
+            static fn (ServerRequestInterface $request) => $listPublic->handle($request),
         );
     }
 }

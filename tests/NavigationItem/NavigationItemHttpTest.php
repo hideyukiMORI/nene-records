@@ -13,6 +13,7 @@ use NeNeRecords\NavigationItem\DeleteNavigationItemHandler;
 use NeNeRecords\NavigationItem\DeleteNavigationItemUseCase;
 use NeNeRecords\NavigationItem\ListNavigationItemsHandler;
 use NeNeRecords\NavigationItem\ListNavigationItemsUseCase;
+use NeNeRecords\NavigationItem\ListPublicNavigationItemsHandler;
 use NeNeRecords\NavigationItem\NavigationItemNotFoundExceptionHandler;
 use NeNeRecords\NavigationItem\NavigationItemRouteRegistrar;
 use NeNeRecords\NavigationItem\UpdateNavigationItemHandler;
@@ -38,8 +39,11 @@ final class NavigationItemHttpTest extends TestCase
         $jsonResponse = new JsonResponseFactory($this->factory, $this->factory);
         $problemDetails = new ProblemDetailsResponseFactory($this->factory, $this->factory);
 
+        $useCase = new ListNavigationItemsUseCase($this->repository);
+
         $registrar = new NavigationItemRouteRegistrar(
-            new ListNavigationItemsHandler(new ListNavigationItemsUseCase($this->repository), $jsonResponse),
+            new ListNavigationItemsHandler($useCase, $jsonResponse),
+            new ListPublicNavigationItemsHandler($useCase, $jsonResponse, $this->factory),
             new CreateNavigationItemHandler(new CreateNavigationItemUseCase($this->repository), $jsonResponse),
             new UpdateNavigationItemHandler(new UpdateNavigationItemUseCase($this->repository), $jsonResponse),
             new DeleteNavigationItemHandler(new DeleteNavigationItemUseCase($this->repository), $jsonResponse),
