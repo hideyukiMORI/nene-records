@@ -8,4 +8,4 @@ export type {
 } from './model'
 export { entityTypeKeys } from './query-keys'
 export { useCreateEntityType, useDeleteEntityType, useUpdateEntityType } from './mutations'
-export { useEntityType, useEntityTypeList } from './queries'
+export { useEntityType, useEntityTypeList, usePinnedEntityTypes } from './queries'

@@ -63,10 +63,13 @@ export const ja: Partial<MessageCatalog> = {
     'サインインしていますが、このアクションを実行する権限がありません。',
 
   // ── Home ─────────────────────────────────────────────────────────────────
-  'admin.home.title': '管理ダッシュボード',
-  'admin.home.description':
-    'Phase 4 スキャフォールドが実行中です。エンティティタイプを使用して TanStack Query 経由の API 連携を確認してください。',
+  'admin.home.title': 'ダッシュボード',
+  'admin.home.description': 'NeNe Records へようこそ。',
   'admin.home.openPublicSite': 'パブリックサイトを開く →',
+  'admin.home.quickAccess': 'クイックアクセス',
+  'admin.home.quickAccess.description': 'コンテンツを管理する',
+  'admin.home.quickAccess.manage': '管理する',
+  'admin.home.quickAccess.empty': 'ピン留めされたコンテンツタイプがありません。コンテンツタイプの設定からピン留めを有効にしてください。',
   'admin.home.dashboard.todayAccess': '本日のアクセス数',
   'admin.home.dashboard.monthAccess': '今月のアクセス数',
   'admin.home.dashboard.recentPublished': '最近公開されたコンテンツ',

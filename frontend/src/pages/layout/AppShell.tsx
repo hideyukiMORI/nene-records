@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import { authStore, currentUserHasCapability } from '@/entities/auth'
+import { usePinnedEntityTypes } from '@/entities/entity-type'
 import { LOCALES, SUPPORTED_LOCALE_IDS, useTranslation } from '@/shared/i18n'
 import { useTheme } from '@/shared/theme'
 import {
@@ -17,6 +18,7 @@ import {
   IconMenu,
   IconX,
   IconChevronRight,
+  IconFileText,
 } from '@/shared/ui/icons/Icons'
 
 interface NavItemProps {
@@ -77,6 +79,8 @@ export function AppShell() {
   const canManageSettings = currentUserHasCapability('manage_settings')
 
   const [advancedOpen, setAdvancedOpen] = useState(false)
+  const pinnedEntityTypesQuery = usePinnedEntityTypes()
+  const pinnedEntityTypes = pinnedEntityTypesQuery.data ?? []
 
   const closeSidebar = () => {
     setSidebarOpen(false)
@@ -155,6 +159,20 @@ export function AppShell() {
                 onClick={closeSidebar}
               />
             </li>
+            {/* ── Pinned content types (dynamic) ── */}
+            {pinnedEntityTypes.map((entityType) => (
+              <li key={entityType.id}>
+                <NavItem
+                  to={`/entity-types/${String(entityType.id)}/entities`}
+                  icon={<IconFileText size={16} />}
+                  label={entityType.name}
+                  onClick={closeSidebar}
+                />
+              </li>
+            ))}
+            {pinnedEntityTypes.length > 0 && (
+              <li aria-hidden="true" className="my-2 border-t border-sidebar-border opacity-50" />
+            )}
             <li>
               <NavItem
                 to="/entity-types"

@@ -70,10 +70,13 @@ export const en = {
     'You are signed in, but your account does not have permission to perform this action.',
 
   // ── Home page ────────────────────────────────────────────────────────────
-  'admin.home.title': 'Admin dashboard',
-  'admin.home.description':
-    'Phase 4 scaffold is running. Use Entity types to verify API integration via TanStack Query.',
+  'admin.home.title': 'Dashboard',
+  'admin.home.description': 'Welcome to NeNe Records.',
   'admin.home.openPublicSite': 'Open public site →',
+  'admin.home.quickAccess': 'Quick access',
+  'admin.home.quickAccess.description': 'Manage your content',
+  'admin.home.quickAccess.manage': 'Manage',
+  'admin.home.quickAccess.empty': 'No pinned content types yet. Pin a content type from the Content types settings to get started.',
   'admin.home.dashboard.todayAccess': "Today's accesses",
   'admin.home.dashboard.monthAccess': "This month's accesses",
   'admin.home.dashboard.recentPublished': 'Recently published',
