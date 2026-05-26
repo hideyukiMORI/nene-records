@@ -140,6 +140,9 @@ describe('EntityRecordsPage', () => {
     expect(await screen.findByText('Item #1')).toBeInTheDocument()
     expect(screen.getByText('Item #2')).toBeInTheDocument()
 
+    // 絞り込みアコーディオンを開く
+    await user.click(screen.getByRole('button', { name: /絞り込み|Filters/ }))
+
     await user.click(screen.getByRole('button', { name: 'Featured' }))
 
     await waitFor(() => {
@@ -166,6 +169,9 @@ describe('EntityRecordsPage', () => {
     renderRecordsPage()
 
     expect(await screen.findByText('Item #1')).toBeInTheDocument()
+
+    // 絞り込みアコーディオンを開く
+    await user.click(screen.getByRole('button', { name: /絞り込み|Filters/ }))
 
     await user.click(screen.getByRole('button', { name: 'Featured' }))
 
@@ -205,6 +211,9 @@ describe('EntityRecordsPage', () => {
 
     expect(await screen.findByText('Item #1')).toBeInTheDocument()
     expect(screen.getByText('Item #2')).toBeInTheDocument()
+
+    // 絞り込みアコーディオンを開く
+    await user.click(screen.getByRole('button', { name: /絞り込み|Filters/ }))
 
     await user.selectOptions(await screen.findByLabelText('author'), '10')
 
@@ -247,6 +256,9 @@ describe('EntityRecordsPage', () => {
     renderRecordsPage()
 
     expect(await screen.findByText('Item #1')).toBeInTheDocument()
+
+    // 絞り込みアコーディオンを開く
+    await user.click(screen.getByRole('button', { name: /絞り込み|Filters/ }))
 
     await user.selectOptions(await screen.findByLabelText('author'), '10')
 

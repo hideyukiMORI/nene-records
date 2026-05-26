@@ -267,6 +267,22 @@ paths:
             type: string
             minLength: 1
           description: Full-text search across slug and text field values (partial match).
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [id, published_at, title]
+            default: id
+          description: Sort key. `title` joins the `title` text field value.
+        - name: order
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+          description: Sort direction.
       responses:
         '200':
           description: Paginated entity list.

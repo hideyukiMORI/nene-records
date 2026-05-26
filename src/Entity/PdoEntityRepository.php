@@ -89,21 +89,40 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
     public function findByCriteria(EntityListCriteria $criteria, int $limit, int $offset): array
     {
         [$where, $params] = $this->buildCriteriaWhere($criteria);
+        $orderBy = $this->buildOrderBy($criteria);
         $params[] = $limit;
         $params[] = $offset;
+
+        $titleJoin = $criteria->sortKey === EntitySortKey::Title
+            ? "LEFT JOIN text_fields tf_sort ON tf_sort.entity_id = e.id AND tf_sort.field_key = 'title' AND tf_sort.is_deleted = 0"
+            : '';
 
         $rows = $this->query->fetchAll(
             <<<SQL
                 SELECT e.id, e.entity_type_id, e.slug, e.status, e.published_at, e.scheduled_at, e.is_deleted, e.deleted_at, e.meta_title, e.meta_description
                 FROM entities e
+                {$titleJoin}
                 WHERE {$where}
-                ORDER BY e.id DESC
+                {$orderBy}
                 LIMIT ? OFFSET ?
                 SQL,
             $params,
         );
 
         return array_map(fn (array $row) => $this->mapRow($row), $rows);
+    }
+
+    private function buildOrderBy(EntityListCriteria $criteria): string
+    {
+        $dir = $criteria->sortOrder === EntitySortOrder::Asc ? 'ASC' : 'DESC';
+
+        return match ($criteria->sortKey) {
+            EntitySortKey::Id => "ORDER BY e.id {$dir}",
+            EntitySortKey::PublishedAt => $criteria->sortOrder === EntitySortOrder::Asc
+                ? 'ORDER BY e.published_at IS NULL ASC, e.published_at ASC'
+                : 'ORDER BY e.published_at IS NULL DESC, e.published_at DESC',
+            EntitySortKey::Title => "ORDER BY COALESCE(tf_sort.value, '') {$dir}, e.id DESC",
+        };
     }
 
     public function countByCriteria(EntityListCriteria $criteria): int

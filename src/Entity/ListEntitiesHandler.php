@@ -36,6 +36,12 @@ final readonly class ListEntitiesHandler
         $rawQ = $request->getQueryParams()['q'] ?? null;
         $q = (is_string($rawQ) && $rawQ !== '') ? $rawQ : null;
 
+        $rawSort = $request->getQueryParams()['sort'] ?? null;
+        $sortKey = is_string($rawSort) ? (EntitySortKey::tryFrom($rawSort) ?? EntitySortKey::Id) : EntitySortKey::Id;
+
+        $rawOrder = $request->getQueryParams()['order'] ?? null;
+        $sortOrder = is_string($rawOrder) ? (EntitySortOrder::tryFrom($rawOrder) ?? EntitySortOrder::Desc) : EntitySortOrder::Desc;
+
         $output = $this->useCase->execute(new ListEntitiesInput(
             limit: $pagination->limit,
             offset: $pagination->offset,
@@ -45,6 +51,8 @@ final readonly class ListEntitiesHandler
                 relationFilters: $relationFilters,
                 status: $status,
                 q: $q,
+                sortKey: $sortKey,
+                sortOrder: $sortOrder,
             ),
         ));
 

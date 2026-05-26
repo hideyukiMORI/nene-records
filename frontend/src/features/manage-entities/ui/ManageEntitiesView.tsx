@@ -1,4 +1,11 @@
-import type { Entity, EntityRelationFilters, EntityStatus } from '@/entities/entity'
+import { useState } from 'react'
+import type {
+  Entity,
+  EntityRelationFilters,
+  EntitySortKey,
+  EntitySortOrder,
+  EntityStatus,
+} from '@/entities/entity'
 import type { RelationFieldDef } from '@/entities/field-def'
 import type { Tag } from '@/entities/tag'
 import { useTranslation } from '@/shared/i18n'
@@ -10,6 +17,43 @@ import { EntityTagFilterPanel } from './EntityTagFilterPanel'
 
 const ENTITY_STATUSES: EntityStatus[] = ['draft', 'published', 'scheduled', 'archived']
 
+interface SortOption {
+  value: string
+  key: EntitySortKey
+  order: EntitySortOrder
+  labelKey:
+    | 'admin.entityRecords.sort.idDesc'
+    | 'admin.entityRecords.sort.idAsc'
+    | 'admin.entityRecords.sort.publishedDesc'
+    | 'admin.entityRecords.sort.publishedAsc'
+    | 'admin.entityRecords.sort.titleAsc'
+    | 'admin.entityRecords.sort.titleDesc'
+}
+
+const SORT_OPTIONS: SortOption[] = [
+  { value: 'id-desc', key: 'id', order: 'desc', labelKey: 'admin.entityRecords.sort.idDesc' },
+  { value: 'id-asc', key: 'id', order: 'asc', labelKey: 'admin.entityRecords.sort.idAsc' },
+  {
+    value: 'published_at-desc',
+    key: 'published_at',
+    order: 'desc',
+    labelKey: 'admin.entityRecords.sort.publishedDesc',
+  },
+  {
+    value: 'published_at-asc',
+    key: 'published_at',
+    order: 'asc',
+    labelKey: 'admin.entityRecords.sort.publishedAsc',
+  },
+  { value: 'title-asc', key: 'title', order: 'asc', labelKey: 'admin.entityRecords.sort.titleAsc' },
+  {
+    value: 'title-desc',
+    key: 'title',
+    order: 'desc',
+    labelKey: 'admin.entityRecords.sort.titleDesc',
+  },
+]
+
 export interface ManageEntitiesViewProps {
   entityTypeId: number
   entityTypeSlug: string
@@ -19,6 +63,8 @@ export interface ManageEntitiesViewProps {
   total: number
   page: number
   totalPages: number
+  sortKey: EntitySortKey
+  sortOrder: EntitySortOrder
   availableTags: Tag[]
   relationFieldDefs: RelationFieldDef[]
   selectedTagSlugs: string[]
@@ -32,6 +78,7 @@ export interface ManageEntitiesViewProps {
   deleteTarget: Entity | null
   isDeleting: boolean
   onRetry: () => void
+  onSortChange: (key: EntitySortKey, order: EntitySortOrder) => void
   onToggleTagSlug: (slug: string) => void
   onClearTagFilter: () => void
   onSelectRelationFilter: (fieldKey: string, targetEntityId: number | undefined) => void
@@ -53,6 +100,8 @@ export function ManageEntitiesView({
   total,
   page,
   totalPages,
+  sortKey,
+  sortOrder,
   availableTags,
   relationFieldDefs,
   selectedTagSlugs,
@@ -66,6 +115,7 @@ export function ManageEntitiesView({
   deleteTarget,
   isDeleting,
   onRetry,
+  onSortChange,
   onToggleTagSlug,
   onClearTagFilter,
   onSelectRelationFilter,
@@ -80,6 +130,15 @@ export function ManageEntitiesView({
 }: ManageEntitiesViewProps) {
   const { t } = useTranslation()
 
+  // アクティブなフィルター件数（検索を除く）
+  const filterCount =
+    selectedTagSlugs.length +
+    Object.keys(selectedRelationFilters).length +
+    (selectedStatus !== undefined ? 1 : 0)
+
+  // 絞り込みアコーディオン — フィルターが有効なら初期展開
+  const [isFilterOpen, setIsFilterOpen] = useState(() => filterCount > 0)
+
   const recordCountKey =
     total === 1 ? 'admin.entityRecords.recordCount.one' : 'admin.entityRecords.recordCount.other'
 
@@ -87,10 +146,12 @@ export function ManageEntitiesView({
   // （Progressive Disclosure: 空ページで絞り込みUI を見せない）
   const showFilters = total > 0 || isFilterActive
 
+  const currentSortValue = `${sortKey}-${sortOrder}`
+
   return (
     <>
       <Stack gap="lg">
-        {/* ── 検索 + フィルター（コンテンツがあるときのみ） ── */}
+        {/* ── 検索 + ソート + フィルター（コンテンツがあるときのみ） ── */}
         {showFilters ? (
           <>
             {/* Search */}
@@ -119,50 +180,110 @@ export function ManageEntitiesView({
               ) : null}
             </div>
 
-            {/* Status Filter */}
-            <Stack gap="sm">
-              <Text as="h2" variant="heading-sm">
-                {t('admin.entityRecords.statusFilter.label')}
-              </Text>
-              <div className="flex flex-wrap gap-inline-sm">
-                <Button
-                  variant={selectedStatus === undefined ? 'primary' : 'secondary'}
-                  size="sm"
-                  aria-pressed={selectedStatus === undefined}
-                  onClick={() => {
-                    onStatusChange(undefined)
-                  }}
+            {/* Sort + Filter toggle toolbar */}
+            <div className="flex items-center gap-inline-md">
+              {/* 並び順セレクト */}
+              <div className="flex items-center gap-1.5">
+                <label
+                  htmlFor="entity-sort-select"
+                  className="shrink-0 font-sans text-caption text-text-muted"
                 >
-                  {t('admin.entityRecords.statusFilter.all')}
-                </Button>
-                {ENTITY_STATUSES.map((status) => (
-                  <Button
-                    key={status}
-                    variant={selectedStatus === status ? 'primary' : 'secondary'}
-                    size="sm"
-                    aria-pressed={selectedStatus === status}
-                    onClick={() => {
-                      onStatusChange(status)
-                    }}
-                  >
-                    {t(`admin.entityStatus.status.${status}`)}
-                  </Button>
-                ))}
+                  {t('admin.entityRecords.sort.label')}
+                </label>
+                <select
+                  id="entity-sort-select"
+                  value={currentSortValue}
+                  onChange={(e) => {
+                    const opt = SORT_OPTIONS.find((o) => o.value === e.target.value)
+                    if (opt !== undefined) {
+                      onSortChange(opt.key, opt.order)
+                    }
+                  }}
+                  className="rounded-md border border-border bg-surface-raised px-inline-sm py-stack-xs font-sans text-caption text-text-primary shadow-sm focus-visible:outline-none focus-visible:shadow-focus"
+                >
+                  {SORT_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {t(opt.labelKey)}
+                    </option>
+                  ))}
+                </select>
               </div>
-            </Stack>
 
-            <EntityTagFilterPanel
-              tags={availableTags}
-              selectedTagSlugs={selectedTagSlugs}
-              onToggleTagSlug={onToggleTagSlug}
-              onClear={onClearTagFilter}
-            />
-            <EntityRelationFilterPanel
-              relationFieldDefs={relationFieldDefs}
-              selectedFilters={selectedRelationFilters}
-              onSelectTarget={onSelectRelationFilter}
-              onClear={onClearRelationFilters}
-            />
+              <div className="flex-1" />
+
+              {/* 絞り込みアコーディオン トグル */}
+              <button
+                type="button"
+                onClick={() => {
+                  setIsFilterOpen((v) => !v)
+                }}
+                aria-expanded={isFilterOpen}
+                aria-controls="filter-accordion"
+                className="inline-flex items-center gap-1 font-sans text-caption text-text-muted transition-colors hover:text-text-primary"
+              >
+                {t('admin.entityRecords.filter.toggle')}
+                {filterCount > 0 ? (
+                  <span className="rounded-full bg-accent px-1.5 py-px text-xs font-medium text-white">
+                    {t('admin.entityRecords.filter.active', { count: filterCount })}
+                  </span>
+                ) : null}
+                <span aria-hidden="true" className="text-xs">
+                  {isFilterOpen ? '▲' : '▼'}
+                </span>
+              </button>
+            </div>
+
+            {/* 絞り込みアコーディオン */}
+            {isFilterOpen ? (
+              <div id="filter-accordion">
+                <Stack gap="md">
+                  {/* Status Filter */}
+                  <Stack gap="sm">
+                    <Text as="h2" variant="heading-sm">
+                      {t('admin.entityRecords.statusFilter.label')}
+                    </Text>
+                    <div className="flex flex-wrap gap-inline-sm">
+                      <Button
+                        variant={selectedStatus === undefined ? 'primary' : 'secondary'}
+                        size="sm"
+                        aria-pressed={selectedStatus === undefined}
+                        onClick={() => {
+                          onStatusChange(undefined)
+                        }}
+                      >
+                        {t('admin.entityRecords.statusFilter.all')}
+                      </Button>
+                      {ENTITY_STATUSES.map((status) => (
+                        <Button
+                          key={status}
+                          variant={selectedStatus === status ? 'primary' : 'secondary'}
+                          size="sm"
+                          aria-pressed={selectedStatus === status}
+                          onClick={() => {
+                            onStatusChange(status)
+                          }}
+                        >
+                          {t(`admin.entityStatus.status.${status}`)}
+                        </Button>
+                      ))}
+                    </div>
+                  </Stack>
+
+                  <EntityTagFilterPanel
+                    tags={availableTags}
+                    selectedTagSlugs={selectedTagSlugs}
+                    onToggleTagSlug={onToggleTagSlug}
+                    onClear={onClearTagFilter}
+                  />
+                  <EntityRelationFilterPanel
+                    relationFieldDefs={relationFieldDefs}
+                    selectedFilters={selectedRelationFilters}
+                    onSelectTarget={onSelectRelationFilter}
+                    onClear={onClearRelationFilters}
+                  />
+                </Stack>
+              </div>
+            ) : null}
           </>
         ) : null}
 
