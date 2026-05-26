@@ -69,8 +69,8 @@ export function InverseRelationPanel({ fieldDef, targetEntityId }: InverseRelati
               <Link
                 to={
                   sourceEntityTypeSlug !== null
-                    ? `/${sourceEntityTypeSlug}/${String(item.id)}`
-                    : `/entity-types/${String(fieldDef.entityTypeId)}/entities/${String(item.id)}`
+                    ? `/admin/${sourceEntityTypeSlug}/${String(item.id)}`
+                    : `/admin/entity-types/${String(fieldDef.entityTypeId)}/entities/${String(item.id)}`
                 }
               >
                 <Button variant="secondary" size="sm">

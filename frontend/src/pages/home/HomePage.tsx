@@ -35,7 +35,7 @@ export function HomePage() {
           <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
             {pinnedTypes.length > 0 ? (
               <Link
-                to={`/${pinnedTypes[0].slug}`}
+                to={`/admin/${pinnedTypes[0].slug}`}
                 className="group flex items-start gap-3 rounded-md border border-border bg-surface-raised p-4 transition-colors hover:border-accent"
               >
                 <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-accent/10 text-accent">
@@ -53,7 +53,7 @@ export function HomePage() {
             ) : null}
             {canManageSettings ? (
               <Link
-                to="/navigation"
+                to="/admin/navigation"
                 className="group flex items-start gap-3 rounded-md border border-border bg-surface-raised p-4 transition-colors hover:border-accent"
               >
                 <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-accent/10 text-accent">
@@ -85,7 +85,7 @@ export function HomePage() {
             {pinnedTypes.map((entityType) => (
               <Link
                 key={entityType.id}
-                to={`/${entityType.slug}`}
+                to={`/admin/${entityType.slug}`}
                 className="group flex items-center gap-3 rounded-lg border border-border bg-surface-raised p-4 shadow-sm transition-colors hover:border-accent hover:bg-surface"
               >
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-accent/10 text-accent transition-colors group-hover:bg-accent/20">
@@ -165,7 +165,7 @@ export function HomePage() {
                 {data.recentPublished.map((entity) => (
                   <li key={entity.id}>
                     <Link
-                      to={`/entity-types/${entity.entityTypeSlug}/entities/${String(entity.id)}`}
+                      to={`/admin/entity-types/${entity.entityTypeSlug}/entities/${String(entity.id)}`}
                       className="text-body text-accent hover:text-accent-hover"
                     >
                       {entity.entityTypeName} / {entity.slug ?? String(entity.id)}
@@ -184,7 +184,7 @@ export function HomePage() {
         </Stack>
       )}
 
-      <Link to="/view" className="text-body font-medium text-accent hover:text-accent-hover">
+      <Link to="/" className="text-body font-medium text-accent hover:text-accent-hover">
         {t('admin.home.openPublicSite')}
       </Link>
     </Stack>

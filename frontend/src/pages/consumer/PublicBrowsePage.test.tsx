@@ -11,13 +11,13 @@ import { resetTextFieldStore, seedTextFields } from '@tests/msw/handlers/text-fi
 import { mswServer } from '@tests/msw/server'
 import { renderWithProviders } from '@tests/render/render-with-providers'
 
-function renderBrowsePage(initialEntry = '/view/article') {
+function renderBrowsePage(initialEntry = '/article') {
   return renderWithProviders(
     <MemoryRouter initialEntries={[initialEntry]}>
       <Routes>
-        <Route path="/view" element={<PublicIndexPage />} />
-        <Route path="/view/:entityTypeSlug" element={<PublicBrowsePage />} />
-        <Route path="/view/:entityTypeSlug/:entityId" element={<PublicRecordDetailPage />} />
+        <Route path="/" element={<PublicIndexPage />} />
+        <Route path="/:entityTypeSlug" element={<PublicBrowsePage />} />
+        <Route path="/:entityTypeSlug/:entityId" element={<PublicRecordDetailPage />} />
       </Routes>
     </MemoryRouter>,
   )
@@ -76,18 +76,12 @@ describe('PublicBrowsePage', () => {
     renderBrowsePage()
 
     expect(await screen.findByText('2 records')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'First post' })).toHaveAttribute(
-      'href',
-      '/view/article/1',
-    )
-    expect(screen.getByRole('link', { name: 'Second post' })).toHaveAttribute(
-      'href',
-      '/view/article/2',
-    )
+    expect(screen.getByRole('link', { name: 'First post' })).toHaveAttribute('href', '/article/1')
+    expect(screen.getByRole('link', { name: 'Second post' })).toHaveAttribute('href', '/article/2')
   })
 
   it('shows empty state for unknown entity type slug', async () => {
-    renderBrowsePage('/view/missing-type')
+    renderBrowsePage('/missing-type')
 
     expect(await screen.findByText('Entity type not found')).toBeInTheDocument()
     expect(screen.getByText('No public content for "missing-type".')).toBeInTheDocument()
@@ -144,7 +138,7 @@ describe('PublicBrowsePage', () => {
     )
 
     const user = userEvent.setup()
-    renderBrowsePage('/view/article')
+    renderBrowsePage('/article')
 
     expect(await screen.findByText('21 records · showing 1–20')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Post 1' })).toBeInTheDocument()

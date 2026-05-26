@@ -27,7 +27,7 @@ function PublicRecordDetailContent({
   return (
     <Stack gap="md">
       <Stack gap="sm">
-        <Link to={`/view/${entityTypeSlug}`}>
+        <Link to={`/${entityTypeSlug}`}>
           <Button variant="secondary" size="sm">
             Back to {entityTypeName}
           </Button>

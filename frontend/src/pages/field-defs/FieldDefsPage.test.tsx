@@ -11,9 +11,9 @@ import { clearAuthSession, seedAdminSession } from '@tests/helpers/auth-session'
 
 function renderFieldDefsPage(entityTypeSlug = 'article') {
   return renderWithProviders(
-    <MemoryRouter initialEntries={[`/entity-types/${entityTypeSlug}/fields`]}>
+    <MemoryRouter initialEntries={[`/admin/entity-types/${entityTypeSlug}/fields`]}>
       <Routes>
-        <Route path="/entity-types/:entityTypeSlug/fields" element={<FieldDefsPage />} />
+        <Route path="/admin/entity-types/:entityTypeSlug/fields" element={<FieldDefsPage />} />
       </Routes>
     </MemoryRouter>,
   )

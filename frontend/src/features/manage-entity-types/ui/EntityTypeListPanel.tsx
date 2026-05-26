@@ -70,13 +70,13 @@ export function EntityTypeListPanel({
           </Stack>
           <div className="flex items-center gap-inline-sm">
             {canManageSchema ? (
-              <Link to={`/entity-types/${item.slug}/fields`}>
+              <Link to={`/admin/entity-types/${item.slug}/fields`}>
                 <Button variant="secondary" size="sm">
                   {t('admin.entityTypes.actions.fields')}
                 </Button>
               </Link>
             ) : null}
-            <Link to={`/${item.slug}`}>
+            <Link to={`/admin/${item.slug}`}>
               <Button variant="secondary" size="sm">
                 {t('admin.entityTypes.actions.records')}
               </Button>

@@ -33,7 +33,7 @@ export function usePublicRelationFieldDisplay(
         textFields,
         `Record #${String(relation.targetEntityId)}`,
       ),
-      href: `/view/${targetSlug}/${String(relation.targetEntityId)}`,
+      href: `/${targetSlug}/${String(relation.targetEntityId)}`,
     }))
   }, [
     entityTypeSlugById,

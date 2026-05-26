@@ -154,7 +154,7 @@ export function AppShell() {
           <ul className="space-y-0.5">
             <li>
               <NavItem
-                to="/"
+                to="/admin"
                 end
                 icon={<IconHome size={16} />}
                 label={t('admin.nav.home')}
@@ -165,7 +165,7 @@ export function AppShell() {
             {pinnedEntityTypes.map((entityType) => (
               <li key={entityType.id}>
                 <NavItem
-                  to={`/${entityType.slug}`}
+                  to={`/admin/${entityType.slug}`}
                   icon={<IconFileText size={16} />}
                   label={getLocalizedEntityTypeName(entityType, locale)}
                   onClick={closeSidebar}
@@ -178,7 +178,7 @@ export function AppShell() {
             {canManageTags ? (
               <li>
                 <NavItem
-                  to="/tags"
+                  to="/admin/tags"
                   icon={<IconTag size={16} />}
                   label={t('admin.nav.tags')}
                   onClick={closeSidebar}
@@ -188,7 +188,7 @@ export function AppShell() {
             {canReadSettings ? (
               <li>
                 <NavItem
-                  to="/settings"
+                  to="/admin/settings"
                   icon={<IconSettings size={16} />}
                   label={t('admin.nav.settings')}
                   onClick={closeSidebar}
@@ -224,7 +224,7 @@ export function AppShell() {
                   <ul className="mt-0.5 space-y-0.5">
                     <li>
                       <NavItem
-                        to="/navigation"
+                        to="/admin/navigation"
                         icon={<IconLink size={16} />}
                         label={t('admin.nav.navigation')}
                         onClick={closeSidebar}
@@ -262,7 +262,7 @@ export function AppShell() {
                   <ul className="mt-0.5 space-y-0.5">
                     <li>
                       <NavItem
-                        to="/entity-types"
+                        to="/admin/entity-types"
                         icon={<IconLayers size={16} />}
                         label={t('admin.nav.entityTypes')}
                         onClick={closeSidebar}
@@ -270,7 +270,7 @@ export function AppShell() {
                     </li>
                     <li>
                       <NavItem
-                        to="/webhooks"
+                        to="/admin/webhooks"
                         icon={<IconWebhook size={16} />}
                         label={t('admin.nav.webhooks')}
                         onClick={closeSidebar}
@@ -287,7 +287,7 @@ export function AppShell() {
           <ul className="space-y-0.5">
             <li>
               <NavItem
-                to="/view"
+                to="/"
                 icon={<IconGlobe size={16} />}
                 label={t('admin.nav.publicSite')}
                 onClick={closeSidebar}

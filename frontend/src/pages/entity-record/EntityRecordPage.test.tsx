@@ -19,9 +19,9 @@ import { renderWithProviders } from '@tests/render/render-with-providers'
 
 function renderEntityRecordPage(entityTypeSlug = 'article', entityId = 1) {
   return renderWithProviders(
-    <MemoryRouter initialEntries={[`/${entityTypeSlug}/${String(entityId)}`]}>
+    <MemoryRouter initialEntries={[`/admin/${entityTypeSlug}/${String(entityId)}`]}>
       <Routes>
-        <Route path="/:entityTypeSlug/:entityId" element={<EntityRecordPage />} />
+        <Route path="/admin/:entityTypeSlug/:entityId" element={<EntityRecordPage />} />
       </Routes>
     </MemoryRouter>,
   )
@@ -351,6 +351,6 @@ describe('EntityRecordPage', () => {
     expect(await screen.findByText('Article · author')).toBeInTheDocument()
     expect(await screen.findByText('My article')).toBeInTheDocument()
     expect(screen.queryByText('Other article')).not.toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Open' })).toHaveAttribute('href', '/article/1')
+    expect(screen.getByRole('link', { name: 'Open' })).toHaveAttribute('href', '/admin/article/1')
   })
 })

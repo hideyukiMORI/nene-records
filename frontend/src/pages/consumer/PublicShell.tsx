@@ -51,7 +51,7 @@ export function PublicShell() {
     >
       <header className="border-b border-border bg-surface-raised shadow-sm">
         <div className="mx-auto flex max-w-3xl items-center justify-between px-inline-md py-stack-md">
-          <Link to="/view">
+          <Link to="/">
             <Stack gap="xs">
               <Text as="span" variant="heading-sm">
                 {siteName}

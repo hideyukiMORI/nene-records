@@ -8,9 +8,9 @@ import { renderWithProviders } from '@tests/render/render-with-providers'
 
 function renderIndexPage() {
   return renderWithProviders(
-    <MemoryRouter initialEntries={['/view']}>
+    <MemoryRouter initialEntries={['/']}>
       <Routes>
-        <Route path="/view" element={<PublicIndexPage />} />
+        <Route path="/" element={<PublicIndexPage />} />
       </Routes>
     </MemoryRouter>,
   )
@@ -39,12 +39,9 @@ describe('PublicIndexPage', () => {
 
     renderIndexPage()
 
-    expect(await screen.findByRole('link', { name: 'Article' })).toHaveAttribute(
-      'href',
-      '/view/article',
-    )
-    expect(screen.getByRole('link', { name: 'Product' })).toHaveAttribute('href', '/view/product')
-    expect(screen.getByText('/view/article')).toBeInTheDocument()
+    expect(await screen.findByRole('link', { name: 'Article' })).toHaveAttribute('href', '/article')
+    expect(screen.getByRole('link', { name: 'Product' })).toHaveAttribute('href', '/product')
+    expect(screen.getByText('/article')).toBeInTheDocument()
   })
 
   it('shows empty state when no entity types exist', async () => {

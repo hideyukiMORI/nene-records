@@ -64,7 +64,7 @@ function EntityRecordsContent({ entityType }: { entityType: EntityType }) {
 
   const handleCreate = async () => {
     const newEntity = await createEntity()
-    void navigate(`/${entityType.slug}/${String(newEntity.id)}`)
+    void navigate(`/admin/${entityType.slug}/${String(newEntity.id)}`)
   }
 
   const localizedName = getLocalizedEntityTypeName(entityType, locale)
@@ -75,7 +75,7 @@ function EntityRecordsContent({ entityType }: { entityType: EntityType }) {
         {/* ── Breadcrumb ── */}
         <nav aria-label="breadcrumb">
           <Link
-            to="/entity-types"
+            to="/admin/entity-types"
             className="inline-flex items-center gap-1 text-xs text-text-muted transition-colors duration-fast hover:text-text-primary"
           >
             <IconChevronLeft size={12} />

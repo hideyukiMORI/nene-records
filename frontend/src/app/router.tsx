@@ -39,7 +39,7 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: '/',
+    path: '/admin',
     element: <AdminShell />,
     children: [
       { index: true, element: <HomePage /> },
@@ -52,14 +52,14 @@ const router = createBrowserRouter([
       // Legacy long-form routes kept for schema management links
       { path: 'entity-types/:entityTypeSlug/entities', element: <EntityRecordsPage /> },
       { path: 'entity-types/:entityTypeSlug/entities/:entityId', element: <EntityRecordPage /> },
-      // Short-form catch-all: /:slug and /:slug/:entityId
+      // Short-form catch-all: /admin/:slug and /admin/:slug/:entityId
       // Must be last — specific routes above take priority
       { path: ':entityTypeSlug', element: <EntityRecordsPage /> },
       { path: ':entityTypeSlug/:entityId', element: <EntityRecordPage /> },
     ],
   },
   {
-    path: '/view',
+    path: '/',
     element: <PublicShell />,
     children: [
       { index: true, element: <PublicIndexPage /> },
