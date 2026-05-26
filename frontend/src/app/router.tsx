@@ -48,9 +48,14 @@ const router = createBrowserRouter([
       { path: 'navigation', element: <NavigationPage /> },
       { path: 'webhooks', element: <WebhooksPage /> },
       { path: 'settings', element: <SiteSettingsPage /> },
-      { path: 'entity-types/:entityTypeId/fields', element: <FieldDefsPage /> },
-      { path: 'entity-types/:entityTypeId/entities', element: <EntityRecordsPage /> },
-      { path: 'entity-types/:entityTypeId/entities/:entityId', element: <EntityRecordPage /> },
+      { path: 'entity-types/:entityTypeSlug/fields', element: <FieldDefsPage /> },
+      // Legacy long-form routes kept for schema management links
+      { path: 'entity-types/:entityTypeSlug/entities', element: <EntityRecordsPage /> },
+      { path: 'entity-types/:entityTypeSlug/entities/:entityId', element: <EntityRecordPage /> },
+      // Short-form catch-all: /:slug and /:slug/:entityId
+      // Must be last — specific routes above take priority
+      { path: ':entityTypeSlug', element: <EntityRecordsPage /> },
+      { path: ':entityTypeSlug/:entityId', element: <EntityRecordPage /> },
     ],
   },
   {

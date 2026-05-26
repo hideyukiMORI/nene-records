@@ -38,6 +38,7 @@ export function useInverseRelationPanel(fieldDef: RelationFieldDef, targetEntity
 
   return {
     sourceEntityTypeName: entityTypeQuery.data?.name ?? null,
+    sourceEntityTypeSlug: entityTypeQuery.data?.slug ?? null,
     items,
     total: listQuery.data?.total ?? 0,
     isLoading,

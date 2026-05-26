@@ -87,7 +87,11 @@ export function ManageNavigationView({
       <ConfirmDialog
         open={deleteTarget !== null}
         title={t('admin.navigation.delete')}
-        description={deleteTarget !== null ? `"${deleteTarget.label}" を削除しますか？` : undefined}
+        description={
+          deleteTarget !== null
+            ? t('admin.navigation.deleteDescription', { label: deleteTarget.label })
+            : undefined
+        }
         confirmLabel={isDeleting ? t('admin.navigation.deleting') : t('admin.navigation.delete')}
         isPending={isDeleting}
         onCancel={onCancelDelete}

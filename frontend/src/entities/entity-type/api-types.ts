@@ -3,6 +3,8 @@ export interface EntityTypeDto {
   name: string
   slug: string
   is_pinned: boolean
+  /** Locale-keyed display names, e.g. {"ja":"投稿","fr":"Articles"}. Empty object = no overrides. */
+  labels?: Record<string, string>
 }
 
 export interface EntityTypeListDto {
@@ -17,4 +19,9 @@ export interface CreateEntityTypeDto {
   is_pinned?: boolean
 }
 
-export type UpdateEntityTypeDto = CreateEntityTypeDto
+export interface UpdateEntityTypeDto {
+  name: string
+  slug: string
+  is_pinned?: boolean
+  labels?: Record<string, string>
+}

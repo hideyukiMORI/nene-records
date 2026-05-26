@@ -17,16 +17,11 @@ import { resetTagStore, seedTags } from '@tests/msw/handlers/tag'
 import { mswServer } from '@tests/msw/server'
 import { renderWithProviders } from '@tests/render/render-with-providers'
 
-function renderEntityRecordPage(entityTypeId = 1, entityId = 1) {
+function renderEntityRecordPage(entityTypeSlug = 'article', entityId = 1) {
   return renderWithProviders(
-    <MemoryRouter
-      initialEntries={[`/entity-types/${String(entityTypeId)}/entities/${String(entityId)}`]}
-    >
+    <MemoryRouter initialEntries={[`/${entityTypeSlug}/${String(entityId)}`]}>
       <Routes>
-        <Route
-          path="/entity-types/:entityTypeId/entities/:entityId"
-          element={<EntityRecordPage />}
-        />
+        <Route path="/:entityTypeSlug/:entityId" element={<EntityRecordPage />} />
       </Routes>
     </MemoryRouter>,
   )
@@ -350,15 +345,12 @@ describe('EntityRecordPage', () => {
       { id: 3, entity_id: 3, field_key: 'title', value: 'Other article' },
     ])
 
-    renderEntityRecordPage(2, 2)
+    renderEntityRecordPage('author', 2)
 
     expect(await screen.findByRole('heading', { name: 'Referenced by' })).toBeInTheDocument()
     expect(await screen.findByText('Article · author')).toBeInTheDocument()
     expect(await screen.findByText('My article')).toBeInTheDocument()
     expect(screen.queryByText('Other article')).not.toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Open' })).toHaveAttribute(
-      'href',
-      '/entity-types/1/entities/1',
-    )
+    expect(screen.getByRole('link', { name: 'Open' })).toHaveAttribute('href', '/article/1')
   })
 })

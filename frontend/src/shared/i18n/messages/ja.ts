@@ -38,6 +38,7 @@ export const ja: Partial<MessageCatalog> = {
   'admin.nav.navigation': 'メニュー',
   'admin.nav.webhooks': 'Webhook',
   'admin.nav.settings': '設定',
+  'admin.nav.appearance': '外観',
   'admin.nav.advanced': '詳細設定',
   'admin.nav.publicSite': 'パブリックサイト',
   'admin.nav.logout': 'ログアウト',
@@ -81,6 +82,15 @@ export const ja: Partial<MessageCatalog> = {
   'admin.home.dashboard.error': 'ダッシュボードを読み込めませんでした',
   'admin.home.dashboard.noRecentPublished': '最近公開されたコンテンツはありません。',
 
+  'admin.home.gettingStarted': 'はじめに',
+  'admin.home.gettingStarted.description': 'サイトを立ち上げるための最初のステップです。',
+  'admin.home.gettingStarted.content': '最初のコンテンツを作成する',
+  'admin.home.gettingStarted.content.description':
+    'コンテンツタイプを開いて、投稿やページを書いてみましょう。',
+  'admin.home.gettingStarted.menus': 'ナビゲーションメニューを設定する',
+  'admin.home.gettingStarted.menus.description':
+    'パブリックサイトのヘッダーに表示するリンクを追加します。',
+
   // ── Entity types ─────────────────────────────────────────────────────────
   'admin.entityTypes.pageTitle': 'コンテンツタイプ',
   'admin.entityTypes.existingList.title': '登録済みのタイプ',
@@ -98,6 +108,9 @@ export const ja: Partial<MessageCatalog> = {
   'admin.entityTypes.editForm.isPinned': 'サイドバーに表示',
   'admin.entityTypes.editForm.isPinnedDescription':
     'サイドバーにピン留めして、すぐアクセスできるようにします。',
+  'admin.entityTypes.editForm.labels.title': '言語別の表示名',
+  'admin.entityTypes.editForm.labels.description':
+    '言語ごとに表示名を上書きできます。空白のままにすると、ベース名が使用されます。',
   'admin.entityTypes.delete.title': 'コンテンツタイプを削除しますか？',
   'admin.entityTypes.delete.description': '「{{name}}」が削除されます。この操作は元に戻せません。',
   'admin.entityTypes.actions.fields': 'フィールド',
@@ -105,22 +118,29 @@ export const ja: Partial<MessageCatalog> = {
   'admin.entityTypes.actions.backToTypes': 'コンテンツタイプに戻る',
 
   // ── Entity records ───────────────────────────────────────────────────────
-  'admin.entityRecords.backToTypes': 'コンテンツタイプに戻る',
+  'admin.entityRecords.backToTypes': 'コンテンツタイプ',
   'admin.entityRecords.backToRecords': 'コンテンツ一覧に戻る',
   'admin.entityRecords.recordCount.one': '{{count}} 件',
   'admin.entityRecords.recordCount.other': '{{count}} 件',
+  'admin.entityRecords.export.csv': 'CSV エクスポート',
+  'admin.entityRecords.export.csv.tooltip':
+    '条件に一致するレコードを CSV スプレッドシートとしてダウンロード',
+  'admin.entityRecords.export.json': 'JSON エクスポート',
+  'admin.entityRecords.export.json.tooltip':
+    '条件に一致するレコードを JSON データとしてダウンロード',
   'admin.entityRecords.list.title': '{{name}}',
   'admin.entityRecords.list.titleDefault': 'コンテンツ',
   'admin.entityRecords.list.loading': '読み込み中…',
   'admin.entityRecords.list.error': 'コンテンツを読み込めませんでした',
   'admin.entityRecords.list.empty.title': 'まだコンテンツがありません',
   'admin.entityRecords.list.empty.description':
-    '上のボタンから最初のコンテンツを作成してください。',
+    '右上の「新規作成」ボタンから最初のコンテンツを作成してください。',
   'admin.entityRecords.list.emptyFiltered.title': '一致するコンテンツがありません',
   'admin.entityRecords.list.emptyFiltered.description':
     'フィルターをクリアするか、別の条件を選択してください。',
   'admin.entityRecords.search.placeholder': '検索…',
   'admin.entityRecords.search.clear': '検索をクリア',
+  'admin.entityRecords.create.newButton': '新規作成',
   'admin.entityRecords.create.title': '新規作成',
   'admin.entityRecords.create.description':
     '下書きとして作成します。作成後にコンテンツを編集できます。',
@@ -224,6 +244,7 @@ export const ja: Partial<MessageCatalog> = {
     'まずこのコンテンツタイプにフィールドを追加してください。',
   'admin.entityRecord.textFields.saving': '保存中…',
   'admin.entityRecord.textFields.save': '保存',
+  'admin.entityRecord.textFields.saved': '保存しました。',
   'admin.entityRecord.locale.label': '言語',
   'admin.entityRecord.locale.default': 'デフォルト',
   'admin.entityRecord.locale.switch': '切替',
@@ -318,10 +339,14 @@ export const ja: Partial<MessageCatalog> = {
   'admin.navigation.loading': 'ナビゲーションアイテムを読み込み中…',
   'admin.navigation.error': 'ナビゲーションアイテムを読み込めませんでした。',
   'admin.navigation.empty': 'ナビゲーションアイテムがありません。',
+  'admin.navigation.empty.description':
+    'パブリックサイトのナビゲーションバーに表示するリンクを追加しましょう。',
+  'admin.navigation.empty.hint': 'ヒント: まず「ホーム」リンク（URL: /）を追加してみましょう',
   'admin.navigation.add': 'リンクを追加',
   'admin.navigation.save': '保存',
   'admin.navigation.saving': '保存中…',
   'admin.navigation.delete': '削除',
+  'admin.navigation.deleteDescription': '「{{label}}」を削除しますか？この操作は元に戻せません。',
   'admin.navigation.deleting': '削除中…',
   'admin.navigation.cancel': 'キャンセル',
   'admin.navigation.label': 'ラベル',

@@ -1,15 +1,33 @@
-import { Link, useParams } from 'react-router-dom'
-import { toEntityTypeId, useEntityType } from '@/entities/entity-type'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import {
+  getLocalizedEntityTypeName,
+  useEntityTypeBySlug,
+  type EntityType,
+} from '@/entities/entity-type'
 import { ManageEntitiesView, useManageEntitiesPage } from '@/features/manage-entities'
 import { useTranslation } from '@/shared/i18n'
 import { Button, Stack, Text } from '@/shared/ui'
+import { IconChevronLeft } from '@/shared/ui/icons/Icons'
 
 export function EntityRecordsPage() {
   const { t } = useTranslation()
-  const { entityTypeId: entityTypeIdParam } = useParams()
-  const entityTypeId = Number(entityTypeIdParam)
+  const { entityTypeSlug = '' } = useParams()
+  const entityTypeQuery = useEntityTypeBySlug(entityTypeSlug)
 
-  const entityTypeQuery = useEntityType(toEntityTypeId(entityTypeId))
+  if (entityTypeQuery.isPending) {
+    return <Text muted>{t('admin.entityRecords.list.titleDefault')}</Text>
+  }
+  if (entityTypeQuery.isError) {
+    return <Text muted>{entityTypeQuery.error.title}</Text>
+  }
+
+  return <EntityRecordsContent entityType={entityTypeQuery.data} />
+}
+
+function EntityRecordsContent({ entityType }: { entityType: EntityType }) {
+  const { t, locale } = useTranslation()
+  const navigate = useNavigate()
+
   const {
     items,
     recordLabels,
@@ -33,7 +51,6 @@ export function EntityRecordsPage() {
     refetch,
     createEntity,
     isCreating,
-    createErrorTitle,
     toggleTagSlug,
     clearTagFilter,
     setRelationFilter,
@@ -43,24 +60,49 @@ export function EntityRecordsPage() {
     cancelDelete,
     confirmDelete,
     isDeleting,
-  } = useManageEntitiesPage(entityTypeId)
+  } = useManageEntitiesPage(Number(entityType.id))
+
+  const handleCreate = async () => {
+    const newEntity = await createEntity()
+    void navigate(`/${entityType.slug}/${String(newEntity.id)}`)
+  }
+
+  const localizedName = getLocalizedEntityTypeName(entityType, locale)
 
   return (
     <Stack gap="md">
-      <Stack gap="sm">
-        <Link to="/entity-types">
-          <Button variant="secondary" size="sm">
+      <Stack gap="xs">
+        {/* ── Breadcrumb ── */}
+        <nav aria-label="breadcrumb">
+          <Link
+            to="/entity-types"
+            className="inline-flex items-center gap-1 text-xs text-text-muted transition-colors duration-fast hover:text-text-primary"
+          >
+            <IconChevronLeft size={12} />
             {t('admin.entityRecords.backToTypes')}
+          </Link>
+        </nav>
+        {/* ── Page header ── */}
+        <div className="flex items-center justify-between gap-4">
+          <Text as="h1" variant="heading-md">
+            {localizedName}
+          </Text>
+          <Button
+            disabled={isCreating}
+            onClick={() => {
+              void handleCreate()
+            }}
+          >
+            {isCreating
+              ? t('admin.entityRecords.create.submitting')
+              : t('admin.entityRecords.create.newButton')}
           </Button>
-        </Link>
-        <Text as="h1" variant="heading-md">
-          {entityTypeQuery.data?.name ?? t('admin.entityRecords.list.titleDefault')}
-        </Text>
+        </div>
       </Stack>
       <ManageEntitiesView
-        entityTypeId={entityTypeId}
-        entityTypeName={entityTypeQuery.data?.name ?? null}
-        entityTypeSlug={entityTypeQuery.data?.slug ?? null}
+        entityTypeId={Number(entityType.id)}
+        entityTypeSlug={entityType.slug}
+        entityTypeName={localizedName}
         items={items}
         recordLabels={recordLabels}
         total={total}
@@ -76,8 +118,6 @@ export function EntityRecordsPage() {
         isLoading={isLoading}
         isError={isError}
         errorTitle={errorTitle}
-        isCreating={isCreating}
-        createErrorTitle={createErrorTitle}
         deleteTarget={deleteTarget}
         isDeleting={isDeleting}
         onRetry={() => {
@@ -91,7 +131,6 @@ export function EntityRecordsPage() {
         onClearTagFilter={clearTagFilter}
         onSelectRelationFilter={setRelationFilter}
         onClearRelationFilters={clearRelationFilters}
-        onCreate={createEntity}
         onRequestDelete={requestDelete}
         onCancelDelete={cancelDelete}
         onConfirmDelete={confirmDelete}

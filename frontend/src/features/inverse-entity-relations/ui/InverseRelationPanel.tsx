@@ -11,8 +11,15 @@ export interface InverseRelationPanelProps {
 
 export function InverseRelationPanel({ fieldDef, targetEntityId }: InverseRelationPanelProps) {
   const { t } = useTranslation()
-  const { sourceEntityTypeName, items, isLoading, isError, errorTitle, refetch } =
-    useInverseRelationPanel(fieldDef, targetEntityId)
+  const {
+    sourceEntityTypeName,
+    sourceEntityTypeSlug,
+    items,
+    isLoading,
+    isError,
+    errorTitle,
+    refetch,
+  } = useInverseRelationPanel(fieldDef, targetEntityId)
 
   const panelTitle =
     sourceEntityTypeName !== null
@@ -60,7 +67,11 @@ export function InverseRelationPanel({ fieldDef, targetEntityId }: InverseRelati
                 </Text>
               </Stack>
               <Link
-                to={`/entity-types/${String(fieldDef.entityTypeId)}/entities/${String(item.id)}`}
+                to={
+                  sourceEntityTypeSlug !== null
+                    ? `/${sourceEntityTypeSlug}/${String(item.id)}`
+                    : `/entity-types/${String(fieldDef.entityTypeId)}/entities/${String(item.id)}`
+                }
               >
                 <Button variant="secondary" size="sm">
                   {t('admin.inverseRelations.open')}

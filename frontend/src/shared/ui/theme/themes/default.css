@@ -45,8 +45,9 @@
   --spacing-stack-xl: 2rem;
 
   /* ── Typography ──────────────────────────────────────────────────────── */
-  --font-family-sans: 'Inter', system-ui, sans-serif;
-  --font-family-mono: ui-monospace, 'Cascadia Code', monospace;
+  /* Tailwind v4 の font-sans ユーティリティが参照する変数を上書き */
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Code', monospace;
   --font-size-body: 0.875rem;
   --font-size-caption: 0.75rem;
   --font-size-heading-sm: 1.125rem;

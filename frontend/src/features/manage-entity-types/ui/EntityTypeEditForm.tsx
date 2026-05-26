@@ -2,14 +2,17 @@ import { Controller } from 'react-hook-form'
 import type { EntityType } from '@/entities/entity-type'
 import { useTranslation } from '@/shared/i18n'
 import { Button, Input, Stack, Text } from '@/shared/ui'
-import { useEditEntityTypeForm } from '../hooks/use-create-entity-type-form'
-import type { CreateEntityTypeFormValues } from '../hooks/use-create-entity-type-form'
+import {
+  EDIT_LABEL_FIELDS,
+  useEditEntityTypeForm,
+  type EditEntityTypeFormValues,
+} from '../hooks/use-create-entity-type-form'
 
 export interface EntityTypeEditFormProps {
   entityType: EntityType
   isSubmitting: boolean
   serverErrorTitle: string | null
-  onSubmit: (values: CreateEntityTypeFormValues) => Promise<void>
+  onSubmit: (values: EditEntityTypeFormValues) => Promise<void>
   onCancel: () => void
 }
 
@@ -29,6 +32,11 @@ export function EntityTypeEditForm({
     name: entityType.name,
     slug: entityType.slug,
     isPinned: entityType.isPinned,
+    labelJa: entityType.labels?.['ja'] ?? '',
+    labelFr: entityType.labels?.['fr'] ?? '',
+    labelZhHans: entityType.labels?.['zh-Hans'] ?? '',
+    labelPtBr: entityType.labels?.['pt-BR'] ?? '',
+    labelDe: entityType.labels?.['de'] ?? '',
   })
 
   return (
@@ -105,6 +113,35 @@ export function EntityTypeEditForm({
             </label>
           )}
         />
+
+        {/* ── Display names by language ── */}
+        <fieldset className="space-y-3 rounded-md border border-border p-4">
+          <legend className="px-1 text-xs font-semibold uppercase tracking-wider text-text-muted">
+            {t('admin.entityTypes.editForm.labels.title')}
+          </legend>
+          <p className="text-xs text-text-muted">
+            {t('admin.entityTypes.editForm.labels.description')}
+          </p>
+          {EDIT_LABEL_FIELDS.map(({ fieldName, nativeLabel }) => (
+            <Controller
+              key={fieldName}
+              name={fieldName}
+              control={control}
+              render={({ field }) => (
+                <Input
+                  id={`entity-type-edit-label-${fieldName}`}
+                  label={nativeLabel}
+                  autoComplete="off"
+                  disabled={isSubmitting}
+                  value={field.value ?? ''}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                />
+              )}
+            />
+          ))}
+        </fieldset>
+
         {serverErrorTitle !== null ? <Text muted>{serverErrorTitle}</Text> : null}
         <div className="flex items-center gap-inline-sm">
           <Button type="submit" disabled={isSubmitting}>

@@ -1,5 +1,9 @@
 import { Link, useParams } from 'react-router-dom'
-import { toEntityTypeId, useEntityType } from '@/entities/entity-type'
+import {
+  getLocalizedEntityTypeName,
+  useEntityTypeBySlug,
+  type EntityType,
+} from '@/entities/entity-type'
 import {
   EditEntityTextFieldsView,
   useEditEntityTextFieldsPage,
@@ -17,11 +21,31 @@ import { Button, Stack, Text } from '@/shared/ui'
 
 export function EntityRecordPage() {
   const { t } = useTranslation()
-  const { entityTypeId: entityTypeIdParam, entityId: entityIdParam } = useParams()
-  const entityTypeId = Number(entityTypeIdParam)
+  const { entityTypeSlug = '', entityId: entityIdParam } = useParams()
   const entityId = Number(entityIdParam)
 
-  const entityTypeQuery = useEntityType(toEntityTypeId(entityTypeId))
+  const entityTypeQuery = useEntityTypeBySlug(entityTypeSlug)
+
+  if (entityTypeQuery.isPending) {
+    return <Text muted>{t('admin.entityRecords.list.titleDefault')}</Text>
+  }
+  if (entityTypeQuery.isError) {
+    return <Text muted>{entityTypeQuery.error.title}</Text>
+  }
+
+  return <EntityRecordContent entityType={entityTypeQuery.data} entityId={entityId} />
+}
+
+function EntityRecordContent({
+  entityType,
+  entityId,
+}: {
+  entityType: EntityType
+  entityId: number
+}) {
+  const { t, locale } = useTranslation()
+  const entityTypeId = Number(entityType.id)
+
   const {
     entity,
     textFieldDefs,
@@ -57,18 +81,16 @@ export function EntityRecordPage() {
   return (
     <Stack gap="md">
       <Stack gap="sm">
-        <Link to={`/entity-types/${String(entityTypeId)}/entities`}>
+        <Link to={`/${entityType.slug}`}>
           <Button variant="secondary" size="sm">
             {t('admin.entityRecord.backToRecords')}
           </Button>
         </Link>
         <Text as="h1" variant="heading-md">
-          {entityTypeQuery.data?.name ?? t('admin.entityRecords.list.titleDefault')}
+          {getLocalizedEntityTypeName(entityType, locale)}
         </Text>
       </Stack>
-      {entity !== null && (
-        <EntityStatusPanel entity={entity} entityTypeSlug={entityTypeQuery.data?.slug} />
-      )}
+      {entity !== null && <EntityStatusPanel entity={entity} entityTypeSlug={entityType.slug} />}
       <EditEntityTextFieldsView
         entity={entity}
         textFieldDefs={textFieldDefs}

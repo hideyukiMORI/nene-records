@@ -108,8 +108,8 @@ export function useManageEntitiesPage(entityTypeId: number) {
     setPage(0)
   }, [])
 
-  const createEntity = useCallback(async () => {
-    await createMutation.mutateAsync({ entityTypeId })
+  const createEntity = useCallback(async (): Promise<Entity> => {
+    return createMutation.mutateAsync({ entityTypeId })
   }, [createMutation, entityTypeId])
 
   const requestDelete = useCallback((entity: Entity) => {

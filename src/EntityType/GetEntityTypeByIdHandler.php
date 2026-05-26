@@ -33,6 +33,7 @@ final readonly class GetEntityTypeByIdHandler
             'name' => $output->name,
             'slug' => $output->slug,
             'is_pinned' => $output->isPinned,
+            'labels' => $output->labels ?? new \stdClass(),
         ]);
     }
 }

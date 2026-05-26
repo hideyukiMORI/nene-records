@@ -5,6 +5,8 @@ export interface EntityType {
   name: string
   slug: string
   isPinned: boolean
+  /** Locale-keyed display names. Empty object / undefined = no overrides. */
+  labels?: Record<string, string>
 }
 
 export interface EntityTypeList {
@@ -19,4 +21,9 @@ export interface CreateEntityTypeInput {
   isPinned?: boolean
 }
 
-export type UpdateEntityTypeInput = CreateEntityTypeInput
+export interface UpdateEntityTypeInput {
+  name: string
+  slug: string
+  isPinned?: boolean
+  labels?: Record<string, string>
+}

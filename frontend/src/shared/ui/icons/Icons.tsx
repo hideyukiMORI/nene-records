@@ -112,6 +112,14 @@ export function IconChevronRight({ size = 16, className }: IconProps) {
   )
 }
 
+export function IconChevronLeft({ size = 16, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className} aria-hidden="true">
+      <polyline points="15 18 9 12 15 6" />
+    </svg>
+  )
+}
+
 export function IconMenu({ size = 16, className }: IconProps) {
   return (
     <svg {...base(size)} className={className} aria-hidden="true">
@@ -137,6 +145,16 @@ export function IconWebhook({ size = 16, className }: IconProps) {
       <path d="M18 16.98h-5.99c-1.1 0-1.95.94-2.48 1.9A4 4 0 0 1 2 17c.01-.7.2-1.4.57-2" />
       <path d="m6 17 3.13-5.78c.53-.97.1-2.18-.5-3.1a4 4 0 1 1 6.89-4.06" />
       <path d="m12 6 3.13 5.73C15.66 12.7 16.9 13 18 13a4 4 0 0 1 0 8" />
+    </svg>
+  )
+}
+
+export function IconLayout({ size = 16, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className} aria-hidden="true">
+      <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+      <line x1="3" y1="9" x2="21" y2="9" />
+      <line x1="9" y1="21" x2="9" y2="9" />
     </svg>
   )
 }

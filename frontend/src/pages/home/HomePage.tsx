@@ -1,21 +1,77 @@
 import { Link } from 'react-router-dom'
 import { useDashboardSummary } from '@/entities/dashboard'
 import { usePinnedEntityTypes } from '@/entities/entity-type'
+import { currentUserHasCapability } from '@/entities/auth'
 import { useTranslation } from '@/shared/i18n'
 import { Stack, Text } from '@/shared/ui'
-import { IconFileText } from '@/shared/ui/icons/Icons'
+import { IconFileText, IconLink } from '@/shared/ui/icons/Icons'
 
 export function HomePage() {
   const { t } = useTranslation()
   const { data, isLoading, isError } = useDashboardSummary()
   const pinnedQuery = usePinnedEntityTypes()
   const pinnedTypes = pinnedQuery.data ?? []
+  const canManageSettings = currentUserHasCapability('manage_settings')
+
+  // Show "Getting started" when no published content yet — heuristic for fresh installs
+  const hasNoContent =
+    data !== undefined &&
+    data.entityTypeSummary.every((s) => s.publishedCount === 0 && s.draftCount === 0)
+  const showGettingStarted = hasNoContent || data === undefined
 
   return (
     <Stack gap="lg">
       <Text as="h1" variant="heading-md">
         {t('admin.home.title')}
       </Text>
+
+      {/* ── Getting started ── */}
+      {showGettingStarted && !isLoading && (pinnedTypes.length > 0 || canManageSettings) ? (
+        <section className="rounded-lg border border-accent/30 bg-accent/5 p-5">
+          <Text as="h2" variant="heading-sm">
+            {t('admin.home.gettingStarted')}
+          </Text>
+          <Text muted>{t('admin.home.gettingStarted.description')}</Text>
+          <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {pinnedTypes.length > 0 ? (
+              <Link
+                to={`/${pinnedTypes[0].slug}`}
+                className="group flex items-start gap-3 rounded-md border border-border bg-surface-raised p-4 transition-colors hover:border-accent"
+              >
+                <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-accent/10 text-accent">
+                  <IconFileText size={16} />
+                </span>
+                <span>
+                  <span className="block font-medium text-text-primary group-hover:text-accent">
+                    {t('admin.home.gettingStarted.content')}
+                  </span>
+                  <span className="mt-0.5 block text-xs text-text-muted">
+                    {t('admin.home.gettingStarted.content.description')}
+                  </span>
+                </span>
+              </Link>
+            ) : null}
+            {canManageSettings ? (
+              <Link
+                to="/navigation"
+                className="group flex items-start gap-3 rounded-md border border-border bg-surface-raised p-4 transition-colors hover:border-accent"
+              >
+                <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-accent/10 text-accent">
+                  <IconLink size={16} />
+                </span>
+                <span>
+                  <span className="block font-medium text-text-primary group-hover:text-accent">
+                    {t('admin.home.gettingStarted.menus')}
+                  </span>
+                  <span className="mt-0.5 block text-xs text-text-muted">
+                    {t('admin.home.gettingStarted.menus.description')}
+                  </span>
+                </span>
+              </Link>
+            ) : null}
+          </div>
+        </section>
+      ) : null}
 
       {/* ── Quick access ── */}
       <section>
@@ -29,7 +85,7 @@ export function HomePage() {
             {pinnedTypes.map((entityType) => (
               <Link
                 key={entityType.id}
-                to={`/entity-types/${String(entityType.id)}/entities`}
+                to={`/${entityType.slug}`}
                 className="group flex items-center gap-3 rounded-lg border border-border bg-surface-raised p-4 shadow-sm transition-colors hover:border-accent hover:bg-surface"
               >
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-accent/10 text-accent transition-colors group-hover:bg-accent/20">

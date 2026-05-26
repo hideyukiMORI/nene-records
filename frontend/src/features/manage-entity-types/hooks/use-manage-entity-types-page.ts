@@ -7,7 +7,11 @@ import {
   type EntityType,
   type EntityTypeId,
 } from '@/entities/entity-type'
-import type { CreateEntityTypeFormValues } from './use-create-entity-type-form'
+import {
+  formValuesToLabels,
+  type CreateEntityTypeFormValues,
+  type EditEntityTypeFormValues,
+} from './use-create-entity-type-form'
 
 export function useManageEntityTypesPage() {
   const listQuery = useEntityTypeList()
@@ -33,14 +37,20 @@ export function useManageEntityTypesPage() {
   }, [])
 
   const updateEntityType = useCallback(
-    async (values: CreateEntityTypeFormValues) => {
+    async (values: EditEntityTypeFormValues) => {
       if (editTarget === null) {
         return
       }
 
+      const labels = formValuesToLabels(values)
       await updateMutation.mutateAsync({
         id: editTarget.id,
-        input: values,
+        input: {
+          name: values.name,
+          slug: values.slug,
+          isPinned: values.isPinned,
+          labels: Object.keys(labels).length > 0 ? labels : undefined,
+        },
       })
       setEditTarget(null)
     },

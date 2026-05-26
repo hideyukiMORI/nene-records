@@ -10,6 +10,7 @@ export interface EntityTextFieldsFormProps {
   fieldDefs: FieldDef[]
   defaultValues: Record<string, string>
   isSubmitting: boolean
+  isSaved: boolean
   serverErrorTitle: string | null
   onSubmit: (values: Record<string, string>) => Promise<void>
 }
@@ -29,6 +30,7 @@ export function EntityTextFieldsForm({
   fieldDefs,
   defaultValues,
   isSubmitting,
+  isSaved,
   serverErrorTitle,
   onSubmit,
 }: EntityTextFieldsFormProps) {
@@ -147,11 +149,16 @@ export function EntityTextFieldsForm({
           )
         })}
         {serverErrorTitle !== null ? <Text muted>{serverErrorTitle}</Text> : null}
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting
-            ? t('admin.entityRecord.textFields.saving')
-            : t('admin.entityRecord.textFields.save')}
-        </Button>
+        <div className="flex items-center gap-inline-md">
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting
+              ? t('admin.entityRecord.textFields.saving')
+              : t('admin.entityRecord.textFields.save')}
+          </Button>
+          {isSaved && !isSubmitting ? (
+            <Text muted>{t('admin.entityRecord.textFields.saved')}</Text>
+          ) : null}
+        </div>
       </Stack>
     </form>
   )

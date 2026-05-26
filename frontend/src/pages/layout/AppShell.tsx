@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import { authStore, currentUserHasCapability } from '@/entities/auth'
-import { usePinnedEntityTypes } from '@/entities/entity-type'
+import { getLocalizedEntityTypeName, usePinnedEntityTypes } from '@/entities/entity-type'
 import { LOCALES, SUPPORTED_LOCALE_IDS, useTranslation } from '@/shared/i18n'
 import { useTheme } from '@/shared/theme'
 import {
@@ -9,6 +9,7 @@ import {
   IconLayers,
   IconTag,
   IconLink,
+  IconLayout,
   IconWebhook,
   IconSettings,
   IconGlobe,
@@ -78,6 +79,7 @@ export function AppShell() {
   const canReadSettings = currentUserHasCapability('read_settings')
   const canManageSettings = currentUserHasCapability('manage_settings')
 
+  const [appearanceOpen, setAppearanceOpen] = useState(true)
   const [advancedOpen, setAdvancedOpen] = useState(false)
   const pinnedEntityTypesQuery = usePinnedEntityTypes()
   const pinnedEntityTypes = pinnedEntityTypesQuery.data ?? []
@@ -163,9 +165,9 @@ export function AppShell() {
             {pinnedEntityTypes.map((entityType) => (
               <li key={entityType.id}>
                 <NavItem
-                  to={`/entity-types/${String(entityType.id)}/entities`}
+                  to={`/${entityType.slug}`}
                   icon={<IconFileText size={16} />}
-                  label={entityType.name}
+                  label={getLocalizedEntityTypeName(entityType, locale)}
                   onClick={closeSidebar}
                 />
               </li>
@@ -173,30 +175,12 @@ export function AppShell() {
             {pinnedEntityTypes.length > 0 && (
               <li aria-hidden="true" className="my-2 border-t border-sidebar-border opacity-50" />
             )}
-            <li>
-              <NavItem
-                to="/entity-types"
-                icon={<IconLayers size={16} />}
-                label={t('admin.nav.entityTypes')}
-                onClick={closeSidebar}
-              />
-            </li>
             {canManageTags ? (
               <li>
                 <NavItem
                   to="/tags"
                   icon={<IconTag size={16} />}
                   label={t('admin.nav.tags')}
-                  onClick={closeSidebar}
-                />
-              </li>
-            ) : null}
-            {canManageSettings ? (
-              <li>
-                <NavItem
-                  to="/navigation"
-                  icon={<IconLink size={16} />}
-                  label={t('admin.nav.navigation')}
                   onClick={closeSidebar}
                 />
               </li>
@@ -213,7 +197,46 @@ export function AppShell() {
             ) : null}
           </ul>
 
-          {/* ── Advanced (collapsible) ── */}
+          {/* ── Appearance (collapsible, default open) ── */}
+          {canManageSettings ? (
+            <>
+              <div className="my-4 border-t border-sidebar-border" />
+              <div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAppearanceOpen((o) => !o)
+                  }}
+                  className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-xs font-semibold uppercase tracking-wider text-sidebar-text-muted transition-colors hover:bg-sidebar-hover-bg hover:text-sidebar-active-text"
+                  aria-expanded={appearanceOpen}
+                >
+                  <IconLayout size={12} className="shrink-0" />
+                  <span className="flex-1 text-left">{t('admin.nav.appearance')}</span>
+                  <IconChevronRight
+                    size={12}
+                    className={[
+                      'shrink-0 transition-transform duration-150',
+                      appearanceOpen ? 'rotate-90' : '',
+                    ].join(' ')}
+                  />
+                </button>
+                {appearanceOpen ? (
+                  <ul className="mt-0.5 space-y-0.5">
+                    <li>
+                      <NavItem
+                        to="/navigation"
+                        icon={<IconLink size={16} />}
+                        label={t('admin.nav.navigation')}
+                        onClick={closeSidebar}
+                      />
+                    </li>
+                  </ul>
+                ) : null}
+              </div>
+            </>
+          ) : null}
+
+          {/* ── Advanced (collapsible, default closed) ── */}
           {canManageSettings ? (
             <>
               <div className="my-4 border-t border-sidebar-border" />
@@ -237,6 +260,14 @@ export function AppShell() {
                 </button>
                 {advancedOpen ? (
                   <ul className="mt-0.5 space-y-0.5">
+                    <li>
+                      <NavItem
+                        to="/entity-types"
+                        icon={<IconLayers size={16} />}
+                        label={t('admin.nav.entityTypes')}
+                        onClick={closeSidebar}
+                      />
+                    </li>
                     <li>
                       <NavItem
                         to="/webhooks"

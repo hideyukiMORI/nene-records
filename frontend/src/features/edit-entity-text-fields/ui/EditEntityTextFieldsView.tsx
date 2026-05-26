@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import type { FieldDef } from '@/entities/field-def'
 import type { Entity } from '@/entities/entity'
 import { useTranslation } from '@/shared/i18n'
@@ -38,6 +38,17 @@ export function EditEntityTextFieldsView({
 }: EditEntityTextFieldsViewProps) {
   const { t } = useTranslation()
   const [customLocaleInput, setCustomLocaleInput] = useState('')
+  const [isSaved, setIsSaved] = useState(false)
+  const savedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const handleSave = async (values: Record<string, string>) => {
+    await onSave(values)
+    setIsSaved(true)
+    if (savedTimerRef.current !== null) clearTimeout(savedTimerRef.current)
+    savedTimerRef.current = setTimeout(() => {
+      setIsSaved(false)
+    }, 3000)
+  }
 
   if (isLoading) {
     return <Text muted>{t('admin.entityRecord.loading')}</Text>
@@ -140,8 +151,9 @@ export function EditEntityTextFieldsView({
         fieldDefs={textFieldDefs}
         defaultValues={initialValues}
         isSubmitting={isSaving}
+        isSaved={isSaved}
         serverErrorTitle={saveErrorTitle}
-        onSubmit={onSave}
+        onSubmit={handleSave}
       />
     </Stack>
   )
