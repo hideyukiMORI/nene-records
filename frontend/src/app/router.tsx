@@ -13,6 +13,7 @@ import { AppShell } from '@/pages/layout/AppShell'
 import { LoginPage } from '@/pages/login/LoginPage'
 import { NavigationPage } from '@/pages/navigation/NavigationPage'
 import { NotFoundPage } from '@/pages/not-found/NotFoundPage'
+import { MediaPage } from '@/pages/media/MediaPage'
 import { SiteSettingsPage } from '@/pages/settings/SiteSettingsPage'
 import { WebhooksPage } from '@/pages/webhooks/WebhooksPage'
 import { TagsPage } from '@/pages/tags/TagsPage'
@@ -48,6 +49,7 @@ const router = createBrowserRouter([
       { path: 'entity-types', element: <EntityTypesPage /> },
       { path: 'tags', element: <TagsPage /> },
       { path: 'navigation', element: <NavigationPage /> },
+      { path: 'media', element: <MediaPage /> },
       { path: 'webhooks', element: <WebhooksPage /> },
       { path: 'settings', element: <SiteSettingsPage /> },
       { path: 'entity-types/:entityTypeSlug/fields', element: <FieldDefsPage /> },

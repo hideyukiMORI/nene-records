@@ -96,6 +96,7 @@ final readonly class UploadMediaUseCase implements UploadMediaUseCaseInterface
             originalName: $input->originalName,
             mimeType: $input->mimeType,
             size: $input->size,
+            createdAt: $now,
         );
     }
 

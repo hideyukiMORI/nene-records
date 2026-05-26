@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace NeNeRecords\Media;
 
-final readonly class UploadMediaOutput
+final readonly class ListMediaItem
 {
     public function __construct(
         public int $id,
@@ -12,7 +12,7 @@ final readonly class UploadMediaOutput
         public string $originalName,
         public string $mimeType,
         public int $size,
-        public string $createdAt = '',
+        public string $createdAt,
     ) {
     }
 }

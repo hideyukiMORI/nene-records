@@ -52,6 +52,30 @@ final readonly class MediaServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(
+                ListMediaUseCaseInterface::class,
+                static function (ContainerInterface $c): ListMediaUseCaseInterface {
+                    $repository = $c->get(MediaRepositoryInterface::class);
+
+                    if (!$repository instanceof MediaRepositoryInterface) {
+                        throw new LogicException('Media repository service is invalid.');
+                    }
+
+                    return new ListMediaUseCase($repository);
+                },
+            )
+            ->set(
+                DeleteMediaUseCaseInterface::class,
+                static function (ContainerInterface $c): DeleteMediaUseCaseInterface {
+                    $repository = $c->get(MediaRepositoryInterface::class);
+
+                    if (!$repository instanceof MediaRepositoryInterface) {
+                        throw new LogicException('Media repository service is invalid.');
+                    }
+
+                    return new DeleteMediaUseCase($repository);
+                },
+            )
+            ->set(
                 UploadMediaHandler::class,
                 static function (ContainerInterface $c): UploadMediaHandler {
                     $useCase = $c->get(UploadMediaUseCaseInterface::class);
@@ -66,6 +90,45 @@ final readonly class MediaServiceProvider implements ServiceProviderInterface
                     }
 
                     return new UploadMediaHandler($useCase, $response);
+                },
+            )
+            ->set(
+                ListMediaHandler::class,
+                static function (ContainerInterface $c): ListMediaHandler {
+                    $useCase = $c->get(ListMediaUseCaseInterface::class);
+                    $response = $c->get(JsonResponseFactory::class);
+
+                    if (!$useCase instanceof ListMediaUseCaseInterface) {
+                        throw new LogicException('ListMedia use case service is invalid.');
+                    }
+
+                    if (!$response instanceof JsonResponseFactory) {
+                        throw new LogicException('JSON response factory service is invalid.');
+                    }
+
+                    return new ListMediaHandler($useCase, $response);
+                },
+            )
+            ->set(
+                DeleteMediaHandler::class,
+                static function (ContainerInterface $c): DeleteMediaHandler {
+                    $useCase = $c->get(DeleteMediaUseCaseInterface::class);
+                    $projectRoot = $c->get(RuntimeServiceProvider::PROJECT_ROOT);
+                    $responseFactory = $c->get(ResponseFactoryInterface::class);
+
+                    if (!$useCase instanceof DeleteMediaUseCaseInterface) {
+                        throw new LogicException('DeleteMedia use case service is invalid.');
+                    }
+
+                    if (!is_string($projectRoot) || $projectRoot === '') {
+                        throw new LogicException('Project root service is invalid.');
+                    }
+
+                    if (!$responseFactory instanceof ResponseFactoryInterface) {
+                        throw new LogicException('Response factory service is invalid.');
+                    }
+
+                    return new DeleteMediaHandler($useCase, $responseFactory, $projectRoot . '/var/media');
                 },
             )
             ->set(
@@ -117,20 +180,42 @@ final readonly class MediaServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(
+                MediaNotFoundExceptionHandler::class,
+                static function (ContainerInterface $c): MediaNotFoundExceptionHandler {
+                    $problemDetails = $c->get(ProblemDetailsResponseFactory::class);
+
+                    if (!$problemDetails instanceof ProblemDetailsResponseFactory) {
+                        throw new LogicException('Problem details response factory service is invalid.');
+                    }
+
+                    return new MediaNotFoundExceptionHandler($problemDetails);
+                },
+            )
+            ->set(
                 'nene-records.route_registrar.media',
                 static function (ContainerInterface $c): MediaRouteRegistrar {
                     $upload = $c->get(UploadMediaHandler::class);
+                    $list = $c->get(ListMediaHandler::class);
+                    $delete = $c->get(DeleteMediaHandler::class);
                     $serve = $c->get(ServeMediaHandler::class);
 
                     if (!$upload instanceof UploadMediaHandler) {
                         throw new LogicException('UploadMedia handler service is invalid.');
                     }
 
+                    if (!$list instanceof ListMediaHandler) {
+                        throw new LogicException('ListMedia handler service is invalid.');
+                    }
+
+                    if (!$delete instanceof DeleteMediaHandler) {
+                        throw new LogicException('DeleteMedia handler service is invalid.');
+                    }
+
                     if (!$serve instanceof ServeMediaHandler) {
                         throw new LogicException('ServeMedia handler service is invalid.');
                     }
 
-                    return new MediaRouteRegistrar($upload, $serve);
+                    return new MediaRouteRegistrar($upload, $list, $delete, $serve);
                 },
             );
     }

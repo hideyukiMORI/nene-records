@@ -413,6 +413,26 @@ export const ja: Partial<MessageCatalog> = {
   'admin.webhooks.form.secretPlaceholder': 'HMAC-SHA256 X-NeNe-Signature ヘッダーに使用',
   'admin.webhooks.form.isActiveLabel': '有効',
 
+  // ── Media library ───────────────────────────────────────────────────────
+  'admin.nav.media': 'メディア',
+  'admin.media.pageTitle': 'メディアライブラリ',
+  'admin.media.description': 'メディアファイルをアップロード・管理します。',
+  'admin.media.dropzone.label': 'ここにファイルをドロップ、またはクリックしてアップロード',
+  'admin.media.dropzone.hint': '画像・PDF・動画・音声 — 1 ファイル最大 10 MB',
+  'admin.media.dropzone.uploading': 'アップロード中…',
+  'admin.media.list.title': 'アップロード済みファイル',
+  'admin.media.list.loading': 'メディアを読み込み中…',
+  'admin.media.list.error': 'メディアを読み込めませんでした。',
+  'admin.media.list.retry': '再試行',
+  'admin.media.list.empty.title': 'ファイルがまだありません',
+  'admin.media.list.empty.description': '上のエリアからファイルをアップロードしてください。',
+  'admin.media.copy': 'URL をコピー',
+  'admin.media.copied': 'コピーしました！',
+  'admin.media.delete': '削除',
+  'admin.media.delete.confirmTitle': 'ファイルを削除しますか？',
+  'admin.media.delete.confirmDescription': '「{{name}}」を削除しますか？この操作は元に戻せません。',
+  'admin.media.delete.deleting': '削除中…',
+
   // ── Public consumer pages ────────────────────────────────────────────────
   'public.record.notFound.title': 'レコードが見つかりません',
   'public.record.notFound.description': 'スラッグ "{{slug}}" のレコードが見つかりません。',

@@ -54,6 +54,14 @@ final class CapabilityResolver
             return Capability::ManageTags;
         }
 
+        if (str_starts_with($path, '/api/v1/media')) {
+            return match (true) {
+                $method === 'DELETE' => Capability::ManageSettings,
+                $method === 'GET' || $method === 'HEAD' => Capability::ReadSettings,
+                default => null,
+            };
+        }
+
         foreach (self::CONTENT_MUTATION_PREFIXES as $prefix) {
             if (str_starts_with($path, $prefix) && self::isMutationMethod($method)) {
                 return Capability::EditContent;
