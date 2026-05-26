@@ -136,17 +136,20 @@ export const ja: Partial<MessageCatalog> = {
   'admin.fieldDefs.dataType.bool': 'ブール値',
   'admin.fieldDefs.dataType.datetime': '日時',
   'admin.fieldDefs.dataType.image': '画像',
+  'admin.fieldDefs.dataType.file': 'ファイル',
   'admin.fieldDefs.dataType.relation': 'リレーション',
 
   // ── Media upload ─────────────────────────────────────────────────────────
   'admin.media.panelTitle': 'メディア',
   'admin.media.uploadButton': '画像をアップロード',
+  'admin.media.fileUploadButton': 'ファイルをアップロード',
   'admin.media.uploading': 'アップロード中…',
   'admin.media.uploadSuccess': 'アップロード完了 — URL をクリップボードにコピーしました。',
   'admin.media.uploadError': 'アップロードに失敗しました。',
   'admin.media.imagePreview': '画像プレビュー',
   'admin.media.noImage': '画像が選択されていません',
   'admin.media.urlLabel': '画像 URL',
+  'admin.media.fileDownload': 'ダウンロード',
 
   // ── Markdown editor ───────────────────────────────────────────────────────
   'admin.markdownEditor.preview': 'プレビュー',

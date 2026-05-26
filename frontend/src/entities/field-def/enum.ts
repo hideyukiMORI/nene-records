@@ -6,6 +6,7 @@ export const FIELD_DATA_TYPES = [
   'bool',
   'datetime',
   'image',
+  'file',
   'relation',
 ] as const
 
