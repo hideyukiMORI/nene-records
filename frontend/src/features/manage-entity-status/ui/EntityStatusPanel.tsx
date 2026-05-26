@@ -9,7 +9,7 @@ import {
 } from '@/entities/entity'
 import { useTranslation } from '@/shared/i18n'
 import type { MessageKey } from '@/shared/i18n'
-import { Button, Input, Stack, Text } from '@/shared/ui'
+import { Button, Input, Stack, Text, useToast } from '@/shared/ui'
 
 const STATUS_BADGE_CLASS: Record<EntityStatus, string> = {
   draft:
@@ -43,14 +43,13 @@ interface EntityStatusPanelProps {
 
 export function EntityStatusPanel({ entity, entityTypeSlug }: EntityStatusPanelProps) {
   const { t } = useTranslation()
+  const { showToast } = useToast()
   const updateMutation = useUpdateEntity()
   const scheduleMutation = useScheduleEntity()
   const unscheduleMutation = useUnscheduleEntity()
   const generatePreviewMutation = useGeneratePreviewToken()
   const revokePreviewMutation = useRevokePreviewToken()
-  const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [slugInput, setSlugInput] = useState(entity.slug ?? '')
-  const [slugSaved, setSlugSaved] = useState(false)
   const [showScheduleForm, setShowScheduleForm] = useState(false)
   const [scheduledAtInput, setScheduledAtInput] = useState('')
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
@@ -64,8 +63,6 @@ export function EntityStatusPanel({ entity, entityTypeSlug }: EntityStatusPanelP
     revokePreviewMutation.isPending
 
   const changeStatus = async (nextStatus: EntityStatus) => {
-    setErrorMessage(null)
-    setSlugSaved(false)
     try {
       await updateMutation.mutateAsync({
         id: Number(entity.id),
@@ -74,13 +71,11 @@ export function EntityStatusPanel({ entity, entityTypeSlug }: EntityStatusPanelP
         status: nextStatus,
       })
     } catch {
-      setErrorMessage(t('admin.entityStatus.updateError'))
+      showToast(t('admin.entityStatus.updateError'), 'error')
     }
   }
 
   const saveSlug = async () => {
-    setErrorMessage(null)
-    setSlugSaved(false)
     try {
       await updateMutation.mutateAsync({
         id: Number(entity.id),
@@ -88,15 +83,14 @@ export function EntityStatusPanel({ entity, entityTypeSlug }: EntityStatusPanelP
         slug: slugInput !== '' ? slugInput : null,
         status: entity.status,
       })
-      setSlugSaved(true)
+      showToast(t('admin.entityStatus.slugSaved'), 'success')
     } catch {
-      setErrorMessage(t('admin.entityStatus.slugError'))
+      showToast(t('admin.entityStatus.slugError'), 'error')
     }
   }
 
   const schedulePublish = async () => {
     if (scheduledAtInput === '') return
-    setErrorMessage(null)
     try {
       await scheduleMutation.mutateAsync({
         id: Number(entity.id),
@@ -105,38 +99,35 @@ export function EntityStatusPanel({ entity, entityTypeSlug }: EntityStatusPanelP
       setShowScheduleForm(false)
       setScheduledAtInput('')
     } catch {
-      setErrorMessage(t('admin.entityStatus.scheduleError'))
+      showToast(t('admin.entityStatus.scheduleError'), 'error')
     }
   }
 
   const cancelSchedule = async () => {
-    setErrorMessage(null)
     try {
       await unscheduleMutation.mutateAsync({ id: entity.id })
     } catch {
-      setErrorMessage(t('admin.entityStatus.updateError'))
+      showToast(t('admin.entityStatus.updateError'), 'error')
     }
   }
 
   const generatePreview = async () => {
-    setErrorMessage(null)
     try {
       const output = await generatePreviewMutation.mutateAsync({ id: Number(entity.id) })
       setPreviewUrl(output.previewUrl)
       setPreviewExpires(output.expiresAt)
     } catch {
-      setErrorMessage(t('admin.entityStatus.previewTokenError'))
+      showToast(t('admin.entityStatus.previewTokenError'), 'error')
     }
   }
 
   const revokePreview = async () => {
-    setErrorMessage(null)
     try {
       await revokePreviewMutation.mutateAsync({ id: Number(entity.id) })
       setPreviewUrl(null)
       setPreviewExpires(null)
     } catch {
-      setErrorMessage(t('admin.entityStatus.updateError'))
+      showToast(t('admin.entityStatus.updateError'), 'error')
     }
   }
 
@@ -181,7 +172,6 @@ export function EntityStatusPanel({ entity, entityTypeSlug }: EntityStatusPanelP
             value={slugInput}
             onChange={(e) => {
               setSlugInput(e.target.value)
-              setSlugSaved(false)
             }}
             placeholder={t('admin.entityStatus.slugPlaceholder')}
           />
@@ -189,7 +179,6 @@ export function EntityStatusPanel({ entity, entityTypeSlug }: EntityStatusPanelP
             {t('admin.entityStatus.saveSlug')}
           </Button>
         </div>
-        {slugSaved && <Text muted>{t('admin.entityStatus.slugSaved')}</Text>}
         {publicUrl !== null && (
           <a
             href={publicUrl}
@@ -309,8 +298,6 @@ export function EntityStatusPanel({ entity, entityTypeSlug }: EntityStatusPanelP
           </Stack>
         </div>
       )}
-
-      {errorMessage !== null && <Text muted>{errorMessage}</Text>}
     </Stack>
   )
 }
