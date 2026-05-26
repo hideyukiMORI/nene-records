@@ -60,6 +60,7 @@ export interface ManageEntitiesViewProps {
   entityTypeName: string | null
   items: Entity[]
   recordLabels: Record<string, string>
+  recordBodyMap: Record<string, string>
   total: number
   page: number
   totalPages: number
@@ -97,6 +98,7 @@ export function ManageEntitiesView({
   entityTypeSlug,
   items,
   recordLabels,
+  recordBodyMap,
   total,
   page,
   totalPages,
@@ -338,6 +340,7 @@ export function ManageEntitiesView({
             entityTypeSlug={entityTypeSlug}
             items={items}
             recordLabels={recordLabels}
+            recordBodyMap={recordBodyMap}
             isLoading={isLoading}
             isError={isError}
             errorTitle={errorTitle}

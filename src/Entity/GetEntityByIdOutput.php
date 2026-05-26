@@ -17,6 +17,8 @@ final readonly class GetEntityByIdOutput
         public ?string $metaTitle = null,
         public ?string $metaDescription = null,
         public ?string $scheduledAtIso = null,
+        public ?string $createdAtIso = null,
+        public ?string $updatedAtIso = null,
     ) {
     }
 }

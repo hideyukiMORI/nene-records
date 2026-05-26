@@ -85,6 +85,20 @@ export function useManageEntitiesPage(entityTypeId: number) {
     )
   }, [items, t, textFieldQuery.data?.items])
 
+  const recordBodyMap = useMemo((): Record<string, string> => {
+    const textFields = textFieldQuery.data?.items ?? []
+    const result: Record<string, string> = {}
+    for (const entity of items) {
+      const bodyField = textFields.find(
+        (f) => f.entityId === Number(entity.id) && f.fieldKey === 'body',
+      )
+      if (bodyField !== undefined && bodyField.value.trim() !== '') {
+        result[String(entity.id)] = bodyField.value.trim()
+      }
+    }
+    return result
+  }, [items, textFieldQuery.data?.items])
+
   const toggleTagSlug = useCallback((slug: string) => {
     setSelectedTagSlugs((current) =>
       current.includes(slug) ? current.filter((item) => item !== slug) : [...current, slug],
@@ -162,6 +176,7 @@ export function useManageEntitiesPage(entityTypeId: number) {
   return {
     items,
     recordLabels,
+    recordBodyMap,
     total,
     page,
     totalPages,

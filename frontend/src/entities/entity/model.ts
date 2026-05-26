@@ -13,6 +13,8 @@ export interface Entity {
   deletedAt: string | null
   metaTitle: string | null
   metaDescription: string | null
+  createdAt: string | null
+  updatedAt: string | null
 }
 
 export interface EntityList {

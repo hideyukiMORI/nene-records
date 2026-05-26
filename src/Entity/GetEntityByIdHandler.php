@@ -39,6 +39,8 @@ final readonly class GetEntityByIdHandler
             'deleted_at' => $output->deletedAtIso,
             'meta_title' => $output->metaTitle,
             'meta_description' => $output->metaDescription,
+            'created_at' => $output->createdAtIso,
+            'updated_at' => $output->updatedAtIso,
         ]);
     }
 }

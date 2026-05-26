@@ -31,6 +31,7 @@ function EntityRecordsContent({ entityType }: { entityType: EntityType }) {
   const {
     items,
     recordLabels,
+    recordBodyMap,
     total,
     page,
     totalPages,
@@ -108,6 +109,7 @@ function EntityRecordsContent({ entityType }: { entityType: EntityType }) {
         entityTypeName={localizedName}
         items={items}
         recordLabels={recordLabels}
+        recordBodyMap={recordBodyMap}
         total={total}
         page={page}
         totalPages={totalPages}
