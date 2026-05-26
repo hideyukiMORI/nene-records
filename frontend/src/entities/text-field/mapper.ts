@@ -13,6 +13,7 @@ export function mapTextFieldDtoToModel(dto: TextFieldDto): TextField {
     entityId: dto.entity_id,
     fieldKey: dto.field_key,
     value: dto.value,
+    locale: dto.locale,
   }
 }
 
@@ -29,6 +30,7 @@ export function mapCreateInputToDto(input: CreateTextFieldInput): CreateTextFiel
     entity_id: input.entityId,
     field_key: input.fieldKey,
     value: input.value,
+    locale: input.locale,
   }
 }
 
@@ -36,5 +38,6 @@ export function mapUpdateInputToDto(input: UpdateTextFieldInput): UpdateTextFiel
   return {
     field_key: input.fieldKey,
     value: input.value,
+    locale: input.locale,
   }
 }

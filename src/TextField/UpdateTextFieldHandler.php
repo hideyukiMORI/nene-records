@@ -49,13 +49,23 @@ final readonly class UpdateTextFieldHandler
             throw new ValidationException($errors);
         }
 
-        $output = $this->useCase->execute(new UpdateTextFieldInput(id: $id, fieldKey: $fieldKey, value: $valueRaw));
+        $localeRaw = isset($body['locale']) && is_string($body['locale']) && $body['locale'] !== ''
+            ? $body['locale']
+            : null;
+
+        $output = $this->useCase->execute(new UpdateTextFieldInput(
+            id: $id,
+            fieldKey: $fieldKey,
+            value: $valueRaw,
+            locale: $localeRaw,
+        ));
 
         return $this->response->create([
             'id'        => $output->id,
             'entity_id' => $output->entityId,
             'field_key' => $output->fieldKey,
             'value'     => $output->value,
+            'locale'    => $output->locale,
         ]);
     }
 }

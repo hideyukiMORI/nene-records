@@ -39,11 +39,17 @@ final readonly class ListTextFieldsHandler
             }
         }
 
+        $locale = null;
+        if (isset($query['locale']) && is_string($query['locale']) && $query['locale'] !== '') {
+            $locale = $query['locale'];
+        }
+
         $output = $this->useCase->execute(new ListTextFieldsInput(
             entityId: $entityId,
             entityTypeId: $entityTypeId,
             limit: $pagination->limit,
             offset: $pagination->offset,
+            locale: $locale,
         ));
 
         return $this->response->create(
@@ -54,6 +60,7 @@ final readonly class ListTextFieldsHandler
                         'entity_id' => $item->entityId,
                         'field_key' => $item->fieldKey,
                         'value'     => $item->value,
+                        'locale'    => $item->locale,
                     ],
                     $output->items,
                 ),

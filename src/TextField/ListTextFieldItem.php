@@ -11,6 +11,7 @@ final readonly class ListTextFieldItem
         public int $entityId,
         public string $fieldKey,
         public string $value,
+        public ?string $locale = null,
     ) {
     }
 }

@@ -24,6 +24,7 @@ final readonly class GetTextFieldByIdUseCase implements GetTextFieldByIdUseCaseI
             entityId: $textField->entityId,
             fieldKey: $textField->fieldKey,
             value: $textField->value,
+            locale: $textField->locale,
         );
     }
 }

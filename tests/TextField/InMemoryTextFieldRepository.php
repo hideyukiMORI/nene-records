@@ -49,12 +49,16 @@ final class InMemoryTextFieldRepository implements TextFieldRepositoryInterface
     }
 
     /** @return list<TextField> */
-    public function findAll(int $limit, int $offset): array
+    public function findAll(int $limit, int $offset, ?string $locale = null): array
     {
         $active = [];
 
         foreach ($this->fields as $id => $textField) {
             if (!isset($this->deletedIds[$id])) {
+                if ($locale !== null && $textField->locale !== $locale) {
+                    continue;
+                }
+
                 $active[] = $textField;
             }
         }
@@ -65,12 +69,16 @@ final class InMemoryTextFieldRepository implements TextFieldRepositoryInterface
     }
 
     /** @return list<TextField> */
-    public function findByEntityId(int $entityId, int $limit, int $offset): array
+    public function findByEntityId(int $entityId, int $limit, int $offset, ?string $locale = null): array
     {
         $active = [];
 
         foreach ($this->fields as $id => $textField) {
             if (!isset($this->deletedIds[$id]) && $textField->entityId === $entityId) {
+                if ($locale !== null && $textField->locale !== $locale) {
+                    continue;
+                }
+
                 $active[] = $textField;
             }
         }
@@ -81,7 +89,7 @@ final class InMemoryTextFieldRepository implements TextFieldRepositoryInterface
     }
 
     /** @return list<TextField> */
-    public function findByEntityTypeId(int $entityTypeId, int $limit, int $offset): array
+    public function findByEntityTypeId(int $entityTypeId, int $limit, int $offset, ?string $locale = null): array
     {
         $active = [];
 
@@ -97,6 +105,10 @@ final class InMemoryTextFieldRepository implements TextFieldRepositoryInterface
             $entity = $this->entities->findById($textField->entityId);
 
             if ($entity !== null && $entity->entityTypeId === $entityTypeId) {
+                if ($locale !== null && $textField->locale !== $locale) {
+                    continue;
+                }
+
                 $active[] = $textField;
             }
         }
@@ -137,6 +149,7 @@ final class InMemoryTextFieldRepository implements TextFieldRepositoryInterface
             fieldKey: $textField->fieldKey,
             value: $textField->value,
             id: $id,
+            locale: $textField->locale,
         );
 
         return $id;

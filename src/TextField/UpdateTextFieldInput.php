@@ -10,6 +10,7 @@ final readonly class UpdateTextFieldInput
         public int $id,
         public string $fieldKey,
         public string $value,
+        public ?string $locale = null,
     ) {
     }
 }

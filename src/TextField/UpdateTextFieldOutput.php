@@ -11,6 +11,7 @@ final readonly class UpdateTextFieldOutput
         public int $entityId,
         public string $fieldKey,
         public string $value,
+        public ?string $locale = null,
     ) {
     }
 }

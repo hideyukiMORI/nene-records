@@ -46,10 +46,15 @@ final readonly class CreateTextFieldHandler
             throw new ValidationException($errors);
         }
 
+        $localeRaw = isset($body['locale']) && is_string($body['locale']) && $body['locale'] !== ''
+            ? $body['locale']
+            : null;
+
         $output = $this->useCase->execute(new CreateTextFieldInput(
             entityId: $entityId,
             fieldKey: $fieldKey,
             value: $valueRaw,
+            locale: $localeRaw,
         ));
 
         return $this->response->create(
@@ -58,6 +63,7 @@ final readonly class CreateTextFieldHandler
                 'entity_id'  => $output->entityId,
                 'field_key'  => $output->fieldKey,
                 'value'      => $output->value,
+                'locale'     => $output->locale,
             ],
             201,
             ['Location' => '/api/v1/text-fields/' . $output->id],

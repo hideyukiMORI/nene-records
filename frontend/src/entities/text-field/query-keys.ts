@@ -5,6 +5,7 @@ export interface TextFieldListParams {
   offset: number
   entityId?: number
   entityTypeId?: number
+  locale?: string | null
 }
 
 export const textFieldKeys = {

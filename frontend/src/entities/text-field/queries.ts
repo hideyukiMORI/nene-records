@@ -32,6 +32,9 @@ export function useTextFieldList(
       } else if (params.entityTypeId !== undefined) {
         search.set('entity_type_id', String(params.entityTypeId))
       }
+      if (params.locale != null) {
+        search.set('locale', params.locale)
+      }
       const dto = await apiClient.get<TextFieldListDto>(
         `/api/v1/text-fields?${search.toString()}`,
         signal,

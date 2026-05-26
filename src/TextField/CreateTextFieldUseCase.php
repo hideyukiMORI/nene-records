@@ -33,6 +33,7 @@ final readonly class CreateTextFieldUseCase implements CreateTextFieldUseCaseInt
             entityId: $input->entityId,
             fieldKey: $input->fieldKey,
             value: $input->value,
+            locale: $input->locale,
         ));
 
         return new CreateTextFieldOutput(
@@ -40,6 +41,7 @@ final readonly class CreateTextFieldUseCase implements CreateTextFieldUseCaseInt
             entityId: $input->entityId,
             fieldKey: $input->fieldKey,
             value: $input->value,
+            locale: $input->locale,
         );
     }
 

@@ -10,6 +10,7 @@ final readonly class CreateTextFieldInput
         public int $entityId,
         public string $fieldKey,
         public string $value,
+        public ?string $locale = null,
     ) {
     }
 }

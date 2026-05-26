@@ -10,24 +10,27 @@ interface TextFieldRepositoryInterface
 
     /**
      * Active (non-soft-deleted) rows only.
+     * When $locale is given, only rows with that locale are returned.
      *
      * @return list<TextField>
      */
-    public function findAll(int $limit, int $offset): array;
+    public function findAll(int $limit, int $offset, ?string $locale = null): array;
 
     /**
      * Active (non-soft-deleted) rows for the given entity only.
+     * When $locale is given, only rows with that locale are returned.
      *
      * @return list<TextField>
      */
-    public function findByEntityId(int $entityId, int $limit, int $offset): array;
+    public function findByEntityId(int $entityId, int $limit, int $offset, ?string $locale = null): array;
 
     /**
      * Active (non-soft-deleted) rows for entities belonging to the given entity type.
+     * When $locale is given, only rows with that locale are returned.
      *
      * @return list<TextField>
      */
-    public function findByEntityTypeId(int $entityTypeId, int $limit, int $offset): array;
+    public function findByEntityTypeId(int $entityTypeId, int $limit, int $offset, ?string $locale = null): array;
 
     /**
      * Active (non-soft-deleted) rows for a batch of entity ids (no limit).

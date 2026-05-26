@@ -33,6 +33,7 @@ final readonly class GetTextFieldByIdHandler
             'entity_id' => $output->entityId,
             'field_key' => $output->fieldKey,
             'value'     => $output->value,
+            'locale'    => $output->locale,
         ]);
     }
 }

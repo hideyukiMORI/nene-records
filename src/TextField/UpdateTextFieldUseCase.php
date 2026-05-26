@@ -40,6 +40,7 @@ final readonly class UpdateTextFieldUseCase implements UpdateTextFieldUseCaseInt
             fieldKey: $input->fieldKey,
             value: $input->value,
             id: $input->id,
+            locale: $input->locale,
         );
         $this->textFields->update($updated);
 
@@ -48,6 +49,7 @@ final readonly class UpdateTextFieldUseCase implements UpdateTextFieldUseCaseInt
             entityId: $existing->entityId,
             fieldKey: $input->fieldKey,
             value: $input->value,
+            locale: $input->locale,
         );
     }
 

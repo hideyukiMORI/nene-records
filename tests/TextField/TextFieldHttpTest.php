@@ -311,6 +311,81 @@ final class TextFieldHttpTest extends TestCase
         self::assertSame('Type A title', $payload['items'][0]['value']);
     }
 
+    public function testCreateTextFieldWithLocaleStoresLocale(): void
+    {
+        $typeId = $this->entityTypes->save(new EntityType(name: 'Article', slug: 'article'));
+        $this->fieldDefs->save(new FieldDef(entityTypeId: $typeId, fieldKey: 'title', dataType: 'text'));
+        $entityId = $this->createEntity($typeId);
+
+        $body = $this->factory->createStream(json_encode([
+            'entity_id' => $entityId,
+            'field_key' => 'title',
+            'value' => 'こんにちは',
+            'locale' => 'ja',
+        ], JSON_THROW_ON_ERROR));
+
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('POST', 'https://example.test/api/v1/text-fields')->withBody($body),
+        );
+        $payload = $this->decodeJson($response);
+
+        self::assertSame(201, $response->getStatusCode());
+        self::assertSame('ja', $payload['locale']);
+    }
+
+    public function testListTextFieldsFiltersByLocale(): void
+    {
+        $typeId = $this->entityTypes->save(new EntityType(name: 'Article', slug: 'article'));
+        $this->fieldDefs->save(new FieldDef(entityTypeId: $typeId, fieldKey: 'title', dataType: 'text'));
+        $entityId = $this->createEntity($typeId);
+
+        // Create default (null locale) and Japanese versions
+        $this->createTextField($entityId, 'title', 'Hello');
+
+        $bodyJa = $this->factory->createStream(json_encode([
+            'entity_id' => $entityId,
+            'field_key' => 'title',
+            'value' => 'こんにちは',
+            'locale' => 'ja',
+        ], JSON_THROW_ON_ERROR));
+        $this->application->handle(
+            $this->factory->createServerRequest('POST', 'https://example.test/api/v1/text-fields')->withBody($bodyJa),
+        );
+
+        // Filter by locale=ja → should return only the Japanese version
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('GET', "https://example.test/api/v1/text-fields?entity_id={$entityId}&locale=ja"),
+        );
+        $payload = $this->decodeJson($response);
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertCount(1, $payload['items']);
+        self::assertSame('こんにちは', $payload['items'][0]['value']);
+        self::assertSame('ja', $payload['items'][0]['locale']);
+    }
+
+    public function testResponseIncludesLocaleField(): void
+    {
+        $typeId = $this->entityTypes->save(new EntityType(name: 'Article', slug: 'article'));
+        $this->fieldDefs->save(new FieldDef(entityTypeId: $typeId, fieldKey: 'body', dataType: 'text'));
+        $entityId = $this->createEntity($typeId);
+
+        $body = $this->factory->createStream(json_encode([
+            'entity_id' => $entityId,
+            'field_key' => 'body',
+            'value' => 'Content',
+        ], JSON_THROW_ON_ERROR));
+
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('POST', 'https://example.test/api/v1/text-fields')->withBody($body),
+        );
+        $payload = $this->decodeJson($response);
+
+        self::assertSame(201, $response->getStatusCode());
+        self::assertArrayHasKey('locale', $payload);
+        self::assertNull($payload['locale']);
+    }
+
     private function createEntity(int $entityTypeId): int
     {
         $bodyEntity = $this->factory->createStream(json_encode(['entity_type_id' => $entityTypeId], JSON_THROW_ON_ERROR));

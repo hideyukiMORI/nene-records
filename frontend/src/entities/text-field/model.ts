@@ -5,6 +5,7 @@ export interface TextField {
   entityId: number
   fieldKey: string
   value: string
+  locale: string | null
 }
 
 export interface TextFieldList {
@@ -17,9 +18,11 @@ export interface CreateTextFieldInput {
   entityId: number
   fieldKey: string
   value: string
+  locale?: string | null
 }
 
 export interface UpdateTextFieldInput {
   fieldKey: string
   value: string
+  locale?: string | null
 }
