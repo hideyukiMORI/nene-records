@@ -30,6 +30,30 @@ final readonly class PdoAccessLogRepository implements AccessLogRepositoryInterf
         );
     }
 
+    public function countByDate(DateTimeImmutable $date): int
+    {
+        $row = $this->query->fetchOne(
+            'SELECT COUNT(*) AS cnt FROM access_logs WHERE access_date = ?',
+            [$date->format('Y-m-d')],
+        );
+
+        return (int) ($row['cnt'] ?? 0);
+    }
+
+    public function countByYearMonth(int $year, int $month): int
+    {
+        $from = sprintf('%04d-%02d-01', $year, $month);
+        $lastDay = (int) date('t', (int) mktime(0, 0, 0, $month, 1, $year));
+        $to   = sprintf('%04d-%02d-%02d', $year, $month, $lastDay);
+
+        $row = $this->query->fetchOne(
+            'SELECT COUNT(*) AS cnt FROM access_logs WHERE access_date >= ? AND access_date <= ?',
+            [$from, $to],
+        );
+
+        return (int) ($row['cnt'] ?? 0);
+    }
+
     public function aggregateByDate(DateTimeImmutable $from, DateTimeImmutable $to): array
     {
         $rows = $this->query->fetchAll(

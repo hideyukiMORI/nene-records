@@ -25,6 +25,34 @@ final class InMemoryAccessLogRepository implements AccessLogRepositoryInterface
         return $this->entries;
     }
 
+    public function countByDate(DateTimeImmutable $date): int
+    {
+        $target = $date->format('Y-m-d');
+        $count = 0;
+
+        foreach ($this->entries as $entry) {
+            if ($entry->accessedAt->format('Y-m-d') === $target) {
+                ++$count;
+            }
+        }
+
+        return $count;
+    }
+
+    public function countByYearMonth(int $year, int $month): int
+    {
+        $prefix = sprintf('%04d-%02d', $year, $month);
+        $count = 0;
+
+        foreach ($this->entries as $entry) {
+            if (str_starts_with($entry->accessedAt->format('Y-m-d'), $prefix)) {
+                ++$count;
+            }
+        }
+
+        return $count;
+    }
+
     public function aggregateByDate(DateTimeImmutable $from, DateTimeImmutable $to): array
     {
         /** @var array<string, list<float>> $byDate */

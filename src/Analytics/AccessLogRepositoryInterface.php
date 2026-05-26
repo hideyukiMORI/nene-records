@@ -14,4 +14,8 @@ interface AccessLogRepositoryInterface
      * @return list<AccessStatsDayItem>
      */
     public function aggregateByDate(DateTimeImmutable $from, DateTimeImmutable $to): array;
+
+    public function countByDate(DateTimeImmutable $date): int;
+
+    public function countByYearMonth(int $year, int $month): int;
 }

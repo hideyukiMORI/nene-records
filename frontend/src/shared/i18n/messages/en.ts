@@ -73,6 +73,15 @@ export const en = {
   'admin.home.description':
     'Phase 4 scaffold is running. Use Entity types to verify API integration via TanStack Query.',
   'admin.home.openPublicSite': 'Open public site →',
+  'admin.home.dashboard.todayAccess': "Today's accesses",
+  'admin.home.dashboard.monthAccess': "This month's accesses",
+  'admin.home.dashboard.recentPublished': 'Recently published',
+  'admin.home.dashboard.entityTypeSummary': 'Content summary',
+  'admin.home.dashboard.published': 'Published',
+  'admin.home.dashboard.draft': 'Draft',
+  'admin.home.dashboard.loading': 'Loading dashboard…',
+  'admin.home.dashboard.error': 'Could not load dashboard',
+  'admin.home.dashboard.noRecentPublished': 'No recently published content.',
 
   // ── Entity types ─────────────────────────────────────────────────────────
   'admin.entityTypes.pageTitle': 'Entity types',
