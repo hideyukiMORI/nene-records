@@ -1851,7 +1851,7 @@ paths:
       tags:
         - Media
       summary: Upload media file
-      description: Accepts a multipart/form-data upload and returns the stored media URL. Allowed types — JPEG, PNG, GIF, WebP, SVG, PDF. Maximum size — 10 MiB.
+      description: "Accepts a multipart/form-data upload and returns the stored media URL. Allowed types — images (JPEG, PNG, GIF, WebP, SVG), documents (PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX), video (MP4, WebM), audio (MP3, WAV, OGG), archives (ZIP), text (TXT, CSV). Maximum size — 10 MiB."
       operationId: uploadMedia
       requestBody:
         required: true
@@ -2606,6 +2606,7 @@ components:
             - bool
             - datetime
             - image
+            - file
             - relation
         target_entity_type_id:
           type: integer
@@ -2639,6 +2640,8 @@ components:
             - enum
             - bool
             - datetime
+            - image
+            - file
             - relation
         target_entity_type_id:
           type: integer

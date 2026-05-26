@@ -10,12 +10,31 @@ final readonly class UploadMediaUseCase implements UploadMediaUseCaseInterface
 {
     /** @var list<string> */
     private const ALLOWED_MIME_TYPES = [
+        // Images
         'image/jpeg',
         'image/png',
         'image/gif',
         'image/webp',
         'image/svg+xml',
+        // Documents
         'application/pdf',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'application/vnd.ms-excel',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'application/vnd.ms-powerpoint',
+        'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+        // Video
+        'video/mp4',
+        'video/webm',
+        // Audio
+        'audio/mpeg',
+        'audio/wav',
+        'audio/ogg',
+        // Archives / Text
+        'application/zip',
+        'text/plain',
+        'text/csv',
     ];
 
     private const MAX_SIZE_BYTES = 10 * 1024 * 1024; // 10 MiB
@@ -89,6 +108,20 @@ final readonly class UploadMediaUseCase implements UploadMediaUseCaseInterface
             'image/webp' => 'webp',
             'image/svg+xml' => 'svg',
             'application/pdf' => 'pdf',
+            'application/msword' => 'doc',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => 'docx',
+            'application/vnd.ms-excel' => 'xls',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' => 'xlsx',
+            'application/vnd.ms-powerpoint' => 'ppt',
+            'application/vnd.openxmlformats-officedocument.presentationml.presentation' => 'pptx',
+            'video/mp4' => 'mp4',
+            'video/webm' => 'webm',
+            'audio/mpeg' => 'mp3',
+            'audio/wav' => 'wav',
+            'audio/ogg' => 'ogg',
+            'application/zip' => 'zip',
+            'text/plain' => 'txt',
+            'text/csv' => 'csv',
             default => 'bin',
         };
     }
