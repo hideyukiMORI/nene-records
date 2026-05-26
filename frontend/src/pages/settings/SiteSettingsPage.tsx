@@ -16,8 +16,8 @@ export function SiteSettingsPage() {
         <Text muted>{t('admin.settings.description')}</Text>
       </Stack>
       <AppearanceView />
-      <PermalinkSettingsView />
       <ManageSiteSettingsView canManageSettings={canManageSettings} />
+      <PermalinkSettingsView />
     </Stack>
   )
 }
