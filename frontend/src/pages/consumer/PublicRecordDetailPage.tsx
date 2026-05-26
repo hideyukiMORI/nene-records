@@ -47,6 +47,7 @@ function PublicRecordDetailContent({
   entityTypeId,
   entityId,
   entityTypeSlugById,
+  entityTypePatternById,
   currentPattern,
 }: {
   entityTypeSlug: string
@@ -54,6 +55,7 @@ function PublicRecordDetailContent({
   entityTypeId: number
   entityId: number
   entityTypeSlugById: Record<number, string>
+  entityTypePatternById: Record<number, string | null | undefined>
   currentPattern: string | null | undefined
 }) {
   const { entity, fieldRows, isLoading, isError, errorTitle, refetch } =
@@ -88,6 +90,7 @@ function PublicRecordDetailContent({
         entity={entity}
         fieldRows={fieldRows}
         entityTypeSlugById={entityTypeSlugById}
+        entityTypePatternById={entityTypePatternById}
         isLoading={isLoading}
         isError={isError}
         errorTitle={errorTitle}
@@ -165,6 +168,7 @@ function PublicRecordDetailBySlug({
   entityTypeId,
   entitySlug,
   entityTypeSlugById,
+  entityTypePatternById,
   currentPattern,
   previousPattern,
   splat,
@@ -174,6 +178,7 @@ function PublicRecordDetailBySlug({
   entityTypeId: number
   entitySlug: string
   entityTypeSlugById: Record<number, string>
+  entityTypePatternById: Record<number, string | null | undefined>
   currentPattern: string | null | undefined
   previousPattern: string | null | undefined
   splat: string
@@ -203,6 +208,7 @@ function PublicRecordDetailBySlug({
       entityTypeId={entityTypeId}
       entityId={entityId}
       entityTypeSlugById={entityTypeSlugById}
+      entityTypePatternById={entityTypePatternById}
       currentPattern={currentPattern}
     />
   )
@@ -226,6 +232,7 @@ function PublicRecordDetailById({
   entityTypeId,
   entityId,
   entityTypeSlugById,
+  entityTypePatternById,
   currentPattern,
 }: {
   entityTypeSlug: string
@@ -233,6 +240,7 @@ function PublicRecordDetailById({
   entityTypeId: number
   entityId: number
   entityTypeSlugById: Record<number, string>
+  entityTypePatternById: Record<number, string | null | undefined>
   currentPattern: string | null | undefined
 }) {
   return (
@@ -242,6 +250,7 @@ function PublicRecordDetailById({
       entityTypeId={entityTypeId}
       entityId={entityId}
       entityTypeSlugById={entityTypeSlugById}
+      entityTypePatternById={entityTypePatternById}
       currentPattern={currentPattern}
     />
   )
@@ -263,6 +272,14 @@ export function PublicRecordDetailPage() {
     (): Record<number, string> =>
       Object.fromEntries(
         (entityTypeQuery.data?.items ?? []).map((item) => [Number(item.id), item.slug]),
+      ),
+    [entityTypeQuery.data?.items],
+  )
+
+  const entityTypePatternById = useMemo(
+    (): Record<number, string | null | undefined> =>
+      Object.fromEntries(
+        (entityTypeQuery.data?.items ?? []).map((item) => [Number(item.id), item.permalinkPattern]),
       ),
     [entityTypeQuery.data?.items],
   )
@@ -291,6 +308,7 @@ export function PublicRecordDetailPage() {
         entityTypeId={entityTypeId}
         entityId={key.id}
         entityTypeSlugById={entityTypeSlugById}
+        entityTypePatternById={entityTypePatternById}
         currentPattern={entityType.permalinkPattern}
       />
     )
@@ -303,6 +321,7 @@ export function PublicRecordDetailPage() {
       entityTypeId={entityTypeId}
       entitySlug={key.slug}
       entityTypeSlugById={entityTypeSlugById}
+      entityTypePatternById={entityTypePatternById}
       currentPattern={entityType.permalinkPattern}
       previousPattern={entityType.previousPermalinkPattern}
       splat={splat}
