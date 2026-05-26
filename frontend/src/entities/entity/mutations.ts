@@ -1,16 +1,24 @@
 import { useMutation, useQueryClient, type UseMutationResult } from '@tanstack/react-query'
 import { apiClient, AppError } from '@/shared/api/client'
-import type { EntityDto, ScheduleEntityResponseDto } from './api-types'
+import type {
+  EntityDto,
+  GeneratePreviewTokenResponseDto,
+  ScheduleEntityResponseDto,
+} from './api-types'
 import type { EntityId } from './ids'
 import {
   mapCreateInputToDto,
   mapEntityDtoToModel,
+  mapGeneratePreviewTokenResponseDtoToOutput,
   mapScheduleResponseDtoToOutput,
   mapUpdateInputToDto,
 } from './mapper'
 import type {
   CreateEntityInput,
   Entity,
+  GeneratePreviewTokenInput,
+  GeneratePreviewTokenOutput,
+  RevokePreviewTokenInput,
   ScheduleEntityInput,
   ScheduleEntityOutput,
   UpdateEntityInput,
@@ -120,6 +128,34 @@ export function useUnscheduleEntity(): UseMutationResult<void, AppError, { id: E
     onSuccess: async (_data, variables) => {
       queryClient.removeQueries({ queryKey: entityKeys.detail(variables.id) })
       await queryClient.invalidateQueries({ queryKey: entityKeys.lists() })
+    },
+  })
+}
+
+export function useGeneratePreviewToken(): UseMutationResult<
+  GeneratePreviewTokenOutput,
+  AppError,
+  GeneratePreviewTokenInput
+> {
+  return useMutation({
+    mutationFn: async (input) => {
+      const dto = await apiClient.post<GeneratePreviewTokenResponseDto>(
+        `/api/v1/entities/${String(input.id)}/preview-token`,
+        {},
+      )
+      return mapGeneratePreviewTokenResponseDtoToOutput(dto)
+    },
+  })
+}
+
+export function useRevokePreviewToken(): UseMutationResult<
+  void,
+  AppError,
+  RevokePreviewTokenInput
+> {
+  return useMutation({
+    mutationFn: async (input) => {
+      await apiClient.delete(`/api/v1/entities/${String(input.id)}/preview-token`)
     },
   })
 }

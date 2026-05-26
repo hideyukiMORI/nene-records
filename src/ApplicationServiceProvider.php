@@ -51,6 +51,8 @@ use NeNeRecords\Media\MediaServiceProvider;
 use NeNeRecords\Media\MediaTooLargeExceptionHandler;
 use NeNeRecords\NavigationItem\NavigationItemNotFoundExceptionHandler;
 use NeNeRecords\NavigationItem\NavigationItemServiceProvider;
+use NeNeRecords\PreviewToken\PreviewTokenNotFoundExceptionHandler;
+use NeNeRecords\PreviewToken\PreviewTokenServiceProvider;
 use NeNeRecords\PublicRecord\PublicEntityTypeNotFoundExceptionHandler;
 use NeNeRecords\PublicRecord\PublicRecordNotFoundExceptionHandler;
 use NeNeRecords\PublicRecord\PublicRecordServiceProvider;
@@ -94,7 +96,8 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
             ->addProvider(new PublicRecordServiceProvider())
             ->addProvider(new SettingServiceProvider())
             ->addProvider(new NavigationItemServiceProvider())
-            ->addProvider(new WebhookServiceProvider());
+            ->addProvider(new WebhookServiceProvider())
+            ->addProvider(new PreviewTokenServiceProvider());
 
         $builder
             ->set(
@@ -118,6 +121,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $setting = $container->get('nene-records.route_registrar.setting');
                     $navigationItem = $container->get('nene-records.route_registrar.navigation_item');
                     $webhook = $container->get('nene-records.route_registrar.webhook');
+                    $previewToken = $container->get('nene-records.route_registrar.preview_token');
                     $auth = $container->get('nene-records.route_registrar.auth');
 
                     if (
@@ -139,6 +143,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         || !is_callable($setting)
                         || !is_callable($navigationItem)
                         || !is_callable($webhook)
+                        || !is_callable($previewToken)
                         || !is_callable($auth)
                     ) {
                         throw new LogicException('Route registrar service is invalid.');
@@ -164,6 +169,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $setting,
                         $navigationItem,
                         $webhook,
+                        $previewToken,
                     ];
                 },
             )
@@ -210,6 +216,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $mediaTooLarge = $container->get(MediaTooLargeExceptionHandler::class);
                     $navigationItemNotFound = $container->get(NavigationItemNotFoundExceptionHandler::class);
                     $webhookNotFound = $container->get(WebhookNotFoundExceptionHandler::class);
+                    $previewTokenNotFound = $container->get(PreviewTokenNotFoundExceptionHandler::class);
 
                     foreach ([
                         $entityTypeNotFound,
@@ -252,6 +259,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $mediaTooLarge,
                         $navigationItemNotFound,
                         $webhookNotFound,
+                        $previewTokenNotFound,
                     ] as $handler) {
                         if (!$handler instanceof DomainExceptionHandlerInterface) {
                             throw new LogicException('Exception handler service is invalid.');
@@ -299,6 +307,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $mediaTooLarge,
                         $navigationItemNotFound,
                         $webhookNotFound,
+                        $previewTokenNotFound,
                     ];
                 },
             );

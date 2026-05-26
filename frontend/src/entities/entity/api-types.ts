@@ -46,6 +46,12 @@ export interface ScheduleEntityResponseDto {
   scheduled_at: string
 }
 
+export interface GeneratePreviewTokenResponseDto {
+  token: string
+  expires_at: string
+  preview_url: string
+}
+
 export interface EntityRevisionDto {
   id: number
   entity_id: number

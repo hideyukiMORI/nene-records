@@ -224,6 +224,10 @@ export const en = {
   'admin.entityStatus.confirmSchedule': 'Set schedule',
   'admin.entityStatus.scheduledAt': 'Scheduled for {{date}}',
   'admin.entityStatus.scheduleError': 'Failed to schedule. The date must be in the future.',
+  'admin.entityStatus.generatePreviewToken': 'Generate preview link',
+  'admin.entityStatus.revokePreviewToken': 'Revoke',
+  'admin.entityStatus.previewTokenExpires': 'Expires: {{date}}',
+  'admin.entityStatus.previewTokenError': 'Failed to generate preview link.',
 
   // ── Relations (outgoing) ──────────────────────────────────────────────────
   'admin.relations.title': 'Relations',
