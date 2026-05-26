@@ -51,7 +51,6 @@ export interface ManageEntitiesViewProps {
 
 export function ManageEntitiesView({
   entityTypeId,
-  entityTypeName,
   entityTypeSlug,
   items,
   recordLabels,
@@ -197,11 +196,6 @@ export function ManageEntitiesView({
           onClear={onClearRelationFilters}
         />
         <Stack gap="sm">
-          <Text as="h2" variant="heading-sm">
-            {entityTypeName !== null
-              ? t('admin.entityRecords.list.title', { name: entityTypeName })
-              : t('admin.entityRecords.list.titleDefault')}
-          </Text>
           <EntityListPanel
             entityTypeId={entityTypeId}
             items={items}

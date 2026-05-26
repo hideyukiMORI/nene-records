@@ -17,17 +17,17 @@ function renderEntityTypesPage() {
 }
 
 function getCreateForm(): HTMLElement {
-  const form = screen.getByRole('heading', { name: 'Create entity type' }).closest('form')
+  const form = screen.getByRole('heading', { name: 'Create content type' }).closest('form')
   if (form === null) {
-    throw new Error('Create entity type form not found')
+    throw new Error('Create content type form not found')
   }
   return form
 }
 
 function getEditForm(): HTMLElement {
-  const form = screen.getByRole('heading', { name: 'Edit entity type' }).closest('form')
+  const form = screen.getByRole('heading', { name: 'Edit content type' }).closest('form')
   if (form === null) {
-    throw new Error('Edit entity type form not found')
+    throw new Error('Edit content type form not found')
   }
   return form
 }
@@ -57,13 +57,13 @@ describe('EntityTypesPage', () => {
     renderEntityTypesPage()
 
     await waitFor(() => {
-      expect(screen.getByText('No entity types yet')).toBeInTheDocument()
+      expect(screen.getByText('No content types yet')).toBeInTheDocument()
     })
 
     await user.type(screen.getByLabelText('Name'), 'Article')
     await user.type(screen.getByLabelText('Slug'), 'article')
     const form = getCreateForm()
-    await user.click(within(form).getByRole('button', { name: 'Create entity type' }))
+    await user.click(within(form).getByRole('button', { name: 'Create content type' }))
 
     await waitFor(() => {
       expect(screen.getByText('Article')).toBeInTheDocument()
@@ -78,7 +78,7 @@ describe('EntityTypesPage', () => {
     await user.type(screen.getByLabelText('Name'), 'Bad Slug')
     await user.type(screen.getByLabelText('Slug'), 'Bad Slug')
     const form = getCreateForm()
-    await user.click(within(form).getByRole('button', { name: 'Create entity type' }))
+    await user.click(within(form).getByRole('button', { name: 'Create content type' }))
 
     expect(
       await screen.findByText('Use lowercase letters, numbers, and hyphens'),
@@ -92,7 +92,7 @@ describe('EntityTypesPage', () => {
     await user.type(screen.getByLabelText('Name'), 'Article')
     await user.type(screen.getByLabelText('Slug'), 'article')
     const createForm = getCreateForm()
-    await user.click(within(createForm).getByRole('button', { name: 'Create entity type' }))
+    await user.click(within(createForm).getByRole('button', { name: 'Create content type' }))
 
     await waitFor(() => {
       expect(screen.getByText('Article')).toBeInTheDocument()
@@ -125,7 +125,7 @@ describe('EntityTypesPage', () => {
     await user.type(screen.getByLabelText('Name'), 'Page')
     await user.type(screen.getByLabelText('Slug'), 'page')
     const form = getCreateForm()
-    await user.click(within(form).getByRole('button', { name: 'Create entity type' }))
+    await user.click(within(form).getByRole('button', { name: 'Create content type' }))
 
     await waitFor(() => {
       expect(screen.getByText('Page')).toBeInTheDocument()
