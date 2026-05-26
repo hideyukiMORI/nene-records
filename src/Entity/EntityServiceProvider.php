@@ -12,6 +12,7 @@ use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use NeNeRecords\EntityType\EntityTypeRepositoryInterface;
 use NeNeRecords\TextField\TextFieldRepositoryInterface;
+use NeNeRecords\Webhook\WebhookDispatcherInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 
@@ -66,6 +67,7 @@ final readonly class EntityServiceProvider implements ServiceProviderInterface
                 static function (ContainerInterface $c): CreateEntityUseCaseInterface {
                     $entities = $c->get(EntityRepositoryInterface::class);
                     $entityTypes = $c->get(EntityTypeRepositoryInterface::class);
+                    $webhooks = $c->get(WebhookDispatcherInterface::class);
 
                     if (!$entities instanceof EntityRepositoryInterface) {
                         throw new LogicException('Entity repository service is invalid.');
@@ -75,7 +77,11 @@ final readonly class EntityServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Entity type repository service is invalid.');
                     }
 
-                    return new CreateEntityUseCase($entities, $entityTypes);
+                    if (!$webhooks instanceof WebhookDispatcherInterface) {
+                        throw new LogicException('Webhook dispatcher service is invalid.');
+                    }
+
+                    return new CreateEntityUseCase($entities, $entityTypes, $webhooks);
                 },
             )
             ->set(
@@ -99,12 +105,17 @@ final readonly class EntityServiceProvider implements ServiceProviderInterface
                 DeleteEntityUseCaseInterface::class,
                 static function (ContainerInterface $c): DeleteEntityUseCaseInterface {
                     $repository = $c->get(EntityRepositoryInterface::class);
+                    $webhooks = $c->get(WebhookDispatcherInterface::class);
 
                     if (!$repository instanceof EntityRepositoryInterface) {
                         throw new LogicException('Entity repository service is invalid.');
                     }
 
-                    return new DeleteEntityUseCase($repository);
+                    if (!$webhooks instanceof WebhookDispatcherInterface) {
+                        throw new LogicException('Webhook dispatcher service is invalid.');
+                    }
+
+                    return new DeleteEntityUseCase($repository, $webhooks);
                 },
             )
             ->set(
@@ -158,6 +169,7 @@ final readonly class EntityServiceProvider implements ServiceProviderInterface
                 static function (ContainerInterface $c): UpdateEntityUseCaseInterface {
                     $entities = $c->get(EntityRepositoryInterface::class);
                     $entityTypes = $c->get(EntityTypeRepositoryInterface::class);
+                    $webhooks = $c->get(WebhookDispatcherInterface::class);
 
                     if (!$entities instanceof EntityRepositoryInterface) {
                         throw new LogicException('Entity repository service is invalid.');
@@ -167,7 +179,11 @@ final readonly class EntityServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Entity type repository service is invalid.');
                     }
 
-                    return new UpdateEntityUseCase($entities, $entityTypes);
+                    if (!$webhooks instanceof WebhookDispatcherInterface) {
+                        throw new LogicException('Webhook dispatcher service is invalid.');
+                    }
+
+                    return new UpdateEntityUseCase($entities, $entityTypes, $webhooks);
                 },
             )
             ->set(

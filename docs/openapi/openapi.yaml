@@ -42,6 +42,8 @@ tags:
     description: Site-wide settings registry with revision history.
   - name: NavigationItems
     description: Ordered navigation link management for the public site header.
+  - name: Webhooks
+    description: Webhook endpoints for entity create/update/delete event notifications.
 paths:
   /api/v1/auth/login:
     post:
@@ -1846,6 +1848,101 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /api/v1/webhooks:
+    get:
+      tags:
+        - Webhooks
+      summary: List webhooks
+      description: Returns all registered webhooks ordered by id.
+      operationId: listWebhooks
+      responses:
+        '200':
+          description: Webhook list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookListResponse'
+    post:
+      tags:
+        - Webhooks
+      summary: Create webhook
+      description: Registers a new webhook endpoint.
+      operationId: createWebhook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWebhookRequest'
+      responses:
+        '201':
+          description: Webhook created.
+          headers:
+            Location:
+              schema:
+                type: string
+              example: /api/v1/webhooks/1
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookResponse'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+  /api/v1/webhooks/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+          minimum: 1
+    get:
+      tags:
+        - Webhooks
+      summary: Get webhook by ID
+      operationId: getWebhookById
+      responses:
+        '200':
+          description: Webhook found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags:
+        - Webhooks
+      summary: Update webhook
+      operationId: updateWebhook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateWebhookRequest'
+      responses:
+        '200':
+          description: Webhook updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+    delete:
+      tags:
+        - Webhooks
+      summary: Delete webhook
+      operationId: deleteWebhook
+      responses:
+        '204':
+          description: Webhook deleted.
+        '404':
+          $ref: '#/components/responses/NotFound'
   /api/v1/media:
     post:
       tags:
@@ -3421,4 +3518,115 @@ components:
           type: integer
           minimum: 0
           default: 0
+      additionalProperties: false
+
+    WebhookResponse:
+      type: object
+      required:
+        - id
+        - url
+        - events
+        - is_active
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: integer
+          format: int64
+        url:
+          type: string
+        events:
+          type: array
+          items:
+            type: string
+            enum:
+              - entity.created
+              - entity.updated
+              - entity.deleted
+        entity_type_id:
+          type: integer
+          format: int64
+          nullable: true
+        secret:
+          type: string
+          nullable: true
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      additionalProperties: false
+    WebhookListResponse:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhookResponse'
+      additionalProperties: false
+    CreateWebhookRequest:
+      type: object
+      required:
+        - url
+        - events
+      properties:
+        url:
+          type: string
+          format: uri
+          minLength: 1
+        events:
+          type: array
+          minItems: 1
+          items:
+            type: string
+            enum:
+              - entity.created
+              - entity.updated
+              - entity.deleted
+        entity_type_id:
+          type: integer
+          format: int64
+          minimum: 1
+          nullable: true
+        secret:
+          type: string
+          nullable: true
+        is_active:
+          type: boolean
+          default: true
+      additionalProperties: false
+    UpdateWebhookRequest:
+      type: object
+      required:
+        - url
+        - events
+      properties:
+        url:
+          type: string
+          format: uri
+          minLength: 1
+        events:
+          type: array
+          minItems: 1
+          items:
+            type: string
+            enum:
+              - entity.created
+              - entity.updated
+              - entity.deleted
+        entity_type_id:
+          type: integer
+          format: int64
+          minimum: 1
+          nullable: true
+        secret:
+          type: string
+          nullable: true
+        is_active:
+          type: boolean
       additionalProperties: false

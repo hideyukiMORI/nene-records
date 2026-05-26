@@ -64,6 +64,8 @@ use NeNeRecords\TextField\FieldKeyNotRegisteredExceptionHandler as TextFieldKeyN
 use NeNeRecords\TextField\FieldTypeMismatchExceptionHandler as TextFieldTypeMismatchExceptionHandler;
 use NeNeRecords\TextField\TextFieldNotFoundExceptionHandler;
 use NeNeRecords\TextField\TextFieldServiceProvider;
+use NeNeRecords\Webhook\WebhookNotFoundExceptionHandler;
+use NeNeRecords\Webhook\WebhookServiceProvider;
 use Psr\Container\ContainerInterface;
 
 final readonly class ApplicationServiceProvider implements ServiceProviderInterface
@@ -91,7 +93,8 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
             ->addProvider(new MediaServiceProvider())
             ->addProvider(new PublicRecordServiceProvider())
             ->addProvider(new SettingServiceProvider())
-            ->addProvider(new NavigationItemServiceProvider());
+            ->addProvider(new NavigationItemServiceProvider())
+            ->addProvider(new WebhookServiceProvider());
 
         $builder
             ->set(
@@ -114,6 +117,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $publicRecord = $container->get('nene-records.route_registrar.public_record');
                     $setting = $container->get('nene-records.route_registrar.setting');
                     $navigationItem = $container->get('nene-records.route_registrar.navigation_item');
+                    $webhook = $container->get('nene-records.route_registrar.webhook');
                     $auth = $container->get('nene-records.route_registrar.auth');
 
                     if (
@@ -134,6 +138,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         || !is_callable($publicRecord)
                         || !is_callable($setting)
                         || !is_callable($navigationItem)
+                        || !is_callable($webhook)
                         || !is_callable($auth)
                     ) {
                         throw new LogicException('Route registrar service is invalid.');
@@ -158,6 +163,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $publicRecord,
                         $setting,
                         $navigationItem,
+                        $webhook,
                     ];
                 },
             )
@@ -203,6 +209,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $mediaInvalidType = $container->get(MediaInvalidTypeExceptionHandler::class);
                     $mediaTooLarge = $container->get(MediaTooLargeExceptionHandler::class);
                     $navigationItemNotFound = $container->get(NavigationItemNotFoundExceptionHandler::class);
+                    $webhookNotFound = $container->get(WebhookNotFoundExceptionHandler::class);
 
                     foreach ([
                         $entityTypeNotFound,
@@ -244,6 +251,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $mediaInvalidType,
                         $mediaTooLarge,
                         $navigationItemNotFound,
+                        $webhookNotFound,
                     ] as $handler) {
                         if (!$handler instanceof DomainExceptionHandlerInterface) {
                             throw new LogicException('Exception handler service is invalid.');
@@ -290,6 +298,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $mediaInvalidType,
                         $mediaTooLarge,
                         $navigationItemNotFound,
+                        $webhookNotFound,
                     ];
                 },
             );

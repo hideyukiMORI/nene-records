@@ -6,12 +6,14 @@ namespace NeNeRecords\Entity;
 
 use NeNeRecords\EntityType\EntityTypeNotFoundException;
 use NeNeRecords\EntityType\EntityTypeRepositoryInterface;
+use NeNeRecords\Webhook\WebhookDispatcherInterface;
 
 final readonly class CreateEntityUseCase implements CreateEntityUseCaseInterface
 {
     public function __construct(
         private EntityRepositoryInterface $entities,
         private EntityTypeRepositoryInterface $entityTypes,
+        private ?WebhookDispatcherInterface $webhooks = null,
     ) {
     }
 
@@ -33,6 +35,8 @@ final readonly class CreateEntityUseCase implements CreateEntityUseCaseInterface
             slug: $slug,
             status: $input->status,
         ));
+
+        $this->webhooks?->dispatch('entity.created', $input->entityTypeId, $id);
 
         return new CreateEntityOutput(
             id: $id,
