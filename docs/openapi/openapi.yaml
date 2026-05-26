@@ -2626,6 +2626,92 @@ paths:
                 $ref: '#/components/schemas/ProblemDetails'
         '422':
           $ref: '#/components/responses/ValidationFailed'
+  /api/v1/users/invite:
+    post:
+      tags:
+        - Users
+      summary: Invite user
+      description: Creates an invited user and sends an email with an activation link. Admin only.
+      operationId: inviteUser
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InviteUserRequest'
+      responses:
+        '201':
+          description: Invite sent.
+          headers:
+            Location:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+  /api/v1/auth/accept-invite:
+    post:
+      tags:
+        - Users
+      summary: Accept invite
+      description: Accepts an invitation token and sets the user's password, activating the account.
+      operationId: acceptInvite
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AcceptInviteRequest'
+      responses:
+        '204':
+          description: Account activated.
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+  /api/v1/auth/password-reset:
+    post:
+      tags:
+        - Auth
+      summary: Request password reset
+      description: >
+        Sends a password reset email. Always returns 204 regardless of whether
+        the email exists (prevents email enumeration).
+      operationId: requestPasswordReset
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordResetRequest'
+      responses:
+        '204':
+          description: Reset email sent (or silently ignored if email not found).
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+  /api/v1/auth/password-reset/confirm:
+    post:
+      tags:
+        - Auth
+      summary: Confirm password reset
+      description: Validates the reset token and sets a new password.
+      operationId: confirmPasswordReset
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordResetConfirmRequest'
+      responses:
+        '204':
+          description: Password updated.
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
 components:
   parameters:
     IdPath:
@@ -2954,6 +3040,60 @@ components:
         - new_password
       properties:
         current_password:
+          type: string
+        new_password:
+          type: string
+          minLength: 8
+      additionalProperties: false
+    InviteUserRequest:
+      type: object
+      required:
+        - email
+        - role
+      properties:
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          enum:
+            - admin
+            - editor
+        app_base_url:
+          type: string
+          description: Optional base URL for the invite link (defaults to request origin).
+      additionalProperties: false
+    AcceptInviteRequest:
+      type: object
+      required:
+        - token
+        - password
+      properties:
+        token:
+          type: string
+        password:
+          type: string
+          minLength: 8
+      additionalProperties: false
+    PasswordResetRequest:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          type: string
+          format: email
+        app_base_url:
+          type: string
+          description: Optional base URL for the reset link (defaults to request origin).
+      additionalProperties: false
+    PasswordResetConfirmRequest:
+      type: object
+      required:
+        - token
+        - new_password
+      properties:
+        token:
           type: string
         new_password:
           type: string
