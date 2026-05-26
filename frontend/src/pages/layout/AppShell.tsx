@@ -352,6 +352,11 @@ export function AppShell() {
         <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8">
           <Outlet />
         </div>
+        <footer className="border-t border-border px-4 py-3 sm:px-6">
+          <p className="text-center font-sans text-caption text-text-muted">
+            Powered by NENE2 · © 2026 AYANE
+          </p>
+        </footer>
       </main>
     </div>
   )
