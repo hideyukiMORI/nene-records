@@ -4,7 +4,12 @@ import { toEntityTypeId } from './ids'
 
 describe('entity-type mapper', () => {
   it('maps entity type dto to model', () => {
-    const model = mapEntityTypeDtoToModel({ id: 1, name: 'Article', slug: 'article', is_pinned: true })
+    const model = mapEntityTypeDtoToModel({
+      id: 1,
+      name: 'Article',
+      slug: 'article',
+      is_pinned: true,
+    })
 
     expect(model).toEqual({
       id: toEntityTypeId(1),

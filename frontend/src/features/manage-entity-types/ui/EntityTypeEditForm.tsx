@@ -81,7 +81,11 @@ export function EntityTypeEditForm({
           name="isPinned"
           control={control}
           render={({ field }) => (
-            <label className="flex cursor-pointer items-start gap-3">
+            <label
+              htmlFor="entity-type-edit-is-pinned"
+              aria-label={t('admin.entityTypes.editForm.isPinned')}
+              className="flex cursor-pointer items-start gap-3"
+            >
               <input
                 type="checkbox"
                 id="entity-type-edit-is-pinned"

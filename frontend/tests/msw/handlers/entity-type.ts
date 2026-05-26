@@ -15,7 +15,9 @@ export function resetEntityTypeStore(): void {
   items = []
 }
 
-export function seedEntityTypes(seed: { id: number; name: string; slug: string; is_pinned?: boolean }[]): void {
+export function seedEntityTypes(
+  seed: { id: number; name: string; slug: string; is_pinned?: boolean }[],
+): void {
   items = seed.map((item) => ({ ...item, is_pinned: item.is_pinned ?? false }))
   nextId = Math.max(0, ...seed.map((item) => item.id)) + 1
 }

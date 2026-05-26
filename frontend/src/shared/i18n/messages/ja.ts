@@ -69,7 +69,8 @@ export const ja: Partial<MessageCatalog> = {
   'admin.home.quickAccess': 'クイックアクセス',
   'admin.home.quickAccess.description': 'コンテンツを管理する',
   'admin.home.quickAccess.manage': '管理する',
-  'admin.home.quickAccess.empty': 'ピン留めされたコンテンツタイプがありません。コンテンツタイプの設定からピン留めを有効にしてください。',
+  'admin.home.quickAccess.empty':
+    'ピン留めされたコンテンツタイプがありません。コンテンツタイプの設定からピン留めを有効にしてください。',
   'admin.home.dashboard.todayAccess': '本日のアクセス数',
   'admin.home.dashboard.monthAccess': '今月のアクセス数',
   'admin.home.dashboard.recentPublished': '最近公開されたコンテンツ',
@@ -95,7 +96,8 @@ export const ja: Partial<MessageCatalog> = {
   'admin.entityTypes.editForm.save': '変更を保存',
   'admin.entityTypes.editForm.saving': '保存中…',
   'admin.entityTypes.editForm.isPinned': 'サイドバーに表示',
-  'admin.entityTypes.editForm.isPinnedDescription': 'サイドバーにピン留めして、すぐアクセスできるようにします。',
+  'admin.entityTypes.editForm.isPinnedDescription':
+    'サイドバーにピン留めして、すぐアクセスできるようにします。',
   'admin.entityTypes.delete.title': 'コンテンツタイプを削除しますか？',
   'admin.entityTypes.delete.description': '「{{name}}」が削除されます。この操作は元に戻せません。',
   'admin.entityTypes.actions.fields': 'フィールド',

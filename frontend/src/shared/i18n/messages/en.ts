@@ -76,7 +76,8 @@ export const en = {
   'admin.home.quickAccess': 'Quick access',
   'admin.home.quickAccess.description': 'Manage your content',
   'admin.home.quickAccess.manage': 'Manage',
-  'admin.home.quickAccess.empty': 'No pinned content types yet. Pin a content type from the Content types settings to get started.',
+  'admin.home.quickAccess.empty':
+    'No pinned content types yet. Pin a content type from the Content types settings to get started.',
   'admin.home.dashboard.todayAccess': "Today's accesses",
   'admin.home.dashboard.monthAccess': "This month's accesses",
   'admin.home.dashboard.recentPublished': 'Recently published',
@@ -102,7 +103,8 @@ export const en = {
   'admin.entityTypes.editForm.save': 'Save changes',
   'admin.entityTypes.editForm.saving': 'Saving…',
   'admin.entityTypes.editForm.isPinned': 'Show in sidebar',
-  'admin.entityTypes.editForm.isPinnedDescription': 'Pin this content type to the navigation sidebar for quick access.',
+  'admin.entityTypes.editForm.isPinnedDescription':
+    'Pin this content type to the navigation sidebar for quick access.',
   'admin.entityTypes.delete.title': 'Delete content type?',
   'admin.entityTypes.delete.description': '"{{name}}" will be removed. This cannot be undone.',
   'admin.entityTypes.actions.fields': 'Fields',
