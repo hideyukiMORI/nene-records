@@ -97,7 +97,7 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
                 SELECT e.id, e.entity_type_id, e.slug, e.status, e.published_at, e.scheduled_at, e.is_deleted, e.deleted_at, e.meta_title, e.meta_description
                 FROM entities e
                 WHERE {$where}
-                ORDER BY e.id ASC
+                ORDER BY e.id DESC
                 LIMIT ? OFFSET ?
                 SQL,
             $params,

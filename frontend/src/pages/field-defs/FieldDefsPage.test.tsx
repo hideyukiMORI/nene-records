@@ -9,11 +9,11 @@ import { mswServer } from '@tests/msw/server'
 import { renderWithProviders } from '@tests/render/render-with-providers'
 import { clearAuthSession, seedAdminSession } from '@tests/helpers/auth-session'
 
-function renderFieldDefsPage(entityTypeId = 1) {
+function renderFieldDefsPage(entityTypeSlug = 'article') {
   return renderWithProviders(
-    <MemoryRouter initialEntries={[`/entity-types/${String(entityTypeId)}/fields`]}>
+    <MemoryRouter initialEntries={[`/entity-types/${entityTypeSlug}/fields`]}>
       <Routes>
-        <Route path="/entity-types/:entityTypeId/fields" element={<FieldDefsPage />} />
+        <Route path="/entity-types/:entityTypeSlug/fields" element={<FieldDefsPage />} />
       </Routes>
     </MemoryRouter>,
   )
@@ -72,7 +72,7 @@ describe('FieldDefsPage', () => {
     const user = userEvent.setup()
     renderFieldDefsPage()
 
-    await user.type(screen.getByLabelText('Field key'), 'Bad Key')
+    await user.type(await screen.findByLabelText('Field key'), 'Bad Key')
     const form = getAddFieldForm()
     await user.click(within(form).getByRole('button', { name: 'Add field' }))
 
@@ -114,7 +114,7 @@ describe('FieldDefsPage', () => {
     const user = userEvent.setup()
     renderFieldDefsPage()
 
-    await user.type(screen.getByLabelText('Field key'), 'body')
+    await user.type(await screen.findByLabelText('Field key'), 'body')
     const form = getAddFieldForm()
     await user.click(within(form).getByRole('button', { name: 'Add field' }))
 

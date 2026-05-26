@@ -1,5 +1,9 @@
 import { Link, Navigate, useParams } from 'react-router-dom'
-import { toEntityTypeId, useEntityType } from '@/entities/entity-type'
+import {
+  getLocalizedEntityTypeName,
+  useEntityTypeBySlug,
+  type EntityType,
+} from '@/entities/entity-type'
 import { currentUserHasCapability } from '@/entities/auth'
 import { ManageFieldDefsView, useManageFieldDefsPage } from '@/features/manage-field-defs'
 import { useTranslation } from '@/shared/i18n'
@@ -7,11 +11,29 @@ import { Button, Stack, Text } from '@/shared/ui'
 
 export function FieldDefsPage() {
   const { t } = useTranslation()
-  const { entityTypeId: entityTypeIdParam } = useParams()
-  const entityTypeId = Number(entityTypeIdParam)
+  const { entityTypeSlug = '' } = useParams()
   const canManageSchema = currentUserHasCapability('manage_schema')
+  const entityTypeQuery = useEntityTypeBySlug(entityTypeSlug)
 
-  const entityTypeQuery = useEntityType(toEntityTypeId(entityTypeId))
+  if (!canManageSchema) {
+    return <Navigate to="/forbidden" replace />
+  }
+
+  if (entityTypeQuery.isPending) {
+    return <Text muted>{t('admin.fieldDefs.pageTitle')}</Text>
+  }
+  if (entityTypeQuery.isError) {
+    return <Text muted>{entityTypeQuery.error.title}</Text>
+  }
+
+  return <FieldDefsContent entityType={entityTypeQuery.data} />
+}
+
+function FieldDefsContent({ entityType }: { entityType: EntityType }) {
+  const { t, locale } = useTranslation()
+  const canManageSchema = currentUserHasCapability('manage_schema')
+  const entityTypeId = Number(entityType.id)
+
   const {
     items,
     isLoading,
@@ -34,10 +56,6 @@ export function FieldDefsPage() {
     isDeleting,
   } = useManageFieldDefsPage(entityTypeId)
 
-  if (!canManageSchema) {
-    return <Navigate to="/forbidden" replace />
-  }
-
   return (
     <Stack gap="md">
       <Stack gap="sm">
@@ -47,11 +65,11 @@ export function FieldDefsPage() {
           </Button>
         </Link>
         <Text as="h1" variant="heading-md">
-          {entityTypeQuery.data?.name ?? t('admin.fieldDefs.pageTitle')}
+          {getLocalizedEntityTypeName(entityType, locale)}
         </Text>
       </Stack>
       <ManageFieldDefsView
-        entityTypeSlug={entityTypeQuery.data?.slug ?? null}
+        entityTypeSlug={entityType.slug}
         canManageSchema={canManageSchema}
         items={items}
         isLoading={isLoading}

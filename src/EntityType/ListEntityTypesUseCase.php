@@ -21,6 +21,7 @@ final readonly class ListEntityTypesUseCase implements ListEntityTypesUseCaseInt
                 name: $entityType->name,
                 slug: $entityType->slug,
                 isPinned: $entityType->isPinned,
+                labels: $entityType->labels,
             ),
             $rows,
         );

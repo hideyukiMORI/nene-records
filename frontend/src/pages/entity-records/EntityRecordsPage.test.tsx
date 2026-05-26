@@ -15,11 +15,15 @@ import { mswServer } from '@tests/msw/server'
 import { renderWithProviders } from '@tests/render/render-with-providers'
 import { clearAuthSession, seedAdminSession } from '@tests/helpers/auth-session'
 
-function renderRecordsPage(entityTypeId = 1) {
+function renderRecordsPage(entityTypeSlug = 'article') {
   return renderWithProviders(
-    <MemoryRouter initialEntries={[`/entity-types/${String(entityTypeId)}/entities`]}>
+    <MemoryRouter initialEntries={[`/${entityTypeSlug}`]}>
       <Routes>
-        <Route path="/entity-types/:entityTypeId/entities" element={<EntityRecordsPage />} />
+        <Route path="/:entityTypeSlug" element={<EntityRecordsPage />} />
+        <Route
+          path="/:entityTypeSlug/:entityId"
+          element={<div data-testid="entity-edit-page">Edit page</div>}
+        />
       </Routes>
     </MemoryRouter>,
   )
@@ -51,7 +55,7 @@ describe('EntityRecordsPage', () => {
     mswServer.close()
   })
 
-  it('creates a record and lists it', async () => {
+  it('navigates to entity edit page after clicking "New item"', async () => {
     seedEntityTypes([{ id: 1, name: 'Article', slug: 'article' }])
     const user = userEvent.setup()
     renderRecordsPage()
@@ -61,20 +65,18 @@ describe('EntityRecordsPage', () => {
       expect(screen.getByText('No content yet')).toBeInTheDocument()
     })
 
-    await user.click(screen.getByRole('button', { name: 'Create' }))
+    await user.click(screen.getByRole('button', { name: 'New item' }))
 
     await waitFor(() => {
-      expect(screen.getByText('Item #1')).toBeInTheDocument()
-      expect(screen.getByText('1 item')).toBeInTheDocument()
+      expect(screen.getByTestId('entity-edit-page')).toBeInTheDocument()
     })
   })
 
   it('deletes a record after confirmation', async () => {
     seedEntityTypes([{ id: 1, name: 'Article', slug: 'article' }])
+    seedEntities([{ id: 1, entity_type_id: 1, is_deleted: false, deleted_at: null }])
     const user = userEvent.setup()
     renderRecordsPage()
-
-    await user.click(screen.getByRole('button', { name: 'Create' }))
 
     await waitFor(() => {
       expect(screen.getByText('Item #1')).toBeInTheDocument()
@@ -259,7 +261,7 @@ describe('EntityRecordsPage', () => {
       <MemoryRouter initialEntries={['/entity-types']}>
         <Routes>
           <Route path="/entity-types" element={<EntityTypesPage />} />
-          <Route path="/entity-types/:entityTypeId/entities" element={<EntityRecordsPage />} />
+          <Route path="/:entityTypeSlug" element={<EntityRecordsPage />} />
         </Routes>
       </MemoryRouter>,
     )
@@ -280,7 +282,6 @@ describe('EntityRecordsPage', () => {
 
     await waitFor(() => {
       expect(screen.getByRole('heading', { name: 'Article' })).toBeInTheDocument()
-      expect(screen.getByText('article')).toBeInTheDocument()
     })
   })
 })

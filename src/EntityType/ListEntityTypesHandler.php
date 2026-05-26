@@ -32,6 +32,7 @@ final readonly class ListEntityTypesHandler
                         'name' => $item->name,
                         'slug' => $item->slug,
                         'is_pinned' => $item->isPinned,
+                        'labels' => $item->labels ?? new \stdClass(),
                     ],
                     $output->items,
                 ),

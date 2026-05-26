@@ -57,3 +57,38 @@ export function useEntityType(id: EntityTypeId): UseQueryResult<EntityType, AppE
     },
   })
 }
+
+const SLUG_LOOKUP_PARAMS = { limit: 100, offset: 0 } as const
+
+/**
+ * Looks up an entity type by its slug.
+ * Uses the same list endpoint as usePinnedEntityTypes (cache-friendly).
+ */
+export function useEntityTypeBySlug(slug: string): UseQueryResult<EntityType, AppError> {
+  return useQuery({
+    queryKey: [...entityTypeKeys.list(SLUG_LOOKUP_PARAMS), 'bySlug', slug],
+    queryFn: async ({ signal }) => {
+      const search = new URLSearchParams({
+        limit: String(SLUG_LOOKUP_PARAMS.limit),
+        offset: String(SLUG_LOOKUP_PARAMS.offset),
+      })
+      const dto = await apiClient.get<EntityTypeListDto>(
+        `/api/v1/entity-types?${search.toString()}`,
+        signal,
+      )
+      const list = mapEntityTypeListDtoToModel(dto)
+      const found = list.items.find((item) => item.slug === slug)
+      if (found === undefined) {
+        throw new AppError({
+          type: 'about:blank',
+          title: 'Not Found',
+          status: 404,
+          instance: `/api/v1/entity-types?slug=${slug}`,
+          detail: `No entity type with slug "${slug}"`,
+        })
+      }
+      return found
+    },
+    enabled: slug.length > 0,
+  })
+}

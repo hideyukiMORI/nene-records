@@ -1,5 +1,6 @@
 export type { EntityTypeId } from './ids'
 export { toEntityTypeId } from './ids'
+export { getLocalizedEntityTypeName } from './get-localized-name'
 export type {
   CreateEntityTypeInput,
   EntityType,
@@ -8,4 +9,9 @@ export type {
 } from './model'
 export { entityTypeKeys } from './query-keys'
 export { useCreateEntityType, useDeleteEntityType, useUpdateEntityType } from './mutations'
-export { useEntityType, useEntityTypeList, usePinnedEntityTypes } from './queries'
+export {
+  useEntityType,
+  useEntityTypeBySlug,
+  useEntityTypeList,
+  usePinnedEntityTypes,
+} from './queries'

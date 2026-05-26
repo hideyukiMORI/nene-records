@@ -15,7 +15,7 @@ const STATUS_BADGE_CLASS: Record<EntityStatus, string> = {
 }
 
 export interface EntityListPanelProps {
-  entityTypeId: number
+  entityTypeSlug: string
   items: Entity[]
   recordLabels: Record<string, string>
   isLoading: boolean
@@ -28,7 +28,7 @@ export interface EntityListPanelProps {
 }
 
 export function EntityListPanel({
-  entityTypeId,
+  entityTypeSlug,
   items,
   recordLabels,
   isLoading,
@@ -95,7 +95,7 @@ export function EntityListPanel({
             </Text>
           </Stack>
           <div className="flex items-center gap-inline-sm">
-            <Link to={`/entity-types/${String(entityTypeId)}/entities/${String(item.id)}`}>
+            <Link to={`/${entityTypeSlug}/${String(item.id)}`}>
               <Button variant="secondary" size="sm">
                 {t('common.actions.edit')}
               </Button>

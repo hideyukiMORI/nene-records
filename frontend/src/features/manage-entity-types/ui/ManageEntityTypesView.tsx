@@ -1,7 +1,10 @@
 import type { EntityType } from '@/entities/entity-type'
 import { useTranslation } from '@/shared/i18n'
 import { ConfirmDialog, Stack, Text } from '@/shared/ui'
-import type { CreateEntityTypeFormValues } from '../hooks/use-create-entity-type-form'
+import type {
+  CreateEntityTypeFormValues,
+  EditEntityTypeFormValues,
+} from '../hooks/use-create-entity-type-form'
 import { EntityTypeCreateForm } from './EntityTypeCreateForm'
 import { EntityTypeEditForm } from './EntityTypeEditForm'
 import { EntityTypeListPanel } from './EntityTypeListPanel'
@@ -24,7 +27,7 @@ export interface ManageEntityTypesViewProps {
   onCreate: (values: CreateEntityTypeFormValues) => Promise<void>
   onRequestEdit: (entityType: EntityType) => void
   onCancelEdit: () => void
-  onUpdate: (values: CreateEntityTypeFormValues) => Promise<void>
+  onUpdate: (values: EditEntityTypeFormValues) => Promise<void>
   onRequestDelete: (entityType: EntityType) => void
   onCancelDelete: () => void
   onConfirmDelete: () => Promise<void>

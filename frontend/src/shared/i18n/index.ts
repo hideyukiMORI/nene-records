@@ -5,3 +5,9 @@ export { LOCALES, SUPPORTED_LOCALE_IDS, DEFAULT_LOCALE, resolveLocale } from './
 export type { SupportedLocale, LocaleMeta } from './locales'
 export type { MessageKey, MessageParams } from './translate'
 export type { I18nContextValue } from './i18n-context-ref'
+export {
+  ADMIN_FONT_FAMILY_VAR,
+  LOCALE_FONT_STACKS,
+  applyLocaleFontFamily,
+  getLocaleFontStack,
+} from './locale-fonts'

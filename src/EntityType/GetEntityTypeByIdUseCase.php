@@ -24,6 +24,7 @@ final readonly class GetEntityTypeByIdUseCase implements GetEntityTypeByIdUseCas
             name: $entityType->name,
             slug: $entityType->slug,
             isPinned: $entityType->isPinned,
+            labels: $entityType->labels,
         );
     }
 }

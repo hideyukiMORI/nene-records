@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import type { EntityType } from '@/entities/entity-type'
+import { getLocalizedEntityTypeName, type EntityType } from '@/entities/entity-type'
 import { useTranslation } from '@/shared/i18n'
 import { Button, EmptyState, Stack, Text } from '@/shared/ui'
 
@@ -26,7 +26,7 @@ export function EntityTypeListPanel({
   onEdit,
   onDelete,
 }: EntityTypeListPanelProps) {
-  const { t } = useTranslation()
+  const { t, locale } = useTranslation()
 
   if (isLoading) {
     return <Text muted>{t('admin.entityTypes.existingList.loading')}</Text>
@@ -62,7 +62,7 @@ export function EntityTypeListPanel({
         >
           <Stack gap="xs">
             <Text as="span" variant="heading-sm">
-              {item.name}
+              {getLocalizedEntityTypeName(item, locale)}
             </Text>
             <Text as="span" muted>
               {item.slug}
@@ -70,13 +70,13 @@ export function EntityTypeListPanel({
           </Stack>
           <div className="flex items-center gap-inline-sm">
             {canManageSchema ? (
-              <Link to={`/entity-types/${String(item.id)}/fields`}>
+              <Link to={`/entity-types/${item.slug}/fields`}>
                 <Button variant="secondary" size="sm">
                   {t('admin.entityTypes.actions.fields')}
                 </Button>
               </Link>
             ) : null}
-            <Link to={`/entity-types/${String(item.id)}/entities`}>
+            <Link to={`/${item.slug}`}>
               <Button variant="secondary" size="sm">
                 {t('admin.entityTypes.actions.records')}
               </Button>

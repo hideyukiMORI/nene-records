@@ -45,6 +45,7 @@ export const en = {
   'admin.nav.navigation': 'Menus',
   'admin.nav.webhooks': 'Webhooks',
   'admin.nav.settings': 'Settings',
+  'admin.nav.appearance': 'Appearance',
   'admin.nav.advanced': 'Advanced',
   'admin.nav.publicSite': 'Public site',
   'admin.nav.logout': 'Log out',
@@ -88,6 +89,14 @@ export const en = {
   'admin.home.dashboard.error': 'Could not load dashboard',
   'admin.home.dashboard.noRecentPublished': 'No recently published content.',
 
+  'admin.home.gettingStarted': 'Getting started',
+  'admin.home.gettingStarted.description': 'A few things to help you set up your site.',
+  'admin.home.gettingStarted.content': 'Create your first content',
+  'admin.home.gettingStarted.content.description':
+    'Open a content type and write your first post or page.',
+  'admin.home.gettingStarted.menus': 'Set up navigation menus',
+  'admin.home.gettingStarted.menus.description': 'Add links to appear in your public site header.',
+
   // ── Entity types ─────────────────────────────────────────────────────────
   'admin.entityTypes.pageTitle': 'Content types',
   'admin.entityTypes.existingList.title': 'Existing types',
@@ -105,6 +114,9 @@ export const en = {
   'admin.entityTypes.editForm.isPinned': 'Show in sidebar',
   'admin.entityTypes.editForm.isPinnedDescription':
     'Pin this content type to the navigation sidebar for quick access.',
+  'admin.entityTypes.editForm.labels.title': 'Display names',
+  'admin.entityTypes.editForm.labels.description':
+    'Optionally override the display name for each language. Leave blank to use the base name.',
   'admin.entityTypes.delete.title': 'Delete content type?',
   'admin.entityTypes.delete.description': '"{{name}}" will be removed. This cannot be undone.',
   'admin.entityTypes.actions.fields': 'Fields',
@@ -112,21 +124,27 @@ export const en = {
   'admin.entityTypes.actions.backToTypes': 'Back to content types',
 
   // ── Entity records ───────────────────────────────────────────────────────
-  'admin.entityRecords.backToTypes': 'Back to content types',
+  'admin.entityRecords.backToTypes': 'Content types',
   'admin.entityRecords.backToRecords': 'Back to contents',
   'admin.entityRecords.recordCount.one': '{{count}} item',
   'admin.entityRecords.recordCount.other': '{{count}} items',
+  'admin.entityRecords.export.csv': 'Export CSV',
+  'admin.entityRecords.export.csv.tooltip': 'Download matching records as a CSV spreadsheet',
+  'admin.entityRecords.export.json': 'Export JSON',
+  'admin.entityRecords.export.json.tooltip': 'Download matching records as JSON data',
   'admin.entityRecords.list.title': '{{name}}',
   'admin.entityRecords.list.titleDefault': 'Contents',
   'admin.entityRecords.list.loading': 'Loading…',
   'admin.entityRecords.list.error': 'Could not load contents',
   'admin.entityRecords.list.empty.title': 'No content yet',
-  'admin.entityRecords.list.empty.description': 'Create your first item using the button above.',
+  'admin.entityRecords.list.empty.description':
+    'Use the "New item" button in the top right to create your first item.',
   'admin.entityRecords.list.emptyFiltered.title': 'No matching items',
   'admin.entityRecords.list.emptyFiltered.description':
     'Try clearing the filters or selecting different criteria.',
   'admin.entityRecords.search.placeholder': 'Search…',
   'admin.entityRecords.search.clear': 'Clear search',
+  'admin.entityRecords.create.newButton': 'New item',
   'admin.entityRecords.create.title': 'New item',
   'admin.entityRecords.create.description':
     'A new draft will be created. You can edit the content after creation.',
@@ -228,6 +246,7 @@ export const en = {
   'admin.entityRecord.textFields.noFields.description': 'Add fields to this content type first.',
   'admin.entityRecord.textFields.saving': 'Saving…',
   'admin.entityRecord.textFields.save': 'Save',
+  'admin.entityRecord.textFields.saved': 'Saved.',
   'admin.entityRecord.locale.label': 'Language',
   'admin.entityRecord.locale.default': 'Default',
   'admin.entityRecord.locale.switch': 'Switch',
@@ -319,10 +338,13 @@ export const en = {
   'admin.navigation.loading': 'Loading navigation items…',
   'admin.navigation.error': 'Could not load navigation items.',
   'admin.navigation.empty': 'No navigation items yet.',
+  'admin.navigation.empty.description': 'Add links to appear in your public site’s navigation bar.',
+  'admin.navigation.empty.hint': 'Tip: start with a “Home” link pointing to /',
   'admin.navigation.add': 'Add link',
   'admin.navigation.save': 'Save',
   'admin.navigation.saving': 'Saving…',
   'admin.navigation.delete': 'Delete',
+  'admin.navigation.deleteDescription': 'Delete "{{label}}"? This cannot be undone.',
   'admin.navigation.deleting': 'Deleting…',
   'admin.navigation.cancel': 'Cancel',
   'admin.navigation.label': 'Label',

@@ -41,7 +41,13 @@ export function NavigationItemListPanel({
   }
 
   if (items.length === 0) {
-    return <EmptyState title={t('admin.navigation.empty')} />
+    return (
+      <EmptyState
+        title={t('admin.navigation.empty')}
+        description={t('admin.navigation.empty.description')}
+        action={<span className="text-xs text-text-muted">{t('admin.navigation.empty.hint')}</span>}
+      />
+    )
   }
 
   return (

@@ -39,6 +39,17 @@ final readonly class UpdateEntityTypeHandler
         $slug = trim((string) ($body['slug'] ?? ''));
         $isPinned = (bool) ($body['is_pinned'] ?? false);
 
+        // labels: optional {"ja":"投稿","fr":"Articles"} – only string values are kept
+        $rawLabels = $body['labels'] ?? null;
+        $labels = null;
+        if (is_array($rawLabels)) {
+            $filtered = array_filter(
+                array_map('strval', $rawLabels),
+                static fn (string $v) => $v !== '',
+            );
+            $labels = $filtered !== [] ? array_map('strval', $filtered) : null;
+        }
+
         if ($name === '') {
             $errors[] = new ValidationError('name', 'Name is required.', 'required');
         }
@@ -53,8 +64,14 @@ final readonly class UpdateEntityTypeHandler
             throw new ValidationException($errors);
         }
 
-        $output = $this->useCase->execute(new UpdateEntityTypeInput(id: $id, name: $name, slug: $slug, isPinned: $isPinned));
+        $output = $this->useCase->execute(new UpdateEntityTypeInput(id: $id, name: $name, slug: $slug, isPinned: $isPinned, labels: $labels));
 
-        return $this->response->create(['id' => $output->id, 'name' => $output->name, 'slug' => $output->slug, 'is_pinned' => $output->isPinned]);
+        return $this->response->create([
+            'id' => $output->id,
+            'name' => $output->name,
+            'slug' => $output->slug,
+            'is_pinned' => $output->isPinned,
+            'labels' => $output->labels ?? new \stdClass(),
+        ]);
     }
 }

@@ -18,6 +18,7 @@ export function mapEntityTypeDtoToModel(dto: EntityTypeDto): EntityType {
     name: dto.name,
     slug: dto.slug,
     isPinned: dto.is_pinned,
+    labels: dto.labels && Object.keys(dto.labels).length > 0 ? dto.labels : undefined,
   }
 }
 
@@ -38,5 +39,10 @@ export function mapCreateInputToDto(input: CreateEntityTypeInput): CreateEntityT
 }
 
 export function mapUpdateInputToDto(input: UpdateEntityTypeInput): UpdateEntityTypeDto {
-  return mapCreateInputToDto(input)
+  return {
+    name: input.name,
+    slug: input.slug,
+    is_pinned: input.isPinned ?? false,
+    labels: input.labels,
+  }
 }
