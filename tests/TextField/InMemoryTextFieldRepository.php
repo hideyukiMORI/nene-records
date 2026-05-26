@@ -106,6 +106,29 @@ final class InMemoryTextFieldRepository implements TextFieldRepositoryInterface
         return array_slice($active, $offset, $limit);
     }
 
+    /**
+     * @param list<int> $entityIds
+     * @return list<TextField>
+     */
+    public function findByEntityIds(array $entityIds): array
+    {
+        if ($entityIds === []) {
+            return [];
+        }
+
+        $active = [];
+
+        foreach ($this->fields as $id => $textField) {
+            if (!isset($this->deletedIds[$id]) && in_array($textField->entityId, $entityIds, true)) {
+                $active[] = $textField;
+            }
+        }
+
+        usort($active, static fn (TextField $a, TextField $b): int => ($a->id ?? 0) <=> ($b->id ?? 0));
+
+        return $active;
+    }
+
     public function save(TextField $textField): int
     {
         $id = $this->nextId++;

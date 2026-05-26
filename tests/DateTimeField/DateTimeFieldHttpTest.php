@@ -27,6 +27,7 @@ use NeNeRecords\Entity\DeleteEntityHandler;
 use NeNeRecords\Entity\DeleteEntityUseCase;
 use NeNeRecords\Entity\EntityNotFoundExceptionHandler;
 use NeNeRecords\Entity\EntityRouteRegistrar;
+use NeNeRecords\Entity\ExportEntitiesHandler;
 use NeNeRecords\Entity\GetEntityByIdHandler;
 use NeNeRecords\Entity\GetEntityByIdUseCase;
 use NeNeRecords\Entity\ListEntitiesHandler;
@@ -41,6 +42,7 @@ use NeNeRecords\FieldDef\FieldDef;
 use NeNeRecords\Tests\Entity\InMemoryEntityRepository;
 use NeNeRecords\Tests\EntityType\InMemoryEntityTypeRepository;
 use NeNeRecords\Tests\FieldDef\InMemoryFieldDefRepository;
+use NeNeRecords\Tests\TextField\InMemoryTextFieldRepository;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
@@ -75,6 +77,7 @@ final class DateTimeFieldHttpTest extends TestCase
             new DeleteEntityHandler(new DeleteEntityUseCase($this->entities), $this->factory),
             new ListEntitiesHandler(new ListEntitiesUseCase($this->entities), $jsonResponse),
             new ListEntityRevisionsHandler(new ListEntityRevisionsUseCase($this->entities), $jsonResponse),
+            new ExportEntitiesHandler($this->entities, new InMemoryTextFieldRepository(), $this->factory),
         );
 
         $intFieldRegistrar = new DateTimeFieldRouteRegistrar(

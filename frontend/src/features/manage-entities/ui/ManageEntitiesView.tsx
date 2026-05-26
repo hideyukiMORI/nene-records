@@ -3,6 +3,7 @@ import type { RelationFieldDef } from '@/entities/field-def'
 import type { Tag } from '@/entities/tag'
 import { useTranslation } from '@/shared/i18n'
 import { ConfirmDialog, Stack, Text } from '@/shared/ui'
+import { buildExportUrl } from '../lib/build-export-url'
 import { EntityCreatePanel } from './EntityCreatePanel'
 import { EntityListPanel } from './EntityListPanel'
 import { EntityRelationFilterPanel } from './EntityRelationFilterPanel'
@@ -79,14 +80,32 @@ export function ManageEntitiesView({
   return (
     <>
       <Stack gap="lg">
-        <Stack gap="xs">
-          <Text as="p" muted>
-            {entityTypeSlug ?? '…'}
-          </Text>
-          <Text as="p" muted>
-            {t(recordCountKey, { count: total })}
-          </Text>
-        </Stack>
+        <div className="flex items-start justify-between gap-4">
+          <Stack gap="xs">
+            <Text as="p" muted>
+              {entityTypeSlug ?? '…'}
+            </Text>
+            <Text as="p" muted>
+              {t(recordCountKey, { count: total })}
+            </Text>
+          </Stack>
+          <div className="flex shrink-0 gap-2">
+            <a
+              href={buildExportUrl(entityTypeId, 'csv', searchQuery)}
+              download="records.csv"
+              className="inline-flex items-center gap-1.5 rounded-md border border-border bg-surface-raised px-inline-sm py-stack-xs font-sans text-caption text-text-muted shadow-sm transition-colors hover:text-text-primary"
+            >
+              ↓ CSV
+            </a>
+            <a
+              href={buildExportUrl(entityTypeId, 'json', searchQuery)}
+              download="records.json"
+              className="inline-flex items-center gap-1.5 rounded-md border border-border bg-surface-raised px-inline-sm py-stack-xs font-sans text-caption text-text-muted shadow-sm transition-colors hover:text-text-primary"
+            >
+              ↓ JSON
+            </a>
+          </div>
+        </div>
         <EntityCreatePanel
           isSubmitting={isCreating}
           serverErrorTitle={createErrorTitle}

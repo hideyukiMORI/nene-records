@@ -16,6 +16,7 @@ final readonly class EntityRouteRegistrar
         private DeleteEntityHandler $deleteHandler,
         private ListEntitiesHandler $listHandler,
         private ListEntityRevisionsHandler $listRevisionsHandler,
+        private ExportEntitiesHandler $exportHandler,
     ) {
     }
 
@@ -27,8 +28,10 @@ final readonly class EntityRouteRegistrar
         $deleteHandler = $this->deleteHandler;
         $listHandler = $this->listHandler;
         $listRevisionsHandler = $this->listRevisionsHandler;
+        $exportHandler = $this->exportHandler;
 
         $router->get('/api/v1/entities', static fn (ServerRequestInterface $request) => $listHandler->handle($request));
+        $router->get('/api/v1/entities/export', static fn (ServerRequestInterface $request) => $exportHandler->handle($request));
         $router->get('/api/v1/entities/{id}', static fn (ServerRequestInterface $request) => $getHandler->handle($request));
         $router->post('/api/v1/entities', static fn (ServerRequestInterface $request) => $createHandler->handle($request));
         $router->put('/api/v1/entities/{id}', static fn (ServerRequestInterface $request) => $updateHandler->handle($request));

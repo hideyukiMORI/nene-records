@@ -99,6 +99,30 @@ final readonly class PdoTextFieldRepository implements TextFieldRepositoryInterf
         );
     }
 
+    /** @param list<int> $entityIds @return list<TextField> */
+    public function findByEntityIds(array $entityIds): array
+    {
+        if ($entityIds === []) {
+            return [];
+        }
+
+        $placeholders = implode(', ', array_fill(0, count($entityIds), '?'));
+        $rows = $this->query->fetchAll(
+            "SELECT id, entity_id, field_key, value FROM text_fields WHERE entity_id IN ({$placeholders}) AND is_deleted = 0 ORDER BY entity_id ASC, id ASC",
+            $entityIds,
+        );
+
+        return array_map(
+            static fn (array $row) => new TextField(
+                entityId: (int) $row['entity_id'],
+                fieldKey: (string) $row['field_key'],
+                value: (string) $row['value'],
+                id: (int) $row['id'],
+            ),
+            $rows,
+        );
+    }
+
     public function save(TextField $textField): int
     {
         $this->query->execute(
