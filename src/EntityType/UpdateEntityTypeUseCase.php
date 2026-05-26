@@ -27,9 +27,9 @@ final readonly class UpdateEntityTypeUseCase implements UpdateEntityTypeUseCaseI
             }
         }
 
-        $updated = new EntityType(name: $input->name, slug: $input->slug, id: $input->id);
+        $updated = new EntityType(name: $input->name, slug: $input->slug, isPinned: $input->isPinned, id: $input->id);
         $this->entityTypes->update($updated);
 
-        return new UpdateEntityTypeOutput(id: $input->id, name: $input->name, slug: $input->slug);
+        return new UpdateEntityTypeOutput(id: $input->id, name: $input->name, slug: $input->slug, isPinned: $input->isPinned);
     }
 }

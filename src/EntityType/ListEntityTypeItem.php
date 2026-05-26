@@ -10,6 +10,7 @@ final readonly class ListEntityTypeItem
         public int $id,
         public string $name,
         public string $slug,
+        public bool $isPinned,
     ) {
     }
 }

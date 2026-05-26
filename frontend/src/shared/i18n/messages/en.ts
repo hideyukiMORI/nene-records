@@ -98,6 +98,8 @@ export const en = {
   'admin.entityTypes.editForm.title': 'Edit content type',
   'admin.entityTypes.editForm.save': 'Save changes',
   'admin.entityTypes.editForm.saving': 'Saving…',
+  'admin.entityTypes.editForm.isPinned': 'Show in sidebar',
+  'admin.entityTypes.editForm.isPinnedDescription': 'Pin this content type to the navigation sidebar for quick access.',
   'admin.entityTypes.delete.title': 'Delete content type?',
   'admin.entityTypes.delete.description': '"{{name}}" will be removed. This cannot be undone.',
   'admin.entityTypes.actions.fields': 'Fields',

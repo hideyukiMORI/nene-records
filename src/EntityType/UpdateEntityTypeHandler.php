@@ -37,6 +37,7 @@ final readonly class UpdateEntityTypeHandler
 
         $name = trim((string) ($body['name'] ?? ''));
         $slug = trim((string) ($body['slug'] ?? ''));
+        $isPinned = (bool) ($body['is_pinned'] ?? false);
 
         if ($name === '') {
             $errors[] = new ValidationError('name', 'Name is required.', 'required');
@@ -52,8 +53,8 @@ final readonly class UpdateEntityTypeHandler
             throw new ValidationException($errors);
         }
 
-        $output = $this->useCase->execute(new UpdateEntityTypeInput(id: $id, name: $name, slug: $slug));
+        $output = $this->useCase->execute(new UpdateEntityTypeInput(id: $id, name: $name, slug: $slug, isPinned: $isPinned));
 
-        return $this->response->create(['id' => $output->id, 'name' => $output->name, 'slug' => $output->slug]);
+        return $this->response->create(['id' => $output->id, 'name' => $output->name, 'slug' => $output->slug, 'is_pinned' => $output->isPinned]);
     }
 }

@@ -32,6 +32,7 @@ final readonly class GetEntityTypeByIdHandler
             'id' => $output->id,
             'name' => $output->name,
             'slug' => $output->slug,
+            'is_pinned' => $output->isPinned,
         ]);
     }
 }

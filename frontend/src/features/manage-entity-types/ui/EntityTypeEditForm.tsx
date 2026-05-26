@@ -3,12 +3,13 @@ import type { EntityType } from '@/entities/entity-type'
 import { useTranslation } from '@/shared/i18n'
 import { Button, Input, Stack, Text } from '@/shared/ui'
 import { useEditEntityTypeForm } from '../hooks/use-create-entity-type-form'
+import type { CreateEntityTypeFormValues } from '../hooks/use-create-entity-type-form'
 
 export interface EntityTypeEditFormProps {
   entityType: EntityType
   isSubmitting: boolean
   serverErrorTitle: string | null
-  onSubmit: (values: { name: string; slug: string }) => Promise<void>
+  onSubmit: (values: CreateEntityTypeFormValues) => Promise<void>
   onCancel: () => void
 }
 
@@ -27,6 +28,7 @@ export function EntityTypeEditForm({
   } = useEditEntityTypeForm({
     name: entityType.name,
     slug: entityType.slug,
+    isPinned: entityType.isPinned,
   })
 
   return (
@@ -73,6 +75,30 @@ export function EntityTypeEditForm({
               onChange={field.onChange}
               onBlur={field.onBlur}
             />
+          )}
+        />
+        <Controller
+          name="isPinned"
+          control={control}
+          render={({ field }) => (
+            <label className="flex cursor-pointer items-start gap-3">
+              <input
+                type="checkbox"
+                id="entity-type-edit-is-pinned"
+                checked={field.value}
+                onChange={field.onChange}
+                disabled={isSubmitting}
+                className="mt-0.5 h-4 w-4 shrink-0 accent-accent"
+              />
+              <span className="flex flex-col gap-0.5">
+                <span className="text-sm font-medium text-text-primary">
+                  {t('admin.entityTypes.editForm.isPinned')}
+                </span>
+                <span className="text-xs text-text-muted">
+                  {t('admin.entityTypes.editForm.isPinnedDescription')}
+                </span>
+              </span>
+            </label>
           )}
         />
         {serverErrorTitle !== null ? <Text muted>{serverErrorTitle}</Text> : null}

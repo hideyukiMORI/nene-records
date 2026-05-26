@@ -31,6 +31,7 @@ final readonly class ListEntityTypesHandler
                         'id' => $item->id,
                         'name' => $item->name,
                         'slug' => $item->slug,
+                        'is_pinned' => $item->isPinned,
                     ],
                     $output->items,
                 ),

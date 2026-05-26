@@ -19,8 +19,8 @@ final readonly class CreateEntityTypeUseCase implements CreateEntityTypeUseCaseI
             throw new EntityTypeSlugConflictException($input->slug);
         }
 
-        $id = $this->entityTypes->save(new EntityType(name: $input->name, slug: $input->slug));
+        $id = $this->entityTypes->save(new EntityType(name: $input->name, slug: $input->slug, isPinned: $input->isPinned));
 
-        return new CreateEntityTypeOutput(id: $id, name: $input->name, slug: $input->slug);
+        return new CreateEntityTypeOutput(id: $id, name: $input->name, slug: $input->slug, isPinned: $input->isPinned);
     }
 }

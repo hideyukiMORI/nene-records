@@ -4,6 +4,7 @@ interface EntityTypeRecord {
   id: number
   name: string
   slug: string
+  is_pinned: boolean
 }
 
 let nextId = 1
@@ -14,8 +15,8 @@ export function resetEntityTypeStore(): void {
   items = []
 }
 
-export function seedEntityTypes(seed: EntityTypeRecord[]): void {
-  items = [...seed]
+export function seedEntityTypes(seed: { id: number; name: string; slug: string; is_pinned?: boolean }[]): void {
+  items = seed.map((item) => ({ ...item, is_pinned: item.is_pinned ?? false }))
   nextId = Math.max(0, ...seed.map((item) => item.id)) + 1
 }
 
@@ -32,7 +33,7 @@ export const entityTypeHandlers = [
     })
   }),
   http.post('/api/v1/entity-types', async ({ request }) => {
-    const body = (await request.json()) as { name?: string; slug?: string }
+    const body = (await request.json()) as { name?: string; slug?: string; is_pinned?: boolean }
 
     if (typeof body.name !== 'string' || body.name.trim() === '') {
       return HttpResponse.json(
@@ -59,10 +60,11 @@ export const entityTypeHandlers = [
       )
     }
 
-    const created = {
+    const created: EntityTypeRecord = {
       id: nextId++,
       name: body.name,
       slug: body.slug ?? '',
+      is_pinned: body.is_pinned ?? false,
     }
     items = [...items, created]
 
@@ -102,7 +104,7 @@ export const entityTypeHandlers = [
       )
     }
 
-    const body = (await request.json()) as { name?: string; slug?: string }
+    const body = (await request.json()) as { name?: string; slug?: string; is_pinned?: boolean }
 
     if (typeof body.name !== 'string' || body.name.trim() === '') {
       return HttpResponse.json(
@@ -129,10 +131,11 @@ export const entityTypeHandlers = [
       )
     }
 
-    const updated = {
+    const updated: EntityTypeRecord = {
       id,
       name: body.name,
       slug: body.slug ?? '',
+      is_pinned: body.is_pinned ?? false,
     }
     items = [...items.slice(0, index), updated, ...items.slice(index + 1)]
 

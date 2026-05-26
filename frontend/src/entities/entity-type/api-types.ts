@@ -2,6 +2,7 @@ export interface EntityTypeDto {
   id: number
   name: string
   slug: string
+  is_pinned: boolean
 }
 
 export interface EntityTypeListDto {
@@ -13,6 +14,7 @@ export interface EntityTypeListDto {
 export interface CreateEntityTypeDto {
   name: string
   slug: string
+  is_pinned?: boolean
 }
 
 export type UpdateEntityTypeDto = CreateEntityTypeDto
