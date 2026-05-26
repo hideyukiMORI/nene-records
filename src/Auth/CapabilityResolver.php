@@ -54,6 +54,14 @@ final class CapabilityResolver
             return Capability::ManageTags;
         }
 
+        if (str_starts_with($path, '/api/v1/media')) {
+            return match (true) {
+                $method === 'DELETE' => Capability::ManageSettings,
+                $method === 'GET' || $method === 'HEAD' => Capability::ReadSettings,
+                default => null,
+            };
+        }
+
         // User management: all mutations require ManageSettings (admin-only)
         // Exception: PUT /api/v1/users/me/password is accessible to any authenticated user (no capability check)
         if (str_starts_with($path, '/api/v1/users') && $path !== '/api/v1/users/me/password' && self::isMutationMethod($method)) {

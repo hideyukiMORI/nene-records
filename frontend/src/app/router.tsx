@@ -12,6 +12,7 @@ import { ForbiddenPage } from '@/pages/forbidden/ForbiddenPage'
 import { HomePage } from '@/pages/home/HomePage'
 import { AppShell } from '@/pages/layout/AppShell'
 import { LoginPage } from '@/pages/login/LoginPage'
+import { MediaPage } from '@/pages/media/MediaPage'
 import { NavigationPage } from '@/pages/navigation/NavigationPage'
 import { NotFoundPage } from '@/pages/not-found/NotFoundPage'
 import { ResetPasswordPage } from '@/pages/reset-password/ResetPasswordPage'
@@ -59,6 +60,7 @@ const router = createBrowserRouter([
       { path: 'entity-types', element: <EntityTypesPage /> },
       { path: 'tags', element: <TagsPage /> },
       { path: 'navigation', element: <NavigationPage /> },
+      { path: 'media', element: <MediaPage /> },
       { path: 'webhooks', element: <WebhooksPage /> },
       { path: 'settings', element: <SiteSettingsPage /> },
       { path: 'users', element: <UsersPage /> },

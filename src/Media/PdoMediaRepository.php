@@ -37,6 +37,22 @@ final readonly class PdoMediaRepository implements MediaRepositoryInterface
         return $this->mapRow($row);
     }
 
+    /** @return list<Media> */
+    public function list(): array
+    {
+        $rows = $this->query->fetchAll(
+            'SELECT id, original_name, stored_name, mime_type, size, url, created_at FROM media ORDER BY created_at DESC',
+            [],
+        );
+
+        return array_map(fn (array $row): Media => $this->mapRow($row), $rows);
+    }
+
+    public function delete(int $id): void
+    {
+        $this->query->execute('DELETE FROM media WHERE id = ?', [$id]);
+    }
+
     /** @param array<string, mixed> $row */
     private function mapRow(array $row): Media
     {

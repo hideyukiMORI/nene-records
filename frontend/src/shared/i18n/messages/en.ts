@@ -411,6 +411,26 @@ export const en = {
   'admin.webhooks.form.secretPlaceholder': 'Used for HMAC-SHA256 X-NeNe-Signature header',
   'admin.webhooks.form.isActiveLabel': 'Active',
 
+  // ── Media library ───────────────────────────────────────────────────────
+  'admin.nav.media': 'Media',
+  'admin.media.pageTitle': 'Media library',
+  'admin.media.description': 'Upload and manage media files.',
+  'admin.media.dropzone.label': 'Drop files here or click to upload',
+  'admin.media.dropzone.hint': 'Images, PDFs, video, audio — max 10 MB each',
+  'admin.media.dropzone.uploading': 'Uploading…',
+  'admin.media.list.title': 'Uploaded files',
+  'admin.media.list.loading': 'Loading media…',
+  'admin.media.list.error': 'Could not load media.',
+  'admin.media.list.retry': 'Retry',
+  'admin.media.list.empty.title': 'No files yet',
+  'admin.media.list.empty.description': 'Upload your first file using the area above.',
+  'admin.media.copy': 'Copy URL',
+  'admin.media.copied': 'Copied!',
+  'admin.media.delete': 'Delete',
+  'admin.media.delete.confirmTitle': 'Delete file?',
+  'admin.media.delete.confirmDescription': 'Delete "{{name}}"? This cannot be undone.',
+  'admin.media.delete.deleting': 'Deleting…',
+
   // ── Users ────────────────────────────────────────────────────────────────
   'admin.users.pageTitle': 'Users',
   'admin.users.description': 'Manage user accounts, roles, and invitations.',

@@ -48,6 +48,7 @@ use NeNeRecords\IntField\FieldTypeMismatchExceptionHandler as IntFieldTypeMismat
 use NeNeRecords\IntField\IntFieldNotFoundExceptionHandler;
 use NeNeRecords\IntField\IntFieldServiceProvider;
 use NeNeRecords\Media\MediaInvalidTypeExceptionHandler;
+use NeNeRecords\Media\MediaNotFoundExceptionHandler;
 use NeNeRecords\Media\MediaServiceProvider;
 use NeNeRecords\Media\MediaTooLargeExceptionHandler;
 use NeNeRecords\NavigationItem\NavigationItemNotFoundExceptionHandler;
@@ -236,6 +237,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $invalidCredentials = $container->get(InvalidCredentialsExceptionHandler::class);
                     $mediaInvalidType = $container->get(MediaInvalidTypeExceptionHandler::class);
                     $mediaTooLarge = $container->get(MediaTooLargeExceptionHandler::class);
+                    $mediaNotFound = $container->get(MediaNotFoundExceptionHandler::class);
                     $navigationItemNotFound = $container->get(NavigationItemNotFoundExceptionHandler::class);
                     $webhookNotFound = $container->get(WebhookNotFoundExceptionHandler::class);
                     $previewTokenNotFound = $container->get(PreviewTokenNotFoundExceptionHandler::class);
@@ -286,6 +288,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $invalidCredentials,
                         $mediaInvalidType,
                         $mediaTooLarge,
+                        $mediaNotFound,
                         $navigationItemNotFound,
                         $webhookNotFound,
                         $previewTokenNotFound,
@@ -341,6 +344,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $invalidCredentials,
                         $mediaInvalidType,
                         $mediaTooLarge,
+                        $mediaNotFound,
                         $navigationItemNotFound,
                         $webhookNotFound,
                         $previewTokenNotFound,

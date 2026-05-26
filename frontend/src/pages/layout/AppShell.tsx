@@ -10,6 +10,7 @@ import {
   IconFileText,
   IconGlobe,
   IconHome,
+  IconImage,
   IconLayers,
   IconLayout,
   IconLink,
@@ -241,6 +242,14 @@ export function AppShell() {
                           to="/admin/navigation"
                           icon={<IconLink size={16} />}
                           label={t('admin.nav.navigation')}
+                          onClick={closeSidebar}
+                        />
+                      </li>
+                      <li>
+                        <NavItem
+                          to="/admin/media"
+                          icon={<IconImage size={16} />}
+                          label={t('admin.nav.media')}
                           onClick={closeSidebar}
                         />
                       </li>
