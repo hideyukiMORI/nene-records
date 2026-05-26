@@ -6,6 +6,21 @@ NeNe Records does not yet follow Semantic Versioning — entries are grouped by 
 
 ---
 
+## [M5 — ユーザー管理・メディアライブラリ] — 2026-05-27
+
+### Added
+- User management API — `GET/POST /api/v1/users`, `GET/PATCH/DELETE /api/v1/users/{id}`, `POST /api/v1/users/{id}/admin-reset-password`, `PUT /api/v1/users/me/password`; admin/editor role enforcement (#190 #191, PR #194)
+- User invite flow — `POST /api/v1/user-invites` sends invite email with one-time token; `POST /api/v1/user-invites/accept` activates account (#190 #191, PR #194)
+- Password reset flow — `POST /api/v1/user-invites/request-password-reset` (anti-enumeration 204); `POST /api/v1/user-invites/confirm-password-reset` exchanges token for new password (#190 #191, PR #194)
+- `MailerInterface` + `SymfonyMailer` using Mailpit in development (#191, PR #194)
+- User management Admin UI — user list, invite form, role change, admin password reset, self-service password change, delete with confirmation (#192, PR #195)
+- Accept-invite public page `/admin/accept-invite?token=…` and reset-password public page `/admin/reset-password?token=…` (#192, PR #195)
+- Media library list API — `GET /api/v1/media` returns all uploads ordered by `created_at DESC`; `created_at` added to upload response (#196, PR #198)
+- Media delete API — `DELETE /api/v1/media/{id}` removes DB record and best-effort unlinks physical file (#196, PR #198)
+- Media library Admin UI — drag-and-drop upload, thumbnail grid, copy-URL, delete with confirmation; `/admin/media` route (#197, PR #198)
+
+---
+
 ## [M4 — 機能拡充・使い勝手改善] — 2026-05-26
 
 ### Added
