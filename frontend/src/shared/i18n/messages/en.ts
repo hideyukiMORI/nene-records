@@ -126,6 +126,8 @@ export const en = {
   'admin.entityRecords.create.submitting': 'Creating…',
   'admin.entityRecords.delete.title': 'Delete record?',
   'admin.entityRecords.delete.description': 'Record #{{id}} will be soft-deleted.',
+  'admin.entityRecords.statusFilter.label': 'Filter by status',
+  'admin.entityRecords.statusFilter.all': 'All',
 
   // ── Field definitions ────────────────────────────────────────────────────
   'admin.fieldDefs.pageTitle': 'Fields',
@@ -213,6 +215,12 @@ export const en = {
     'Add field definitions for this entity type first.',
   'admin.entityRecord.textFields.saving': 'Saving…',
   'admin.entityRecord.textFields.save': 'Save values',
+  'admin.entityRecord.locale.label': 'Language',
+  'admin.entityRecord.locale.default': 'Default',
+  'admin.entityRecord.locale.switch': 'Switch',
+  'admin.entityRecord.locale.inputPlaceholder': 'e.g. ja, en, fr…',
+  'admin.entityRecord.locale.editing': 'Editing locale: {{locale}}',
+  'admin.entityRecord.locale.editingDefault': 'Editing default (no locale)',
 
   // ── Entity status panel ───────────────────────────────────────────────────
   'admin.entityStatus.panelTitle': 'Publish status',

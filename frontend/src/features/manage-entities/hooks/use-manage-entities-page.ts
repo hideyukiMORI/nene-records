@@ -7,6 +7,7 @@ import {
   type Entity,
   type EntityId,
   type EntityRelationFilters,
+  type EntityStatus,
 } from '@/entities/entity'
 import {
   defaultFieldDefListParams,
@@ -22,6 +23,7 @@ export function useManageEntitiesPage(entityTypeId: number) {
   const [selectedTagSlugs, setSelectedTagSlugs] = useState<string[]>([])
   const [selectedRelationFilters, setSelectedRelationFilters] = useState<EntityRelationFilters>({})
   const [searchQuery, setSearchQuery] = useState('')
+  const [selectedStatus, setSelectedStatus] = useState<EntityStatus | undefined>(undefined)
   const listParams = useMemo(
     () =>
       defaultEntityListParams(
@@ -30,8 +32,9 @@ export function useManageEntitiesPage(entityTypeId: number) {
         selectedRelationFilters,
         0,
         searchQuery,
+        selectedStatus,
       ),
-    [entityTypeId, selectedRelationFilters, selectedTagSlugs, searchQuery],
+    [entityTypeId, selectedRelationFilters, selectedTagSlugs, searchQuery, selectedStatus],
   )
   const listQuery = useEntityList(listParams)
   const tagListQuery = useTagList({ limit: 100, offset: 0 })
@@ -117,6 +120,8 @@ export function useManageEntitiesPage(entityTypeId: number) {
     relationFieldDefs,
     selectedTagSlugs,
     selectedRelationFilters,
+    selectedStatus,
+    setStatus: setSelectedStatus,
     searchQuery,
     setSearchQuery,
     toggleTagSlug,
@@ -126,7 +131,8 @@ export function useManageEntitiesPage(entityTypeId: number) {
     isFilterActive:
       selectedTagSlugs.length > 0 ||
       Object.keys(selectedRelationFilters).length > 0 ||
-      searchQuery !== '',
+      searchQuery !== '' ||
+      selectedStatus !== undefined,
     isLoading,
     isError,
     errorTitle,

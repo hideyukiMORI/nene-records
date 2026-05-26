@@ -7,7 +7,7 @@ import {
   mapEntityListDtoToModel,
   mapEntityRevisionListDtoToModel,
 } from './mapper'
-import type { Entity, EntityList, EntityRevisionList } from './model'
+import type { Entity, EntityList, EntityRevisionList, EntityStatus } from './model'
 import { entityKeys, type EntityListParams } from './query-keys'
 
 const DEFAULT_LIST_PARAMS = { limit: 20, offset: 0 } as const
@@ -87,6 +87,7 @@ export function defaultEntityListParams(
   relationFilters: EntityListParams['relationFilters'] = {},
   offset = 0,
   q?: string,
+  status?: EntityStatus,
 ): EntityListParams {
   return {
     entityTypeId,
@@ -95,5 +96,6 @@ export function defaultEntityListParams(
     limit: DEFAULT_LIST_PARAMS.limit,
     offset,
     q: q !== '' ? q : undefined,
+    status,
   }
 }

@@ -10,6 +10,8 @@ const STATUS_BADGE_CLASS: Record<EntityStatus, string> = {
     'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-green-100 text-green-800',
   archived:
     'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-600',
+  scheduled:
+    'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-800',
 }
 
 export interface EntityListPanelProps {

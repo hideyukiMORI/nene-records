@@ -1,13 +1,15 @@
-import type { Entity, EntityRelationFilters } from '@/entities/entity'
+import type { Entity, EntityRelationFilters, EntityStatus } from '@/entities/entity'
 import type { RelationFieldDef } from '@/entities/field-def'
 import type { Tag } from '@/entities/tag'
 import { useTranslation } from '@/shared/i18n'
-import { ConfirmDialog, Stack, Text } from '@/shared/ui'
+import { Button, ConfirmDialog, Stack, Text } from '@/shared/ui'
 import { buildExportUrl } from '../lib/build-export-url'
 import { EntityCreatePanel } from './EntityCreatePanel'
 import { EntityListPanel } from './EntityListPanel'
 import { EntityRelationFilterPanel } from './EntityRelationFilterPanel'
 import { EntityTagFilterPanel } from './EntityTagFilterPanel'
+
+const ENTITY_STATUSES: EntityStatus[] = ['draft', 'published', 'scheduled', 'archived']
 
 export interface ManageEntitiesViewProps {
   entityTypeId: number
@@ -20,6 +22,7 @@ export interface ManageEntitiesViewProps {
   relationFieldDefs: RelationFieldDef[]
   selectedTagSlugs: string[]
   selectedRelationFilters: EntityRelationFilters
+  selectedStatus: EntityStatus | undefined
   searchQuery: string
   isFilterActive: boolean
   isLoading: boolean
@@ -34,6 +37,7 @@ export interface ManageEntitiesViewProps {
   onClearTagFilter: () => void
   onSelectRelationFilter: (fieldKey: string, targetEntityId: number | undefined) => void
   onClearRelationFilters: () => void
+  onStatusChange: (status: EntityStatus | undefined) => void
   onSearchChange: (q: string) => void
   onCreate: () => Promise<void>
   onRequestDelete: (entity: Entity) => void
@@ -52,6 +56,7 @@ export function ManageEntitiesView({
   relationFieldDefs,
   selectedTagSlugs,
   selectedRelationFilters,
+  selectedStatus,
   searchQuery,
   isFilterActive,
   isLoading,
@@ -66,6 +71,7 @@ export function ManageEntitiesView({
   onClearTagFilter,
   onSelectRelationFilter,
   onClearRelationFilters,
+  onStatusChange,
   onSearchChange,
   onCreate,
   onRequestDelete,
@@ -137,6 +143,38 @@ export function ManageEntitiesView({
             </button>
           ) : null}
         </div>
+
+        {/* ── Status Filter ── */}
+        <Stack gap="sm">
+          <Text as="h2" variant="heading-sm">
+            {t('admin.entityRecords.statusFilter.label')}
+          </Text>
+          <div className="flex flex-wrap gap-inline-sm">
+            <Button
+              variant={selectedStatus === undefined ? 'primary' : 'secondary'}
+              size="sm"
+              aria-pressed={selectedStatus === undefined}
+              onClick={() => {
+                onStatusChange(undefined)
+              }}
+            >
+              {t('admin.entityRecords.statusFilter.all')}
+            </Button>
+            {ENTITY_STATUSES.map((status) => (
+              <Button
+                key={status}
+                variant={selectedStatus === status ? 'primary' : 'secondary'}
+                size="sm"
+                aria-pressed={selectedStatus === status}
+                onClick={() => {
+                  onStatusChange(status)
+                }}
+              >
+                {t(`admin.entityStatus.status.${status}`)}
+              </Button>
+            ))}
+          </div>
+        </Stack>
 
         <EntityTagFilterPanel
           tags={availableTags}

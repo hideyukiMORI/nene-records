@@ -119,6 +119,8 @@ export const ja: Partial<MessageCatalog> = {
   'admin.entityRecords.create.submitting': '作成中…',
   'admin.entityRecords.delete.title': 'レコードを削除しますか？',
   'admin.entityRecords.delete.description': 'レコード #{{id}} がソフト削除されます。',
+  'admin.entityRecords.statusFilter.label': 'ステータスで絞り込む',
+  'admin.entityRecords.statusFilter.all': 'すべて',
 
   // ── Field definitions ────────────────────────────────────────────────────
   'admin.fieldDefs.pageTitle': 'フィールド',
@@ -207,6 +209,12 @@ export const ja: Partial<MessageCatalog> = {
     'まずこのエンティティタイプのフィールド定義を追加してください。',
   'admin.entityRecord.textFields.saving': '保存中…',
   'admin.entityRecord.textFields.save': '値を保存',
+  'admin.entityRecord.locale.label': '言語',
+  'admin.entityRecord.locale.default': 'デフォルト',
+  'admin.entityRecord.locale.switch': '切替',
+  'admin.entityRecord.locale.inputPlaceholder': '例: ja、en、fr…',
+  'admin.entityRecord.locale.editing': '編集中のロケール: {{locale}}',
+  'admin.entityRecord.locale.editingDefault': 'デフォルト（ロケールなし）を編集中',
 
   // ── Entity status panel ───────────────────────────────────────────────────
   'admin.entityStatus.panelTitle': '公開ステータス',
