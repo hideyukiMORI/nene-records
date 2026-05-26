@@ -7,6 +7,9 @@ export type {
   EntityRevision,
   EntityRevisionList,
   EntityStatus,
+  GeneratePreviewTokenInput,
+  GeneratePreviewTokenOutput,
+  RevokePreviewTokenInput,
   ScheduleEntityInput,
   ScheduleEntityOutput,
   UpdateEntityInput,
@@ -16,6 +19,8 @@ export type { EntityListParams, EntityRelationFilters } from './query-keys'
 export {
   useCreateEntity,
   useDeleteEntity,
+  useGeneratePreviewToken,
+  useRevokePreviewToken,
   useScheduleEntity,
   useUnscheduleEntity,
   useUpdateEntity,

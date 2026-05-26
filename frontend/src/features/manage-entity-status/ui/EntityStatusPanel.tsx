@@ -1,6 +1,12 @@
 import { useState } from 'react'
 import type { Entity, EntityStatus } from '@/entities/entity'
-import { useScheduleEntity, useUnscheduleEntity, useUpdateEntity } from '@/entities/entity'
+import {
+  useGeneratePreviewToken,
+  useRevokePreviewToken,
+  useScheduleEntity,
+  useUnscheduleEntity,
+  useUpdateEntity,
+} from '@/entities/entity'
 import { useTranslation } from '@/shared/i18n'
 import type { MessageKey } from '@/shared/i18n'
 import { Button, Input, Stack, Text } from '@/shared/ui'
@@ -40,14 +46,22 @@ export function EntityStatusPanel({ entity, entityTypeSlug }: EntityStatusPanelP
   const updateMutation = useUpdateEntity()
   const scheduleMutation = useScheduleEntity()
   const unscheduleMutation = useUnscheduleEntity()
+  const generatePreviewMutation = useGeneratePreviewToken()
+  const revokePreviewMutation = useRevokePreviewToken()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [slugInput, setSlugInput] = useState(entity.slug ?? '')
   const [slugSaved, setSlugSaved] = useState(false)
   const [showScheduleForm, setShowScheduleForm] = useState(false)
   const [scheduledAtInput, setScheduledAtInput] = useState('')
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [previewExpires, setPreviewExpires] = useState<string | null>(null)
 
   const isPending =
-    updateMutation.isPending || scheduleMutation.isPending || unscheduleMutation.isPending
+    updateMutation.isPending ||
+    scheduleMutation.isPending ||
+    unscheduleMutation.isPending ||
+    generatePreviewMutation.isPending ||
+    revokePreviewMutation.isPending
 
   const changeStatus = async (nextStatus: EntityStatus) => {
     setErrorMessage(null)
@@ -99,6 +113,28 @@ export function EntityStatusPanel({ entity, entityTypeSlug }: EntityStatusPanelP
     setErrorMessage(null)
     try {
       await unscheduleMutation.mutateAsync({ id: entity.id })
+    } catch {
+      setErrorMessage(t('admin.entityStatus.updateError'))
+    }
+  }
+
+  const generatePreview = async () => {
+    setErrorMessage(null)
+    try {
+      const output = await generatePreviewMutation.mutateAsync({ id: Number(entity.id) })
+      setPreviewUrl(output.previewUrl)
+      setPreviewExpires(output.expiresAt)
+    } catch {
+      setErrorMessage(t('admin.entityStatus.previewTokenError'))
+    }
+  }
+
+  const revokePreview = async () => {
+    setErrorMessage(null)
+    try {
+      await revokePreviewMutation.mutateAsync({ id: Number(entity.id) })
+      setPreviewUrl(null)
+      setPreviewExpires(null)
     } catch {
       setErrorMessage(t('admin.entityStatus.updateError'))
     }
@@ -204,6 +240,14 @@ export function EntityStatusPanel({ entity, entityTypeSlug }: EntityStatusPanelP
             {t('admin.entityStatus.cancelSchedule')}
           </Button>
         )}
+        <Button
+          variant="secondary"
+          size="sm"
+          disabled={isPending}
+          onClick={() => void generatePreview()}
+        >
+          {t('admin.entityStatus.generatePreviewToken')}
+        </Button>
       </div>
 
       {showScheduleForm && (
@@ -233,6 +277,36 @@ export function EntityStatusPanel({ entity, entityTypeSlug }: EntityStatusPanelP
           >
             {t('common.actions.cancel')}
           </Button>
+        </div>
+      )}
+
+      {previewUrl !== null && (
+        <div className="rounded-md border border-border bg-surface p-3">
+          <Stack gap="xs">
+            <Text as="span" muted>
+              {t('admin.entityStatus.previewTokenExpires', {
+                date: previewExpires !== null ? new Date(previewExpires).toLocaleString() : '',
+              })}
+            </Text>
+            <div className="flex items-center gap-inline-sm">
+              <a
+                href={previewUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 truncate text-sm text-blue-600 underline hover:text-blue-800"
+              >
+                {previewUrl}
+              </a>
+              <Button
+                variant="secondary"
+                size="sm"
+                disabled={isPending}
+                onClick={() => void revokePreview()}
+              >
+                {t('admin.entityStatus.revokePreviewToken')}
+              </Button>
+            </div>
+          </Stack>
         </div>
       )}
 

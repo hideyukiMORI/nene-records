@@ -4,6 +4,7 @@ import type {
   EntityListDto,
   EntityRevisionDto,
   EntityRevisionListDto,
+  GeneratePreviewTokenResponseDto,
   ScheduleEntityResponseDto,
   UpdateEntityDto,
 } from './api-types'
@@ -14,6 +15,7 @@ import type {
   EntityList,
   EntityRevision,
   EntityRevisionList,
+  GeneratePreviewTokenOutput,
   ScheduleEntityOutput,
   UpdateEntityInput,
 } from './model'
@@ -68,6 +70,16 @@ export function mapUpdateInputToDto(input: UpdateEntityInput): UpdateEntityDto {
     ...(input.publishedAt !== undefined ? { published_at: input.publishedAt } : {}),
     ...(input.metaTitle !== undefined ? { meta_title: input.metaTitle } : {}),
     ...(input.metaDescription !== undefined ? { meta_description: input.metaDescription } : {}),
+  }
+}
+
+export function mapGeneratePreviewTokenResponseDtoToOutput(
+  dto: GeneratePreviewTokenResponseDto,
+): GeneratePreviewTokenOutput {
+  return {
+    token: dto.token,
+    expiresAt: dto.expires_at,
+    previewUrl: dto.preview_url,
   }
 }
 

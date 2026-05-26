@@ -2160,6 +2160,81 @@ paths:
                 $ref: '#/components/schemas/NavigationItemListResponse'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /api/v1/entities/{id}/preview-token:
+    post:
+      tags:
+        - Entity
+      summary: Generate a draft preview token
+      description: Generates (or rotates) a 24-hour preview token for the entity. Any previously issued token for the same entity is revoked.
+      operationId: generatePreviewToken
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '201':
+          description: Preview token created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneratePreviewTokenResponse'
+        '401':
+          $ref: '#/components/responses/InvalidCredentials'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Entity
+      summary: Revoke draft preview token
+      description: Deletes all preview tokens for the entity. Returns 204 even if no token existed.
+      operationId: revokePreviewToken
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Token revoked.
+        '401':
+          $ref: '#/components/responses/InvalidCredentials'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/public/preview/{token}:
+    get:
+      tags:
+        - PublicConsumer
+      summary: Get entity record by preview token
+      description: Returns the full public record view for any entity (including drafts) identified by a valid, non-expired preview token. No authentication required.
+      operationId: getPreviewRecordByToken
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Preview record bootstrap data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicRecordViewResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /api/v1/analytics/access-stats:
     get:
       tags:
@@ -3642,6 +3717,7 @@ components:
           default: 0
       additionalProperties: false
 
+
     WebhookResponse:
       type: object
       required:
@@ -3751,4 +3827,22 @@ components:
           nullable: true
         is_active:
           type: boolean
+      additionalProperties: false
+    GeneratePreviewTokenResponse:
+      type: object
+      required:
+        - token
+        - expires_at
+        - preview_url
+      properties:
+        token:
+          type: string
+          description: Opaque 64-character hex token.
+        expires_at:
+          type: string
+          format: date-time
+          description: ISO 8601 expiry timestamp (24 hours from generation).
+        preview_url:
+          type: string
+          description: Relative API path to fetch the preview record.
       additionalProperties: false

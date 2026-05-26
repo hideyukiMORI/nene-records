@@ -50,6 +50,20 @@ export interface ScheduleEntityOutput {
   scheduledAt: string
 }
 
+export interface GeneratePreviewTokenInput {
+  id: number
+}
+
+export interface GeneratePreviewTokenOutput {
+  token: string
+  expiresAt: string
+  previewUrl: string
+}
+
+export interface RevokePreviewTokenInput {
+  id: number
+}
+
 export type EntityRevisionAction = 'created' | 'updated' | 'deleted' | 'restored'
 
 export interface EntityRevision {

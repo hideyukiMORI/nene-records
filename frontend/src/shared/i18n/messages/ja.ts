@@ -219,6 +219,10 @@ export const ja: Partial<MessageCatalog> = {
   'admin.entityStatus.confirmSchedule': '予約を確定',
   'admin.entityStatus.scheduledAt': '{{date}} に公開予定',
   'admin.entityStatus.scheduleError': '予約に失敗しました。日時は未来である必要があります。',
+  'admin.entityStatus.generatePreviewToken': 'プレビューリンク生成',
+  'admin.entityStatus.revokePreviewToken': '無効化',
+  'admin.entityStatus.previewTokenExpires': '有効期限: {{date}}',
+  'admin.entityStatus.previewTokenError': 'プレビューリンクの生成に失敗しました。',
 
   // ── Relations (outgoing) ──────────────────────────────────────────────────
   'admin.relations.title': 'リレーション',
