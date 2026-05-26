@@ -129,11 +129,13 @@ export const en = {
   'admin.fieldDefs.delete.title': 'Delete field?',
   'admin.fieldDefs.delete.description': '"{{fieldKey}}" will be removed from the schema.',
   'admin.fieldDefs.dataType.text': 'Text',
+  'admin.fieldDefs.dataType.markdown': 'Markdown',
   'admin.fieldDefs.dataType.int': 'Integer',
   'admin.fieldDefs.dataType.enum': 'Enum',
   'admin.fieldDefs.dataType.bool': 'Boolean',
   'admin.fieldDefs.dataType.datetime': 'Date & time',
   'admin.fieldDefs.dataType.image': 'Image',
+  'admin.fieldDefs.dataType.relation': 'Relation',
 
   // ── Media upload ─────────────────────────────────────────────────────────
   'admin.media.panelTitle': 'Media',
@@ -144,6 +146,11 @@ export const en = {
   'admin.media.imagePreview': 'Image preview',
   'admin.media.noImage': 'No image selected',
   'admin.media.urlLabel': 'Image URL',
+
+  // ── Markdown editor ───────────────────────────────────────────────────────
+  'admin.markdownEditor.preview': 'Preview',
+  'admin.markdownEditor.write': 'Write',
+  'admin.markdownEditor.empty': 'Nothing to preview.',
 
   // ── Tags ─────────────────────────────────────────────────────────────────
   'admin.tags.pageTitle': 'Tags',

@@ -1,5 +1,6 @@
 export const FIELD_DATA_TYPES = [
   'text',
+  'markdown',
   'int',
   'enum',
   'bool',

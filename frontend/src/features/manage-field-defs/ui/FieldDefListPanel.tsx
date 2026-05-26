@@ -6,10 +6,12 @@ import { Button, EmptyState, Stack, Text } from '@/shared/ui'
 
 const DATA_TYPE_LABEL_KEYS: Record<FieldDataType, MessageKey> = {
   text: 'admin.fieldDefs.dataType.text',
+  markdown: 'admin.fieldDefs.dataType.markdown',
   int: 'admin.fieldDefs.dataType.int',
   enum: 'admin.fieldDefs.dataType.enum',
   bool: 'admin.fieldDefs.dataType.bool',
   datetime: 'admin.fieldDefs.dataType.datetime',
+  relation: 'admin.fieldDefs.dataType.relation',
 }
 
 export interface FieldDefListPanelProps {
