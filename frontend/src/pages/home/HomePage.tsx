@@ -1,20 +1,55 @@
 import { Link } from 'react-router-dom'
 import { useDashboardSummary } from '@/entities/dashboard'
+import { usePinnedEntityTypes } from '@/entities/entity-type'
 import { useTranslation } from '@/shared/i18n'
 import { Stack, Text } from '@/shared/ui'
+import { IconFileText } from '@/shared/ui/icons/Icons'
 
 export function HomePage() {
   const { t } = useTranslation()
   const { data, isLoading, isError } = useDashboardSummary()
+  const pinnedQuery = usePinnedEntityTypes()
+  const pinnedTypes = pinnedQuery.data ?? []
 
   return (
-    <Stack gap="md">
+    <Stack gap="lg">
       <Text as="h1" variant="heading-md">
         {t('admin.home.title')}
       </Text>
 
-      {isLoading && <Text muted>{t('admin.home.dashboard.loading')}</Text>}
+      {/* ── Quick access ── */}
+      <section>
+        <Text as="h2" variant="heading-sm">
+          {t('admin.home.quickAccess')}
+        </Text>
+        {pinnedTypes.length === 0 && !pinnedQuery.isLoading ? (
+          <Text muted>{t('admin.home.quickAccess.empty')}</Text>
+        ) : (
+          <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {pinnedTypes.map((entityType) => (
+              <Link
+                key={entityType.id}
+                to={`/entity-types/${String(entityType.id)}/entities`}
+                className="group flex items-center gap-3 rounded-lg border border-border bg-surface-raised p-4 shadow-sm transition-colors hover:border-accent hover:bg-surface"
+              >
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-accent/10 text-accent transition-colors group-hover:bg-accent/20">
+                  <IconFileText size={18} />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate font-medium text-text-primary">
+                    {entityType.name}
+                  </span>
+                  <span className="block text-xs text-text-muted">
+                    {t('admin.home.quickAccess.manage')}
+                  </span>
+                </span>
+              </Link>
+            ))}
+          </div>
+        )}
+      </section>
 
+      {isLoading && <Text muted>{t('admin.home.dashboard.loading')}</Text>}
       {isError && <Text muted>{t('admin.home.dashboard.error')}</Text>}
 
       {data && (

@@ -8,6 +8,7 @@ import type { EntityType, EntityTypeList } from './model'
 import { entityTypeKeys } from './query-keys'
 
 const DEFAULT_LIST_PARAMS = { limit: 20, offset: 0 } as const
+const PINNED_LIST_PARAMS = { limit: 100, offset: 0 } as const
 
 export function useEntityTypeList(
   params: { limit: number; offset: number } = DEFAULT_LIST_PARAMS,
@@ -25,6 +26,25 @@ export function useEntityTypeList(
       )
       return mapEntityTypeListDtoToModel(dto)
     },
+  })
+}
+
+export function usePinnedEntityTypes(): UseQueryResult<EntityType[], AppError> {
+  return useQuery({
+    queryKey: [...entityTypeKeys.list(PINNED_LIST_PARAMS), 'pinned'],
+    queryFn: async ({ signal }) => {
+      const search = new URLSearchParams({
+        limit: String(PINNED_LIST_PARAMS.limit),
+        offset: String(PINNED_LIST_PARAMS.offset),
+      })
+      const dto = await apiClient.get<EntityTypeListDto>(
+        `/api/v1/entity-types?${search.toString()}`,
+        signal,
+      )
+      const list = mapEntityTypeListDtoToModel(dto)
+      return list.items.filter((item) => item.isPinned)
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes — sidebar nav doesn't need frequent refresh
   })
 }
 
