@@ -1,0 +1,3 @@
+# NeNe Records scheduled publish processor
+# Runs every minute — transitions scheduled entities to published when scheduled_at has passed.
+* * * * * wget -q -O- --post-data="" http://app/api/v1/entities/process-scheduled

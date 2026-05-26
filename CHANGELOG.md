@@ -6,13 +6,36 @@ NeNe Records does not yet follow Semantic Versioning — entries are grouped by 
 
 ---
 
-## [Unreleased]
+## [M3 Complete — Headless CMS Platform] — 2026-05-26
+
+### Added
+- Admin UI redesign — sidebar layout, dark theme, responsive mobile drawer (#127, PR #128)
+- Full-text search API — `/api/v1/entities/search?q=` with entity type scoping (#129, PR #131)
+- Export API — CSV / JSON download per entity type with field columns (#130, PR #132)
+- File field type — non-image file upload support extending the media upload API (#133, PR #134)
+- Webhook / event hooks — CRUD for webhook subscriptions; HMAC-SHA256 signed POST on `entity.created` / `.updated` / `.deleted` (#135, PR #136)
+- Scheduled publish — `scheduled_at` + `status: scheduled`; `POST /api/v1/entities/process-scheduled` batch transition (#137, PR #138)
+- Draft preview token — 64-char hex token URL for non-published record preview; 24-hour TTL with rotation (#139, PR #141)
+- Public cache headers — `Cache-Control` / `ETag` / `304 Not Modified` on public consumer endpoints (#142, PR #143)
+- Docker Compose `cron` service — calls `process-scheduled` every minute via busybox crond
+
+---
+
+## [M2 Complete — Team-Ready CMS] — 2026-05-26
 
 ### Added
 - Admin / editor roles with JWT-embedded `role` and `CapabilityMiddleware` on mutating routes (#108, PR #111)
 - Entity archive before entity type purge — JSON snapshot + CSV download API (PR #107)
 - Default user seed migration — `admin@nene-records.local` / `editor@nene-records.local` (#108)
 - Admin UI role-based nav and button visibility; 403 → `/forbidden` page (#108)
+- PHP / TypeScript naming convention document; renamed all files to match (#113, PR #114)
+- Admin i18n foundation — 6-language message catalog (`ja` / `en` / `zh` / `ko` / `fr` / `de`) and locale switcher (#109, PR #115)
+- Admin full-screen i18n migration — all hardcoded strings moved to `t()` calls (#110, PR #116)
+- Entity record revision history — action log snapshot on create / update / delete (#117, PR #118)
+- Per-record SEO fields — `meta_title` / `meta_description` on entity records (#119, PR #120)
+- Image field type and media upload API — multipart POST, type/size validation, local storage (#121, PR #122)
+- Markdown field type and Admin preview editor (#124, PR #123)
+- Navigation settings CRUD API and Admin management screen (#125, PR #124)
 - `CHANGELOG.md` — this file (#94)
 - `SECURITY.md` — vulnerability reporting policy (#97)
 - `llms.txt` — LLM crawler summary (#96)
