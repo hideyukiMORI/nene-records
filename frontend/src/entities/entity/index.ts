@@ -15,7 +15,12 @@ export type {
   UpdateEntityInput,
 } from './model'
 export { entityKeys } from './query-keys'
-export type { EntityListParams, EntityRelationFilters } from './query-keys'
+export type {
+  EntityListParams,
+  EntityRelationFilters,
+  EntitySortKey,
+  EntitySortOrder,
+} from './query-keys'
 export {
   useCreateEntity,
   useDeleteEntity,

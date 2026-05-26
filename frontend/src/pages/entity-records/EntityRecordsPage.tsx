@@ -34,6 +34,9 @@ function EntityRecordsContent({ entityType }: { entityType: EntityType }) {
     total,
     page,
     totalPages,
+    sortKey,
+    sortOrder,
+    setSort,
     prevPage,
     nextPage,
     availableTags,
@@ -108,6 +111,9 @@ function EntityRecordsContent({ entityType }: { entityType: EntityType }) {
         total={total}
         page={page}
         totalPages={totalPages}
+        sortKey={sortKey}
+        sortOrder={sortOrder}
+        onSortChange={setSort}
         availableTags={availableTags}
         relationFieldDefs={relationFieldDefs}
         selectedTagSlugs={selectedTagSlugs}

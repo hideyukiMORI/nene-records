@@ -7,6 +7,8 @@ import {
   type Entity,
   type EntityId,
   type EntityRelationFilters,
+  type EntitySortKey,
+  type EntitySortOrder,
   type EntityStatus,
 } from '@/entities/entity'
 import {
@@ -28,6 +30,8 @@ export function useManageEntitiesPage(entityTypeId: number) {
   const [selectedRelationFilters, setSelectedRelationFilters] = useState<EntityRelationFilters>({})
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedStatus, setSelectedStatus] = useState<EntityStatus | undefined>(undefined)
+  const [sortKey, setSortKey] = useState<EntitySortKey>('id')
+  const [sortOrder, setSortOrder] = useState<EntitySortOrder>('desc')
   const [page, setPage] = useState(0)
   const listParams = useMemo(
     () =>
@@ -38,8 +42,19 @@ export function useManageEntitiesPage(entityTypeId: number) {
         page * PAGE_LIMIT,
         searchQuery,
         selectedStatus,
+        sortKey,
+        sortOrder,
       ),
-    [entityTypeId, page, selectedRelationFilters, selectedTagSlugs, searchQuery, selectedStatus],
+    [
+      entityTypeId,
+      page,
+      selectedRelationFilters,
+      selectedTagSlugs,
+      searchQuery,
+      selectedStatus,
+      sortKey,
+      sortOrder,
+    ],
   )
   const listQuery = useEntityList(listParams)
   const tagListQuery = useTagList({ limit: 100, offset: 0 })
@@ -108,6 +123,12 @@ export function useManageEntitiesPage(entityTypeId: number) {
     setPage(0)
   }, [])
 
+  const setSort = useCallback((key: EntitySortKey, order: EntitySortOrder) => {
+    setSortKey(key)
+    setSortOrder(order)
+    setPage(0)
+  }, [])
+
   const createEntity = useCallback(async (): Promise<Entity> => {
     return createMutation.mutateAsync({ entityTypeId })
   }, [createMutation, entityTypeId])
@@ -144,6 +165,9 @@ export function useManageEntitiesPage(entityTypeId: number) {
     total,
     page,
     totalPages,
+    sortKey,
+    sortOrder,
+    setSort,
     prevPage:
       page > 0
         ? () => {

@@ -16,6 +16,8 @@ final readonly class EntityListCriteria
         public array $relationFilters = [],
         public ?EntityStatus $status = null,
         public ?string $q = null,
+        public EntitySortKey $sortKey = EntitySortKey::Id,
+        public EntitySortOrder $sortOrder = EntitySortOrder::Desc,
     ) {
     }
 }

@@ -34,6 +34,12 @@ export function useEntityList(
       if (params.q !== undefined && params.q !== '') {
         search.set('q', params.q)
       }
+      if (params.sortKey !== undefined) {
+        search.set('sort', params.sortKey)
+      }
+      if (params.sortOrder !== undefined) {
+        search.set('order', params.sortOrder)
+      }
       if (params.relationFilters !== undefined) {
         for (const [fieldKey, targetEntityId] of Object.entries(params.relationFilters)) {
           search.set(`relation.${fieldKey}`, String(targetEntityId))
@@ -88,6 +94,8 @@ export function defaultEntityListParams(
   offset = 0,
   q?: string,
   status?: EntityStatus,
+  sortKey?: EntityListParams['sortKey'],
+  sortOrder?: EntityListParams['sortOrder'],
 ): EntityListParams {
   return {
     entityTypeId,
@@ -97,5 +105,7 @@ export function defaultEntityListParams(
     offset,
     q: q !== '' ? q : undefined,
     status,
+    sortKey,
+    sortOrder,
   }
 }
