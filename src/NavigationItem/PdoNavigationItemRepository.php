@@ -47,9 +47,7 @@ final readonly class PdoNavigationItemRepository implements NavigationItemReposi
             [$item->label, $item->url, $item->displayOrder, $now, $now],
         );
 
-        $row = $this->query->fetchOne('SELECT LAST_INSERT_ID() AS id');
-
-        return isset($row['id']) ? (int) $row['id'] : 0;
+        return $this->query->lastInsertId();
     }
 
     public function update(NavigationItem $item): void
