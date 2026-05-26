@@ -16,6 +16,7 @@ import {
   IconLogOut,
   IconMenu,
   IconX,
+  IconChevronRight,
 } from '@/shared/ui/icons/Icons'
 
 interface NavItemProps {
@@ -74,6 +75,8 @@ export function AppShell() {
   const canManageTags = currentUserHasCapability('manage_tags')
   const canReadSettings = currentUserHasCapability('read_settings')
   const canManageSettings = currentUserHasCapability('manage_settings')
+
+  const [advancedOpen, setAdvancedOpen] = useState(false)
 
   const closeSidebar = () => {
     setSidebarOpen(false)
@@ -141,6 +144,7 @@ export function AppShell() {
 
         {/* Nav links */}
         <nav className="flex-1 overflow-y-auto px-3 py-4" aria-label="Main">
+          {/* ── Primary nav ── */}
           <ul className="space-y-0.5">
             <li>
               <NavItem
@@ -179,16 +183,6 @@ export function AppShell() {
                 />
               </li>
             ) : null}
-            {canManageSettings ? (
-              <li>
-                <NavItem
-                  to="/webhooks"
-                  icon={<IconWebhook size={16} />}
-                  label={t('admin.nav.webhooks')}
-                  onClick={closeSidebar}
-                />
-              </li>
-            ) : null}
             {canReadSettings ? (
               <li>
                 <NavItem
@@ -200,6 +194,44 @@ export function AppShell() {
               </li>
             ) : null}
           </ul>
+
+          {/* ── Advanced (collapsible) ── */}
+          {canManageSettings ? (
+            <>
+              <div className="my-4 border-t border-sidebar-border" />
+              <div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAdvancedOpen((o) => !o)
+                  }}
+                  className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-xs font-semibold uppercase tracking-wider text-sidebar-text-muted transition-colors hover:bg-sidebar-hover-bg hover:text-sidebar-active-text"
+                  aria-expanded={advancedOpen}
+                >
+                  <span className="flex-1 text-left">{t('admin.nav.advanced')}</span>
+                  <IconChevronRight
+                    size={12}
+                    className={[
+                      'shrink-0 transition-transform duration-150',
+                      advancedOpen ? 'rotate-90' : '',
+                    ].join(' ')}
+                  />
+                </button>
+                {advancedOpen ? (
+                  <ul className="mt-0.5 space-y-0.5">
+                    <li>
+                      <NavItem
+                        to="/webhooks"
+                        icon={<IconWebhook size={16} />}
+                        label={t('admin.nav.webhooks')}
+                        onClick={closeSidebar}
+                      />
+                    </li>
+                  </ul>
+                ) : null}
+              </div>
+            </>
+          ) : null}
 
           <div className="my-4 border-t border-sidebar-border" />
 
