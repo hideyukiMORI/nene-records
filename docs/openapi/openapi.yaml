@@ -2712,6 +2712,10 @@ components:
           nullable: true
           description: 'URL pattern for public records. Tokens: {type} {slug} {id} {year} {month} {day}. Null = default "/{type}/{id}".'
           example: '/{type}/{slug}'
+        previous_permalink_pattern:
+          type: string
+          nullable: true
+          description: 'Previous URL pattern, automatically saved when permalink_pattern changes. Used to redirect old URLs.'
     CreateEntityTypeRequest:
       type: object
       required:

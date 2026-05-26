@@ -17,6 +17,7 @@ describe('entity-type mapper', () => {
       slug: 'article',
       isPinned: true,
       permalinkPattern: null,
+      previousPermalinkPattern: null,
     })
   })
 

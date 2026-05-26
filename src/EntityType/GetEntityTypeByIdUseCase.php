@@ -26,6 +26,7 @@ final readonly class GetEntityTypeByIdUseCase implements GetEntityTypeByIdUseCas
             isPinned: $entityType->isPinned,
             labels: $entityType->labels,
             permalinkPattern: $entityType->permalinkPattern,
+            previousPermalinkPattern: $entityType->previousPermalinkPattern,
         );
     }
 }

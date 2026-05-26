@@ -13,6 +13,8 @@ export interface EntityType {
    * Undefined/null = use default "/{type}/{id}".
    */
   permalinkPattern?: string | null
+  /** Previous URL pattern — saved when permalink_pattern changes. Used to redirect old URLs. */
+  previousPermalinkPattern?: string | null
 }
 
 export interface EntityTypeList {

@@ -143,6 +143,13 @@ function PermalinkFieldset({
                 {t('admin.entityTypes.editForm.permalink.example', { example: liveExample })}
               </p>
             )}
+
+            {/* ⚠ No {type} warning */}
+            {effectivePattern && !effectivePattern.includes('{type}') && (
+              <p className="text-xs text-warning">
+                ⚠ {t('admin.entityTypes.editForm.permalink.noTypeWarning')}
+              </p>
+            )}
           </fieldset>
         )
       }}

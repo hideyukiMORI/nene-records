@@ -105,12 +105,13 @@ final readonly class UpdateEntityTypeHandler
         ));
 
         return $this->response->create([
-            'id'                => $output->id,
-            'name'              => $output->name,
-            'slug'              => $output->slug,
-            'is_pinned'         => $output->isPinned,
-            'labels'            => $output->labels ?? new \stdClass(),
-            'permalink_pattern' => $output->permalinkPattern,
+            'id'                         => $output->id,
+            'name'                       => $output->name,
+            'slug'                       => $output->slug,
+            'is_pinned'                  => $output->isPinned,
+            'labels'                     => $output->labels ?? new \stdClass(),
+            'permalink_pattern'          => $output->permalinkPattern,
+            'previous_permalink_pattern' => $output->previousPermalinkPattern,
         ]);
     }
 }

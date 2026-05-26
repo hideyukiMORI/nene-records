@@ -20,6 +20,7 @@ export function mapEntityTypeDtoToModel(dto: EntityTypeDto): EntityType {
     isPinned: dto.is_pinned,
     labels: dto.labels && Object.keys(dto.labels).length > 0 ? dto.labels : undefined,
     permalinkPattern: dto.permalink_pattern ?? null,
+    previousPermalinkPattern: dto.previous_permalink_pattern ?? null,
   }
 }
 

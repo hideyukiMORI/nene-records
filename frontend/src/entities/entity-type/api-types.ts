@@ -11,6 +11,8 @@ export interface EntityTypeDto {
    * Null = default "/{type}/{id}".
    */
   permalink_pattern?: string | null
+  /** Previous URL pattern, saved automatically when permalink_pattern changes. */
+  previous_permalink_pattern?: string | null
 }
 
 export interface EntityTypeListDto {

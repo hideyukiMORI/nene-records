@@ -34,6 +34,7 @@ final class InMemoryEntityTypeRepository implements EntityTypeRepositoryInterfac
                     id: $id,
                     labels: $entityType->labels,
                     permalinkPattern: $entityType->permalinkPattern,
+                    previousPermalinkPattern: $entityType->previousPermalinkPattern,
                 );
                 $this->byId[$id] = $stored;
                 $this->slugToId[$stored->slug] = $id;
@@ -77,6 +78,7 @@ final class InMemoryEntityTypeRepository implements EntityTypeRepositoryInterfac
             id: $id,
             labels: $entityType->labels,
             permalinkPattern: $entityType->permalinkPattern,
+            previousPermalinkPattern: $entityType->previousPermalinkPattern,
         );
         $this->byId[$id] = $stored;
         $this->slugToId[$stored->slug] = $id;

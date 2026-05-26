@@ -27,9 +27,31 @@ final readonly class UpdateEntityTypeUseCase implements UpdateEntityTypeUseCaseI
             }
         }
 
-        $updated = new EntityType(name: $input->name, slug: $input->slug, isPinned: $input->isPinned, id: $input->id, labels: $input->labels, permalinkPattern: $input->permalinkPattern);
+        // When the permalink pattern changes, preserve the old one for redirect purposes.
+        $previousPermalinkPattern = $entityType->previousPermalinkPattern;
+        if ($input->permalinkPattern !== $entityType->permalinkPattern) {
+            $previousPermalinkPattern = $entityType->permalinkPattern;
+        }
+
+        $updated = new EntityType(
+            name: $input->name,
+            slug: $input->slug,
+            isPinned: $input->isPinned,
+            id: $input->id,
+            labels: $input->labels,
+            permalinkPattern: $input->permalinkPattern,
+            previousPermalinkPattern: $previousPermalinkPattern,
+        );
         $this->entityTypes->update($updated);
 
-        return new UpdateEntityTypeOutput(id: $input->id, name: $input->name, slug: $input->slug, isPinned: $input->isPinned, labels: $input->labels, permalinkPattern: $input->permalinkPattern);
+        return new UpdateEntityTypeOutput(
+            id: $input->id,
+            name: $input->name,
+            slug: $input->slug,
+            isPinned: $input->isPinned,
+            labels: $input->labels,
+            permalinkPattern: $input->permalinkPattern,
+            previousPermalinkPattern: $previousPermalinkPattern,
+        );
     }
 }

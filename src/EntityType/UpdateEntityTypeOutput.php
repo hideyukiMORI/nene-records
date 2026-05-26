@@ -16,6 +16,7 @@ final readonly class UpdateEntityTypeOutput
         public bool $isPinned,
         public ?array $labels = null,
         public ?string $permalinkPattern = null,
+        public ?string $previousPermalinkPattern = null,
     ) {
     }
 }

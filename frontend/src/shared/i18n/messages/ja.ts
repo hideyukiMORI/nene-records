@@ -125,6 +125,8 @@ export const ja: Partial<MessageCatalog> = {
   'admin.entityTypes.editForm.permalink.customHelp':
     '使用できるトークン: {type}、{slug}、{id}、{year}、{month}、{day}',
   'admin.entityTypes.editForm.permalink.example': '例: {{example}}',
+  'admin.entityTypes.editForm.permalink.noTypeWarning':
+    'パターンに {type} が含まれていません — 複数のコンテンツタイプで URL が衝突する可能性があります。',
   'admin.entityTypes.delete.title': 'コンテンツタイプを削除しますか？',
   'admin.entityTypes.delete.description': '「{{name}}」が削除されます。この操作は元に戻せません。',
   'admin.entityTypes.actions.fields': 'フィールド',
@@ -344,6 +346,9 @@ export const ja: Partial<MessageCatalog> = {
 
   // ── Settings ──────────────────────────────────────────────────────────────
   'admin.settings.appearance.title': '外観',
+  'admin.settings.permalink.title': 'パーマリンク',
+  'admin.settings.permalink.description':
+    'コンテンツタイプごとに公開 URL の構造を選択します。変更はすぐ反映され、旧 URL は自動リダイレクトされます。',
 
   'admin.settings.pageTitle': 'サイト設定',
   'admin.settings.description':
