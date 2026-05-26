@@ -25,11 +25,13 @@ use Nene2\Http\ResponseEmitter;
 use Nene2\Http\RuntimeApplicationFactory;
 use Nene2\Log\MonologLoggerFactory;
 use Nene2\Log\RequestIdHolder;
+use Nene2\Middleware\ThrottleMiddleware;
 use NeNeRecords\Analytics\AccessLogMiddleware;
 use NeNeRecords\ApplicationServiceProvider;
 use NeNeRecords\Auth\AdminApiAuthMiddleware;
 use NeNeRecords\Auth\AuthServiceProvider;
 use NeNeRecords\Auth\CapabilityMiddleware;
+use NeNeRecords\RateLimit\RateLimitServiceProvider;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -45,6 +47,7 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
     {
         $builder->addProvider(new ApplicationServiceProvider());
         $builder->addProvider(new AuthServiceProvider());
+        $builder->addProvider(new RateLimitServiceProvider());
 
         $builder
             ->set(
@@ -288,6 +291,12 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
                     $authMiddleware[] = new AdminApiAuthMiddleware($problemDetails, $tokenVerifier);
                     $authMiddleware[] = new CapabilityMiddleware($problemDetails);
 
+                    $throttle = $container->get(ThrottleMiddleware::class);
+
+                    if (!$throttle instanceof ThrottleMiddleware) {
+                        throw new LogicException('ThrottleMiddleware service is invalid.');
+                    }
+
                     return new RuntimeApplicationFactory(
                         responseFactory: $responseFactory,
                         streamFactory: $streamFactory,
@@ -297,6 +306,7 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
                         requestIdHolder: $requestIdHolder,
                         routeRegistrars: $routeRegistrars,
                         authMiddleware: $authMiddleware,
+                        throttleMiddleware: $throttle,
                         debug: $config->debug,
                         requestMaxBodyBytes: 10 * 1024 * 1024, // 10 MiB — required for media uploads
                     );
