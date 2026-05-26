@@ -11,6 +11,13 @@ final readonly class User
         public string $email,
         public string $passwordHash,
         public string $role,
+        public string $status = 'active',
+        public ?string $inviteTokenHash = null,
+        public ?int $inviteExpiresAt = null,
+        public ?string $passwordResetTokenHash = null,
+        public ?int $passwordResetExpiresAt = null,
+        public ?int $createdAt = null,
+        public ?int $updatedAt = null,
     ) {
     }
 }
