@@ -16,6 +16,7 @@ import {
   IconLink,
   IconLogOut,
   IconMenu,
+  IconMessageCircle,
   IconMoon,
   IconSettings,
   IconSun,
@@ -250,6 +251,14 @@ export function AppShell() {
                           to="/admin/media"
                           icon={<IconImage size={16} />}
                           label={t('admin.nav.media')}
+                          onClick={closeSidebar}
+                        />
+                      </li>
+                      <li>
+                        <NavItem
+                          to="/admin/comments"
+                          icon={<IconMessageCircle size={16} />}
+                          label={t('admin.nav.comments')}
                           onClick={closeSidebar}
                         />
                       </li>

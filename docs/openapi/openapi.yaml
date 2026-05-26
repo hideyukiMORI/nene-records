@@ -2079,6 +2079,159 @@ paths:
           description: Webhook deleted.
         '404':
           $ref: '#/components/responses/NotFound'
+  /api/v1/entities/{id}/comments:
+    get:
+      tags:
+        - Comments
+      summary: List approved comments for an entity
+      description: Returns approved comments for the specified entity, ordered by created_at ascending.
+      operationId: listComments
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Comment list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentListResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Comments
+      summary: Post a comment
+      description: Submits a new comment. The comment is stored with is_approved=false and awaits moderation.
+      operationId: postComment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostCommentRequest'
+      responses:
+        '201':
+          description: Comment submitted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentResponse'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/admin/comments:
+    get:
+      tags:
+        - Comments
+      summary: List all comments (admin)
+      description: Returns all comments (approved and pending), ordered by created_at descending. Requires ManageSettings capability.
+      operationId: listAllComments
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Comment list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminCommentListResponse'
+        '401':
+          description: Unauthorized.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '403':
+          description: Forbidden.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/admin/comments/{id}/approve:
+    patch:
+      tags:
+        - Comments
+      summary: Approve a comment
+      description: Sets is_approved=true for the specified comment.
+      operationId: approveComment
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Comment approved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminCommentResponse'
+        '401':
+          description: Unauthorized.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '403':
+          description: Forbidden.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/admin/comments/{id}:
+    delete:
+      tags:
+        - Comments
+      summary: Delete a comment
+      description: Permanently removes the specified comment.
+      operationId: deleteComment
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Comment deleted.
+        '401':
+          description: Unauthorized.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '403':
+          description: Forbidden.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /api/v1/media:
     get:
       tags:
@@ -4594,6 +4747,94 @@ components:
         draft_count:
           type: integer
           minimum: 0
+      additionalProperties: false
+    PostCommentRequest:
+      type: object
+      required:
+        - author_name
+        - author_email
+        - body
+      properties:
+        author_name:
+          type: string
+          maxLength: 100
+        author_email:
+          type: string
+          format: email
+          maxLength: 255
+        body:
+          type: string
+      additionalProperties: false
+    CommentResponse:
+      type: object
+      required:
+        - id
+        - entity_id
+        - author_name
+        - body
+        - is_approved
+        - created_at
+      properties:
+        id:
+          type: integer
+        entity_id:
+          type: integer
+        author_name:
+          type: string
+        body:
+          type: string
+        is_approved:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+      additionalProperties: false
+    CommentListResponse:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommentResponse'
+      additionalProperties: false
+    AdminCommentResponse:
+      type: object
+      required:
+        - id
+        - entity_id
+        - author_name
+        - author_email
+        - body
+        - is_approved
+        - created_at
+      properties:
+        id:
+          type: integer
+        entity_id:
+          type: integer
+        author_name:
+          type: string
+        author_email:
+          type: string
+        body:
+          type: string
+        is_approved:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+      additionalProperties: false
+    AdminCommentListResponse:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdminCommentResponse'
       additionalProperties: false
     GeneratePreviewTokenResponse:
       type: object

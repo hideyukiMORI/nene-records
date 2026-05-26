@@ -488,11 +488,43 @@ export const en = {
   'admin.resetPassword.success': 'Your password has been reset. You can now sign in.',
   'admin.resetPassword.invalidToken': 'This reset link is invalid or has expired.',
 
+  // ── Comments (admin) ────────────────────────────────────────────────────
+  'admin.nav.comments': 'Comments',
+  'admin.comments.pageTitle': 'Comments',
+  'admin.comments.description': 'Review and moderate reader comments.',
+  'admin.comments.loading': 'Loading comments…',
+  'admin.comments.loadError': 'Could not load comments.',
+  'admin.comments.empty': 'No comments yet',
+  'admin.comments.empty.description': 'Comments submitted by readers will appear here.',
+  'admin.comments.entityId': 'Entity #{{id}}',
+  'admin.comments.approved': 'Approved',
+  'admin.comments.pending': 'Pending',
+  'admin.comments.approve': 'Approve',
+  'admin.comments.delete': 'Delete',
+  'admin.comments.approveSuccess': 'Comment approved.',
+  'admin.comments.deleteSuccess': 'Comment deleted.',
+  'admin.comments.deleteConfirmTitle': 'Delete comment?',
+  'admin.comments.deleteConfirmDescription': 'Delete comment by {{name}}? This cannot be undone.',
+
   // ── Public consumer pages ────────────────────────────────────────────────
   'public.record.notFound.title': 'Record not found',
   'public.record.notFound.description': 'No record with slug "{{slug}}".',
   'public.entityType.notFound.title': 'Not found',
   'public.entityType.notFound.description': 'No public content for "{{slug}}".',
+
+  // ── Public comments ──────────────────────────────────────────────────────
+  'public.comments.title': 'Comments',
+  'public.comments.loading': 'Loading comments…',
+  'public.comments.loadError': 'Could not load comments.',
+  'public.comments.empty': 'No comments yet. Be the first!',
+  'public.comments.form.title': 'Leave a comment',
+  'public.comments.form.authorName': 'Name',
+  'public.comments.form.authorEmail': 'Email address',
+  'public.comments.form.body': 'Comment',
+  'public.comments.form.submit': 'Submit',
+  'public.comments.form.submitting': 'Submitting…',
+  'public.comments.form.success': 'Your comment has been submitted and is awaiting moderation.',
+  'public.comments.form.error': 'Could not submit comment. Please try again.',
 } as const
 
 /** Complete message catalog type — derived from the English source of truth. */

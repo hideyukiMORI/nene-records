@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { Link, Navigate, useLocation, useParams } from 'react-router-dom'
 import { toEntityId, useEntity } from '@/entities/entity'
 import { useEntityTypeList } from '@/entities/entity-type'
+import { CommentSection } from '@/features/comment-section'
 import {
   PublicRecordDetailView,
   usePublicViewEntityRecordPage,
@@ -98,6 +99,7 @@ function PublicRecordDetailContent({
           void refetch()
         }}
       />
+      {entity !== null && !isLoading && !isError ? <CommentSection entityId={entityId} /> : null}
     </Stack>
   )
 }
