@@ -1,19 +1,19 @@
 # Current Work
 
-Last updated: 2026-05-26
+Last updated: 2026-05-27
 
 ## 状態サマリー
 
 **M1 — Usable Blog CMS: 完了（2026-05-24）**
 
-**M2 — Team-Ready CMS: 進行中** — Roles・i18n・Entity revisions 完了
+**M2 — Team-Ready CMS: ほぼ完了** — P1/P2 バックログ全消化
 
-197 tests / PHPStan Max / CS-Fixer / OpenAPI / MCP バリデーション — 全グリーン。
+213 tests / PHPStan Max / CS-Fixer / OpenAPI / MCP バリデーション — 全グリーン。
 Backend CI + Frontend CI (GitHub Actions) 稼働中。
 
 ---
 
-## M2 進行中
+## M2 完了（マージ済み）
 
 | Issue | PR | Summary |
 | --- | --- | --- |
@@ -24,6 +24,10 @@ Backend CI + Frontend CI (GitHub Actions) 稼働中。
 | #109 | #115 | feat: Admin i18n 基盤（6 言語メッセージカタログ・`t()`・locale 切替） |
 | #110 | #116 | feat: Admin 全画面 i18n 移行（ハードコード排除） |
 | #117 | #118 | feat: エンティティレコード変更履歴（revisions） |
+| #119 | #120 | feat: エンティティレコードごとの SEO フィールド（meta_title / meta_description） |
+| #121 | #122 | feat: 画像フィールド + メディアアップロード API（+ Vite proxy バグ修正） |
+| #124 | #123 | feat: Markdown フィールド型 + 管理 UI プレビューエディタ |
+| #125 | #124 | feat: ナビゲーション設定 CRUD API とフロントエンド管理画面 |
 
 ---
 
@@ -48,14 +52,16 @@ Backend CI + Frontend CI (GitHub Actions) 稼働中。
 
 ---
 
-## Up Next — M2（Team-Ready CMS）
+## Up Next — M3
 
-| 優先 | Issue | 項目 | 説明 |
-| --- | --- | --- | --- |
-| P1 | — | Image / file field + upload API | 最小メディア対応 |
-| P1 | — | Per-record SEO fields | meta override on public bootstrap |
-| P2 | — | Navigation settings | menu defs + PublicShell |
-| P2 | — | Admin Markdown editor UX | preview pane 付き textarea |
+M2 が完了したため、M3 の計画を策定中。
+
+| 優先 | 項目 | 説明 |
+| --- | --- | --- |
+| P1 | Full-text search API | エンティティレコードの全文検索 |
+| P1 | Export API | CSV/JSON エクスポート |
+| P2 | File field + upload | image 以外のファイルタイプ対応 |
+| P2 | Webhook / event hooks | レコード変更時の外部通知 |
 
 ---
 
