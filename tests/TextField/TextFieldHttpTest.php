@@ -13,6 +13,7 @@ use NeNeRecords\Entity\DeleteEntityHandler;
 use NeNeRecords\Entity\DeleteEntityUseCase;
 use NeNeRecords\Entity\EntityNotFoundExceptionHandler;
 use NeNeRecords\Entity\EntityRouteRegistrar;
+use NeNeRecords\Entity\ExportEntitiesHandler;
 use NeNeRecords\Entity\GetEntityByIdHandler;
 use NeNeRecords\Entity\GetEntityByIdUseCase;
 use NeNeRecords\Entity\ListEntitiesHandler;
@@ -75,6 +76,7 @@ final class TextFieldHttpTest extends TestCase
             new DeleteEntityHandler(new DeleteEntityUseCase($this->entities), $this->factory),
             new ListEntitiesHandler(new ListEntitiesUseCase($this->entities), $jsonResponse),
             new ListEntityRevisionsHandler(new ListEntityRevisionsUseCase($this->entities), $jsonResponse),
+            new ExportEntitiesHandler($this->entities, $this->textFields, $this->factory),
         );
 
         $textFieldRegistrar = new TextFieldRouteRegistrar(

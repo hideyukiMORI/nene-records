@@ -11,6 +11,7 @@ use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use NeNeRecords\EntityType\EntityTypeRepositoryInterface;
+use NeNeRecords\TextField\TextFieldRepositoryInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 
@@ -240,6 +241,28 @@ final readonly class EntityServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(
+                ExportEntitiesHandler::class,
+                static function (ContainerInterface $c): ExportEntitiesHandler {
+                    $entities = $c->get(EntityRepositoryInterface::class);
+                    $textFields = $c->get(TextFieldRepositoryInterface::class);
+                    $responseFactory = $c->get(ResponseFactoryInterface::class);
+
+                    if (!$entities instanceof EntityRepositoryInterface) {
+                        throw new LogicException('Entity repository service is invalid.');
+                    }
+
+                    if (!$textFields instanceof TextFieldRepositoryInterface) {
+                        throw new LogicException('Text field repository service is invalid.');
+                    }
+
+                    if (!$responseFactory instanceof ResponseFactoryInterface) {
+                        throw new LogicException('Response factory service is invalid.');
+                    }
+
+                    return new ExportEntitiesHandler($entities, $textFields, $responseFactory);
+                },
+            )
+            ->set(
                 'nene-records.route_registrar.entity',
                 static function (ContainerInterface $c): EntityRouteRegistrar {
                     $get = $c->get(GetEntityByIdHandler::class);
@@ -248,6 +271,7 @@ final readonly class EntityServiceProvider implements ServiceProviderInterface
                     $delete = $c->get(DeleteEntityHandler::class);
                     $list = $c->get(ListEntitiesHandler::class);
                     $listRevisions = $c->get(ListEntityRevisionsHandler::class);
+                    $export = $c->get(ExportEntitiesHandler::class);
 
                     if (!$get instanceof GetEntityByIdHandler) {
                         throw new LogicException('GetEntityById handler service is invalid.');
@@ -273,7 +297,11 @@ final readonly class EntityServiceProvider implements ServiceProviderInterface
                         throw new LogicException('ListEntityRevisions handler service is invalid.');
                     }
 
-                    return new EntityRouteRegistrar($get, $create, $update, $delete, $list, $listRevisions);
+                    if (!$export instanceof ExportEntitiesHandler) {
+                        throw new LogicException('ExportEntities handler service is invalid.');
+                    }
+
+                    return new EntityRouteRegistrar($get, $create, $update, $delete, $list, $listRevisions, $export);
                 },
             );
     }
