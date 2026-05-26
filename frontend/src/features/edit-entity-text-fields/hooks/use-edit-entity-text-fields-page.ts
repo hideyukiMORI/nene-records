@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { FIELD_DATA_TYPES, type FieldDataType } from '@/entities/field-def'
 import { defaultFieldDefListParams, useFieldDefList } from '@/entities/field-def'
 import { toEntityId, useEntity } from '@/entities/entity'
@@ -82,6 +82,8 @@ function datetimeLocalToIso(local: string): string {
 }
 
 export function useEditEntityTextFieldsPage(entityTypeId: number, entityId: number) {
+  const [selectedLocale, setSelectedLocale] = useState<string | null>(null)
+
   const listParams = useMemo(() => ({ ...FIELD_LIST_PARAMS, entityId }), [entityId])
 
   const entityQuery = useEntity(toEntityId(entityId))
@@ -114,6 +116,20 @@ export function useEditEntityTextFieldsPage(entityTypeId: number, entityId: numb
     return textFieldQuery.data?.items ?? []
   }, [textFieldQuery.data?.items])
 
+  // Text fields filtered to the currently selected locale
+  const textFieldsForLocale = useMemo(
+    () => textFieldsForEntity.filter((f) => f.locale === selectedLocale),
+    [textFieldsForEntity, selectedLocale],
+  )
+
+  // Unique locales present in the fetched text fields (excluding null = default)
+  const availableLocales = useMemo(() => {
+    const locales = new Set(textFieldsForEntity.map((f) => f.locale))
+    return Array.from(locales)
+      .filter((l): l is string => l !== null)
+      .sort()
+  }, [textFieldsForEntity])
+
   const intFieldsForEntity = useMemo((): IntField[] => {
     return intFieldQuery.data?.items ?? []
   }, [intFieldQuery.data?.items])
@@ -137,7 +153,7 @@ export function useEditEntityTextFieldsPage(entityTypeId: number, entityId: numb
           case 'text':
           case 'markdown':
           case 'image': {
-            const existing = textFieldsForEntity.find((item) => item.fieldKey === fieldDef.fieldKey)
+            const existing = textFieldsForLocale.find((item) => item.fieldKey === fieldDef.fieldKey)
             return [fieldDef.fieldKey, existing?.value ?? '']
           }
           case 'int': {
@@ -172,7 +188,7 @@ export function useEditEntityTextFieldsPage(entityTypeId: number, entityId: numb
     editableFieldDefs,
     enumFieldsForEntity,
     intFieldsForEntity,
-    textFieldsForEntity,
+    textFieldsForLocale,
   ])
 
   const saveTextFields = useCallback(
@@ -184,18 +200,19 @@ export function useEditEntityTextFieldsPage(entityTypeId: number, entityId: numb
           case 'text':
           case 'markdown':
           case 'image': {
-            const existing = textFieldsForEntity.find((item) => item.fieldKey === fieldDef.fieldKey)
+            const existing = textFieldsForLocale.find((item) => item.fieldKey === fieldDef.fieldKey)
 
             if (existing !== undefined) {
               await updateTextMutation.mutateAsync({
                 id: existing.id,
-                input: { fieldKey: fieldDef.fieldKey, value: rawValue },
+                input: { fieldKey: fieldDef.fieldKey, value: rawValue, locale: selectedLocale },
               })
             } else {
               await createTextMutation.mutateAsync({
                 entityId,
                 fieldKey: fieldDef.fieldKey,
                 value: rawValue,
+                locale: selectedLocale,
               })
             }
             break
@@ -288,7 +305,8 @@ export function useEditEntityTextFieldsPage(entityTypeId: number, entityId: numb
       entityId,
       enumFieldsForEntity,
       intFieldsForEntity,
-      textFieldsForEntity,
+      selectedLocale,
+      textFieldsForLocale,
       updateBoolMutation,
       updateDateTimeMutation,
       updateEnumMutation,
@@ -327,6 +345,9 @@ export function useEditEntityTextFieldsPage(entityTypeId: number, entityId: numb
     entity: entityQuery.data ?? null,
     textFieldDefs: editableFieldDefs,
     initialValues,
+    selectedLocale,
+    availableLocales,
+    setLocale: setSelectedLocale,
     isLoading,
     isError,
     errorTitle,

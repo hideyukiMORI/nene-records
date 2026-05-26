@@ -26,6 +26,9 @@ export function EntityRecordPage() {
     entity,
     textFieldDefs,
     initialValues,
+    selectedLocale,
+    availableLocales,
+    setLocale,
     isLoading,
     isError,
     errorTitle,
@@ -70,11 +73,14 @@ export function EntityRecordPage() {
         entity={entity}
         textFieldDefs={textFieldDefs}
         initialValues={initialValues}
+        selectedLocale={selectedLocale}
+        availableLocales={availableLocales}
         isLoading={isLoading}
         isError={isError}
         errorTitle={errorTitle}
         isSaving={isSaving}
         saveErrorTitle={saveErrorTitle}
+        onLocaleChange={setLocale}
         onRetry={() => {
           void refetch()
         }}
