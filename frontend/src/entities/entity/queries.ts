@@ -31,6 +31,9 @@ export function useEntityList(
       if (params.tagSlugs !== undefined && params.tagSlugs.length > 0) {
         search.set('tags', params.tagSlugs.join(','))
       }
+      if (params.q !== undefined && params.q !== '') {
+        search.set('q', params.q)
+      }
       if (params.relationFilters !== undefined) {
         for (const [fieldKey, targetEntityId] of Object.entries(params.relationFilters)) {
           search.set(`relation.${fieldKey}`, String(targetEntityId))
@@ -83,6 +86,7 @@ export function defaultEntityListParams(
   tagSlugs: string[] = [],
   relationFilters: EntityListParams['relationFilters'] = {},
   offset = 0,
+  q?: string,
 ): EntityListParams {
   return {
     entityTypeId,
@@ -90,5 +94,6 @@ export function defaultEntityListParams(
     relationFilters,
     limit: DEFAULT_LIST_PARAMS.limit,
     offset,
+    q: q !== '' ? q : undefined,
   }
 }

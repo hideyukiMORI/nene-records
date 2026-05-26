@@ -18,6 +18,8 @@ export function EntityRecordsPage() {
     relationFieldDefs,
     selectedTagSlugs,
     selectedRelationFilters,
+    searchQuery,
+    setSearchQuery,
     isFilterActive,
     isLoading,
     isError,
@@ -60,6 +62,7 @@ export function EntityRecordsPage() {
         relationFieldDefs={relationFieldDefs}
         selectedTagSlugs={selectedTagSlugs}
         selectedRelationFilters={selectedRelationFilters}
+        searchQuery={searchQuery}
         isFilterActive={isFilterActive}
         isLoading={isLoading}
         isError={isError}
@@ -71,6 +74,7 @@ export function EntityRecordsPage() {
         onRetry={() => {
           void refetch()
         }}
+        onSearchChange={setSearchQuery}
         onToggleTagSlug={toggleTagSlug}
         onClearTagFilter={clearTagFilter}
         onSelectRelationFilter={setRelationFilter}

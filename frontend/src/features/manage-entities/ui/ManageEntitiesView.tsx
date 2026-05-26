@@ -19,6 +19,7 @@ export interface ManageEntitiesViewProps {
   relationFieldDefs: RelationFieldDef[]
   selectedTagSlugs: string[]
   selectedRelationFilters: EntityRelationFilters
+  searchQuery: string
   isFilterActive: boolean
   isLoading: boolean
   isError: boolean
@@ -32,6 +33,7 @@ export interface ManageEntitiesViewProps {
   onClearTagFilter: () => void
   onSelectRelationFilter: (fieldKey: string, targetEntityId: number | undefined) => void
   onClearRelationFilters: () => void
+  onSearchChange: (q: string) => void
   onCreate: () => Promise<void>
   onRequestDelete: (entity: Entity) => void
   onCancelDelete: () => void
@@ -49,6 +51,7 @@ export function ManageEntitiesView({
   relationFieldDefs,
   selectedTagSlugs,
   selectedRelationFilters,
+  searchQuery,
   isFilterActive,
   isLoading,
   isError,
@@ -62,6 +65,7 @@ export function ManageEntitiesView({
   onClearTagFilter,
   onSelectRelationFilter,
   onClearRelationFilters,
+  onSearchChange,
   onCreate,
   onRequestDelete,
   onCancelDelete,
@@ -88,6 +92,33 @@ export function ManageEntitiesView({
           serverErrorTitle={createErrorTitle}
           onCreate={onCreate}
         />
+
+        {/* ── Search ── */}
+        <div className="relative">
+          <input
+            type="search"
+            value={searchQuery}
+            onChange={(e) => {
+              onSearchChange(e.target.value)
+            }}
+            placeholder={t('admin.entityRecords.search.placeholder')}
+            aria-label={t('admin.entityRecords.search.placeholder')}
+            className="w-full rounded-md border border-border bg-surface-raised px-inline-md py-stack-sm font-sans text-body text-text-primary shadow-sm focus-visible:outline-none focus-visible:shadow-focus"
+          />
+          {searchQuery !== '' ? (
+            <button
+              type="button"
+              onClick={() => {
+                onSearchChange('')
+              }}
+              aria-label={t('admin.entityRecords.search.clear')}
+              className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-0.5 text-text-muted hover:text-text-primary"
+            >
+              ✕
+            </button>
+          ) : null}
+        </div>
+
         <EntityTagFilterPanel
           tags={availableTags}
           selectedTagSlugs={selectedTagSlugs}

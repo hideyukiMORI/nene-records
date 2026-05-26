@@ -243,7 +243,7 @@ paths:
       tags:
         - Entities
       summary: List entities
-      description: Returns non-deleted entities, optionally filtered by entity type, status, tags, and relation fields.
+      description: Returns non-deleted entities, optionally filtered by entity type, status, tags, relation fields, and full-text search.
       operationId: listEntities
       parameters:
         - $ref: '#/components/parameters/LimitQuery'
@@ -258,6 +258,13 @@ paths:
         - $ref: '#/components/parameters/TagsQuery'
         - $ref: '#/components/parameters/TagQuery'
         - $ref: '#/components/parameters/RelationFilterQuery'
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+            minLength: 1
+          description: Full-text search across slug and text field values (partial match).
       responses:
         '200':
           description: Paginated entity list.

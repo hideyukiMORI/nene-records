@@ -107,6 +107,8 @@ export const en = {
   'admin.entityRecords.list.emptyFiltered.title': 'No matching records',
   'admin.entityRecords.list.emptyFiltered.description':
     'Try clearing the filters or selecting different criteria.',
+  'admin.entityRecords.search.placeholder': 'Search records…',
+  'admin.entityRecords.search.clear': 'Clear search',
   'admin.entityRecords.create.title': 'Create record',
   'admin.entityRecords.create.description':
     'Records are created for this entity type. Field values will be editable in a later phase.',

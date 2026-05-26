@@ -169,6 +169,23 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
             $params[] = $targetEntityId;
         }
 
+        if ($criteria->q !== null && $criteria->q !== '') {
+            $like = '%' . $criteria->q . '%';
+            $conditions[] = <<<'SQL'
+                (
+                    e.slug LIKE ?
+                    OR EXISTS (
+                        SELECT 1 FROM text_fields tf
+                        WHERE tf.entity_id = e.id
+                          AND tf.is_deleted = 0
+                          AND tf.value LIKE ?
+                    )
+                )
+                SQL;
+            $params[] = $like;
+            $params[] = $like;
+        }
+
         return [implode(' AND ', $conditions), $params];
     }
 
