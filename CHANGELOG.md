@@ -15,6 +15,23 @@ NeNe Records does not yet follow Semantic Versioning — entries are grouped by 
 - Entity list status filter — All / Draft / Published / Scheduled / Archived toggle buttons on the records management screen (#151, PR #153)
 - Locale switcher on field edit screen — Default + per-locale buttons; free-text locale input; locale-aware create / update mutations (#152, PR #153)
 - `scheduled` status badge (blue) on entity list items — previously missing
+- Tag filter i18n, export URL status reflect, pagination UI improvements (#154 #155, PR #156)
+- Sidebar content-first restructure — Webhooks moved to advanced settings (#158, PR #163)
+- i18n term unification — WordPress-style Content types / Items (#157, PR #162)
+- `is_pinned` flag on entity types — dynamic navigation foundation (#159, PR #164)
+- Default content types seed — Posts & Pages (#160, PR #165)
+- Pinned entity types in sidebar, dashboard revision (#161, PR #166)
+- Short-form entity record management URLs `/admin/:slug` (#167, PR #170)
+- Admin moved to `/admin/` prefix; public URLs stripped of `/view/` (#168, PR #171)
+- Default content type multilingual labels seed (#172, PR #173)
+- Entity list body / created_at / updated_at columns (#176, PR #177)
+- Entity list sort + filter accordion (#174, PR #175)
+- Admin footer — "Powered by NENE2 / © 2026 AYANE" (#179, PR #179)
+- Admin footer fixed bottom-right copyright display (#181, PR #181)
+- Admin theme selector — Default / GitHub / Solarized / Dracula / Monokai (#183, PR #183)
+- Markdown editor improvements — body field type, toolbar icons (#185, PR #185)
+- Toast notifications for save operations (#186, PR #187)
+- WordPress-style permalink settings — per-entity-type URL pattern with presets & custom tokens, old-URL redirect, `{type}` collision warning (#169, PR #188)
 
 ---
 
