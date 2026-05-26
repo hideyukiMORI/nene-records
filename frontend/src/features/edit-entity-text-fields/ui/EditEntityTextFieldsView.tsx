@@ -45,7 +45,7 @@ export function EditEntityTextFieldsView({
       await onSave(values)
       showToast(t('admin.entityRecord.textFields.saved'), 'success')
     } catch {
-      showToast(t('common.error.unknown'), 'error')
+      // エラーは saveErrorTitle 経由で EntityTextFieldsForm 内に表示される
     }
   }
 
