@@ -9,12 +9,14 @@ use DateTimeInterface;
 use LogicException;
 use NeNeRecords\EntityType\EntityTypeNotFoundException;
 use NeNeRecords\EntityType\EntityTypeRepositoryInterface;
+use NeNeRecords\Webhook\WebhookDispatcherInterface;
 
 final readonly class UpdateEntityUseCase implements UpdateEntityUseCaseInterface
 {
     public function __construct(
         private EntityRepositoryInterface $entities,
         private EntityTypeRepositoryInterface $entityTypes,
+        private ?WebhookDispatcherInterface $webhooks = null,
     ) {
     }
 
@@ -61,6 +63,8 @@ final readonly class UpdateEntityUseCase implements UpdateEntityUseCaseInterface
         );
 
         $this->entities->update($updated);
+
+        $this->webhooks?->dispatch('entity.updated', $input->entityTypeId, $entityId);
 
         return new UpdateEntityOutput(
             id: $entityId,

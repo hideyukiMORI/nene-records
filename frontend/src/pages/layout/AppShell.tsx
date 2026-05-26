@@ -8,6 +8,7 @@ import {
   IconLayers,
   IconTag,
   IconLink,
+  IconWebhook,
   IconSettings,
   IconGlobe,
   IconSun,
@@ -174,6 +175,16 @@ export function AppShell() {
                   to="/navigation"
                   icon={<IconLink size={16} />}
                   label={t('admin.nav.navigation')}
+                  onClick={closeSidebar}
+                />
+              </li>
+            ) : null}
+            {canManageSettings ? (
+              <li>
+                <NavItem
+                  to="/webhooks"
+                  icon={<IconWebhook size={16} />}
+                  label={t('admin.nav.webhooks')}
                   onClick={closeSidebar}
                 />
               </li>

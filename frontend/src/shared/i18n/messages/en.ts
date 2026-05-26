@@ -43,6 +43,7 @@ export const en = {
   'admin.nav.entityTypes': 'Entity types',
   'admin.nav.tags': 'Tags',
   'admin.nav.navigation': 'Navigation',
+  'admin.nav.webhooks': 'Webhooks',
   'admin.nav.settings': 'Settings',
   'admin.nav.publicSite': 'Public site',
   'admin.nav.logout': 'Log out',
@@ -292,6 +293,29 @@ export const en = {
   'admin.navigation.createSuccess': 'Navigation item created.',
   'admin.navigation.updateSuccess': 'Navigation item updated.',
   'admin.navigation.deleteSuccess': 'Navigation item deleted.',
+
+  // ── Webhooks ────────────────────────────────────────────────────────────────
+  'admin.webhooks.title': 'Webhooks',
+  'admin.webhooks.description':
+    'Send HTTP POST notifications to external URLs when entity records are created, updated, or deleted.',
+  'admin.webhooks.loading': 'Loading webhooks…',
+  'admin.webhooks.addButton': 'Add webhook',
+  'admin.webhooks.createError': 'Failed to create webhook.',
+  'admin.webhooks.updateError': 'Failed to update webhook.',
+  'admin.webhooks.empty.title': 'No webhooks yet',
+  'admin.webhooks.empty.description': 'Add a webhook to start receiving event notifications.',
+  'admin.webhooks.status.active': 'Active',
+  'admin.webhooks.status.inactive': 'Inactive',
+  'admin.webhooks.entityTypeFilter': 'Entity type #{id}',
+  'admin.webhooks.delete.title': 'Delete webhook',
+  'admin.webhooks.delete.description': 'Are you sure you want to delete the webhook for {url}?',
+  'admin.webhooks.form.urlLabel': 'Endpoint URL',
+  'admin.webhooks.form.eventsLabel': 'Events',
+  'admin.webhooks.form.entityTypeIdLabel': 'Entity type ID (optional)',
+  'admin.webhooks.form.entityTypeIdPlaceholder': 'All entity types',
+  'admin.webhooks.form.secretLabel': 'Signing secret (optional)',
+  'admin.webhooks.form.secretPlaceholder': 'Used for HMAC-SHA256 X-NeNe-Signature header',
+  'admin.webhooks.form.isActiveLabel': 'Active',
 } as const
 
 /** Complete message catalog type — derived from the English source of truth. */
