@@ -348,16 +348,16 @@ export function AppShell() {
       </aside>
 
       {/* ── Main content ────────────────────────────────────────────────── */}
-      <main className="min-w-0 flex-1 pt-14 lg:ml-60 lg:pt-0">
+      <main className="min-w-0 flex-1 pb-8 pt-14 lg:ml-60 lg:pt-0">
         <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8">
           <Outlet />
         </div>
-        <footer className="border-t border-border px-4 py-3 sm:px-6">
-          <p className="text-center font-sans text-caption text-text-muted">
-            Powered by NENE2 · © 2026 AYANE
-          </p>
-        </footer>
       </main>
+
+      {/* ── Footer (fixed bottom-right) ─────────────────────────────────── */}
+      <footer className="fixed bottom-0 right-0 px-4 py-2">
+        <p className="font-sans text-caption text-text-muted">Powered by NENE2 · © 2026 AYANE</p>
+      </footer>
     </div>
   )
 }
