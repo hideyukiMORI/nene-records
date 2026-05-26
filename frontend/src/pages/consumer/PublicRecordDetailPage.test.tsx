@@ -167,6 +167,6 @@ describe('PublicRecordDetailPage', () => {
   it('shows not found for unknown entity type slug', async () => {
     renderDetailPage('unknown', 1)
 
-    expect(await screen.findByText('Entity type not found')).toBeInTheDocument()
+    expect(await screen.findByText('Not found')).toBeInTheDocument()
   })
 })

@@ -6,6 +6,7 @@ import {
   PublicRecordDetailView,
   usePublicViewEntityRecordPage,
 } from '@/features/public-view-entity-record'
+import { useTranslation } from '@/shared/i18n'
 import { findEntityTypeBySlug } from '@/shared/lib/find-entity-type-by-slug'
 import {
   DEFAULT_PERMALINK_PATTERN,
@@ -177,6 +178,7 @@ function PublicRecordDetailBySlug({
   previousPattern: string | null | undefined
   splat: string
 }) {
+  const { t } = useTranslation()
   const { entityId, isLoading, isError } = useEntityIdWithFallback(
     entityTypeId,
     entitySlug,
@@ -187,7 +189,10 @@ function PublicRecordDetailBySlug({
   if (isLoading) return <Text muted>Loading…</Text>
   if (isError || entityId === null) {
     return (
-      <EmptyState title="Record not found" description={`No record with slug "${entitySlug}".`} />
+      <EmptyState
+        title={t('public.record.notFound.title')}
+        description={t('public.record.notFound.description', { slug: entitySlug })}
+      />
     )
   }
 
@@ -247,6 +252,7 @@ function PublicRecordDetailById({
 export function PublicRecordDetailPage() {
   // React Router v6: splat param is '*'
   const { entityTypeSlug = '', '*': splat = '' } = useParams()
+  const { t } = useTranslation()
 
   const entityTypeQuery = useEntityTypeList({ limit: 100, offset: 0 })
   const entityType = useMemo(
@@ -268,8 +274,8 @@ export function PublicRecordDetailPage() {
   if (entityType === undefined) {
     return (
       <EmptyState
-        title="Entity type not found"
-        description={`No public content for "${entityTypeSlug}".`}
+        title={t('public.entityType.notFound.title')}
+        description={t('public.entityType.notFound.description', { slug: entityTypeSlug })}
       />
     )
   }
