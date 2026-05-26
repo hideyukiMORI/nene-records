@@ -33,6 +33,9 @@ final readonly class ListEntitiesHandler
         $rawStatus = $request->getQueryParams()['status'] ?? null;
         $status = is_string($rawStatus) ? EntityStatus::tryFrom($rawStatus) : null;
 
+        $rawQ = $request->getQueryParams()['q'] ?? null;
+        $q = (is_string($rawQ) && $rawQ !== '') ? $rawQ : null;
+
         $output = $this->useCase->execute(new ListEntitiesInput(
             limit: $pagination->limit,
             offset: $pagination->offset,
@@ -41,6 +44,7 @@ final readonly class ListEntitiesHandler
                 tagSlugs: $tagSlugs,
                 relationFilters: $relationFilters,
                 status: $status,
+                q: $q,
             ),
         ));
 

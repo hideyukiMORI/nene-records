@@ -10,6 +10,7 @@ export interface EntityListParams {
   status?: EntityStatus
   tagSlugs?: string[]
   relationFilters?: EntityRelationFilters
+  q?: string
 }
 
 export const entityKeys = {

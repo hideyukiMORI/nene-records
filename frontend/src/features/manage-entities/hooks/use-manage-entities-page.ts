@@ -21,9 +21,17 @@ import { getRecordDisplayLabel } from '@/shared/lib/get-record-display-label'
 export function useManageEntitiesPage(entityTypeId: number) {
   const [selectedTagSlugs, setSelectedTagSlugs] = useState<string[]>([])
   const [selectedRelationFilters, setSelectedRelationFilters] = useState<EntityRelationFilters>({})
+  const [searchQuery, setSearchQuery] = useState('')
   const listParams = useMemo(
-    () => defaultEntityListParams(entityTypeId, selectedTagSlugs, selectedRelationFilters),
-    [entityTypeId, selectedRelationFilters, selectedTagSlugs],
+    () =>
+      defaultEntityListParams(
+        entityTypeId,
+        selectedTagSlugs,
+        selectedRelationFilters,
+        0,
+        searchQuery,
+      ),
+    [entityTypeId, selectedRelationFilters, selectedTagSlugs, searchQuery],
   )
   const listQuery = useEntityList(listParams)
   const tagListQuery = useTagList({ limit: 100, offset: 0 })
@@ -109,11 +117,16 @@ export function useManageEntitiesPage(entityTypeId: number) {
     relationFieldDefs,
     selectedTagSlugs,
     selectedRelationFilters,
+    searchQuery,
+    setSearchQuery,
     toggleTagSlug,
     clearTagFilter,
     setRelationFilter,
     clearRelationFilters,
-    isFilterActive: selectedTagSlugs.length > 0 || Object.keys(selectedRelationFilters).length > 0,
+    isFilterActive:
+      selectedTagSlugs.length > 0 ||
+      Object.keys(selectedRelationFilters).length > 0 ||
+      searchQuery !== '',
     isLoading,
     isError,
     errorTitle,

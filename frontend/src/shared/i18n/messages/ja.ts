@@ -100,6 +100,8 @@ export const ja: Partial<MessageCatalog> = {
   'admin.entityRecords.list.emptyFiltered.title': '一致するレコードがありません',
   'admin.entityRecords.list.emptyFiltered.description':
     'フィルターをクリアするか、別の条件を選択してください。',
+  'admin.entityRecords.search.placeholder': 'レコードを検索…',
+  'admin.entityRecords.search.clear': '検索をクリア',
   'admin.entityRecords.create.title': 'レコードを作成',
   'admin.entityRecords.create.description':
     'このエンティティタイプのレコードを作成します。フィールド値は後のフェーズで編集できます。',

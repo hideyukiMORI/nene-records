@@ -251,4 +251,76 @@ final class PdoEntityRepositoryTest extends TestCase
         self::assertSame($entityA, $andList[0]->id);
         self::assertSame(1, $repository->countByCriteria($andFilter));
     }
+
+    public function testFindByCriteriaSearchBySlug(): void
+    {
+        $typeId = $this->insertEntityTypeId();
+        $repository = new PdoEntityRepository($this->executor);
+
+        $entityA = $repository->save(new Entity(id: null, entityTypeId: $typeId, slug: 'hello-world'));
+        $repository->save(new Entity(id: null, entityTypeId: $typeId, slug: 'another-post'));
+
+        $list = $repository->findByCriteria(new EntityListCriteria(q: 'hello'), 10, 0);
+
+        self::assertCount(1, $list);
+        self::assertSame($entityA, $list[0]->id);
+        self::assertSame(1, $repository->countByCriteria(new EntityListCriteria(q: 'hello')));
+    }
+
+    public function testFindByCriteriaSearchByTextField(): void
+    {
+        $typeId = $this->insertEntityTypeId();
+        $repository = new PdoEntityRepository($this->executor);
+
+        $entityA = $repository->save(new Entity(id: null, entityTypeId: $typeId));
+        $entityB = $repository->save(new Entity(id: null, entityTypeId: $typeId));
+
+        $this->executor->execute(
+            'INSERT INTO text_fields (entity_id, field_key, value) VALUES (?, ?, ?)',
+            [$entityA, 'title', 'Welcome to NeNe Records'],
+        );
+        $this->executor->execute(
+            'INSERT INTO text_fields (entity_id, field_key, value) VALUES (?, ?, ?)',
+            [$entityB, 'title', 'Another article'],
+        );
+
+        $list = $repository->findByCriteria(new EntityListCriteria(q: 'NeNe'), 10, 0);
+
+        self::assertCount(1, $list);
+        self::assertSame($entityA, $list[0]->id);
+        self::assertSame(1, $repository->countByCriteria(new EntityListCriteria(q: 'NeNe')));
+    }
+
+    public function testFindByCriteriaSearchReturnsEmptyWhenNoMatch(): void
+    {
+        $typeId = $this->insertEntityTypeId();
+        $repository = new PdoEntityRepository($this->executor);
+
+        $repository->save(new Entity(id: null, entityTypeId: $typeId, slug: 'hello-world'));
+
+        $list = $repository->findByCriteria(new EntityListCriteria(q: 'zzznomatch'), 10, 0);
+
+        self::assertCount(0, $list);
+        self::assertSame(0, $repository->countByCriteria(new EntityListCriteria(q: 'zzznomatch')));
+    }
+
+    public function testFindByCriteriaSearchCombinesWithEntityTypeId(): void
+    {
+        $typeId = $this->insertEntityTypeId();
+        $this->executor->execute("INSERT INTO entity_types (name, slug) VALUES ('Other', 'other')");
+        $otherTypeId = $this->executor->lastInsertId();
+
+        $repository = new PdoEntityRepository($this->executor);
+        $entityA = $repository->save(new Entity(id: null, entityTypeId: $typeId, slug: 'hello-world'));
+        $repository->save(new Entity(id: null, entityTypeId: $otherTypeId, slug: 'hello-other'));
+
+        $list = $repository->findByCriteria(
+            new EntityListCriteria(entityTypeId: $typeId, q: 'hello'),
+            10,
+            0,
+        );
+
+        self::assertCount(1, $list);
+        self::assertSame($entityA, $list[0]->id);
+    }
 }
