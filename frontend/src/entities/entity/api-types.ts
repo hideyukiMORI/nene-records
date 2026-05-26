@@ -8,6 +8,8 @@ export interface EntityDto {
   published_at: string | null
   is_deleted: boolean
   deleted_at: string | null
+  meta_title: string | null
+  meta_description: string | null
 }
 
 export interface EntityListDto {
@@ -28,6 +30,8 @@ export interface UpdateEntityDto {
   slug?: string | null
   status: EntityStatusDto
   published_at?: string | null
+  meta_title?: string | null
+  meta_description?: string | null
 }
 
 export interface EntityRevisionDto {

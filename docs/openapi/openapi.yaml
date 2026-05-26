@@ -306,6 +306,8 @@ paths:
                     published_at: null
                     is_deleted: false
                     deleted_at: null
+                    meta_title: null
+                    meta_description: null
         '404':
           $ref: '#/components/responses/NotFound'
         '422':
@@ -336,6 +338,8 @@ paths:
                     published_at: null
                     is_deleted: false
                     deleted_at: null
+                    meta_title: null
+                    meta_description: null
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -373,6 +377,8 @@ paths:
                     published_at: '2026-05-24T10:00:00+00:00'
                     is_deleted: false
                     deleted_at: null
+                    meta_title: null
+                    meta_description: null
         '404':
           $ref: '#/components/responses/NotFound'
         '422':
@@ -2175,6 +2181,8 @@ components:
         - published_at
         - is_deleted
         - deleted_at
+        - meta_title
+        - meta_description
       properties:
         id:
           type: integer
@@ -2201,6 +2209,15 @@ components:
             - string
             - 'null'
           format: date-time
+        meta_title:
+          type:
+            - string
+            - 'null'
+          maxLength: 255
+        meta_description:
+          type:
+            - string
+            - 'null'
     CreateEntityRequest:
       type: object
       required:
@@ -2235,6 +2252,15 @@ components:
             - string
             - 'null'
           format: date-time
+        meta_title:
+          type:
+            - string
+            - 'null'
+          maxLength: 255
+        meta_description:
+          type:
+            - string
+            - 'null'
       additionalProperties: false
     EntityListResponse:
       type: object

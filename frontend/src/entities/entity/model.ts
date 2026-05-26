@@ -10,6 +10,8 @@ export interface Entity {
   publishedAt: string | null
   isDeleted: boolean
   deletedAt: string | null
+  metaTitle: string | null
+  metaDescription: string | null
 }
 
 export interface EntityList {
@@ -31,6 +33,8 @@ export interface UpdateEntityInput {
   slug?: string | null
   status: EntityStatus
   publishedAt?: string | null
+  metaTitle?: string | null
+  metaDescription?: string | null
 }
 
 export type EntityRevisionAction = 'created' | 'updated' | 'deleted' | 'restored'

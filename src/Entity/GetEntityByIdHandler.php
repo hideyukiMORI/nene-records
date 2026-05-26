@@ -36,6 +36,8 @@ final readonly class GetEntityByIdHandler
             'published_at' => $output->publishedAtIso,
             'is_deleted' => $output->isDeleted,
             'deleted_at' => $output->deletedAtIso,
+            'meta_title' => $output->metaTitle,
+            'meta_description' => $output->metaDescription,
         ]);
     }
 }

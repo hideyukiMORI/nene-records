@@ -215,6 +215,16 @@ export const ja: Partial<MessageCatalog> = {
   'admin.entityRevisions.error': '変更履歴を読み込めませんでした。',
   'admin.entityRevisions.empty': 'まだ変更履歴がありません。',
 
+  // ── Entity SEO ────────────────────────────────────────────────────────────
+  'admin.entitySeo.title': 'SEO',
+  'admin.entitySeo.metaTitle': 'メタタイトル',
+  'admin.entitySeo.metaTitle.placeholder': '検索エンジン向けのページタイトルを上書き…',
+  'admin.entitySeo.metaDescription': 'メタディスクリプション',
+  'admin.entitySeo.metaDescription.placeholder': '検索エンジン向けのメタ説明を上書き…',
+  'admin.entitySeo.save': 'SEO を保存',
+  'admin.entitySeo.saving': '保存中…',
+  'admin.entitySeo.saveSuccess': 'SEO 設定を保存しました。',
+
   // ── Settings ──────────────────────────────────────────────────────────────
   'admin.settings.pageTitle': 'サイト設定',
   'admin.settings.description':

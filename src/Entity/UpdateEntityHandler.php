@@ -52,6 +52,12 @@ final readonly class UpdateEntityHandler
         $rawPublishedAt = $body['published_at'] ?? null;
         $publishedAt = is_string($rawPublishedAt) ? (DateTimeImmutable::createFromFormat(DATE_ATOM, $rawPublishedAt) ?: null) : null;
 
+        $rawMetaTitle = $body['meta_title'] ?? null;
+        $metaTitle = is_string($rawMetaTitle) && trim($rawMetaTitle) !== '' ? trim($rawMetaTitle) : null;
+
+        $rawMetaDescription = $body['meta_description'] ?? null;
+        $metaDescription = is_string($rawMetaDescription) && trim($rawMetaDescription) !== '' ? trim($rawMetaDescription) : null;
+
         if ($errors !== []) {
             throw new ValidationException($errors);
         }
@@ -63,6 +69,8 @@ final readonly class UpdateEntityHandler
             slug: $slug,
             status: $status,
             publishedAt: $publishedAt,
+            metaTitle: $metaTitle,
+            metaDescription: $metaDescription,
         ));
 
         return $this->response->create([
@@ -73,6 +81,8 @@ final readonly class UpdateEntityHandler
             'published_at' => $output->publishedAtIso,
             'is_deleted' => $output->isDeleted,
             'deleted_at' => $output->deletedAtIso,
+            'meta_title' => $output->metaTitle,
+            'meta_description' => $output->metaDescription,
         ]);
     }
 }

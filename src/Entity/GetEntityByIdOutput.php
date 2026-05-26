@@ -14,6 +14,8 @@ final readonly class GetEntityByIdOutput
         public ?string $publishedAtIso,
         public bool $isDeleted,
         public ?string $deletedAtIso,
+        public ?string $metaTitle = null,
+        public ?string $metaDescription = null,
     ) {
     }
 }

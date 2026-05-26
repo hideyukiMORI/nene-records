@@ -56,6 +56,8 @@ final readonly class UpdateEntityUseCase implements UpdateEntityUseCaseInterface
             publishedAt: $publishedAt,
             isDeleted: $existing->isDeleted,
             deletedAt: $existing->deletedAt,
+            metaTitle: $input->metaTitle,
+            metaDescription: $input->metaDescription,
         );
 
         $this->entities->update($updated);
@@ -68,6 +70,8 @@ final readonly class UpdateEntityUseCase implements UpdateEntityUseCaseInterface
             publishedAtIso: $publishedAt?->format(DateTimeInterface::ATOM),
             isDeleted: $existing->isDeleted,
             deletedAtIso: $existing->deletedAt?->format(DateTimeInterface::ATOM),
+            metaTitle: $input->metaTitle,
+            metaDescription: $input->metaDescription,
         );
     }
 

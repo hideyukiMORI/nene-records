@@ -25,6 +25,8 @@ export function mapEntityDtoToModel(dto: EntityDto): Entity {
     publishedAt: dto.published_at,
     isDeleted: dto.is_deleted,
     deletedAt: dto.deleted_at,
+    metaTitle: dto.meta_title,
+    metaDescription: dto.meta_description,
   }
 }
 
@@ -51,6 +53,8 @@ export function mapUpdateInputToDto(input: UpdateEntityInput): UpdateEntityDto {
     ...(input.slug !== undefined ? { slug: input.slug } : {}),
     status: input.status,
     ...(input.publishedAt !== undefined ? { published_at: input.publishedAt } : {}),
+    ...(input.metaTitle !== undefined ? { meta_title: input.metaTitle } : {}),
+    ...(input.metaDescription !== undefined ? { meta_description: input.metaDescription } : {}),
   }
 }
 
