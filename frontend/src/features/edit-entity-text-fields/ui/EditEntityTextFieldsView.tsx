@@ -1,8 +1,8 @@
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import type { FieldDef } from '@/entities/field-def'
 import type { Entity } from '@/entities/entity'
 import { useTranslation } from '@/shared/i18n'
-import { Button, Stack, Text } from '@/shared/ui'
+import { Button, Stack, Text, useToast } from '@/shared/ui'
 import { EntityTextFieldsForm } from './EntityTextFieldsForm'
 
 export interface EditEntityTextFieldsViewProps {
@@ -37,17 +37,16 @@ export function EditEntityTextFieldsView({
   onSave,
 }: EditEntityTextFieldsViewProps) {
   const { t } = useTranslation()
+  const { showToast } = useToast()
   const [customLocaleInput, setCustomLocaleInput] = useState('')
-  const [isSaved, setIsSaved] = useState(false)
-  const savedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const handleSave = async (values: Record<string, string>) => {
-    await onSave(values)
-    setIsSaved(true)
-    if (savedTimerRef.current !== null) clearTimeout(savedTimerRef.current)
-    savedTimerRef.current = setTimeout(() => {
-      setIsSaved(false)
-    }, 3000)
+    try {
+      await onSave(values)
+      showToast(t('admin.entityRecord.textFields.saved'), 'success')
+    } catch {
+      // エラーは saveErrorTitle 経由で EntityTextFieldsForm 内に表示される
+    }
   }
 
   if (isLoading) {
@@ -151,7 +150,6 @@ export function EditEntityTextFieldsView({
         fieldDefs={textFieldDefs}
         defaultValues={initialValues}
         isSubmitting={isSaving}
-        isSaved={isSaved}
         serverErrorTitle={saveErrorTitle}
         onSubmit={handleSave}
       />
