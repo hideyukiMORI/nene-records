@@ -412,4 +412,10 @@ export const ja: Partial<MessageCatalog> = {
   'admin.webhooks.form.secretLabel': '署名シークレット（省略可）',
   'admin.webhooks.form.secretPlaceholder': 'HMAC-SHA256 X-NeNe-Signature ヘッダーに使用',
   'admin.webhooks.form.isActiveLabel': '有効',
+
+  // ── Public consumer pages ────────────────────────────────────────────────
+  'public.record.notFound.title': 'レコードが見つかりません',
+  'public.record.notFound.description': 'スラッグ "{{slug}}" のレコードが見つかりません。',
+  'public.entityType.notFound.title': '見つかりません',
+  'public.entityType.notFound.description': '"{{slug}}" の公開コンテンツが見つかりません。',
 }

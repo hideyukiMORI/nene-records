@@ -410,6 +410,12 @@ export const en = {
   'admin.webhooks.form.secretLabel': 'Signing secret (optional)',
   'admin.webhooks.form.secretPlaceholder': 'Used for HMAC-SHA256 X-NeNe-Signature header',
   'admin.webhooks.form.isActiveLabel': 'Active',
+
+  // ── Public consumer pages ────────────────────────────────────────────────
+  'public.record.notFound.title': 'Record not found',
+  'public.record.notFound.description': 'No record with slug "{{slug}}".',
+  'public.entityType.notFound.title': 'Not found',
+  'public.entityType.notFound.description': 'No public content for "{{slug}}".',
 } as const
 
 /** Complete message catalog type — derived from the English source of truth. */
