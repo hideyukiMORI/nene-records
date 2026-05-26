@@ -12,7 +12,29 @@ Last updated: 2026-05-27
 
 **M4 — 機能拡充＋使い勝手改善: 完了（2026-05-27）**
 
-264 tests / PHPStan Max / CS-Fixer / OpenAPI / MCP バリデーション — 全グリーン。
+**M5 — ユーザー管理・メディアライブラリ: 完了（2026-05-27）**
+
+tests / PHPStan Max / CS-Fixer / OpenAPI / MCP バリデーション — 全グリーン。
+
+---
+
+## M5 完了（マージ済み）
+
+| Issue | PR | Summary |
+| --- | --- | --- |
+| #190, #191 | #194 | feat: ユーザー管理 API・招待・パスワードリセット |
+| #192 | #195 | feat: ユーザー管理フロントエンド（一覧・招待・パスワード変更） |
+| #196, #197 | #198 | feat: メディアライブラリ（一覧・削除 API ＋管理画面） |
+
+---
+
+## 次フェーズ候補
+
+| 項目 | 概要 | 難易度 |
+| --- | --- | --- |
+| AI Consumer Chat | NeNe Records を外部 API として使うチャットシステム（**別リポジトリ**） | 大 |
+| コメント機能 | エンティティへのコメント投稿・管理 | 中 |
+| 関連エンティティの公開表示 | Relation フィールドを公開ページでリンク表示 | 小 |
 
 ---
 
@@ -44,17 +66,6 @@ Last updated: 2026-05-27
 
 ---
 
-## 次フェーズ候補
-
-| 項目 | 概要 | 難易度 |
-| --- | --- | --- |
-| AI Consumer Chat | NeNe Records を外部 API として使うチャットシステム（**別リポジトリ**） | 大 |
-| コメント機能 | エンティティへのコメント投稿・管理 | 中 |
-| メディアライブラリ | アップロード済みメディアの一覧・再利用 | 中 |
-| 関連エンティティの公開表示 | Relation フィールドを公開ページでリンク表示 | 小 |
-
----
-
 ## M3 完了（マージ済み）
 
 | 優先 | 項目 | Issue | PR |
@@ -73,7 +84,7 @@ Last updated: 2026-05-27
 ## Verification
 
 ```bash
-composer check                    # 264 tests + PHPStan + CS-Fixer + OpenAPI + MCP
+composer check                    # tests + PHPStan + CS-Fixer + OpenAPI + MCP
 npm run check --prefix frontend   # type-check + lint + test + storybook
 docker compose exec app vendor/bin/phinx migrate
 docker compose exec app php tools/seed-blog-demo.php http://localhost
