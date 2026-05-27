@@ -1,6 +1,6 @@
 # Current Work
 
-Last updated: 2026-05-27
+Last updated: 2026-07-01
 
 ## 状態サマリー
 
@@ -20,7 +20,23 @@ Last updated: 2026-05-27
 
 **M8 — マルチテナント運用機能: 完了（2026-05-27）**
 
-tests (318) / PHPStan Max / CS-Fixer / OpenAPI / MCP バリデーション — 全グリーン。
+tests (374) / PHPStan level 8 / CS-Fixer / OpenAPI / MCP バリデーション — 全グリーン。
+
+---
+
+## M9 — マルチテナント完成（1ユーザー=1組織）: 完了（2026-07-01）
+
+| Issue | PR | Summary |
+| --- | --- | --- |
+| #251 | #252 | feat: マルチテナント基盤を実装する（DB・JWT・CapabilityMiddleware） |
+
+**変更内容:**
+- `users` テーブルに `organization_id` / `org_role` 追加（superadmin は NULL）
+- `organizations` テーブルに `external_id` 追加（NeNe Corpus 将来連携用）
+- `organization_users` テーブルを DROP（1ユーザー=1組織方針・未使用）
+- JWT に `org_id` を埋め込み（superadmin = null、admin/editor = 所属 org ID）
+- `CapabilityMiddleware` で JWT org_id vs 解決済み org_id を照合（不一致 → 403）
+- `ListUsers` / `CreateUser` / `InviteUser` を org スコープ対応
 
 ---
 
