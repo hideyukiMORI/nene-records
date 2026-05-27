@@ -6,6 +6,20 @@ NeNe Records does not yet follow Semantic Versioning — entries are grouped by 
 
 ---
 
+## [M7 — マルチテナント基盤・スーパー管理画面] — 2026-05-27
+
+### Added
+- `organizations` table — `id`, `name`, `slug` (unique), `custom_domain`, `plan` (`free`/`starter`/`pro`/`enterprise`), `is_active`, `created_at`, `updated_at` (#205, PR #210)
+- Organization CRUD API — `GET /api/v1/superadmin/organizations`, `POST`, `GET /{id}`, `PATCH /{id}`, `DELETE /{id}`; superadmin only (#206, PR #210)
+- `OrgResolverMiddleware` — resolves `organization_id` from `X-Organization-Slug` request header; shares value via `RequestScopedHolder<int>` injected into all repositories (#205, PR #210)
+- Row-level org isolation — `organization_id INTEGER NOT NULL DEFAULT 0` added to all field/media/navigation/setting tables; all PDO repositories filter and insert by `organization_id` (#207, PR #210)
+- `superadmin` role and `manage_organizations` capability (#205, PR #210)
+- Organization HTTP tests — 13 tests covering CRUD happy paths and error cases using `InMemoryOrganizationRepository` (#208, PR #210)
+- Superadmin React UI — `SuperadminShell` layout + `OrganizationsPage` (list / create / delete) + `OrganizationDetailPage` (edit / danger-zone delete); route tree `/superadmin/**` guarded by `RequireAuth` + superadmin check (#209, PR #210)
+- AppShell: superadmin navigation link visible only to superadmin users; `IconBuilding` SVG icon (#209, PR #210)
+
+---
+
 ## [M6 — コメント機能] — 2026-05-27
 
 ### Added
