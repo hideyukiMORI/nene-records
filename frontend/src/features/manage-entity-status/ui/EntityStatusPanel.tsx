@@ -1,15 +1,8 @@
-import { useState } from 'react'
-import type { Entity, EntityStatus } from '@/entities/entity'
-import {
-  useGeneratePreviewToken,
-  useRevokePreviewToken,
-  useScheduleEntity,
-  useUnscheduleEntity,
-  useUpdateEntity,
-} from '@/entities/entity'
+import type { EntityStatus } from '@/entities/entity'
 import { useTranslation } from '@/shared/i18n'
 import type { MessageKey } from '@/shared/i18n'
-import { Button, Input, Stack, Text, useToast } from '@/shared/ui'
+import { Button, Input, Stack, Text } from '@/shared/ui'
+import type { EntityStatusPanelState } from '../hooks/useEntityStatusPanel'
 
 const STATUS_BADGE_CLASS: Record<EntityStatus, string> = {
   draft:
@@ -36,100 +29,27 @@ const STATUS_LABEL_KEYS: Record<EntityStatus, MessageKey> = {
   scheduled: 'admin.entityStatus.status.scheduled',
 }
 
-interface EntityStatusPanelProps {
-  entity: Entity
-  entityTypeSlug?: string
-}
-
-export function EntityStatusPanel({ entity, entityTypeSlug }: EntityStatusPanelProps) {
+export function EntityStatusPanel({
+  entity,
+  entityTypeSlug,
+  slugInput,
+  showScheduleForm,
+  scheduledAtInput,
+  previewUrl,
+  previewExpires,
+  isPending,
+  onSlugInputChange,
+  onScheduledAtChange,
+  onToggleScheduleForm,
+  onCancelScheduleForm,
+  onChangeStatus,
+  onSaveSlug,
+  onSchedulePublish,
+  onCancelSchedule,
+  onGeneratePreview,
+  onRevokePreview,
+}: EntityStatusPanelState) {
   const { t } = useTranslation()
-  const { showToast } = useToast()
-  const updateMutation = useUpdateEntity()
-  const scheduleMutation = useScheduleEntity()
-  const unscheduleMutation = useUnscheduleEntity()
-  const generatePreviewMutation = useGeneratePreviewToken()
-  const revokePreviewMutation = useRevokePreviewToken()
-  const [slugInput, setSlugInput] = useState(entity.slug ?? '')
-  const [showScheduleForm, setShowScheduleForm] = useState(false)
-  const [scheduledAtInput, setScheduledAtInput] = useState('')
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
-  const [previewExpires, setPreviewExpires] = useState<string | null>(null)
-
-  const isPending =
-    updateMutation.isPending ||
-    scheduleMutation.isPending ||
-    unscheduleMutation.isPending ||
-    generatePreviewMutation.isPending ||
-    revokePreviewMutation.isPending
-
-  const changeStatus = async (nextStatus: EntityStatus) => {
-    try {
-      await updateMutation.mutateAsync({
-        id: Number(entity.id),
-        entityTypeId: entity.entityTypeId,
-        slug: slugInput !== '' ? slugInput : null,
-        status: nextStatus,
-      })
-    } catch {
-      showToast(t('admin.entityStatus.updateError'), 'error')
-    }
-  }
-
-  const saveSlug = async () => {
-    try {
-      await updateMutation.mutateAsync({
-        id: Number(entity.id),
-        entityTypeId: entity.entityTypeId,
-        slug: slugInput !== '' ? slugInput : null,
-        status: entity.status,
-      })
-      showToast(t('admin.entityStatus.slugSaved'), 'success')
-    } catch {
-      showToast(t('admin.entityStatus.slugError'), 'error')
-    }
-  }
-
-  const schedulePublish = async () => {
-    if (scheduledAtInput === '') return
-    try {
-      await scheduleMutation.mutateAsync({
-        id: Number(entity.id),
-        scheduledAt: new Date(scheduledAtInput).toISOString(),
-      })
-      setShowScheduleForm(false)
-      setScheduledAtInput('')
-    } catch {
-      showToast(t('admin.entityStatus.scheduleError'), 'error')
-    }
-  }
-
-  const cancelSchedule = async () => {
-    try {
-      await unscheduleMutation.mutateAsync({ id: entity.id })
-    } catch {
-      showToast(t('admin.entityStatus.updateError'), 'error')
-    }
-  }
-
-  const generatePreview = async () => {
-    try {
-      const output = await generatePreviewMutation.mutateAsync({ id: Number(entity.id) })
-      setPreviewUrl(output.previewUrl)
-      setPreviewExpires(output.expiresAt)
-    } catch {
-      showToast(t('admin.entityStatus.previewTokenError'), 'error')
-    }
-  }
-
-  const revokePreview = async () => {
-    try {
-      await revokePreviewMutation.mutateAsync({ id: Number(entity.id) })
-      setPreviewUrl(null)
-      setPreviewExpires(null)
-    } catch {
-      showToast(t('admin.entityStatus.updateError'), 'error')
-    }
-  }
 
   const currentStatus = entity.status
   const publicUrl =
@@ -171,11 +91,11 @@ export function EntityStatusPanel({ entity, entityTypeSlug }: EntityStatusPanelP
             id="entity-slug"
             value={slugInput}
             onChange={(e) => {
-              setSlugInput(e.target.value)
+              onSlugInputChange(e.target.value)
             }}
             placeholder={t('admin.entityStatus.slugPlaceholder')}
           />
-          <Button variant="secondary" size="sm" onClick={() => void saveSlug()}>
+          <Button variant="secondary" size="sm" onClick={onSaveSlug}>
             {t('admin.entityStatus.saveSlug')}
           </Button>
         </div>
@@ -199,7 +119,7 @@ export function EntityStatusPanel({ entity, entityTypeSlug }: EntityStatusPanelP
             size="sm"
             disabled={isPending}
             onClick={() => {
-              void changeStatus(nextStatus)
+              onChangeStatus(nextStatus)
             }}
           >
             {nextStatus === 'published'
@@ -208,33 +128,16 @@ export function EntityStatusPanel({ entity, entityTypeSlug }: EntityStatusPanelP
           </Button>
         ))}
         {currentStatus !== 'scheduled' && (
-          <Button
-            variant="secondary"
-            size="sm"
-            disabled={isPending}
-            onClick={() => {
-              setShowScheduleForm(!showScheduleForm)
-            }}
-          >
+          <Button variant="secondary" size="sm" disabled={isPending} onClick={onToggleScheduleForm}>
             {t('admin.entityStatus.schedule')}
           </Button>
         )}
         {currentStatus === 'scheduled' && (
-          <Button
-            variant="secondary"
-            size="sm"
-            disabled={isPending}
-            onClick={() => void cancelSchedule()}
-          >
+          <Button variant="secondary" size="sm" disabled={isPending} onClick={onCancelSchedule}>
             {t('admin.entityStatus.cancelSchedule')}
           </Button>
         )}
-        <Button
-          variant="secondary"
-          size="sm"
-          disabled={isPending}
-          onClick={() => void generatePreview()}
-        >
+        <Button variant="secondary" size="sm" disabled={isPending} onClick={onGeneratePreview}>
           {t('admin.entityStatus.generatePreviewToken')}
         </Button>
       </div>
@@ -245,25 +148,18 @@ export function EntityStatusPanel({ entity, entityTypeSlug }: EntityStatusPanelP
             type="datetime-local"
             value={scheduledAtInput}
             onChange={(e) => {
-              setScheduledAtInput(e.target.value)
+              onScheduledAtChange(e.target.value)
             }}
             className="rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
           <Button
             size="sm"
             disabled={isPending || scheduledAtInput === ''}
-            onClick={() => void schedulePublish()}
+            onClick={onSchedulePublish}
           >
             {t('admin.entityStatus.confirmSchedule')}
           </Button>
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => {
-              setShowScheduleForm(false)
-              setScheduledAtInput('')
-            }}
-          >
+          <Button variant="secondary" size="sm" onClick={onCancelScheduleForm}>
             {t('common.actions.cancel')}
           </Button>
         </div>
@@ -286,12 +182,7 @@ export function EntityStatusPanel({ entity, entityTypeSlug }: EntityStatusPanelP
               >
                 {previewUrl}
               </a>
-              <Button
-                variant="secondary"
-                size="sm"
-                disabled={isPending}
-                onClick={() => void revokePreview()}
-              >
+              <Button variant="secondary" size="sm" disabled={isPending} onClick={onRevokePreview}>
                 {t('admin.entityStatus.revokePreviewToken')}
               </Button>
             </div>
