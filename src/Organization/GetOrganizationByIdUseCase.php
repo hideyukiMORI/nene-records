@@ -25,6 +25,7 @@ final readonly class GetOrganizationByIdUseCase implements GetOrganizationByIdUs
             slug: $org->slug,
             plan: $org->plan,
             isActive: $org->isActive,
+            externalId: $org->externalId,
             customDomain: $org->customDomain,
             createdAt: $org->createdAt,
             updatedAt: $org->updatedAt,

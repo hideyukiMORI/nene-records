@@ -11,6 +11,8 @@ final readonly class User
         public string $email,
         public string $passwordHash,
         public string $role,
+        public ?int $organizationId = null,
+        public ?string $orgRole = null,
         public string $status = 'active',
         public ?string $inviteTokenHash = null,
         public ?int $inviteExpiresAt = null,

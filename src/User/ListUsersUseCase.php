@@ -15,13 +15,19 @@ final readonly class ListUsersUseCase implements ListUsersUseCaseInterface
 
     public function execute(ListUsersInput $input): ListUsersOutput
     {
-        $users = $this->users->list();
+        // superadmin (organizationId = null) → 全ユーザー一覧
+        // admin / editor (organizationId = N) → 自組織ユーザーのみ
+        $users = $input->organizationId !== null
+            ? $this->users->listByOrganizationId($input->organizationId)
+            : $this->users->list();
 
         $items = array_map(
             static fn ($user) => new ListUserItem(
                 id: $user->id,
                 email: $user->email,
                 role: $user->role,
+                organizationId: $user->organizationId,
+                orgRole: $user->orgRole,
                 status: $user->status,
                 createdAt: $user->createdAt,
                 updatedAt: $user->updatedAt,

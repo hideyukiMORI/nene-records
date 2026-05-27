@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace NeNeRecords\Auth;
 
+use DateTimeImmutable;
+use DateTimeInterface;
 use Nene2\Http\JsonRequestBodyParser;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Validation\ValidationError;
@@ -43,10 +45,11 @@ final readonly class LoginHandler
         $output = $this->useCase->execute(new LoginInput(email: $email, password: $password));
 
         return $this->response->create([
-            'token' => $output->token,
-            'expires_at' => (new \DateTimeImmutable('@' . $output->expiresAt))->format(\DateTimeInterface::ATOM),
-            'email' => $output->email,
-            'role' => $output->role,
+            'token'      => $output->token,
+            'expires_at' => (new DateTimeImmutable('@' . $output->expiresAt))->format(DateTimeInterface::ATOM),
+            'email'      => $output->email,
+            'role'       => $output->role,
+            'org_id'     => $output->orgId,
         ]);
     }
 }

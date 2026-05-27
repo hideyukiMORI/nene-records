@@ -12,6 +12,7 @@ final readonly class UpdateOrganizationOutput
         public string $slug,
         public string $plan,
         public bool $isActive,
+        public ?string $externalId,
         public ?string $customDomain,
         public ?string $createdAt,
         public ?string $updatedAt,

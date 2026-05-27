@@ -8,6 +8,14 @@ use Nene2\Database\DatabaseQueryExecutorInterface;
 
 final readonly class PdoUserRepository implements UserRepositoryInterface
 {
+    private const SELECT_COLUMNS = '
+        id, email, password_hash, role, organization_id, org_role, status,
+        invite_token_hash, invite_expires_at,
+        password_reset_token_hash, password_reset_expires_at,
+        UNIX_TIMESTAMP(created_at) AS created_at,
+        UNIX_TIMESTAMP(updated_at) AS updated_at
+    ';
+
     public function __construct(
         private DatabaseQueryExecutorInterface $query,
     ) {
@@ -16,12 +24,7 @@ final readonly class PdoUserRepository implements UserRepositoryInterface
     public function findByEmail(string $email): ?User
     {
         $row = $this->query->fetchOne(
-            'SELECT id, email, password_hash, role, status,
-                    invite_token_hash, invite_expires_at,
-                    password_reset_token_hash, password_reset_expires_at,
-                    UNIX_TIMESTAMP(created_at) AS created_at,
-                    UNIX_TIMESTAMP(updated_at) AS updated_at
-             FROM users WHERE email = ?',
+            'SELECT ' . self::SELECT_COLUMNS . ' FROM users WHERE email = ?',
             [$email],
         );
 
@@ -35,12 +38,7 @@ final readonly class PdoUserRepository implements UserRepositoryInterface
     public function findById(int $id): ?User
     {
         $row = $this->query->fetchOne(
-            'SELECT id, email, password_hash, role, status,
-                    invite_token_hash, invite_expires_at,
-                    password_reset_token_hash, password_reset_expires_at,
-                    UNIX_TIMESTAMP(created_at) AS created_at,
-                    UNIX_TIMESTAMP(updated_at) AS updated_at
-             FROM users WHERE id = ?',
+            'SELECT ' . self::SELECT_COLUMNS . ' FROM users WHERE id = ?',
             [$id],
         );
 
@@ -55,25 +53,36 @@ final readonly class PdoUserRepository implements UserRepositoryInterface
     public function list(): array
     {
         $rows = $this->query->fetchAll(
-            'SELECT id, email, password_hash, role, status,
-                    invite_token_hash, invite_expires_at,
-                    password_reset_token_hash, password_reset_expires_at,
-                    UNIX_TIMESTAMP(created_at) AS created_at,
-                    UNIX_TIMESTAMP(updated_at) AS updated_at
-             FROM users ORDER BY id ASC',
+            'SELECT ' . self::SELECT_COLUMNS . ' FROM users ORDER BY id ASC',
             [],
         );
 
         return array_map($this->mapRow(...), $rows);
     }
 
-    public function create(string $email, string $passwordHash, string $role): User
+    /** @return list<User> */
+    public function listByOrganizationId(int $organizationId): array
     {
+        $rows = $this->query->fetchAll(
+            'SELECT ' . self::SELECT_COLUMNS . ' FROM users WHERE organization_id = ? ORDER BY id ASC',
+            [$organizationId],
+        );
+
+        return array_map($this->mapRow(...), $rows);
+    }
+
+    public function create(
+        string $email,
+        string $passwordHash,
+        string $role,
+        ?int $organizationId = null,
+        ?string $orgRole = null,
+    ): User {
         $now = date('Y-m-d H:i:s');
         $this->query->execute(
-            'INSERT INTO users (email, password_hash, role, status, created_at, updated_at)
-             VALUES (?, ?, ?, ?, ?, ?)',
-            [$email, $passwordHash, $role, 'active', $now, $now],
+            'INSERT INTO users (email, password_hash, role, organization_id, org_role, status, created_at, updated_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+            [$email, $passwordHash, $role, $organizationId, $orgRole, 'active', $now, $now],
         );
 
         $user = $this->findByEmail($email);
@@ -81,6 +90,14 @@ final readonly class PdoUserRepository implements UserRepositoryInterface
         assert($user !== null);
 
         return $user;
+    }
+
+    public function updateOrganization(int $id, ?int $organizationId, ?string $orgRole): void
+    {
+        $this->query->execute(
+            'UPDATE users SET organization_id = ?, org_role = ?, updated_at = NOW() WHERE id = ?',
+            [$organizationId, $orgRole, $id],
+        );
     }
 
     public function updateRole(int $id, string $role): void
@@ -119,12 +136,7 @@ final readonly class PdoUserRepository implements UserRepositoryInterface
     public function findByInviteToken(string $tokenHash): ?User
     {
         $row = $this->query->fetchOne(
-            'SELECT id, email, password_hash, role, status,
-                    invite_token_hash, invite_expires_at,
-                    password_reset_token_hash, password_reset_expires_at,
-                    UNIX_TIMESTAMP(created_at) AS created_at,
-                    UNIX_TIMESTAMP(updated_at) AS updated_at
-             FROM users WHERE invite_token_hash = ?',
+            'SELECT ' . self::SELECT_COLUMNS . ' FROM users WHERE invite_token_hash = ?',
             [$tokenHash],
         );
 
@@ -155,12 +167,7 @@ final readonly class PdoUserRepository implements UserRepositoryInterface
     public function findByPasswordResetToken(string $tokenHash): ?User
     {
         $row = $this->query->fetchOne(
-            'SELECT id, email, password_hash, role, status,
-                    invite_token_hash, invite_expires_at,
-                    password_reset_token_hash, password_reset_expires_at,
-                    UNIX_TIMESTAMP(created_at) AS created_at,
-                    UNIX_TIMESTAMP(updated_at) AS updated_at
-             FROM users WHERE password_reset_token_hash = ?',
+            'SELECT ' . self::SELECT_COLUMNS . ' FROM users WHERE password_reset_token_hash = ?',
             [$tokenHash],
         );
 
@@ -202,6 +209,8 @@ final readonly class PdoUserRepository implements UserRepositoryInterface
             email: (string) $row['email'],
             passwordHash: (string) $row['password_hash'],
             role: (string) $row['role'],
+            organizationId: isset($row['organization_id']) ? (int) $row['organization_id'] : null,
+            orgRole: isset($row['org_role']) ? (string) $row['org_role'] : null,
             status: (string) ($row['status'] ?? 'active'),
             inviteTokenHash: isset($row['invite_token_hash']) ? (string) $row['invite_token_hash'] : null,
             inviteExpiresAt: isset($row['invite_expires_at']) ? (int) $row['invite_expires_at'] : null,

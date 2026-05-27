@@ -11,6 +11,7 @@ final readonly class CreateOrganizationInput
         public string $slug,
         public string $plan = 'free',
         public bool $isActive = true,
+        public ?string $externalId = null,
         public ?string $customDomain = null,
     ) {
     }

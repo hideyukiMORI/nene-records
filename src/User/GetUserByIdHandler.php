@@ -20,17 +20,19 @@ final readonly class GetUserByIdHandler
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $parameters = $request->getAttribute(Router::PARAMETERS_ATTRIBUTE, []);
-        $id = (int) ($parameters['id'] ?? 0);
+        $id         = (int) ($parameters['id'] ?? 0);
 
         $output = $this->useCase->execute(new GetUserByIdInput($id));
 
         return $this->response->create([
-            'id' => $output->id,
-            'email' => $output->email,
-            'role' => $output->role,
-            'status' => $output->status,
-            'created_at' => $output->createdAt !== null ? date('c', $output->createdAt) : null,
-            'updated_at' => $output->updatedAt !== null ? date('c', $output->updatedAt) : null,
+            'id'              => $output->id,
+            'email'           => $output->email,
+            'role'            => $output->role,
+            'organization_id' => $output->organizationId,
+            'org_role'        => $output->orgRole,
+            'status'          => $output->status,
+            'created_at'      => $output->createdAt !== null ? date('c', $output->createdAt) : null,
+            'updated_at'      => $output->updatedAt !== null ? date('c', $output->updatedAt) : null,
         ]);
     }
 }

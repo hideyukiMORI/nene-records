@@ -30,7 +30,13 @@ final readonly class CreateUserUseCase implements CreateUserUseCaseInterface
         }
 
         $passwordHash = password_hash($input->password, PASSWORD_BCRYPT);
-        $user = $this->users->create($input->email, $passwordHash, $input->role);
+        $user = $this->users->create(
+            $input->email,
+            $passwordHash,
+            $input->role,
+            $input->organizationId,
+            $input->orgRole ?? $input->role, // org_role はデフォルトで role と同値
+        );
 
         return new CreateUserOutput(
             id: $user->id,

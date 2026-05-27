@@ -25,6 +25,8 @@ final readonly class GetUserByIdUseCase implements GetUserByIdUseCaseInterface
             id: $user->id,
             email: $user->email,
             role: $user->role,
+            organizationId: $user->organizationId,
+            orgRole: $user->orgRole,
             status: $user->status,
             createdAt: $user->createdAt,
             updatedAt: $user->updatedAt,

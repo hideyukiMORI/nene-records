@@ -10,6 +10,8 @@ final readonly class CreateUserInput
         public string $email,
         public string $password,
         public string $role,
+        public ?int $organizationId = null,
+        public ?string $orgRole = null,
     ) {
     }
 }

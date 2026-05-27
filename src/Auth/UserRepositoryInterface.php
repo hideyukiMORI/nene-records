@@ -13,7 +13,18 @@ interface UserRepositoryInterface
     /** @return list<User> */
     public function list(): array;
 
-    public function create(string $email, string $passwordHash, string $role): User;
+    /** @return list<User> */
+    public function listByOrganizationId(int $organizationId): array;
+
+    public function create(
+        string $email,
+        string $passwordHash,
+        string $role,
+        ?int $organizationId = null,
+        ?string $orgRole = null,
+    ): User;
+
+    public function updateOrganization(int $id, ?int $organizationId, ?string $orgRole): void;
 
     public function updateRole(int $id, string $role): void;
 

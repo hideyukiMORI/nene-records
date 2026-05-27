@@ -14,6 +14,7 @@ final readonly class CreateOrganizationUseCase implements CreateOrganizationUseC
     public function execute(CreateOrganizationInput $input): CreateOrganizationOutput
     {
         $existing = $this->organizations->findBySlug($input->slug);
+
         if ($existing !== null) {
             throw new OrganizationSlugConflictException($input->slug);
         }
@@ -23,6 +24,7 @@ final readonly class CreateOrganizationUseCase implements CreateOrganizationUseC
             slug: $input->slug,
             plan: $input->plan,
             isActive: $input->isActive,
+            externalId: $input->externalId,
             customDomain: $input->customDomain,
         ));
 
@@ -32,6 +34,7 @@ final readonly class CreateOrganizationUseCase implements CreateOrganizationUseC
             slug: $input->slug,
             plan: $input->plan,
             isActive: $input->isActive,
+            externalId: $input->externalId,
             customDomain: $input->customDomain,
         );
     }

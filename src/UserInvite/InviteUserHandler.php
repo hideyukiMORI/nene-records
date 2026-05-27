@@ -8,6 +8,7 @@ use Nene2\Http\JsonRequestBodyParser;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Validation\ValidationError;
 use Nene2\Validation\ValidationException;
+use NeNeRecords\Auth\Role;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -26,7 +27,7 @@ final readonly class InviteUserHandler
         $errors = [];
 
         $email = trim((string) ($body['email'] ?? ''));
-        $role = trim((string) ($body['role'] ?? ''));
+        $role  = trim((string) ($body['role'] ?? ''));
 
         if ($email === '') {
             $errors[] = new ValidationError('email', 'Email is required.', 'required');
@@ -45,23 +46,38 @@ final readonly class InviteUserHandler
         $appBaseUrl = (string) ($body['app_base_url'] ?? '');
 
         if ($appBaseUrl === '') {
-            $scheme = $request->getUri()->getScheme();
-            $host = $request->getUri()->getHost();
-            $port = $request->getUri()->getPort();
+            $scheme     = $request->getUri()->getScheme();
+            $host       = $request->getUri()->getHost();
+            $port       = $request->getUri()->getPort();
             $appBaseUrl = $scheme . '://' . $host . ($port !== null ? ':' . $port : '');
+        }
+
+        // 組織 ID の解決（CreateUserHandler と同様のロジック）
+        $resolvedOrgId = $request->getAttribute('nene2.org.id');
+        $claims        = $request->getAttribute('nene2.auth.claims');
+        $callerRole    = is_array($claims) ? Role::tryFrom((string) ($claims['role'] ?? '')) : null;
+
+        if ($resolvedOrgId !== null) {
+            $organizationId = (int) $resolvedOrgId;
+        } elseif ($callerRole === Role::Superadmin && isset($body['organization_id'])) {
+            $organizationId = (int) $body['organization_id'];
+        } else {
+            $organizationId = null;
         }
 
         $output = $this->useCase->execute(new InviteUserInput(
             email: $email,
             role: $role,
             appBaseUrl: $appBaseUrl,
+            organizationId: $organizationId,
+            orgRole: $role,
         ));
 
         return $this->response->create(
             [
-                'id' => $output->id,
-                'email' => $output->email,
-                'role' => $output->role,
+                'id'     => $output->id,
+                'email'  => $output->email,
+                'role'   => $output->role,
                 'status' => $output->status,
             ],
             201,

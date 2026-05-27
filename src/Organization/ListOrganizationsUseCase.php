@@ -14,7 +14,7 @@ final readonly class ListOrganizationsUseCase implements ListOrganizationsUseCas
     public function execute(ListOrganizationsInput $input): ListOrganizationsOutput
     {
         $organizations = $this->organizations->findAll($input->limit, $input->offset);
-        $total = $this->organizations->count();
+        $total         = $this->organizations->count();
 
         $items = array_map(
             static fn (Organization $o): ListOrganizationItem => new ListOrganizationItem(
@@ -23,6 +23,7 @@ final readonly class ListOrganizationsUseCase implements ListOrganizationsUseCas
                 slug: $o->slug,
                 plan: $o->plan,
                 isActive: $o->isActive,
+                externalId: $o->externalId,
                 customDomain: $o->customDomain,
                 createdAt: $o->createdAt,
                 updatedAt: $o->updatedAt,
