@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace NeNeRecords\Tests\Auth;
 
+use Nene2\Auth\TokenIssuerInterface;
 use NeNeRecords\Auth\InvalidCredentialsException;
 use NeNeRecords\Auth\LoginInput;
 use NeNeRecords\Auth\LoginUseCase;
 use NeNeRecords\Auth\User;
 use NeNeRecords\Tests\User\InMemoryUserRepository;
-use Nene2\Auth\TokenIssuerInterface;
 use PHPUnit\Framework\TestCase;
 
 final class StubTokenIssuer implements TokenIssuerInterface
@@ -81,5 +81,76 @@ final class LoginUseCaseTest extends TestCase
         $this->expectException(InvalidCredentialsException::class);
 
         $useCase->execute(new LoginInput(email: 'ghost@example.com', password: 'secret'));
+    }
+
+    // ── org_id in JWT output ─────────────────────────────────────────────────────
+
+    /**
+     * admin ユーザーのログイン出力には organizationId が org_id として含まれる
+     */
+    public function testAdminLoginOutputContainsOrgId(): void
+    {
+        $hash = password_hash('secret', PASSWORD_BCRYPT);
+        $users = new InMemoryUserRepository([
+            new User(id: 1, email: 'admin@example.com', passwordHash: $hash, role: 'admin', organizationId: 42),
+        ]);
+
+        $useCase = new LoginUseCase($users, $this->tokenIssuer);
+        $output = $useCase->execute(new LoginInput(email: 'admin@example.com', password: 'secret'));
+
+        self::assertSame(42, $output->orgId);
+        self::assertSame('admin', $output->role);
+    }
+
+    /**
+     * superadmin のログイン出力では org_id は null（組織に属さない）
+     */
+    public function testSuperadminLoginOutputHasNullOrgId(): void
+    {
+        $hash = password_hash('secret', PASSWORD_BCRYPT);
+        $users = new InMemoryUserRepository([
+            // superadmin は organizationId を持たない
+            new User(id: 2, email: 'sa@example.com', passwordHash: $hash, role: 'superadmin', organizationId: null),
+        ]);
+
+        $useCase = new LoginUseCase($users, $this->tokenIssuer);
+        $output = $useCase->execute(new LoginInput(email: 'sa@example.com', password: 'secret'));
+
+        self::assertNull($output->orgId);
+        self::assertSame('superadmin', $output->role);
+    }
+
+    /**
+     * editor ユーザーのログイン出力にも organizationId が含まれる
+     */
+    public function testEditorLoginOutputContainsOrgId(): void
+    {
+        $hash = password_hash('secret', PASSWORD_BCRYPT);
+        $users = new InMemoryUserRepository([
+            new User(id: 3, email: 'editor@example.com', passwordHash: $hash, role: 'editor', organizationId: 7),
+        ]);
+
+        $useCase = new LoginUseCase($users, $this->tokenIssuer);
+        $output = $useCase->execute(new LoginInput(email: 'editor@example.com', password: 'secret'));
+
+        self::assertSame(7, $output->orgId);
+        self::assertSame('editor', $output->role);
+    }
+
+    /**
+     * admin が組織未割当（organizationId=null）の場合、org_id は null
+     */
+    public function testAdminWithNullOrganizationIdHasNullOrgId(): void
+    {
+        $hash = password_hash('secret', PASSWORD_BCRYPT);
+        $users = new InMemoryUserRepository([
+            new User(id: 4, email: 'unassigned@example.com', passwordHash: $hash, role: 'admin', organizationId: null),
+        ]);
+
+        $useCase = new LoginUseCase($users, $this->tokenIssuer);
+        $output = $useCase->execute(new LoginInput(email: 'unassigned@example.com', password: 'secret'));
+
+        self::assertNull($output->orgId);
+        self::assertSame('admin', $output->role);
     }
 }

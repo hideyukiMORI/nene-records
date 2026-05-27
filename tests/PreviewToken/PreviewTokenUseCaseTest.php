@@ -68,8 +68,9 @@ final class PreviewTokenUseCaseTest extends TestCase
 
         // Only the second token should exist — one token per entity
         self::assertNull($previewTokens->findByToken($first->token));
-        self::assertNotNull($previewTokens->findByToken($second->token));
-        self::assertSame($entityId, $previewTokens->findByToken($second->token)?->entityId);
+        $secondToken = $previewTokens->findByToken($second->token);
+        self::assertNotNull($secondToken);
+        self::assertSame($entityId, $secondToken->entityId);
     }
 
     public function testRevokeRemovesTokenForExistingEntity(): void

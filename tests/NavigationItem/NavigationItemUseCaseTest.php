@@ -8,7 +8,6 @@ use NeNeRecords\NavigationItem\CreateNavigationItemInput;
 use NeNeRecords\NavigationItem\CreateNavigationItemUseCase;
 use NeNeRecords\NavigationItem\DeleteNavigationItemInput;
 use NeNeRecords\NavigationItem\DeleteNavigationItemUseCase;
-use NeNeRecords\NavigationItem\NavigationItem;
 use NeNeRecords\NavigationItem\NavigationItemNotFoundException;
 use NeNeRecords\NavigationItem\UpdateNavigationItemInput;
 use NeNeRecords\NavigationItem\UpdateNavigationItemUseCase;

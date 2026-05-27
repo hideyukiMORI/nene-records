@@ -61,15 +61,21 @@ export async function bypassLogin(
   options: {
     email?: string;
     role?: string;
+    orgId?: number | null;
     entityTypes?: object;
   } = {},
 ): Promise<void> {
-  const session = {
+  const session: Record<string, unknown> = {
     token: ADMIN_TOKEN,
     expiresAt: '2099-01-01T00:00:00Z',
     email: options.email ?? 'admin@example.com',
     role: options.role ?? 'admin',
   };
+
+  // org_id を明示的に指定した場合のみセッションに含める（multi-tenancy テスト用）
+  if ('orgId' in options) {
+    session['orgId'] = options.orgId ?? null;
+  }
 
   // Mock entity-types list (used by sidebar in AppShell)
   await mockEntityTypesEndpoint(page, options.entityTypes ?? ENTITY_TYPE_LIST_EMPTY);
