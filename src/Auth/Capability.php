@@ -11,4 +11,5 @@ enum Capability
     case ReadSettings;
     case ManageTags;
     case EditContent;
+    case ManageOrganizations;
 }

@@ -20,6 +20,11 @@ final class CapabilityResolver
     {
         $method = strtoupper($method);
 
+        // Organization management: superadmin only
+        if (str_starts_with($path, '/api/v1/organizations')) {
+            return Capability::ManageOrganizations;
+        }
+
         if (str_starts_with($path, '/api/v1/settings')) {
             return match ($method) {
                 'PUT' => Capability::ManageSettings,
