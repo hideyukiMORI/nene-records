@@ -17,6 +17,7 @@ NeNe Records lets you define entity types and typed fields from the admin fronte
 - **Secure**: auth and validation at the API boundary; MCP tools never touch the database directly
 - **Replaceable layers**: swap the API runtime, admin UI, or consumer views independently
 - **AI-native**: 60+ MCP tools expose every API operation to AI clients
+- **Multi-tenant**: organization-scoped data with superadmin / admin / editor roles and JWT org_id enforcement
 
 ## Quick Start
 
@@ -47,26 +48,26 @@ AI clients (MCP)        ──┘
 - **Frontend**: React 19, TypeScript, Vite, TailwindCSS v4, React Query
 - **API contract**: OpenAPI 3.1 ([`docs/openapi/openapi.yaml`](./docs/openapi/openapi.yaml))
 - **MCP**: 60+ tools auto-generated from OpenAPI
+- **Multi-tenancy**: organization-scoped data isolation; `OrgResolverMiddleware` + JWT `org_id` claim
 
 ## Current Status
 
-**M1 — Usable Blog CMS: complete (2026-05-24)**
-
-**M2 — Team-Ready CMS: in progress** — roles done; i18n infrastructure next
+All milestones M1 – M9 are complete. See [`docs/todo/current.md`](./docs/todo/current.md) and [`docs/roadmap.md`](./docs/roadmap.md) for future direction.
 
 | Area | State |
 | --- | --- |
-| Entity model | entity_types, entities, 6 typed field tables, relations, tags, entity archive |
-| Admin UI | entity types, field defs, records, tags, relations, site settings, login |
-| Auth | JWT Bearer — admin / editor roles, capability checks on mutating endpoints (#108) |
-| Publish workflow | `draft` / `published` / `archived` + `published_at` |
-| Public consumer | `/view/{type}/{slug}`, Markdown body, site settings |
+| Entity model | entity_types, entities, 6 typed field tables, relations, tags, revisions, archive |
+| Admin UI | entity types, field defs, records, tags, SEO, navigation, media library, comments, users |
+| Auth | JWT Bearer — superadmin / admin / editor roles, capability checks, org-scoped JWT |
+| Multi-tenancy | organizations CRUD, org resolver middleware, per-table org isolation, superadmin UI |
+| User management | invite flow, password reset, role management, org membership (1 user = 1 org) |
+| Publish workflow | `draft` / `published` / `archived` / `scheduled` + `published_at` |
+| Media | upload, library list/delete, image + file field types |
+| Comments | submission, moderation API, public comment UI, admin comment management |
+| Public consumer | `/view/{type}/{slug}`, Markdown body, site settings, navigation |
 | OpenAPI | 3.1 contract, validated on every CI run |
 | MCP tools | 60+ tools auto-generated from OpenAPI |
-| CI | Backend (PHPUnit 193 tests / PHPStan / CS-Fixer / OpenAPI / MCP) + Frontend (ESLint / TypeScript / Vitest) |
-
-Next up: **M2 — Team-Ready CMS** (admin i18n #109–#110, entity revisions, image upload, per-record SEO, navigation).
-See [`docs/roadmap.md`](./docs/roadmap.md) and [`docs/todo/current.md`](./docs/todo/current.md).
+| CI | Backend (374 PHPUnit tests / PHPStan level 8 / CS-Fixer / OpenAPI / MCP) + Frontend (ESLint / TypeScript / Vitest) |
 
 ## Contributing
 

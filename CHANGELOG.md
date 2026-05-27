@@ -6,6 +6,28 @@ NeNe Records does not yet follow Semantic Versioning — entries are grouped by 
 
 ---
 
+## [M9 — マルチテナント完成（1ユーザー=1組織）] — 2026-07-01
+
+### Added
+- `organization_id` column on `users` table — non-superadmin users are bound to exactly one organization; superadmin users have `NULL` (#251, PR #252)
+- `org_role` column on `users` table — organization-level role (`admin` / `editor`) stored alongside the global role (#251, PR #252)
+- `external_id` column on `organizations` table — unique nullable identifier for NeNe Corpus and future external system integration (#251, PR #252)
+- JWT `org_id` claim — `LoginUseCase` embeds the user's organization ID in the token at login; superadmin receives `null` (#251, PR #252)
+- `CapabilityMiddleware` org scope enforcement — validates that JWT `org_id` matches the request-resolved org context (`nene2.org.id`); returns 403 `org-access-denied` on mismatch; superadmin bypasses the check (#251, PR #252)
+- `listByOrganizationId()` and `updateOrganization()` on `PdoUserRepository` and `UserRepositoryInterface` (#251, PR #252)
+- Org-scoped user listing — `ListUsersHandler` returns only same-organization users for admin/editor JWT tokens; superadmin sees all (#251, PR #252)
+- Org-auto-assignment on user create and invite — `CreateUserHandler` and `InviteUserHandler` resolve organization from `nene2.org.id` request attribute (org-scoped routes) or `organization_id` body field (superadmin direct) (#251, PR #252)
+
+### Removed
+- `organization_users` join table — previously unused; allowed multiple org memberships and conflicted with the 1-user-1-org policy (#251, PR #252)
+
+### Changed
+- All Organization CRUD (`CreateOrganization`, `UpdateOrganization`, `GetOrganizationById`, `ListOrganizations`) — Input / Output / UseCase / Handler updated to expose and persist `external_id` (#251, PR #252)
+- `GetUserById`, `ListUsers`, `CreateUser` API responses now include `organization_id` and `org_role` fields (#251, PR #252)
+- Login API response now includes `org_id` field (#251, PR #252)
+
+---
+
 ## [M8 — マルチテナント運用機能] — 2026-05-27
 
 ### Added

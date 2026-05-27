@@ -26,11 +26,15 @@ Claude Code / AI agent guide for this repository. Cursor summaries live in `.cur
 
 ## Product Direction
 
-Flexible entity platform — lighter and more typed than WordPress post meta. Admin frontend for schema UX; API for persistence, auth, and contracts; MCP for AI operations.
+Flexible entity platform — lighter and more typed than WordPress post meta. Admin frontend for schema UX; API for persistence, auth, and contracts; MCP for AI operations. Multi-tenant: organization-scoped data with JWT `org_id` enforcement.
+
+## Current Status
+
+M1 – M9 complete. See `docs/todo/current.md`.
 
 ## Verification
 
 ```bash
-composer check                    # 193 tests + PHPStan + CS-Fixer + OpenAPI + MCP
+composer check                    # 374 tests + PHPStan level 8 + CS-Fixer + OpenAPI + MCP
 npm run check --prefix frontend   # type-check + lint + test + storybook
 ```
