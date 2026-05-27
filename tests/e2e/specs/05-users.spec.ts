@@ -57,12 +57,12 @@ test.describe('Users', () => {
     await expect(page.locator('input[type="email"]')).toBeVisible({ timeout: 6000 });
   });
 
-  test('05-06: invite user — calls POST /api/v1/user-invite/invite', async ({ page }) => {
+  test('05-06: invite user — calls POST /api/v1/users/invite', async ({ page }) => {
     await bypassLogin(page);
     await mockUsersEndpoint(page, USER_LIST_EMPTY);
 
     let postCalled = false;
-    await page.route('**/api/v1/user-invite/invite', (route) => {
+    await page.route('**/api/v1/users/invite', (route) => {
       if (route.request().method() === 'POST') {
         postCalled = true;
         return route.fulfill({
@@ -82,9 +82,10 @@ test.describe('Users', () => {
     await gotoAdmin(page, '/users');
     await page.locator('button:has-text("Invite user")').click();
 
-    // Fill invite form
+    // Fill invite form — use pressSequentially to properly trigger react-hook-form onChange
     const emailInput = page.locator('input[type="email"]').first();
-    await emailInput.fill('newuser@example.com');
+    await emailInput.click();
+    await emailInput.pressSequentially('newuser@example.com');
     await page.locator('button[type="submit"]:has-text("Send invitation")').click();
 
     await page.waitForTimeout(500);

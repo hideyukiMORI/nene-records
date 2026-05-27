@@ -1,8 +1,11 @@
+import { forwardRef } from 'react'
+
 export interface InputProps {
   id: string
   label: string
   type?: 'text' | 'email' | 'password' | 'number' | 'datetime-local'
-  value: string
+  name?: string
+  value?: string
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void
   onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void
   disabled?: boolean
@@ -10,17 +13,21 @@ export interface InputProps {
   autoComplete?: string
 }
 
-export function Input({
-  id,
-  label,
-  type = 'text',
-  value,
-  onChange,
-  onBlur,
-  disabled = false,
-  error,
-  autoComplete,
-}: InputProps) {
+export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
+  {
+    id,
+    label,
+    type = 'text',
+    name,
+    value,
+    onChange,
+    onBlur,
+    disabled = false,
+    error,
+    autoComplete,
+  },
+  ref,
+) {
   const errorId = error !== undefined ? `${id}-error` : undefined
 
   return (
@@ -29,8 +36,10 @@ export function Input({
         {label}
       </label>
       <input
+        ref={ref}
         id={id}
         type={type}
+        name={name}
         value={value}
         onChange={onChange}
         onBlur={onBlur}
@@ -53,4 +62,4 @@ export function Input({
       ) : null}
     </div>
   )
-}
+})

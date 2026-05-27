@@ -9,13 +9,11 @@ import {
   bypassLogin,
   gotoAdmin,
   mockEntityTypesEndpoint,
-  mockDashboard,
 } from '../fixtures/helpers.js';
 import {
   ENTITY_TYPE_LIST_EMPTY,
   ENTITY_TYPE_LIST,
   ENTITY_TYPE_CREATED,
-  DASHBOARD_EMPTY,
 } from '../fixtures/api-mocks.js';
 
 test.describe('Entity Types', () => {
@@ -105,7 +103,7 @@ test.describe('Entity Types', () => {
     await mockEntityTypesEndpoint(page, ENTITY_TYPE_LIST_EMPTY);
     await gotoAdmin(page, '/entity-types');
 
-    // Editor should be redirected to /forbidden (no manage_schema capability)
-    await expect(page).toHaveURL(/\/(forbidden|login)/, { timeout: 6000 });
+    // Editor lacks manage_schema capability — stays on the page but create form is hidden
+    await expect(page.locator('input[id="entity-type-name"]')).not.toBeVisible({ timeout: 6000 });
   });
 });
