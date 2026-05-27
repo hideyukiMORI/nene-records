@@ -31,6 +31,7 @@ final readonly class ListOrganizationsHandler implements RequestHandlerInterface
                     'id'            => $item->id,
                     'name'          => $item->name,
                     'slug'          => $item->slug,
+                    'external_id'   => $item->externalId,
                     'custom_domain' => $item->customDomain,
                     'plan'          => $item->plan,
                     'is_active'     => $item->isActive,

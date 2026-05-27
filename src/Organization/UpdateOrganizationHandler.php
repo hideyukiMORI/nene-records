@@ -39,6 +39,11 @@ final readonly class UpdateOrganizationHandler implements RequestHandlerInterfac
         $plan     = isset($body['plan']) ? trim((string) $body['plan']) : null;
         $isActive = isset($body['is_active']) ? (bool) $body['is_active'] : null;
 
+        $updateExternalId = array_key_exists('external_id', $body);
+        $externalId       = $updateExternalId
+            ? (($body['external_id'] !== null && $body['external_id'] !== '') ? trim((string) $body['external_id']) : null)
+            : null;
+
         $updateCustomDomain = array_key_exists('custom_domain', $body);
         $customDomain       = $updateCustomDomain
             ? (($body['custom_domain'] !== null && $body['custom_domain'] !== '') ? trim((string) $body['custom_domain']) : null)
@@ -72,12 +77,15 @@ final readonly class UpdateOrganizationHandler implements RequestHandlerInterfac
             isActive: $isActive,
             updateCustomDomain: $updateCustomDomain,
             customDomain: $customDomain,
+            updateExternalId: $updateExternalId,
+            externalId: $externalId,
         ));
 
         return $this->response->create([
             'id'            => $output->id,
             'name'          => $output->name,
             'slug'          => $output->slug,
+            'external_id'   => $output->externalId,
             'custom_domain' => $output->customDomain,
             'plan'          => $output->plan,
             'is_active'     => $output->isActive,

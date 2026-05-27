@@ -10,6 +10,8 @@ final readonly class GetUserByIdOutput
         public int $id,
         public string $email,
         public string $role,
+        public ?int $organizationId,
+        public ?string $orgRole,
         public string $status,
         public ?int $createdAt,
         public ?int $updatedAt,

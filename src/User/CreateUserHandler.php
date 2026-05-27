@@ -8,6 +8,7 @@ use Nene2\Http\JsonRequestBodyParser;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Validation\ValidationError;
 use Nene2\Validation\ValidationException;
+use NeNeRecords\Auth\Role;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -25,9 +26,9 @@ final readonly class CreateUserHandler
 
         $errors = [];
 
-        $email = trim((string) ($body['email'] ?? ''));
+        $email    = trim((string) ($body['email'] ?? ''));
         $password = (string) ($body['password'] ?? '');
-        $role = trim((string) ($body['role'] ?? ''));
+        $role     = trim((string) ($body['role'] ?? ''));
 
         if ($email === '') {
             $errors[] = new ValidationError('email', 'Email is required.', 'required');
@@ -49,18 +50,35 @@ final readonly class CreateUserHandler
             throw new ValidationException($errors);
         }
 
+        // 組織 ID の解決:
+        //  - nene2.org.id が設定されている (org-scoped route) → そちらを使う
+        //  - なければリクエストボディの organization_id を使う（superadmin 直接指定）
+        $resolvedOrgId = $request->getAttribute('nene2.org.id');
+        $claims        = $request->getAttribute('nene2.auth.claims');
+        $callerRole    = is_array($claims) ? Role::tryFrom((string) ($claims['role'] ?? '')) : null;
+
+        if ($resolvedOrgId !== null) {
+            $organizationId = (int) $resolvedOrgId;
+        } elseif ($callerRole === Role::Superadmin && isset($body['organization_id'])) {
+            $organizationId = (int) $body['organization_id'];
+        } else {
+            $organizationId = null;
+        }
+
         $output = $this->useCase->execute(new CreateUserInput(
             email: $email,
             password: $password,
             role: $role,
+            organizationId: $organizationId,
+            orgRole: $role,
         ));
 
         return $this->response->create(
             [
-                'id' => $output->id,
-                'email' => $output->email,
-                'role' => $output->role,
-                'status' => $output->status,
+                'id'         => $output->id,
+                'email'      => $output->email,
+                'role'       => $output->role,
+                'status'     => $output->status,
                 'created_at' => $output->createdAt !== null ? date('c', $output->createdAt) : null,
             ],
             201,

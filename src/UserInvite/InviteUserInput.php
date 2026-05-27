@@ -10,6 +10,8 @@ final readonly class InviteUserInput
         public string $email,
         public string $role,
         public string $appBaseUrl,
+        public ?int $organizationId = null,
+        public ?string $orgRole = null,
     ) {
     }
 }

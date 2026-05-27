@@ -19,14 +19,16 @@ final readonly class UpdateOrganizationUseCase implements UpdateOrganizationUseC
             throw new OrganizationNotFoundException($input->id);
         }
 
-        $name         = $input->name         ?? $org->name;
-        $slug         = $input->slug         ?? $org->slug;
-        $plan         = $input->plan         ?? $org->plan;
-        $isActive     = $input->isActive     ?? $org->isActive;
+        $name         = $input->name     ?? $org->name;
+        $slug         = $input->slug     ?? $org->slug;
+        $plan         = $input->plan     ?? $org->plan;
+        $isActive     = $input->isActive ?? $org->isActive;
+        $externalId   = $input->updateExternalId ? $input->externalId : $org->externalId;
         $customDomain = $input->updateCustomDomain ? $input->customDomain : $org->customDomain;
 
         if ($slug !== $org->slug) {
             $existing = $this->organizations->findBySlug($slug);
+
             if ($existing !== null && $existing->id !== $input->id) {
                 throw new OrganizationSlugConflictException($slug);
             }
@@ -38,6 +40,7 @@ final readonly class UpdateOrganizationUseCase implements UpdateOrganizationUseC
             plan: $plan,
             isActive: $isActive,
             id: $input->id,
+            externalId: $externalId,
             customDomain: $customDomain,
         );
 
@@ -56,6 +59,7 @@ final readonly class UpdateOrganizationUseCase implements UpdateOrganizationUseC
             slug: $refreshed->slug,
             plan: $refreshed->plan,
             isActive: $refreshed->isActive,
+            externalId: $refreshed->externalId,
             customDomain: $refreshed->customDomain,
             createdAt: $refreshed->createdAt,
             updatedAt: $refreshed->updatedAt,

@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace NeNeRecords\Organization;
 
 use Nene2\Database\DatabaseQueryExecutorInterface;
+use PDOException;
 
 final readonly class PdoOrganizationRepository implements OrganizationRepositoryInterface
 {
-    private const COLUMNS = 'id, name, slug, custom_domain, plan, is_active, created_at, updated_at';
+    private const COLUMNS = 'id, name, slug, external_id, custom_domain, plan, is_active, created_at, updated_at';
 
     public function __construct(
         private DatabaseQueryExecutorInterface $query,
@@ -59,6 +60,7 @@ final readonly class PdoOrganizationRepository implements OrganizationRepository
     public function count(): int
     {
         $row = $this->query->fetchOne('SELECT COUNT(*) AS cnt FROM organizations', []);
+
         return $row !== null ? (int) $row['cnt'] : 0;
     }
 
@@ -68,10 +70,12 @@ final readonly class PdoOrganizationRepository implements OrganizationRepository
 
         try {
             $this->query->execute(
-                'INSERT INTO organizations (name, slug, custom_domain, plan, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                'INSERT INTO organizations (name, slug, external_id, custom_domain, plan, is_active, created_at, updated_at)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
                 [
                     $organization->name,
                     $organization->slug,
+                    $organization->externalId,
                     $organization->customDomain,
                     $organization->plan,
                     $organization->isActive ? 1 : 0,
@@ -79,7 +83,7 @@ final readonly class PdoOrganizationRepository implements OrganizationRepository
                     $now,
                 ],
             );
-        } catch (\PDOException $e) {
+        } catch (PDOException $e) {
             if (str_contains($e->getMessage(), 'Duplicate entry') || str_contains($e->getMessage(), 'UNIQUE constraint failed')) {
                 throw new OrganizationSlugConflictException($organization->slug);
             }
@@ -99,10 +103,11 @@ final readonly class PdoOrganizationRepository implements OrganizationRepository
         $now = date('Y-m-d H:i:s');
 
         $this->query->execute(
-            'UPDATE organizations SET name = ?, slug = ?, custom_domain = ?, plan = ?, is_active = ?, updated_at = ? WHERE id = ?',
+            'UPDATE organizations SET name = ?, slug = ?, external_id = ?, custom_domain = ?, plan = ?, is_active = ?, updated_at = ? WHERE id = ?',
             [
                 $organization->name,
                 $organization->slug,
+                $organization->externalId,
                 $organization->customDomain,
                 $organization->plan,
                 $organization->isActive ? 1 : 0,
@@ -132,6 +137,7 @@ final readonly class PdoOrganizationRepository implements OrganizationRepository
             plan: (string) $row['plan'],
             isActive: (bool) $row['is_active'],
             id: (int) $row['id'],
+            externalId: isset($row['external_id']) && $row['external_id'] !== '' ? (string) $row['external_id'] : null,
             customDomain: isset($row['custom_domain']) && $row['custom_domain'] !== '' ? (string) $row['custom_domain'] : null,
             createdAt: (string) $row['created_at'],
             updatedAt: (string) $row['updated_at'],

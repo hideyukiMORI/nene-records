@@ -36,7 +36,13 @@ final readonly class InviteUserUseCase implements InviteUserUseCaseInterface
 
         // Create as invited user with a temporary random password (never usable without the invite)
         $tempHash = password_hash(bin2hex(random_bytes(32)), PASSWORD_BCRYPT);
-        $user = $this->users->create($input->email, $tempHash, $input->role);
+        $user     = $this->users->create(
+            $input->email,
+            $tempHash,
+            $input->role,
+            $input->organizationId,
+            $input->orgRole ?? $input->role,
+        );
 
         [$rawToken, $tokenHash] = SecureTokenHelper::generateWithHash();
         $expiresAt = time() + self::INVITE_TTL_SECONDS;

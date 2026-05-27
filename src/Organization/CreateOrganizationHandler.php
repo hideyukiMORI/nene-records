@@ -34,6 +34,9 @@ final readonly class CreateOrganizationHandler implements RequestHandlerInterfac
         $name         = trim((string) ($body['name'] ?? ''));
         $slug         = trim((string) ($body['slug'] ?? ''));
         $plan         = trim((string) ($body['plan'] ?? 'free'));
+        $externalId   = isset($body['external_id']) && $body['external_id'] !== ''
+            ? trim((string) $body['external_id'])
+            : null;
         $customDomain = isset($body['custom_domain']) && $body['custom_domain'] !== ''
             ? trim((string) $body['custom_domain'])
             : null;
@@ -60,6 +63,7 @@ final readonly class CreateOrganizationHandler implements RequestHandlerInterfac
             name: $name,
             slug: $slug,
             plan: $plan,
+            externalId: $externalId,
             customDomain: $customDomain,
         ));
 
@@ -68,6 +72,7 @@ final readonly class CreateOrganizationHandler implements RequestHandlerInterfac
                 'id'            => $output->id,
                 'name'          => $output->name,
                 'slug'          => $output->slug,
+                'external_id'   => $output->externalId,
                 'custom_domain' => $output->customDomain,
                 'plan'          => $output->plan,
                 'is_active'     => $output->isActive,

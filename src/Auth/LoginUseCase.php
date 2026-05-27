@@ -32,11 +32,16 @@ final readonly class LoginUseCase
 
         $expiresAt = time() + self::TOKEN_TTL_SECONDS;
 
+        // superadmin はどの組織にも属さないため org_id は null。
+        // admin / editor は所属組織の ID を JWT に埋め込む。
+        $orgId = $role === Role::Superadmin ? null : $user->organizationId;
+
         $token = $this->tokenIssuer->issue([
-            'sub' => $user->email,
-            'role' => $role->value,
-            'iat' => time(),
-            'exp' => $expiresAt,
+            'sub'    => $user->email,
+            'role'   => $role->value,
+            'org_id' => $orgId,
+            'iat'    => time(),
+            'exp'    => $expiresAt,
         ]);
 
         return new LoginOutput(
@@ -44,6 +49,7 @@ final readonly class LoginUseCase
             expiresAt: $expiresAt,
             email: $user->email,
             role: $role->value,
+            orgId: $orgId,
         );
     }
 }

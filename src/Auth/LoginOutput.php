@@ -11,6 +11,7 @@ final readonly class LoginOutput
         public int $expiresAt,
         public string $email,
         public string $role,
+        public ?int $orgId = null,
     ) {
     }
 }

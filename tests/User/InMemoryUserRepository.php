@@ -55,14 +55,66 @@ final class InMemoryUserRepository implements UserRepositoryInterface
         return $users;
     }
 
-    public function create(string $email, string $passwordHash, string $role): User
+    /** @return list<User> */
+    public function listByOrganizationId(int $organizationId): array
     {
-        $id = $this->nextId++;
-        $user = new User(id: $id, email: $email, passwordHash: $passwordHash, role: $role, status: 'active', createdAt: time(), updatedAt: time());
-        $this->byId[$id] = $user;
-        $this->emailToId[$email] = $id;
+        $users = array_values(array_filter(
+            $this->byId,
+            static fn (User $u): bool => $u->organizationId === $organizationId,
+        ));
+        usort($users, static fn (User $a, User $b): int => $a->id <=> $b->id);
+
+        return $users;
+    }
+
+    public function create(
+        string $email,
+        string $passwordHash,
+        string $role,
+        ?int $organizationId = null,
+        ?string $orgRole = null,
+    ): User {
+        $id   = $this->nextId++;
+        $user = new User(
+            id: $id,
+            email: $email,
+            passwordHash: $passwordHash,
+            role: $role,
+            organizationId: $organizationId,
+            orgRole: $orgRole,
+            status: 'active',
+            createdAt: time(),
+            updatedAt: time(),
+        );
+        $this->byId[$id]           = $user;
+        $this->emailToId[$email]   = $id;
 
         return $user;
+    }
+
+    public function updateOrganization(int $id, ?int $organizationId, ?string $orgRole): void
+    {
+        $user = $this->byId[$id] ?? null;
+
+        if ($user === null) {
+            return;
+        }
+
+        $this->byId[$id] = new User(
+            id: $user->id,
+            email: $user->email,
+            passwordHash: $user->passwordHash,
+            role: $user->role,
+            organizationId: $organizationId,
+            orgRole: $orgRole,
+            status: $user->status,
+            inviteTokenHash: $user->inviteTokenHash,
+            inviteExpiresAt: $user->inviteExpiresAt,
+            passwordResetTokenHash: $user->passwordResetTokenHash,
+            passwordResetExpiresAt: $user->passwordResetExpiresAt,
+            createdAt: $user->createdAt,
+            updatedAt: time(),
+        );
     }
 
     public function updateRole(int $id, string $role): void
@@ -78,6 +130,8 @@ final class InMemoryUserRepository implements UserRepositoryInterface
             email: $user->email,
             passwordHash: $user->passwordHash,
             role: $role,
+            organizationId: $user->organizationId,
+            orgRole: $user->orgRole,
             status: $user->status,
             inviteTokenHash: $user->inviteTokenHash,
             inviteExpiresAt: $user->inviteExpiresAt,
@@ -101,6 +155,8 @@ final class InMemoryUserRepository implements UserRepositoryInterface
             email: $user->email,
             passwordHash: $passwordHash,
             role: $user->role,
+            organizationId: $user->organizationId,
+            orgRole: $user->orgRole,
             status: $user->status,
             inviteTokenHash: $user->inviteTokenHash,
             inviteExpiresAt: $user->inviteExpiresAt,
@@ -124,6 +180,8 @@ final class InMemoryUserRepository implements UserRepositoryInterface
             email: $user->email,
             passwordHash: $user->passwordHash,
             role: $user->role,
+            organizationId: $user->organizationId,
+            orgRole: $user->orgRole,
             status: $status,
             inviteTokenHash: $user->inviteTokenHash,
             inviteExpiresAt: $user->inviteExpiresAt,
@@ -148,6 +206,8 @@ final class InMemoryUserRepository implements UserRepositoryInterface
             email: $user->email,
             passwordHash: $user->passwordHash,
             role: $user->role,
+            organizationId: $user->organizationId,
+            orgRole: $user->orgRole,
             status: 'invited',
             inviteTokenHash: $tokenHash,
             inviteExpiresAt: $expiresAt,
@@ -182,6 +242,8 @@ final class InMemoryUserRepository implements UserRepositoryInterface
             email: $user->email,
             passwordHash: $user->passwordHash,
             role: $user->role,
+            organizationId: $user->organizationId,
+            orgRole: $user->orgRole,
             status: 'active',
             inviteTokenHash: null,
             inviteExpiresAt: null,
@@ -206,6 +268,8 @@ final class InMemoryUserRepository implements UserRepositoryInterface
             email: $user->email,
             passwordHash: $user->passwordHash,
             role: $user->role,
+            organizationId: $user->organizationId,
+            orgRole: $user->orgRole,
             status: $user->status,
             inviteTokenHash: $user->inviteTokenHash,
             inviteExpiresAt: $user->inviteExpiresAt,
@@ -240,6 +304,8 @@ final class InMemoryUserRepository implements UserRepositoryInterface
             email: $user->email,
             passwordHash: $user->passwordHash,
             role: $user->role,
+            organizationId: $user->organizationId,
+            orgRole: $user->orgRole,
             status: $user->status,
             inviteTokenHash: $user->inviteTokenHash,
             inviteExpiresAt: $user->inviteExpiresAt,
