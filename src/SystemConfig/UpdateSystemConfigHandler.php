@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace NeNeRecords\SystemConfig;
 
-use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonRequestBodyParser;
 use Nene2\Http\JsonResponseFactory;
 use Psr\Http\Message\ResponseInterface;
@@ -13,12 +12,9 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 final readonly class UpdateSystemConfigHandler implements RequestHandlerInterface
 {
-    private const VALID_MODES = ['single', 'subdomain', 'path'];
-
     public function __construct(
-        private SystemConfigRepositoryInterface $config,
+        private UpdateSystemConfigUseCaseInterface $useCase,
         private JsonResponseFactory $json,
-        private ProblemDetailsResponseFactory $problemDetails,
     ) {
     }
 
@@ -26,36 +22,24 @@ final readonly class UpdateSystemConfigHandler implements RequestHandlerInterfac
     {
         $body = JsonRequestBodyParser::parse($request);
 
-        $mode = isset($body['tenant_resolution_mode'])
-            ? (string) $body['tenant_resolution_mode']
-            : null;
+        $input = new UpdateSystemConfigInput(
+            tenantResolutionMode: isset($body['tenant_resolution_mode'])
+                ? (string) $body['tenant_resolution_mode']
+                : '',
+            tenantOrgSlug: isset($body['tenant_org_slug'])
+                ? (string) $body['tenant_org_slug']
+                : null,
+            tenantBaseDomain: isset($body['tenant_base_domain'])
+                ? (string) $body['tenant_base_domain']
+                : null,
+        );
 
-        if ($mode === null || !in_array($mode, self::VALID_MODES, true)) {
-            return $this->problemDetails->create(
-                $request,
-                'validation-failed',
-                'Validation Failed',
-                422,
-                'tenant_resolution_mode must be one of: ' . implode(', ', self::VALID_MODES),
-            );
-        }
-
-        $this->config->set('tenant_resolution_mode', $mode);
-
-        if (isset($body['tenant_org_slug'])) {
-            $this->config->set('tenant_org_slug', (string) $body['tenant_org_slug']);
-        }
-
-        if (isset($body['tenant_base_domain'])) {
-            $this->config->set('tenant_base_domain', (string) $body['tenant_base_domain']);
-        }
-
-        $all = $this->config->all();
+        $output = $this->useCase->execute($input);
 
         return $this->json->create([
-            'tenant_resolution_mode' => $all['tenant_resolution_mode'] ?? 'single',
-            'tenant_org_slug'        => $all['tenant_org_slug'] ?? '',
-            'tenant_base_domain'     => $all['tenant_base_domain'] ?? 'localhost',
+            'tenant_resolution_mode' => $output->tenantResolutionMode,
+            'tenant_org_slug'        => $output->tenantOrgSlug,
+            'tenant_base_domain'     => $output->tenantBaseDomain,
         ]);
     }
 }
