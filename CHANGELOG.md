@@ -6,6 +6,20 @@ NeNe Records does not yet follow Semantic Versioning — entries are grouped by 
 
 ---
 
+## [M8 — マルチテナント運用機能] — 2026-05-27
+
+### Added
+- Data Migration UI — `GET /api/v1/superadmin/data-migration/status` returns unassigned record counts per table; `POST /api/v1/superadmin/data-migration/assign-org` bulk-reassigns `organization_id=0` records to a target org (#214, PR #216)
+- Superadmin Data Migration page — shows per-table unassigned counts, org selector, and "Assign Records" action; accessible from Superadmin sidebar (#214, PR #216)
+- JSON Export — `GET /api/v1/superadmin/organizations/{id}/export` exports all tenant-scoped data (entity types, entities, field values, tags, navigation, settings, media) as a downloadable JSON payload (#215, PR #216)
+- JSON Import — `POST /api/v1/superadmin/organizations/{id}/import` imports an export payload; all primary keys are remapped to new auto-increment values; cross-table references are resolved via ID mapping; globally unique tag slugs are reused if already present (#215, PR #216)
+- Export / Import buttons on Organization Detail page — "Export JSON" triggers file download; "Import JSON" opens file picker and POSTs the parsed payload (#215, PR #216)
+- `IconDatabase` and `IconDownload` SVG icons added (#216)
+- Tenancy resolution mode selector — `GET/PATCH /api/v1/superadmin/system-config`; `system_config` table stores `tenant_resolution_mode`, `tenant_org_slug`, `tenant_base_domain`; `RuntimeServiceProvider` reads from DB with env fallback (#211, #212, PR #213)
+- Superadmin Settings page — radio group for single / subdomain / path mode with conditional aux inputs (#211, PR #213)
+
+---
+
 ## [M7 — マルチテナント基盤・スーパー管理画面] — 2026-05-27
 
 ### Added

@@ -18,11 +18,23 @@ Last updated: 2026-05-27
 
 **M7 — マルチテナント基盤・スーパー管理画面: 完了（2026-05-27）**
 
-tests (304) / PHPStan Max / CS-Fixer / OpenAPI / MCP バリデーション — 全グリーン。
+**M8 — マルチテナント運用機能: 完了（2026-05-27）**
+
+tests (318) / PHPStan Max / CS-Fixer / OpenAPI / MCP バリデーション — 全グリーン。
 
 ---
 
-## M7 完了（PR レビュー待ち）
+## M8 完了（マージ済み）
+
+| Issue | PR | Summary |
+| --- | --- | --- |
+| #211, #212 | #213 | feat: テナント解決モード設定 UI（single/subdomain/path） |
+| #214 | #216 | feat: 既存データ組織割当 UI（シングル→マルチ移行） |
+| #215 | #216 | feat: JSON 完全エクスポート／インポート（ID リマッピング付き） |
+
+---
+
+## M7 完了（マージ済み）
 
 | Issue | PR | Summary |
 | --- | --- | --- |
