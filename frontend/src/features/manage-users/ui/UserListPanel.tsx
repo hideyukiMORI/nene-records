@@ -1,7 +1,7 @@
 import type { User, UserRole } from '@/entities/user'
 import { useTranslation } from '@/shared/i18n'
 import { Button, EmptyState, Stack, Text } from '@/shared/ui'
-import { IconKey, IconUsers } from '@/shared/ui/icons/Icons'
+import { IconKey, IconMail, IconUsers } from '@/shared/ui/icons/Icons'
 
 export interface UserListPanelProps {
   users: User[]
@@ -11,6 +11,7 @@ export interface UserListPanelProps {
   currentUserEmail: string | null
   onRetry: () => void
   onChangeRole: (user: User, role: UserRole) => Promise<void>
+  onChangeEmail: (user: User) => void
   onResetPassword: (user: User) => void
   onDelete: (user: User) => void
 }
@@ -25,6 +26,7 @@ export function UserListPanel({
   currentUserEmail,
   onRetry,
   onChangeRole,
+  onChangeEmail,
   onResetPassword,
   onDelete,
 }: UserListPanelProps) {
@@ -106,6 +108,16 @@ export function UserListPanel({
 
           {/* Action buttons */}
           <div className="flex shrink-0 gap-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              title={t('admin.users.changeEmail.button')}
+              onClick={() => {
+                onChangeEmail(user)
+              }}
+            >
+              <IconMail size={14} />
+            </Button>
             <Button
               variant="ghost"
               size="sm"

@@ -14,6 +14,11 @@ export interface UserList {
   users: User[]
 }
 
+export interface ChangeEmailInput {
+  userId: number
+  email: string
+}
+
 export interface CreateUserInput {
   email: string
   password: string

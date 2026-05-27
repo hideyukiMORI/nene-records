@@ -91,6 +91,18 @@ final readonly class UserServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(
+                ChangeEmailUseCaseInterface::class,
+                static function (ContainerInterface $c): ChangeEmailUseCaseInterface {
+                    $users = $c->get(UserRepositoryInterface::class);
+
+                    if (!$users instanceof UserRepositoryInterface) {
+                        throw new LogicException('UserRepositoryInterface service is invalid.');
+                    }
+
+                    return new ChangeEmailUseCase($users);
+                },
+            )
+            ->set(
                 ResetUserPasswordUseCaseInterface::class,
                 static function (ContainerInterface $c): ResetUserPasswordUseCaseInterface {
                     $users = $c->get(UserRepositoryInterface::class);
@@ -270,6 +282,23 @@ final readonly class UserServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(
+                ChangeEmailHandler::class,
+                static function (ContainerInterface $c): ChangeEmailHandler {
+                    $useCase = $c->get(ChangeEmailUseCaseInterface::class);
+                    $responseFactory = $c->get(ResponseFactoryInterface::class);
+
+                    if (!$useCase instanceof ChangeEmailUseCaseInterface) {
+                        throw new LogicException('ChangeEmailUseCase service is invalid.');
+                    }
+
+                    if (!$responseFactory instanceof ResponseFactoryInterface) {
+                        throw new LogicException('ResponseFactoryInterface service is invalid.');
+                    }
+
+                    return new ChangeEmailHandler($useCase, $responseFactory);
+                },
+            )
+            ->set(
                 InvalidCurrentPasswordExceptionHandler::class,
                 static function (ContainerInterface $c): InvalidCurrentPasswordExceptionHandler {
                     $problemDetails = $c->get(ProblemDetailsResponseFactory::class);
@@ -291,6 +320,7 @@ final readonly class UserServiceProvider implements ServiceProviderInterface
                     $resetPassword = $c->get(ResetUserPasswordHandler::class);
                     $delete = $c->get(DeleteUserHandler::class);
                     $changePassword = $c->get(ChangePasswordHandler::class);
+                    $changeEmail = $c->get(ChangeEmailHandler::class);
 
                     if (!$list instanceof ListUsersHandler) {
                         throw new LogicException('ListUsersHandler service is invalid.');
@@ -320,7 +350,11 @@ final readonly class UserServiceProvider implements ServiceProviderInterface
                         throw new LogicException('ChangePasswordHandler service is invalid.');
                     }
 
-                    return new UserRouteRegistrar($list, $get, $create, $updateRole, $resetPassword, $delete, $changePassword);
+                    if (!$changeEmail instanceof ChangeEmailHandler) {
+                        throw new LogicException('ChangeEmailHandler service is invalid.');
+                    }
+
+                    return new UserRouteRegistrar($list, $get, $create, $updateRole, $resetPassword, $delete, $changePassword, $changeEmail);
                 },
             );
     }

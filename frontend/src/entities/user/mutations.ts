@@ -4,6 +4,7 @@ import type { InviteUserResponseDto, UserDto } from './api-types'
 import { mapUserDtoToModel } from './mapper'
 import type {
   AdminResetPasswordInput,
+  ChangeEmailInput,
   ChangeOwnPasswordInput,
   CreateUserInput,
   InviteUserInput,
@@ -71,6 +72,21 @@ export function useChangeOwnPassword(): UseMutationResult<void, AppError, Change
         current_password: input.currentPassword,
         new_password: input.newPassword,
       })
+    },
+  })
+}
+
+export function useChangeEmail(): UseMutationResult<void, AppError, ChangeEmailInput> {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (input) => {
+      await apiClient.patch(`/api/v1/users/${String(input.userId)}/email`, {
+        email: input.email,
+      })
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: userKeys.list() })
     },
   })
 }

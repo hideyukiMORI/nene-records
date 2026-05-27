@@ -3,10 +3,12 @@ import { useTranslation } from '@/shared/i18n'
 import { Button, ConfirmDialog, Stack, Text } from '@/shared/ui'
 import type {
   AdminResetPasswordFormValues,
+  ChangeEmailFormValues,
   ChangeOwnPasswordFormValues,
   InviteFormValues,
 } from '../hooks/use-manage-users-page'
 import { AdminResetPasswordForm } from './AdminResetPasswordForm'
+import { ChangeEmailForm } from './ChangeEmailForm'
 import { ChangeOwnPasswordForm } from './ChangeOwnPasswordForm'
 import { UserInviteForm } from './UserInviteForm'
 import { UserListPanel } from './UserListPanel'
@@ -41,6 +43,13 @@ export interface ManageUsersViewProps {
   onOpenChangeOwnPassword: () => void
   onCloseChangeOwnPassword: () => void
   onChangeOwnPassword: (values: ChangeOwnPasswordFormValues) => Promise<void>
+
+  changeEmailTarget: User | null
+  isChangingEmail: boolean
+  changeEmailErrorTitle: string | null
+  onRequestChangeEmail: (user: User) => void
+  onCancelChangeEmail: () => void
+  onChangeEmail: (values: ChangeEmailFormValues) => Promise<void>
 
   deleteTarget: User | null
   isDeleting: boolean
@@ -81,6 +90,13 @@ export function ManageUsersView({
   onOpenChangeOwnPassword,
   onCloseChangeOwnPassword,
   onChangeOwnPassword,
+
+  changeEmailTarget,
+  isChangingEmail,
+  changeEmailErrorTitle,
+  onRequestChangeEmail,
+  onCancelChangeEmail,
+  onChangeEmail,
 
   deleteTarget,
   isDeleting,
@@ -140,6 +156,17 @@ export function ManageUsersView({
           />
         ) : null}
 
+        {/* Change email form */}
+        {changeEmailTarget !== null ? (
+          <ChangeEmailForm
+            user={changeEmailTarget}
+            isSubmitting={isChangingEmail}
+            serverErrorTitle={changeEmailErrorTitle}
+            onSubmit={onChangeEmail}
+            onCancel={onCancelChangeEmail}
+          />
+        ) : null}
+
         {/* User list */}
         <Stack gap="sm">
           <Text as="h2" variant="heading-sm">
@@ -153,6 +180,7 @@ export function ManageUsersView({
             currentUserEmail={currentUserEmail}
             onRetry={onRetry}
             onChangeRole={onChangeRole}
+            onChangeEmail={onRequestChangeEmail}
             onResetPassword={onRequestResetPassword}
             onDelete={onRequestDelete}
           />

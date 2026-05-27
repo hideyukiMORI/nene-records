@@ -470,7 +470,15 @@ export const ja: Partial<MessageCatalog> = {
   'admin.users.delete.confirmTitle': 'ユーザーを削除しますか？',
   'admin.users.delete.confirmDescription': '{{email}} を削除しますか？この操作は元に戻せません。',
   'admin.users.delete.deleting': '削除中…',
+  'admin.users.changeEmail.button': 'メールアドレスを変更',
+  'admin.users.changeEmail.title': 'メールアドレスを変更',
+  'admin.users.changeEmail.description': '{{email}} の新しいメールアドレスを設定します。',
+  'admin.users.changeEmail.emailLabel': '新しいメールアドレス',
+  'admin.users.changeEmail.submit': 'メールアドレスを保存',
+  'admin.users.changeEmail.saving': '保存中…',
+
   'admin.users.validation.emailRequired': 'メールアドレスを入力してください。',
+  'admin.users.validation.emailInvalid': '有効なメールアドレスを入力してください。',
   'admin.users.validation.passwordRequired': 'パスワードを入力してください。',
   'admin.users.validation.passwordMinLength': 'パスワードは8文字以上にしてください。',
 

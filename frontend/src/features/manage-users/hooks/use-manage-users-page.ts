@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react'
 import {
   useAdminResetPassword,
+  useChangeEmail,
   useChangeOwnPassword,
   useDeleteUser,
   useInviteUser,
@@ -24,16 +25,22 @@ export interface AdminResetPasswordFormValues {
   newPassword: string
 }
 
+export interface ChangeEmailFormValues {
+  email: string
+}
+
 export function useManageUsersPage() {
   const listQuery = useUserList()
   const inviteMutation = useInviteUser()
   const updateRoleMutation = useUpdateUserRole()
   const adminResetPasswordMutation = useAdminResetPassword()
   const changeOwnPasswordMutation = useChangeOwnPassword()
+  const changeEmailMutation = useChangeEmail()
   const deleteMutation = useDeleteUser()
 
   const [deleteTarget, setDeleteTarget] = useState<User | null>(null)
   const [resetPasswordTarget, setResetPasswordTarget] = useState<User | null>(null)
+  const [changeEmailTarget, setChangeEmailTarget] = useState<User | null>(null)
   const [showInviteForm, setShowInviteForm] = useState(false)
   const [showChangeOwnPassword, setShowChangeOwnPassword] = useState(false)
 
@@ -73,6 +80,18 @@ export function useManageUsersPage() {
       setShowChangeOwnPassword(false)
     },
     [changeOwnPasswordMutation],
+  )
+
+  const changeEmail = useCallback(
+    async (values: ChangeEmailFormValues) => {
+      if (changeEmailTarget === null) return
+      await changeEmailMutation.mutateAsync({
+        userId: changeEmailTarget.id,
+        email: values.email,
+      })
+      setChangeEmailTarget(null)
+    },
+    [changeEmailMutation, changeEmailTarget],
   )
 
   const requestDelete = useCallback((user: User) => {
@@ -135,6 +154,17 @@ export function useManageUsersPage() {
     changeOwnPassword,
     isChangingOwnPassword: changeOwnPasswordMutation.isPending,
     changeOwnPasswordErrorTitle: changeOwnPasswordMutation.error?.title ?? null,
+
+    changeEmailTarget,
+    requestChangeEmail: (user: User) => {
+      setChangeEmailTarget(user)
+    },
+    cancelChangeEmail: () => {
+      setChangeEmailTarget(null)
+    },
+    changeEmail,
+    isChangingEmail: changeEmailMutation.isPending,
+    changeEmailErrorTitle: changeEmailMutation.error?.title ?? null,
 
     deleteTarget,
     requestDelete,

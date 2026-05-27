@@ -1,4 +1,5 @@
 export type {
+  ChangeEmailInput,
   CreateUserInput,
   AdminResetPasswordInput,
   ChangeOwnPasswordInput,
@@ -12,6 +13,7 @@ export type {
 export {
   useAcceptInvite,
   useAdminResetPassword,
+  useChangeEmail,
   useChangeOwnPassword,
   useConfirmPasswordReset,
   useCreateUser,

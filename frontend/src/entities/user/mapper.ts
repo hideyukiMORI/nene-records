@@ -14,6 +14,6 @@ export function mapUserDtoToModel(dto: UserDto): User {
 
 export function mapUserListDtoToModel(dto: UserListDto): UserList {
   return {
-    users: dto.users.map(mapUserDtoToModel),
+    users: dto.items.map(mapUserDtoToModel),
   }
 }

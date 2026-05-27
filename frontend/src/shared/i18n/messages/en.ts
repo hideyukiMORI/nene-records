@@ -468,7 +468,15 @@ export const en = {
   'admin.users.delete.confirmTitle': 'Delete user?',
   'admin.users.delete.confirmDescription': 'Delete {{email}}? This cannot be undone.',
   'admin.users.delete.deleting': 'Deleting…',
+  'admin.users.changeEmail.button': 'Change email',
+  'admin.users.changeEmail.title': 'Change email address',
+  'admin.users.changeEmail.description': 'Set a new email address for {{email}}.',
+  'admin.users.changeEmail.emailLabel': 'New email address',
+  'admin.users.changeEmail.submit': 'Save email',
+  'admin.users.changeEmail.saving': 'Saving…',
+
   'admin.users.validation.emailRequired': 'Email address is required.',
+  'admin.users.validation.emailInvalid': 'Email address is invalid.',
   'admin.users.validation.passwordRequired': 'Password is required.',
   'admin.users.validation.passwordMinLength': 'Password must be at least 8 characters.',
 

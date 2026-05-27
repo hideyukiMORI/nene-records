@@ -46,6 +46,12 @@ export function UsersPage() {
         onOpenChangeOwnPassword={page.openChangeOwnPassword}
         onCloseChangeOwnPassword={page.closeChangeOwnPassword}
         onChangeOwnPassword={page.changeOwnPassword}
+        changeEmailTarget={page.changeEmailTarget}
+        isChangingEmail={page.isChangingEmail}
+        changeEmailErrorTitle={page.changeEmailErrorTitle}
+        onRequestChangeEmail={page.requestChangeEmail}
+        onCancelChangeEmail={page.cancelChangeEmail}
+        onChangeEmail={page.changeEmail}
         deleteTarget={page.deleteTarget}
         isDeleting={page.isDeleting}
         onRequestDelete={page.requestDelete}

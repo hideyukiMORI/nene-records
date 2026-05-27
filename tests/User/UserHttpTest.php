@@ -9,6 +9,8 @@ use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RuntimeApplicationFactory;
 use NeNeRecords\Auth\User;
 use NeNeRecords\User\CannotDeleteSelfExceptionHandler;
+use NeNeRecords\User\ChangeEmailHandler;
+use NeNeRecords\User\ChangeEmailUseCase;
 use NeNeRecords\User\ChangePasswordHandler;
 use NeNeRecords\User\ChangePasswordUseCase;
 use NeNeRecords\User\CreateUserHandler;
@@ -69,6 +71,7 @@ final class UserHttpTest extends TestCase
             new ResetUserPasswordHandler(new ResetUserPasswordUseCase($this->repository), $this->factory),
             new DeleteUserHandler(new DeleteUserUseCase($this->repository), $this->factory),
             new ChangePasswordHandler(new ChangePasswordUseCase($this->repository), $this->factory),
+            new ChangeEmailHandler(new ChangeEmailUseCase($this->repository), $this->factory),
         );
 
         $this->application = (new RuntimeApplicationFactory(
@@ -280,6 +283,75 @@ final class UserHttpTest extends TestCase
         );
 
         self::assertSame(422, $response->getStatusCode());
+    }
+
+    // ── Change email ────────────────────────────────────────────────────────────
+
+    public function testPatchUserEmailReturns204(): void
+    {
+        $body = $this->factory->createStream(json_encode([
+            'email' => 'newemail@example.test',
+        ], JSON_THROW_ON_ERROR));
+
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('PATCH', 'https://example.test/api/v1/users/1/email')
+                ->withBody($body)
+                ->withAttribute('nene2.auth.claims', ['sub' => 'admin@example.test']),
+        );
+
+        self::assertSame(204, $response->getStatusCode());
+
+        $updated = $this->repository->findById(1);
+        self::assertNotNull($updated);
+        self::assertSame('newemail@example.test', $updated->email);
+    }
+
+    public function testPatchUserEmailWithDuplicateReturns409(): void
+    {
+        // Create a second user
+        $this->repository->create('other@example.test', 'hash', 'editor');
+
+        $body = $this->factory->createStream(json_encode([
+            'email' => 'other@example.test',
+        ], JSON_THROW_ON_ERROR));
+
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('PATCH', 'https://example.test/api/v1/users/1/email')
+                ->withBody($body)
+                ->withAttribute('nene2.auth.claims', ['sub' => 'admin@example.test']),
+        );
+
+        self::assertSame(409, $response->getStatusCode());
+    }
+
+    public function testPatchUserEmailWithInvalidEmailReturns422(): void
+    {
+        $body = $this->factory->createStream(json_encode([
+            'email' => 'not-an-email',
+        ], JSON_THROW_ON_ERROR));
+
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('PATCH', 'https://example.test/api/v1/users/1/email')
+                ->withBody($body)
+                ->withAttribute('nene2.auth.claims', ['sub' => 'admin@example.test']),
+        );
+
+        self::assertSame(422, $response->getStatusCode());
+    }
+
+    public function testPatchNonExistentUserEmailReturns404(): void
+    {
+        $body = $this->factory->createStream(json_encode([
+            'email' => 'newemail@example.test',
+        ], JSON_THROW_ON_ERROR));
+
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('PATCH', 'https://example.test/api/v1/users/999/email')
+                ->withBody($body)
+                ->withAttribute('nene2.auth.claims', ['sub' => 'admin@example.test']),
+        );
+
+        self::assertSame(404, $response->getStatusCode());
     }
 
     /** @return array<string, mixed> */

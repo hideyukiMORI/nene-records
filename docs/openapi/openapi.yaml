@@ -2753,6 +2753,44 @@ paths:
                 $ref: '#/components/schemas/ProblemDetails'
         '404':
           $ref: '#/components/responses/NotFound'
+  /api/v1/users/{id}/email:
+    patch:
+      tags:
+        - Users
+      summary: Change user email
+      description: Changes the email address for a user. Admin only.
+      operationId: changeUserEmail
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangeUserEmailRequest'
+      responses:
+        '204':
+          description: Email address updated.
+        '401':
+          description: Unauthorized.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '403':
+          description: Forbidden.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
   /api/v1/users/{id}/password:
     patch:
       tags:
@@ -3212,6 +3250,15 @@ components:
           enum:
             - admin
             - editor
+      additionalProperties: false
+    ChangeUserEmailRequest:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          type: string
+          format: email
       additionalProperties: false
     AdminResetPasswordRequest:
       type: object
