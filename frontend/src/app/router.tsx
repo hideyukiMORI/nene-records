@@ -20,6 +20,7 @@ import { SiteSettingsPage } from '@/pages/settings/SiteSettingsPage'
 import { CommentsPage } from '@/pages/comments/CommentsPage'
 import { UsersPage } from '@/pages/users/UsersPage'
 import { WebhooksPage } from '@/pages/webhooks/WebhooksPage'
+import { NotificationChannelsPage } from '@/pages/notifications/NotificationChannelsPage'
 import { TagsPage } from '@/pages/tags/TagsPage'
 import { SuperadminShell } from '@/pages/superadmin/SuperadminShell'
 import { OrganizationsPage } from '@/pages/superadmin/OrganizationsPage'
@@ -77,6 +78,7 @@ const router = createBrowserRouter([
       { path: 'navigation', element: <NavigationPage /> },
       { path: 'media', element: <MediaPage /> },
       { path: 'webhooks', element: <WebhooksPage /> },
+      { path: 'notifications', element: <NotificationChannelsPage /> },
       { path: 'settings', element: <SiteSettingsPage /> },
       { path: 'users', element: <UsersPage /> },
       { path: 'entity-types/:entityTypeSlug/fields', element: <FieldDefsPage /> },

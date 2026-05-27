@@ -28,6 +28,7 @@ import {
   IconSun,
   IconTag,
   IconUsers,
+  IconBell,
   IconWebhook,
   IconX,
 } from '@/shared/ui/icons/Icons'
@@ -322,6 +323,14 @@ export function AppShell() {
                           to="/admin/webhooks"
                           icon={<IconWebhook size={16} />}
                           label={t('admin.nav.webhooks')}
+                          onClick={closeSidebar}
+                        />
+                      </li>
+                      <li>
+                        <NavItem
+                          to="/admin/notifications"
+                          icon={<IconBell size={16} />}
+                          label={t('admin.nav.notifications')}
                           onClick={closeSidebar}
                         />
                       </li>

@@ -1984,6 +1984,138 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /api/v1/notification-channels:
+    get:
+      tags:
+        - NotificationChannels
+      summary: List notification channels
+      description: Returns all notification channels for the current organization.
+      operationId: listNotificationChannels
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of notification channels.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationChannelListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      tags:
+        - NotificationChannels
+      summary: Create notification channel
+      description: Creates a new notification channel.
+      operationId: createNotificationChannel
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateNotificationChannelRequest'
+      responses:
+        '201':
+          description: Channel created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationChannelResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+  /api/v1/notification-channels/{id}:
+    patch:
+      tags:
+        - NotificationChannels
+      summary: Update notification channel
+      description: Updates the label, enabled state, and config of a channel.
+      operationId: updateNotificationChannel
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateNotificationChannelRequest'
+      responses:
+        '200':
+          description: Channel updated.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                properties:
+                  success:
+                    type: boolean
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+    delete:
+      tags:
+        - NotificationChannels
+      summary: Delete notification channel
+      description: Deletes a notification channel.
+      operationId: deleteNotificationChannel
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdPath'
+      responses:
+        '204':
+          description: Channel deleted.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /api/v1/notification-channels/{id}/test:
+    post:
+      tags:
+        - NotificationChannels
+      summary: Test notification channel
+      description: Sends a test notification through the specified channel.
+      operationId: testNotificationChannel
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdPath'
+      responses:
+        '200':
+          description: Test notification sent.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                properties:
+                  success:
+                    type: boolean
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
   /api/v1/webhooks:
     get:
       tags:
@@ -3005,6 +3137,18 @@ components:
         pattern: '^[a-z][a-z0-9_]*$'
       example: site_name
   responses:
+    Unauthorized:
+      description: Unauthorized.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+    Forbidden:
+      description: Forbidden.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
     InvalidCredentials:
       description: Email or password is incorrect.
       content:
@@ -4853,4 +4997,77 @@ components:
         preview_url:
           type: string
           description: Relative API path to fetch the preview record.
+      additionalProperties: false
+    NotificationChannelResponse:
+      type: object
+      required:
+        - id
+        - channel_type
+        - label
+        - is_enabled
+        - config
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: integer
+        channel_type:
+          type: string
+          enum: [email, slack, discord, chatwork, webhook]
+        label:
+          type: string
+        is_enabled:
+          type: boolean
+        config:
+          type: object
+          additionalProperties: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      additionalProperties: false
+    NotificationChannelListResponse:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/NotificationChannelResponse'
+      additionalProperties: false
+    CreateNotificationChannelRequest:
+      type: object
+      required:
+        - channel_type
+        - label
+      properties:
+        channel_type:
+          type: string
+          enum: [email, slack, discord, chatwork, webhook]
+        label:
+          type: string
+          maxLength: 100
+        is_enabled:
+          type: boolean
+          default: true
+        config:
+          type: object
+          additionalProperties: true
+      additionalProperties: false
+    UpdateNotificationChannelRequest:
+      type: object
+      required:
+        - label
+      properties:
+        label:
+          type: string
+          maxLength: 100
+        is_enabled:
+          type: boolean
+        config:
+          type: object
+          additionalProperties: true
       additionalProperties: false
