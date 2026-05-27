@@ -6,14 +6,14 @@ namespace NeNeRecords\Tests\TextField;
 
 use NeNeRecords\Entity\Entity;
 use NeNeRecords\FieldDef\FieldDef;
+use NeNeRecords\Tests\Entity\InMemoryEntityRepository;
+use NeNeRecords\Tests\FieldDef\InMemoryFieldDefRepository;
 use NeNeRecords\TextField\DeleteTextFieldByIdInput;
 use NeNeRecords\TextField\DeleteTextFieldUseCase;
 use NeNeRecords\TextField\TextField;
 use NeNeRecords\TextField\TextFieldNotFoundException;
 use NeNeRecords\TextField\UpdateTextFieldInput;
 use NeNeRecords\TextField\UpdateTextFieldUseCase;
-use NeNeRecords\Tests\Entity\InMemoryEntityRepository;
-use NeNeRecords\Tests\FieldDef\InMemoryFieldDefRepository;
 use PHPUnit\Framework\TestCase;
 
 final class TextFieldDeleteUpdateUseCaseTest extends TestCase

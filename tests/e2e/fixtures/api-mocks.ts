@@ -16,6 +16,16 @@ export const DEFAULT_LOGIN_RESPONSE = {
   expires_at: '2099-01-01T00:00:00Z',
   email: 'admin@example.com',
   role: 'admin',
+  org_id: null,
+};
+
+/** admin ログイン — org_id=1 付き（org スコープ済み admin） */
+export const ADMIN_LOGIN_WITH_ORG_ID = {
+  token: ADMIN_TOKEN,
+  expires_at: '2099-01-01T00:00:00Z',
+  email: 'admin@acme.example.com',
+  role: 'admin',
+  org_id: 1,
 };
 
 export const SUPERADMIN_LOGIN_RESPONSE = {
@@ -23,6 +33,7 @@ export const SUPERADMIN_LOGIN_RESPONSE = {
   expires_at: '2099-01-01T00:00:00Z',
   email: 'superadmin@example.com',
   role: 'superadmin',
+  org_id: null,
 };
 
 // ── Dashboard ─────────────────────────────────────────────────────────────────
@@ -154,6 +165,57 @@ export const USER_LIST = {
   ],
 };
 
+/** org スコープ付きユーザーリスト（organization_id フィールド含む） */
+export const USER_LIST_WITH_ORG = {
+  users: [
+    {
+      id: 1,
+      email: 'admin@acme.example.com',
+      role: 'admin',
+      status: 'active',
+      organization_id: 1,
+      org_role: 'admin',
+      created_at: '2024-01-01T00:00:00Z',
+      updated_at: '2024-01-01T00:00:00Z',
+    },
+    {
+      id: 2,
+      email: 'editor@acme.example.com',
+      role: 'editor',
+      status: 'active',
+      organization_id: 1,
+      org_role: 'editor',
+      created_at: '2024-01-02T00:00:00Z',
+      updated_at: '2024-01-02T00:00:00Z',
+    },
+  ],
+};
+
+/** org 2 のユーザー（クロス org 分離テスト用） */
+export const USER_LIST_ORG2 = {
+  users: [
+    {
+      id: 3,
+      email: 'admin@globex.example.com',
+      role: 'admin',
+      status: 'active',
+      organization_id: 2,
+      org_role: 'admin',
+      created_at: '2024-03-01T00:00:00Z',
+      updated_at: '2024-03-01T00:00:00Z',
+    },
+  ],
+};
+
+/** 招待済みユーザーレスポンス（org_id 付き） */
+export const INVITE_USER_RESPONSE_WITH_ORG = {
+  id: 10,
+  email: 'newmember@acme.example.com',
+  role: 'editor',
+  status: 'invited',
+  organization_id: 1,
+};
+
 // ── Organizations (Superadmin) ─────────────────────────────────────────────────
 // Shape: OrganizationListDto { data: OrganizationDto[], meta: { total, limit, offset } }
 
@@ -197,4 +259,17 @@ export const ORGANIZATION_DETAIL = {
   custom_domain: null,
   created_at: '2026-01-01T00:00:00Z',
   updated_at: '2026-01-01T00:00:00Z',
+};
+
+/** external_id フィールド付きの org 詳細（NeNe Corpus 連携テスト用） */
+export const ORGANIZATION_DETAIL_WITH_EXTERNAL_ID = {
+  id: 2,
+  name: 'Globex Inc',
+  slug: 'globex',
+  plan: 'starter',
+  is_active: true,
+  custom_domain: null,
+  external_id: 'corpus-tenant-abc123',
+  created_at: '2026-02-01T00:00:00Z',
+  updated_at: '2026-02-01T00:00:00Z',
 };

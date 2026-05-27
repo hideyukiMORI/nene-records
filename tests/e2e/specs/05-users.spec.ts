@@ -10,7 +10,7 @@ import {
   gotoAdmin,
   mockUsersEndpoint,
 } from '../fixtures/helpers.js';
-import { USER_LIST_EMPTY, USER_LIST } from '../fixtures/api-mocks.js';
+import { USER_LIST_EMPTY, USER_LIST, USER_LIST_WITH_ORG, INVITE_USER_RESPONSE_WITH_ORG } from '../fixtures/api-mocks.js';
 
 test.describe('Users', () => {
   test('05-01: page title — "Users"', async ({ page }) => {
@@ -107,5 +107,56 @@ test.describe('Users', () => {
     await gotoAdmin(page, '/users');
 
     await expect(page.locator('text=Could not load users')).toBeVisible({ timeout: 6000 });
+  });
+
+  // ── Level 2: Multi-tenancy single-feature ─────────────────────────────────────
+
+  test('05-09: org-augmented user list — page renders correctly with organization_id in response', async ({ page }) => {
+    await bypassLogin(page, { orgId: 1 });
+    await mockUsersEndpoint(page, USER_LIST_WITH_ORG);
+    await gotoAdmin(page, '/users');
+
+    // org フィールドを含む API レスポンスでも email/role が正しく描画される
+    await expect(page.locator('text=admin@acme.example.com').first()).toBeVisible({ timeout: 6000 });
+    await expect(page.locator('text=editor@acme.example.com').first()).toBeVisible({ timeout: 6000 });
+  });
+
+  test('05-10: invite user with org context — POST /api/v1/users/invite called with org_id in response', async ({ page }) => {
+    await bypassLogin(page, { orgId: 1 });
+    await mockUsersEndpoint(page, USER_LIST_EMPTY);
+
+    let postBody: unknown = null;
+    await page.route('**/api/v1/users/invite', (route) => {
+      if (route.request().method() === 'POST') {
+        postBody = route.request().postDataJSON();
+        return route.fulfill({
+          status: 201,
+          contentType: 'application/json',
+          body: JSON.stringify(INVITE_USER_RESPONSE_WITH_ORG),
+        });
+      }
+      return route.continue();
+    });
+
+    await gotoAdmin(page, '/users');
+    await page.locator('button:has-text("Invite user")').click();
+
+    const emailInput = page.locator('input[type="email"]').first();
+    await emailInput.click();
+    await emailInput.pressSequentially('newmember@acme.example.com');
+    await page.locator('button[type="submit"]:has-text("Send invitation")').click();
+
+    await page.waitForTimeout(500);
+    expect(postBody).not.toBeNull();
+  });
+
+  test('05-11: superadmin role — can access users page (no /forbidden redirect)', async ({ page }) => {
+    await bypassLogin(page, { role: 'superadmin' });
+    await mockUsersEndpoint(page, USER_LIST_EMPTY);
+    await gotoAdmin(page, '/users');
+
+    // superadmin はユーザー管理にアクセスできる（/forbidden に遷移しない）
+    await expect(page).not.toHaveURL(/\/forbidden/, { timeout: 6000 });
+    await expect(page.locator('h1')).toContainText('Users', { timeout: 6000 });
   });
 });

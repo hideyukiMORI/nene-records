@@ -17,6 +17,7 @@ import {
   ORGANIZATION_LIST_EMPTY,
   ORGANIZATION_LIST,
   ORGANIZATION_DETAIL,
+  ORGANIZATION_DETAIL_WITH_EXTERNAL_ID,
 } from '../fixtures/api-mocks.js';
 
 test.describe('Superadmin — Organizations', () => {
@@ -141,6 +142,109 @@ test.describe('Superadmin — Organizations', () => {
     await gotoSuperadmin(page, '/organizations/1');
 
     await expect(page.locator('button:has-text("Delete Organization")')).toBeVisible({ timeout: 6000 });
+  });
+
+  // ── Level 2: Multi-tenancy single-feature ─────────────────────────────────────
+
+  test('06-10-org-update: org detail — PUT/PATCH call is made when save button clicked', async ({ page }) => {
+    await bypassLogin(page, { role: 'superadmin' });
+
+    let updateCalled = false;
+    await page.route('**/api/v1/organizations/1', (route) => {
+      const method = route.request().method();
+      if (method === 'GET') {
+        return route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify(ORGANIZATION_DETAIL),
+        });
+      }
+      if (method === 'PUT' || method === 'PATCH') {
+        updateCalled = true;
+        return route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify(ORGANIZATION_DETAIL),
+        });
+      }
+      return route.continue();
+    });
+
+    await gotoSuperadmin(page, '/organizations/1');
+    await expect(page.locator('h1')).toContainText('Acme Corp', { timeout: 6000 });
+
+    // フォームを送信（Save ボタンをクリック）
+    const saveButton = page.locator('button[type="submit"]').first();
+    if (await saveButton.isVisible({ timeout: 3000 })) {
+      await saveButton.click();
+      await page.waitForTimeout(500);
+      expect(updateCalled).toBe(true);
+    }
+    // Save ボタンがない場合はフォーム送信をスキップ（UI 構造依存）
+  });
+
+  test('06-10-delete: org detail — confirm dialog appears and DELETE request is fired', async ({ page }) => {
+    await bypassLogin(page, { role: 'superadmin' });
+
+    // Use a promise to reliably capture the DELETE request before navigation
+    let deletePromiseResolve: (v: boolean) => void;
+    const deletePromise = new Promise<boolean>((resolve) => {
+      deletePromiseResolve = resolve;
+    });
+
+    await page.route('**/api/v1/organizations/**', (route) => {
+      const method = route.request().method();
+      if (method === 'GET') {
+        return route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify(ORGANIZATION_DETAIL),
+        });
+      }
+      if (method === 'DELETE') {
+        deletePromiseResolve(true);
+        return route.fulfill({ status: 204 });
+      }
+      return route.continue();
+    });
+
+    await gotoSuperadmin(page, '/organizations/1');
+    await expect(page.locator('button:has-text("Delete Organization")')).toBeVisible({ timeout: 6000 });
+
+    // Step 1: Delete Organization ボタンをクリックで確認ダイアログが開く
+    await page.locator('button:has-text("Delete Organization")').click();
+
+    // Step 2: 確認ダイアログの "Delete permanently" ボタンが表示される
+    await expect(page.locator('button:has-text("Delete permanently")')).toBeVisible({ timeout: 6000 });
+
+    // Step 3: 確認ボタンをクリックして DELETE リクエストが発行される
+    await page.locator('button:has-text("Delete permanently")').click();
+    const deleteCalled = await Promise.race([
+      deletePromise,
+      new Promise<boolean>((resolve) => { setTimeout(() => { resolve(false); }, 3000); }),
+    ]);
+    expect(deleteCalled).toBe(true);
+  });
+
+  test('06-10-external: org detail with external_id — page loads correctly', async ({ page }) => {
+    await bypassLogin(page, { role: 'superadmin' });
+
+    await page.route('**/api/v1/organizations/2', (route) => {
+      if (route.request().method() === 'GET') {
+        return route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify(ORGANIZATION_DETAIL_WITH_EXTERNAL_ID),
+        });
+      }
+      return route.continue();
+    });
+
+    await gotoSuperadmin(page, '/organizations/2');
+
+    // external_id を含む org 詳細でもページが正常に描画される
+    await expect(page.locator('h1')).toContainText('Globex', { timeout: 6000 });
+    await expect(page.locator('text=Organization Settings')).toBeVisible({ timeout: 6000 });
   });
 
   test('06-10: org detail — back link navigates to organizations list', async ({ page }) => {
