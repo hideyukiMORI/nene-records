@@ -6,14 +6,14 @@ namespace NeNeRecords\User;
 
 use NeNeRecords\Auth\UserRepositoryInterface;
 
-final readonly class ChangeOwnPasswordUseCase implements ChangeOwnPasswordUseCaseInterface
+final readonly class ChangePasswordUseCase implements ChangePasswordUseCaseInterface
 {
     public function __construct(
         private UserRepositoryInterface $users,
     ) {
     }
 
-    public function execute(ChangeOwnPasswordInput $input): void
+    public function execute(ChangePasswordInput $input): void
     {
         $user = $this->users->findByEmail($input->currentUserEmail);
 

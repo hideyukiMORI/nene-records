@@ -6,14 +6,14 @@ namespace NeNeRecords\User;
 
 use NeNeRecords\Auth\UserRepositoryInterface;
 
-final readonly class AdminResetPasswordUseCase implements AdminResetPasswordUseCaseInterface
+final readonly class ResetUserPasswordUseCase implements ResetUserPasswordUseCaseInterface
 {
     public function __construct(
         private UserRepositoryInterface $users,
     ) {
     }
 
-    public function execute(AdminResetPasswordInput $input): void
+    public function execute(ResetUserPasswordInput $input): void
     {
         $user = $this->users->findById($input->id);
 

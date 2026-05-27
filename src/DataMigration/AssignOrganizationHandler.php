@@ -16,10 +16,10 @@ use Psr\Http\Server\RequestHandlerInterface;
  * Reassigns all records with organization_id = 0 to the specified organization.
  * This is the "single → multi" data migration operation.
  */
-final readonly class AssignOrgHandler implements RequestHandlerInterface
+final readonly class AssignOrganizationHandler implements RequestHandlerInterface
 {
     public function __construct(
-        private DataMigrationRepository $repository,
+        private DataMigrationRepositoryInterface $repository,
         private OrganizationRepositoryInterface $orgs,
         private JsonResponseFactory $json,
         private ProblemDetailsResponseFactory $problemDetails,

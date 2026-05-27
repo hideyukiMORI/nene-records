@@ -17,14 +17,14 @@ use Psr\Http\Server\RequestHandlerInterface;
  *
  * POST /api/v1/superadmin/organizations/{id}/import
  *
- * The request body must be a JSON export payload produced by OrgExportHandler.
+ * The request body must be a JSON export payload produced by ExportOrganizationHandler.
  * All IDs are remapped to new auto-increment values; existing data in the
  * target organization is not removed before import.
  */
-final readonly class OrgImportHandler implements RequestHandlerInterface
+final readonly class ImportOrganizationHandler implements RequestHandlerInterface
 {
     public function __construct(
-        private OrgImportRepository $repository,
+        private OrgImportRepositoryInterface $repository,
         private OrganizationRepositoryInterface $orgs,
         private JsonResponseFactory $json,
         private ProblemDetailsResponseFactory $problemDetails,

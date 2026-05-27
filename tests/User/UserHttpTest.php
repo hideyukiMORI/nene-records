@@ -8,11 +8,9 @@ use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RuntimeApplicationFactory;
 use NeNeRecords\Auth\User;
-use NeNeRecords\User\AdminResetPasswordHandler;
-use NeNeRecords\User\AdminResetPasswordUseCase;
 use NeNeRecords\User\CannotDeleteSelfExceptionHandler;
-use NeNeRecords\User\ChangeOwnPasswordHandler;
-use NeNeRecords\User\ChangeOwnPasswordUseCase;
+use NeNeRecords\User\ChangePasswordHandler;
+use NeNeRecords\User\ChangePasswordUseCase;
 use NeNeRecords\User\CreateUserHandler;
 use NeNeRecords\User\CreateUserUseCase;
 use NeNeRecords\User\DeleteUserHandler;
@@ -23,6 +21,8 @@ use NeNeRecords\User\InvalidCurrentPasswordExceptionHandler;
 use NeNeRecords\User\InvalidUserRoleExceptionHandler;
 use NeNeRecords\User\ListUsersHandler;
 use NeNeRecords\User\ListUsersUseCase;
+use NeNeRecords\User\ResetUserPasswordHandler;
+use NeNeRecords\User\ResetUserPasswordUseCase;
 use NeNeRecords\User\UpdateUserRoleHandler;
 use NeNeRecords\User\UpdateUserRoleUseCase;
 use NeNeRecords\User\UserEmailConflictExceptionHandler;
@@ -66,9 +66,9 @@ final class UserHttpTest extends TestCase
             new GetUserByIdHandler(new GetUserByIdUseCase($this->repository), $jsonResponse),
             new CreateUserHandler(new CreateUserUseCase($this->repository), $jsonResponse),
             new UpdateUserRoleHandler(new UpdateUserRoleUseCase($this->repository), $jsonResponse),
-            new AdminResetPasswordHandler(new AdminResetPasswordUseCase($this->repository), $this->factory),
+            new ResetUserPasswordHandler(new ResetUserPasswordUseCase($this->repository), $this->factory),
             new DeleteUserHandler(new DeleteUserUseCase($this->repository), $this->factory),
-            new ChangeOwnPasswordHandler(new ChangeOwnPasswordUseCase($this->repository), $this->factory),
+            new ChangePasswordHandler(new ChangePasswordUseCase($this->repository), $this->factory),
         );
 
         $this->application = (new RuntimeApplicationFactory(

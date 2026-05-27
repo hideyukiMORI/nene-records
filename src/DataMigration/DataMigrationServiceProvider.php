@@ -19,53 +19,53 @@ final readonly class DataMigrationServiceProvider implements ServiceProviderInte
     {
         $builder
             ->set(
-                DataMigrationRepository::class,
-                static function (ContainerInterface $c): DataMigrationRepository {
+                DataMigrationRepositoryInterface::class,
+                static function (ContainerInterface $c): DataMigrationRepositoryInterface {
                     $query = $c->get(DatabaseQueryExecutorInterface::class);
                     if (!$query instanceof DatabaseQueryExecutorInterface) {
                         throw new LogicException('DatabaseQueryExecutorInterface is invalid.');
                     }
 
-                    return new DataMigrationRepository($query);
+                    return new PdoDataMigrationRepository($query);
                 },
             )
             ->set(
-                DataMigrationStatusHandler::class,
-                static function (ContainerInterface $c): DataMigrationStatusHandler {
-                    $repo = $c->get(DataMigrationRepository::class);
+                GetDataMigrationStatusHandler::class,
+                static function (ContainerInterface $c): GetDataMigrationStatusHandler {
+                    $repo = $c->get(DataMigrationRepositoryInterface::class);
                     $json = $c->get(JsonResponseFactory::class);
-                    if (!$repo instanceof DataMigrationRepository || !$json instanceof JsonResponseFactory) {
-                        throw new LogicException('DataMigrationStatusHandler dependencies are invalid.');
+                    if (!$repo instanceof DataMigrationRepositoryInterface || !$json instanceof JsonResponseFactory) {
+                        throw new LogicException('GetDataMigrationStatusHandler dependencies are invalid.');
                     }
 
-                    return new DataMigrationStatusHandler($repo, $json);
+                    return new GetDataMigrationStatusHandler($repo, $json);
                 },
             )
             ->set(
-                AssignOrgHandler::class,
-                static function (ContainerInterface $c): AssignOrgHandler {
-                    $repo    = $c->get(DataMigrationRepository::class);
+                AssignOrganizationHandler::class,
+                static function (ContainerInterface $c): AssignOrganizationHandler {
+                    $repo    = $c->get(DataMigrationRepositoryInterface::class);
                     $orgs    = $c->get(OrganizationRepositoryInterface::class);
                     $json    = $c->get(JsonResponseFactory::class);
                     $problem = $c->get(ProblemDetailsResponseFactory::class);
                     if (
-                        !$repo instanceof DataMigrationRepository
+                        !$repo instanceof DataMigrationRepositoryInterface
                         || !$orgs instanceof OrganizationRepositoryInterface
                         || !$json instanceof JsonResponseFactory
                         || !$problem instanceof ProblemDetailsResponseFactory
                     ) {
-                        throw new LogicException('AssignOrgHandler dependencies are invalid.');
+                        throw new LogicException('AssignOrganizationHandler dependencies are invalid.');
                     }
 
-                    return new AssignOrgHandler($repo, $orgs, $json, $problem);
+                    return new AssignOrganizationHandler($repo, $orgs, $json, $problem);
                 },
             )
             ->set(
                 DataMigrationRouteRegistrar::class,
                 static function (ContainerInterface $c): DataMigrationRouteRegistrar {
-                    $status = $c->get(DataMigrationStatusHandler::class);
-                    $assign = $c->get(AssignOrgHandler::class);
-                    if (!$status instanceof DataMigrationStatusHandler || !$assign instanceof AssignOrgHandler) {
+                    $status = $c->get(GetDataMigrationStatusHandler::class);
+                    $assign = $c->get(AssignOrganizationHandler::class);
+                    if (!$status instanceof GetDataMigrationStatusHandler || !$assign instanceof AssignOrganizationHandler) {
                         throw new LogicException('DataMigrationRouteRegistrar dependencies are invalid.');
                     }
 

@@ -19,73 +19,73 @@ final readonly class OrgExportServiceProvider implements ServiceProviderInterfac
     {
         $builder
             ->set(
-                OrgExportRepository::class,
-                static function (ContainerInterface $c): OrgExportRepository {
+                OrgExportRepositoryInterface::class,
+                static function (ContainerInterface $c): OrgExportRepositoryInterface {
                     $query = $c->get(DatabaseQueryExecutorInterface::class);
                     if (!$query instanceof DatabaseQueryExecutorInterface) {
                         throw new LogicException('DatabaseQueryExecutorInterface is invalid.');
                     }
 
-                    return new OrgExportRepository($query);
+                    return new PdoOrgExportRepository($query);
                 },
             )
             ->set(
-                OrgImportRepository::class,
-                static function (ContainerInterface $c): OrgImportRepository {
+                OrgImportRepositoryInterface::class,
+                static function (ContainerInterface $c): OrgImportRepositoryInterface {
                     $query = $c->get(DatabaseQueryExecutorInterface::class);
                     if (!$query instanceof DatabaseQueryExecutorInterface) {
                         throw new LogicException('DatabaseQueryExecutorInterface is invalid.');
                     }
 
-                    return new OrgImportRepository($query);
+                    return new PdoOrgImportRepository($query);
                 },
             )
             ->set(
-                OrgExportHandler::class,
-                static function (ContainerInterface $c): OrgExportHandler {
-                    $repo    = $c->get(OrgExportRepository::class);
+                ExportOrganizationHandler::class,
+                static function (ContainerInterface $c): ExportOrganizationHandler {
+                    $repo    = $c->get(OrgExportRepositoryInterface::class);
                     $orgs    = $c->get(OrganizationRepositoryInterface::class);
                     $json    = $c->get(JsonResponseFactory::class);
                     $problem = $c->get(ProblemDetailsResponseFactory::class);
                     if (
-                        !$repo instanceof OrgExportRepository
+                        !$repo instanceof OrgExportRepositoryInterface
                         || !$orgs instanceof OrganizationRepositoryInterface
                         || !$json instanceof JsonResponseFactory
                         || !$problem instanceof ProblemDetailsResponseFactory
                     ) {
-                        throw new LogicException('OrgExportHandler dependencies are invalid.');
+                        throw new LogicException('ExportOrganizationHandler dependencies are invalid.');
                     }
 
-                    return new OrgExportHandler($repo, $orgs, $json, $problem);
+                    return new ExportOrganizationHandler($repo, $orgs, $json, $problem);
                 },
             )
             ->set(
-                OrgImportHandler::class,
-                static function (ContainerInterface $c): OrgImportHandler {
-                    $repo    = $c->get(OrgImportRepository::class);
+                ImportOrganizationHandler::class,
+                static function (ContainerInterface $c): ImportOrganizationHandler {
+                    $repo    = $c->get(OrgImportRepositoryInterface::class);
                     $orgs    = $c->get(OrganizationRepositoryInterface::class);
                     $json    = $c->get(JsonResponseFactory::class);
                     $problem = $c->get(ProblemDetailsResponseFactory::class);
                     if (
-                        !$repo instanceof OrgImportRepository
+                        !$repo instanceof OrgImportRepositoryInterface
                         || !$orgs instanceof OrganizationRepositoryInterface
                         || !$json instanceof JsonResponseFactory
                         || !$problem instanceof ProblemDetailsResponseFactory
                     ) {
-                        throw new LogicException('OrgImportHandler dependencies are invalid.');
+                        throw new LogicException('ImportOrganizationHandler dependencies are invalid.');
                     }
 
-                    return new OrgImportHandler($repo, $orgs, $json, $problem);
+                    return new ImportOrganizationHandler($repo, $orgs, $json, $problem);
                 },
             )
             ->set(
                 OrgExportRouteRegistrar::class,
                 static function (ContainerInterface $c): OrgExportRouteRegistrar {
-                    $export = $c->get(OrgExportHandler::class);
-                    $import = $c->get(OrgImportHandler::class);
+                    $export = $c->get(ExportOrganizationHandler::class);
+                    $import = $c->get(ImportOrganizationHandler::class);
                     if (
-                        !$export instanceof OrgExportHandler
-                        || !$import instanceof OrgImportHandler
+                        !$export instanceof ExportOrganizationHandler
+                        || !$import instanceof ImportOrganizationHandler
                     ) {
                         throw new LogicException('OrgExportRouteRegistrar dependencies are invalid.');
                     }

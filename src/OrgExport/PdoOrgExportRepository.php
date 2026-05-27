@@ -9,7 +9,7 @@ use Nene2\Database\DatabaseQueryExecutorInterface;
 /**
  * Reads all tenant-scoped data for a given organization.
  */
-final readonly class OrgExportRepository
+final readonly class PdoOrgExportRepository implements OrgExportRepositoryInterface
 {
     public function __construct(
         private DatabaseQueryExecutorInterface $query,
@@ -17,7 +17,7 @@ final readonly class OrgExportRepository
     }
 
     /** @return list<array<string, mixed>> */
-    public function fetchEntityTypes(int $orgId): array
+    public function findAllEntityTypes(int $orgId): array
     {
         return $this->query->fetchAll(
             'SELECT * FROM entity_types WHERE organization_id = ? ORDER BY id',
@@ -26,7 +26,7 @@ final readonly class OrgExportRepository
     }
 
     /** @return list<array<string, mixed>> */
-    public function fetchEntities(int $orgId): array
+    public function findAllEntities(int $orgId): array
     {
         return $this->query->fetchAll(
             'SELECT * FROM entities WHERE organization_id = ? ORDER BY id',
@@ -35,7 +35,7 @@ final readonly class OrgExportRepository
     }
 
     /** @return list<array<string, mixed>> */
-    public function fetchFieldDefs(int $orgId): array
+    public function findAllFieldDefs(int $orgId): array
     {
         return $this->query->fetchAll(
             'SELECT * FROM field_defs WHERE organization_id = ? ORDER BY id',
@@ -44,7 +44,7 @@ final readonly class OrgExportRepository
     }
 
     /** @return list<array<string, mixed>> */
-    public function fetchTextFields(int $orgId): array
+    public function findAllTextFields(int $orgId): array
     {
         return $this->query->fetchAll(
             'SELECT * FROM text_fields WHERE organization_id = ? ORDER BY id',
@@ -53,7 +53,7 @@ final readonly class OrgExportRepository
     }
 
     /** @return list<array<string, mixed>> */
-    public function fetchIntFields(int $orgId): array
+    public function findAllIntFields(int $orgId): array
     {
         return $this->query->fetchAll(
             'SELECT * FROM int_fields WHERE organization_id = ? ORDER BY id',
@@ -62,7 +62,7 @@ final readonly class OrgExportRepository
     }
 
     /** @return list<array<string, mixed>> */
-    public function fetchEnumFields(int $orgId): array
+    public function findAllEnumFields(int $orgId): array
     {
         return $this->query->fetchAll(
             'SELECT * FROM enum_fields WHERE organization_id = ? ORDER BY id',
@@ -71,7 +71,7 @@ final readonly class OrgExportRepository
     }
 
     /** @return list<array<string, mixed>> */
-    public function fetchBoolFields(int $orgId): array
+    public function findAllBoolFields(int $orgId): array
     {
         return $this->query->fetchAll(
             'SELECT * FROM bool_fields WHERE organization_id = ? ORDER BY id',
@@ -80,7 +80,7 @@ final readonly class OrgExportRepository
     }
 
     /** @return list<array<string, mixed>> */
-    public function fetchDatetimeFields(int $orgId): array
+    public function findAllDatetimeFields(int $orgId): array
     {
         return $this->query->fetchAll(
             'SELECT * FROM datetime_fields WHERE organization_id = ? ORDER BY id',
@@ -89,7 +89,7 @@ final readonly class OrgExportRepository
     }
 
     /** @return list<array<string, mixed>> */
-    public function fetchTags(int $orgId): array
+    public function findAllTags(int $orgId): array
     {
         return $this->query->fetchAll(
             'SELECT * FROM tags WHERE organization_id = ? ORDER BY id',
@@ -98,7 +98,7 @@ final readonly class OrgExportRepository
     }
 
     /** @return list<array<string, mixed>> */
-    public function fetchEntityTags(int $orgId): array
+    public function findAllEntityTags(int $orgId): array
     {
         return $this->query->fetchAll(
             'SELECT et.* FROM entity_tags et
@@ -110,7 +110,7 @@ final readonly class OrgExportRepository
     }
 
     /** @return list<array<string, mixed>> */
-    public function fetchNavigationItems(int $orgId): array
+    public function findAllNavigationItems(int $orgId): array
     {
         return $this->query->fetchAll(
             'SELECT * FROM navigation_items WHERE organization_id = ? ORDER BY display_order',
@@ -119,7 +119,7 @@ final readonly class OrgExportRepository
     }
 
     /** @return list<array<string, mixed>> */
-    public function fetchSettingDefs(int $orgId): array
+    public function findAllSettingDefs(int $orgId): array
     {
         return $this->query->fetchAll(
             'SELECT * FROM setting_defs WHERE organization_id = ? ORDER BY setting_key',
@@ -128,7 +128,7 @@ final readonly class OrgExportRepository
     }
 
     /** @return list<array<string, mixed>> */
-    public function fetchSettingValues(int $orgId): array
+    public function findAllSettingValues(int $orgId): array
     {
         return $this->query->fetchAll(
             'SELECT * FROM setting_values WHERE organization_id = ? ORDER BY setting_key',
@@ -137,7 +137,7 @@ final readonly class OrgExportRepository
     }
 
     /** @return list<array<string, mixed>> */
-    public function fetchMedia(int $orgId): array
+    public function findAllMedia(int $orgId): array
     {
         return $this->query->fetchAll(
             'SELECT * FROM media WHERE organization_id = ? ORDER BY id',

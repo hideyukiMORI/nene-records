@@ -9,7 +9,7 @@ use Nene2\Database\DatabaseQueryExecutorInterface;
 /**
  * Lightweight key-value store backed by the system_config table.
  */
-final readonly class SystemConfigRepository
+final readonly class PdoSystemConfigRepository implements SystemConfigRepositoryInterface
 {
     public function __construct(
         private DatabaseQueryExecutorInterface $query,

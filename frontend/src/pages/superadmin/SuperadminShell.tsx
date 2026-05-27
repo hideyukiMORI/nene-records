@@ -2,15 +2,13 @@ import { Link, NavLink, Outlet, Navigate } from 'react-router-dom'
 import { currentUserIsSuperadmin } from '@/entities/auth'
 import { IconBuilding, IconDatabase, IconHome, IconSettings } from '@/shared/ui/icons/Icons'
 
-function SuperadminNavItem({
-  to,
-  icon,
-  label,
-}: {
+interface SuperadminNavItemProps {
   to: string
   icon: React.ReactNode
   label: string
-}) {
+}
+
+function SuperadminNavItem({ to, icon, label }: SuperadminNavItemProps) {
   return (
     <NavLink
       to={to}

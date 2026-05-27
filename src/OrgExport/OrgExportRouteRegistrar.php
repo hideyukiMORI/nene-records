@@ -10,8 +10,8 @@ use Psr\Http\Message\ServerRequestInterface;
 final readonly class OrgExportRouteRegistrar
 {
     public function __construct(
-        private OrgExportHandler $exportHandler,
-        private OrgImportHandler $importHandler,
+        private ExportOrganizationHandler $exportHandler,
+        private ImportOrganizationHandler $importHandler,
     ) {
     }
 
