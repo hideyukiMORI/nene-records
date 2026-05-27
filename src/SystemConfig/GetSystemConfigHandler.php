@@ -12,19 +12,19 @@ use Psr\Http\Server\RequestHandlerInterface;
 final readonly class GetSystemConfigHandler implements RequestHandlerInterface
 {
     public function __construct(
-        private SystemConfigRepositoryInterface $config,
+        private GetSystemConfigUseCaseInterface $useCase,
         private JsonResponseFactory $json,
     ) {
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $all = $this->config->all();
+        $output = $this->useCase->execute();
 
         return $this->json->create([
-            'tenant_resolution_mode' => $all['tenant_resolution_mode'] ?? 'single',
-            'tenant_org_slug'        => $all['tenant_org_slug'] ?? '',
-            'tenant_base_domain'     => $all['tenant_base_domain'] ?? 'localhost',
+            'tenant_resolution_mode' => $output->tenantResolutionMode,
+            'tenant_org_slug'        => $output->tenantOrgSlug,
+            'tenant_base_domain'     => $output->tenantBaseDomain,
         ]);
     }
 }

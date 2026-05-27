@@ -8,7 +8,6 @@ use LogicException;
 use Nene2\Database\DatabaseQueryExecutorInterface;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
-use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use Psr\Container\ContainerInterface;
 
@@ -29,40 +28,57 @@ final readonly class SystemConfigServiceProvider implements ServiceProviderInter
                 },
             )
             ->set(
-                GetSystemConfigHandler::class,
-                static function (ContainerInterface $c): GetSystemConfigHandler {
+                GetSystemConfigUseCaseInterface::class,
+                static function (ContainerInterface $c): GetSystemConfigUseCaseInterface {
                     $config = $c->get(SystemConfigRepositoryInterface::class);
-                    $json   = $c->get(JsonResponseFactory::class);
                     if (!$config instanceof SystemConfigRepositoryInterface) {
                         throw new LogicException('SystemConfigRepositoryInterface is invalid.');
+                    }
+
+                    return new GetSystemConfigUseCase($config);
+                },
+            )
+            ->set(
+                UpdateSystemConfigUseCaseInterface::class,
+                static function (ContainerInterface $c): UpdateSystemConfigUseCaseInterface {
+                    $config = $c->get(SystemConfigRepositoryInterface::class);
+                    if (!$config instanceof SystemConfigRepositoryInterface) {
+                        throw new LogicException('SystemConfigRepositoryInterface is invalid.');
+                    }
+
+                    return new UpdateSystemConfigUseCase($config);
+                },
+            )
+            ->set(
+                GetSystemConfigHandler::class,
+                static function (ContainerInterface $c): GetSystemConfigHandler {
+                    $useCase = $c->get(GetSystemConfigUseCaseInterface::class);
+                    $json    = $c->get(JsonResponseFactory::class);
+                    if (!$useCase instanceof GetSystemConfigUseCaseInterface) {
+                        throw new LogicException('GetSystemConfigUseCaseInterface is invalid.');
                     }
 
                     if (!$json instanceof JsonResponseFactory) {
                         throw new LogicException('JsonResponseFactory is invalid.');
                     }
 
-                    return new GetSystemConfigHandler($config, $json);
+                    return new GetSystemConfigHandler($useCase, $json);
                 },
             )
             ->set(
                 UpdateSystemConfigHandler::class,
                 static function (ContainerInterface $c): UpdateSystemConfigHandler {
-                    $config  = $c->get(SystemConfigRepositoryInterface::class);
+                    $useCase = $c->get(UpdateSystemConfigUseCaseInterface::class);
                     $json    = $c->get(JsonResponseFactory::class);
-                    $problem = $c->get(ProblemDetailsResponseFactory::class);
-                    if (!$config instanceof SystemConfigRepositoryInterface) {
-                        throw new LogicException('SystemConfigRepositoryInterface is invalid.');
+                    if (!$useCase instanceof UpdateSystemConfigUseCaseInterface) {
+                        throw new LogicException('UpdateSystemConfigUseCaseInterface is invalid.');
                     }
 
                     if (!$json instanceof JsonResponseFactory) {
                         throw new LogicException('JsonResponseFactory is invalid.');
                     }
 
-                    if (!$problem instanceof ProblemDetailsResponseFactory) {
-                        throw new LogicException('ProblemDetailsResponseFactory is invalid.');
-                    }
-
-                    return new UpdateSystemConfigHandler($config, $json, $problem);
+                    return new UpdateSystemConfigHandler($useCase, $json);
                 },
             )
             ->set(
