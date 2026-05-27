@@ -7,6 +7,8 @@ namespace NeNeRecords\BoolField;
 use NeNeRecords\Entity\EntityNotFoundException;
 use NeNeRecords\Entity\EntityRepositoryInterface;
 use NeNeRecords\FieldDef\FieldDefRepositoryInterface;
+use NeNeRecords\FieldDef\FieldKeyNotRegisteredException;
+use NeNeRecords\FieldDef\FieldTypeMismatchException;
 
 final readonly class CreateBoolFieldUseCase implements CreateBoolFieldUseCaseInterface
 {
@@ -48,7 +50,7 @@ final readonly class CreateBoolFieldUseCase implements CreateBoolFieldUseCaseInt
         $fieldDef = $this->fieldDefs->findByEntityTypeIdAndFieldKey($entityTypeId, $fieldKey);
 
         if ($fieldDef === null) {
-            throw new FieldKeyNotRegisteredException($entityTypeId, $fieldKey);
+            throw new FieldKeyNotRegisteredException($fieldKey, $entityTypeId);
         }
 
         if ($fieldDef->dataType !== self::BOOL_DATA_TYPE) {

@@ -7,6 +7,8 @@ namespace NeNeRecords\DateTimeField;
 use NeNeRecords\Entity\EntityNotFoundException;
 use NeNeRecords\Entity\EntityRepositoryInterface;
 use NeNeRecords\FieldDef\FieldDefRepositoryInterface;
+use NeNeRecords\FieldDef\FieldKeyNotRegisteredException;
+use NeNeRecords\FieldDef\FieldTypeMismatchException;
 
 final readonly class UpdateDateTimeFieldUseCase implements UpdateDateTimeFieldUseCaseInterface
 {
@@ -56,7 +58,7 @@ final readonly class UpdateDateTimeFieldUseCase implements UpdateDateTimeFieldUs
         $fieldDef = $this->fieldDefs->findByEntityTypeIdAndFieldKey($entityTypeId, $fieldKey);
 
         if ($fieldDef === null) {
-            throw new FieldKeyNotRegisteredException($entityTypeId, $fieldKey);
+            throw new FieldKeyNotRegisteredException($fieldKey, $entityTypeId);
         }
 
         if ($fieldDef->dataType !== self::DATETIME_DATA_TYPE) {
