@@ -6,5 +6,5 @@ namespace NeNeRecords\NavigationItem;
 
 interface DeleteNavigationItemUseCaseInterface
 {
-    public function execute(int $id): void;
+    public function execute(DeleteNavigationItemInput $input): void;
 }

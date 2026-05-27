@@ -22,7 +22,7 @@ final readonly class DeleteNavigationItemHandler
         $parameters = $request->getAttribute(Router::PARAMETERS_ATTRIBUTE, []);
         $id = (int) ($parameters['id'] ?? 0);
 
-        $this->useCase->execute($id);
+        $this->useCase->execute(new DeleteNavigationItemInput($id));
 
         return $this->response->createEmpty(204);
     }

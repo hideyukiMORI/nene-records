@@ -6,5 +6,5 @@ namespace NeNeRecords\Comment;
 
 interface ApproveCommentUseCaseInterface
 {
-    public function execute(ApproveCommentInput $input): Comment;
+    public function execute(ApproveCommentInput $input): ApproveCommentOutput;
 }

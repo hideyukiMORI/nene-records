@@ -11,14 +11,14 @@ final readonly class GetWebhookByIdUseCase implements GetWebhookByIdUseCaseInter
     ) {
     }
 
-    public function execute(int $id): Webhook
+    public function execute(GetWebhookByIdInput $input): GetWebhookByIdOutput
     {
-        $webhook = $this->webhooks->findById($id);
+        $webhook = $this->webhooks->findById($input->id);
 
         if ($webhook === null) {
-            throw new WebhookNotFoundException($id);
+            throw new WebhookNotFoundException($input->id);
         }
 
-        return $webhook;
+        return new GetWebhookByIdOutput(webhook: $webhook);
     }
 }

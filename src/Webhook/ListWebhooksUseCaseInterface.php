@@ -6,6 +6,5 @@ namespace NeNeRecords\Webhook;
 
 interface ListWebhooksUseCaseInterface
 {
-    /** @return list<Webhook> */
-    public function execute(): array;
+    public function execute(): ListWebhooksOutput;
 }

@@ -11,12 +11,12 @@ final readonly class DeleteWebhookUseCase implements DeleteWebhookUseCaseInterfa
     ) {
     }
 
-    public function execute(int $id): void
+    public function execute(DeleteWebhookInput $input): void
     {
-        if ($this->webhooks->findById($id) === null) {
-            throw new WebhookNotFoundException($id);
+        if ($this->webhooks->findById($input->id) === null) {
+            throw new WebhookNotFoundException($input->id);
         }
 
-        $this->webhooks->delete($id);
+        $this->webhooks->delete($input->id);
     }
 }

@@ -10,8 +10,17 @@ final readonly class ApproveCommentUseCase implements ApproveCommentUseCaseInter
     {
     }
 
-    public function execute(ApproveCommentInput $input): Comment
+    public function execute(ApproveCommentInput $input): ApproveCommentOutput
     {
-        return $this->comments->approve($input->id);
+        $comment = $this->comments->approve($input->id);
+
+        return new ApproveCommentOutput(
+            id: $comment->id,
+            entityId: $comment->entityId,
+            authorName: $comment->authorName,
+            body: $comment->body,
+            isApproved: $comment->isApproved,
+            createdAt: $comment->createdAt,
+        );
     }
 }

@@ -21,8 +21,9 @@ final readonly class GetWebhookByIdHandler
     {
         $parameters = $request->getAttribute(Router::PARAMETERS_ATTRIBUTE, []);
         $id = (int) ($parameters['id'] ?? 0);
-        $webhook = $this->useCase->execute($id);
 
-        return $this->response->create(WebhookHttpMapper::toArray($webhook));
+        $output = $this->useCase->execute(new GetWebhookByIdInput($id));
+
+        return $this->response->create(WebhookHttpMapper::toArray($output->webhook));
     }
 }

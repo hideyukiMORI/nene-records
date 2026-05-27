@@ -50,26 +50,20 @@ final readonly class PostCommentHandler
             throw new ValidationException($errors);
         }
 
-        $comment = $this->useCase->execute(new PostCommentInput(
+        $output = $this->useCase->execute(new PostCommentInput(
             entityId: $entityId,
             authorName: $authorName,
             authorEmail: $authorEmail,
             body: $commentBody,
         ));
 
-        return $this->response->create($this->serialize($comment), 201);
-    }
-
-    /** @return array<string, mixed> */
-    private function serialize(Comment $comment): array
-    {
-        return [
-            'id'          => $comment->id,
-            'entity_id'   => $comment->entityId,
-            'author_name' => $comment->authorName,
-            'body'        => $comment->body,
-            'is_approved' => $comment->isApproved,
-            'created_at'  => $comment->createdAt,
-        ];
+        return $this->response->create([
+            'id'          => $output->id,
+            'entity_id'   => $output->entityId,
+            'author_name' => $output->authorName,
+            'body'        => $output->body,
+            'is_approved' => $output->isApproved,
+            'created_at'  => $output->createdAt,
+        ], 201);
     }
 }

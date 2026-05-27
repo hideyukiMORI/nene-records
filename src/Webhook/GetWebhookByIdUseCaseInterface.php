@@ -6,5 +6,5 @@ namespace NeNeRecords\Webhook;
 
 interface GetWebhookByIdUseCaseInterface
 {
-    public function execute(int $id): Webhook;
+    public function execute(GetWebhookByIdInput $input): GetWebhookByIdOutput;
 }

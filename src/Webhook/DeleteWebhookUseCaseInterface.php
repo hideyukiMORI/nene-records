@@ -6,5 +6,5 @@ namespace NeNeRecords\Webhook;
 
 interface DeleteWebhookUseCaseInterface
 {
-    public function execute(int $id): void;
+    public function execute(DeleteWebhookInput $input): void;
 }
