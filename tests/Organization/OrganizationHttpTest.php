@@ -44,7 +44,7 @@ final class OrganizationHttpTest extends TestCase
         $registrar = new OrganizationRouteRegistrar(
             new ListOrganizationsHandler(new ListOrganizationsUseCase($this->repository), $jsonResponse),
             new GetOrganizationByIdHandler(new GetOrganizationByIdUseCase($this->repository), $jsonResponse),
-            new CreateOrganizationHandler(new CreateOrganizationUseCase($this->repository), $jsonResponse),
+            new CreateOrganizationHandler(new CreateOrganizationUseCase($this->repository, new RecordingDefaultContentTypeSeeder()), $jsonResponse),
             new UpdateOrganizationHandler(new UpdateOrganizationUseCase($this->repository), $jsonResponse),
             new DeleteOrganizationHandler(new DeleteOrganizationUseCase($this->repository), $this->factory),
         );
