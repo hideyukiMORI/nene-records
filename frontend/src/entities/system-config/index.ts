@@ -1,2 +1,6 @@
 export type { SystemConfigDto } from './api-types'
-export { useSystemConfig, useUpdateSystemConfig } from './queries'
+export type { SystemConfig, UpdateSystemConfigInput, TenantResolutionMode } from './model'
+export { mapSystemConfigDtoToModel, mapUpdateInputToDto } from './mapper'
+export { systemConfigKeys } from './query-keys'
+export { useSystemConfig } from './queries'
+export { useUpdateSystemConfig } from './mutations'

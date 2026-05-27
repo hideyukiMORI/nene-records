@@ -25,7 +25,7 @@ export function DataMigrationPage() {
       {
         onSuccess: (result) => {
           showToast(
-            `Migrated ${String(result.total)} records to "${result.organization_name}".`,
+            `Migrated ${String(result.total)} records to "${result.organizationName}".`,
             'success',
           )
         },

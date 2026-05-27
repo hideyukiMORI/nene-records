@@ -1,3 +1,6 @@
 export type { OrgImportResultDto } from './api-types'
+export type { OrgImportResult } from './model'
+export { mapOrgImportResultDtoToModel } from './mapper'
+export { orgExportKeys } from './query-keys'
 export { fetchOrgExport } from './queries'
 export { useImportOrg } from './mutations'

@@ -1,3 +1,6 @@
 export type { DataMigrationStatusDto, AssignOrgResultDto } from './api-types'
-export { useDataMigrationStatus, dataMigrationKeys } from './queries'
+export type { DataMigrationStatus, AssignOrgResult } from './model'
+export { mapDataMigrationStatusDtoToModel, mapAssignOrgResultDtoToModel } from './mapper'
+export { dataMigrationKeys } from './query-keys'
+export { useDataMigrationStatus } from './queries'
 export { useAssignOrg } from './mutations'
