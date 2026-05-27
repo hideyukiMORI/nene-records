@@ -11,6 +11,7 @@ import { fieldDefHandlers } from './handlers/field-def'
 import { intFieldHandlers } from './handlers/int-field'
 import { tagHandlers } from './handlers/tag'
 import { textFieldHandlers } from './handlers/text-field'
+import { userHandlers } from './handlers/user'
 
 export const mswServer = setupServer(
   ...authHandlers,
@@ -25,4 +26,5 @@ export const mswServer = setupServer(
   ...boolFieldHandlers,
   ...dateTimeFieldHandlers,
   ...tagHandlers,
+  ...userHandlers,
 )

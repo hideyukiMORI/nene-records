@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { resolveLocale, DEFAULT_LOCALE } from './locales'
+import { en } from './messages/en'
+import { ja } from './messages/ja'
 
 describe('resolveLocale', () => {
   it('returns a supported locale unchanged', () => {
@@ -27,5 +29,22 @@ describe('resolveLocale', () => {
     expect(resolveLocale('unknown')).toBe(DEFAULT_LOCALE)
     expect(resolveLocale('xx-YY')).toBe(DEFAULT_LOCALE)
     expect(resolveLocale('')).toBe(DEFAULT_LOCALE)
+  })
+})
+
+describe('i18n key coverage', () => {
+  it('ja contains every key defined in en (no translation missing)', () => {
+    const enKeys = Object.keys(en)
+    const missingInJa = enKeys.filter((key) => !(key in ja))
+
+    if (missingInJa.length > 0) {
+      throw new Error(
+        `ja.ts is missing ${String(missingInJa.length)} key(s):\n` +
+          missingInJa.map((k) => `  • ${k}`).join('\n') +
+          '\n\nAdd the missing keys to frontend/src/shared/i18n/messages/ja.ts',
+      )
+    }
+
+    expect(missingInJa).toHaveLength(0)
   })
 })

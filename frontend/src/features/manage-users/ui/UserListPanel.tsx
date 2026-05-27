@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import type { User, UserRole } from '@/entities/user'
 import { useTranslation } from '@/shared/i18n'
 import { Button, EmptyState, Stack, Text } from '@/shared/ui'
@@ -106,6 +107,11 @@ export function UserListPanel({
 
           {/* Action buttons */}
           <div className="flex shrink-0 gap-1">
+            <Link to={`/admin/users/${String(user.id)}`}>
+              <Button variant="secondary" size="sm" title={t('admin.users.edit.button')}>
+                {t('admin.users.edit.button')}
+              </Button>
+            </Link>
             <Button
               variant="ghost"
               size="sm"

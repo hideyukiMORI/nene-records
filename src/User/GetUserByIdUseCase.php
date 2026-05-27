@@ -10,6 +10,7 @@ final readonly class GetUserByIdUseCase implements GetUserByIdUseCaseInterface
 {
     public function __construct(
         private UserRepositoryInterface $users,
+        private UserProfileRepositoryInterface $profiles,
     ) {
     }
 
@@ -21,6 +22,8 @@ final readonly class GetUserByIdUseCase implements GetUserByIdUseCaseInterface
             throw new UserNotFoundException($input->id);
         }
 
+        $profile = $this->profiles->findByUserId($user->id);
+
         return new GetUserByIdOutput(
             id: $user->id,
             email: $user->email,
@@ -28,6 +31,9 @@ final readonly class GetUserByIdUseCase implements GetUserByIdUseCaseInterface
             organizationId: $user->organizationId,
             orgRole: $user->orgRole,
             status: $user->status,
+            displayName: $profile?->displayName,
+            fullName: $profile?->fullName,
+            jobTitle: $profile?->jobTitle,
             createdAt: $user->createdAt,
             updatedAt: $user->updatedAt,
         );

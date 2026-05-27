@@ -31,6 +31,9 @@ final readonly class GetUserByIdHandler
             'organization_id' => $output->organizationId,
             'org_role'        => $output->orgRole,
             'status'          => $output->status,
+            'display_name'    => $output->displayName,
+            'full_name'       => $output->fullName,
+            'job_title'       => $output->jobTitle,
             'created_at'      => $output->createdAt !== null ? date('c', $output->createdAt) : null,
             'updated_at'      => $output->updatedAt !== null ? date('c', $output->updatedAt) : null,
         ]);

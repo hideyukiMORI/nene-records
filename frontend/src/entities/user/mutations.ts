@@ -1,14 +1,17 @@
 import { useMutation, useQueryClient, type UseMutationResult } from '@tanstack/react-query'
 import { apiClient, AppError } from '@/shared/api/client'
-import type { InviteUserResponseDto, UserDto } from './api-types'
-import { mapUserDtoToModel } from './mapper'
+import type { InviteUserResponseDto, UserDto, UserProfileDto } from './api-types'
+import { mapUserDtoToModel, mapUserProfileDtoToModel } from './mapper'
 import type {
   AdminResetPasswordInput,
+  ChangeEmailInput,
   ChangeOwnPasswordInput,
   CreateUserInput,
   InviteUserInput,
+  UpdateUserProfileInput,
   UpdateUserRoleInput,
   User,
+  UserProfile,
 } from './model'
 import { userKeys } from './query-keys'
 
@@ -137,6 +140,48 @@ export function useConfirmPasswordReset(): UseMutationResult<
         new_password: input.newPassword,
       })
       return undefined
+    },
+  })
+}
+
+export function useChangeEmail(): UseMutationResult<
+  void,
+  AppError,
+  { id: number; input: ChangeEmailInput }
+> {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({ id, input }) => {
+      await apiClient.patch(`/api/v1/users/${String(id)}/email`, {
+        email: input.email,
+      })
+    },
+    onSuccess: async (_data, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: userKeys.list() })
+      await queryClient.invalidateQueries({ queryKey: userKeys.detail(id) })
+    },
+  })
+}
+
+export function useUpdateUserProfile(): UseMutationResult<
+  UserProfile,
+  AppError,
+  { id: number; input: UpdateUserProfileInput }
+> {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({ id, input }) => {
+      const dto = await apiClient.patch<UserProfileDto>(`/api/v1/users/${String(id)}/profile`, {
+        display_name: input.displayName,
+        full_name: input.fullName,
+        job_title: input.jobTitle,
+      })
+      return mapUserProfileDtoToModel(dto)
+    },
+    onSuccess: async (_data, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: userKeys.detail(id) })
     },
   })
 }

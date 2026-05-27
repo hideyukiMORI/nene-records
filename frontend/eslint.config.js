@@ -71,7 +71,14 @@ const importZones = [
 
 export default tseslint.config(
   {
-    ignores: ['dist', 'storybook-static', 'node_modules', 'coverage'],
+    ignores: [
+      'dist',
+      'storybook-static',
+      'node_modules',
+      'coverage',
+      'src/shared/api/schema.gen.ts',
+      'public/mockServiceWorker.js',
+    ],
   },
   {
     extends: [js.configs.recommended, ...tseslint.configs.strictTypeChecked],

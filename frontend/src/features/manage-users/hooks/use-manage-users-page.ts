@@ -98,7 +98,7 @@ export function useManageUsersPage() {
   }, [])
 
   return {
-    users: listQuery.data?.users ?? [],
+    users: listQuery.data?.items ?? [],
     isLoading: listQuery.isLoading,
     isError: listQuery.isError,
     errorTitle: listQuery.error?.title ?? null,

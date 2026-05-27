@@ -35,6 +35,62 @@ M1 – M9 complete. See `docs/todo/current.md`.
 ## Verification
 
 ```bash
-composer check                    # 545 tests + PHPStan level 8 + CS-Fixer + OpenAPI + MCP
-npm run check --prefix frontend   # type-check + lint + test + storybook
+# Full quality gates (run before every PR)
+composer check                    # PHPUnit + PHPStan level 8 + CS-Fixer + OpenAPI + MCP
+npm run check --prefix frontend   # type-check + lint + prettier + test + storybook
+
+# Individual steps (faster feedback during development)
+composer test                     # PHPUnit only
+composer analyse                  # PHPStan only
+composer cs                       # CS-Fixer dry-run
+composer openapi                  # OpenAPI contract validation
+npm run type-check --prefix frontend
+npm run test --prefix frontend
+```
+
+## Local stack
+
+| Service | URL |
+| --- | --- |
+| API | http://localhost:8082 |
+| phpMyAdmin | http://localhost:8083 |
+| Mailpit | http://localhost:8026 |
+| Frontend dev | http://localhost:5173 |
+
+Health check: `curl -fsS http://localhost:8082/health`
+
+## Database migrations
+
+**Create a new migration** (auto-assigns the next safe version number):
+```bash
+composer migrations:new -- CreateFooTable
+# → database/migrations/YYYYMMDD######_create_foo_table.php
+```
+
+Never create migration files manually — version collisions cause silent skips.
+
+```bash
+composer migrations:status    # show applied / pending
+composer migrations:migrate   # apply pending
+composer migrations:rollback  # rollback last batch
+```
+
+## OpenAPI → TypeScript types
+
+The frontend types for API responses are **auto-generated** from `docs/openapi/openapi.yaml`.
+
+```bash
+npm run codegen --prefix frontend
+# → frontend/src/shared/api/schema.gen.ts (do not edit manually)
+```
+
+When you add or change an endpoint:
+1. Update `docs/openapi/openapi.yaml`
+2. Run `npm run codegen --prefix frontend`
+3. Reference types via `components['schemas']['YourSchema']` in the entity's `api-types.ts`
+
+Example pattern (`src/entities/user/api-types.ts`):
+```ts
+import type { components } from '@/shared/api/schema.gen'
+export type UserDto = components['schemas']['UserResponse']
 ```

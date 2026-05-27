@@ -142,6 +142,34 @@ final class InMemoryUserRepository implements UserRepositoryInterface
         );
     }
 
+    public function updateEmail(int $id, string $email): void
+    {
+        $user = $this->byId[$id] ?? null;
+
+        if ($user === null) {
+            return;
+        }
+
+        unset($this->emailToId[$user->email]);
+        $this->emailToId[$email] = $id;
+
+        $this->byId[$id] = new User(
+            id: $user->id,
+            email: $email,
+            passwordHash: $user->passwordHash,
+            role: $user->role,
+            organizationId: $user->organizationId,
+            orgRole: $user->orgRole,
+            status: $user->status,
+            inviteTokenHash: $user->inviteTokenHash,
+            inviteExpiresAt: $user->inviteExpiresAt,
+            passwordResetTokenHash: $user->passwordResetTokenHash,
+            passwordResetExpiresAt: $user->passwordResetExpiresAt,
+            createdAt: $user->createdAt,
+            updatedAt: time(),
+        );
+    }
+
     public function updatePassword(int $id, string $passwordHash): void
     {
         $user = $this->byId[$id] ?? null;

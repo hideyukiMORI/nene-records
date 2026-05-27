@@ -1,12 +1,17 @@
-import type { UserDto, UserListDto } from './api-types'
-import type { User, UserList, UserRole, UserStatus } from './model'
+import type { UserDto, UserListDto, UserProfileDto } from './api-types'
+import type { User, UserList, UserProfile, UserRole } from './model'
 
 export function mapUserDtoToModel(dto: UserDto): User {
   return {
     id: dto.id,
     email: dto.email,
     role: dto.role as UserRole,
-    status: dto.status as UserStatus,
+    organizationId: dto.organization_id,
+    orgRole: dto.org_role,
+    status: dto.status,
+    displayName: dto.display_name ?? null,
+    fullName: dto.full_name ?? null,
+    jobTitle: dto.job_title ?? null,
     createdAt: dto.created_at,
     updatedAt: dto.updated_at,
   }
@@ -14,6 +19,14 @@ export function mapUserDtoToModel(dto: UserDto): User {
 
 export function mapUserListDtoToModel(dto: UserListDto): UserList {
   return {
-    users: dto.users.map(mapUserDtoToModel),
+    items: dto.items.map(mapUserDtoToModel),
+  }
+}
+
+export function mapUserProfileDtoToModel(dto: UserProfileDto): UserProfile {
+  return {
+    displayName: dto.display_name,
+    fullName: dto.full_name,
+    jobTitle: dto.job_title,
   }
 }

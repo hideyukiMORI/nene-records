@@ -289,7 +289,7 @@ final class UserUseCaseTest extends TestCase
             new User(id: 1, email: 'admin@example.com', passwordHash: $hash, role: 'admin', status: 'active', createdAt: 1000, updatedAt: 2000),
         ]);
 
-        $useCase = new GetUserByIdUseCase($users);
+        $useCase = new GetUserByIdUseCase($users, new InMemoryUserProfileRepository());
         $output = $useCase->execute(new GetUserByIdInput(id: 1));
 
         self::assertSame(1, $output->id);
@@ -303,7 +303,7 @@ final class UserUseCaseTest extends TestCase
     public function testGetUserByIdThrowsUserNotFoundExceptionForUnknownId(): void
     {
         $users = new InMemoryUserRepository([]);
-        $useCase = new GetUserByIdUseCase($users);
+        $useCase = new GetUserByIdUseCase($users, new InMemoryUserProfileRepository());
 
         $this->expectException(UserNotFoundException::class);
 

@@ -18,6 +18,7 @@ import { NotFoundPage } from '@/pages/not-found/NotFoundPage'
 import { ResetPasswordPage } from '@/pages/reset-password/ResetPasswordPage'
 import { SiteSettingsPage } from '@/pages/settings/SiteSettingsPage'
 import { CommentsPage } from '@/pages/comments/CommentsPage'
+import { UserEditPage } from '@/pages/users/UserEditPage'
 import { UsersPage } from '@/pages/users/UsersPage'
 import { WebhooksPage } from '@/pages/webhooks/WebhooksPage'
 import { TagsPage } from '@/pages/tags/TagsPage'
@@ -79,6 +80,7 @@ const router = createBrowserRouter([
       { path: 'webhooks', element: <WebhooksPage /> },
       { path: 'settings', element: <SiteSettingsPage /> },
       { path: 'users', element: <UsersPage /> },
+      { path: 'users/:id', element: <UserEditPage /> },
       { path: 'entity-types/:entityTypeSlug/fields', element: <FieldDefsPage /> },
       // Legacy long-form routes kept for schema management links
       { path: 'entity-types/:entityTypeSlug/entities', element: <EntityRecordsPage /> },

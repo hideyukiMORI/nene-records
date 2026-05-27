@@ -108,6 +108,14 @@ final readonly class PdoUserRepository implements UserRepositoryInterface
         );
     }
 
+    public function updateEmail(int $id, string $email): void
+    {
+        $this->query->execute(
+            'UPDATE users SET email = ?, updated_at = NOW() WHERE id = ?',
+            [$email, $id],
+        );
+    }
+
     public function updatePassword(int $id, string $passwordHash): void
     {
         $this->query->execute(
