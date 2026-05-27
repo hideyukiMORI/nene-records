@@ -9,3 +9,6 @@
 /.php-cs-fixer.cache
 /var/
 /public_html/assets/
+
+# E2E test artifacts
+test-results/
