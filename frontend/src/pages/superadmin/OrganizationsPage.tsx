@@ -11,13 +11,12 @@ import { Button, ConfirmDialog, Input, Stack, Text } from '@/shared/ui'
 import { useToast } from '@/shared/ui'
 import { IconBuilding, IconX } from '@/shared/ui/icons/Icons'
 
-function CreateOrganizationForm({
-  onClose,
-  onSuccess,
-}: {
+interface CreateOrganizationFormProps {
   onClose: () => void
   onSuccess: () => void
-}) {
+}
+
+function CreateOrganizationForm({ onClose, onSuccess }: CreateOrganizationFormProps) {
   const { showToast } = useToast()
   const createOrg = useCreateOrganization()
 

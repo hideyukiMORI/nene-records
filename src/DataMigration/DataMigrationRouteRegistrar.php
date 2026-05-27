@@ -10,8 +10,8 @@ use Psr\Http\Message\ServerRequestInterface;
 final readonly class DataMigrationRouteRegistrar
 {
     public function __construct(
-        private DataMigrationStatusHandler $statusHandler,
-        private AssignOrgHandler $assignHandler,
+        private GetDataMigrationStatusHandler $statusHandler,
+        private AssignOrganizationHandler $assignHandler,
     ) {
     }
 

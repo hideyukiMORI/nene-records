@@ -79,27 +79,27 @@ final readonly class UserServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(
-                ChangeOwnPasswordUseCaseInterface::class,
-                static function (ContainerInterface $c): ChangeOwnPasswordUseCaseInterface {
+                ChangePasswordUseCaseInterface::class,
+                static function (ContainerInterface $c): ChangePasswordUseCaseInterface {
                     $users = $c->get(UserRepositoryInterface::class);
 
                     if (!$users instanceof UserRepositoryInterface) {
                         throw new LogicException('UserRepositoryInterface service is invalid.');
                     }
 
-                    return new ChangeOwnPasswordUseCase($users);
+                    return new ChangePasswordUseCase($users);
                 },
             )
             ->set(
-                AdminResetPasswordUseCaseInterface::class,
-                static function (ContainerInterface $c): AdminResetPasswordUseCaseInterface {
+                ResetUserPasswordUseCaseInterface::class,
+                static function (ContainerInterface $c): ResetUserPasswordUseCaseInterface {
                     $users = $c->get(UserRepositoryInterface::class);
 
                     if (!$users instanceof UserRepositoryInterface) {
                         throw new LogicException('UserRepositoryInterface service is invalid.');
                     }
 
-                    return new AdminResetPasswordUseCase($users);
+                    return new ResetUserPasswordUseCase($users);
                 },
             )
             ->set(
@@ -171,20 +171,20 @@ final readonly class UserServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(
-                AdminResetPasswordHandler::class,
-                static function (ContainerInterface $c): AdminResetPasswordHandler {
-                    $useCase = $c->get(AdminResetPasswordUseCaseInterface::class);
+                ResetUserPasswordHandler::class,
+                static function (ContainerInterface $c): ResetUserPasswordHandler {
+                    $useCase = $c->get(ResetUserPasswordUseCaseInterface::class);
                     $responseFactory = $c->get(ResponseFactoryInterface::class);
 
-                    if (!$useCase instanceof AdminResetPasswordUseCaseInterface) {
-                        throw new LogicException('AdminResetPasswordUseCase service is invalid.');
+                    if (!$useCase instanceof ResetUserPasswordUseCaseInterface) {
+                        throw new LogicException('ResetUserPasswordUseCase service is invalid.');
                     }
 
                     if (!$responseFactory instanceof ResponseFactoryInterface) {
                         throw new LogicException('ResponseFactoryInterface service is invalid.');
                     }
 
-                    return new AdminResetPasswordHandler($useCase, $responseFactory);
+                    return new ResetUserPasswordHandler($useCase, $responseFactory);
                 },
             )
             ->set(
@@ -205,20 +205,20 @@ final readonly class UserServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(
-                ChangeOwnPasswordHandler::class,
-                static function (ContainerInterface $c): ChangeOwnPasswordHandler {
-                    $useCase = $c->get(ChangeOwnPasswordUseCaseInterface::class);
+                ChangePasswordHandler::class,
+                static function (ContainerInterface $c): ChangePasswordHandler {
+                    $useCase = $c->get(ChangePasswordUseCaseInterface::class);
                     $responseFactory = $c->get(ResponseFactoryInterface::class);
 
-                    if (!$useCase instanceof ChangeOwnPasswordUseCaseInterface) {
-                        throw new LogicException('ChangeOwnPasswordUseCase service is invalid.');
+                    if (!$useCase instanceof ChangePasswordUseCaseInterface) {
+                        throw new LogicException('ChangePasswordUseCase service is invalid.');
                     }
 
                     if (!$responseFactory instanceof ResponseFactoryInterface) {
                         throw new LogicException('ResponseFactoryInterface service is invalid.');
                     }
 
-                    return new ChangeOwnPasswordHandler($useCase, $responseFactory);
+                    return new ChangePasswordHandler($useCase, $responseFactory);
                 },
             )
             ->set(
@@ -288,9 +288,9 @@ final readonly class UserServiceProvider implements ServiceProviderInterface
                     $get = $c->get(GetUserByIdHandler::class);
                     $create = $c->get(CreateUserHandler::class);
                     $updateRole = $c->get(UpdateUserRoleHandler::class);
-                    $resetPassword = $c->get(AdminResetPasswordHandler::class);
+                    $resetPassword = $c->get(ResetUserPasswordHandler::class);
                     $delete = $c->get(DeleteUserHandler::class);
-                    $changeOwn = $c->get(ChangeOwnPasswordHandler::class);
+                    $changePassword = $c->get(ChangePasswordHandler::class);
 
                     if (!$list instanceof ListUsersHandler) {
                         throw new LogicException('ListUsersHandler service is invalid.');
@@ -308,19 +308,19 @@ final readonly class UserServiceProvider implements ServiceProviderInterface
                         throw new LogicException('UpdateUserRoleHandler service is invalid.');
                     }
 
-                    if (!$resetPassword instanceof AdminResetPasswordHandler) {
-                        throw new LogicException('AdminResetPasswordHandler service is invalid.');
+                    if (!$resetPassword instanceof ResetUserPasswordHandler) {
+                        throw new LogicException('ResetUserPasswordHandler service is invalid.');
                     }
 
                     if (!$delete instanceof DeleteUserHandler) {
                         throw new LogicException('DeleteUserHandler service is invalid.');
                     }
 
-                    if (!$changeOwn instanceof ChangeOwnPasswordHandler) {
-                        throw new LogicException('ChangeOwnPasswordHandler service is invalid.');
+                    if (!$changePassword instanceof ChangePasswordHandler) {
+                        throw new LogicException('ChangePasswordHandler service is invalid.');
                     }
 
-                    return new UserRouteRegistrar($list, $get, $create, $updateRole, $resetPassword, $delete, $changeOwn);
+                    return new UserRouteRegistrar($list, $get, $create, $updateRole, $resetPassword, $delete, $changePassword);
                 },
             );
     }

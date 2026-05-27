@@ -16,7 +16,7 @@ final readonly class UpdateSystemConfigHandler implements RequestHandlerInterfac
     private const VALID_MODES = ['single', 'subdomain', 'path'];
 
     public function __construct(
-        private SystemConfigRepository $config,
+        private SystemConfigRepositoryInterface $config,
         private JsonResponseFactory $json,
         private ProblemDetailsResponseFactory $problemDetails,
     ) {

@@ -12,7 +12,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 final readonly class GetSystemConfigHandler implements RequestHandlerInterface
 {
     public function __construct(
-        private SystemConfigRepository $config,
+        private SystemConfigRepositoryInterface $config,
         private JsonResponseFactory $json,
     ) {
     }

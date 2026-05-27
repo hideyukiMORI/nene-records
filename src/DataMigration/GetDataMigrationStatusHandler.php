@@ -13,10 +13,10 @@ use Psr\Http\Server\RequestHandlerInterface;
  * Returns the count of records with organization_id = 0 per table.
  * Used to show the user how many records would be affected by an org assignment.
  */
-final readonly class DataMigrationStatusHandler implements RequestHandlerInterface
+final readonly class GetDataMigrationStatusHandler implements RequestHandlerInterface
 {
     public function __construct(
-        private DataMigrationRepository $repository,
+        private DataMigrationRepositoryInterface $repository,
         private JsonResponseFactory $json,
     ) {
     }

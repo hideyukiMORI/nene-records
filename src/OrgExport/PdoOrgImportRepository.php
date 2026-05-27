@@ -13,7 +13,7 @@ use Nene2\Database\DatabaseQueryExecutorInterface;
  * can safely coexist with existing data. Cross-table references are updated
  * accordingly before insertion.
  */
-final readonly class OrgImportRepository
+final readonly class PdoOrgImportRepository implements OrgImportRepositoryInterface
 {
     public function __construct(
         private DatabaseQueryExecutorInterface $query,

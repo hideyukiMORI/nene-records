@@ -9,7 +9,7 @@ use Nene2\Database\DatabaseQueryExecutorInterface;
 /**
  * Low-level operations for migrating organization_id across all tenant-scoped tables.
  */
-final readonly class DataMigrationRepository
+final readonly class PdoDataMigrationRepository implements DataMigrationRepositoryInterface
 {
     /** Tables that carry organization_id and should be included in migration. */
     private const TABLES = [

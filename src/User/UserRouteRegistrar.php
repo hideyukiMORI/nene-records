@@ -14,9 +14,9 @@ final readonly class UserRouteRegistrar
         private GetUserByIdHandler $getHandler,
         private CreateUserHandler $createHandler,
         private UpdateUserRoleHandler $updateRoleHandler,
-        private AdminResetPasswordHandler $resetPasswordHandler,
+        private ResetUserPasswordHandler $resetPasswordHandler,
         private DeleteUserHandler $deleteHandler,
-        private ChangeOwnPasswordHandler $changeOwnPasswordHandler,
+        private ChangePasswordHandler $changePasswordHandler,
     ) {
     }
 
@@ -28,7 +28,7 @@ final readonly class UserRouteRegistrar
         $updateRole = $this->updateRoleHandler;
         $resetPassword = $this->resetPasswordHandler;
         $delete = $this->deleteHandler;
-        $changeOwn = $this->changeOwnPasswordHandler;
+        $changePassword = $this->changePasswordHandler;
 
         $router->get('/api/v1/users', static fn (ServerRequestInterface $r) => $list->handle($r));
         $router->get('/api/v1/users/{id}', static fn (ServerRequestInterface $r) => $get->handle($r));
@@ -36,6 +36,6 @@ final readonly class UserRouteRegistrar
         $router->patch('/api/v1/users/{id}', static fn (ServerRequestInterface $r) => $updateRole->handle($r));
         $router->patch('/api/v1/users/{id}/password', static fn (ServerRequestInterface $r) => $resetPassword->handle($r));
         $router->delete('/api/v1/users/{id}', static fn (ServerRequestInterface $r) => $delete->handle($r));
-        $router->put('/api/v1/users/me/password', static fn (ServerRequestInterface $r) => $changeOwn->handle($r));
+        $router->put('/api/v1/users/me/password', static fn (ServerRequestInterface $r) => $changePassword->handle($r));
     }
 }

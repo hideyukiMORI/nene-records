@@ -5,34 +5,29 @@ declare(strict_types=1);
 namespace NeNeRecords\User;
 
 use Nene2\Http\JsonRequestBodyParser;
+use Nene2\Routing\Router;
 use Nene2\Validation\ValidationError;
 use Nene2\Validation\ValidationException;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-final readonly class ChangeOwnPasswordHandler
+final readonly class ResetUserPasswordHandler
 {
     public function __construct(
-        private ChangeOwnPasswordUseCaseInterface $useCase,
+        private ResetUserPasswordUseCaseInterface $useCase,
         private ResponseFactoryInterface $responseFactory,
     ) {
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $claims = $request->getAttribute('nene2.auth.claims');
-        $currentUserEmail = is_array($claims) ? (string) ($claims['sub'] ?? '') : '';
-
+        $parameters = $request->getAttribute(Router::PARAMETERS_ATTRIBUTE, []);
+        $id = (int) ($parameters['id'] ?? 0);
         $body = JsonRequestBodyParser::parse($request);
 
         $errors = [];
-        $currentPassword = (string) ($body['current_password'] ?? '');
         $newPassword = (string) ($body['new_password'] ?? '');
-
-        if ($currentPassword === '') {
-            $errors[] = new ValidationError('current_password', 'Current password is required.', 'required');
-        }
 
         if ($newPassword === '') {
             $errors[] = new ValidationError('new_password', 'New password is required.', 'required');
@@ -44,11 +39,7 @@ final readonly class ChangeOwnPasswordHandler
             throw new ValidationException($errors);
         }
 
-        $this->useCase->execute(new ChangeOwnPasswordInput(
-            currentUserEmail: $currentUserEmail,
-            currentPassword: $currentPassword,
-            newPassword: $newPassword,
-        ));
+        $this->useCase->execute(new ResetUserPasswordInput(id: $id, newPassword: $newPassword));
 
         return $this->responseFactory->createResponse(204);
     }

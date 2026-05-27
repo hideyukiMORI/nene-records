@@ -18,23 +18,23 @@ final readonly class SystemConfigServiceProvider implements ServiceProviderInter
     {
         $builder
             ->set(
-                SystemConfigRepository::class,
-                static function (ContainerInterface $c): SystemConfigRepository {
+                SystemConfigRepositoryInterface::class,
+                static function (ContainerInterface $c): SystemConfigRepositoryInterface {
                     $query = $c->get(DatabaseQueryExecutorInterface::class);
                     if (!$query instanceof DatabaseQueryExecutorInterface) {
                         throw new LogicException('DatabaseQueryExecutorInterface is invalid.');
                     }
 
-                    return new SystemConfigRepository($query);
+                    return new PdoSystemConfigRepository($query);
                 },
             )
             ->set(
                 GetSystemConfigHandler::class,
                 static function (ContainerInterface $c): GetSystemConfigHandler {
-                    $config = $c->get(SystemConfigRepository::class);
+                    $config = $c->get(SystemConfigRepositoryInterface::class);
                     $json   = $c->get(JsonResponseFactory::class);
-                    if (!$config instanceof SystemConfigRepository) {
-                        throw new LogicException('SystemConfigRepository is invalid.');
+                    if (!$config instanceof SystemConfigRepositoryInterface) {
+                        throw new LogicException('SystemConfigRepositoryInterface is invalid.');
                     }
 
                     if (!$json instanceof JsonResponseFactory) {
@@ -42,6 +42,27 @@ final readonly class SystemConfigServiceProvider implements ServiceProviderInter
                     }
 
                     return new GetSystemConfigHandler($config, $json);
+                },
+            )
+            ->set(
+                UpdateSystemConfigHandler::class,
+                static function (ContainerInterface $c): UpdateSystemConfigHandler {
+                    $config  = $c->get(SystemConfigRepositoryInterface::class);
+                    $json    = $c->get(JsonResponseFactory::class);
+                    $problem = $c->get(ProblemDetailsResponseFactory::class);
+                    if (!$config instanceof SystemConfigRepositoryInterface) {
+                        throw new LogicException('SystemConfigRepositoryInterface is invalid.');
+                    }
+
+                    if (!$json instanceof JsonResponseFactory) {
+                        throw new LogicException('JsonResponseFactory is invalid.');
+                    }
+
+                    if (!$problem instanceof ProblemDetailsResponseFactory) {
+                        throw new LogicException('ProblemDetailsResponseFactory is invalid.');
+                    }
+
+                    return new UpdateSystemConfigHandler($config, $json, $problem);
                 },
             )
             ->set(
@@ -58,27 +79,6 @@ final readonly class SystemConfigServiceProvider implements ServiceProviderInter
                     }
 
                     return new SystemConfigRouteRegistrar($get, $update);
-                },
-            )
-            ->set(
-                UpdateSystemConfigHandler::class,
-                static function (ContainerInterface $c): UpdateSystemConfigHandler {
-                    $config  = $c->get(SystemConfigRepository::class);
-                    $json    = $c->get(JsonResponseFactory::class);
-                    $problem = $c->get(ProblemDetailsResponseFactory::class);
-                    if (!$config instanceof SystemConfigRepository) {
-                        throw new LogicException('SystemConfigRepository is invalid.');
-                    }
-
-                    if (!$json instanceof JsonResponseFactory) {
-                        throw new LogicException('JsonResponseFactory is invalid.');
-                    }
-
-                    if (!$problem instanceof ProblemDetailsResponseFactory) {
-                        throw new LogicException('ProblemDetailsResponseFactory is invalid.');
-                    }
-
-                    return new UpdateSystemConfigHandler($config, $json, $problem);
                 },
             );
     }
