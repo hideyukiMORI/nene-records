@@ -296,15 +296,19 @@ test.describe('Repetition & Long-form Stability', () => {
     const nameInput = page.locator('input[id="entity-type-name"]');
     const slugInput = page.locator('input[id="entity-type-slug"]');
     const submitBtn = page.locator('button:has-text("Create content type")');
+    // While POST is in-flight, the button text changes to "Creating…" (isSubmitting=true)
+    const inFlightBtn = page.locator('button:has-text("Creating…")');
 
     for (let i = 0; i < 5; i++) {
       await nameInput.fill(`Op${String(i + 1)}`);
       await slugInput.fill(`op${String(i + 1)}`);
 
-      // First click triggers the POST; subsequent forced clicks while button is disabled
+      // First click triggers the POST; wait for "Creating…" (confirms button is disabled)
       await submitBtn.click();
-      await submitBtn.click({ force: true });
-      await submitBtn.click({ force: true });
+      await expect(inFlightBtn).toBeVisible({ timeout: 1000 }); // POST is in-flight
+      // Force-click the disabled "Creating…" button twice — should NOT trigger extra POSTs
+      await inFlightBtn.click({ force: true });
+      await inFlightBtn.click({ force: true });
 
       // Wait for this operation to complete (inputs cleared = form reset)
       await expect(nameInput).toHaveValue('', { timeout: 6000 });
