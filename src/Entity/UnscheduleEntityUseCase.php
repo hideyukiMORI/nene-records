@@ -13,12 +13,12 @@ final readonly class UnscheduleEntityUseCase implements UnscheduleEntityUseCaseI
     ) {
     }
 
-    public function execute(int $entityId): void
+    public function execute(UnscheduleEntityInput $input): void
     {
-        $existing = $this->entities->findById($entityId);
+        $existing = $this->entities->findById($input->entityId);
 
         if ($existing === null) {
-            throw new EntityNotFoundException($entityId);
+            throw new EntityNotFoundException($input->entityId);
         }
 
         $id = $existing->id;

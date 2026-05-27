@@ -6,5 +6,5 @@ namespace NeNeRecords\Entity;
 
 interface UnscheduleEntityUseCaseInterface
 {
-    public function execute(int $entityId): void;
+    public function execute(UnscheduleEntityInput $input): void;
 }
