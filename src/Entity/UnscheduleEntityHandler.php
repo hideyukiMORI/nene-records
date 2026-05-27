@@ -26,7 +26,7 @@ final readonly class UnscheduleEntityHandler
             throw new EntityNotFoundException($id);
         }
 
-        $this->useCase->execute($id);
+        $this->useCase->execute(new UnscheduleEntityInput($id));
 
         return $this->responseFactory->createResponse(204);
     }
