@@ -1,11 +1,17 @@
 import { useEffect, useState } from 'react'
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
-import { authStore, currentUserHasCapability, currentUserIsAdmin } from '@/entities/auth'
+import {
+  authStore,
+  currentUserHasCapability,
+  currentUserIsAdmin,
+  currentUserIsSuperadmin,
+} from '@/entities/auth'
 import { getLocalizedEntityTypeName, usePinnedEntityTypes } from '@/entities/entity-type'
 import { LOCALES, SUPPORTED_LOCALE_IDS, useTranslation } from '@/shared/i18n'
 import { useTheme } from '@/shared/theme'
 import { ToastProvider } from '@/shared/ui'
 import {
+  IconBuilding,
   IconChevronRight,
   IconFileText,
   IconGlobe,
@@ -83,6 +89,7 @@ export function AppShell() {
   const canReadSettings = currentUserHasCapability('read_settings')
   const canManageSettings = currentUserHasCapability('manage_settings')
   const isAdmin = currentUserIsAdmin()
+  const isSuperadmin = currentUserIsSuperadmin()
 
   const [appearanceOpen, setAppearanceOpen] = useState(true)
   const [advancedOpen, setAdvancedOpen] = useState(false)
@@ -197,6 +204,16 @@ export function AppShell() {
                     to="/admin/users"
                     icon={<IconUsers size={16} />}
                     label={t('admin.nav.users')}
+                    onClick={closeSidebar}
+                  />
+                </li>
+              ) : null}
+              {isSuperadmin ? (
+                <li>
+                  <NavItem
+                    to="/superadmin"
+                    icon={<IconBuilding size={16} />}
+                    label="Superadmin"
                     onClick={closeSidebar}
                   />
                 </li>

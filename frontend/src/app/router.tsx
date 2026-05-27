@@ -21,12 +21,23 @@ import { CommentsPage } from '@/pages/comments/CommentsPage'
 import { UsersPage } from '@/pages/users/UsersPage'
 import { WebhooksPage } from '@/pages/webhooks/WebhooksPage'
 import { TagsPage } from '@/pages/tags/TagsPage'
+import { SuperadminShell } from '@/pages/superadmin/SuperadminShell'
+import { OrganizationsPage } from '@/pages/superadmin/OrganizationsPage'
+import { OrganizationDetailPage } from '@/pages/superadmin/OrganizationDetailPage'
 import { RequireAuth } from '@/shared/auth/RequireAuth'
 
 function AdminShell() {
   return (
     <RequireAuth>
       <AppShell />
+    </RequireAuth>
+  )
+}
+
+function SuperadminGuard() {
+  return (
+    <RequireAuth>
+      <SuperadminShell />
     </RequireAuth>
   )
 }
@@ -74,6 +85,16 @@ const router = createBrowserRouter([
       // Must be last — specific routes above take priority
       { path: ':entityTypeSlug', element: <EntityRecordsPage /> },
       { path: ':entityTypeSlug/:entityId', element: <EntityRecordPage /> },
+    ],
+  },
+  {
+    path: '/superadmin',
+    element: <SuperadminGuard />,
+    errorElement: <NotFoundPage />,
+    children: [
+      { index: true, element: <OrganizationsPage /> },
+      { path: 'organizations', element: <OrganizationsPage /> },
+      { path: 'organizations/:id', element: <OrganizationDetailPage /> },
     ],
   },
   {

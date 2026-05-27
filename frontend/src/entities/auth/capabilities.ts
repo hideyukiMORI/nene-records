@@ -1,6 +1,7 @@
-export type UserRole = 'admin' | 'editor'
+export type UserRole = 'superadmin' | 'admin' | 'editor'
 
 export type Capability =
+  | 'manage_organizations'
   | 'manage_schema'
   | 'manage_settings'
   | 'read_settings'
@@ -10,8 +11,12 @@ export type Capability =
 const EDITOR_CAPABILITIES: readonly Capability[] = ['read_settings', 'edit_content'] as const
 
 export function hasCapability(role: string | undefined, capability: Capability): boolean {
-  if (role === 'admin') {
+  if (role === 'superadmin') {
     return true
+  }
+
+  if (role === 'admin') {
+    return capability !== 'manage_organizations'
   }
 
   if (role === 'editor') {
@@ -22,5 +27,9 @@ export function hasCapability(role: string | undefined, capability: Capability):
 }
 
 export function isAdmin(role: string | undefined): boolean {
-  return role === 'admin'
+  return role === 'admin' || role === 'superadmin'
+}
+
+export function isSuperadmin(role: string | undefined): boolean {
+  return role === 'superadmin'
 }
