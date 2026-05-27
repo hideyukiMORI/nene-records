@@ -94,7 +94,7 @@ export function OrganizationDetailPage() {
         importOrg.mutate(payload, {
           onSuccess: (result) => {
             showToast(
-              `Imported ${String(result.total)} records into "${result.organization_name}".`,
+              `Imported ${String(result.total)} records into "${result.organizationName}".`,
               'success',
             )
           },

@@ -1,12 +1,10 @@
 import { useState } from 'react'
 import { useSystemConfig, useUpdateSystemConfig } from '@/entities/system-config'
-import type { SystemConfigDto } from '@/entities/system-config'
+import type { TenantResolutionMode } from '@/entities/system-config'
 import { Button, Input, Stack, Text } from '@/shared/ui'
 import { useToast } from '@/shared/ui'
 
-type ResolutionMode = SystemConfigDto['tenant_resolution_mode']
-
-const MODES: { value: ResolutionMode; label: string; description: string }[] = [
+const MODES: { value: TenantResolutionMode; label: string; description: string }[] = [
   {
     value: 'single',
     label: 'シングルテナント（固定 org）',
@@ -30,21 +28,21 @@ export function SettingsPage() {
   const update = useUpdateSystemConfig()
 
   // undefined = 未編集 → loaded data にフォールバック（useEffect 不要）
-  const [mode, setMode] = useState<ResolutionMode | undefined>(undefined)
+  const [mode, setMode] = useState<TenantResolutionMode | undefined>(undefined)
   const [orgSlug, setOrgSlug] = useState<string | undefined>(undefined)
   const [baseDomain, setBaseDomain] = useState<string | undefined>(undefined)
 
-  const currentMode = mode ?? data?.tenant_resolution_mode ?? 'single'
-  const currentOrgSlug = orgSlug ?? data?.tenant_org_slug ?? ''
-  const currentBaseDomain = baseDomain ?? data?.tenant_base_domain ?? 'localhost'
+  const currentMode = mode ?? data?.tenantResolutionMode ?? 'single'
+  const currentOrgSlug = orgSlug ?? data?.tenantOrgSlug ?? ''
+  const currentBaseDomain = baseDomain ?? data?.tenantBaseDomain ?? 'localhost'
 
   function handleSubmit(e: React.SyntheticEvent) {
     e.preventDefault()
     update.mutate(
       {
-        tenant_resolution_mode: currentMode,
-        tenant_org_slug: currentOrgSlug.trim(),
-        tenant_base_domain: currentBaseDomain.trim(),
+        tenantResolutionMode: currentMode,
+        tenantOrgSlug: currentOrgSlug.trim(),
+        tenantBaseDomain: currentBaseDomain.trim(),
       },
       {
         onSuccess: () => {
@@ -189,18 +187,18 @@ export function SettingsPage() {
           <dl className="mt-3 space-y-2 text-sm">
             <div className="flex gap-3">
               <dt className="w-44 shrink-0 text-text-muted">解決方式</dt>
-              <dd className="font-mono text-text-primary">{data.tenant_resolution_mode}</dd>
+              <dd className="font-mono text-text-primary">{data.tenantResolutionMode}</dd>
             </div>
-            {data.tenant_org_slug !== '' && (
+            {data.tenantOrgSlug !== '' && (
               <div className="flex gap-3">
                 <dt className="w-44 shrink-0 text-text-muted">組織スラッグ</dt>
-                <dd className="font-mono text-text-primary">{data.tenant_org_slug}</dd>
+                <dd className="font-mono text-text-primary">{data.tenantOrgSlug}</dd>
               </div>
             )}
-            {data.tenant_resolution_mode === 'subdomain' && (
+            {data.tenantResolutionMode === 'subdomain' && (
               <div className="flex gap-3">
                 <dt className="w-44 shrink-0 text-text-muted">ベースドメイン</dt>
-                <dd className="font-mono text-text-primary">{data.tenant_base_domain}</dd>
+                <dd className="font-mono text-text-primary">{data.tenantBaseDomain}</dd>
               </div>
             )}
           </dl>
