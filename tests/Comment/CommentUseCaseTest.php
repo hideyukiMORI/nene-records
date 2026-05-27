@@ -10,6 +10,7 @@ use NeNeRecords\Comment\DeleteCommentInput;
 use NeNeRecords\Comment\DeleteCommentUseCase;
 use NeNeRecords\Comment\PostCommentInput;
 use NeNeRecords\Comment\PostCommentUseCase;
+use NeNeRecords\Notification\NullNotifier;
 use PHPUnit\Framework\TestCase;
 
 final class CommentUseCaseTest extends TestCase
@@ -19,7 +20,7 @@ final class CommentUseCaseTest extends TestCase
     public function testPostCommentCreatesCommentWithIsApprovedFalse(): void
     {
         $comments = new InMemoryCommentRepository();
-        $useCase = new PostCommentUseCase($comments);
+        $useCase = new PostCommentUseCase($comments, new NullNotifier());
 
         $output = $useCase->execute(new PostCommentInput(
             entityId: 1,
@@ -34,7 +35,7 @@ final class CommentUseCaseTest extends TestCase
     public function testPostCommentReturnsCorrectOutput(): void
     {
         $comments = new InMemoryCommentRepository();
-        $useCase = new PostCommentUseCase($comments);
+        $useCase = new PostCommentUseCase($comments, new NullNotifier());
 
         $output = $useCase->execute(new PostCommentInput(
             entityId: 42,
@@ -53,7 +54,7 @@ final class CommentUseCaseTest extends TestCase
     public function testPostCommentAssignsSequentialIds(): void
     {
         $comments = new InMemoryCommentRepository();
-        $useCase = new PostCommentUseCase($comments);
+        $useCase = new PostCommentUseCase($comments, new NullNotifier());
 
         $first = $useCase->execute(new PostCommentInput(
             entityId: 1,
@@ -77,7 +78,7 @@ final class CommentUseCaseTest extends TestCase
     public function testApproveCommentSetsIsApprovedTrue(): void
     {
         $comments = new InMemoryCommentRepository();
-        $posted = (new PostCommentUseCase($comments))->execute(new PostCommentInput(
+        $posted = (new PostCommentUseCase($comments, new NullNotifier()))->execute(new PostCommentInput(
             entityId: 1,
             authorName: 'Alice',
             authorEmail: 'alice@example.com',
@@ -96,7 +97,7 @@ final class CommentUseCaseTest extends TestCase
     public function testApproveCommentReturnsCorrectOutput(): void
     {
         $comments = new InMemoryCommentRepository();
-        $posted = (new PostCommentUseCase($comments))->execute(new PostCommentInput(
+        $posted = (new PostCommentUseCase($comments, new NullNotifier()))->execute(new PostCommentInput(
             entityId: 7,
             authorName: 'Carol',
             authorEmail: 'carol@example.com',
@@ -119,7 +120,7 @@ final class CommentUseCaseTest extends TestCase
     public function testDeleteCommentSuccessfully(): void
     {
         $comments = new InMemoryCommentRepository();
-        $posted = (new PostCommentUseCase($comments))->execute(new PostCommentInput(
+        $posted = (new PostCommentUseCase($comments, new NullNotifier()))->execute(new PostCommentInput(
             entityId: 1,
             authorName: 'Dave',
             authorEmail: 'dave@example.com',
@@ -137,7 +138,7 @@ final class CommentUseCaseTest extends TestCase
     public function testDeleteCommentDeletesOnlySpecifiedComment(): void
     {
         $comments = new InMemoryCommentRepository();
-        $postUseCase = new PostCommentUseCase($comments);
+        $postUseCase = new PostCommentUseCase($comments, new NullNotifier());
 
         $first = $postUseCase->execute(new PostCommentInput(
             entityId: 1,
