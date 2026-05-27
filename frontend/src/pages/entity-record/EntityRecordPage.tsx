@@ -15,6 +15,7 @@ import {
   EntityStatusPanel,
   useEntityRevisionsPanel,
   useEntitySeoPanel,
+  useEntityStatusPanel,
 } from '@/features/manage-entity-status'
 import { ManageEntityTagsView, useManageEntityTagsPage } from '@/features/manage-entity-tags'
 import {
@@ -42,7 +43,18 @@ export function EntityRecordPage() {
   return <EntityRecordContent entityType={entityTypeQuery.data} entityId={entityId} />
 }
 
-// ── Thin wrapper so useEntitySeoPanel runs only after entity loads ────────────
+// ── Thin wrappers so hooks that require non-null entity run only after load ────
+
+function EntityStatusPanelSection({
+  entity,
+  entityTypeSlug,
+}: {
+  entity: Entity
+  entityTypeSlug: string
+}) {
+  const statusPanel = useEntityStatusPanel(entity, entityTypeSlug)
+  return <EntityStatusPanel {...statusPanel} />
+}
 
 function EntitySeoPanelSection({ entity }: { entity: Entity }) {
   const seoPanel = useEntitySeoPanel(entity)
@@ -108,7 +120,9 @@ function EntityRecordContent({
           {getLocalizedEntityTypeName(entityType, locale)}
         </Text>
       </Stack>
-      {entity !== null && <EntityStatusPanel entity={entity} entityTypeSlug={entityType.slug} />}
+      {entity !== null && (
+        <EntityStatusPanelSection entity={entity} entityTypeSlug={entityType.slug} />
+      )}
       <EditEntityTextFieldsView
         entity={entity}
         textFieldDefs={textFieldDefs}
