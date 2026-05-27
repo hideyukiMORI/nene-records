@@ -8,7 +8,7 @@ export interface UserDto {
 }
 
 export interface UserListDto {
-  users: UserDto[]
+  items: UserDto[]
 }
 
 export interface CreateUserRequestDto {
