@@ -6,6 +6,23 @@ NeNe Records does not yet follow Semantic Versioning — entries are grouped by 
 
 ---
 
+## [E2E テスト拡充 — 包括的ブラウザシナリオ] — 2026-05-27
+
+### Added
+- `09-ui-states.spec.ts` (6 tests) — ローディング中ボタンテキスト変化・フォーム disabled・ダブルサブミット防止・エラーメッセージ重複なし確認 (#260, PR #259)
+- `10-accessibility.spec.ts` (11 tests) — ARIA 属性・ラベル紐付け・キーボードナビゲーション・スクリーンリーダーアクセシブルなエラー状態 (#260, PR #259)
+- `11-error-recovery.spec.ts` (10 tests) — entity-types/tags/users ロードエラー→Retry→成功・POST エラー→リトライ→アイテム表示 (#260, PR #259)
+- `12-crud-flows.spec.ts` (8 tests) — 複数作成・フィールドdefs ナビゲーション・削除確認ダイアログ・キャンセルで保持 (#260, PR #259)
+- `13-role-access.spec.ts` (20 tests) — admin/editor/superadmin 役割×ページの網羅的アクセスマトリクス (#260, PR #259)
+- `14-pages.spec.ts` (27 tests) — Comments・Navigation・Webhooks・Media Library・Site Settings・Dashboard 各ページの完全カバレッジ (#260, PR #259)
+- `15-repetition.spec.ts` (8 tests) — N 連続作成安定性・フォームリセット確認・エラー/成功交互サイクル・ダブルサブミット長期安定性 (#260, PR #259)
+- `16-auth-lifecycle.spec.ts` (10 tests) — Bearer ヘッダー伝播・localStorage トークン永続・期限切れリダイレクト・401 による自動ログアウト (#260, PR #259)
+
+### Changed
+- Playwright E2E 合計: 67 → 157 tests (#260, PR #259)
+
+---
+
 ## [M10 — マルチテナント包括テストスイート] — 2026-07-01
 
 ### Added
