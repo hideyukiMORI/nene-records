@@ -145,30 +145,6 @@ final readonly class EntityRelationServiceProvider implements ServiceProviderInt
                 },
             )
             ->set(
-                FieldKeyNotRegisteredExceptionHandler::class,
-                static function (ContainerInterface $c): FieldKeyNotRegisteredExceptionHandler {
-                    $problemDetails = $c->get(ProblemDetailsResponseFactory::class);
-
-                    if (!$problemDetails instanceof ProblemDetailsResponseFactory) {
-                        throw new LogicException('Problem details response factory service is invalid.');
-                    }
-
-                    return new FieldKeyNotRegisteredExceptionHandler($problemDetails);
-                },
-            )
-            ->set(
-                FieldTypeMismatchExceptionHandler::class,
-                static function (ContainerInterface $c): FieldTypeMismatchExceptionHandler {
-                    $problemDetails = $c->get(ProblemDetailsResponseFactory::class);
-
-                    if (!$problemDetails instanceof ProblemDetailsResponseFactory) {
-                        throw new LogicException('Problem details response factory service is invalid.');
-                    }
-
-                    return new FieldTypeMismatchExceptionHandler($problemDetails);
-                },
-            )
-            ->set(
                 RelationTargetTypeMismatchExceptionHandler::class,
                 static function (ContainerInterface $c): RelationTargetTypeMismatchExceptionHandler {
                     $problemDetails = $c->get(ProblemDetailsResponseFactory::class);

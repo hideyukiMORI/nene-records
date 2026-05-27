@@ -6,10 +6,10 @@ namespace NeNeRecords\Tests\IntField;
 
 use NeNeRecords\Entity\Entity;
 use NeNeRecords\FieldDef\FieldDef;
+use NeNeRecords\FieldDef\FieldKeyNotRegisteredException;
+use NeNeRecords\FieldDef\FieldTypeMismatchException;
 use NeNeRecords\IntField\CreateIntFieldInput;
 use NeNeRecords\IntField\CreateIntFieldUseCase;
-use NeNeRecords\IntField\FieldKeyNotRegisteredException;
-use NeNeRecords\IntField\FieldTypeMismatchException;
 use NeNeRecords\IntField\IntField;
 use NeNeRecords\IntField\UpdateIntFieldInput;
 use NeNeRecords\IntField\UpdateIntFieldUseCase;

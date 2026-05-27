@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace NeNeRecords\TextField;
+namespace NeNeRecords\FieldDef;
 
 use Nene2\Error\DomainExceptionHandlerInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;

@@ -8,6 +8,8 @@ use NeNeRecords\Entity\Entity;
 use NeNeRecords\Entity\EntityNotFoundException;
 use NeNeRecords\Entity\EntityRepositoryInterface;
 use NeNeRecords\FieldDef\FieldDefRepositoryInterface;
+use NeNeRecords\FieldDef\FieldKeyNotRegisteredException;
+use NeNeRecords\FieldDef\FieldTypeMismatchException;
 
 final readonly class AttachEntityRelationUseCase implements AttachEntityRelationUseCaseInterface
 {

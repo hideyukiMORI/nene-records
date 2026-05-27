@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace NeNeRecords\EntityRelation;
+namespace NeNeRecords\FieldDef;
 
 use RuntimeException;
 
@@ -13,11 +13,8 @@ final class FieldTypeMismatchException extends RuntimeException
         public readonly string $expectedDataType,
         public readonly string $actualDataType,
     ) {
-        parent::__construct(sprintf(
-            'Field key "%s" expects data type "%s" but is registered as "%s".',
-            $fieldKey,
-            $expectedDataType,
-            $actualDataType,
-        ));
+        parent::__construct(
+            "Field key \"{$fieldKey}\" expects data type \"{$expectedDataType}\" but is registered as \"{$actualDataType}\".",
+        );
     }
 }

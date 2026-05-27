@@ -7,6 +7,8 @@ namespace NeNeRecords\IntField;
 use NeNeRecords\Entity\EntityNotFoundException;
 use NeNeRecords\Entity\EntityRepositoryInterface;
 use NeNeRecords\FieldDef\FieldDefRepositoryInterface;
+use NeNeRecords\FieldDef\FieldKeyNotRegisteredException;
+use NeNeRecords\FieldDef\FieldTypeMismatchException;
 
 final readonly class UpdateIntFieldUseCase implements UpdateIntFieldUseCaseInterface
 {
@@ -56,7 +58,7 @@ final readonly class UpdateIntFieldUseCase implements UpdateIntFieldUseCaseInter
         $fieldDef = $this->fieldDefs->findByEntityTypeIdAndFieldKey($entityTypeId, $fieldKey);
 
         if ($fieldDef === null) {
-            throw new FieldKeyNotRegisteredException($entityTypeId, $fieldKey);
+            throw new FieldKeyNotRegisteredException($fieldKey, $entityTypeId);
         }
 
         if ($fieldDef->dataType !== self::INT_DATA_TYPE) {

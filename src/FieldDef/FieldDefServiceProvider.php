@@ -217,6 +217,30 @@ final readonly class FieldDefServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(
+                FieldKeyNotRegisteredExceptionHandler::class,
+                static function (ContainerInterface $c): FieldKeyNotRegisteredExceptionHandler {
+                    $problemDetails = $c->get(ProblemDetailsResponseFactory::class);
+
+                    if (!$problemDetails instanceof ProblemDetailsResponseFactory) {
+                        throw new LogicException('Problem details response factory service is invalid.');
+                    }
+
+                    return new FieldKeyNotRegisteredExceptionHandler($problemDetails);
+                },
+            )
+            ->set(
+                FieldTypeMismatchExceptionHandler::class,
+                static function (ContainerInterface $c): FieldTypeMismatchExceptionHandler {
+                    $problemDetails = $c->get(ProblemDetailsResponseFactory::class);
+
+                    if (!$problemDetails instanceof ProblemDetailsResponseFactory) {
+                        throw new LogicException('Problem details response factory service is invalid.');
+                    }
+
+                    return new FieldTypeMismatchExceptionHandler($problemDetails);
+                },
+            )
+            ->set(
                 'nene-records.route_registrar.field_def',
                 static function (ContainerInterface $c): FieldDefRouteRegistrar {
                     $get = $c->get(GetFieldDefByIdHandler::class);

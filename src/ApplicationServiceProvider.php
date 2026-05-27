@@ -13,8 +13,6 @@ use NeNeRecords\Analytics\AnalyticsServiceProvider;
 use NeNeRecords\Auth\InvalidCredentialsExceptionHandler;
 use NeNeRecords\BoolField\BoolFieldNotFoundExceptionHandler;
 use NeNeRecords\BoolField\BoolFieldServiceProvider;
-use NeNeRecords\BoolField\FieldKeyNotRegisteredExceptionHandler as BoolFieldKeyNotRegisteredExceptionHandler;
-use NeNeRecords\BoolField\FieldTypeMismatchExceptionHandler as BoolFieldTypeMismatchExceptionHandler;
 use NeNeRecords\Comment\CommentNotFoundExceptionHandler;
 use NeNeRecords\Comment\CommentRouteRegistrar;
 use NeNeRecords\Comment\CommentServiceProvider;
@@ -23,15 +21,11 @@ use NeNeRecords\DataMigration\DataMigrationRouteRegistrar;
 use NeNeRecords\DataMigration\DataMigrationServiceProvider;
 use NeNeRecords\DateTimeField\DateTimeFieldNotFoundExceptionHandler;
 use NeNeRecords\DateTimeField\DateTimeFieldServiceProvider;
-use NeNeRecords\DateTimeField\FieldKeyNotRegisteredExceptionHandler as DateTimeFieldKeyNotRegisteredExceptionHandler;
-use NeNeRecords\DateTimeField\FieldTypeMismatchExceptionHandler as DateTimeFieldTypeMismatchExceptionHandler;
 use NeNeRecords\Entity\DuplicateEntitySlugExceptionHandler;
 use NeNeRecords\Entity\EntityNotFoundExceptionHandler;
 use NeNeRecords\Entity\EntityServiceProvider;
 use NeNeRecords\EntityArchive\EntityArchiveServiceProvider;
 use NeNeRecords\EntityRelation\EntityRelationServiceProvider;
-use NeNeRecords\EntityRelation\FieldKeyNotRegisteredExceptionHandler as EntityRelationFieldKeyNotRegisteredExceptionHandler;
-use NeNeRecords\EntityRelation\FieldTypeMismatchExceptionHandler as EntityRelationFieldTypeMismatchExceptionHandler;
 use NeNeRecords\EntityRelation\RelationAlreadyAttachedExceptionHandler;
 use NeNeRecords\EntityRelation\RelationNotAttachedExceptionHandler;
 use NeNeRecords\EntityRelation\RelationTargetTypeMismatchExceptionHandler;
@@ -44,13 +38,11 @@ use NeNeRecords\EntityType\EntityTypeServiceProvider;
 use NeNeRecords\EntityType\EntityTypeSlugConflictExceptionHandler;
 use NeNeRecords\EnumField\EnumFieldNotFoundExceptionHandler;
 use NeNeRecords\EnumField\EnumFieldServiceProvider;
-use NeNeRecords\EnumField\FieldKeyNotRegisteredExceptionHandler as EnumFieldKeyNotRegisteredExceptionHandler;
-use NeNeRecords\EnumField\FieldTypeMismatchExceptionHandler as EnumFieldTypeMismatchExceptionHandler;
 use NeNeRecords\FieldDef\FieldDefConflictExceptionHandler;
 use NeNeRecords\FieldDef\FieldDefNotFoundExceptionHandler;
 use NeNeRecords\FieldDef\FieldDefServiceProvider;
-use NeNeRecords\IntField\FieldKeyNotRegisteredExceptionHandler as IntFieldKeyNotRegisteredExceptionHandler;
-use NeNeRecords\IntField\FieldTypeMismatchExceptionHandler as IntFieldTypeMismatchExceptionHandler;
+use NeNeRecords\FieldDef\FieldKeyNotRegisteredExceptionHandler;
+use NeNeRecords\FieldDef\FieldTypeMismatchExceptionHandler;
 use NeNeRecords\IntField\IntFieldNotFoundExceptionHandler;
 use NeNeRecords\IntField\IntFieldServiceProvider;
 use NeNeRecords\Media\MediaInvalidTypeExceptionHandler;
@@ -78,8 +70,6 @@ use NeNeRecords\SystemConfig\SystemConfigServiceProvider;
 use NeNeRecords\Tag\TagNotFoundExceptionHandler;
 use NeNeRecords\Tag\TagServiceProvider;
 use NeNeRecords\Tag\TagSlugConflictExceptionHandler;
-use NeNeRecords\TextField\FieldKeyNotRegisteredExceptionHandler as TextFieldKeyNotRegisteredExceptionHandler;
-use NeNeRecords\TextField\FieldTypeMismatchExceptionHandler as TextFieldTypeMismatchExceptionHandler;
 use NeNeRecords\TextField\TextFieldNotFoundExceptionHandler;
 use NeNeRecords\TextField\TextFieldServiceProvider;
 use NeNeRecords\User\CannotDeleteSelfExceptionHandler;
@@ -253,26 +243,16 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $entityNotFound = $container->get(EntityNotFoundExceptionHandler::class);
                     $duplicateEntitySlug = $container->get(DuplicateEntitySlugExceptionHandler::class);
                     $textFieldNotFound = $container->get(TextFieldNotFoundExceptionHandler::class);
-                    $textFieldKeyNotRegistered = $container->get(TextFieldKeyNotRegisteredExceptionHandler::class);
-                    $textFieldTypeMismatch = $container->get(TextFieldTypeMismatchExceptionHandler::class);
                     $intFieldNotFound = $container->get(IntFieldNotFoundExceptionHandler::class);
-                    $intFieldKeyNotRegistered = $container->get(IntFieldKeyNotRegisteredExceptionHandler::class);
-                    $intFieldTypeMismatch = $container->get(IntFieldTypeMismatchExceptionHandler::class);
                     $enumFieldNotFound = $container->get(EnumFieldNotFoundExceptionHandler::class);
-                    $enumFieldKeyNotRegistered = $container->get(EnumFieldKeyNotRegisteredExceptionHandler::class);
-                    $enumFieldTypeMismatch = $container->get(EnumFieldTypeMismatchExceptionHandler::class);
                     $boolFieldNotFound = $container->get(BoolFieldNotFoundExceptionHandler::class);
-                    $boolFieldKeyNotRegistered = $container->get(BoolFieldKeyNotRegisteredExceptionHandler::class);
-                    $boolFieldTypeMismatch = $container->get(BoolFieldTypeMismatchExceptionHandler::class);
                     $datetimeFieldNotFound = $container->get(DateTimeFieldNotFoundExceptionHandler::class);
-                    $datetimeFieldKeyNotRegistered = $container->get(DateTimeFieldKeyNotRegisteredExceptionHandler::class);
-                    $datetimeFieldTypeMismatch = $container->get(DateTimeFieldTypeMismatchExceptionHandler::class);
+                    $fieldKeyNotRegistered = $container->get(FieldKeyNotRegisteredExceptionHandler::class);
+                    $fieldTypeMismatch = $container->get(FieldTypeMismatchExceptionHandler::class);
                     $tagNotFound = $container->get(TagNotFoundExceptionHandler::class);
                     $tagSlugConflict = $container->get(TagSlugConflictExceptionHandler::class);
                     $entityTagAlreadyAttached = $container->get(EntityTagAlreadyAttachedExceptionHandler::class);
                     $entityTagNotAttached = $container->get(EntityTagNotAttachedExceptionHandler::class);
-                    $entityRelationFieldKeyNotRegistered = $container->get(EntityRelationFieldKeyNotRegisteredExceptionHandler::class);
-                    $entityRelationFieldTypeMismatch = $container->get(EntityRelationFieldTypeMismatchExceptionHandler::class);
                     $relationTargetTypeMismatch = $container->get(RelationTargetTypeMismatchExceptionHandler::class);
                     $relationAlreadyAttached = $container->get(RelationAlreadyAttachedExceptionHandler::class);
                     $relationNotAttached = $container->get(RelationNotAttachedExceptionHandler::class);
@@ -307,26 +287,16 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $entityNotFound,
                         $duplicateEntitySlug,
                         $textFieldNotFound,
-                        $textFieldKeyNotRegistered,
-                        $textFieldTypeMismatch,
                         $intFieldNotFound,
-                        $intFieldKeyNotRegistered,
-                        $intFieldTypeMismatch,
                         $enumFieldNotFound,
-                        $enumFieldKeyNotRegistered,
-                        $enumFieldTypeMismatch,
                         $boolFieldNotFound,
-                        $boolFieldKeyNotRegistered,
-                        $boolFieldTypeMismatch,
                         $datetimeFieldNotFound,
-                        $datetimeFieldKeyNotRegistered,
-                        $datetimeFieldTypeMismatch,
+                        $fieldKeyNotRegistered,
+                        $fieldTypeMismatch,
                         $tagNotFound,
                         $tagSlugConflict,
                         $entityTagAlreadyAttached,
                         $entityTagNotAttached,
-                        $entityRelationFieldKeyNotRegistered,
-                        $entityRelationFieldTypeMismatch,
                         $relationTargetTypeMismatch,
                         $relationAlreadyAttached,
                         $relationNotAttached,
@@ -366,26 +336,16 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $entityNotFound,
                         $duplicateEntitySlug,
                         $textFieldNotFound,
-                        $textFieldKeyNotRegistered,
-                        $textFieldTypeMismatch,
                         $intFieldNotFound,
-                        $intFieldKeyNotRegistered,
-                        $intFieldTypeMismatch,
                         $enumFieldNotFound,
-                        $enumFieldKeyNotRegistered,
-                        $enumFieldTypeMismatch,
                         $boolFieldNotFound,
-                        $boolFieldKeyNotRegistered,
-                        $boolFieldTypeMismatch,
                         $datetimeFieldNotFound,
-                        $datetimeFieldKeyNotRegistered,
-                        $datetimeFieldTypeMismatch,
+                        $fieldKeyNotRegistered,
+                        $fieldTypeMismatch,
                         $tagNotFound,
                         $tagSlugConflict,
                         $entityTagAlreadyAttached,
                         $entityTagNotAttached,
-                        $entityRelationFieldKeyNotRegistered,
-                        $entityRelationFieldTypeMismatch,
                         $relationTargetTypeMismatch,
                         $relationAlreadyAttached,
                         $relationNotAttached,

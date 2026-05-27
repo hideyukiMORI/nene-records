@@ -216,30 +216,6 @@ final readonly class EnumFieldServiceProvider implements ServiceProviderInterfac
                 },
             )
             ->set(
-                FieldKeyNotRegisteredExceptionHandler::class,
-                static function (ContainerInterface $container): FieldKeyNotRegisteredExceptionHandler {
-                    $problemDetails = $container->get(ProblemDetailsResponseFactory::class);
-
-                    if (!$problemDetails instanceof ProblemDetailsResponseFactory) {
-                        throw new LogicException('Problem details response factory service is invalid.');
-                    }
-
-                    return new FieldKeyNotRegisteredExceptionHandler($problemDetails);
-                },
-            )
-            ->set(
-                FieldTypeMismatchExceptionHandler::class,
-                static function (ContainerInterface $container): FieldTypeMismatchExceptionHandler {
-                    $problemDetails = $container->get(ProblemDetailsResponseFactory::class);
-
-                    if (!$problemDetails instanceof ProblemDetailsResponseFactory) {
-                        throw new LogicException('Problem details response factory service is invalid.');
-                    }
-
-                    return new FieldTypeMismatchExceptionHandler($problemDetails);
-                },
-            )
-            ->set(
                 'nene-records.route_registrar.enum_field',
                 static function (ContainerInterface $container): EnumFieldRouteRegistrar {
                     $list = $container->get(ListEnumFieldsHandler::class);

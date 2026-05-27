@@ -6,12 +6,12 @@ namespace NeNeRecords\Tests\TextField;
 
 use NeNeRecords\Entity\Entity;
 use NeNeRecords\FieldDef\FieldDef;
+use NeNeRecords\FieldDef\FieldKeyNotRegisteredException;
+use NeNeRecords\FieldDef\FieldTypeMismatchException;
 use NeNeRecords\Tests\Entity\InMemoryEntityRepository;
 use NeNeRecords\Tests\FieldDef\InMemoryFieldDefRepository;
 use NeNeRecords\TextField\CreateTextFieldInput;
 use NeNeRecords\TextField\CreateTextFieldUseCase;
-use NeNeRecords\TextField\FieldKeyNotRegisteredException;
-use NeNeRecords\TextField\FieldTypeMismatchException;
 use NeNeRecords\TextField\TextField;
 use NeNeRecords\TextField\UpdateTextFieldInput;
 use NeNeRecords\TextField\UpdateTextFieldUseCase;
