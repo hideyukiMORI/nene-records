@@ -35,20 +35,32 @@ final readonly class EntityArchiveServiceProvider implements ServiceProviderInte
                 },
             )
             ->set(
-                GetEntityArchiveCsvHandler::class,
-                static function (ContainerInterface $c): GetEntityArchiveCsvHandler {
+                GetEntityArchiveCsvUseCaseInterface::class,
+                static function (ContainerInterface $c): GetEntityArchiveCsvUseCaseInterface {
                     $archive = $c->get(EntityArchiveRepositoryInterface::class);
-                    $responseFactory = $c->get(ResponseFactoryInterface::class);
 
                     if (!$archive instanceof EntityArchiveRepositoryInterface) {
                         throw new LogicException('Entity archive repository service is invalid.');
+                    }
+
+                    return new GetEntityArchiveCsvUseCase($archive);
+                },
+            )
+            ->set(
+                GetEntityArchiveCsvHandler::class,
+                static function (ContainerInterface $c): GetEntityArchiveCsvHandler {
+                    $useCase         = $c->get(GetEntityArchiveCsvUseCaseInterface::class);
+                    $responseFactory = $c->get(ResponseFactoryInterface::class);
+
+                    if (!$useCase instanceof GetEntityArchiveCsvUseCaseInterface) {
+                        throw new LogicException('GetEntityArchiveCsvUseCaseInterface service is invalid.');
                     }
 
                     if (!$responseFactory instanceof ResponseFactoryInterface) {
                         throw new LogicException('Response factory service is invalid.');
                     }
 
-                    return new GetEntityArchiveCsvHandler($archive, $responseFactory);
+                    return new GetEntityArchiveCsvHandler($useCase, $responseFactory);
                 },
             )
             ->set(
@@ -57,7 +69,7 @@ final readonly class EntityArchiveServiceProvider implements ServiceProviderInte
                     $csv = $c->get(GetEntityArchiveCsvHandler::class);
 
                     if (!$csv instanceof GetEntityArchiveCsvHandler) {
-                        throw new \LogicException('GetEntityArchiveCsv handler service is invalid.');
+                        throw new LogicException('GetEntityArchiveCsv handler service is invalid.');
                     }
 
                     return new EntityArchiveRouteRegistrar($csv);
