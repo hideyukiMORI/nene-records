@@ -17,7 +17,10 @@ import {
   useEntitySeoPanel,
 } from '@/features/manage-entity-status'
 import { ManageEntityTagsView, useManageEntityTagsPage } from '@/features/manage-entity-tags'
-import { ManageEntityRelationsView } from '@/features/manage-entity-relations'
+import {
+  ManageEntityRelationsView,
+  useManageEntityRelationsView,
+} from '@/features/manage-entity-relations'
 import { InverseEntityRelationsView } from '@/features/inverse-entity-relations'
 import { useTranslation } from '@/shared/i18n'
 import { Button, Stack, Text } from '@/shared/ui'
@@ -75,6 +78,7 @@ function EntityRecordContent({
   } = useEditEntityTextFieldsPage(entityTypeId, entityId)
 
   const revisionsPanel = useEntityRevisionsPanel(entityId)
+  const entityRelations = useManageEntityRelationsView(entityTypeId)
 
   const {
     attachedTags,
@@ -139,7 +143,7 @@ function EntityRecordContent({
         onAttach={attachTag}
         onDetach={detachTag}
       />
-      <ManageEntityRelationsView entityId={entityId} entityTypeId={entityTypeId} />
+      <ManageEntityRelationsView entityId={entityId} {...entityRelations} />
       <InverseEntityRelationsView entityId={entityId} entityTypeId={entityTypeId} />
       {entity !== null && <EntitySeoPanelSection entity={entity} />}
       <EntityRevisionsPanel {...revisionsPanel} />

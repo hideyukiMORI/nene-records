@@ -1,62 +1,60 @@
-import { useState } from 'react'
-import type { CreateWebhookInput, Webhook } from '@/entities/webhook'
-import {
-  useCreateWebhook,
-  useDeleteWebhook,
-  useUpdateWebhook,
-  useWebhookList,
-} from '@/entities/webhook'
+import type { CreateWebhookInput, Webhook, WebhookList } from '@/entities/webhook'
 import { useTranslation } from '@/shared/i18n'
 import { Button, ConfirmDialog, EmptyState, Stack, Text } from '@/shared/ui'
 import { WebhookForm } from './WebhookForm'
 
-export function ManageWebhooksView() {
+interface ManageWebhooksViewProps {
+  webhooks: WebhookList | undefined
+  isLoading: boolean
+  isError: boolean
+  showCreateForm: boolean
+  editingId: number | null
+  deleteTarget: Webhook | null
+  isCreating: boolean
+  isUpdating: boolean
+  isDeleting: boolean
+  createError: string | null
+  updateError: string | null
+  onCreate: (input: CreateWebhookInput) => Promise<void>
+  onUpdate: (id: number, input: CreateWebhookInput) => Promise<void>
+  onDeleteConfirm: () => Promise<void>
+  onShowCreateForm: () => void
+  onHideCreateForm: () => void
+  onStartEdit: (id: number) => void
+  onCancelEdit: () => void
+  onDeleteRequest: (webhook: Webhook) => void
+  onDeleteCancel: () => void
+}
+
+export function ManageWebhooksView({
+  webhooks,
+  isLoading,
+  isError,
+  showCreateForm,
+  editingId,
+  deleteTarget,
+  isCreating,
+  isUpdating,
+  isDeleting,
+  createError,
+  updateError,
+  onCreate,
+  onUpdate,
+  onDeleteConfirm,
+  onShowCreateForm,
+  onHideCreateForm,
+  onStartEdit,
+  onCancelEdit,
+  onDeleteRequest,
+  onDeleteCancel,
+}: ManageWebhooksViewProps) {
   const { t } = useTranslation()
-  const { data, isLoading, isError } = useWebhookList()
-  const createMutation = useCreateWebhook()
-  const updateMutation = useUpdateWebhook()
-  const deleteMutation = useDeleteWebhook()
-
-  const [showCreateForm, setShowCreateForm] = useState(false)
-  const [editingId, setEditingId] = useState<number | null>(null)
-  const [deleteTarget, setDeleteTarget] = useState<Webhook | null>(null)
-  const [createError, setCreateError] = useState<string | null>(null)
-  const [updateError, setUpdateError] = useState<string | null>(null)
-
-  const handleCreate = async (input: CreateWebhookInput) => {
-    setCreateError(null)
-    try {
-      await createMutation.mutateAsync(input)
-      setShowCreateForm(false)
-    } catch {
-      setCreateError(t('admin.webhooks.createError'))
-    }
-  }
-
-  const handleUpdate = async (id: number, input: CreateWebhookInput) => {
-    setUpdateError(null)
-    try {
-      await updateMutation.mutateAsync({ id, input })
-      setEditingId(null)
-    } catch {
-      setUpdateError(t('admin.webhooks.updateError'))
-    }
-  }
-
-  const handleDelete = async () => {
-    if (deleteTarget === null) return
-    try {
-      await deleteMutation.mutateAsync(deleteTarget.id)
-    } finally {
-      setDeleteTarget(null)
-    }
-  }
 
   if (isLoading) {
     return <Text muted>{t('admin.webhooks.loading')}</Text>
   }
 
-  if (isError || data === undefined) {
+  if (isError || webhooks === undefined) {
     return <Text muted>{t('common.error.serverError')}</Text>
   }
 
@@ -67,13 +65,7 @@ export function ManageWebhooksView() {
           {t('admin.webhooks.title')}
         </Text>
         {!showCreateForm && (
-          <Button
-            type="button"
-            size="sm"
-            onClick={() => {
-              setShowCreateForm(true)
-            }}
-          >
+          <Button type="button" size="sm" onClick={onShowCreateForm}>
             {t('admin.webhooks.addButton')}
           </Button>
         )}
@@ -83,25 +75,22 @@ export function ManageWebhooksView() {
 
       {showCreateForm && (
         <WebhookForm
-          isSubmitting={createMutation.isPending}
+          isSubmitting={isCreating}
           serverErrorTitle={createError}
           submitLabel={t('common.actions.create')}
-          onSubmit={handleCreate}
-          onCancel={() => {
-            setShowCreateForm(false)
-            setCreateError(null)
-          }}
+          onSubmit={onCreate}
+          onCancel={onHideCreateForm}
         />
       )}
 
-      {data.items.length === 0 && !showCreateForm ? (
+      {webhooks.items.length === 0 && !showCreateForm ? (
         <EmptyState
           title={t('admin.webhooks.empty.title')}
           description={t('admin.webhooks.empty.description')}
         />
       ) : (
         <Stack gap="sm">
-          {data.items.map((webhook) =>
+          {webhooks.items.map((webhook) =>
             editingId === webhook.id ? (
               <WebhookForm
                 key={webhook.id}
@@ -112,14 +101,11 @@ export function ManageWebhooksView() {
                   secret: webhook.secret ?? '',
                   isActive: webhook.isActive,
                 }}
-                isSubmitting={updateMutation.isPending}
+                isSubmitting={isUpdating}
                 serverErrorTitle={updateError}
                 submitLabel={t('common.actions.save')}
-                onSubmit={async (input) => handleUpdate(webhook.id, input)}
-                onCancel={() => {
-                  setEditingId(null)
-                  setUpdateError(null)
-                }}
+                onSubmit={async (input) => onUpdate(webhook.id, input)}
+                onCancel={onCancelEdit}
               />
             ) : (
               <div
@@ -170,7 +156,7 @@ export function ManageWebhooksView() {
                     variant="secondary"
                     size="sm"
                     onClick={() => {
-                      setEditingId(webhook.id)
+                      onStartEdit(webhook.id)
                     }}
                   >
                     {t('common.actions.edit')}
@@ -180,7 +166,7 @@ export function ManageWebhooksView() {
                     variant="secondary"
                     size="sm"
                     onClick={() => {
-                      setDeleteTarget(webhook)
+                      onDeleteRequest(webhook)
                     }}
                   >
                     {t('common.actions.delete')}
@@ -200,16 +186,12 @@ export function ManageWebhooksView() {
             ? t('admin.webhooks.delete.description', { url: deleteTarget.url })
             : undefined
         }
-        confirmLabel={
-          deleteMutation.isPending ? t('common.actions.deleting') : t('common.actions.delete')
-        }
+        confirmLabel={isDeleting ? t('common.actions.deleting') : t('common.actions.delete')}
         cancelLabel={t('common.actions.cancel')}
-        isPending={deleteMutation.isPending}
-        onCancel={() => {
-          setDeleteTarget(null)
-        }}
+        isPending={isDeleting}
+        onCancel={onDeleteCancel}
         onConfirm={() => {
-          void handleDelete()
+          void onDeleteConfirm()
         }}
       />
     </Stack>

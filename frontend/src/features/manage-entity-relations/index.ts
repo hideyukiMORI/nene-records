@@ -1,4 +1,6 @@
 export { useRelationFieldPanel } from './hooks/use-relation-field-panel'
+export { useManageEntityRelationsView } from './hooks/use-manage-entity-relations-view'
+export type { ManageEntityRelationsViewState } from './hooks/use-manage-entity-relations-view'
 export { ManageEntityRelationsView } from './ui/ManageEntityRelationsView'
 export { RelationFieldPanel } from './ui/RelationFieldPanel'
 export type { ManageEntityRelationsViewProps } from './ui/ManageEntityRelationsView'

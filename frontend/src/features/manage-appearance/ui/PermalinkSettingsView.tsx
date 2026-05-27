@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useEntityTypeList, useUpdateEntityType, type EntityType } from '@/entities/entity-type'
+import { useUpdateEntityType, type EntityType } from '@/entities/entity-type'
 import { useTranslation } from '@/shared/i18n'
 import {
   DEFAULT_PERMALINK_PATTERN,
@@ -27,7 +27,7 @@ function matchPreset(value: string | null | undefined): string | null {
   return PERMALINK_PRESETS.find((p) => p.pattern === value)?.pattern ?? null
 }
 
-// ── Per-entity-type permalink row ─────────────────────────────────────────────
+// ── Per-entity-type permalink row (per-row mutation kept internal) ─────────────
 
 function PermalinkRow({ entityType, onSaved }: { entityType: EntityType; onSaved: () => void }) {
   const { t } = useTranslation()
@@ -147,10 +147,8 @@ function PermalinkRow({ entityType, onSaved }: { entityType: EntityType; onSaved
           </div>
         )}
 
-        {/* No {type} warning */}
         {effectivePattern && <NoTypeTokenWarning pattern={effectivePattern} />}
 
-        {/* Live example */}
         {effectivePattern && !isCustom && (
           <p className="text-xs text-text-muted">
             {t('admin.entityTypes.editForm.permalink.example', {
@@ -191,12 +189,20 @@ function PermalinkRow({ entityType, onSaved }: { entityType: EntityType; onSaved
   )
 }
 
-// ── Main view ─────────────────────────────────────────────────────────────────
+// ── Main view (props-driven) ──────────────────────────────────────────────────
 
-export function PermalinkSettingsView() {
+interface PermalinkSettingsViewProps {
+  entityTypes: EntityType[]
+  isLoading: boolean
+  onRefresh: () => void
+}
+
+export function PermalinkSettingsView({
+  entityTypes,
+  isLoading,
+  onRefresh,
+}: PermalinkSettingsViewProps) {
   const { t } = useTranslation()
-  const listQuery = useEntityTypeList({ limit: 100, offset: 0 })
-  const items = listQuery.data?.items ?? []
 
   return (
     <Stack gap="sm">
@@ -205,20 +211,14 @@ export function PermalinkSettingsView() {
         <Text muted>{t('admin.settings.permalink.description')}</Text>
       </Stack>
 
-      {listQuery.isLoading && <Text muted>{t('admin.entityTypes.existingList.loading')}</Text>}
+      {isLoading && <Text muted>{t('admin.entityTypes.existingList.loading')}</Text>}
 
-      {items.length === 0 && !listQuery.isLoading && (
+      {entityTypes.length === 0 && !isLoading && (
         <Text muted>{t('admin.entityTypes.existingList.empty.description')}</Text>
       )}
 
-      {items.map((entityType) => (
-        <PermalinkRow
-          key={String(entityType.id)}
-          entityType={entityType}
-          onSaved={() => {
-            void listQuery.refetch()
-          }}
-        />
+      {entityTypes.map((entityType) => (
+        <PermalinkRow key={String(entityType.id)} entityType={entityType} onSaved={onRefresh} />
       ))}
     </Stack>
   )

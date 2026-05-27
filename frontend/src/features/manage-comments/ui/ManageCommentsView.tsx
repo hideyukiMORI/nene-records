@@ -1,70 +1,61 @@
 import type { AdminComment } from '@/entities/comment'
-import { useAdminCommentList, useApproveComment, useDeleteComment } from '@/entities/comment'
 import { useTranslation } from '@/shared/i18n'
 import { Button, ConfirmDialog, EmptyState, Stack, Text } from '@/shared/ui'
-import { useToast } from '@/shared/ui'
-import { useState } from 'react'
 
-export function ManageCommentsView() {
+interface ManageCommentsViewProps {
+  comments: AdminComment[]
+  isLoading: boolean
+  isError: boolean
+  isApproving: boolean
+  isDeleting: boolean
+  deleteTarget: AdminComment | null
+  onRetry: () => void
+  onApprove: (comment: AdminComment) => void
+  onDeleteRequest: (comment: AdminComment) => void
+  onDeleteConfirm: () => void
+  onDeleteCancel: () => void
+}
+
+export function ManageCommentsView({
+  comments,
+  isLoading,
+  isError,
+  isApproving,
+  isDeleting,
+  deleteTarget,
+  onRetry,
+  onApprove,
+  onDeleteRequest,
+  onDeleteConfirm,
+  onDeleteCancel,
+}: ManageCommentsViewProps) {
   const { t } = useTranslation()
-  const { showToast } = useToast()
-  const commentsQuery = useAdminCommentList()
-  const approveComment = useApproveComment()
-  const deleteComment = useDeleteComment()
 
-  const [deleteTarget, setDeleteTarget] = useState<AdminComment | null>(null)
-
-  function handleApprove(comment: AdminComment) {
-    approveComment.mutate(comment.id, {
-      onSuccess: () => {
-        showToast(t('admin.comments.approveSuccess'), 'success')
-      },
-    })
-  }
-
-  function handleDeleteConfirm() {
-    if (deleteTarget === null) return
-    const id = deleteTarget.id
-    setDeleteTarget(null)
-    deleteComment.mutate(id, {
-      onSuccess: () => {
-        showToast(t('admin.comments.deleteSuccess'), 'success')
-      },
-    })
-  }
-
-  if (commentsQuery.isLoading) {
+  if (isLoading) {
     return <Text muted>{t('admin.comments.loading')}</Text>
   }
 
-  if (commentsQuery.isError) {
+  if (isError) {
     return (
       <Stack gap="sm">
         <Text muted>{t('admin.comments.loadError')}</Text>
-        <Button
-          variant="secondary"
-          onClick={() => {
-            void commentsQuery.refetch()
-          }}
-        >
+        <Button variant="secondary" onClick={onRetry}>
           {t('common.actions.retry')}
         </Button>
       </Stack>
     )
   }
 
-  const items = commentsQuery.data?.items ?? []
-
   return (
     <>
-      {items.length === 0 ? (
+      {comments.length === 0 ? (
         <EmptyState
           title={t('admin.comments.empty')}
           description={t('admin.comments.empty.description')}
         />
       ) : (
         <Stack gap="md">
-          {items.map((comment) => (
+          {comments.map((comment) => (
             <div
               key={comment.id}
               className="rounded-lg border border-border bg-surface-raised px-inline-md py-stack-sm"
@@ -105,9 +96,9 @@ export function ManageCommentsView() {
                       <Button
                         variant="secondary"
                         size="sm"
-                        disabled={approveComment.isPending}
+                        disabled={isApproving}
                         onClick={() => {
-                          handleApprove(comment)
+                          onApprove(comment)
                         }}
                       >
                         {t('admin.comments.approve')}
@@ -116,9 +107,9 @@ export function ManageCommentsView() {
                     <Button
                       variant="danger"
                       size="sm"
-                      disabled={deleteComment.isPending}
+                      disabled={isDeleting}
                       onClick={() => {
-                        setDeleteTarget(comment)
+                        onDeleteRequest(comment)
                       }}
                     >
                       {t('admin.comments.delete')}
@@ -139,11 +130,9 @@ export function ManageCommentsView() {
           name: deleteTarget?.authorName ?? '',
         })}
         confirmLabel={t('admin.comments.delete')}
-        isPending={deleteComment.isPending}
-        onConfirm={handleDeleteConfirm}
-        onCancel={() => {
-          setDeleteTarget(null)
-        }}
+        isPending={isDeleting}
+        onConfirm={onDeleteConfirm}
+        onCancel={onDeleteCancel}
       />
     </>
   )

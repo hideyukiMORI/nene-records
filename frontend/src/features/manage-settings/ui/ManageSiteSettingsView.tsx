@@ -1,34 +1,34 @@
-import { useCallback, useMemo, useState } from 'react'
-import {
-  useSettingList,
-  useSettingRevisions,
-  useUpdateSetting,
-  type SettingItem,
-} from '@/entities/setting'
+import { useState } from 'react'
+import type { SettingItem, SettingRevision } from '@/entities/setting'
 import { useTranslation } from '@/shared/i18n'
 import { Button, Stack, Text } from '@/shared/ui'
 
-function SettingRevisionsPanel({ settingKey }: { settingKey: string }) {
-  const { t } = useTranslation()
-  const revisionsQuery = useSettingRevisions(settingKey)
+// ── Revisions panel (props-driven) ───────────────────────────────────────────
 
-  if (revisionsQuery.isLoading) {
+interface SettingRevisionsPanelProps {
+  revisions: SettingRevision[]
+  isLoading: boolean
+  isError: boolean
+}
+
+function SettingRevisionsPanel({ revisions, isLoading, isError }: SettingRevisionsPanelProps) {
+  const { t } = useTranslation()
+
+  if (isLoading) {
     return <Text muted>{t('admin.settings.history.loading')}</Text>
   }
 
-  if (revisionsQuery.isError) {
+  if (isError) {
     return <Text muted>{t('admin.settings.history.error')}</Text>
   }
 
-  const items = revisionsQuery.data?.items ?? []
-
-  if (items.length === 0) {
+  if (revisions.length === 0) {
     return <Text muted>{t('admin.settings.history.empty')}</Text>
   }
 
   return (
     <Stack gap="xs">
-      {items.map((revision) => (
+      {revisions.map((revision) => (
         <Text key={revision.id} muted variant="caption">
           {revision.createdAt} · {revision.action}
           {revision.previousValue !== null ? ` · from "${revision.previousValue}"` : ''}
@@ -38,6 +38,20 @@ function SettingRevisionsPanel({ settingKey }: { settingKey: string }) {
   )
 }
 
+// ── Setting card (local form state only) ─────────────────────────────────────
+
+interface SettingCardProps {
+  item: SettingItem
+  isSaving: boolean
+  canManageSettings: boolean
+  onSave: (settingKey: string, value: string) => Promise<void>
+  isExpanded: boolean
+  onToggle: () => void
+  revisions: SettingRevision[]
+  revisionsLoading: boolean
+  revisionsError: boolean
+}
+
 function SettingCard({
   item,
   isSaving,
@@ -45,14 +59,10 @@ function SettingCard({
   onSave,
   isExpanded,
   onToggle,
-}: {
-  item: SettingItem
-  isSaving: boolean
-  canManageSettings: boolean
-  onSave: (settingKey: string, value: string) => Promise<void>
-  isExpanded: boolean
-  onToggle: () => void
-}) {
+  revisions,
+  revisionsLoading,
+  revisionsError,
+}: SettingCardProps) {
   const { t } = useTranslation()
   const [value, setValue] = useState(item.value)
   const inputId = `setting-${item.settingKey}`
@@ -79,7 +89,6 @@ function SettingCard({
 
       {/* ── Field ── */}
       {item.dataType === 'markdown' ? (
-        /* Markdown: textarea stacked, save right-aligned below */
         <div className="flex flex-col gap-stack-sm">
           <Text muted variant="caption">
             Markdown ·{' '}
@@ -113,7 +122,6 @@ function SettingCard({
           ) : null}
         </div>
       ) : (
-        /* Text: input + save button inline */
         <div className="flex items-center gap-stack-sm">
           <input
             id={inputId}
@@ -143,37 +151,59 @@ function SettingCard({
       {/* ── History panel ── */}
       {isExpanded ? (
         <div className="mt-stack-md border-t border-border pt-stack-sm">
-          <SettingRevisionsPanel settingKey={item.settingKey} />
+          <SettingRevisionsPanel
+            revisions={revisions}
+            isLoading={revisionsLoading}
+            isError={revisionsError}
+          />
         </div>
       ) : null}
     </section>
   )
 }
 
-export function ManageSiteSettingsView({ canManageSettings }: { canManageSettings: boolean }) {
+// ── Main view ─────────────────────────────────────────────────────────────────
+
+interface ManageSiteSettingsViewProps {
+  items: SettingItem[]
+  isLoading: boolean
+  isError: boolean
+  isSaving: boolean
+  expandedKey: string | null
+  revisions: SettingRevision[]
+  revisionsLoading: boolean
+  revisionsError: boolean
+  canManageSettings: boolean
+  onRetry: () => void
+  onSave: (settingKey: string, value: string) => Promise<void>
+  onToggleExpanded: (settingKey: string) => void
+}
+
+export function ManageSiteSettingsView({
+  items,
+  isLoading,
+  isError,
+  isSaving,
+  expandedKey,
+  revisions,
+  revisionsLoading,
+  revisionsError,
+  canManageSettings,
+  onRetry,
+  onSave,
+  onToggleExpanded,
+}: ManageSiteSettingsViewProps) {
   const { t } = useTranslation()
-  const listQuery = useSettingList()
-  const updateMutation = useUpdateSetting()
-  const [expandedKey, setExpandedKey] = useState<string | null>(null)
 
-  const saveSetting = useCallback(
-    async (settingKey: string, value: string) => {
-      await updateMutation.mutateAsync({ settingKey, input: { value } })
-    },
-    [updateMutation],
-  )
-
-  const items = useMemo(() => listQuery.data?.items ?? [], [listQuery.data?.items])
-
-  if (listQuery.isLoading) {
+  if (isLoading) {
     return <Text muted>{t('admin.settings.loading')}</Text>
   }
 
-  if (listQuery.isError) {
+  if (isError) {
     return (
       <Stack gap="sm">
         <Text muted>{t('admin.settings.error')}</Text>
-        <Button variant="secondary" size="sm" onClick={() => void listQuery.refetch()}>
+        <Button variant="secondary" size="sm" onClick={onRetry}>
           {t('common.actions.retry')}
         </Button>
       </Stack>
@@ -186,13 +216,16 @@ export function ManageSiteSettingsView({ canManageSettings }: { canManageSetting
         <SettingCard
           key={`${item.settingKey}:${item.updatedAt ?? 'default'}`}
           item={item}
-          isSaving={updateMutation.isPending}
+          isSaving={isSaving}
           canManageSettings={canManageSettings}
-          onSave={saveSetting}
+          onSave={onSave}
           isExpanded={expandedKey === item.settingKey}
           onToggle={() => {
-            setExpandedKey((cur) => (cur === item.settingKey ? null : item.settingKey))
+            onToggleExpanded(item.settingKey)
           }}
+          revisions={expandedKey === item.settingKey ? revisions : []}
+          revisionsLoading={expandedKey === item.settingKey && revisionsLoading}
+          revisionsError={expandedKey === item.settingKey && revisionsError}
         />
       ))}
     </Stack>

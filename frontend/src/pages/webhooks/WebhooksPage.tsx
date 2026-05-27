@@ -1,5 +1,6 @@
-import { ManageWebhooksView } from '@/features/manage-webhooks/ui/ManageWebhooksView'
+import { ManageWebhooksView, useManageWebhooksPage } from '@/features/manage-webhooks'
 
 export function WebhooksPage() {
-  return <ManageWebhooksView />
+  const webhooksPage = useManageWebhooksPage()
+  return <ManageWebhooksView {...webhooksPage} />
 }
