@@ -11,6 +11,7 @@ use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RequestScopedHolder;
+use NeNeRecords\Notification\NotifierInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 
@@ -43,7 +44,12 @@ final readonly class CommentServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Comment repository service is invalid.');
                     }
 
-                    return new PostCommentUseCase($repo);
+                    $notifier = $c->get(NotifierInterface::class);
+                    if (!$notifier instanceof NotifierInterface) {
+                        throw new LogicException('Notifier service is invalid.');
+                    }
+
+                    return new PostCommentUseCase($repo, $notifier);
                 },
             )
             ->set(

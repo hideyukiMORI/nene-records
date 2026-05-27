@@ -19,6 +19,7 @@ use NeNeRecords\Comment\ListCommentsHandler;
 use NeNeRecords\Comment\ListCommentsUseCase;
 use NeNeRecords\Comment\PostCommentHandler;
 use NeNeRecords\Comment\PostCommentUseCase;
+use NeNeRecords\Notification\NullNotifier;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
@@ -41,7 +42,7 @@ final class CommentHttpTest extends TestCase
         $problemDetails = new ProblemDetailsResponseFactory($this->factory, $this->factory);
 
         $registrar = new CommentRouteRegistrar(
-            new PostCommentHandler(new PostCommentUseCase($this->repository), $jsonResponse),
+            new PostCommentHandler(new PostCommentUseCase($this->repository, new NullNotifier()), $jsonResponse),
             new ListCommentsHandler(new ListCommentsUseCase($this->repository), $jsonResponse),
             new ListAllCommentsHandler(new ListAllCommentsUseCase($this->repository), $jsonResponse),
             new ApproveCommentHandler(new ApproveCommentUseCase($this->repository), $jsonResponse),

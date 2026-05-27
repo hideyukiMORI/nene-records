@@ -51,6 +51,9 @@ use NeNeRecords\Media\MediaServiceProvider;
 use NeNeRecords\Media\MediaTooLargeExceptionHandler;
 use NeNeRecords\NavigationItem\NavigationItemNotFoundExceptionHandler;
 use NeNeRecords\NavigationItem\NavigationItemServiceProvider;
+use NeNeRecords\Notification\NotificationChannelNotFoundExceptionHandler;
+use NeNeRecords\Notification\NotificationRouteRegistrar;
+use NeNeRecords\Notification\NotificationServiceProvider;
 use NeNeRecords\Organization\OrganizationNotFoundExceptionHandler;
 use NeNeRecords\Organization\OrganizationRouteRegistrar;
 use NeNeRecords\Organization\OrganizationServiceProvider;
@@ -128,6 +131,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
             ->addProvider(new DashboardServiceProvider())
             ->addProvider(new UserServiceProvider())
             ->addProvider(new UserInviteServiceProvider())
+            ->addProvider(new NotificationServiceProvider())
             ->addProvider(new CommentServiceProvider())
             ->addProvider(new OrganizationServiceProvider())
             ->addProvider(new SystemConfigServiceProvider())
@@ -161,6 +165,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $user = $container->get('nene-records.route_registrar.user');
                     $userInvite = $container->get('nene-records.route_registrar.user_invite');
                     $auth = $container->get('nene-records.route_registrar.auth');
+                    $notification = $container->get(NotificationRouteRegistrar::class);
                     $comment = $container->get(CommentRouteRegistrar::class);
                     $organization = $container->get(OrganizationRouteRegistrar::class);
                     $systemConfig = $container->get(SystemConfigRouteRegistrar::class);
@@ -191,6 +196,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         || !is_callable($user)
                         || !is_callable($userInvite)
                         || !is_callable($auth)
+                        || !$notification instanceof NotificationRouteRegistrar
                         || !is_callable($comment)
                         || !$organization instanceof OrganizationRouteRegistrar
                         || !$systemConfig instanceof SystemConfigRouteRegistrar
@@ -224,6 +230,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $dashboard,
                         $user,
                         $userInvite,
+                        $notification,
                         $comment,
                         $organization,
                         $systemConfig,
@@ -277,6 +284,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $commentNotFound = $container->get(CommentNotFoundExceptionHandler::class);
                     $organizationNotFound = $container->get(OrganizationNotFoundExceptionHandler::class);
                     $organizationSlugConflict = $container->get(OrganizationSlugConflictExceptionHandler::class);
+                    $notificationChannelNotFound = $container->get(NotificationChannelNotFoundExceptionHandler::class);
 
                     foreach ([
                         $entityTypeNotFound,
@@ -321,6 +329,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $commentNotFound,
                         $organizationNotFound,
                         $organizationSlugConflict,
+                        $notificationChannelNotFound,
                     ] as $handler) {
                         if (!$handler instanceof DomainExceptionHandlerInterface) {
                             throw new LogicException('Exception handler service is invalid.');
@@ -370,6 +379,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $commentNotFound,
                         $organizationNotFound,
                         $organizationSlugConflict,
+                        $notificationChannelNotFound,
                     ];
                 },
             );
