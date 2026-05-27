@@ -8,6 +8,7 @@ use LogicException;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\DomainExceptionHandlerInterface;
+use Nene2\Http\RequestScopedHolder;
 use NeNeRecords\Analytics\AnalyticsServiceProvider;
 use NeNeRecords\Auth\InvalidCredentialsExceptionHandler;
 use NeNeRecords\BoolField\BoolFieldNotFoundExceptionHandler;
@@ -94,8 +95,20 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
 
     public const EXCEPTION_HANDLERS = 'nene-records.exception_handlers';
 
+    /** Container key for the shared RequestScopedHolder<int> that carries org_id. */
+    public const ORG_ID_HOLDER = 'nene-records.org_id_holder';
+
     public function register(ContainerBuilder $builder): void
     {
+        // Register the shared org_id holder so all repos and OrgResolverMiddleware share the same instance.
+        $builder->set(
+            self::ORG_ID_HOLDER,
+            static function (): RequestScopedHolder {
+                /** @var RequestScopedHolder<int> */
+                return new RequestScopedHolder();
+            },
+        );
+
         $builder
             ->addProvider(new EntityArchiveServiceProvider())
             ->addProvider(new EntityTypeServiceProvider())

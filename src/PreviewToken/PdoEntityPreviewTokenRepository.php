@@ -6,11 +6,16 @@ namespace NeNeRecords\PreviewToken;
 
 use DateTimeImmutable;
 use Nene2\Database\DatabaseQueryExecutorInterface;
+use Nene2\Http\RequestScopedHolder;
 
 final readonly class PdoEntityPreviewTokenRepository implements EntityPreviewTokenRepositoryInterface
 {
+    /**
+     * @param RequestScopedHolder<int> $orgId
+     */
     public function __construct(
         private DatabaseQueryExecutorInterface $query,
+        private readonly RequestScopedHolder $orgId,
     ) {
     }
 
@@ -19,8 +24,8 @@ final readonly class PdoEntityPreviewTokenRepository implements EntityPreviewTok
         $row = $this->query->fetchOne(
             'SELECT id, entity_id, token, expires_at, created_at
              FROM entity_preview_tokens
-             WHERE token = ?',
-            [$token],
+             WHERE token = ? AND organization_id = ?',
+            [$token, $this->orgId->get()],
         );
 
         return $row === null ? null : $this->mapRow($row);
@@ -31,10 +36,10 @@ final readonly class PdoEntityPreviewTokenRepository implements EntityPreviewTok
         $row = $this->query->fetchOne(
             'SELECT id, entity_id, token, expires_at, created_at
              FROM entity_preview_tokens
-             WHERE entity_id = ?
+             WHERE entity_id = ? AND organization_id = ?
              ORDER BY id DESC
              LIMIT 1',
-            [$entityId],
+            [$entityId, $this->orgId->get()],
         );
 
         return $row === null ? null : $this->mapRow($row);
@@ -43,9 +48,10 @@ final readonly class PdoEntityPreviewTokenRepository implements EntityPreviewTok
     public function save(EntityPreviewToken $token): EntityPreviewToken
     {
         $this->query->execute(
-            'INSERT INTO entity_preview_tokens (entity_id, token, expires_at, created_at)
-             VALUES (?, ?, ?, ?)',
+            'INSERT INTO entity_preview_tokens (organization_id, entity_id, token, expires_at, created_at)
+             VALUES (?, ?, ?, ?, ?)',
             [
+                $this->orgId->get(),
                 $token->entityId,
                 $token->token,
                 $token->expiresAt->format('Y-m-d H:i:s'),
@@ -67,8 +73,8 @@ final readonly class PdoEntityPreviewTokenRepository implements EntityPreviewTok
     public function deleteByEntityId(int $entityId): void
     {
         $this->query->execute(
-            'DELETE FROM entity_preview_tokens WHERE entity_id = ?',
-            [$entityId],
+            'DELETE FROM entity_preview_tokens WHERE entity_id = ? AND organization_id = ?',
+            [$entityId, $this->orgId->get()],
         );
     }
 

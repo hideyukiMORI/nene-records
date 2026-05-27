@@ -6,19 +6,24 @@ namespace NeNeRecords\TextField;
 
 use LogicException;
 use Nene2\Database\DatabaseQueryExecutorInterface;
+use Nene2\Http\RequestScopedHolder;
 
 final readonly class PdoTextFieldRepository implements TextFieldRepositoryInterface
 {
+    /**
+     * @param RequestScopedHolder<int> $orgId
+     */
     public function __construct(
         private DatabaseQueryExecutorInterface $query,
+        private readonly RequestScopedHolder $orgId,
     ) {
     }
 
     public function findById(int $id): ?TextField
     {
         $row = $this->query->fetchOne(
-            'SELECT id, entity_id, field_key, locale, value FROM text_fields WHERE id = ? AND is_deleted = 0',
-            [$id],
+            'SELECT id, entity_id, field_key, locale, value FROM text_fields WHERE id = ? AND is_deleted = 0 AND organization_id = ?',
+            [$id, $this->orgId->get()],
         );
 
         if ($row === null) {
@@ -33,13 +38,13 @@ final readonly class PdoTextFieldRepository implements TextFieldRepositoryInterf
     {
         if ($locale !== null) {
             $rows = $this->query->fetchAll(
-                'SELECT id, entity_id, field_key, locale, value FROM text_fields WHERE is_deleted = 0 AND locale = ? ORDER BY id ASC LIMIT ? OFFSET ?',
-                [$locale, $limit, $offset],
+                'SELECT id, entity_id, field_key, locale, value FROM text_fields WHERE is_deleted = 0 AND locale = ? AND organization_id = ? ORDER BY id ASC LIMIT ? OFFSET ?',
+                [$locale, $this->orgId->get(), $limit, $offset],
             );
         } else {
             $rows = $this->query->fetchAll(
-                'SELECT id, entity_id, field_key, locale, value FROM text_fields WHERE is_deleted = 0 ORDER BY id ASC LIMIT ? OFFSET ?',
-                [$limit, $offset],
+                'SELECT id, entity_id, field_key, locale, value FROM text_fields WHERE is_deleted = 0 AND organization_id = ? ORDER BY id ASC LIMIT ? OFFSET ?',
+                [$this->orgId->get(), $limit, $offset],
             );
         }
 
@@ -51,13 +56,13 @@ final readonly class PdoTextFieldRepository implements TextFieldRepositoryInterf
     {
         if ($locale !== null) {
             $rows = $this->query->fetchAll(
-                'SELECT id, entity_id, field_key, locale, value FROM text_fields WHERE entity_id = ? AND locale = ? AND is_deleted = 0 ORDER BY id ASC LIMIT ? OFFSET ?',
-                [$entityId, $locale, $limit, $offset],
+                'SELECT id, entity_id, field_key, locale, value FROM text_fields WHERE entity_id = ? AND locale = ? AND is_deleted = 0 AND organization_id = ? ORDER BY id ASC LIMIT ? OFFSET ?',
+                [$entityId, $locale, $this->orgId->get(), $limit, $offset],
             );
         } else {
             $rows = $this->query->fetchAll(
-                'SELECT id, entity_id, field_key, locale, value FROM text_fields WHERE entity_id = ? AND is_deleted = 0 ORDER BY id ASC LIMIT ? OFFSET ?',
-                [$entityId, $limit, $offset],
+                'SELECT id, entity_id, field_key, locale, value FROM text_fields WHERE entity_id = ? AND is_deleted = 0 AND organization_id = ? ORDER BY id ASC LIMIT ? OFFSET ?',
+                [$entityId, $this->orgId->get(), $limit, $offset],
             );
         }
 
@@ -77,10 +82,11 @@ final readonly class PdoTextFieldRepository implements TextFieldRepositoryInterf
                   AND e.is_deleted = 0
                   AND e.entity_type_id = ?
                   AND tf.locale = ?
+                  AND tf.organization_id = ?
                 ORDER BY tf.id ASC
                 LIMIT ? OFFSET ?
                 SQL,
-                [$entityTypeId, $locale, $limit, $offset],
+                [$entityTypeId, $locale, $this->orgId->get(), $limit, $offset],
             );
         } else {
             $rows = $this->query->fetchAll(
@@ -91,10 +97,11 @@ final readonly class PdoTextFieldRepository implements TextFieldRepositoryInterf
                 WHERE tf.is_deleted = 0
                   AND e.is_deleted = 0
                   AND e.entity_type_id = ?
+                  AND tf.organization_id = ?
                 ORDER BY tf.id ASC
                 LIMIT ? OFFSET ?
                 SQL,
-                [$entityTypeId, $limit, $offset],
+                [$entityTypeId, $this->orgId->get(), $limit, $offset],
             );
         }
 
@@ -110,8 +117,8 @@ final readonly class PdoTextFieldRepository implements TextFieldRepositoryInterf
 
         $placeholders = implode(', ', array_fill(0, count($entityIds), '?'));
         $rows = $this->query->fetchAll(
-            "SELECT id, entity_id, field_key, locale, value FROM text_fields WHERE entity_id IN ({$placeholders}) AND is_deleted = 0 ORDER BY entity_id ASC, id ASC",
-            $entityIds,
+            "SELECT id, entity_id, field_key, locale, value FROM text_fields WHERE entity_id IN ({$placeholders}) AND is_deleted = 0 AND organization_id = ? ORDER BY entity_id ASC, id ASC",
+            [...$entityIds, $this->orgId->get()],
         );
 
         return array_map(fn (array $row) => $this->mapRow($row), $rows);
@@ -120,8 +127,8 @@ final readonly class PdoTextFieldRepository implements TextFieldRepositoryInterf
     public function save(TextField $textField): int
     {
         $this->query->execute(
-            'INSERT INTO text_fields (entity_id, field_key, locale, value) VALUES (?, ?, ?, ?)',
-            [$textField->entityId, $textField->fieldKey, $textField->locale, $textField->value],
+            'INSERT INTO text_fields (organization_id, entity_id, field_key, locale, value) VALUES (?, ?, ?, ?, ?)',
+            [$this->orgId->get(), $textField->entityId, $textField->fieldKey, $textField->locale, $textField->value],
         );
 
         return $this->query->lastInsertId();
@@ -134,8 +141,8 @@ final readonly class PdoTextFieldRepository implements TextFieldRepositoryInterf
         }
 
         $affected = $this->query->execute(
-            'UPDATE text_fields SET field_key = ?, locale = ?, value = ? WHERE id = ? AND is_deleted = 0',
-            [$textField->fieldKey, $textField->locale, $textField->value, $textField->id],
+            'UPDATE text_fields SET field_key = ?, locale = ?, value = ? WHERE id = ? AND is_deleted = 0 AND organization_id = ?',
+            [$textField->fieldKey, $textField->locale, $textField->value, $textField->id, $this->orgId->get()],
         );
 
         if ($affected === 0) {
@@ -146,8 +153,8 @@ final readonly class PdoTextFieldRepository implements TextFieldRepositoryInterf
     public function delete(int $id): void
     {
         $affected = $this->query->execute(
-            'UPDATE text_fields SET is_deleted = 1, deleted_at = CURRENT_TIMESTAMP WHERE id = ? AND is_deleted = 0',
-            [$id],
+            'UPDATE text_fields SET is_deleted = 1, deleted_at = CURRENT_TIMESTAMP WHERE id = ? AND is_deleted = 0 AND organization_id = ?',
+            [$id, $this->orgId->get()],
         );
 
         if ($affected === 0) {

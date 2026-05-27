@@ -9,6 +9,7 @@ use DateTimeZone;
 use Nene2\Config\DatabaseConfig;
 use Nene2\Database\PdoConnectionFactory;
 use Nene2\Database\PdoDatabaseQueryExecutor;
+use Nene2\Http\RequestScopedHolder;
 use NeNeRecords\Analytics\AccessLogEntry;
 use NeNeRecords\Analytics\PdoAccessLogRepository;
 use PHPUnit\Framework\TestCase;
@@ -17,6 +18,9 @@ final class PdoAccessLogRepositoryTest extends TestCase
 {
     private PdoDatabaseQueryExecutor $executor;
     private PdoAccessLogRepository $repository;
+
+    /** @var RequestScopedHolder<int> */
+    private RequestScopedHolder $orgId;
 
     protected function setUp(): void
     {
@@ -34,11 +38,14 @@ final class PdoAccessLogRepositoryTest extends TestCase
             'utf8',
         )));
 
+        $this->orgId = new RequestScopedHolder();
+        $this->orgId->set(0);
+
         foreach ($this->schemaStatements() as $statement) {
             $this->executor->execute($statement);
         }
 
-        $this->repository = new PdoAccessLogRepository($this->executor);
+        $this->repository = new PdoAccessLogRepository($this->executor, $this->orgId);
     }
 
     /**

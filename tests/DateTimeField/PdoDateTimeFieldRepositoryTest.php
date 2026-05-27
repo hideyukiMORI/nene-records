@@ -7,6 +7,7 @@ namespace NeNeRecords\Tests\DateTimeField;
 use Nene2\Config\DatabaseConfig;
 use Nene2\Database\PdoConnectionFactory;
 use Nene2\Database\PdoDatabaseQueryExecutor;
+use Nene2\Http\RequestScopedHolder;
 use NeNeRecords\DateTimeField\DateTimeField;
 use NeNeRecords\DateTimeField\DateTimeFieldNotFoundException;
 use NeNeRecords\DateTimeField\PdoDateTimeFieldRepository;
@@ -15,6 +16,9 @@ use PHPUnit\Framework\TestCase;
 final class PdoDateTimeFieldRepositoryTest extends TestCase
 {
     private PdoDatabaseQueryExecutor $executor;
+
+    /** @var RequestScopedHolder<int> */
+    private RequestScopedHolder $orgId;
 
     protected function setUp(): void
     {
@@ -33,6 +37,8 @@ final class PdoDateTimeFieldRepositoryTest extends TestCase
         )));
 
         $this->executor->execute('PRAGMA foreign_keys = ON');
+        $this->orgId = new RequestScopedHolder();
+        $this->orgId->set(0);
 
         foreach ($this->schemaStatements() as $statement) {
             $this->executor->execute($statement);
@@ -88,7 +94,7 @@ final class PdoDateTimeFieldRepositoryTest extends TestCase
             [$ids['entityId'], 'count', '2026-05-24T12:00:00+00:00'],
         );
 
-        $repository = new PdoDateTimeFieldRepository($this->executor);
+        $repository = new PdoDateTimeFieldRepository($this->executor, $this->orgId);
         $datetimeField = $repository->findById(1);
 
         self::assertNotNull($datetimeField);
@@ -107,7 +113,7 @@ final class PdoDateTimeFieldRepositoryTest extends TestCase
             [$ids['entityId'], 'count', '2026-05-24T12:00:00+00:00'],
         );
 
-        $repository = new PdoDateTimeFieldRepository($this->executor);
+        $repository = new PdoDateTimeFieldRepository($this->executor, $this->orgId);
         $repository->delete(1);
 
         self::assertNull($repository->findById(1));
@@ -117,7 +123,7 @@ final class PdoDateTimeFieldRepositoryTest extends TestCase
     {
         $ids = $this->insertEntityHierarchy();
 
-        $repository = new PdoDateTimeFieldRepository($this->executor);
+        $repository = new PdoDateTimeFieldRepository($this->executor, $this->orgId);
         $id = $repository->save(new DateTimeField(entityId: $ids['entityId'], fieldKey: 'k', value: '2026-05-24T12:00:00+00:00'));
 
         self::assertSame(1, $id);
@@ -132,7 +138,7 @@ final class PdoDateTimeFieldRepositoryTest extends TestCase
             [$ids['entityId'], 'count', '2026-05-24T12:00:00+00:00'],
         );
 
-        $repository = new PdoDateTimeFieldRepository($this->executor);
+        $repository = new PdoDateTimeFieldRepository($this->executor, $this->orgId);
         $repository->delete(1);
 
         $this->expectException(DateTimeFieldNotFoundException::class);
@@ -144,7 +150,7 @@ final class PdoDateTimeFieldRepositoryTest extends TestCase
     {
         $ids = $this->insertEntityHierarchy();
 
-        $repository = new PdoDateTimeFieldRepository($this->executor);
+        $repository = new PdoDateTimeFieldRepository($this->executor, $this->orgId);
 
         $repository->save(new DateTimeField(entityId: $ids['entityId'], fieldKey: 'a', value: '2026-05-24T12:00:00+00:00'));
         $b = $repository->save(new DateTimeField(entityId: $ids['entityId'], fieldKey: 'b', value: '2026-05-25T12:00:00+00:00'));

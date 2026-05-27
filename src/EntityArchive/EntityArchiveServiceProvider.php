@@ -8,6 +8,7 @@ use LogicException;
 use Nene2\Database\DatabaseQueryExecutorInterface;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
+use Nene2\Http\RequestScopedHolder;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 
@@ -25,7 +26,12 @@ final readonly class EntityArchiveServiceProvider implements ServiceProviderInte
                         throw new LogicException('Database query executor service is invalid.');
                     }
 
-                    return new PdoEntityArchiveRepository($query);
+                    $orgId = $c->get('nene-records.org_id_holder');
+                    if (!$orgId instanceof RequestScopedHolder) {
+                        throw new LogicException('Org ID holder service is invalid.');
+                    }
+
+                    return new PdoEntityArchiveRepository($query, $orgId);
                 },
             )
             ->set(

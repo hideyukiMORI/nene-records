@@ -299,8 +299,11 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
                         throw new LogicException('OrganizationRepositoryInterface service is invalid.');
                     }
 
+                    $orgIdHolder = $container->get(ApplicationServiceProvider::ORG_ID_HOLDER);
+                    if (!$orgIdHolder instanceof RequestScopedHolder) {
+                        throw new LogicException('Org ID holder service is invalid.');
+                    }
                     /** @var RequestScopedHolder<int> $orgIdHolder */
-                    $orgIdHolder = new RequestScopedHolder();
 
                     $tenantResolution = (string) (getenv('TENANT_RESOLUTION') ?: 'env');
                     $strategy = match ($tenantResolution) {

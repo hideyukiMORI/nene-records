@@ -1,5 +1,6 @@
 CREATE TABLE access_logs (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    organization_id INTEGER NOT NULL DEFAULT 0,
     request_id VARCHAR(64) NULL,
     method VARCHAR(10) NOT NULL,
     path VARCHAR(2048) NOT NULL,
@@ -11,3 +12,4 @@ CREATE TABLE access_logs (
 
 CREATE INDEX idx_access_logs_access_date ON access_logs (access_date);
 CREATE INDEX idx_access_logs_accessed_at ON access_logs (accessed_at);
+CREATE INDEX access_logs_org ON access_logs (organization_id);

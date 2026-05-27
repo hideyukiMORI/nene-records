@@ -6,19 +6,24 @@ namespace NeNeRecords\DateTimeField;
 
 use LogicException;
 use Nene2\Database\DatabaseQueryExecutorInterface;
+use Nene2\Http\RequestScopedHolder;
 
 final readonly class PdoDateTimeFieldRepository implements DateTimeFieldRepositoryInterface
 {
+    /**
+     * @param RequestScopedHolder<int> $orgId
+     */
     public function __construct(
         private DatabaseQueryExecutorInterface $query,
+        private readonly RequestScopedHolder $orgId,
     ) {
     }
 
     public function findById(int $id): ?DateTimeField
     {
         $row = $this->query->fetchOne(
-            'SELECT id, entity_id, field_key, value FROM datetime_fields WHERE id = ? AND is_deleted = 0',
-            [$id],
+            'SELECT id, entity_id, field_key, value FROM datetime_fields WHERE id = ? AND is_deleted = 0 AND organization_id = ?',
+            [$id, $this->orgId->get()],
         );
 
         if ($row === null) {
@@ -37,8 +42,8 @@ final readonly class PdoDateTimeFieldRepository implements DateTimeFieldReposito
     public function findAll(int $limit, int $offset): array
     {
         $rows = $this->query->fetchAll(
-            'SELECT id, entity_id, field_key, value FROM datetime_fields WHERE is_deleted = 0 ORDER BY id ASC LIMIT ? OFFSET ?',
-            [$limit, $offset],
+            'SELECT id, entity_id, field_key, value FROM datetime_fields WHERE is_deleted = 0 AND organization_id = ? ORDER BY id ASC LIMIT ? OFFSET ?',
+            [$this->orgId->get(), $limit, $offset],
         );
 
         return array_map(
@@ -56,8 +61,8 @@ final readonly class PdoDateTimeFieldRepository implements DateTimeFieldReposito
     public function findByEntityId(int $entityId, int $limit, int $offset): array
     {
         $rows = $this->query->fetchAll(
-            'SELECT id, entity_id, field_key, value FROM datetime_fields WHERE entity_id = ? AND is_deleted = 0 ORDER BY id ASC LIMIT ? OFFSET ?',
-            [$entityId, $limit, $offset],
+            'SELECT id, entity_id, field_key, value FROM datetime_fields WHERE entity_id = ? AND is_deleted = 0 AND organization_id = ? ORDER BY id ASC LIMIT ? OFFSET ?',
+            [$entityId, $this->orgId->get(), $limit, $offset],
         );
 
         return array_map(
@@ -74,8 +79,8 @@ final readonly class PdoDateTimeFieldRepository implements DateTimeFieldReposito
     public function save(DateTimeField $intField): int
     {
         $this->query->execute(
-            'INSERT INTO datetime_fields (entity_id, field_key, value) VALUES (?, ?, ?)',
-            [$intField->entityId, $intField->fieldKey, $intField->value],
+            'INSERT INTO datetime_fields (organization_id, entity_id, field_key, value) VALUES (?, ?, ?, ?)',
+            [$this->orgId->get(), $intField->entityId, $intField->fieldKey, $intField->value],
         );
 
         return $this->query->lastInsertId();
@@ -88,8 +93,8 @@ final readonly class PdoDateTimeFieldRepository implements DateTimeFieldReposito
         }
 
         $affected = $this->query->execute(
-            'UPDATE datetime_fields SET field_key = ?, value = ? WHERE id = ? AND is_deleted = 0',
-            [$intField->fieldKey, $intField->value, $intField->id],
+            'UPDATE datetime_fields SET field_key = ?, value = ? WHERE id = ? AND is_deleted = 0 AND organization_id = ?',
+            [$intField->fieldKey, $intField->value, $intField->id, $this->orgId->get()],
         );
 
         if ($affected === 0) {
@@ -100,8 +105,8 @@ final readonly class PdoDateTimeFieldRepository implements DateTimeFieldReposito
     public function delete(int $id): void
     {
         $affected = $this->query->execute(
-            'UPDATE datetime_fields SET is_deleted = 1, deleted_at = CURRENT_TIMESTAMP WHERE id = ? AND is_deleted = 0',
-            [$id],
+            'UPDATE datetime_fields SET is_deleted = 1, deleted_at = CURRENT_TIMESTAMP WHERE id = ? AND is_deleted = 0 AND organization_id = ?',
+            [$id, $this->orgId->get()],
         );
 
         if ($affected === 0) {

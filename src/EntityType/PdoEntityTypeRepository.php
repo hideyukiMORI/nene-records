@@ -5,19 +5,24 @@ declare(strict_types=1);
 namespace NeNeRecords\EntityType;
 
 use Nene2\Database\DatabaseQueryExecutorInterface;
+use Nene2\Http\RequestScopedHolder;
 
 final readonly class PdoEntityTypeRepository implements EntityTypeRepositoryInterface
 {
+    /**
+     * @param RequestScopedHolder<int> $orgId
+     */
     public function __construct(
         private DatabaseQueryExecutorInterface $query,
+        private RequestScopedHolder $orgId,
     ) {
     }
 
     public function findById(int $id): ?EntityType
     {
         $row = $this->query->fetchOne(
-            'SELECT id, name, slug, is_pinned, labels, permalink_pattern, previous_permalink_pattern FROM entity_types WHERE id = ?',
-            [$id],
+            'SELECT id, name, slug, is_pinned, labels, permalink_pattern, previous_permalink_pattern FROM entity_types WHERE id = ? AND organization_id = ?',
+            [$id, $this->orgId->get()],
         );
 
         if ($row === null) {
@@ -30,8 +35,8 @@ final readonly class PdoEntityTypeRepository implements EntityTypeRepositoryInte
     public function findBySlug(string $slug): ?EntityType
     {
         $row = $this->query->fetchOne(
-            'SELECT id, name, slug, is_pinned, labels, permalink_pattern, previous_permalink_pattern FROM entity_types WHERE slug = ?',
-            [$slug],
+            'SELECT id, name, slug, is_pinned, labels, permalink_pattern, previous_permalink_pattern FROM entity_types WHERE slug = ? AND organization_id = ?',
+            [$slug, $this->orgId->get()],
         );
 
         if ($row === null) {
@@ -45,8 +50,8 @@ final readonly class PdoEntityTypeRepository implements EntityTypeRepositoryInte
     public function findAll(int $limit, int $offset): array
     {
         $rows = $this->query->fetchAll(
-            'SELECT id, name, slug, is_pinned, labels, permalink_pattern, previous_permalink_pattern FROM entity_types ORDER BY id ASC LIMIT ? OFFSET ?',
-            [$limit, $offset],
+            'SELECT id, name, slug, is_pinned, labels, permalink_pattern, previous_permalink_pattern FROM entity_types WHERE organization_id = ? ORDER BY id ASC LIMIT ? OFFSET ?',
+            [$this->orgId->get(), $limit, $offset],
         );
 
         return array_map(fn (array $row) => $this->mapRow($row), $rows);
@@ -55,8 +60,9 @@ final readonly class PdoEntityTypeRepository implements EntityTypeRepositoryInte
     public function save(EntityType $entityType): int
     {
         $this->query->execute(
-            'INSERT INTO entity_types (name, slug, is_pinned, labels, permalink_pattern) VALUES (?, ?, ?, ?, ?)',
+            'INSERT INTO entity_types (organization_id, name, slug, is_pinned, labels, permalink_pattern) VALUES (?, ?, ?, ?, ?, ?)',
             [
+                $this->orgId->get(),
                 $entityType->name,
                 $entityType->slug,
                 $entityType->isPinned ? 1 : 0,
@@ -71,7 +77,7 @@ final readonly class PdoEntityTypeRepository implements EntityTypeRepositoryInte
     public function update(EntityType $entityType): void
     {
         $this->query->execute(
-            'UPDATE entity_types SET name = ?, slug = ?, is_pinned = ?, labels = ?, permalink_pattern = ?, previous_permalink_pattern = ? WHERE id = ?',
+            'UPDATE entity_types SET name = ?, slug = ?, is_pinned = ?, labels = ?, permalink_pattern = ?, previous_permalink_pattern = ? WHERE id = ? AND organization_id = ?',
             [
                 $entityType->name,
                 $entityType->slug,
@@ -80,14 +86,15 @@ final readonly class PdoEntityTypeRepository implements EntityTypeRepositoryInte
                 $entityType->permalinkPattern,
                 $entityType->previousPermalinkPattern,
                 $entityType->id,
+                $this->orgId->get(),
             ],
         );
     }
 
     public function delete(int $id): void
     {
-        $this->query->execute('DELETE FROM field_defs WHERE entity_type_id = ?', [$id]);
-        $this->query->execute('DELETE FROM entity_types WHERE id = ?', [$id]);
+        $this->query->execute('DELETE FROM field_defs WHERE entity_type_id = ? AND organization_id = ?', [$id, $this->orgId->get()]);
+        $this->query->execute('DELETE FROM entity_types WHERE id = ? AND organization_id = ?', [$id, $this->orgId->get()]);
     }
 
     /** @param array<string, mixed> $row */

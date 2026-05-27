@@ -6,20 +6,25 @@ namespace NeNeRecords\EntityArchive;
 
 use DateTimeImmutable;
 use Nene2\Database\DatabaseQueryExecutorInterface;
+use Nene2\Http\RequestScopedHolder;
 use NeNeRecords\EntityType\EntityType;
 
 final readonly class PdoEntityArchiveRepository implements EntityArchiveRepositoryInterface
 {
+    /**
+     * @param RequestScopedHolder<int> $orgId
+     */
     public function __construct(
         private DatabaseQueryExecutorInterface $query,
+        private RequestScopedHolder $orgId,
     ) {
     }
 
     public function archiveAndPurgeSoftDeleted(EntityType $entityType): void
     {
         $rows = $this->query->fetchAll(
-            'SELECT id, slug, status, deleted_at FROM entities WHERE entity_type_id = ? AND is_deleted = 1',
-            [$entityType->id],
+            'SELECT id, slug, status, deleted_at FROM entities WHERE entity_type_id = ? AND organization_id = ? AND is_deleted = 1',
+            [$entityType->id, $this->orgId->get()],
         );
 
         if ($rows === []) {
@@ -144,8 +149,8 @@ final readonly class PdoEntityArchiveRepository implements EntityArchiveReposito
             $entityIds,
         );
         $this->query->execute(
-            'DELETE FROM entities WHERE entity_type_id = ? AND is_deleted = 1',
-            [$entityType->id],
+            'DELETE FROM entities WHERE entity_type_id = ? AND organization_id = ? AND is_deleted = 1',
+            [$entityType->id, $this->orgId->get()],
         );
     }
 

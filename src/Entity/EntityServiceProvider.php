@@ -10,6 +10,7 @@ use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
+use Nene2\Http\RequestScopedHolder;
 use NeNeRecords\EntityType\EntityTypeRepositoryInterface;
 use NeNeRecords\TextField\TextFieldRepositoryInterface;
 use NeNeRecords\Webhook\WebhookDispatcherInterface;
@@ -30,7 +31,12 @@ final readonly class EntityServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Database query executor service is invalid.');
                     }
 
-                    return new PdoEntityRepository($query);
+                    $orgId = $c->get('nene-records.org_id_holder');
+                    if (!$orgId instanceof RequestScopedHolder) {
+                        throw new LogicException('Org ID holder service is invalid.');
+                    }
+
+                    return new PdoEntityRepository($query, $orgId);
                 },
             )
             ->set(

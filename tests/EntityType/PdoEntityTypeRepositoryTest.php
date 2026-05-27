@@ -7,6 +7,7 @@ namespace NeNeRecords\Tests\EntityType;
 use Nene2\Config\DatabaseConfig;
 use Nene2\Database\PdoConnectionFactory;
 use Nene2\Database\PdoDatabaseQueryExecutor;
+use Nene2\Http\RequestScopedHolder;
 use NeNeRecords\EntityType\EntityType;
 use NeNeRecords\EntityType\PdoEntityTypeRepository;
 use PHPUnit\Framework\TestCase;
@@ -14,6 +15,9 @@ use PHPUnit\Framework\TestCase;
 final class PdoEntityTypeRepositoryTest extends TestCase
 {
     private PdoDatabaseQueryExecutor $executor;
+
+    /** @var RequestScopedHolder<int> */
+    private RequestScopedHolder $orgId;
 
     protected function setUp(): void
     {
@@ -32,6 +36,8 @@ final class PdoEntityTypeRepositoryTest extends TestCase
         )));
 
         $this->executor->execute('PRAGMA foreign_keys = ON');
+        $this->orgId = new RequestScopedHolder();
+        $this->orgId->set(0);
 
         foreach ($this->schemaStatements() as $statement) {
             $this->executor->execute($statement);
@@ -71,7 +77,7 @@ final class PdoEntityTypeRepositoryTest extends TestCase
     {
         $this->executor->execute("INSERT INTO entity_types (name, slug) VALUES ('Book', 'book')");
 
-        $repository = new PdoEntityTypeRepository($this->executor);
+        $repository = new PdoEntityTypeRepository($this->executor, $this->orgId);
         $entityType = $repository->findById(1);
 
         self::assertNotNull($entityType);
@@ -82,7 +88,7 @@ final class PdoEntityTypeRepositoryTest extends TestCase
 
     public function testFindByIdReturnsNullWhenAbsent(): void
     {
-        $repository = new PdoEntityTypeRepository($this->executor);
+        $repository = new PdoEntityTypeRepository($this->executor, $this->orgId);
         self::assertNull($repository->findById(99));
     }
 
@@ -90,7 +96,7 @@ final class PdoEntityTypeRepositoryTest extends TestCase
     {
         $this->executor->execute("INSERT INTO entity_types (name, slug) VALUES ('Doc', 'doc')");
 
-        $repository = new PdoEntityTypeRepository($this->executor);
+        $repository = new PdoEntityTypeRepository($this->executor, $this->orgId);
         $entityType = $repository->findBySlug('doc');
 
         self::assertNotNull($entityType);
@@ -99,7 +105,7 @@ final class PdoEntityTypeRepositoryTest extends TestCase
 
     public function testSaveReturnsNewId(): void
     {
-        $repository = new PdoEntityTypeRepository($this->executor);
+        $repository = new PdoEntityTypeRepository($this->executor, $this->orgId);
         $id = $repository->save(new EntityType(name: 'Note', slug: 'note'));
 
         self::assertSame(1, $id);
@@ -107,7 +113,7 @@ final class PdoEntityTypeRepositoryTest extends TestCase
 
     public function testSavedEntityTypeIsRetrievableById(): void
     {
-        $repository = new PdoEntityTypeRepository($this->executor);
+        $repository = new PdoEntityTypeRepository($this->executor, $this->orgId);
         $id = $repository->save(new EntityType(name: 'Tag', slug: 'tag'));
         $entityType = $repository->findById($id);
 
@@ -118,7 +124,7 @@ final class PdoEntityTypeRepositoryTest extends TestCase
 
     public function testUpdateChangesFields(): void
     {
-        $repository = new PdoEntityTypeRepository($this->executor);
+        $repository = new PdoEntityTypeRepository($this->executor, $this->orgId);
         $id = $repository->save(new EntityType(name: 'Old', slug: 'old'));
 
         $repository->update(new EntityType(name: 'New', slug: 'new', id: $id));
@@ -131,7 +137,7 @@ final class PdoEntityTypeRepositoryTest extends TestCase
 
     public function testDeleteRemovesEntityType(): void
     {
-        $repository = new PdoEntityTypeRepository($this->executor);
+        $repository = new PdoEntityTypeRepository($this->executor, $this->orgId);
         $id = $repository->save(new EntityType(name: 'Gone', slug: 'gone'));
         $repository->delete($id);
 
@@ -140,7 +146,7 @@ final class PdoEntityTypeRepositoryTest extends TestCase
 
     public function testFindAllReturnsEntityTypesOrderedById(): void
     {
-        $repository = new PdoEntityTypeRepository($this->executor);
+        $repository = new PdoEntityTypeRepository($this->executor, $this->orgId);
         $repository->save(new EntityType(name: 'First', slug: 'first'));
         $repository->save(new EntityType(name: 'Second', slug: 'second'));
 
@@ -153,7 +159,7 @@ final class PdoEntityTypeRepositoryTest extends TestCase
 
     public function testFindAllRespectsLimitAndOffset(): void
     {
-        $repository = new PdoEntityTypeRepository($this->executor);
+        $repository = new PdoEntityTypeRepository($this->executor, $this->orgId);
 
         for ($i = 1; $i <= 5; $i++) {
             $repository->save(new EntityType(name: "Row {$i}", slug: 't' . $i));
