@@ -5,13 +5,18 @@ export interface User {
   id: number
   email: string
   role: UserRole
+  organizationId: number | null
+  orgRole: string | null
   status: UserStatus
-  createdAt: string
-  updatedAt: string
+  displayName: string | null
+  fullName: string | null
+  jobTitle: string | null
+  createdAt: number | null
+  updatedAt: number | null
 }
 
 export interface UserList {
-  users: User[]
+  items: User[]
 }
 
 export interface CreateUserInput {
@@ -36,4 +41,20 @@ export interface ChangeOwnPasswordInput {
 export interface InviteUserInput {
   email: string
   role: UserRole
+}
+
+export interface ChangeEmailInput {
+  email: string
+}
+
+export interface UpdateUserProfileInput {
+  displayName: string | null
+  fullName: string | null
+  jobTitle: string | null
+}
+
+export interface UserProfile {
+  displayName: string | null
+  fullName: string | null
+  jobTitle: string | null
 }

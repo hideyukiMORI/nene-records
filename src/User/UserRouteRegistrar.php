@@ -17,6 +17,8 @@ final readonly class UserRouteRegistrar
         private ResetUserPasswordHandler $resetPasswordHandler,
         private DeleteUserHandler $deleteHandler,
         private ChangePasswordHandler $changePasswordHandler,
+        private ChangeEmailHandler $changeEmailHandler,
+        private UpdateUserProfileHandler $updateProfileHandler,
     ) {
     }
 
@@ -29,11 +31,15 @@ final readonly class UserRouteRegistrar
         $resetPassword = $this->resetPasswordHandler;
         $delete = $this->deleteHandler;
         $changePassword = $this->changePasswordHandler;
+        $changeEmail = $this->changeEmailHandler;
+        $updateProfile = $this->updateProfileHandler;
 
         $router->get('/api/v1/users', static fn (ServerRequestInterface $r) => $list->handle($r));
         $router->get('/api/v1/users/{id}', static fn (ServerRequestInterface $r) => $get->handle($r));
         $router->post('/api/v1/users', static fn (ServerRequestInterface $r) => $create->handle($r));
         $router->patch('/api/v1/users/{id}', static fn (ServerRequestInterface $r) => $updateRole->handle($r));
+        $router->patch('/api/v1/users/{id}/email', static fn (ServerRequestInterface $r) => $changeEmail->handle($r));
+        $router->patch('/api/v1/users/{id}/profile', static fn (ServerRequestInterface $r) => $updateProfile->handle($r));
         $router->patch('/api/v1/users/{id}/password', static fn (ServerRequestInterface $r) => $resetPassword->handle($r));
         $router->delete('/api/v1/users/{id}', static fn (ServerRequestInterface $r) => $delete->handle($r));
         $router->put('/api/v1/users/me/password', static fn (ServerRequestInterface $r) => $changePassword->handle($r));

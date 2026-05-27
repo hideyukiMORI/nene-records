@@ -9,6 +9,8 @@ use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RuntimeApplicationFactory;
 use NeNeRecords\Auth\User;
 use NeNeRecords\User\CannotDeleteSelfExceptionHandler;
+use NeNeRecords\User\ChangeEmailHandler;
+use NeNeRecords\User\ChangeEmailUseCase;
 use NeNeRecords\User\ChangePasswordHandler;
 use NeNeRecords\User\ChangePasswordUseCase;
 use NeNeRecords\User\CreateUserHandler;
@@ -23,6 +25,8 @@ use NeNeRecords\User\ListUsersHandler;
 use NeNeRecords\User\ListUsersUseCase;
 use NeNeRecords\User\ResetUserPasswordHandler;
 use NeNeRecords\User\ResetUserPasswordUseCase;
+use NeNeRecords\User\UpdateUserProfileHandler;
+use NeNeRecords\User\UpdateUserProfileUseCase;
 use NeNeRecords\User\UpdateUserRoleHandler;
 use NeNeRecords\User\UpdateUserRoleUseCase;
 use NeNeRecords\User\UserEmailConflictExceptionHandler;
@@ -37,6 +41,7 @@ final class UserHttpTest extends TestCase
 {
     private Psr17Factory $factory;
     private InMemoryUserRepository $repository;
+    private InMemoryUserProfileRepository $profiles;
     private RequestHandlerInterface $application;
 
     protected function setUp(): void
@@ -58,17 +63,21 @@ final class UserHttpTest extends TestCase
             ),
         ]);
 
+        $this->profiles = new InMemoryUserProfileRepository();
+
         $jsonResponse = new JsonResponseFactory($this->factory, $this->factory);
         $problemDetails = new ProblemDetailsResponseFactory($this->factory, $this->factory);
 
         $registrar = new UserRouteRegistrar(
             new ListUsersHandler(new ListUsersUseCase($this->repository), $jsonResponse),
-            new GetUserByIdHandler(new GetUserByIdUseCase($this->repository), $jsonResponse),
+            new GetUserByIdHandler(new GetUserByIdUseCase($this->repository, $this->profiles), $jsonResponse),
             new CreateUserHandler(new CreateUserUseCase($this->repository), $jsonResponse),
             new UpdateUserRoleHandler(new UpdateUserRoleUseCase($this->repository), $jsonResponse),
             new ResetUserPasswordHandler(new ResetUserPasswordUseCase($this->repository), $this->factory),
             new DeleteUserHandler(new DeleteUserUseCase($this->repository), $this->factory),
             new ChangePasswordHandler(new ChangePasswordUseCase($this->repository), $this->factory),
+            new ChangeEmailHandler(new ChangeEmailUseCase($this->repository), $this->factory),
+            new UpdateUserProfileHandler(new UpdateUserProfileUseCase($this->repository, $this->profiles), $jsonResponse),
         );
 
         $this->application = (new RuntimeApplicationFactory(
@@ -280,6 +289,170 @@ final class UserHttpTest extends TestCase
         );
 
         self::assertSame(422, $response->getStatusCode());
+    }
+
+    // ── Change email ────────────────────────────────────────────────────────────
+
+    public function testPatchUserEmailReturns204(): void
+    {
+        $body = $this->factory->createStream(json_encode([
+            'email' => 'newemail@example.test',
+        ], JSON_THROW_ON_ERROR));
+
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('PATCH', 'https://example.test/api/v1/users/1/email')
+                ->withBody($body)
+                ->withAttribute('nene2.auth.claims', ['sub' => 'admin@example.test']),
+        );
+
+        self::assertSame(204, $response->getStatusCode());
+
+        $updated = $this->repository->findById(1);
+        self::assertNotNull($updated);
+        self::assertSame('newemail@example.test', $updated->email);
+    }
+
+    public function testPatchUserEmailWithDuplicateReturns409(): void
+    {
+        $this->repository->create('other@example.test', 'hash', 'editor');
+
+        $body = $this->factory->createStream(json_encode([
+            'email' => 'other@example.test',
+        ], JSON_THROW_ON_ERROR));
+
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('PATCH', 'https://example.test/api/v1/users/1/email')
+                ->withBody($body)
+                ->withAttribute('nene2.auth.claims', ['sub' => 'admin@example.test']),
+        );
+
+        self::assertSame(409, $response->getStatusCode());
+    }
+
+    public function testPatchUserEmailWithInvalidEmailReturns422(): void
+    {
+        $body = $this->factory->createStream(json_encode([
+            'email' => 'not-an-email',
+        ], JSON_THROW_ON_ERROR));
+
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('PATCH', 'https://example.test/api/v1/users/1/email')
+                ->withBody($body)
+                ->withAttribute('nene2.auth.claims', ['sub' => 'admin@example.test']),
+        );
+
+        self::assertSame(422, $response->getStatusCode());
+    }
+
+    public function testPatchNonExistentUserEmailReturns404(): void
+    {
+        $body = $this->factory->createStream(json_encode([
+            'email' => 'newemail@example.test',
+        ], JSON_THROW_ON_ERROR));
+
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('PATCH', 'https://example.test/api/v1/users/999/email')
+                ->withBody($body)
+                ->withAttribute('nene2.auth.claims', ['sub' => 'admin@example.test']),
+        );
+
+        self::assertSame(404, $response->getStatusCode());
+    }
+
+    // ── Update profile ───────────────────────────────────────────────────────────
+
+    public function testPatchUserProfileReturns200WithProfileData(): void
+    {
+        $body = $this->factory->createStream(json_encode([
+            'display_name' => 'Admin User',
+            'full_name'    => 'Administrator Surname',
+            'job_title'    => 'System Administrator',
+        ], JSON_THROW_ON_ERROR));
+
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('PATCH', 'https://example.test/api/v1/users/1/profile')
+                ->withBody($body)
+                ->withAttribute('nene2.auth.claims', ['sub' => 'admin@example.test']),
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+
+        $data = $this->decodeJson($response);
+        self::assertSame('Admin User', $data['display_name']);
+        self::assertSame('Administrator Surname', $data['full_name']);
+        self::assertSame('System Administrator', $data['job_title']);
+    }
+
+    public function testPatchUserProfileAllowsNullFields(): void
+    {
+        $body = $this->factory->createStream(json_encode([
+            'display_name' => null,
+            'full_name'    => null,
+            'job_title'    => null,
+        ], JSON_THROW_ON_ERROR));
+
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('PATCH', 'https://example.test/api/v1/users/1/profile')
+                ->withBody($body)
+                ->withAttribute('nene2.auth.claims', ['sub' => 'admin@example.test']),
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+
+        $data = $this->decodeJson($response);
+        self::assertNull($data['display_name']);
+        self::assertNull($data['full_name']);
+        self::assertNull($data['job_title']);
+    }
+
+    public function testPatchProfileForNonExistentUserReturns404(): void
+    {
+        $body = $this->factory->createStream(json_encode([
+            'display_name' => 'Ghost',
+            'full_name'    => null,
+            'job_title'    => null,
+        ], JSON_THROW_ON_ERROR));
+
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('PATCH', 'https://example.test/api/v1/users/999/profile')
+                ->withBody($body)
+                ->withAttribute('nene2.auth.claims', ['sub' => 'admin@example.test']),
+        );
+
+        self::assertSame(404, $response->getStatusCode());
+    }
+
+    public function testGetUserByIdIncludesProfileFields(): void
+    {
+        // Pre-populate profile
+        $this->profiles->upsert(1, 'Admin', 'Admin Fullname', 'CTO');
+
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/api/v1/users/1')
+                ->withAttribute('nene2.auth.claims', ['sub' => 'admin@example.test']),
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+
+        $data = $this->decodeJson($response);
+        self::assertSame('Admin', $data['display_name']);
+        self::assertSame('Admin Fullname', $data['full_name']);
+        self::assertSame('CTO', $data['job_title']);
+    }
+
+    public function testGetUserByIdReturnsNullProfileFieldsWhenNoProfile(): void
+    {
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/api/v1/users/1')
+                ->withAttribute('nene2.auth.claims', ['sub' => 'admin@example.test']),
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+
+        $data = $this->decodeJson($response);
+        self::assertNull($data['display_name']);
+        self::assertNull($data['full_name']);
+        self::assertNull($data['job_title']);
     }
 
     /** @return array<string, mixed> */

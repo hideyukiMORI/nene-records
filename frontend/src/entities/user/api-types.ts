@@ -2,13 +2,18 @@ export interface UserDto {
   id: number
   email: string
   role: string
+  organization_id: number | null
+  org_role: string | null
   status: string
-  created_at: string
-  updated_at: string
+  display_name: string | null
+  full_name: string | null
+  job_title: string | null
+  created_at: number | null
+  updated_at: number | null
 }
 
 export interface UserListDto {
-  users: UserDto[]
+  items: UserDto[]
 }
 
 export interface CreateUserRequestDto {
@@ -40,4 +45,20 @@ export interface InviteUserResponseDto {
   email: string
   role: string
   status: string
+}
+
+export interface ChangeUserEmailRequestDto {
+  email: string
+}
+
+export interface UpdateUserProfileRequestDto {
+  display_name: string | null
+  full_name: string | null
+  job_title: string | null
+}
+
+export interface UserProfileDto {
+  display_name: string | null
+  full_name: string | null
+  job_title: string | null
 }

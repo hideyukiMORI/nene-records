@@ -4,15 +4,10 @@ declare(strict_types=1);
 
 namespace NeNeRecords\User;
 
-final readonly class GetUserByIdOutput
+final readonly class UserProfile
 {
     public function __construct(
-        public int $id,
-        public string $email,
-        public string $role,
-        public ?int $organizationId,
-        public ?string $orgRole,
-        public string $status,
+        public int $userId,
         public ?string $displayName,
         public ?string $fullName,
         public ?string $jobTitle,

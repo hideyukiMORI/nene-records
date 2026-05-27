@@ -1,23 +1,28 @@
 export type {
+  ChangeEmailInput,
   CreateUserInput,
   AdminResetPasswordInput,
   ChangeOwnPasswordInput,
   InviteUserInput,
+  UpdateUserProfileInput,
   UpdateUserRoleInput,
   User,
   UserList,
+  UserProfile,
   UserRole,
   UserStatus,
 } from './model'
 export {
   useAcceptInvite,
   useAdminResetPassword,
+  useChangeEmail,
   useChangeOwnPassword,
   useConfirmPasswordReset,
   useCreateUser,
   useDeleteUser,
   useInviteUser,
+  useUpdateUserProfile,
   useUpdateUserRole,
 } from './mutations'
-export { useUserList } from './queries'
+export { useUserById, useUserList } from './queries'
 export { userKeys } from './query-keys'
