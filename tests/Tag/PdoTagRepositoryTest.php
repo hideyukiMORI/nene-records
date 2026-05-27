@@ -7,6 +7,7 @@ namespace NeNeRecords\Tests\Tag;
 use Nene2\Config\DatabaseConfig;
 use Nene2\Database\PdoConnectionFactory;
 use Nene2\Database\PdoDatabaseQueryExecutor;
+use Nene2\Http\RequestScopedHolder;
 use NeNeRecords\Tag\PdoTagRepository;
 use NeNeRecords\Tag\Tag;
 use PHPUnit\Framework\TestCase;
@@ -14,6 +15,9 @@ use PHPUnit\Framework\TestCase;
 final class PdoTagRepositoryTest extends TestCase
 {
     private PdoDatabaseQueryExecutor $executor;
+
+    /** @var RequestScopedHolder<int> */
+    private RequestScopedHolder $orgId;
 
     protected function setUp(): void
     {
@@ -30,6 +34,9 @@ final class PdoTagRepositoryTest extends TestCase
             '',
             'utf8',
         )));
+
+        $this->orgId = new RequestScopedHolder();
+        $this->orgId->set(0);
 
         foreach ($this->schemaStatements() as $statement) {
             $this->executor->execute($statement);
@@ -58,7 +65,7 @@ final class PdoTagRepositoryTest extends TestCase
 
     public function testSaveAndFindBySlug(): void
     {
-        $repository = new PdoTagRepository($this->executor);
+        $repository = new PdoTagRepository($this->executor, $this->orgId);
         $id = $repository->save(new Tag(slug: 'featured', name: 'Featured'));
 
         $tag = $repository->findBySlug('featured');
@@ -70,7 +77,7 @@ final class PdoTagRepositoryTest extends TestCase
 
     public function testFindAllReturnsTagsInIdOrder(): void
     {
-        $repository = new PdoTagRepository($this->executor);
+        $repository = new PdoTagRepository($this->executor, $this->orgId);
         $repository->save(new Tag(slug: 'a', name: 'A'));
         $repository->save(new Tag(slug: 'b', name: 'B'));
 

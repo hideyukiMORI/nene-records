@@ -8,11 +8,16 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use LogicException;
 use Nene2\Database\DatabaseQueryExecutorInterface;
+use Nene2\Http\RequestScopedHolder;
 
 final readonly class PdoEntityRepository implements EntityRepositoryInterface
 {
+    /**
+     * @param RequestScopedHolder<int> $orgId
+     */
     public function __construct(
         private DatabaseQueryExecutorInterface $query,
+        private RequestScopedHolder $orgId,
     ) {
     }
 
@@ -22,9 +27,9 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
             <<<'SQL'
                 SELECT id, entity_type_id, slug, status, published_at, scheduled_at, is_deleted, created_at, updated_at, deleted_at, meta_title, meta_description
                 FROM entities
-                WHERE id = ? AND is_deleted = 0
+                WHERE id = ? AND organization_id = ? AND is_deleted = 0
                 SQL,
-            [$id],
+            [$id, $this->orgId->get()],
         );
 
         if ($row === null) {
@@ -40,9 +45,9 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
             <<<'SQL'
                 SELECT id, entity_type_id, slug, status, published_at, scheduled_at, is_deleted, created_at, updated_at, deleted_at, meta_title, meta_description
                 FROM entities
-                WHERE slug = ? AND entity_type_id = ? AND is_deleted = 0
+                WHERE slug = ? AND entity_type_id = ? AND organization_id = ? AND is_deleted = 0
                 SQL,
-            [$slug, $entityTypeId],
+            [$slug, $entityTypeId, $this->orgId->get()],
         );
 
         if ($row === null) {
@@ -56,13 +61,13 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
     {
         if ($excludeId !== null) {
             $row = $this->query->fetchOne(
-                'SELECT id FROM entities WHERE slug = ? AND entity_type_id = ? AND id != ? AND is_deleted = 0',
-                [$slug, $entityTypeId, $excludeId],
+                'SELECT id FROM entities WHERE slug = ? AND entity_type_id = ? AND organization_id = ? AND id != ? AND is_deleted = 0',
+                [$slug, $entityTypeId, $this->orgId->get(), $excludeId],
             );
         } else {
             $row = $this->query->fetchOne(
-                'SELECT id FROM entities WHERE slug = ? AND entity_type_id = ? AND is_deleted = 0',
-                [$slug, $entityTypeId],
+                'SELECT id FROM entities WHERE slug = ? AND entity_type_id = ? AND organization_id = ? AND is_deleted = 0',
+                [$slug, $entityTypeId, $this->orgId->get()],
             );
         }
 
@@ -72,8 +77,8 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
     public function existsActiveByEntityTypeId(int $entityTypeId): bool
     {
         $row = $this->query->fetchOne(
-            'SELECT id FROM entities WHERE entity_type_id = ? AND is_deleted = 0 LIMIT 1',
-            [$entityTypeId],
+            'SELECT id FROM entities WHERE entity_type_id = ? AND organization_id = ? AND is_deleted = 0 LIMIT 1',
+            [$entityTypeId, $this->orgId->get()],
         );
 
         return $row !== null;
@@ -146,8 +151,8 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
      */
     private function buildCriteriaWhere(EntityListCriteria $criteria): array
     {
-        $conditions = ['e.is_deleted = 0'];
-        $params = [];
+        $conditions = ['e.is_deleted = 0', 'e.organization_id = ?'];
+        $params = [$this->orgId->get()];
 
         if ($criteria->entityTypeId !== null) {
             $conditions[] = 'e.entity_type_id = ?';
@@ -230,8 +235,8 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
         $now = date('Y-m-d H:i:s');
 
         $this->query->execute(
-            'INSERT INTO entities (entity_type_id, slug, status, published_at, scheduled_at, created_at, updated_at, meta_title, meta_description) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            [$entity->entityTypeId, $entity->slug, $entity->status->value, $publishedAt, $scheduledAt, $now, $now, $entity->metaTitle, $entity->metaDescription],
+            'INSERT INTO entities (organization_id, entity_type_id, slug, status, published_at, scheduled_at, created_at, updated_at, meta_title, meta_description) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [$this->orgId->get(), $entity->entityTypeId, $entity->slug, $entity->status->value, $publishedAt, $scheduledAt, $now, $now, $entity->metaTitle, $entity->metaDescription],
         );
 
         $id = $this->query->lastInsertId();
@@ -262,9 +267,9 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
             <<<'SQL'
                 UPDATE entities
                 SET entity_type_id = ?, slug = ?, status = ?, published_at = ?, scheduled_at = ?, updated_at = ?, meta_title = ?, meta_description = ?
-                WHERE id = ? AND is_deleted = 0
+                WHERE id = ? AND organization_id = ? AND is_deleted = 0
                 SQL,
-            [$entity->entityTypeId, $entity->slug, $entity->status->value, $publishedAt, $scheduledAt, $now, $entity->metaTitle, $entity->metaDescription, $id],
+            [$entity->entityTypeId, $entity->slug, $entity->status->value, $publishedAt, $scheduledAt, $now, $entity->metaTitle, $entity->metaDescription, $id, $this->orgId->get()],
         );
 
         $this->query->execute(
@@ -291,9 +296,9 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
             <<<'SQL'
                 UPDATE entities
                 SET is_deleted = 1, deleted_at = CURRENT_TIMESTAMP
-                WHERE id = ? AND is_deleted = 0
+                WHERE id = ? AND organization_id = ? AND is_deleted = 0
                 SQL,
-            [$id],
+            [$id, $this->orgId->get()],
         );
 
         if ($existing !== null) {
@@ -336,9 +341,9 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
             <<<'SQL'
                 SELECT id, entity_type_id, slug, status, published_at, scheduled_at, is_deleted, created_at, updated_at, deleted_at, meta_title, meta_description
                 FROM entities
-                WHERE status = 'scheduled' AND scheduled_at <= CURRENT_TIMESTAMP AND is_deleted = 0
+                WHERE status = 'scheduled' AND scheduled_at <= CURRENT_TIMESTAMP AND organization_id = ? AND is_deleted = 0
                 SQL,
-            [],
+            [$this->orgId->get()],
         );
 
         return array_map(fn (array $row) => $this->mapRow($row), $rows);
@@ -350,11 +355,11 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
             <<<SQL
                 SELECT id, entity_type_id, slug, status, published_at, scheduled_at, is_deleted, created_at, updated_at, deleted_at, meta_title, meta_description
                 FROM entities
-                WHERE status = 'published' AND is_deleted = 0
+                WHERE status = 'published' AND organization_id = ? AND is_deleted = 0
                 ORDER BY published_at DESC
                 LIMIT ?
                 SQL,
-            [$limit],
+            [$this->orgId->get(), $limit],
         );
 
         return array_map(fn (array $row) => $this->mapRow($row), $rows);
@@ -366,10 +371,10 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
             <<<'SQL'
                 SELECT entity_type_id, COUNT(*) AS cnt
                 FROM entities
-                WHERE status = 'published' AND is_deleted = 0
+                WHERE status = 'published' AND organization_id = ? AND is_deleted = 0
                 GROUP BY entity_type_id
                 SQL,
-            [],
+            [$this->orgId->get()],
         );
 
         $result = [];
@@ -386,10 +391,10 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
             <<<'SQL'
                 SELECT entity_type_id, COUNT(*) AS cnt
                 FROM entities
-                WHERE status = 'draft' AND is_deleted = 0
+                WHERE status = 'draft' AND organization_id = ? AND is_deleted = 0
                 GROUP BY entity_type_id
                 SQL,
-            [],
+            [$this->orgId->get()],
         );
 
         $result = [];

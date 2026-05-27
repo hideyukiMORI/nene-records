@@ -7,6 +7,7 @@ namespace NeNeRecords\Tests\Setting;
 use Nene2\Config\DatabaseConfig;
 use Nene2\Database\PdoConnectionFactory;
 use Nene2\Database\PdoDatabaseQueryExecutor;
+use Nene2\Http\RequestScopedHolder;
 use NeNeRecords\Setting\PdoSettingRepository;
 use NeNeRecords\Setting\SettingRevisionAction;
 use PHPUnit\Framework\TestCase;
@@ -14,6 +15,9 @@ use PHPUnit\Framework\TestCase;
 final class PdoSettingRepositoryTest extends TestCase
 {
     private PdoDatabaseQueryExecutor $executor;
+
+    /** @var RequestScopedHolder<int> */
+    private RequestScopedHolder $orgId;
 
     protected function setUp(): void
     {
@@ -32,6 +36,9 @@ final class PdoSettingRepositoryTest extends TestCase
         ));
 
         $this->executor = new PdoDatabaseQueryExecutor($factory);
+
+        $this->orgId = new RequestScopedHolder();
+        $this->orgId->set(0);
 
         foreach ($this->schemaStatements() as $statement) {
             $this->executor->execute($statement);
@@ -65,7 +72,7 @@ final class PdoSettingRepositoryTest extends TestCase
 
     public function testApplyValueCreatesRevisionAndStoredValue(): void
     {
-        $repository = new PdoSettingRepository($this->executor);
+        $repository = new PdoSettingRepository($this->executor, $this->orgId);
         $stored = $repository->applyValue('site_name', 'Updated Site', null);
 
         self::assertSame('Updated Site', $stored->value);

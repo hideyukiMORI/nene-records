@@ -37,6 +37,7 @@ final readonly class AdminApiAuthMiddleware implements MiddlewareInterface
         '/api/v1/media',
         '/api/v1/users',
         '/api/v1/admin/comments',
+        '/api/v1/organizations',
     ];
 
     public function __construct(

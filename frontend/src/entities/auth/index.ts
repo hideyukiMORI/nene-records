@@ -1,6 +1,11 @@
 export { authStore } from './model'
 export type { AuthSession } from './model'
 export { useLogin } from './mutations'
-export { hasCapability, isAdmin } from './capabilities'
+export { hasCapability, isAdmin, isSuperadmin } from './capabilities'
 export type { Capability, UserRole } from './capabilities'
-export { currentUserHasCapability, currentUserIsAdmin, getCurrentRole } from './authorization'
+export {
+  currentUserHasCapability,
+  currentUserIsAdmin,
+  currentUserIsSuperadmin,
+  getCurrentRole,
+} from './authorization'

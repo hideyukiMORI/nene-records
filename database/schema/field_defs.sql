@@ -1,5 +1,6 @@
 CREATE TABLE field_defs (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    organization_id INTEGER NOT NULL DEFAULT 0,
     entity_type_id INTEGER NOT NULL,
     field_key TEXT NOT NULL,
     data_type TEXT NOT NULL,

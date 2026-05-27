@@ -10,10 +10,21 @@ use PHPUnit\Framework\TestCase;
 
 final class RoleTest extends TestCase
 {
-    public function testAdminHasAllCapabilities(): void
+    public function testSuperadminHasAllCapabilities(): void
     {
         foreach (Capability::cases() as $capability) {
-            self::assertTrue(Role::Admin->hasCapability($capability));
+            self::assertTrue(Role::Superadmin->hasCapability($capability));
+        }
+    }
+
+    public function testAdminHasAllCapabilitiesExceptManageOrganizations(): void
+    {
+        foreach (Capability::cases() as $capability) {
+            if ($capability === Capability::ManageOrganizations) {
+                self::assertFalse(Role::Admin->hasCapability($capability));
+            } else {
+                self::assertTrue(Role::Admin->hasCapability($capability));
+            }
         }
     }
 

@@ -243,3 +243,13 @@ export function IconMessageCircle({ size = 16, className }: IconProps) {
     </svg>
   )
 }
+
+export function IconBuilding({ size = 16, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className} aria-hidden="true">
+      <rect x="3" y="3" width="18" height="18" rx="2" />
+      <path d="M3 9h18" />
+      <path d="M9 21V9" />
+    </svg>
+  )
+}

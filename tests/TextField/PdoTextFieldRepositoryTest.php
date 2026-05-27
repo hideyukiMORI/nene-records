@@ -7,6 +7,7 @@ namespace NeNeRecords\Tests\TextField;
 use Nene2\Config\DatabaseConfig;
 use Nene2\Database\PdoConnectionFactory;
 use Nene2\Database\PdoDatabaseQueryExecutor;
+use Nene2\Http\RequestScopedHolder;
 use NeNeRecords\TextField\PdoTextFieldRepository;
 use NeNeRecords\TextField\TextField;
 use NeNeRecords\TextField\TextFieldNotFoundException;
@@ -15,6 +16,9 @@ use PHPUnit\Framework\TestCase;
 final class PdoTextFieldRepositoryTest extends TestCase
 {
     private PdoDatabaseQueryExecutor $executor;
+
+    /** @var RequestScopedHolder<int> */
+    private RequestScopedHolder $orgId;
 
     protected function setUp(): void
     {
@@ -33,6 +37,8 @@ final class PdoTextFieldRepositoryTest extends TestCase
         )));
 
         $this->executor->execute('PRAGMA foreign_keys = ON');
+        $this->orgId = new RequestScopedHolder();
+        $this->orgId->set(0);
 
         foreach ($this->schemaStatements() as $statement) {
             $this->executor->execute($statement);
@@ -88,7 +94,7 @@ final class PdoTextFieldRepositoryTest extends TestCase
             [$ids['entityId'], 'title', 'Hi'],
         );
 
-        $repository = new PdoTextFieldRepository($this->executor);
+        $repository = new PdoTextFieldRepository($this->executor, $this->orgId);
         $textField = $repository->findById(1);
 
         self::assertNotNull($textField);
@@ -107,7 +113,7 @@ final class PdoTextFieldRepositoryTest extends TestCase
             [$ids['entityId'], 'body', 'X'],
         );
 
-        $repository = new PdoTextFieldRepository($this->executor);
+        $repository = new PdoTextFieldRepository($this->executor, $this->orgId);
         $repository->delete(1);
 
         self::assertNull($repository->findById(1));
@@ -117,7 +123,7 @@ final class PdoTextFieldRepositoryTest extends TestCase
     {
         $ids = $this->insertEntityHierarchy();
 
-        $repository = new PdoTextFieldRepository($this->executor);
+        $repository = new PdoTextFieldRepository($this->executor, $this->orgId);
         $id = $repository->save(new TextField(entityId: $ids['entityId'], fieldKey: 'k', value: 'v'));
 
         self::assertSame(1, $id);
@@ -132,7 +138,7 @@ final class PdoTextFieldRepositoryTest extends TestCase
             [$ids['entityId'], 'note', 'A'],
         );
 
-        $repository = new PdoTextFieldRepository($this->executor);
+        $repository = new PdoTextFieldRepository($this->executor, $this->orgId);
         $repository->delete(1);
 
         $this->expectException(TextFieldNotFoundException::class);
@@ -144,7 +150,7 @@ final class PdoTextFieldRepositoryTest extends TestCase
     {
         $ids = $this->insertEntityHierarchy();
 
-        $repository = new PdoTextFieldRepository($this->executor);
+        $repository = new PdoTextFieldRepository($this->executor, $this->orgId);
 
         $repository->save(new TextField(entityId: $ids['entityId'], fieldKey: 'a', value: '1'));
         $b = $repository->save(new TextField(entityId: $ids['entityId'], fieldKey: 'b', value: '2'));
@@ -169,7 +175,7 @@ final class PdoTextFieldRepositoryTest extends TestCase
         $this->executor->execute('INSERT INTO entities (entity_type_id) VALUES (?)', [$typeBId]);
         $entityBId = $this->executor->lastInsertId();
 
-        $repository = new PdoTextFieldRepository($this->executor);
+        $repository = new PdoTextFieldRepository($this->executor, $this->orgId);
 
         $repository->save(new TextField(entityId: $entityAId, fieldKey: 'title', value: 'A'));
         $repository->save(new TextField(entityId: $entityBId, fieldKey: 'title', value: 'B'));

@@ -7,6 +7,7 @@ namespace NeNeRecords\Tests\FieldDef;
 use Nene2\Config\DatabaseConfig;
 use Nene2\Database\PdoConnectionFactory;
 use Nene2\Database\PdoDatabaseQueryExecutor;
+use Nene2\Http\RequestScopedHolder;
 use NeNeRecords\FieldDef\FieldDef;
 use NeNeRecords\FieldDef\PdoFieldDefRepository;
 use PHPUnit\Framework\TestCase;
@@ -14,6 +15,9 @@ use PHPUnit\Framework\TestCase;
 final class PdoFieldDefRepositoryTest extends TestCase
 {
     private PdoDatabaseQueryExecutor $executor;
+
+    /** @var RequestScopedHolder<int> */
+    private RequestScopedHolder $orgId;
 
     protected function setUp(): void
     {
@@ -32,6 +36,8 @@ final class PdoFieldDefRepositoryTest extends TestCase
         )));
 
         $this->executor->execute('PRAGMA foreign_keys = ON');
+        $this->orgId = new RequestScopedHolder();
+        $this->orgId->set(0);
 
         foreach ($this->schemaStatements() as $statement) {
             $this->executor->execute($statement);
@@ -72,7 +78,7 @@ final class PdoFieldDefRepositoryTest extends TestCase
         $this->executor->execute("INSERT INTO entity_types (name, slug) VALUES ('Article', 'article')");
         $this->executor->execute("INSERT INTO field_defs (entity_type_id, field_key, data_type) VALUES (1, 'title', 'text')");
 
-        $repository = new PdoFieldDefRepository($this->executor);
+        $repository = new PdoFieldDefRepository($this->executor, $this->orgId);
         $fieldDef = $repository->findById(1);
 
         self::assertNotNull($fieldDef);
@@ -87,7 +93,7 @@ final class PdoFieldDefRepositoryTest extends TestCase
         $this->executor->execute("INSERT INTO entity_types (name, slug) VALUES ('Article', 'article')");
         $this->executor->execute("INSERT INTO field_defs (entity_type_id, field_key, data_type) VALUES (1, 'title', 'text')");
 
-        $repository = new PdoFieldDefRepository($this->executor);
+        $repository = new PdoFieldDefRepository($this->executor, $this->orgId);
         $fieldDef = $repository->findByEntityTypeIdAndFieldKey(1, 'title');
 
         self::assertNotNull($fieldDef);
@@ -99,7 +105,7 @@ final class PdoFieldDefRepositoryTest extends TestCase
         $this->executor->execute("INSERT INTO entity_types (name, slug) VALUES ('Article', 'article')");
         $this->executor->execute("INSERT INTO field_defs (entity_type_id, field_key, data_type) VALUES (1, 'title', 'text')");
 
-        $repository = new PdoFieldDefRepository($this->executor);
+        $repository = new PdoFieldDefRepository($this->executor, $this->orgId);
         $repository->softDelete(1);
 
         self::assertNull($repository->findById(1));
@@ -113,7 +119,7 @@ final class PdoFieldDefRepositoryTest extends TestCase
         $this->executor->execute("INSERT INTO field_defs (entity_type_id, field_key, data_type) VALUES (1, 'title', 'text')");
         $this->executor->execute("INSERT INTO field_defs (entity_type_id, field_key, data_type) VALUES (2, 'body', 'text')");
 
-        $repository = new PdoFieldDefRepository($this->executor);
+        $repository = new PdoFieldDefRepository($this->executor, $this->orgId);
         $list = $repository->findAll(1, 10, 0);
 
         self::assertCount(1, $list);
@@ -124,7 +130,7 @@ final class PdoFieldDefRepositoryTest extends TestCase
     {
         $this->executor->execute("INSERT INTO entity_types (name, slug) VALUES ('Article', 'article')");
 
-        $repository = new PdoFieldDefRepository($this->executor);
+        $repository = new PdoFieldDefRepository($this->executor, $this->orgId);
         $id = $repository->save(new FieldDef(entityTypeId: 1, fieldKey: 'summary', dataType: 'text'));
 
         self::assertSame(1, $id);
@@ -135,7 +141,7 @@ final class PdoFieldDefRepositoryTest extends TestCase
         $this->executor->execute("INSERT INTO entity_types (name, slug) VALUES ('Article', 'article')");
         $this->executor->execute("INSERT INTO field_defs (entity_type_id, field_key, data_type) VALUES (1, 'title', 'text')");
 
-        $repository = new PdoFieldDefRepository($this->executor);
+        $repository = new PdoFieldDefRepository($this->executor, $this->orgId);
         $repository->update(new FieldDef(entityTypeId: 1, fieldKey: 'headline', dataType: 'text', id: 1));
         $fieldDef = $repository->findById(1);
 

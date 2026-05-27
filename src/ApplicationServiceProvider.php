@@ -8,6 +8,7 @@ use LogicException;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\DomainExceptionHandlerInterface;
+use Nene2\Http\RequestScopedHolder;
 use NeNeRecords\Analytics\AnalyticsServiceProvider;
 use NeNeRecords\Auth\InvalidCredentialsExceptionHandler;
 use NeNeRecords\BoolField\BoolFieldNotFoundExceptionHandler;
@@ -56,6 +57,10 @@ use NeNeRecords\Media\MediaServiceProvider;
 use NeNeRecords\Media\MediaTooLargeExceptionHandler;
 use NeNeRecords\NavigationItem\NavigationItemNotFoundExceptionHandler;
 use NeNeRecords\NavigationItem\NavigationItemServiceProvider;
+use NeNeRecords\Organization\OrganizationNotFoundExceptionHandler;
+use NeNeRecords\Organization\OrganizationRouteRegistrar;
+use NeNeRecords\Organization\OrganizationServiceProvider;
+use NeNeRecords\Organization\OrganizationSlugConflictExceptionHandler;
 use NeNeRecords\PreviewToken\PreviewTokenNotFoundExceptionHandler;
 use NeNeRecords\PreviewToken\PreviewTokenServiceProvider;
 use NeNeRecords\PublicRecord\PublicEntityTypeNotFoundExceptionHandler;
@@ -90,8 +95,20 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
 
     public const EXCEPTION_HANDLERS = 'nene-records.exception_handlers';
 
+    /** Container key for the shared RequestScopedHolder<int> that carries org_id. */
+    public const ORG_ID_HOLDER = 'nene-records.org_id_holder';
+
     public function register(ContainerBuilder $builder): void
     {
+        // Register the shared org_id holder so all repos and OrgResolverMiddleware share the same instance.
+        $builder->set(
+            self::ORG_ID_HOLDER,
+            static function (): RequestScopedHolder {
+                /** @var RequestScopedHolder<int> */
+                return new RequestScopedHolder();
+            },
+        );
+
         $builder
             ->addProvider(new EntityArchiveServiceProvider())
             ->addProvider(new EntityTypeServiceProvider())
@@ -115,7 +132,8 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
             ->addProvider(new DashboardServiceProvider())
             ->addProvider(new UserServiceProvider())
             ->addProvider(new UserInviteServiceProvider())
-            ->addProvider(new CommentServiceProvider());
+            ->addProvider(new CommentServiceProvider())
+            ->addProvider(new OrganizationServiceProvider());
 
         $builder
             ->set(
@@ -145,6 +163,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $userInvite = $container->get('nene-records.route_registrar.user_invite');
                     $auth = $container->get('nene-records.route_registrar.auth');
                     $comment = $container->get(CommentRouteRegistrar::class);
+                    $organization = $container->get(OrganizationRouteRegistrar::class);
 
                     if (
                         !is_callable($entityType)
@@ -171,6 +190,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         || !is_callable($userInvite)
                         || !is_callable($auth)
                         || !is_callable($comment)
+                        || !$organization instanceof OrganizationRouteRegistrar
                     ) {
                         throw new LogicException('Route registrar service is invalid.');
                     }
@@ -200,6 +220,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $user,
                         $userInvite,
                         $comment,
+                        $organization,
                     ];
                 },
             )
@@ -256,6 +277,8 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $invalidInviteToken = $container->get(InvalidInviteTokenExceptionHandler::class);
                     $invalidResetToken = $container->get(InvalidPasswordResetTokenExceptionHandler::class);
                     $commentNotFound = $container->get(CommentNotFoundExceptionHandler::class);
+                    $organizationNotFound = $container->get(OrganizationNotFoundExceptionHandler::class);
+                    $organizationSlugConflict = $container->get(OrganizationSlugConflictExceptionHandler::class);
 
                     foreach ([
                         $entityTypeNotFound,
@@ -308,6 +331,8 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $invalidInviteToken,
                         $invalidResetToken,
                         $commentNotFound,
+                        $organizationNotFound,
+                        $organizationSlugConflict,
                     ] as $handler) {
                         if (!$handler instanceof DomainExceptionHandlerInterface) {
                             throw new LogicException('Exception handler service is invalid.');
@@ -365,6 +390,8 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $invalidInviteToken,
                         $invalidResetToken,
                         $commentNotFound,
+                        $organizationNotFound,
+                        $organizationSlugConflict,
                     ];
                 },
             );

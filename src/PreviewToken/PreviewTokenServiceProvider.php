@@ -10,6 +10,7 @@ use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
+use Nene2\Http\RequestScopedHolder;
 use NeNeRecords\BoolField\BoolFieldRepositoryInterface;
 use NeNeRecords\DateTimeField\DateTimeFieldRepositoryInterface;
 use NeNeRecords\Entity\EntityRepositoryInterface;
@@ -37,7 +38,12 @@ final readonly class PreviewTokenServiceProvider implements ServiceProviderInter
                         throw new LogicException('Database query executor service is invalid.');
                     }
 
-                    return new PdoEntityPreviewTokenRepository($query);
+                    $orgId = $container->get('nene-records.org_id_holder');
+                    if (!$orgId instanceof RequestScopedHolder) {
+                        throw new LogicException('Org ID holder service is invalid.');
+                    }
+
+                    return new PdoEntityPreviewTokenRepository($query, $orgId);
                 },
             )
             ->set(

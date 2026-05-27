@@ -16,7 +16,10 @@ final readonly class CreateUserUseCase implements CreateUserUseCaseInterface
 
     public function execute(CreateUserInput $input): CreateUserOutput
     {
-        if (Role::tryFrom($input->role) === null) {
+        $role = Role::tryFrom($input->role);
+
+        // superadmin is a platform-level role and cannot be created via the org user API
+        if ($role === null || $role === Role::Superadmin) {
             throw new InvalidUserRoleException($input->role);
         }
 

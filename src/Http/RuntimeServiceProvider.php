@@ -21,6 +21,7 @@ use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\DomainExceptionHandlerInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
+use Nene2\Http\RequestScopedHolder;
 use Nene2\Http\ResponseEmitter;
 use Nene2\Http\RuntimeApplicationFactory;
 use Nene2\Log\MonologLoggerFactory;
@@ -31,6 +32,10 @@ use NeNeRecords\ApplicationServiceProvider;
 use NeNeRecords\Auth\AdminApiAuthMiddleware;
 use NeNeRecords\Auth\AuthServiceProvider;
 use NeNeRecords\Auth\CapabilityMiddleware;
+use NeNeRecords\Organization\OrganizationRepositoryInterface;
+use NeNeRecords\Organization\Resolution\EnvResolutionStrategy;
+use NeNeRecords\Organization\Resolution\OrgResolverMiddleware;
+use NeNeRecords\Organization\Resolution\SubdomainResolutionStrategy;
 use NeNeRecords\RateLimit\RateLimitServiceProvider;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Psr\Container\ContainerInterface;
@@ -288,6 +293,29 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
                         throw new LogicException('TokenVerifierInterface service is invalid.');
                     }
 
+                    // Org resolver: select strategy from TENANT_RESOLUTION env var
+                    $orgRepo = $container->get(OrganizationRepositoryInterface::class);
+                    if (!$orgRepo instanceof OrganizationRepositoryInterface) {
+                        throw new LogicException('OrganizationRepositoryInterface service is invalid.');
+                    }
+
+                    $orgIdHolder = $container->get(ApplicationServiceProvider::ORG_ID_HOLDER);
+                    if (!$orgIdHolder instanceof RequestScopedHolder) {
+                        throw new LogicException('Org ID holder service is invalid.');
+                    }
+                    /** @var RequestScopedHolder<int> $orgIdHolder */
+
+                    $tenantResolution = (string) (getenv('TENANT_RESOLUTION') ?: 'env');
+                    $strategy = match ($tenantResolution) {
+                        'subdomain' => new SubdomainResolutionStrategy(
+                            (string) (getenv('BASE_DOMAIN') ?: 'localhost'),
+                        ),
+                        default => new EnvResolutionStrategy(
+                            (string) (getenv('ORG_SLUG') ?: ''),
+                        ),
+                    };
+
+                    $authMiddleware[] = new OrgResolverMiddleware($orgIdHolder, $orgRepo, $problemDetails, $strategy);
                     $authMiddleware[] = new AdminApiAuthMiddleware($problemDetails, $tokenVerifier);
                     $authMiddleware[] = new CapabilityMiddleware($problemDetails);
 

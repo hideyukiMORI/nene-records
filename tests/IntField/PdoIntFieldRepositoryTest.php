@@ -7,6 +7,7 @@ namespace NeNeRecords\Tests\IntField;
 use Nene2\Config\DatabaseConfig;
 use Nene2\Database\PdoConnectionFactory;
 use Nene2\Database\PdoDatabaseQueryExecutor;
+use Nene2\Http\RequestScopedHolder;
 use NeNeRecords\IntField\IntField;
 use NeNeRecords\IntField\IntFieldNotFoundException;
 use NeNeRecords\IntField\PdoIntFieldRepository;
@@ -15,6 +16,9 @@ use PHPUnit\Framework\TestCase;
 final class PdoIntFieldRepositoryTest extends TestCase
 {
     private PdoDatabaseQueryExecutor $executor;
+
+    /** @var RequestScopedHolder<int> */
+    private RequestScopedHolder $orgId;
 
     protected function setUp(): void
     {
@@ -33,6 +37,8 @@ final class PdoIntFieldRepositoryTest extends TestCase
         )));
 
         $this->executor->execute('PRAGMA foreign_keys = ON');
+        $this->orgId = new RequestScopedHolder();
+        $this->orgId->set(0);
 
         foreach ($this->schemaStatements() as $statement) {
             $this->executor->execute($statement);
@@ -88,7 +94,7 @@ final class PdoIntFieldRepositoryTest extends TestCase
             [$ids['entityId'], 'count', 42],
         );
 
-        $repository = new PdoIntFieldRepository($this->executor);
+        $repository = new PdoIntFieldRepository($this->executor, $this->orgId);
         $intField = $repository->findById(1);
 
         self::assertNotNull($intField);
@@ -107,7 +113,7 @@ final class PdoIntFieldRepositoryTest extends TestCase
             [$ids['entityId'], 'count', 7],
         );
 
-        $repository = new PdoIntFieldRepository($this->executor);
+        $repository = new PdoIntFieldRepository($this->executor, $this->orgId);
         $repository->delete(1);
 
         self::assertNull($repository->findById(1));
@@ -117,7 +123,7 @@ final class PdoIntFieldRepositoryTest extends TestCase
     {
         $ids = $this->insertEntityHierarchy();
 
-        $repository = new PdoIntFieldRepository($this->executor);
+        $repository = new PdoIntFieldRepository($this->executor, $this->orgId);
         $id = $repository->save(new IntField(entityId: $ids['entityId'], fieldKey: 'k', value: 3));
 
         self::assertSame(1, $id);
@@ -132,7 +138,7 @@ final class PdoIntFieldRepositoryTest extends TestCase
             [$ids['entityId'], 'count', 1],
         );
 
-        $repository = new PdoIntFieldRepository($this->executor);
+        $repository = new PdoIntFieldRepository($this->executor, $this->orgId);
         $repository->delete(1);
 
         $this->expectException(IntFieldNotFoundException::class);
@@ -144,7 +150,7 @@ final class PdoIntFieldRepositoryTest extends TestCase
     {
         $ids = $this->insertEntityHierarchy();
 
-        $repository = new PdoIntFieldRepository($this->executor);
+        $repository = new PdoIntFieldRepository($this->executor, $this->orgId);
 
         $repository->save(new IntField(entityId: $ids['entityId'], fieldKey: 'a', value: 1));
         $b = $repository->save(new IntField(entityId: $ids['entityId'], fieldKey: 'b', value: 2));

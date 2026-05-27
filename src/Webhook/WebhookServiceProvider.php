@@ -10,6 +10,7 @@ use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
+use Nene2\Http\RequestScopedHolder;
 use Psr\Container\ContainerInterface;
 
 final readonly class WebhookServiceProvider implements ServiceProviderInterface
@@ -26,7 +27,12 @@ final readonly class WebhookServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Database query executor service is invalid.');
                     }
 
-                    return new PdoWebhookRepository($query);
+                    $orgId = $container->get('nene-records.org_id_holder');
+                    if (!$orgId instanceof RequestScopedHolder) {
+                        throw new LogicException('Org ID holder service is invalid.');
+                    }
+
+                    return new PdoWebhookRepository($query, $orgId);
                 },
             )
             ->set(

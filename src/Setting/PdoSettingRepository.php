@@ -5,11 +5,16 @@ declare(strict_types=1);
 namespace NeNeRecords\Setting;
 
 use Nene2\Database\DatabaseQueryExecutorInterface;
+use Nene2\Http\RequestScopedHolder;
 
 final readonly class PdoSettingRepository implements SettingRepositoryInterface
 {
+    /**
+     * @param RequestScopedHolder<int> $orgId
+     */
     public function __construct(
         private DatabaseQueryExecutorInterface $query,
+        private readonly RequestScopedHolder $orgId,
     ) {
     }
 
@@ -19,7 +24,9 @@ final readonly class PdoSettingRepository implements SettingRepositoryInterface
         $rows = $this->query->fetchAll(
             'SELECT id, setting_key, data_type, default_value, is_public, label
              FROM setting_defs
+             WHERE organization_id = ?
              ORDER BY id ASC',
+            [$this->orgId->get()],
         );
 
         return array_map($this->mapDef(...), $rows);
@@ -30,8 +37,8 @@ final readonly class PdoSettingRepository implements SettingRepositoryInterface
         $row = $this->query->fetchOne(
             'SELECT id, setting_key, data_type, default_value, is_public, label
              FROM setting_defs
-             WHERE setting_key = ?',
-            [$settingKey],
+             WHERE setting_key = ? AND organization_id = ?',
+            [$settingKey, $this->orgId->get()],
         );
 
         return $row === null ? null : $this->mapDef($row);
@@ -42,8 +49,8 @@ final readonly class PdoSettingRepository implements SettingRepositoryInterface
         $row = $this->query->fetchOne(
             'SELECT id, setting_key, value, is_deleted, deleted_at, created_by, updated_by, created_at, updated_at
              FROM setting_values
-             WHERE setting_key = ?',
-            [$settingKey],
+             WHERE setting_key = ? AND organization_id = ?',
+            [$settingKey, $this->orgId->get()],
         );
 
         return $row === null ? null : $this->mapValue($row);
@@ -114,16 +121,16 @@ final readonly class PdoSettingRepository implements SettingRepositoryInterface
 
         if ($existing === null) {
             $this->query->execute(
-                'INSERT INTO setting_values (setting_key, value, is_deleted, deleted_at, created_by, updated_by, created_at, updated_at)
-                 VALUES (?, ?, 0, NULL, ?, ?, ?, ?)',
-                [$settingKey, $normalized, $actorUserId, $actorUserId, $now, $now],
+                'INSERT INTO setting_values (organization_id, setting_key, value, is_deleted, deleted_at, created_by, updated_by, created_at, updated_at)
+                 VALUES (?, ?, ?, 0, NULL, ?, ?, ?, ?)',
+                [$this->orgId->get(), $settingKey, $normalized, $actorUserId, $actorUserId, $now, $now],
             );
         } else {
             $this->query->execute(
                 'UPDATE setting_values
                  SET value = ?, is_deleted = 0, deleted_at = NULL, updated_by = ?, updated_at = ?
-                 WHERE setting_key = ?',
-                [$normalized, $actorUserId, $now, $settingKey],
+                 WHERE setting_key = ? AND organization_id = ?',
+                [$normalized, $actorUserId, $now, $settingKey, $this->orgId->get()],
             );
         }
 
@@ -168,7 +175,9 @@ final readonly class PdoSettingRepository implements SettingRepositoryInterface
     {
         $rows = $this->query->fetchAll(
             'SELECT id, setting_key, value, is_deleted, deleted_at, created_by, updated_by, created_at, updated_at
-             FROM setting_values',
+             FROM setting_values
+             WHERE organization_id = ?',
+            [$this->orgId->get()],
         );
 
         return array_map($this->mapValue(...), $rows);

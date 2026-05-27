@@ -5,11 +5,16 @@ declare(strict_types=1);
 namespace NeNeRecords\Webhook;
 
 use Nene2\Database\DatabaseQueryExecutorInterface;
+use Nene2\Http\RequestScopedHolder;
 
 final readonly class PdoWebhookRepository implements WebhookRepositoryInterface
 {
+    /**
+     * @param RequestScopedHolder<int> $orgId
+     */
     public function __construct(
         private DatabaseQueryExecutorInterface $query,
+        private readonly RequestScopedHolder $orgId,
     ) {
     }
 
@@ -19,7 +24,9 @@ final readonly class PdoWebhookRepository implements WebhookRepositoryInterface
         $rows = $this->query->fetchAll(
             'SELECT id, url, events, entity_type_id, secret, is_active, created_at, updated_at
              FROM webhooks
+             WHERE organization_id = ?
              ORDER BY id ASC',
+            [$this->orgId->get()],
         );
 
         return array_map($this->mapRow(...), $rows);
@@ -30,8 +37,8 @@ final readonly class PdoWebhookRepository implements WebhookRepositoryInterface
         $row = $this->query->fetchOne(
             'SELECT id, url, events, entity_type_id, secret, is_active, created_at, updated_at
              FROM webhooks
-             WHERE id = ?',
-            [$id],
+             WHERE id = ? AND organization_id = ?',
+            [$id, $this->orgId->get()],
         );
 
         return $row === null ? null : $this->mapRow($row);
@@ -43,8 +50,9 @@ final readonly class PdoWebhookRepository implements WebhookRepositoryInterface
         $rows = $this->query->fetchAll(
             'SELECT id, url, events, entity_type_id, secret, is_active, created_at, updated_at
              FROM webhooks
-             WHERE is_active = 1
+             WHERE is_active = 1 AND organization_id = ?
              ORDER BY id ASC',
+            [$this->orgId->get()],
         );
 
         return array_values(array_filter(
@@ -65,9 +73,10 @@ final readonly class PdoWebhookRepository implements WebhookRepositoryInterface
         $now = date('Y-m-d H:i:s');
 
         $this->query->execute(
-            'INSERT INTO webhooks (url, events, entity_type_id, secret, is_active, created_at, updated_at)
-             VALUES (?, ?, ?, ?, ?, ?, ?)',
+            'INSERT INTO webhooks (organization_id, url, events, entity_type_id, secret, is_active, created_at, updated_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
             [
+                $this->orgId->get(),
                 $webhook->url,
                 json_encode($webhook->events, JSON_THROW_ON_ERROR),
                 $webhook->entityTypeId,
@@ -88,7 +97,7 @@ final readonly class PdoWebhookRepository implements WebhookRepositoryInterface
         $this->query->execute(
             'UPDATE webhooks
              SET url = ?, events = ?, entity_type_id = ?, secret = ?, is_active = ?, updated_at = ?
-             WHERE id = ?',
+             WHERE id = ? AND organization_id = ?',
             [
                 $webhook->url,
                 json_encode($webhook->events, JSON_THROW_ON_ERROR),
@@ -97,13 +106,14 @@ final readonly class PdoWebhookRepository implements WebhookRepositoryInterface
                 $webhook->isActive ? 1 : 0,
                 $now,
                 $webhook->id,
+                $this->orgId->get(),
             ],
         );
     }
 
     public function delete(int $id): void
     {
-        $this->query->execute('DELETE FROM webhooks WHERE id = ?', [$id]);
+        $this->query->execute('DELETE FROM webhooks WHERE id = ? AND organization_id = ?', [$id, $this->orgId->get()]);
     }
 
     /** @param array<string, mixed> $row */

@@ -5,11 +5,16 @@ declare(strict_types=1);
 namespace NeNeRecords\NavigationItem;
 
 use Nene2\Database\DatabaseQueryExecutorInterface;
+use Nene2\Http\RequestScopedHolder;
 
 final readonly class PdoNavigationItemRepository implements NavigationItemRepositoryInterface
 {
+    /**
+     * @param RequestScopedHolder<int> $orgId
+     */
     public function __construct(
         private DatabaseQueryExecutorInterface $query,
+        private readonly RequestScopedHolder $orgId,
     ) {
     }
 
@@ -19,7 +24,9 @@ final readonly class PdoNavigationItemRepository implements NavigationItemReposi
         $rows = $this->query->fetchAll(
             'SELECT id, label, url, display_order, created_at, updated_at
              FROM navigation_items
+             WHERE organization_id = ?
              ORDER BY display_order ASC, id ASC',
+            [$this->orgId->get()],
         );
 
         return array_map($this->mapRow(...), $rows);
@@ -30,8 +37,8 @@ final readonly class PdoNavigationItemRepository implements NavigationItemReposi
         $row = $this->query->fetchOne(
             'SELECT id, label, url, display_order, created_at, updated_at
              FROM navigation_items
-             WHERE id = ?',
-            [$id],
+             WHERE id = ? AND organization_id = ?',
+            [$id, $this->orgId->get()],
         );
 
         return $row === null ? null : $this->mapRow($row);
@@ -42,9 +49,9 @@ final readonly class PdoNavigationItemRepository implements NavigationItemReposi
         $now = date('Y-m-d H:i:s');
 
         $this->query->execute(
-            'INSERT INTO navigation_items (label, url, display_order, created_at, updated_at)
-             VALUES (?, ?, ?, ?, ?)',
-            [$item->label, $item->url, $item->displayOrder, $now, $now],
+            'INSERT INTO navigation_items (organization_id, label, url, display_order, created_at, updated_at)
+             VALUES (?, ?, ?, ?, ?, ?)',
+            [$this->orgId->get(), $item->label, $item->url, $item->displayOrder, $now, $now],
         );
 
         return $this->query->lastInsertId();
@@ -57,14 +64,14 @@ final readonly class PdoNavigationItemRepository implements NavigationItemReposi
         $this->query->execute(
             'UPDATE navigation_items
              SET label = ?, url = ?, display_order = ?, updated_at = ?
-             WHERE id = ?',
-            [$item->label, $item->url, $item->displayOrder, $now, $item->id],
+             WHERE id = ? AND organization_id = ?',
+            [$item->label, $item->url, $item->displayOrder, $now, $item->id, $this->orgId->get()],
         );
     }
 
     public function delete(int $id): void
     {
-        $this->query->execute('DELETE FROM navigation_items WHERE id = ?', [$id]);
+        $this->query->execute('DELETE FROM navigation_items WHERE id = ? AND organization_id = ?', [$id, $this->orgId->get()]);
     }
 
     /** @param array<string, mixed> $row */

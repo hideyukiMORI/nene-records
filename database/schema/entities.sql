@@ -1,5 +1,6 @@
 CREATE TABLE entities (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    organization_id INTEGER NOT NULL DEFAULT 0,
     entity_type_id INTEGER UNSIGNED NOT NULL,
     slug VARCHAR(255) NULL,
     status VARCHAR(16) NOT NULL DEFAULT 'draft',

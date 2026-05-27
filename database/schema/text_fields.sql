@@ -1,5 +1,6 @@
 CREATE TABLE text_fields (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    organization_id INTEGER NOT NULL DEFAULT 0,
     entity_id INTEGER UNSIGNED NOT NULL,
     field_key VARCHAR(255) NOT NULL,
     locale VARCHAR(10) NULL DEFAULT NULL,
@@ -10,3 +11,4 @@ CREATE TABLE text_fields (
 );
 CREATE INDEX text_fields_entity_id ON text_fields (entity_id);
 CREATE INDEX text_fields_entity_locale ON text_fields (entity_id, locale);
+CREATE INDEX text_fields_org ON text_fields (organization_id);

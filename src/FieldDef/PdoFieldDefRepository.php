@@ -7,11 +7,16 @@ namespace NeNeRecords\FieldDef;
 use DateTimeImmutable;
 use LogicException;
 use Nene2\Database\DatabaseQueryExecutorInterface;
+use Nene2\Http\RequestScopedHolder;
 
 final readonly class PdoFieldDefRepository implements FieldDefRepositoryInterface
 {
+    /**
+     * @param RequestScopedHolder<int> $orgId
+     */
     public function __construct(
         private DatabaseQueryExecutorInterface $query,
+        private RequestScopedHolder $orgId,
     ) {
     }
 
@@ -21,9 +26,9 @@ final readonly class PdoFieldDefRepository implements FieldDefRepositoryInterfac
             <<<'SQL'
                 SELECT id, entity_type_id, field_key, data_type, target_entity_type_id, cardinality, is_deleted, deleted_at
                 FROM field_defs
-                WHERE id = ? AND is_deleted = 0
+                WHERE id = ? AND organization_id = ? AND is_deleted = 0
                 SQL,
-            [$id],
+            [$id, $this->orgId->get()],
         );
 
         if ($row === null) {
@@ -39,9 +44,9 @@ final readonly class PdoFieldDefRepository implements FieldDefRepositoryInterfac
             <<<'SQL'
                 SELECT id, entity_type_id, field_key, data_type, target_entity_type_id, cardinality, is_deleted, deleted_at
                 FROM field_defs
-                WHERE entity_type_id = ? AND field_key = ? AND is_deleted = 0
+                WHERE entity_type_id = ? AND field_key = ? AND organization_id = ? AND is_deleted = 0
                 SQL,
-            [$entityTypeId, $fieldKey],
+            [$entityTypeId, $fieldKey, $this->orgId->get()],
         );
 
         if ($row === null) {
@@ -59,22 +64,22 @@ final readonly class PdoFieldDefRepository implements FieldDefRepositoryInterfac
                 <<<'SQL'
                     SELECT id, entity_type_id, field_key, data_type, target_entity_type_id, cardinality, is_deleted, deleted_at
                     FROM field_defs
-                    WHERE is_deleted = 0 AND entity_type_id = ?
+                    WHERE is_deleted = 0 AND entity_type_id = ? AND organization_id = ?
                     ORDER BY id ASC
                     LIMIT ? OFFSET ?
                     SQL,
-                [$entityTypeId, $limit, $offset],
+                [$entityTypeId, $this->orgId->get(), $limit, $offset],
             );
         } else {
             $rows = $this->query->fetchAll(
                 <<<'SQL'
                     SELECT id, entity_type_id, field_key, data_type, target_entity_type_id, cardinality, is_deleted, deleted_at
                     FROM field_defs
-                    WHERE is_deleted = 0
+                    WHERE is_deleted = 0 AND organization_id = ?
                     ORDER BY id ASC
                     LIMIT ? OFFSET ?
                     SQL,
-                [$limit, $offset],
+                [$this->orgId->get(), $limit, $offset],
             );
         }
 
@@ -85,10 +90,11 @@ final readonly class PdoFieldDefRepository implements FieldDefRepositoryInterfac
     {
         $this->query->execute(
             <<<'SQL'
-                INSERT INTO field_defs (entity_type_id, field_key, data_type, target_entity_type_id, cardinality)
-                VALUES (?, ?, ?, ?, ?)
+                INSERT INTO field_defs (organization_id, entity_type_id, field_key, data_type, target_entity_type_id, cardinality)
+                VALUES (?, ?, ?, ?, ?, ?)
                 SQL,
             [
+                $this->orgId->get(),
                 $fieldDef->entityTypeId,
                 $fieldDef->fieldKey,
                 $fieldDef->dataType,
@@ -112,7 +118,7 @@ final readonly class PdoFieldDefRepository implements FieldDefRepositoryInterfac
             <<<'SQL'
                 UPDATE field_defs
                 SET entity_type_id = ?, field_key = ?, data_type = ?, target_entity_type_id = ?, cardinality = ?
-                WHERE id = ? AND is_deleted = 0
+                WHERE id = ? AND organization_id = ? AND is_deleted = 0
                 SQL,
             [
                 $fieldDef->entityTypeId,
@@ -121,6 +127,7 @@ final readonly class PdoFieldDefRepository implements FieldDefRepositoryInterfac
                 $fieldDef->targetEntityTypeId,
                 $fieldDef->cardinality,
                 $id,
+                $this->orgId->get(),
             ],
         );
     }
@@ -131,9 +138,9 @@ final readonly class PdoFieldDefRepository implements FieldDefRepositoryInterfac
             <<<'SQL'
                 UPDATE field_defs
                 SET is_deleted = 1, deleted_at = CURRENT_TIMESTAMP
-                WHERE id = ? AND is_deleted = 0
+                WHERE id = ? AND organization_id = ? AND is_deleted = 0
                 SQL,
-            [$id],
+            [$id, $this->orgId->get()],
         );
     }
 

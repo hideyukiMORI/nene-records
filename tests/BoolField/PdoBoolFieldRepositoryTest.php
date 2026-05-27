@@ -7,6 +7,7 @@ namespace NeNeRecords\Tests\BoolField;
 use Nene2\Config\DatabaseConfig;
 use Nene2\Database\PdoConnectionFactory;
 use Nene2\Database\PdoDatabaseQueryExecutor;
+use Nene2\Http\RequestScopedHolder;
 use NeNeRecords\BoolField\BoolField;
 use NeNeRecords\BoolField\BoolFieldNotFoundException;
 use NeNeRecords\BoolField\PdoBoolFieldRepository;
@@ -15,6 +16,9 @@ use PHPUnit\Framework\TestCase;
 final class PdoBoolFieldRepositoryTest extends TestCase
 {
     private PdoDatabaseQueryExecutor $executor;
+
+    /** @var RequestScopedHolder<int> */
+    private RequestScopedHolder $orgId;
 
     protected function setUp(): void
     {
@@ -33,6 +37,9 @@ final class PdoBoolFieldRepositoryTest extends TestCase
         )));
 
         $this->executor->execute('PRAGMA foreign_keys = ON');
+
+        $this->orgId = new RequestScopedHolder();
+        $this->orgId->set(0);
 
         foreach ($this->schemaStatements() as $statement) {
             $this->executor->execute($statement);
@@ -88,7 +95,7 @@ final class PdoBoolFieldRepositoryTest extends TestCase
             [$ids['entityId'], 'count', 1],
         );
 
-        $repository = new PdoBoolFieldRepository($this->executor);
+        $repository = new PdoBoolFieldRepository($this->executor, $this->orgId);
         $boolField = $repository->findById(1);
 
         self::assertNotNull($boolField);
@@ -107,7 +114,7 @@ final class PdoBoolFieldRepositoryTest extends TestCase
             [$ids['entityId'], 'count', 1],
         );
 
-        $repository = new PdoBoolFieldRepository($this->executor);
+        $repository = new PdoBoolFieldRepository($this->executor, $this->orgId);
         $repository->delete(1);
 
         self::assertNull($repository->findById(1));
@@ -117,7 +124,7 @@ final class PdoBoolFieldRepositoryTest extends TestCase
     {
         $ids = $this->insertEntityHierarchy();
 
-        $repository = new PdoBoolFieldRepository($this->executor);
+        $repository = new PdoBoolFieldRepository($this->executor, $this->orgId);
         $id = $repository->save(new BoolField(entityId: $ids['entityId'], fieldKey: 'k', value: true));
 
         self::assertSame(1, $id);
@@ -132,7 +139,7 @@ final class PdoBoolFieldRepositoryTest extends TestCase
             [$ids['entityId'], 'count', 1],
         );
 
-        $repository = new PdoBoolFieldRepository($this->executor);
+        $repository = new PdoBoolFieldRepository($this->executor, $this->orgId);
         $repository->delete(1);
 
         $this->expectException(BoolFieldNotFoundException::class);
@@ -144,7 +151,7 @@ final class PdoBoolFieldRepositoryTest extends TestCase
     {
         $ids = $this->insertEntityHierarchy();
 
-        $repository = new PdoBoolFieldRepository($this->executor);
+        $repository = new PdoBoolFieldRepository($this->executor, $this->orgId);
 
         $repository->save(new BoolField(entityId: $ids['entityId'], fieldKey: 'a', value: true));
         $b = $repository->save(new BoolField(entityId: $ids['entityId'], fieldKey: 'b', value: false));
