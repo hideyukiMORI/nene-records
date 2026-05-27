@@ -37,6 +37,7 @@ final readonly class OrgResolverMiddleware implements MiddlewareInterface
     private const BYPASS_PREFIXES = [
         '/health',
         '/api/v1/organizations',
+        '/api/v1/superadmin/',
         '/api/v1/auth/',
     ];
 

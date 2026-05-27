@@ -35,8 +35,10 @@ use NeNeRecords\Auth\CapabilityMiddleware;
 use NeNeRecords\Organization\OrganizationRepositoryInterface;
 use NeNeRecords\Organization\Resolution\EnvResolutionStrategy;
 use NeNeRecords\Organization\Resolution\OrgResolverMiddleware;
+use NeNeRecords\Organization\Resolution\PathPrefixResolutionStrategy;
 use NeNeRecords\Organization\Resolution\SubdomainResolutionStrategy;
 use NeNeRecords\RateLimit\RateLimitServiceProvider;
+use NeNeRecords\SystemConfig\SystemConfigRepository;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -305,14 +307,21 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
                     }
                     /** @var RequestScopedHolder<int> $orgIdHolder */
 
-                    $tenantResolution = (string) (getenv('TENANT_RESOLUTION') ?: 'env');
-                    $strategy = match ($tenantResolution) {
-                        'subdomain' => new SubdomainResolutionStrategy(
-                            (string) (getenv('BASE_DOMAIN') ?: 'localhost'),
-                        ),
-                        default => new EnvResolutionStrategy(
-                            (string) (getenv('ORG_SLUG') ?: ''),
-                        ),
+                    // DB の system_config から解決モードを読む（env フォールバック付き）
+                    $sysConfig      = $container->get(SystemConfigRepository::class);
+                    $resolvedMode   = 'single';
+                    $resolvedSlug   = (string) (getenv('ORG_SLUG') ?: '');
+                    $resolvedDomain = (string) (getenv('BASE_DOMAIN') ?: 'localhost');
+                    if ($sysConfig instanceof SystemConfigRepository) {
+                        $resolvedMode   = $sysConfig->get('tenant_resolution_mode') ?? (string) (getenv('TENANT_RESOLUTION') ?: 'single');
+                        $resolvedSlug   = $sysConfig->get('tenant_org_slug') ?? $resolvedSlug;
+                        $resolvedDomain = $sysConfig->get('tenant_base_domain') ?? $resolvedDomain;
+                    }
+
+                    $strategy = match ($resolvedMode) {
+                        'subdomain' => new SubdomainResolutionStrategy($resolvedDomain),
+                        'path'      => new PathPrefixResolutionStrategy(),
+                        default     => new EnvResolutionStrategy($resolvedSlug),
                     };
 
                     $authMiddleware[] = new OrgResolverMiddleware($orgIdHolder, $orgRepo, $problemDetails, $strategy);
