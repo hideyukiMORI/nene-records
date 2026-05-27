@@ -1,6 +1,6 @@
 import { Link, NavLink, Outlet, Navigate } from 'react-router-dom'
 import { currentUserIsSuperadmin } from '@/entities/auth'
-import { IconBuilding, IconHome, IconSettings } from '@/shared/ui/icons/Icons'
+import { IconBuilding, IconDatabase, IconHome, IconSettings } from '@/shared/ui/icons/Icons'
 
 function SuperadminNavItem({
   to,
@@ -46,6 +46,11 @@ export function SuperadminShell() {
             to="/superadmin/organizations"
             icon={<IconBuilding size={16} />}
             label="Organizations"
+          />
+          <SuperadminNavItem
+            to="/superadmin/data-migration"
+            icon={<IconDatabase size={16} />}
+            label="Data Migration"
           />
           <SuperadminNavItem
             to="/superadmin/settings"

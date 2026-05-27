@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import {
   useOrganization,
@@ -7,9 +7,10 @@ import {
   PLANS,
 } from '@/entities/organization'
 import type { UpdateOrganizationInput } from '@/entities/organization'
+import { fetchOrgExport, useImportOrg } from '@/entities/org-export'
 import { Button, ConfirmDialog, Input, Stack, Text } from '@/shared/ui'
 import { useToast } from '@/shared/ui'
-import { IconChevronLeft } from '@/shared/ui/icons/Icons'
+import { IconChevronLeft, IconDownload, IconUpload } from '@/shared/ui/icons/Icons'
 
 export function OrganizationDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -27,6 +28,9 @@ export function OrganizationDetailPage() {
   const [isActive, setIsActive] = useState<boolean | undefined>(undefined)
   const [customDomain, setCustomDomain] = useState<string | undefined>(undefined)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [isExporting, setIsExporting] = useState(false)
+  const importFileRef = useRef<HTMLInputElement>(null)
+  const importOrg = useImportOrg(orgId)
 
   // Controlled values fall back to loaded org data before user edits
   const currentName = name ?? org?.name ?? ''
@@ -57,6 +61,56 @@ export function OrganizationDetailPage() {
         },
       },
     )
+  }
+
+  async function handleExport() {
+    setIsExporting(true)
+    try {
+      const payload = await fetchOrgExport(orgId)
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `org-${String(orgId)}-export.json`
+      a.click()
+      URL.revokeObjectURL(url)
+    } catch {
+      showToast('Export failed.', 'error')
+    } finally {
+      setIsExporting(false)
+    }
+  }
+
+  function handleImportFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (file === undefined) return
+
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      try {
+        const raw = event.target?.result
+        if (typeof raw !== 'string') return
+        const payload = JSON.parse(raw) as Record<string, unknown>
+        importOrg.mutate(payload, {
+          onSuccess: (result) => {
+            showToast(
+              `Imported ${String(result.total)} records into "${result.organization_name}".`,
+              'success',
+            )
+          },
+          onError: (err) => {
+            showToast(err.title, 'error')
+          },
+        })
+      } catch {
+        showToast('Invalid JSON file.', 'error')
+      }
+      // Reset file input so the same file can be selected again
+      if (importFileRef.current !== null) {
+        importFileRef.current.value = ''
+      }
+    }
+    reader.readAsText(file)
   }
 
   function handleDelete() {
@@ -217,6 +271,50 @@ export function OrganizationDetailPage() {
           </Stack>
         </div>
       </form>
+
+      {/* Export / Import */}
+      <div className="rounded-lg border border-border bg-surface-raised p-6">
+        <Text as="h2" variant="heading-sm">
+          Export &amp; Import
+        </Text>
+        <Text muted className="mt-1">
+          Export all data for this organization as a JSON file, or import a previously exported
+          file.
+        </Text>
+
+        <div className="mt-4 flex flex-wrap gap-3">
+          {/* Export */}
+          <Button
+            variant="secondary"
+            onClick={() => {
+              void handleExport()
+            }}
+            disabled={isExporting}
+          >
+            <IconDownload size={14} className="mr-1.5" />
+            {isExporting ? 'Exporting…' : 'Export JSON'}
+          </Button>
+
+          {/* Import */}
+          <Button
+            variant="secondary"
+            onClick={() => {
+              importFileRef.current?.click()
+            }}
+            disabled={importOrg.isPending}
+          >
+            <IconUpload size={14} className="mr-1.5" />
+            {importOrg.isPending ? 'Importing…' : 'Import JSON'}
+          </Button>
+          <input
+            ref={importFileRef}
+            type="file"
+            accept="application/json,.json"
+            className="hidden"
+            onChange={handleImportFileChange}
+          />
+        </div>
+      </div>
 
       {/* Danger zone */}
       <div className="rounded-lg border border-red-200 bg-red-50 p-6 dark:border-red-900/40 dark:bg-red-950/20">

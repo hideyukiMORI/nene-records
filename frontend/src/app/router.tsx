@@ -25,6 +25,7 @@ import { SuperadminShell } from '@/pages/superadmin/SuperadminShell'
 import { OrganizationsPage } from '@/pages/superadmin/OrganizationsPage'
 import { OrganizationDetailPage } from '@/pages/superadmin/OrganizationDetailPage'
 import { SettingsPage } from '@/pages/superadmin/SettingsPage'
+import { DataMigrationPage } from '@/pages/superadmin/DataMigrationPage'
 import { RequireAuth } from '@/shared/auth/RequireAuth'
 
 function AdminShell() {
@@ -96,6 +97,7 @@ const router = createBrowserRouter([
       { index: true, element: <OrganizationsPage /> },
       { path: 'organizations', element: <OrganizationsPage /> },
       { path: 'organizations/:id', element: <OrganizationDetailPage /> },
+      { path: 'data-migration', element: <DataMigrationPage /> },
       { path: 'settings', element: <SettingsPage /> },
     ],
   },
