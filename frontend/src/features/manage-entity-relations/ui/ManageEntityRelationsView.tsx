@@ -1,39 +1,34 @@
-import { useMemo } from 'react'
-import {
-  defaultFieldDefListParams,
-  isRelationFieldDef,
-  useFieldDefList,
-} from '@/entities/field-def'
+import type { RelationFieldDef } from '@/entities/field-def'
 import { useTranslation } from '@/shared/i18n'
 import { Stack, Text } from '@/shared/ui'
 import { RelationFieldPanel } from './RelationFieldPanel'
 
 export interface ManageEntityRelationsViewProps {
   entityId: number
-  entityTypeId: number
+  relationFieldDefs: RelationFieldDef[]
+  isLoading: boolean
+  isError: boolean
+  errorTitle: string | null
 }
 
 export function ManageEntityRelationsView({
   entityId,
-  entityTypeId,
+  relationFieldDefs,
+  isLoading,
+  isError,
+  errorTitle,
 }: ManageEntityRelationsViewProps) {
   const { t } = useTranslation()
-  const fieldDefQuery = useFieldDefList(defaultFieldDefListParams(entityTypeId))
 
-  const relationFieldDefs = useMemo(
-    () => (fieldDefQuery.data?.items ?? []).filter(isRelationFieldDef),
-    [fieldDefQuery.data?.items],
-  )
-
-  if (fieldDefQuery.isLoading) {
+  if (isLoading) {
     return <Text muted>{t('admin.relations.loadingField', { fieldKey: '…' })}</Text>
   }
 
-  if (fieldDefQuery.isError) {
+  if (isError) {
     return (
       <Stack gap="sm">
         <Text variant="heading-sm">{t('admin.relations.title')}</Text>
-        <Text muted>{fieldDefQuery.error.title}</Text>
+        <Text muted>{errorTitle}</Text>
       </Stack>
     )
   }
