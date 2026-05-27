@@ -16,19 +16,18 @@ use Psr\Http\Server\RequestHandlerInterface;
 final readonly class GetDataMigrationStatusHandler implements RequestHandlerInterface
 {
     public function __construct(
-        private DataMigrationRepositoryInterface $repository,
+        private GetDataMigrationStatusUseCaseInterface $useCase,
         private JsonResponseFactory $json,
     ) {
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $counts = $this->repository->countUnassigned();
-        $total  = array_sum($counts);
+        $output = $this->useCase->execute();
 
         return $this->json->create([
-            'total'  => $total,
-            'tables' => $counts,
+            'total'  => $output->total,
+            'tables' => $output->tables,
         ]);
     }
 }
