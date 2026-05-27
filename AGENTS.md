@@ -4,14 +4,14 @@ This file is the entry point for AI agents working on NeNe Records.
 
 ## Read First
 
-- **Current work & status:** `docs/todo/current.md` — M1 完了、M2 進行中（#108 Roles 完了、#109 i18n 基盤 Up Next）
+- **Current work & status:** `docs/todo/current.md` — M1–M9 完了。次フェーズ候補は current.md 末尾を参照
 - **Product vision:** `docs/explanation/product-vision.md`
 - Inheritance map: `docs/inheritance-from-nene2.md`
 - Human and AI collaboration: `docs/CONTRIBUTING.md`
 - Workflow: `docs/workflow.md`
 - Coding standards: `docs/development/coding-standards.md`
 - Backend standards: `docs/development/backend-standards.md`
-- Frontend standards (Phase 4+; policy now): `docs/development/frontend-standards.md`
+- Frontend standards: `docs/development/frontend-standards.md`
 - Commit messages: `docs/development/commit-conventions.md`
 - AI tool policy: `docs/integrations/ai-tools.md`
 - Roadmap: `docs/roadmap.md`
@@ -37,6 +37,7 @@ NeNe Records is an API-first flexible entity platform on NENE2:
 - Admin frontend owns most configuration UX; API enforces validation and auth.
 - MCP tools expose the same API boundary to AI clients.
 - Consumer views are replaceable presentation layers.
+- Multi-tenant: organizations table, org-scoped data, JWT `org_id`, superadmin / admin / editor roles.
 
 ## Framework Reference
 
