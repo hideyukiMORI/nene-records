@@ -113,15 +113,13 @@ PHPUnit 545 tests / PHPStan level 8 / CS-Fixer / OpenAPI / MCP + Playwright 157 
 
 ## 次フェーズ候補
 
-> Issue を作成してから実装着手。未 Issue 化のため現時点では未着手。
-
-| 項目 | 概要 | 難易度 | 優先度 |
-| --- | --- | --- | --- |
-| コメント通知 | 新規コメント時にメール通知（MailerInterface 活用） | 小 | P1 |
-| コメントスパム対策 | honeypot / CAPTCHA / レート制限 | 小〜中 | P1 |
-| AI Consumer Chat | NeNe Records を外部 API として使うチャットシステム（**別リポジトリ**） | 大 | P2 |
-| スケジュール公開改善 | `scheduled_at` ジョブ状態 UI・失敗ハンドリング | 小〜中 | P2 |
-| コンテンツ検索 UI | Admin SPA に全文検索フォーム追加 | 小 | P2 |
+| Issue | 項目 | 概要 | 難易度 | 優先度 |
+| --- | --- | --- | --- | --- |
+| #263 | コメント通知 | 新規コメント時にメール通知（MailerInterface 活用） | 小 | P1 |
+| #264 | コメントスパム対策 | honeypot / レート制限 | 小〜中 | P1 |
+| #265 | コンテンツ検索 UI | Admin SPA に全文検索フォーム追加 | 小 | P2 |
+| — | AI Consumer Chat | NeNe Records を外部 API として使うチャットシステム（**別リポジトリ**） | 大 | P2 |
+| — | スケジュール公開改善 | `scheduled_at` ジョブ状態 UI・失敗ハンドリング | 小〜中 | P2 |
 
 ---
 
