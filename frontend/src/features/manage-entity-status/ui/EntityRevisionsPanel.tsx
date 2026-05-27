@@ -1,44 +1,23 @@
-import { useState } from 'react'
-import { toEntityId, useEntityRevisions } from '@/entities/entity'
+import type { EntityRevision } from '@/entities/entity'
 import { useTranslation } from '@/shared/i18n'
 import { Button, Stack, Text } from '@/shared/ui'
 
-function RevisionsList({ entityId }: { entityId: number }) {
-  const { t } = useTranslation()
-  const revisionsQuery = useEntityRevisions(toEntityId(entityId))
-
-  if (revisionsQuery.isLoading) {
-    return <Text muted>{t('admin.entityRevisions.loading')}</Text>
-  }
-
-  if (revisionsQuery.isError) {
-    return <Text muted>{t('admin.entityRevisions.error')}</Text>
-  }
-
-  const items = revisionsQuery.data?.items ?? []
-
-  if (items.length === 0) {
-    return <Text muted>{t('admin.entityRevisions.empty')}</Text>
-  }
-
-  return (
-    <Stack gap="xs">
-      {items.map((revision) => (
-        <Text key={revision.id} muted variant="caption">
-          {revision.createdAt} · {revision.action} · {revision.status}
-          {revision.previousStatus !== null && revision.previousStatus !== revision.status
-            ? ` ← ${revision.previousStatus}`
-            : ''}
-          {revision.slug !== null ? ` · /${revision.slug}` : ''}
-        </Text>
-      ))}
-    </Stack>
-  )
+interface EntityRevisionsPanelProps {
+  revisions: EntityRevision[]
+  isLoading: boolean
+  isError: boolean
+  isExpanded: boolean
+  onToggle: () => void
 }
 
-export function EntityRevisionsPanel({ entityId }: { entityId: number }) {
+export function EntityRevisionsPanel({
+  revisions,
+  isLoading,
+  isError,
+  isExpanded,
+  onToggle,
+}: EntityRevisionsPanelProps) {
   const { t } = useTranslation()
-  const [isExpanded, setIsExpanded] = useState(false)
 
   return (
     <section className="rounded-md border border-border bg-surface-raised p-inline-md shadow-sm">
@@ -47,17 +26,32 @@ export function EntityRevisionsPanel({ entityId }: { entityId: number }) {
           <Text as="h2" variant="heading-sm">
             {t('admin.entityRevisions.title')}
           </Text>
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => {
-              setIsExpanded((prev) => !prev)
-            }}
-          >
+          <Button variant="secondary" size="sm" onClick={onToggle}>
             {isExpanded ? t('admin.entityRevisions.hide') : t('admin.entityRevisions.show')}
           </Button>
         </div>
-        {isExpanded ? <RevisionsList entityId={entityId} /> : null}
+
+        {isExpanded ? (
+          isLoading ? (
+            <Text muted>{t('admin.entityRevisions.loading')}</Text>
+          ) : isError ? (
+            <Text muted>{t('admin.entityRevisions.error')}</Text>
+          ) : revisions.length === 0 ? (
+            <Text muted>{t('admin.entityRevisions.empty')}</Text>
+          ) : (
+            <Stack gap="xs">
+              {revisions.map((revision) => (
+                <Text key={revision.id} muted variant="caption">
+                  {revision.createdAt} · {revision.action} · {revision.status}
+                  {revision.previousStatus !== null && revision.previousStatus !== revision.status
+                    ? ` ← ${revision.previousStatus}`
+                    : ''}
+                  {revision.slug !== null ? ` · /${revision.slug}` : ''}
+                </Text>
+              ))}
+            </Stack>
+          )
+        ) : null}
       </Stack>
     </section>
   )

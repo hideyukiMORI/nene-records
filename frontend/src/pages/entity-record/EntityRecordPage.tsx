@@ -1,4 +1,5 @@
 import { Link, useParams } from 'react-router-dom'
+import type { Entity } from '@/entities/entity'
 import {
   getLocalizedEntityTypeName,
   useEntityTypeBySlug,
@@ -12,6 +13,8 @@ import {
   EntityRevisionsPanel,
   EntitySeoPanel,
   EntityStatusPanel,
+  useEntityRevisionsPanel,
+  useEntitySeoPanel,
 } from '@/features/manage-entity-status'
 import { ManageEntityTagsView, useManageEntityTagsPage } from '@/features/manage-entity-tags'
 import { ManageEntityRelationsView } from '@/features/manage-entity-relations'
@@ -35,6 +38,15 @@ export function EntityRecordPage() {
 
   return <EntityRecordContent entityType={entityTypeQuery.data} entityId={entityId} />
 }
+
+// ── Thin wrapper so useEntitySeoPanel runs only after entity loads ────────────
+
+function EntitySeoPanelSection({ entity }: { entity: Entity }) {
+  const seoPanel = useEntitySeoPanel(entity)
+  return <EntitySeoPanel {...seoPanel} />
+}
+
+// ── Main content ─────────────────────────────────────────────────────────────
 
 function EntityRecordContent({
   entityType,
@@ -61,6 +73,8 @@ function EntityRecordContent({
     isSaving,
     saveErrorTitle,
   } = useEditEntityTextFieldsPage(entityTypeId, entityId)
+
+  const revisionsPanel = useEntityRevisionsPanel(entityId)
 
   const {
     attachedTags,
@@ -127,8 +141,8 @@ function EntityRecordContent({
       />
       <ManageEntityRelationsView entityId={entityId} entityTypeId={entityTypeId} />
       <InverseEntityRelationsView entityId={entityId} entityTypeId={entityTypeId} />
-      {entity !== null && <EntitySeoPanel entity={entity} />}
-      <EntityRevisionsPanel entityId={entityId} />
+      {entity !== null && <EntitySeoPanelSection entity={entity} />}
+      <EntityRevisionsPanel {...revisionsPanel} />
     </Stack>
   )
 }

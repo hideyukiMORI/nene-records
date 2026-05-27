@@ -1,44 +1,39 @@
-import { useCommentList, usePostComment } from '@/entities/comment'
+import type { Comment } from '@/entities/comment'
 import { useTranslation } from '@/shared/i18n'
 import { Button, Input, Stack, Text } from '@/shared/ui'
-import { useState } from 'react'
 
 interface Props {
-  entityId: number
+  comments: Comment[]
+  isLoading: boolean
+  isError: boolean
+  authorName: string
+  authorEmail: string
+  body: string
+  submitted: boolean
+  isPending: boolean
+  isPostError: boolean
+  onAuthorNameChange: (value: string) => void
+  onAuthorEmailChange: (value: string) => void
+  onBodyChange: (value: string) => void
+  onSubmit: (e: React.SyntheticEvent) => void
 }
 
-export function CommentSection({ entityId }: Props) {
+export function CommentSection({
+  comments,
+  isLoading,
+  isError,
+  authorName,
+  authorEmail,
+  body,
+  submitted,
+  isPending,
+  isPostError,
+  onAuthorNameChange,
+  onAuthorEmailChange,
+  onBodyChange,
+  onSubmit,
+}: Props) {
   const { t } = useTranslation()
-  const commentsQuery = useCommentList(entityId)
-  const postComment = usePostComment()
-
-  const [authorName, setAuthorName] = useState('')
-  const [authorEmail, setAuthorEmail] = useState('')
-  const [body, setBody] = useState('')
-  const [submitted, setSubmitted] = useState(false)
-
-  function handleSubmit(e: React.SyntheticEvent) {
-    e.preventDefault()
-    setSubmitted(false)
-    postComment.mutate(
-      {
-        entityId,
-        authorName: authorName.trim(),
-        authorEmail: authorEmail.trim(),
-        body: body.trim(),
-      },
-      {
-        onSuccess: () => {
-          setAuthorName('')
-          setAuthorEmail('')
-          setBody('')
-          setSubmitted(true)
-        },
-      },
-    )
-  }
-
-  const comments = commentsQuery.data?.items ?? []
 
   return (
     <Stack gap="lg">
@@ -47,9 +42,9 @@ export function CommentSection({ entityId }: Props) {
       </Text>
 
       {/* Comment list */}
-      {commentsQuery.isLoading ? (
+      {isLoading ? (
         <Text muted>{t('public.comments.loading')}</Text>
-      ) : commentsQuery.isError ? (
+      ) : isError ? (
         <Text muted>{t('public.comments.loadError')}</Text>
       ) : comments.length === 0 ? (
         <Text muted>{t('public.comments.empty')}</Text>
@@ -86,7 +81,7 @@ export function CommentSection({ entityId }: Props) {
             {t('public.comments.form.success')}
           </p>
         ) : null}
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={onSubmit}>
           <Stack gap="md">
             <Input
               id="comment-author-name"
@@ -94,9 +89,9 @@ export function CommentSection({ entityId }: Props) {
               type="text"
               value={authorName}
               onChange={(e) => {
-                setAuthorName(e.target.value)
+                onAuthorNameChange(e.target.value)
               }}
-              disabled={postComment.isPending}
+              disabled={isPending}
             />
             <Input
               id="comment-author-email"
@@ -104,9 +99,9 @@ export function CommentSection({ entityId }: Props) {
               type="email"
               value={authorEmail}
               onChange={(e) => {
-                setAuthorEmail(e.target.value)
+                onAuthorEmailChange(e.target.value)
               }}
-              disabled={postComment.isPending}
+              disabled={isPending}
             />
             <div className="flex flex-col gap-stack-xs">
               <label
@@ -119,17 +114,17 @@ export function CommentSection({ entityId }: Props) {
                 id="comment-body"
                 value={body}
                 onChange={(e) => {
-                  setBody(e.target.value)
+                  onBodyChange(e.target.value)
                 }}
-                disabled={postComment.isPending}
+                disabled={isPending}
                 rows={4}
                 className="rounded-md border border-border bg-surface-raised px-inline-md py-stack-sm font-sans text-body text-text-primary shadow-sm focus-visible:outline-none focus-visible:shadow-focus disabled:cursor-not-allowed disabled:opacity-50"
               />
             </div>
-            {postComment.isError ? <Text muted>{t('public.comments.form.error')}</Text> : null}
+            {isPostError ? <Text muted>{t('public.comments.form.error')}</Text> : null}
             <div>
-              <Button type="submit" disabled={postComment.isPending}>
-                {postComment.isPending
+              <Button type="submit" disabled={isPending}>
+                {isPending
                   ? t('public.comments.form.submitting')
                   : t('public.comments.form.submit')}
               </Button>

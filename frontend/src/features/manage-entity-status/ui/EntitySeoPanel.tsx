@@ -1,36 +1,24 @@
-import { useState } from 'react'
-import type { Entity } from '@/entities/entity'
-import { useUpdateEntity } from '@/entities/entity'
 import { useTranslation } from '@/shared/i18n'
-import { Button, Stack, Text, useToast } from '@/shared/ui'
+import { Button, Stack, Text } from '@/shared/ui'
 
 interface EntitySeoPanelProps {
-  entity: Entity
+  metaTitle: string
+  metaDescription: string
+  isPending: boolean
+  onMetaTitleChange: (value: string) => void
+  onMetaDescriptionChange: (value: string) => void
+  onSave: () => void
 }
 
-export function EntitySeoPanel({ entity }: EntitySeoPanelProps) {
+export function EntitySeoPanel({
+  metaTitle,
+  metaDescription,
+  isPending,
+  onMetaTitleChange,
+  onMetaDescriptionChange,
+  onSave,
+}: EntitySeoPanelProps) {
   const { t } = useTranslation()
-  const { showToast } = useToast()
-  const updateMutation = useUpdateEntity()
-
-  const [metaTitle, setMetaTitle] = useState(entity.metaTitle ?? '')
-  const [metaDescription, setMetaDescription] = useState(entity.metaDescription ?? '')
-
-  const save = async () => {
-    try {
-      await updateMutation.mutateAsync({
-        id: Number(entity.id),
-        entityTypeId: entity.entityTypeId,
-        slug: entity.slug,
-        status: entity.status,
-        metaTitle: metaTitle !== '' ? metaTitle : null,
-        metaDescription: metaDescription !== '' ? metaDescription : null,
-      })
-      showToast(t('admin.entitySeo.saveSuccess'), 'success')
-    } catch {
-      showToast(t('common.error.serverError'), 'error')
-    }
-  }
 
   return (
     <section className="rounded-xl border border-border bg-surface p-4">
@@ -48,7 +36,7 @@ export function EntitySeoPanel({ entity }: EntitySeoPanelProps) {
             type="text"
             value={metaTitle}
             onChange={(e) => {
-              setMetaTitle(e.target.value)
+              onMetaTitleChange(e.target.value)
             }}
             placeholder={t('admin.entitySeo.metaTitle.placeholder')}
             maxLength={255}
@@ -67,7 +55,7 @@ export function EntitySeoPanel({ entity }: EntitySeoPanelProps) {
             id="entity-meta-description"
             value={metaDescription}
             onChange={(e) => {
-              setMetaDescription(e.target.value)
+              onMetaDescriptionChange(e.target.value)
             }}
             placeholder={t('admin.entitySeo.metaDescription.placeholder')}
             rows={3}
@@ -76,13 +64,8 @@ export function EntitySeoPanel({ entity }: EntitySeoPanelProps) {
         </Stack>
 
         <div className="flex items-center gap-inline-sm">
-          <Button
-            variant="secondary"
-            size="sm"
-            disabled={updateMutation.isPending}
-            onClick={() => void save()}
-          >
-            {updateMutation.isPending ? t('admin.entitySeo.saving') : t('admin.entitySeo.save')}
+          <Button variant="secondary" size="sm" disabled={isPending} onClick={onSave}>
+            {isPending ? t('admin.entitySeo.saving') : t('admin.entitySeo.save')}
           </Button>
         </div>
       </Stack>

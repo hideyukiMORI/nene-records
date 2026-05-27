@@ -1,3 +1,7 @@
 export { EntityRevisionsPanel } from './ui/EntityRevisionsPanel'
 export { EntitySeoPanel } from './ui/EntitySeoPanel'
 export { EntityStatusPanel } from './ui/EntityStatusPanel'
+export { useEntitySeoPanel } from './hooks/useEntitySeoPanel'
+export { useEntityRevisionsPanel } from './hooks/useEntityRevisionsPanel'
+export type { EntitySeoPanelState } from './hooks/useEntitySeoPanel'
+export type { EntityRevisionsPanelState } from './hooks/useEntityRevisionsPanel'
