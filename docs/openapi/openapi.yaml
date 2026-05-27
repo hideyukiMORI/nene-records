@@ -3232,9 +3232,12 @@ components:
           format: email
         role:
           type: string
-          enum:
-            - admin
-            - editor
+        organization_id:
+          type: integer
+          nullable: true
+        org_role:
+          type: string
+          nullable: true
         status:
           type: string
           enum:

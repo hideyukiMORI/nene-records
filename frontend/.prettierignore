@@ -1,0 +1,6 @@
+dist
+storybook-static
+node_modules
+coverage
+# Auto-generated — do not edit manually, run `npm run codegen` to update
+src/shared/api/schema.gen.ts

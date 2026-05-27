@@ -1,5 +1,5 @@
 import type { UserDto, UserListDto, UserProfileDto } from './api-types'
-import type { User, UserList, UserProfile, UserRole, UserStatus } from './model'
+import type { User, UserList, UserProfile, UserRole } from './model'
 
 export function mapUserDtoToModel(dto: UserDto): User {
   return {
@@ -8,7 +8,7 @@ export function mapUserDtoToModel(dto: UserDto): User {
     role: dto.role as UserRole,
     organizationId: dto.organization_id,
     orgRole: dto.org_role,
-    status: dto.status as UserStatus,
+    status: dto.status,
     displayName: dto.display_name ?? null,
     fullName: dto.full_name ?? null,
     jobTitle: dto.job_title ?? null,

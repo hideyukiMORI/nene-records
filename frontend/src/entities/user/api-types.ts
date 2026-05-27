@@ -1,65 +1,19 @@
-export interface UserDto {
-  id: number
-  email: string
-  role: string
-  organization_id: number | null
-  org_role: string | null
-  status: string
-  // Profile fields — present in GET /users/{id} but absent in GET /users (list)
-  display_name?: string | null
-  full_name?: string | null
-  job_title?: string | null
-  created_at: string | null
-  updated_at: string | null
-}
+/**
+ * User entity API types — auto-derived from OpenAPI schema.
+ *
+ * DO NOT hand-edit these types. Run `npm run codegen` to regenerate
+ * after updating docs/openapi/openapi.yaml.
+ */
+import type { components } from '@/shared/api/schema.gen'
 
-export interface UserListDto {
-  items: UserDto[]
-}
-
-export interface CreateUserRequestDto {
-  email: string
-  password: string
-  role: string
-}
-
-export interface UpdateUserRoleRequestDto {
-  role: string
-}
-
-export interface AdminResetPasswordRequestDto {
-  new_password: string
-}
-
-export interface ChangeOwnPasswordRequestDto {
-  current_password: string
-  new_password: string
-}
-
-export interface InviteUserRequestDto {
-  email: string
-  role: string
-}
-
-export interface InviteUserResponseDto {
-  id: number
-  email: string
-  role: string
-  status: string
-}
-
-export interface ChangeUserEmailRequestDto {
-  email: string
-}
-
-export interface UpdateUserProfileRequestDto {
-  display_name: string | null
-  full_name: string | null
-  job_title: string | null
-}
-
-export interface UserProfileDto {
-  display_name: string | null
-  full_name: string | null
-  job_title: string | null
-}
+export type UserDto = components['schemas']['UserResponse']
+export type UserListDto = components['schemas']['UserListResponse']
+export type UserProfileDto = components['schemas']['UserProfileResponse']
+export type CreateUserRequestDto = components['schemas']['CreateUserRequest']
+export type UpdateUserRoleRequestDto = components['schemas']['UpdateUserRoleRequest']
+export type AdminResetPasswordRequestDto = components['schemas']['AdminResetPasswordRequest']
+export type ChangeOwnPasswordRequestDto = components['schemas']['ChangeOwnPasswordRequest']
+export type InviteUserRequestDto = components['schemas']['InviteUserRequest']
+export type InviteUserResponseDto = components['schemas']['UserResponse']
+export type ChangeUserEmailRequestDto = components['schemas']['ChangeUserEmailRequest']
+export type UpdateUserProfileRequestDto = components['schemas']['UpdateUserProfileRequest']

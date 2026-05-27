@@ -18,6 +18,7 @@
     "test:watch": "vitest",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
+    "codegen": "openapi-typescript ../docs/openapi/openapi.yaml -o src/shared/api/schema.gen.ts",
     "knip": "knip",
     "check": "npm run type-check && npm run lint && npm run format && npm run test && npm run build-storybook"
   },
@@ -60,6 +61,7 @@
     "jsdom": "^27.2.0",
     "knip": "^5.70.2",
     "msw": "^2.12.3",
+    "openapi-typescript": "^7.13.0",
     "prettier": "^3.6.2",
     "storybook": "^10.1.4",
     "tailwindcss": "^4.1.17",
