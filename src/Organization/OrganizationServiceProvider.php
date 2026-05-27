@@ -30,91 +30,154 @@ final readonly class OrganizationServiceProvider implements ServiceProviderInter
                     return new PdoOrganizationRepository($query);
                 },
             )
+            // ── Use cases ──────────────────────────────────────────────────────
             ->set(
-                ListOrganizationsHandler::class,
-                static function (ContainerInterface $c): ListOrganizationsHandler {
+                ListOrganizationsUseCaseInterface::class,
+                static function (ContainerInterface $c): ListOrganizationsUseCaseInterface {
                     $repo = $c->get(OrganizationRepositoryInterface::class);
-                    $json = $c->get(JsonResponseFactory::class);
 
                     if (!$repo instanceof OrganizationRepositoryInterface) {
                         throw new LogicException('Organization repository service is invalid.');
+                    }
+
+                    return new ListOrganizationsUseCase($repo);
+                },
+            )
+            ->set(
+                GetOrganizationByIdUseCaseInterface::class,
+                static function (ContainerInterface $c): GetOrganizationByIdUseCaseInterface {
+                    $repo = $c->get(OrganizationRepositoryInterface::class);
+
+                    if (!$repo instanceof OrganizationRepositoryInterface) {
+                        throw new LogicException('Organization repository service is invalid.');
+                    }
+
+                    return new GetOrganizationByIdUseCase($repo);
+                },
+            )
+            ->set(
+                CreateOrganizationUseCaseInterface::class,
+                static function (ContainerInterface $c): CreateOrganizationUseCaseInterface {
+                    $repo = $c->get(OrganizationRepositoryInterface::class);
+
+                    if (!$repo instanceof OrganizationRepositoryInterface) {
+                        throw new LogicException('Organization repository service is invalid.');
+                    }
+
+                    return new CreateOrganizationUseCase($repo);
+                },
+            )
+            ->set(
+                UpdateOrganizationUseCaseInterface::class,
+                static function (ContainerInterface $c): UpdateOrganizationUseCaseInterface {
+                    $repo = $c->get(OrganizationRepositoryInterface::class);
+
+                    if (!$repo instanceof OrganizationRepositoryInterface) {
+                        throw new LogicException('Organization repository service is invalid.');
+                    }
+
+                    return new UpdateOrganizationUseCase($repo);
+                },
+            )
+            ->set(
+                DeleteOrganizationUseCaseInterface::class,
+                static function (ContainerInterface $c): DeleteOrganizationUseCaseInterface {
+                    $repo = $c->get(OrganizationRepositoryInterface::class);
+
+                    if (!$repo instanceof OrganizationRepositoryInterface) {
+                        throw new LogicException('Organization repository service is invalid.');
+                    }
+
+                    return new DeleteOrganizationUseCase($repo);
+                },
+            )
+            // ── Handlers ───────────────────────────────────────────────────────
+            ->set(
+                ListOrganizationsHandler::class,
+                static function (ContainerInterface $c): ListOrganizationsHandler {
+                    $uc   = $c->get(ListOrganizationsUseCaseInterface::class);
+                    $json = $c->get(JsonResponseFactory::class);
+
+                    if (!$uc instanceof ListOrganizationsUseCaseInterface) {
+                        throw new LogicException('ListOrganizations use case service is invalid.');
                     }
 
                     if (!$json instanceof JsonResponseFactory) {
                         throw new LogicException('JSON response factory service is invalid.');
                     }
 
-                    return new ListOrganizationsHandler($repo, $json);
+                    return new ListOrganizationsHandler($uc, $json);
                 },
             )
             ->set(
                 GetOrganizationByIdHandler::class,
                 static function (ContainerInterface $c): GetOrganizationByIdHandler {
-                    $repo = $c->get(OrganizationRepositoryInterface::class);
+                    $uc   = $c->get(GetOrganizationByIdUseCaseInterface::class);
                     $json = $c->get(JsonResponseFactory::class);
 
-                    if (!$repo instanceof OrganizationRepositoryInterface) {
-                        throw new LogicException('Organization repository service is invalid.');
+                    if (!$uc instanceof GetOrganizationByIdUseCaseInterface) {
+                        throw new LogicException('GetOrganizationById use case service is invalid.');
                     }
 
                     if (!$json instanceof JsonResponseFactory) {
                         throw new LogicException('JSON response factory service is invalid.');
                     }
 
-                    return new GetOrganizationByIdHandler($repo, $json);
+                    return new GetOrganizationByIdHandler($uc, $json);
                 },
             )
             ->set(
                 CreateOrganizationHandler::class,
                 static function (ContainerInterface $c): CreateOrganizationHandler {
-                    $repo = $c->get(OrganizationRepositoryInterface::class);
+                    $uc   = $c->get(CreateOrganizationUseCaseInterface::class);
                     $json = $c->get(JsonResponseFactory::class);
 
-                    if (!$repo instanceof OrganizationRepositoryInterface) {
-                        throw new LogicException('Organization repository service is invalid.');
+                    if (!$uc instanceof CreateOrganizationUseCaseInterface) {
+                        throw new LogicException('CreateOrganization use case service is invalid.');
                     }
 
                     if (!$json instanceof JsonResponseFactory) {
                         throw new LogicException('JSON response factory service is invalid.');
                     }
 
-                    return new CreateOrganizationHandler($repo, $json);
+                    return new CreateOrganizationHandler($uc, $json);
                 },
             )
             ->set(
                 UpdateOrganizationHandler::class,
                 static function (ContainerInterface $c): UpdateOrganizationHandler {
-                    $repo = $c->get(OrganizationRepositoryInterface::class);
+                    $uc   = $c->get(UpdateOrganizationUseCaseInterface::class);
                     $json = $c->get(JsonResponseFactory::class);
 
-                    if (!$repo instanceof OrganizationRepositoryInterface) {
-                        throw new LogicException('Organization repository service is invalid.');
+                    if (!$uc instanceof UpdateOrganizationUseCaseInterface) {
+                        throw new LogicException('UpdateOrganization use case service is invalid.');
                     }
 
                     if (!$json instanceof JsonResponseFactory) {
                         throw new LogicException('JSON response factory service is invalid.');
                     }
 
-                    return new UpdateOrganizationHandler($repo, $json);
+                    return new UpdateOrganizationHandler($uc, $json);
                 },
             )
             ->set(
                 DeleteOrganizationHandler::class,
                 static function (ContainerInterface $c): DeleteOrganizationHandler {
-                    $repo = $c->get(OrganizationRepositoryInterface::class);
+                    $uc              = $c->get(DeleteOrganizationUseCaseInterface::class);
                     $responseFactory = $c->get(ResponseFactoryInterface::class);
 
-                    if (!$repo instanceof OrganizationRepositoryInterface) {
-                        throw new LogicException('Organization repository service is invalid.');
+                    if (!$uc instanceof DeleteOrganizationUseCaseInterface) {
+                        throw new LogicException('DeleteOrganization use case service is invalid.');
                     }
 
                     if (!$responseFactory instanceof ResponseFactoryInterface) {
                         throw new LogicException('Response factory service is invalid.');
                     }
 
-                    return new DeleteOrganizationHandler($repo, $responseFactory);
+                    return new DeleteOrganizationHandler($uc, $responseFactory);
                 },
             )
+            // ── Exception handlers ─────────────────────────────────────────────
             ->set(
                 OrganizationNotFoundExceptionHandler::class,
                 static function (ContainerInterface $c): OrganizationNotFoundExceptionHandler {
@@ -139,11 +202,12 @@ final readonly class OrganizationServiceProvider implements ServiceProviderInter
                     return new OrganizationSlugConflictExceptionHandler($problemDetails);
                 },
             )
+            // ── Route registrar ────────────────────────────────────────────────
             ->set(
                 OrganizationRouteRegistrar::class,
                 static function (ContainerInterface $c): OrganizationRouteRegistrar {
-                    $list = $c->get(ListOrganizationsHandler::class);
-                    $get = $c->get(GetOrganizationByIdHandler::class);
+                    $list   = $c->get(ListOrganizationsHandler::class);
+                    $get    = $c->get(GetOrganizationByIdHandler::class);
                     $create = $c->get(CreateOrganizationHandler::class);
                     $update = $c->get(UpdateOrganizationHandler::class);
                     $delete = $c->get(DeleteOrganizationHandler::class);

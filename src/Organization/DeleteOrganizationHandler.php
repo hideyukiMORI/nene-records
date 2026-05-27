@@ -8,11 +8,12 @@ use Nene2\Routing\Router;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
-final readonly class DeleteOrganizationHandler
+final readonly class DeleteOrganizationHandler implements RequestHandlerInterface
 {
     public function __construct(
-        private OrganizationRepositoryInterface $repository,
+        private DeleteOrganizationUseCaseInterface $useCase,
         private ResponseFactoryInterface $responseFactory,
     ) {
     }
@@ -20,14 +21,9 @@ final readonly class DeleteOrganizationHandler
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $parameters = (array) $request->getAttribute(Router::PARAMETERS_ATTRIBUTE, []);
-        $id = (int) ($parameters['id'] ?? 0);
-        $org = $this->repository->findById($id);
+        $id         = (int) ($parameters['id'] ?? 0);
 
-        if ($org === null) {
-            throw new OrganizationNotFoundException($id);
-        }
-
-        $this->repository->delete($id);
+        $this->useCase->execute(new DeleteOrganizationInput(id: $id));
 
         return $this->responseFactory->createResponse(204);
     }

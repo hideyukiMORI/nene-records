@@ -7,11 +7,12 @@ namespace NeNeRecords\Organization;
 use Nene2\Http\JsonResponseFactory;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
-final readonly class ListOrganizationsHandler
+final readonly class ListOrganizationsHandler implements RequestHandlerInterface
 {
     public function __construct(
-        private OrganizationRepositoryInterface $repository,
+        private ListOrganizationsUseCaseInterface $useCase,
         private JsonResponseFactory $response,
     ) {
     }
@@ -19,30 +20,30 @@ final readonly class ListOrganizationsHandler
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $params = $request->getQueryParams();
-        $limit = max(1, min(100, (int) ($params['limit'] ?? 20)));
+        $limit  = max(1, min(100, (int) ($params['limit'] ?? 20)));
         $offset = max(0, (int) ($params['offset'] ?? 0));
 
-        $organizations = $this->repository->findAll($limit, $offset);
-        $total = $this->repository->count();
+        $output = $this->useCase->execute(new ListOrganizationsInput(limit: $limit, offset: $offset));
 
         return $this->response->create([
-            'data' => array_map(static fn (Organization $o) => self::toArray($o), $organizations),
-            'meta' => ['total' => $total, 'limit' => $limit, 'offset' => $offset],
+            'data' => array_map(
+                static fn (ListOrganizationItem $item): array => [
+                    'id'            => $item->id,
+                    'name'          => $item->name,
+                    'slug'          => $item->slug,
+                    'custom_domain' => $item->customDomain,
+                    'plan'          => $item->plan,
+                    'is_active'     => $item->isActive,
+                    'created_at'    => $item->createdAt,
+                    'updated_at'    => $item->updatedAt,
+                ],
+                $output->items,
+            ),
+            'meta' => [
+                'total'  => $output->total,
+                'limit'  => $output->limit,
+                'offset' => $output->offset,
+            ],
         ]);
-    }
-
-    /** @return array<string, mixed> */
-    private static function toArray(Organization $o): array
-    {
-        return [
-            'id' => $o->id,
-            'name' => $o->name,
-            'slug' => $o->slug,
-            'custom_domain' => $o->customDomain,
-            'plan' => $o->plan,
-            'is_active' => $o->isActive,
-            'created_at' => $o->createdAt,
-            'updated_at' => $o->updatedAt,
-        ];
     }
 }

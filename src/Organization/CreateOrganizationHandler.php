@@ -10,15 +10,17 @@ use Nene2\Validation\ValidationError;
 use Nene2\Validation\ValidationException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
-final readonly class CreateOrganizationHandler
+final readonly class CreateOrganizationHandler implements RequestHandlerInterface
 {
     private const SLUG_PATTERN = '/^[a-z0-9]+(?:-[a-z0-9]+)*$/';
 
+    /** @var list<string> */
     private const VALID_PLANS = ['free', 'starter', 'pro', 'enterprise'];
 
     public function __construct(
-        private OrganizationRepositoryInterface $repository,
+        private CreateOrganizationUseCaseInterface $useCase,
         private JsonResponseFactory $response,
     ) {
     }
@@ -29,10 +31,12 @@ final readonly class CreateOrganizationHandler
 
         $errors = [];
 
-        $name = trim((string) ($body['name'] ?? ''));
-        $slug = trim((string) ($body['slug'] ?? ''));
-        $plan = trim((string) ($body['plan'] ?? 'free'));
-        $customDomain = isset($body['custom_domain']) && $body['custom_domain'] !== '' ? trim((string) $body['custom_domain']) : null;
+        $name         = trim((string) ($body['name'] ?? ''));
+        $slug         = trim((string) ($body['slug'] ?? ''));
+        $plan         = trim((string) ($body['plan'] ?? 'free'));
+        $customDomain = isset($body['custom_domain']) && $body['custom_domain'] !== ''
+            ? trim((string) $body['custom_domain'])
+            : null;
 
         if ($name === '') {
             $errors[] = new ValidationError('name', 'Name is required.', 'required');
@@ -52,27 +56,24 @@ final readonly class CreateOrganizationHandler
             throw new ValidationException($errors);
         }
 
-        $org = new Organization(
+        $output = $this->useCase->execute(new CreateOrganizationInput(
             name: $name,
             slug: $slug,
             plan: $plan,
-            isActive: true,
             customDomain: $customDomain,
-        );
-
-        $id = $this->repository->save($org);
+        ));
 
         return $this->response->create(
             [
-                'id' => $id,
-                'name' => $name,
-                'slug' => $slug,
-                'custom_domain' => $customDomain,
-                'plan' => $plan,
-                'is_active' => true,
+                'id'            => $output->id,
+                'name'          => $output->name,
+                'slug'          => $output->slug,
+                'custom_domain' => $output->customDomain,
+                'plan'          => $output->plan,
+                'is_active'     => $output->isActive,
             ],
             201,
-            ['Location' => '/api/v1/organizations/' . $id],
+            ['Location' => '/api/v1/organizations/' . $output->id],
         );
     }
 }

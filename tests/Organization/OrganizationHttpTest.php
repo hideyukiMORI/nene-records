@@ -8,13 +8,18 @@ use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RuntimeApplicationFactory;
 use NeNeRecords\Organization\CreateOrganizationHandler;
+use NeNeRecords\Organization\CreateOrganizationUseCase;
 use NeNeRecords\Organization\DeleteOrganizationHandler;
+use NeNeRecords\Organization\DeleteOrganizationUseCase;
 use NeNeRecords\Organization\GetOrganizationByIdHandler;
+use NeNeRecords\Organization\GetOrganizationByIdUseCase;
 use NeNeRecords\Organization\ListOrganizationsHandler;
+use NeNeRecords\Organization\ListOrganizationsUseCase;
 use NeNeRecords\Organization\OrganizationNotFoundExceptionHandler;
 use NeNeRecords\Organization\OrganizationRouteRegistrar;
 use NeNeRecords\Organization\OrganizationSlugConflictExceptionHandler;
 use NeNeRecords\Organization\UpdateOrganizationHandler;
+use NeNeRecords\Organization\UpdateOrganizationUseCase;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
@@ -30,18 +35,18 @@ final class OrganizationHttpTest extends TestCase
     {
         parent::setUp();
 
-        $this->factory = new Psr17Factory();
+        $this->factory    = new Psr17Factory();
         $this->repository = new InMemoryOrganizationRepository();
 
-        $jsonResponse = new JsonResponseFactory($this->factory, $this->factory);
+        $jsonResponse   = new JsonResponseFactory($this->factory, $this->factory);
         $problemDetails = new ProblemDetailsResponseFactory($this->factory, $this->factory);
 
         $registrar = new OrganizationRouteRegistrar(
-            new ListOrganizationsHandler($this->repository, $jsonResponse),
-            new GetOrganizationByIdHandler($this->repository, $jsonResponse),
-            new CreateOrganizationHandler($this->repository, $jsonResponse),
-            new UpdateOrganizationHandler($this->repository, $jsonResponse),
-            new DeleteOrganizationHandler($this->repository, $this->factory),
+            new ListOrganizationsHandler(new ListOrganizationsUseCase($this->repository), $jsonResponse),
+            new GetOrganizationByIdHandler(new GetOrganizationByIdUseCase($this->repository), $jsonResponse),
+            new CreateOrganizationHandler(new CreateOrganizationUseCase($this->repository), $jsonResponse),
+            new UpdateOrganizationHandler(new UpdateOrganizationUseCase($this->repository), $jsonResponse),
+            new DeleteOrganizationHandler(new DeleteOrganizationUseCase($this->repository), $this->factory),
         );
 
         $this->application = (new RuntimeApplicationFactory(
