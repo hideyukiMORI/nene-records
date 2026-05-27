@@ -77,6 +77,7 @@ export default tseslint.config(
       'node_modules',
       'coverage',
       'src/shared/api/schema.gen.ts',
+      'public/mockServiceWorker.js',
     ],
   },
   {

@@ -6,8 +6,18 @@
   "engines": {
     "node": ">=22"
   },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix --max-warnings 0",
+      "prettier --write"
+    ],
+    "*.{json,yaml,yml,md,css}": [
+      "prettier --write"
+    ]
+  },
   "scripts": {
     "dev": "vite",
+    "mock": "VITE_MOCK_API=true vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "type-check": "tsc --noEmit",
@@ -19,8 +29,10 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "codegen": "openapi-typescript ../docs/openapi/openapi.yaml -o src/shared/api/schema.gen.ts",
+    "check:fast": "npm run type-check && npm run lint && npm run format && npm run test",
     "knip": "knip",
-    "check": "npm run type-check && npm run lint && npm run format && npm run test && npm run build-storybook"
+    "check": "npm run type-check && npm run lint && npm run format && npm run test && npm run knip && npm run build-storybook",
+    "prepare": "husky"
   },
   "dependencies": {
     "@fontsource/inter": "^5.2.8",
@@ -58,8 +70,10 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.6.0",
+    "husky": "^9.1.7",
     "jsdom": "^27.2.0",
     "knip": "^5.70.2",
+    "lint-staged": "^17.0.5",
     "msw": "^2.12.3",
     "openapi-typescript": "^7.13.0",
     "prettier": "^3.6.2",
@@ -69,5 +83,10 @@
     "typescript-eslint": "^8.59.2",
     "vite": "^8.0.12",
     "vitest": "^4.0.14"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
   }
 }
