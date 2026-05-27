@@ -67,7 +67,7 @@ All milestones M1 – M9 are complete. See [`docs/todo/current.md`](./docs/todo/
 | Public consumer | `/view/{type}/{slug}`, Markdown body, site settings, navigation |
 | OpenAPI | 3.1 contract, validated on every CI run |
 | MCP tools | 60+ tools auto-generated from OpenAPI |
-| CI | Backend (545 PHPUnit tests / PHPStan level 8 / CS-Fixer / OpenAPI / MCP) + Frontend (ESLint / TypeScript / Vitest) + Playwright 67 E2E tests |
+| CI | Backend (545 PHPUnit tests / PHPStan level 8 / CS-Fixer / OpenAPI / MCP) + Frontend (ESLint / TypeScript / Vitest) + Playwright 157 E2E tests |
 
 ## Contributing
 
