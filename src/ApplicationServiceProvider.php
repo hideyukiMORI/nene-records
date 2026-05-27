@@ -19,6 +19,8 @@ use NeNeRecords\Comment\CommentNotFoundExceptionHandler;
 use NeNeRecords\Comment\CommentRouteRegistrar;
 use NeNeRecords\Comment\CommentServiceProvider;
 use NeNeRecords\Dashboard\DashboardServiceProvider;
+use NeNeRecords\DataMigration\DataMigrationRouteRegistrar;
+use NeNeRecords\DataMigration\DataMigrationServiceProvider;
 use NeNeRecords\DateTimeField\DateTimeFieldNotFoundExceptionHandler;
 use NeNeRecords\DateTimeField\DateTimeFieldServiceProvider;
 use NeNeRecords\DateTimeField\FieldKeyNotRegisteredExceptionHandler as DateTimeFieldKeyNotRegisteredExceptionHandler;
@@ -61,6 +63,8 @@ use NeNeRecords\Organization\OrganizationNotFoundExceptionHandler;
 use NeNeRecords\Organization\OrganizationRouteRegistrar;
 use NeNeRecords\Organization\OrganizationServiceProvider;
 use NeNeRecords\Organization\OrganizationSlugConflictExceptionHandler;
+use NeNeRecords\OrgExport\OrgExportRouteRegistrar;
+use NeNeRecords\OrgExport\OrgExportServiceProvider;
 use NeNeRecords\PreviewToken\PreviewTokenNotFoundExceptionHandler;
 use NeNeRecords\PreviewToken\PreviewTokenServiceProvider;
 use NeNeRecords\PublicRecord\PublicEntityTypeNotFoundExceptionHandler;
@@ -136,7 +140,9 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
             ->addProvider(new UserInviteServiceProvider())
             ->addProvider(new CommentServiceProvider())
             ->addProvider(new OrganizationServiceProvider())
-            ->addProvider(new SystemConfigServiceProvider());
+            ->addProvider(new SystemConfigServiceProvider())
+            ->addProvider(new DataMigrationServiceProvider())
+            ->addProvider(new OrgExportServiceProvider());
 
         $builder
             ->set(
@@ -168,6 +174,8 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $comment = $container->get(CommentRouteRegistrar::class);
                     $organization = $container->get(OrganizationRouteRegistrar::class);
                     $systemConfig = $container->get(SystemConfigRouteRegistrar::class);
+                    $dataMigration = $container->get(DataMigrationRouteRegistrar::class);
+                    $orgExport     = $container->get(OrgExportRouteRegistrar::class);
 
                     if (
                         !is_callable($entityType)
@@ -196,6 +204,8 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         || !is_callable($comment)
                         || !$organization instanceof OrganizationRouteRegistrar
                         || !$systemConfig instanceof SystemConfigRouteRegistrar
+                        || !$dataMigration instanceof DataMigrationRouteRegistrar
+                        || !$orgExport instanceof OrgExportRouteRegistrar
                     ) {
                         throw new LogicException('Route registrar service is invalid.');
                     }
@@ -227,6 +237,8 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $comment,
                         $organization,
                         $systemConfig,
+                        $dataMigration,
+                        $orgExport,
                     ];
                 },
             )
