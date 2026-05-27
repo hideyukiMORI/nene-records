@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { Link, Navigate, useLocation, useParams } from 'react-router-dom'
 import { toEntityId, useEntity } from '@/entities/entity'
 import { useEntityTypeList } from '@/entities/entity-type'
-import { CommentSection } from '@/features/comment-section'
+import { CommentSection, useCommentSection } from '@/features/comment-section'
 import {
   PublicRecordDetailView,
   usePublicViewEntityRecordPage,
@@ -61,6 +61,7 @@ function PublicRecordDetailContent({
 }) {
   const { entity, fieldRows, isLoading, isError, errorTitle, refetch } =
     usePublicViewEntityRecordPage(entityTypeId, entityId)
+  const commentSection = useCommentSection(entityId)
 
   // Redirect if the current URL doesn't match the canonical URL for this entity.
   // This handles pattern changes (e.g. /{type}/{id} → /{type}/{slug}) transparently.
@@ -99,7 +100,7 @@ function PublicRecordDetailContent({
           void refetch()
         }}
       />
-      {entity !== null && !isLoading && !isError ? <CommentSection entityId={entityId} /> : null}
+      {entity !== null && !isLoading && !isError ? <CommentSection {...commentSection} /> : null}
     </Stack>
   )
 }
