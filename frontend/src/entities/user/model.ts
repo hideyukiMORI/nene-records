@@ -11,8 +11,8 @@ export interface User {
   displayName: string | null
   fullName: string | null
   jobTitle: string | null
-  createdAt: number | null
-  updatedAt: number | null
+  createdAt: string | null
+  updatedAt: string | null
 }
 
 export interface UserList {

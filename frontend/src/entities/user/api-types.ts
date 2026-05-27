@@ -5,11 +5,12 @@ export interface UserDto {
   organization_id: number | null
   org_role: string | null
   status: string
-  display_name: string | null
-  full_name: string | null
-  job_title: string | null
-  created_at: number | null
-  updated_at: number | null
+  // Profile fields — present in GET /users/{id} but absent in GET /users (list)
+  display_name?: string | null
+  full_name?: string | null
+  job_title?: string | null
+  created_at: string | null
+  updated_at: string | null
 }
 
 export interface UserListDto {
