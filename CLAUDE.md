@@ -35,6 +35,6 @@ M1 – M9 complete. See `docs/todo/current.md`.
 ## Verification
 
 ```bash
-composer check                    # 374 tests + PHPStan level 8 + CS-Fixer + OpenAPI + MCP
+composer check                    # 545 tests + PHPStan level 8 + CS-Fixer + OpenAPI + MCP
 npm run check --prefix frontend   # type-check + lint + test + storybook
 ```
