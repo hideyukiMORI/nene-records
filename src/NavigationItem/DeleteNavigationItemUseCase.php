@@ -11,12 +11,12 @@ final readonly class DeleteNavigationItemUseCase implements DeleteNavigationItem
     ) {
     }
 
-    public function execute(int $id): void
+    public function execute(DeleteNavigationItemInput $input): void
     {
-        if ($this->repository->findById($id) === null) {
-            throw new NavigationItemNotFoundException($id);
+        if ($this->repository->findById($input->id) === null) {
+            throw new NavigationItemNotFoundException($input->id);
         }
 
-        $this->repository->delete($id);
+        $this->repository->delete($input->id);
     }
 }

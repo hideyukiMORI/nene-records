@@ -11,9 +11,10 @@ final readonly class ListWebhooksUseCase implements ListWebhooksUseCaseInterface
     ) {
     }
 
-    /** @return list<Webhook> */
-    public function execute(): array
+    public function execute(): ListWebhooksOutput
     {
-        return $this->webhooks->findAll();
+        return new ListWebhooksOutput(
+            items: $this->webhooks->findAll(),
+        );
     }
 }

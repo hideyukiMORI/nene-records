@@ -22,15 +22,15 @@ final readonly class ApproveCommentHandler
         $params = $request->getAttribute(Router::PARAMETERS_ATTRIBUTE, []);
         $id = (int) ($params['id'] ?? 0);
 
-        $comment = $this->useCase->execute(new ApproveCommentInput($id));
+        $output = $this->useCase->execute(new ApproveCommentInput($id));
 
         return $this->response->create([
-            'id'          => $comment->id,
-            'entity_id'   => $comment->entityId,
-            'author_name' => $comment->authorName,
-            'body'        => $comment->body,
-            'is_approved' => $comment->isApproved,
-            'created_at'  => $comment->createdAt,
+            'id'          => $output->id,
+            'entity_id'   => $output->entityId,
+            'author_name' => $output->authorName,
+            'body'        => $output->body,
+            'is_approved' => $output->isApproved,
+            'created_at'  => $output->createdAt,
         ]);
     }
 }

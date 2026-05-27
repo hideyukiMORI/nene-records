@@ -6,5 +6,5 @@ namespace NeNeRecords\Comment;
 
 interface PostCommentUseCaseInterface
 {
-    public function execute(PostCommentInput $input): Comment;
+    public function execute(PostCommentInput $input): PostCommentOutput;
 }

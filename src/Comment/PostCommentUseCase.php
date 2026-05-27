@@ -10,13 +10,22 @@ final readonly class PostCommentUseCase implements PostCommentUseCaseInterface
     {
     }
 
-    public function execute(PostCommentInput $input): Comment
+    public function execute(PostCommentInput $input): PostCommentOutput
     {
-        return $this->comments->create(
+        $comment = $this->comments->create(
             $input->entityId,
             $input->authorName,
             $input->authorEmail,
             $input->body,
+        );
+
+        return new PostCommentOutput(
+            id: $comment->id,
+            entityId: $comment->entityId,
+            authorName: $comment->authorName,
+            body: $comment->body,
+            isApproved: $comment->isApproved,
+            createdAt: $comment->createdAt,
         );
     }
 }

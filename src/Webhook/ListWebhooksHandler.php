@@ -18,12 +18,12 @@ final readonly class ListWebhooksHandler
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $items = $this->useCase->execute();
+        $output = $this->useCase->execute();
 
         return $this->response->create([
             'items' => array_map(
                 static fn (Webhook $webhook) => WebhookHttpMapper::toArray($webhook),
-                $items,
+                $output->items,
             ),
         ]);
     }
