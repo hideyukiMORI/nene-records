@@ -6,6 +6,30 @@ NeNe Records does not yet follow Semantic Versioning — entries are grouped by 
 
 ---
 
+## [M10 — マルチテナント包括テストスイート] — 2026-07-01
+
+### Added
+- PHPUnit `CapabilityMiddlewareTest` — org_id 一致・不一致・superadmin バイパス・非 int 属性・JWT org_id なし等 8 ケース追加 (#256, PR #257)
+- PHPUnit `LoginUseCaseTest` — admin/editor の org_id 出力・superadmin は null 等 4 ケース追加 (#256, PR #257)
+- PHPUnit `ListUsersUseCaseTest` (新規) — organizationId=null 全件・org 絞り込み・クロス org 分離・ソート 6 ケース (#256, PR #257)
+- PHPUnit `CreateUserUseCaseTest` (新規) — org 割当あり・なし・orgRole デフォルト・クロス org 分離 6 ケース (#256, PR #257)
+- PHPUnit `InviteUserMultitenancyTest` (新規) — 招待ユーザーへの org 伝播・listByOrgId への反映 6 ケース (#256, PR #257)
+- Playwright Level 2 (1機能) — org フィールド含む API レスポンスでも UI 正常描画・org 更新/削除 API コール確認 (05-09〜11, 06-10-*) (#256, PR #257)
+- Playwright Level 3 ショートシナリオ (新規 `07-multitenancy-short.spec.ts`) — 6 tests (#256, PR #257)
+- Playwright Level 4 完全シナリオ (新規 `08-multitenancy-full.spec.ts`) — 7 tests: クロス org 分離・ロールアクセスマトリクス・superadmin ライフサイクル (#256, PR #257)
+- `api-mocks.ts` に org 付きモックデータ追加 (`USER_LIST_WITH_ORG`、`USER_LIST_ORG2`、`INVITE_USER_RESPONSE_WITH_ORG`、`ADMIN_LOGIN_WITH_ORG_ID` 等) (#256, PR #257)
+- `bypassLogin()` ヘルパーに `orgId?` オプション追加 (#256, PR #257)
+
+### Changed
+- PHPUnit 合計: 374 → 545 tests (#256, PR #257)
+- Playwright 合計: 48 → 67 tests (#256, PR #257)
+
+### Fixed
+- `PreviewTokenUseCaseTest` の PHPStan `nullsafe.neverNull` 警告を修正 (#256, PR #257)
+- `NavigationItemUseCaseTest`・`TextFieldDeleteUpdateUseCaseTest` の CS Fixer import 順を修正 (#256, PR #257)
+
+---
+
 ## [M9 — マルチテナント完成（1ユーザー=1組織）] — 2026-07-01
 
 ### Added
