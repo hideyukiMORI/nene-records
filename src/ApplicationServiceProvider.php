@@ -69,6 +69,8 @@ use NeNeRecords\PublicRecord\PublicRecordServiceProvider;
 use NeNeRecords\Setting\SettingKeyNotFoundExceptionHandler;
 use NeNeRecords\Setting\SettingServiceProvider;
 use NeNeRecords\Setting\SettingValueInvalidExceptionHandler;
+use NeNeRecords\SystemConfig\SystemConfigRouteRegistrar;
+use NeNeRecords\SystemConfig\SystemConfigServiceProvider;
 use NeNeRecords\Tag\TagNotFoundExceptionHandler;
 use NeNeRecords\Tag\TagServiceProvider;
 use NeNeRecords\Tag\TagSlugConflictExceptionHandler;
@@ -133,7 +135,8 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
             ->addProvider(new UserServiceProvider())
             ->addProvider(new UserInviteServiceProvider())
             ->addProvider(new CommentServiceProvider())
-            ->addProvider(new OrganizationServiceProvider());
+            ->addProvider(new OrganizationServiceProvider())
+            ->addProvider(new SystemConfigServiceProvider());
 
         $builder
             ->set(
@@ -164,6 +167,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $auth = $container->get('nene-records.route_registrar.auth');
                     $comment = $container->get(CommentRouteRegistrar::class);
                     $organization = $container->get(OrganizationRouteRegistrar::class);
+                    $systemConfig = $container->get(SystemConfigRouteRegistrar::class);
 
                     if (
                         !is_callable($entityType)
@@ -191,6 +195,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         || !is_callable($auth)
                         || !is_callable($comment)
                         || !$organization instanceof OrganizationRouteRegistrar
+                        || !$systemConfig instanceof SystemConfigRouteRegistrar
                     ) {
                         throw new LogicException('Route registrar service is invalid.');
                     }
@@ -221,6 +226,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $userInvite,
                         $comment,
                         $organization,
+                        $systemConfig,
                     ];
                 },
             )
