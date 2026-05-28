@@ -51,13 +51,14 @@ test.describe('UI States', () => {
 
     await page.locator('input[id="entity-type-name"]').fill('Events');
     await page.locator('input[id="entity-type-slug"]').fill('events');
-    await page.locator('button:has-text("Create content type")').click();
+    await page.locator('[data-testid="submit-idle"]').click();
 
-    // While POST is in-flight, button text should change to submitting state
-    await expect(page.locator('button:has-text("Creating…")')).toBeVisible({ timeout: 3000 });
+    // While POST is in-flight, the submit button switches to the in-flight testid
+    // (detected via data-testid rather than the i18n label).
+    await expect(page.locator('[data-testid="submit-in-flight"]')).toBeVisible({ timeout: 3000 });
 
-    // After response, button returns to normal text
-    await expect(page.locator('button:has-text("Create content type")')).toBeVisible({ timeout: 6000 });
+    // After response, the button returns to its idle state
+    await expect(page.locator('[data-testid="submit-idle"]')).toBeVisible({ timeout: 6000 });
   });
 
   // ── 09-02: Form inputs disabled during entity type creation ────────────────
@@ -174,13 +175,13 @@ test.describe('UI States', () => {
 
     await page.locator('input[id="tag-name"]').fill('Tutorial');
     await page.locator('input[id="tag-slug"]').fill('tutorial');
-    await page.locator('button:has-text("Create tag")').click();
+    await page.locator('[data-testid="submit-idle"]').click();
 
-    // In-flight state
-    await expect(page.locator('button:has-text("Creating…")')).toBeVisible({ timeout: 3000 });
+    // In-flight state (detected via data-testid rather than the i18n label)
+    await expect(page.locator('[data-testid="submit-in-flight"]')).toBeVisible({ timeout: 3000 });
 
-    // After response
-    await expect(page.locator('button:has-text("Create tag")')).toBeVisible({ timeout: 6000 });
+    // After response, the button returns to its idle state
+    await expect(page.locator('[data-testid="submit-idle"]')).toBeVisible({ timeout: 6000 });
   });
 
   // ── 09-05: Error message does not stack — only one error instance ──────────

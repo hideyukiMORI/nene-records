@@ -70,7 +70,11 @@ export function EntityTypeCreateForm({
           )}
         />
         {serverErrorTitle !== null ? <Text muted>{serverErrorTitle}</Text> : null}
-        <Button type="submit" disabled={isSubmitting}>
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          data-testid={isSubmitting ? 'submit-in-flight' : 'submit-idle'}
+        >
           {isSubmitting
             ? t('admin.entityTypes.createForm.submitting')
             : t('admin.entityTypes.createForm.submit')}

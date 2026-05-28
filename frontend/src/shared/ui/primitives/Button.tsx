@@ -11,6 +11,8 @@ export interface ButtonProps {
   onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void
   onFocus?: (event: React.FocusEvent<HTMLButtonElement>) => void
   onBlur?: (event: React.FocusEvent<HTMLButtonElement>) => void
+  /** Stable hook for E2E tests; prefer this over matching on (i18n) button text. */
+  'data-testid'?: string
 }
 
 const variantClasses: Record<ButtonVariant, string> = {
@@ -39,6 +41,7 @@ export function Button({
   onClick,
   onFocus,
   onBlur,
+  'data-testid': dataTestId,
 }: ButtonProps) {
   const classes = [
     'inline-flex items-center justify-center rounded-md border font-sans font-medium transition-colors duration-fast ease-default',
@@ -58,6 +61,7 @@ export function Button({
       onClick={onClick}
       onFocus={onFocus}
       onBlur={onBlur}
+      data-testid={dataTestId}
     >
       {children}
     </button>
