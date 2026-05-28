@@ -63,6 +63,13 @@ const SLUG_LOOKUP_PARAMS = { limit: 100, offset: 0 } as const
 /**
  * Looks up an entity type by its slug.
  * Uses the same list endpoint as usePinnedEntityTypes (cache-friendly).
+ *
+ * NOTE: Slug resolution is done client-side over the first {@link SLUG_LOOKUP_PARAMS}.limit
+ * (100) entity types. If an organization ever holds more than 100 entity types, slugs on the
+ * 101st+ type will not be found here and surface as a misleading 404 ("No entity type with
+ * slug ..."). This is intentional for now (cache-friendly, well under realistic scale). When
+ * that ceiling becomes a concern, switch to a server-side slug filter
+ * (`GET /api/v1/entity-types?slug=xxx`) instead of raising the client-side limit. See #278.
  */
 export function useEntityTypeBySlug(slug: string): UseQueryResult<EntityType, AppError> {
   return useQuery({
