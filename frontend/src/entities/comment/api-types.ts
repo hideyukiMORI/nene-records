@@ -29,4 +29,6 @@ export interface PostCommentRequestDto {
   author_name: string
   author_email: string
   body: string
+  /** Honeypot field. Always sent (empty for real users); a non-empty value is rejected (422). */
+  website: string
 }

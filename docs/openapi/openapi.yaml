@@ -2260,6 +2260,8 @@ paths:
                 $ref: '#/components/schemas/CommentResponse'
         '422':
           $ref: '#/components/responses/ValidationFailed'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/InternalServerError'
   /api/v1/admin/comments:
@@ -3266,6 +3268,20 @@ components:
                 status: 409
                 detail: The slug is already in use.
                 instance: /api/v1/entity-types
+    TooManyRequests:
+      description: Rate limit exceeded.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          examples:
+            tooManyRequests:
+              value:
+                type: https://nene-records.dev/problems/too-many-requests
+                title: Too Many Requests
+                status: 429
+                detail: Comment rate limit of 3 per 3600 seconds exceeded. Try again in 1800 seconds.
+                instance: /api/v1/entities/1/comments
     FieldDefNotFound:
       description: Field definition not found.
       content:
@@ -5038,6 +5054,12 @@ components:
           maxLength: 255
         body:
           type: string
+        website:
+          type: string
+          description: >-
+            Honeypot anti-spam field. Real clients must leave this empty;
+            a non-empty value is rejected with 422. Not shown to users.
+          maxLength: 255
       additionalProperties: false
     CommentResponse:
       type: object

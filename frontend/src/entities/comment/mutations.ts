@@ -16,6 +16,7 @@ export function usePostComment(): UseMutationResult<Comment, AppError, PostComme
           author_name: input.authorName,
           author_email: input.authorEmail,
           body: input.body,
+          website: input.honeypot ?? '',
         },
       )
       return mapCommentDtoToModel(dto)

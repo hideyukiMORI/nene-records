@@ -7,6 +7,7 @@ namespace NeNeRecords\Tests\Comment;
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RuntimeApplicationFactory;
+use Nene2\Middleware\InMemoryRateLimitStorage;
 use NeNeRecords\Comment\ApproveCommentHandler;
 use NeNeRecords\Comment\ApproveCommentUseCase;
 use NeNeRecords\Comment\CommentNotFoundExceptionHandler;
@@ -42,7 +43,12 @@ final class CommentHttpTest extends TestCase
         $problemDetails = new ProblemDetailsResponseFactory($this->factory, $this->factory);
 
         $registrar = new CommentRouteRegistrar(
-            new PostCommentHandler(new PostCommentUseCase($this->repository, new NullNotifier()), $jsonResponse),
+            new PostCommentHandler(
+                new PostCommentUseCase($this->repository, new NullNotifier()),
+                $jsonResponse,
+                $problemDetails,
+                new InMemoryRateLimitStorage(),
+            ),
             new ListCommentsHandler(new ListCommentsUseCase($this->repository), $jsonResponse),
             new ListAllCommentsHandler(new ListAllCommentsUseCase($this->repository), $jsonResponse),
             new ApproveCommentHandler(new ApproveCommentUseCase($this->repository), $jsonResponse),
@@ -135,6 +141,103 @@ final class CommentHttpTest extends TestCase
         );
 
         self::assertSame(422, $response->getStatusCode());
+    }
+
+    public function testPostCommentWithFilledHoneypotReturns422(): void
+    {
+        $body = $this->factory->createStream(json_encode([
+            'author_name'  => 'SpamBot',
+            'author_email' => 'spam@example.com',
+            'body'         => 'Buy cheap stuff!',
+            'website'      => 'http://spam.example.com',
+        ], JSON_THROW_ON_ERROR));
+
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('POST', 'https://example.test/api/v1/entities/1/comments')
+                ->withBody($body),
+        );
+
+        self::assertSame(422, $response->getStatusCode());
+
+        // The honeypot submission must not create a comment.
+        $listResponse = $this->application->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/api/v1/admin/comments'),
+        );
+        self::assertCount(0, $this->decodeJson($listResponse)['items']);
+    }
+
+    public function testEmptyHoneypotIsAccepted(): void
+    {
+        $body = $this->factory->createStream(json_encode([
+            'author_name'  => 'Alice',
+            'author_email' => 'alice@example.com',
+            'body'         => 'Real comment',
+            'website'      => '',
+        ], JSON_THROW_ON_ERROR));
+
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('POST', 'https://example.test/api/v1/entities/1/comments')
+                ->withBody($body),
+        );
+
+        self::assertSame(201, $response->getStatusCode());
+    }
+
+    public function testFourthCommentFromSameIpToSameEntityIsRateLimited(): void
+    {
+        $post = function (string $name): ResponseInterface {
+            $body = $this->factory->createStream(json_encode([
+                'author_name'  => $name,
+                'author_email' => strtolower($name) . '@example.com',
+                'body'         => 'Comment from ' . $name,
+            ], JSON_THROW_ON_ERROR));
+
+            return $this->application->handle(
+                $this->factory->createServerRequest(
+                    'POST',
+                    'https://example.test/api/v1/entities/1/comments',
+                    ['REMOTE_ADDR' => '203.0.113.7'],
+                )->withBody($body),
+            );
+        };
+
+        // First 3 comments succeed.
+        self::assertSame(201, $post('Alice')->getStatusCode());
+        self::assertSame(201, $post('Bob')->getStatusCode());
+        self::assertSame(201, $post('Carol')->getStatusCode());
+
+        // The 4th within the window is rejected with 429.
+        $fourth = $post('Dave');
+        self::assertSame(429, $fourth->getStatusCode());
+        self::assertNotSame('', $fourth->getHeaderLine('Retry-After'));
+    }
+
+    public function testRateLimitIsPerEntity(): void
+    {
+        $post = function (int $entityId): ResponseInterface {
+            $body = $this->factory->createStream(json_encode([
+                'author_name'  => 'Alice',
+                'author_email' => 'alice@example.com',
+                'body'         => 'Hello',
+            ], JSON_THROW_ON_ERROR));
+
+            return $this->application->handle(
+                $this->factory->createServerRequest(
+                    'POST',
+                    "https://example.test/api/v1/entities/{$entityId}/comments",
+                    ['REMOTE_ADDR' => '203.0.113.7'],
+                )->withBody($body),
+            );
+        };
+
+        // 3 comments to entity 1 exhaust its bucket.
+        $post(1);
+        $post(1);
+        $post(1);
+        self::assertSame(429, $post(1)->getStatusCode());
+
+        // A different entity has its own bucket and still accepts comments.
+        self::assertSame(201, $post(2)->getStatusCode());
     }
 
     public function testListCommentsOnlyShowsApproved(): void

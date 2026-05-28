@@ -9,12 +9,14 @@ interface Props {
   authorName: string
   authorEmail: string
   body: string
+  honeypot: string
   submitted: boolean
   isPending: boolean
   isPostError: boolean
   onAuthorNameChange: (value: string) => void
   onAuthorEmailChange: (value: string) => void
   onBodyChange: (value: string) => void
+  onHoneypotChange: (value: string) => void
   onSubmit: (e: React.SyntheticEvent) => void
 }
 
@@ -25,12 +27,14 @@ export function CommentSection({
   authorName,
   authorEmail,
   body,
+  honeypot,
   submitted,
   isPending,
   isPostError,
   onAuthorNameChange,
   onAuthorEmailChange,
   onBodyChange,
+  onHoneypotChange,
   onSubmit,
 }: Props) {
   const { t } = useTranslation()
@@ -83,6 +87,33 @@ export function CommentSection({
         ) : null}
         <form onSubmit={onSubmit}>
           <Stack gap="md">
+            {/*
+              Honeypot: hidden from real users (and assistive tech) but visible to naive bots
+              that auto-fill every field. A non-empty value is rejected server-side (#264).
+            */}
+            <div
+              aria-hidden="true"
+              style={{
+                position: 'absolute',
+                left: '-9999px',
+                height: 0,
+                width: 0,
+                overflow: 'hidden',
+              }}
+            >
+              <label htmlFor="comment-website">Website</label>
+              <input
+                id="comment-website"
+                name="website"
+                type="text"
+                tabIndex={-1}
+                autoComplete="off"
+                value={honeypot}
+                onChange={(e) => {
+                  onHoneypotChange(e.target.value)
+                }}
+              />
+            </div>
             <Input
               id="comment-author-name"
               label={t('public.comments.form.authorName')}
