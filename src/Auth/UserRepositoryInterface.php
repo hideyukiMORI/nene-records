@@ -46,6 +46,16 @@ interface UserRepositoryInterface
 
     public function clearPasswordResetToken(int $id): void;
 
+    /** Store a pending email change with its hashed verification token. */
+    public function storeEmailVerification(int $id, string $pendingEmail, string $tokenHash, int $expiresAt): void;
+
+    public function findByEmailVerificationToken(string $tokenHash): ?User;
+
+    /** Promote pending_email to email and clear the verification token. */
+    public function applyPendingEmail(int $id): void;
+
+    public function clearEmailVerification(int $id): void;
+
     public function delete(int $id): void;
 
     public function countByRole(string $role): int;

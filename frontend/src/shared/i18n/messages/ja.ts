@@ -520,6 +520,9 @@ export const ja: Partial<MessageCatalog> = {
   'admin.users.edit.email.label': 'メールアドレス',
   'admin.users.edit.email.save': 'メールアドレスを保存',
   'admin.users.edit.email.saved': 'メールアドレスを更新しました。',
+  'admin.users.edit.email.verificationSent':
+    '確認メールを送信しました。新しいアドレス宛のリンクをクリックすると変更が反映されます。',
+  'admin.users.edit.email.pending': '確認待ち: {{email}}',
   'admin.users.edit.email.error': 'メールアドレスの更新に失敗しました。',
   'admin.users.edit.profile.title': 'プロフィール',
   'admin.users.edit.profile.displayName': '表示名',
@@ -544,6 +547,15 @@ export const ja: Partial<MessageCatalog> = {
   'admin.resetPassword.submitting': '設定中…',
   'admin.resetPassword.success': 'パスワードがリセットされました。サインインできます。',
   'admin.resetPassword.invalidToken': 'このリセットリンクは無効または期限切れです。',
+
+  // ── Verify email (email change confirmation) ────────────────────────────
+  'admin.verifyEmail.pageTitle': 'メールアドレスの確認',
+  'admin.verifyEmail.verifying': '確認しています…',
+  'admin.verifyEmail.success': 'メールアドレスが変更されました。',
+  'admin.verifyEmail.expired':
+    'この確認リンクは期限切れです。お手数ですが、もう一度メールアドレス変更を行ってください。',
+  'admin.verifyEmail.invalid': 'この確認リンクは無効です。',
+  'admin.verifyEmail.conflict': 'このメールアドレスは既に他のアカウントで使用されています。',
 
   // ── Comments (admin) ────────────────────────────────────────────────────
   'admin.nav.comments': 'コメント',

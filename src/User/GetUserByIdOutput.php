@@ -13,6 +13,7 @@ final readonly class GetUserByIdOutput
         public ?int $organizationId,
         public ?string $orgRole,
         public string $status,
+        public ?string $pendingEmail,
         public ?string $displayName,
         public ?string $fullName,
         public ?string $jobTitle,

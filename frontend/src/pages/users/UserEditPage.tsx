@@ -136,7 +136,10 @@ export function UserEditPage() {
             error={emailError ?? undefined}
             autoComplete="off"
           />
-          {emailSuccess ? <Text muted>{t('admin.users.edit.email.saved')}</Text> : null}
+          {user.pendingEmail !== null ? (
+            <Text muted>{t('admin.users.edit.email.pending', { email: user.pendingEmail })}</Text>
+          ) : null}
+          {emailSuccess ? <Text muted>{t('admin.users.edit.email.verificationSent')}</Text> : null}
           {changeEmailMutation.error !== null ? (
             <Text muted>{changeEmailMutation.error.title}</Text>
           ) : null}

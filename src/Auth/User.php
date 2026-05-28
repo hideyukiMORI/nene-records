@@ -18,6 +18,9 @@ final readonly class User
         public ?int $inviteExpiresAt = null,
         public ?string $passwordResetTokenHash = null,
         public ?int $passwordResetExpiresAt = null,
+        public ?string $pendingEmail = null,
+        public ?string $emailVerificationTokenHash = null,
+        public ?int $emailVerificationExpiresAt = null,
         public ?int $createdAt = null,
         public ?int $updatedAt = null,
     ) {

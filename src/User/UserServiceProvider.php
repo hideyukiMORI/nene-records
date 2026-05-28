@@ -11,6 +11,7 @@ use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use NeNeRecords\Auth\UserRepositoryInterface;
+use NeNeRecords\Mail\MailerInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 
@@ -112,12 +113,29 @@ final readonly class UserServiceProvider implements ServiceProviderInterface
                 ChangeEmailUseCaseInterface::class,
                 static function (ContainerInterface $c): ChangeEmailUseCaseInterface {
                     $users = $c->get(UserRepositoryInterface::class);
+                    $mailer = $c->get(MailerInterface::class);
 
                     if (!$users instanceof UserRepositoryInterface) {
                         throw new LogicException('UserRepositoryInterface service is invalid.');
                     }
 
-                    return new ChangeEmailUseCase($users);
+                    if (!$mailer instanceof MailerInterface) {
+                        throw new LogicException('MailerInterface service is invalid.');
+                    }
+
+                    return new ChangeEmailUseCase($users, $mailer);
+                },
+            )
+            ->set(
+                VerifyEmailChangeUseCaseInterface::class,
+                static function (ContainerInterface $c): VerifyEmailChangeUseCaseInterface {
+                    $users = $c->get(UserRepositoryInterface::class);
+
+                    if (!$users instanceof UserRepositoryInterface) {
+                        throw new LogicException('UserRepositoryInterface service is invalid.');
+                    }
+
+                    return new VerifyEmailChangeUseCase($users);
                 },
             )
             ->set(
@@ -334,6 +352,35 @@ final readonly class UserServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(
+                VerifyEmailChangeHandler::class,
+                static function (ContainerInterface $c): VerifyEmailChangeHandler {
+                    $useCase = $c->get(VerifyEmailChangeUseCaseInterface::class);
+                    $responseFactory = $c->get(ResponseFactoryInterface::class);
+
+                    if (!$useCase instanceof VerifyEmailChangeUseCaseInterface) {
+                        throw new LogicException('VerifyEmailChangeUseCase service is invalid.');
+                    }
+
+                    if (!$responseFactory instanceof ResponseFactoryInterface) {
+                        throw new LogicException('ResponseFactoryInterface service is invalid.');
+                    }
+
+                    return new VerifyEmailChangeHandler($useCase, $responseFactory);
+                },
+            )
+            ->set(
+                EmailVerificationTokenExceptionHandler::class,
+                static function (ContainerInterface $c): EmailVerificationTokenExceptionHandler {
+                    $problemDetails = $c->get(ProblemDetailsResponseFactory::class);
+
+                    if (!$problemDetails instanceof ProblemDetailsResponseFactory) {
+                        throw new LogicException('ProblemDetailsResponseFactory service is invalid.');
+                    }
+
+                    return new EmailVerificationTokenExceptionHandler($problemDetails);
+                },
+            )
+            ->set(
                 UpdateUserProfileHandler::class,
                 static function (ContainerInterface $c): UpdateUserProfileHandler {
                     $useCase = $c->get(UpdateUserProfileUseCaseInterface::class);
@@ -373,6 +420,7 @@ final readonly class UserServiceProvider implements ServiceProviderInterface
                     $delete = $c->get(DeleteUserHandler::class);
                     $changePassword = $c->get(ChangePasswordHandler::class);
                     $changeEmail = $c->get(ChangeEmailHandler::class);
+                    $verifyEmail = $c->get(VerifyEmailChangeHandler::class);
                     $updateProfile = $c->get(UpdateUserProfileHandler::class);
 
                     if (!$list instanceof ListUsersHandler) {
@@ -407,11 +455,15 @@ final readonly class UserServiceProvider implements ServiceProviderInterface
                         throw new LogicException('ChangeEmailHandler service is invalid.');
                     }
 
+                    if (!$verifyEmail instanceof VerifyEmailChangeHandler) {
+                        throw new LogicException('VerifyEmailChangeHandler service is invalid.');
+                    }
+
                     if (!$updateProfile instanceof UpdateUserProfileHandler) {
                         throw new LogicException('UpdateUserProfileHandler service is invalid.');
                     }
 
-                    return new UserRouteRegistrar($list, $get, $create, $updateRole, $resetPassword, $delete, $changePassword, $changeEmail, $updateProfile);
+                    return new UserRouteRegistrar($list, $get, $create, $updateRole, $resetPassword, $delete, $changePassword, $changeEmail, $verifyEmail, $updateProfile);
                 },
             );
     }

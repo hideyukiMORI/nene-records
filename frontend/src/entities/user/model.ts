@@ -8,6 +8,7 @@ export interface User {
   organizationId: number | null
   orgRole: string | null
   status: UserStatus
+  pendingEmail: string | null
   displayName: string | null
   fullName: string | null
   jobTitle: string | null
@@ -45,6 +46,8 @@ export interface InviteUserInput {
 
 export interface ChangeEmailInput {
   email: string
+  /** Base URL for the verification link. Defaults to the current origin when omitted. */
+  appBaseUrl?: string
 }
 
 export interface UpdateUserProfileInput {

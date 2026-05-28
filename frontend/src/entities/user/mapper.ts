@@ -9,6 +9,7 @@ export function mapUserDtoToModel(dto: UserDto): User {
     organizationId: dto.organization_id,
     orgRole: dto.org_role,
     status: dto.status,
+    pendingEmail: dto.pending_email ?? null,
     displayName: dto.display_name ?? null,
     fullName: dto.full_name ?? null,
     jobTitle: dto.job_title ?? null,

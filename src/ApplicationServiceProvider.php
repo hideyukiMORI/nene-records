@@ -96,6 +96,7 @@ use NeNeRecords\TextField\TextFieldNotFoundExceptionHandler;
 use NeNeRecords\TextField\TextFieldRouteRegistrar;
 use NeNeRecords\TextField\TextFieldServiceProvider;
 use NeNeRecords\User\CannotDeleteSelfExceptionHandler;
+use NeNeRecords\User\EmailVerificationTokenExceptionHandler;
 use NeNeRecords\User\InvalidCurrentPasswordExceptionHandler;
 use NeNeRecords\User\InvalidUserRoleExceptionHandler;
 use NeNeRecords\User\UserEmailConflictExceptionHandler;
@@ -302,6 +303,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $cannotDeleteSelf = $container->get(CannotDeleteSelfExceptionHandler::class);
                     $invalidUserRole = $container->get(InvalidUserRoleExceptionHandler::class);
                     $invalidCurrentPassword = $container->get(InvalidCurrentPasswordExceptionHandler::class);
+                    $emailVerificationToken = $container->get(EmailVerificationTokenExceptionHandler::class);
                     $invalidInviteToken = $container->get(InvalidInviteTokenExceptionHandler::class);
                     $invalidResetToken = $container->get(InvalidPasswordResetTokenExceptionHandler::class);
                     $commentNotFound = $container->get(CommentNotFoundExceptionHandler::class);
@@ -347,6 +349,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $cannotDeleteSelf,
                         $invalidUserRole,
                         $invalidCurrentPassword,
+                        $emailVerificationToken,
                         $invalidInviteToken,
                         $invalidResetToken,
                         $commentNotFound,
@@ -397,6 +400,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $cannotDeleteSelf,
                         $invalidUserRole,
                         $invalidCurrentPassword,
+                        $emailVerificationToken,
                         $invalidInviteToken,
                         $invalidResetToken,
                         $commentNotFound,

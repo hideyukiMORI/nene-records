@@ -7,7 +7,9 @@ namespace NeNeRecords\Tests\User;
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RuntimeApplicationFactory;
+use Nene2\Http\SecureTokenHelper;
 use NeNeRecords\Auth\User;
+use NeNeRecords\Tests\UserInvite\NullMailer;
 use NeNeRecords\User\CannotDeleteSelfExceptionHandler;
 use NeNeRecords\User\ChangeEmailHandler;
 use NeNeRecords\User\ChangeEmailUseCase;
@@ -17,6 +19,7 @@ use NeNeRecords\User\CreateUserHandler;
 use NeNeRecords\User\CreateUserUseCase;
 use NeNeRecords\User\DeleteUserHandler;
 use NeNeRecords\User\DeleteUserUseCase;
+use NeNeRecords\User\EmailVerificationTokenExceptionHandler;
 use NeNeRecords\User\GetUserByIdHandler;
 use NeNeRecords\User\GetUserByIdUseCase;
 use NeNeRecords\User\InvalidCurrentPasswordExceptionHandler;
@@ -32,6 +35,8 @@ use NeNeRecords\User\UpdateUserRoleUseCase;
 use NeNeRecords\User\UserEmailConflictExceptionHandler;
 use NeNeRecords\User\UserNotFoundExceptionHandler;
 use NeNeRecords\User\UserRouteRegistrar;
+use NeNeRecords\User\VerifyEmailChangeHandler;
+use NeNeRecords\User\VerifyEmailChangeUseCase;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
@@ -42,6 +47,7 @@ final class UserHttpTest extends TestCase
     private Psr17Factory $factory;
     private InMemoryUserRepository $repository;
     private InMemoryUserProfileRepository $profiles;
+    private NullMailer $mailer;
     private RequestHandlerInterface $application;
 
     protected function setUp(): void
@@ -64,6 +70,7 @@ final class UserHttpTest extends TestCase
         ]);
 
         $this->profiles = new InMemoryUserProfileRepository();
+        $this->mailer = new NullMailer();
 
         $jsonResponse = new JsonResponseFactory($this->factory, $this->factory);
         $problemDetails = new ProblemDetailsResponseFactory($this->factory, $this->factory);
@@ -76,7 +83,8 @@ final class UserHttpTest extends TestCase
             new ResetUserPasswordHandler(new ResetUserPasswordUseCase($this->repository), $this->factory),
             new DeleteUserHandler(new DeleteUserUseCase($this->repository), $this->factory),
             new ChangePasswordHandler(new ChangePasswordUseCase($this->repository), $this->factory),
-            new ChangeEmailHandler(new ChangeEmailUseCase($this->repository), $this->factory),
+            new ChangeEmailHandler(new ChangeEmailUseCase($this->repository, $this->mailer), $this->factory),
+            new VerifyEmailChangeHandler(new VerifyEmailChangeUseCase($this->repository), $this->factory),
             new UpdateUserProfileHandler(new UpdateUserProfileUseCase($this->repository, $this->profiles), $jsonResponse),
         );
 
@@ -89,6 +97,7 @@ final class UserHttpTest extends TestCase
                 new CannotDeleteSelfExceptionHandler($problemDetails),
                 new InvalidUserRoleExceptionHandler($problemDetails),
                 new InvalidCurrentPasswordExceptionHandler($problemDetails),
+                new EmailVerificationTokenExceptionHandler($problemDetails),
             ],
             routeRegistrars: [$registrar],
         ))->create();
@@ -293,7 +302,7 @@ final class UserHttpTest extends TestCase
 
     // ── Change email ────────────────────────────────────────────────────────────
 
-    public function testPatchUserEmailReturns204(): void
+    public function testPatchUserEmailReturns202AndKeepsEmailPending(): void
     {
         $body = $this->factory->createStream(json_encode([
             'email' => 'newemail@example.test',
@@ -305,11 +314,98 @@ final class UserHttpTest extends TestCase
                 ->withAttribute('nene2.auth.claims', ['sub' => 'admin@example.test']),
         );
 
+        // 202 Accepted: change is pending until the new address is verified.
+        self::assertSame(202, $response->getStatusCode());
+
+        $updated = $this->repository->findById(1);
+        self::assertNotNull($updated);
+        self::assertSame('admin@example.test', $updated->email, 'email must not change before verification');
+        self::assertSame('newemail@example.test', $updated->pendingEmail);
+
+        // A verification email was sent to the new address.
+        self::assertCount(1, $this->mailer->sent);
+        self::assertSame('newemail@example.test', $this->mailer->sent[0]->to);
+    }
+
+    public function testVerifyEmailAppliesPendingEmail(): void
+    {
+        // Initiate the change.
+        $body = $this->factory->createStream(json_encode([
+            'email' => 'verified@example.test',
+        ], JSON_THROW_ON_ERROR));
+        $this->application->handle(
+            $this->factory->createServerRequest('PATCH', 'https://example.test/api/v1/users/1/email')
+                ->withBody($body)
+                ->withAttribute('nene2.auth.claims', ['sub' => 'admin@example.test']),
+        );
+
+        // Extract the raw token from the verification link in the sent email.
+        self::assertCount(1, $this->mailer->sent);
+        $rawToken = $this->extractTokenFromMail($this->mailer->sent[0]->textBody);
+
+        $verifyBody = $this->factory->createStream(json_encode(['token' => $rawToken], JSON_THROW_ON_ERROR));
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('POST', 'https://example.test/api/v1/auth/verify-email')
+                ->withBody($verifyBody),
+        );
+
         self::assertSame(204, $response->getStatusCode());
 
         $updated = $this->repository->findById(1);
         self::assertNotNull($updated);
-        self::assertSame('newemail@example.test', $updated->email);
+        self::assertSame('verified@example.test', $updated->email);
+        self::assertNull($updated->pendingEmail);
+    }
+
+    public function testVerifyEmailAcceptsTokenFromQueryParam(): void
+    {
+        $body = $this->factory->createStream(json_encode([
+            'email' => 'viaquery@example.test',
+        ], JSON_THROW_ON_ERROR));
+        $this->application->handle(
+            $this->factory->createServerRequest('PATCH', 'https://example.test/api/v1/users/1/email')
+                ->withBody($body)
+                ->withAttribute('nene2.auth.claims', ['sub' => 'admin@example.test']),
+        );
+        $rawToken = $this->extractTokenFromMail($this->mailer->sent[0]->textBody);
+
+        $response = $this->application->handle(
+            $this->factory->createServerRequest(
+                'POST',
+                'https://example.test/api/v1/auth/verify-email?token=' . $rawToken,
+            ),
+        );
+
+        self::assertSame(204, $response->getStatusCode());
+        self::assertSame('viaquery@example.test', $this->repository->findById(1)?->email);
+    }
+
+    public function testVerifyEmailWithInvalidTokenReturns422(): void
+    {
+        $verifyBody = $this->factory->createStream(json_encode(['token' => 'definitely-not-valid'], JSON_THROW_ON_ERROR));
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('POST', 'https://example.test/api/v1/auth/verify-email')
+                ->withBody($verifyBody),
+        );
+
+        self::assertSame(422, $response->getStatusCode());
+    }
+
+    public function testVerifyEmailWithExpiredTokenReturns410(): void
+    {
+        [$rawToken, $tokenHash] = SecureTokenHelper::generateWithHash();
+        // Store a pending change whose token already expired.
+        $this->repository->storeEmailVerification(1, 'expired@example.test', $tokenHash, time() - 60);
+
+        $verifyBody = $this->factory->createStream(json_encode(['token' => $rawToken], JSON_THROW_ON_ERROR));
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('POST', 'https://example.test/api/v1/auth/verify-email')
+                ->withBody($verifyBody),
+        );
+
+        self::assertSame(410, $response->getStatusCode());
+        // Email must remain unchanged.
+        self::assertSame('admin@example.test', $this->repository->findById(1)?->email);
     }
 
     public function testPatchUserEmailWithDuplicateReturns409(): void
@@ -453,6 +549,15 @@ final class UserHttpTest extends TestCase
         self::assertNull($data['display_name']);
         self::assertNull($data['full_name']);
         self::assertNull($data['job_title']);
+    }
+
+    private function extractTokenFromMail(string $body): string
+    {
+        if (preg_match('/token=([A-Za-z0-9_-]+)/', $body, $matches) !== 1) {
+            self::fail('No verification token found in the email body.');
+        }
+
+        return $matches[1];
     }
 
     /** @return array<string, mixed> */

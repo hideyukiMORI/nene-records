@@ -2891,8 +2891,11 @@ paths:
     patch:
       tags:
         - Users
-      summary: Change user email
-      description: Changes the email address for a user. Admin only.
+      summary: Request user email change
+      description: >-
+        Starts an email change. The new address is stored as pending and a verification
+        link is emailed to it; the change only takes effect once confirmed via
+        `POST /api/v1/auth/verify-email`. Admin only.
       operationId: changeUserEmail
       security:
         - bearerAuth: []
@@ -2905,8 +2908,8 @@ paths:
             schema:
               $ref: '#/components/schemas/ChangeUserEmailRequest'
       responses:
-        '204':
-          description: Email address updated.
+        '202':
+          description: Verification email sent; the change is pending confirmation.
         '401':
           description: Unauthorized.
           content:
@@ -3111,6 +3114,38 @@ paths:
           description: Password updated.
         '422':
           $ref: '#/components/responses/ValidationFailed'
+  /api/v1/auth/verify-email:
+    post:
+      tags:
+        - Auth
+      summary: Verify a pending email change
+      description: >-
+        Confirms a pending email change using the verification token sent to the new
+        address. The token may be supplied in the JSON body or as a `?token=` query
+        parameter. On success the pending address becomes the user's email.
+      operationId: verifyEmailChange
+      parameters:
+        - name: token
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Verification token (alternative to supplying it in the request body).
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyEmailRequest'
+      responses:
+        '204':
+          description: Email change verified and applied.
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '410':
+          $ref: '#/components/responses/Gone'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
 components:
   parameters:
     IdPath:
@@ -3268,6 +3303,20 @@ components:
                 status: 409
                 detail: The slug is already in use.
                 instance: /api/v1/entity-types
+    Gone:
+      description: The target resource is no longer available (e.g. an expired token).
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          examples:
+            gone:
+              value:
+                type: https://nene-records.dev/problems/gone
+                title: Gone
+                status: 410
+                detail: Email verification token has expired.
+                instance: /api/v1/auth/verify-email
     TooManyRequests:
       description: Rate limit exceeded.
       content:
@@ -3403,6 +3452,11 @@ components:
           enum:
             - active
             - invited
+        pending_email:
+          type: string
+          format: email
+          nullable: true
+          description: New email awaiting verification, or null when no change is pending.
         display_name:
           type: string
           nullable: true
@@ -3446,6 +3500,18 @@ components:
         email:
           type: string
           format: email
+        app_base_url:
+          type: string
+          description: >-
+            Base URL used to build the verification link in the email. Optional;
+            defaults to the request origin when omitted.
+      additionalProperties: false
+    VerifyEmailRequest:
+      type: object
+      properties:
+        token:
+          type: string
+          description: Verification token (may also be supplied as a `?token=` query parameter).
       additionalProperties: false
     UpdateUserProfileRequest:
       type: object

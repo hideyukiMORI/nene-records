@@ -21,6 +21,9 @@ final class InMemoryUserRepository implements UserRepositoryInterface
     /** @var array<string, int> */
     private array $resetTokenToId = [];
 
+    /** @var array<string, int> */
+    private array $emailVerificationTokenToId = [];
+
     private int $nextId = 1;
 
     /** @param list<User> $seed */
@@ -112,6 +115,9 @@ final class InMemoryUserRepository implements UserRepositoryInterface
             inviteExpiresAt: $user->inviteExpiresAt,
             passwordResetTokenHash: $user->passwordResetTokenHash,
             passwordResetExpiresAt: $user->passwordResetExpiresAt,
+            pendingEmail: $user->pendingEmail,
+            emailVerificationTokenHash: $user->emailVerificationTokenHash,
+            emailVerificationExpiresAt: $user->emailVerificationExpiresAt,
             createdAt: $user->createdAt,
             updatedAt: time(),
         );
@@ -137,6 +143,9 @@ final class InMemoryUserRepository implements UserRepositoryInterface
             inviteExpiresAt: $user->inviteExpiresAt,
             passwordResetTokenHash: $user->passwordResetTokenHash,
             passwordResetExpiresAt: $user->passwordResetExpiresAt,
+            pendingEmail: $user->pendingEmail,
+            emailVerificationTokenHash: $user->emailVerificationTokenHash,
+            emailVerificationExpiresAt: $user->emailVerificationExpiresAt,
             createdAt: $user->createdAt,
             updatedAt: time(),
         );
@@ -165,6 +174,9 @@ final class InMemoryUserRepository implements UserRepositoryInterface
             inviteExpiresAt: $user->inviteExpiresAt,
             passwordResetTokenHash: $user->passwordResetTokenHash,
             passwordResetExpiresAt: $user->passwordResetExpiresAt,
+            pendingEmail: $user->pendingEmail,
+            emailVerificationTokenHash: $user->emailVerificationTokenHash,
+            emailVerificationExpiresAt: $user->emailVerificationExpiresAt,
             createdAt: $user->createdAt,
             updatedAt: time(),
         );
@@ -190,6 +202,9 @@ final class InMemoryUserRepository implements UserRepositoryInterface
             inviteExpiresAt: $user->inviteExpiresAt,
             passwordResetTokenHash: $user->passwordResetTokenHash,
             passwordResetExpiresAt: $user->passwordResetExpiresAt,
+            pendingEmail: $user->pendingEmail,
+            emailVerificationTokenHash: $user->emailVerificationTokenHash,
+            emailVerificationExpiresAt: $user->emailVerificationExpiresAt,
             createdAt: $user->createdAt,
             updatedAt: time(),
         );
@@ -215,6 +230,9 @@ final class InMemoryUserRepository implements UserRepositoryInterface
             inviteExpiresAt: $user->inviteExpiresAt,
             passwordResetTokenHash: $user->passwordResetTokenHash,
             passwordResetExpiresAt: $user->passwordResetExpiresAt,
+            pendingEmail: $user->pendingEmail,
+            emailVerificationTokenHash: $user->emailVerificationTokenHash,
+            emailVerificationExpiresAt: $user->emailVerificationExpiresAt,
             createdAt: $user->createdAt,
             updatedAt: time(),
         );
@@ -241,6 +259,9 @@ final class InMemoryUserRepository implements UserRepositoryInterface
             inviteExpiresAt: $expiresAt,
             passwordResetTokenHash: $user->passwordResetTokenHash,
             passwordResetExpiresAt: $user->passwordResetExpiresAt,
+            pendingEmail: $user->pendingEmail,
+            emailVerificationTokenHash: $user->emailVerificationTokenHash,
+            emailVerificationExpiresAt: $user->emailVerificationExpiresAt,
             createdAt: $user->createdAt,
             updatedAt: time(),
         );
@@ -277,6 +298,9 @@ final class InMemoryUserRepository implements UserRepositoryInterface
             inviteExpiresAt: null,
             passwordResetTokenHash: $user->passwordResetTokenHash,
             passwordResetExpiresAt: $user->passwordResetExpiresAt,
+            pendingEmail: $user->pendingEmail,
+            emailVerificationTokenHash: $user->emailVerificationTokenHash,
+            emailVerificationExpiresAt: $user->emailVerificationExpiresAt,
             createdAt: $user->createdAt,
             updatedAt: time(),
         );
@@ -303,6 +327,9 @@ final class InMemoryUserRepository implements UserRepositoryInterface
             inviteExpiresAt: $user->inviteExpiresAt,
             passwordResetTokenHash: $tokenHash,
             passwordResetExpiresAt: $expiresAt,
+            pendingEmail: $user->pendingEmail,
+            emailVerificationTokenHash: $user->emailVerificationTokenHash,
+            emailVerificationExpiresAt: $user->emailVerificationExpiresAt,
             createdAt: $user->createdAt,
             updatedAt: time(),
         );
@@ -339,6 +366,112 @@ final class InMemoryUserRepository implements UserRepositoryInterface
             inviteExpiresAt: $user->inviteExpiresAt,
             passwordResetTokenHash: null,
             passwordResetExpiresAt: null,
+            pendingEmail: $user->pendingEmail,
+            emailVerificationTokenHash: $user->emailVerificationTokenHash,
+            emailVerificationExpiresAt: $user->emailVerificationExpiresAt,
+            createdAt: $user->createdAt,
+            updatedAt: time(),
+        );
+    }
+
+    public function storeEmailVerification(int $id, string $pendingEmail, string $tokenHash, int $expiresAt): void
+    {
+        $user = $this->byId[$id] ?? null;
+
+        if ($user === null) {
+            return;
+        }
+
+        $this->emailVerificationTokenToId[$tokenHash] = $id;
+        $this->byId[$id] = new User(
+            id: $user->id,
+            email: $user->email,
+            passwordHash: $user->passwordHash,
+            role: $user->role,
+            organizationId: $user->organizationId,
+            orgRole: $user->orgRole,
+            status: $user->status,
+            inviteTokenHash: $user->inviteTokenHash,
+            inviteExpiresAt: $user->inviteExpiresAt,
+            passwordResetTokenHash: $user->passwordResetTokenHash,
+            passwordResetExpiresAt: $user->passwordResetExpiresAt,
+            pendingEmail: $pendingEmail,
+            emailVerificationTokenHash: $tokenHash,
+            emailVerificationExpiresAt: $expiresAt,
+            createdAt: $user->createdAt,
+            updatedAt: time(),
+        );
+    }
+
+    public function findByEmailVerificationToken(string $tokenHash): ?User
+    {
+        $id = $this->emailVerificationTokenToId[$tokenHash] ?? null;
+
+        return $id !== null ? ($this->byId[$id] ?? null) : null;
+    }
+
+    public function applyPendingEmail(int $id): void
+    {
+        $user = $this->byId[$id] ?? null;
+
+        if ($user === null || $user->pendingEmail === null) {
+            return;
+        }
+
+        if ($user->emailVerificationTokenHash !== null) {
+            unset($this->emailVerificationTokenToId[$user->emailVerificationTokenHash]);
+        }
+
+        unset($this->emailToId[$user->email]);
+        $this->emailToId[$user->pendingEmail] = $id;
+
+        $this->byId[$id] = new User(
+            id: $user->id,
+            email: $user->pendingEmail,
+            passwordHash: $user->passwordHash,
+            role: $user->role,
+            organizationId: $user->organizationId,
+            orgRole: $user->orgRole,
+            status: $user->status,
+            inviteTokenHash: $user->inviteTokenHash,
+            inviteExpiresAt: $user->inviteExpiresAt,
+            passwordResetTokenHash: $user->passwordResetTokenHash,
+            passwordResetExpiresAt: $user->passwordResetExpiresAt,
+            pendingEmail: null,
+            emailVerificationTokenHash: null,
+            emailVerificationExpiresAt: null,
+            createdAt: $user->createdAt,
+            updatedAt: time(),
+        );
+    }
+
+    public function clearEmailVerification(int $id): void
+    {
+        $user = $this->byId[$id] ?? null;
+
+        if ($user === null) {
+            return;
+        }
+
+        if ($user->emailVerificationTokenHash !== null) {
+            unset($this->emailVerificationTokenToId[$user->emailVerificationTokenHash]);
+        }
+
+        $this->byId[$id] = new User(
+            id: $user->id,
+            email: $user->email,
+            passwordHash: $user->passwordHash,
+            role: $user->role,
+            organizationId: $user->organizationId,
+            orgRole: $user->orgRole,
+            status: $user->status,
+            inviteTokenHash: $user->inviteTokenHash,
+            inviteExpiresAt: $user->inviteExpiresAt,
+            passwordResetTokenHash: $user->passwordResetTokenHash,
+            passwordResetExpiresAt: $user->passwordResetExpiresAt,
+            pendingEmail: null,
+            emailVerificationTokenHash: null,
+            emailVerificationExpiresAt: null,
             createdAt: $user->createdAt,
             updatedAt: time(),
         );
