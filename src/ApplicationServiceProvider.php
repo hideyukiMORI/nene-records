@@ -9,47 +9,62 @@ use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\DomainExceptionHandlerInterface;
 use Nene2\Http\RequestScopedHolder;
+use NeNeRecords\Analytics\AnalyticsRouteRegistrar;
 use NeNeRecords\Analytics\AnalyticsServiceProvider;
+use NeNeRecords\Auth\AuthRouteRegistrar;
 use NeNeRecords\Auth\InvalidCredentialsExceptionHandler;
 use NeNeRecords\BoolField\BoolFieldNotFoundExceptionHandler;
+use NeNeRecords\BoolField\BoolFieldRouteRegistrar;
 use NeNeRecords\BoolField\BoolFieldServiceProvider;
 use NeNeRecords\Comment\CommentNotFoundExceptionHandler;
 use NeNeRecords\Comment\CommentRouteRegistrar;
 use NeNeRecords\Comment\CommentServiceProvider;
+use NeNeRecords\Dashboard\DashboardRouteRegistrar;
 use NeNeRecords\Dashboard\DashboardServiceProvider;
 use NeNeRecords\DataMigration\DataMigrationRouteRegistrar;
 use NeNeRecords\DataMigration\DataMigrationServiceProvider;
 use NeNeRecords\DateTimeField\DateTimeFieldNotFoundExceptionHandler;
+use NeNeRecords\DateTimeField\DateTimeFieldRouteRegistrar;
 use NeNeRecords\DateTimeField\DateTimeFieldServiceProvider;
 use NeNeRecords\Entity\DuplicateEntitySlugExceptionHandler;
 use NeNeRecords\Entity\EntityNotFoundExceptionHandler;
+use NeNeRecords\Entity\EntityRouteRegistrar;
 use NeNeRecords\Entity\EntityServiceProvider;
+use NeNeRecords\EntityArchive\EntityArchiveRouteRegistrar;
 use NeNeRecords\EntityArchive\EntityArchiveServiceProvider;
+use NeNeRecords\EntityRelation\EntityRelationRouteRegistrar;
 use NeNeRecords\EntityRelation\EntityRelationServiceProvider;
 use NeNeRecords\EntityRelation\RelationAlreadyAttachedExceptionHandler;
 use NeNeRecords\EntityRelation\RelationNotAttachedExceptionHandler;
 use NeNeRecords\EntityRelation\RelationTargetTypeMismatchExceptionHandler;
 use NeNeRecords\EntityTag\EntityTagAlreadyAttachedExceptionHandler;
 use NeNeRecords\EntityTag\EntityTagNotAttachedExceptionHandler;
+use NeNeRecords\EntityTag\EntityTagRouteRegistrar;
 use NeNeRecords\EntityTag\EntityTagServiceProvider;
 use NeNeRecords\EntityType\EntityTypeHasEntitiesExceptionHandler;
 use NeNeRecords\EntityType\EntityTypeNotFoundExceptionHandler;
+use NeNeRecords\EntityType\EntityTypeRouteRegistrar;
 use NeNeRecords\EntityType\EntityTypeServiceProvider;
 use NeNeRecords\EntityType\EntityTypeSlugConflictExceptionHandler;
 use NeNeRecords\EnumField\EnumFieldNotFoundExceptionHandler;
+use NeNeRecords\EnumField\EnumFieldRouteRegistrar;
 use NeNeRecords\EnumField\EnumFieldServiceProvider;
 use NeNeRecords\FieldDef\FieldDefConflictExceptionHandler;
 use NeNeRecords\FieldDef\FieldDefNotFoundExceptionHandler;
+use NeNeRecords\FieldDef\FieldDefRouteRegistrar;
 use NeNeRecords\FieldDef\FieldDefServiceProvider;
 use NeNeRecords\FieldDef\FieldKeyNotRegisteredExceptionHandler;
 use NeNeRecords\FieldDef\FieldTypeMismatchExceptionHandler;
 use NeNeRecords\IntField\IntFieldNotFoundExceptionHandler;
+use NeNeRecords\IntField\IntFieldRouteRegistrar;
 use NeNeRecords\IntField\IntFieldServiceProvider;
 use NeNeRecords\Media\MediaInvalidTypeExceptionHandler;
 use NeNeRecords\Media\MediaNotFoundExceptionHandler;
+use NeNeRecords\Media\MediaRouteRegistrar;
 use NeNeRecords\Media\MediaServiceProvider;
 use NeNeRecords\Media\MediaTooLargeExceptionHandler;
 use NeNeRecords\NavigationItem\NavigationItemNotFoundExceptionHandler;
+use NeNeRecords\NavigationItem\NavigationItemRouteRegistrar;
 use NeNeRecords\NavigationItem\NavigationItemServiceProvider;
 use NeNeRecords\Notification\NotificationChannelNotFoundExceptionHandler;
 use NeNeRecords\Notification\NotificationRouteRegistrar;
@@ -61,30 +76,38 @@ use NeNeRecords\Organization\OrganizationSlugConflictExceptionHandler;
 use NeNeRecords\OrgExport\OrgExportRouteRegistrar;
 use NeNeRecords\OrgExport\OrgExportServiceProvider;
 use NeNeRecords\PreviewToken\PreviewTokenNotFoundExceptionHandler;
+use NeNeRecords\PreviewToken\PreviewTokenRouteRegistrar;
 use NeNeRecords\PreviewToken\PreviewTokenServiceProvider;
 use NeNeRecords\PublicRecord\PublicEntityTypeNotFoundExceptionHandler;
 use NeNeRecords\PublicRecord\PublicRecordNotFoundExceptionHandler;
+use NeNeRecords\PublicRecord\PublicRecordRouteRegistrar;
 use NeNeRecords\PublicRecord\PublicRecordServiceProvider;
 use NeNeRecords\Setting\SettingKeyNotFoundExceptionHandler;
+use NeNeRecords\Setting\SettingRouteRegistrar;
 use NeNeRecords\Setting\SettingServiceProvider;
 use NeNeRecords\Setting\SettingValueInvalidExceptionHandler;
 use NeNeRecords\SystemConfig\SystemConfigRouteRegistrar;
 use NeNeRecords\SystemConfig\SystemConfigServiceProvider;
 use NeNeRecords\Tag\TagNotFoundExceptionHandler;
+use NeNeRecords\Tag\TagRouteRegistrar;
 use NeNeRecords\Tag\TagServiceProvider;
 use NeNeRecords\Tag\TagSlugConflictExceptionHandler;
 use NeNeRecords\TextField\TextFieldNotFoundExceptionHandler;
+use NeNeRecords\TextField\TextFieldRouteRegistrar;
 use NeNeRecords\TextField\TextFieldServiceProvider;
 use NeNeRecords\User\CannotDeleteSelfExceptionHandler;
 use NeNeRecords\User\InvalidCurrentPasswordExceptionHandler;
 use NeNeRecords\User\InvalidUserRoleExceptionHandler;
 use NeNeRecords\User\UserEmailConflictExceptionHandler;
 use NeNeRecords\User\UserNotFoundExceptionHandler;
+use NeNeRecords\User\UserRouteRegistrar;
 use NeNeRecords\User\UserServiceProvider;
 use NeNeRecords\UserInvite\InvalidInviteTokenExceptionHandler;
 use NeNeRecords\UserInvite\InvalidPasswordResetTokenExceptionHandler;
+use NeNeRecords\UserInvite\UserInviteRouteRegistrar;
 use NeNeRecords\UserInvite\UserInviteServiceProvider;
 use NeNeRecords\Webhook\WebhookNotFoundExceptionHandler;
+use NeNeRecords\Webhook\WebhookRouteRegistrar;
 use NeNeRecords\Webhook\WebhookServiceProvider;
 use Psr\Container\ContainerInterface;
 
@@ -173,31 +196,31 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $orgExport     = $container->get(OrgExportRouteRegistrar::class);
 
                     if (
-                        !is_callable($entityType)
-                        || !is_callable($entityArchive)
-                        || !is_callable($fieldDef)
-                        || !is_callable($entity)
-                        || !is_callable($textField)
-                        || !is_callable($intField)
-                        || !is_callable($enumField)
-                        || !is_callable($boolField)
-                        || !is_callable($datetimeField)
-                        || !is_callable($tag)
-                        || !is_callable($entityTag)
-                        || !is_callable($entityRelation)
-                        || !is_callable($media)
-                        || !is_callable($analytics)
-                        || !is_callable($publicRecord)
-                        || !is_callable($setting)
-                        || !is_callable($navigationItem)
-                        || !is_callable($webhook)
-                        || !is_callable($previewToken)
-                        || !is_callable($dashboard)
-                        || !is_callable($user)
-                        || !is_callable($userInvite)
-                        || !is_callable($auth)
+                        !$entityType instanceof EntityTypeRouteRegistrar
+                        || !$entityArchive instanceof EntityArchiveRouteRegistrar
+                        || !$fieldDef instanceof FieldDefRouteRegistrar
+                        || !$entity instanceof EntityRouteRegistrar
+                        || !$textField instanceof TextFieldRouteRegistrar
+                        || !$intField instanceof IntFieldRouteRegistrar
+                        || !$enumField instanceof EnumFieldRouteRegistrar
+                        || !$boolField instanceof BoolFieldRouteRegistrar
+                        || !$datetimeField instanceof DateTimeFieldRouteRegistrar
+                        || !$tag instanceof TagRouteRegistrar
+                        || !$entityTag instanceof EntityTagRouteRegistrar
+                        || !$entityRelation instanceof EntityRelationRouteRegistrar
+                        || !$media instanceof MediaRouteRegistrar
+                        || !$analytics instanceof AnalyticsRouteRegistrar
+                        || !$publicRecord instanceof PublicRecordRouteRegistrar
+                        || !$setting instanceof SettingRouteRegistrar
+                        || !$navigationItem instanceof NavigationItemRouteRegistrar
+                        || !$webhook instanceof WebhookRouteRegistrar
+                        || !$previewToken instanceof PreviewTokenRouteRegistrar
+                        || !$dashboard instanceof DashboardRouteRegistrar
+                        || !$user instanceof UserRouteRegistrar
+                        || !$userInvite instanceof UserInviteRouteRegistrar
+                        || !$auth instanceof AuthRouteRegistrar
                         || !$notification instanceof NotificationRouteRegistrar
-                        || !is_callable($comment)
+                        || !$comment instanceof CommentRouteRegistrar
                         || !$organization instanceof OrganizationRouteRegistrar
                         || !$systemConfig instanceof SystemConfigRouteRegistrar
                         || !$dataMigration instanceof DataMigrationRouteRegistrar
