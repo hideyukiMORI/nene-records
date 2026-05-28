@@ -11,6 +11,7 @@ use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RequestScopedHolder;
+use Nene2\Middleware\RateLimitStorageInterface;
 use NeNeRecords\Notification\NotifierInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -101,14 +102,22 @@ final readonly class CommentServiceProvider implements ServiceProviderInterface
                 static function (ContainerInterface $c): PostCommentHandler {
                     $useCase = $c->get(PostCommentUseCaseInterface::class);
                     $response = $c->get(JsonResponseFactory::class);
+                    $problemDetails = $c->get(ProblemDetailsResponseFactory::class);
+                    $rateLimitStorage = $c->get(RateLimitStorageInterface::class);
                     if (!$useCase instanceof PostCommentUseCaseInterface) {
                         throw new LogicException('PostComment use case service is invalid.');
                     }
                     if (!$response instanceof JsonResponseFactory) {
                         throw new LogicException('JsonResponseFactory service is invalid.');
                     }
+                    if (!$problemDetails instanceof ProblemDetailsResponseFactory) {
+                        throw new LogicException('ProblemDetailsResponseFactory service is invalid.');
+                    }
+                    if (!$rateLimitStorage instanceof RateLimitStorageInterface) {
+                        throw new LogicException('Rate limit storage service is invalid.');
+                    }
 
-                    return new PostCommentHandler($useCase, $response);
+                    return new PostCommentHandler($useCase, $response, $problemDetails, $rateLimitStorage);
                 },
             )
             ->set(

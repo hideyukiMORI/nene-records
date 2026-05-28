@@ -30,4 +30,6 @@ export interface PostCommentInput {
   authorName: string
   authorEmail: string
   body: string
+  /** Honeypot value. Real users leave this empty; a non-empty value is rejected server-side. */
+  honeypot?: string
 }
