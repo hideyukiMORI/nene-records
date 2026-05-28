@@ -1,7 +1,7 @@
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import { cleanup, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter, Route, Routes } from 'react-router-dom'
+import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
 import { EntityRecordsPage } from '@/pages/entity-records/EntityRecordsPage'
 import { EntityTypesPage } from '@/pages/entity-types/EntityTypesPage'
 import { resetEntityStore, seedEntities } from '@tests/msw/handlers/entity'
@@ -16,8 +16,18 @@ import { renderWithProviders } from '@tests/render/render-with-providers'
 import { clearAuthSession, seedAdminSession } from '@tests/helpers/auth-session'
 
 function renderRecordsPage(entityTypeSlug = 'article') {
+  return renderRecordsPageAt(`/admin/${entityTypeSlug}`)
+}
+
+function LocationProbe() {
+  const location = useLocation()
+  return <div data-testid="location-search">{location.search}</div>
+}
+
+function renderRecordsPageAt(initialEntry: string) {
   return renderWithProviders(
-    <MemoryRouter initialEntries={[`/admin/${entityTypeSlug}`]}>
+    <MemoryRouter initialEntries={[initialEntry]}>
+      <LocationProbe />
       <Routes>
         <Route path="/admin/:entityTypeSlug" element={<EntityRecordsPage />} />
         <Route
@@ -264,6 +274,63 @@ describe('EntityRecordsPage', () => {
 
     await waitFor(() => {
       expect(screen.getByText('No matching items')).toBeInTheDocument()
+    })
+  })
+
+  it('initializes the search box from the ?q= URL param', async () => {
+    seedEntityTypes([{ id: 1, name: 'Article', slug: 'article' }])
+    seedEntities([
+      { id: 1, entity_type_id: 1, slug: 'hello-world', is_deleted: false, deleted_at: null },
+    ])
+
+    renderRecordsPageAt('/admin/article?q=hello')
+
+    const searchBox = await screen.findByLabelText('Search…')
+    expect(searchBox).toHaveValue('hello')
+  })
+
+  it('reflects the search query in the URL when typing', async () => {
+    seedEntityTypes([{ id: 1, name: 'Article', slug: 'article' }])
+    seedEntities([
+      { id: 1, entity_type_id: 1, slug: 'hello-world', is_deleted: false, deleted_at: null },
+    ])
+
+    const user = userEvent.setup()
+    renderRecordsPage()
+
+    const searchBox = await screen.findByLabelText('Search…')
+    await user.type(searchBox, 'hello')
+
+    await waitFor(() => {
+      expect(screen.getByTestId('location-search')).toHaveTextContent('q=hello')
+    })
+  })
+
+  it('filters records by the search query', async () => {
+    seedEntityTypes([{ id: 1, name: 'Article', slug: 'article' }])
+    seedEntities([
+      { id: 1, entity_type_id: 1, slug: 'alpha-post', is_deleted: false, deleted_at: null },
+      { id: 2, entity_type_id: 1, slug: 'beta-post', is_deleted: false, deleted_at: null },
+    ])
+
+    const user = userEvent.setup()
+    renderRecordsPage()
+
+    expect(await screen.findByText('Item #1')).toBeInTheDocument()
+    expect(screen.getByText('Item #2')).toBeInTheDocument()
+
+    await user.type(screen.getByLabelText('Search…'), 'alpha')
+
+    await waitFor(() => {
+      expect(screen.getByText('Item #1')).toBeInTheDocument()
+      expect(screen.queryByText('Item #2')).not.toBeInTheDocument()
+    })
+
+    await user.click(screen.getByRole('button', { name: 'Clear search' }))
+
+    await waitFor(() => {
+      expect(screen.getByText('Item #1')).toBeInTheDocument()
+      expect(screen.getByText('Item #2')).toBeInTheDocument()
     })
   })
 

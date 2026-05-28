@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import {
   defaultEntityListParams,
   useCreateEntity,
@@ -26,9 +27,11 @@ const PAGE_LIMIT = 20
 
 export function useManageEntitiesPage(entityTypeId: number) {
   const { t } = useTranslation()
+  // The search query lives in the URL (?q=) so searches are bookmarkable / shareable.
+  const [searchParams, setSearchParams] = useSearchParams()
+  const searchQuery = searchParams.get('q') ?? ''
   const [selectedTagSlugs, setSelectedTagSlugs] = useState<string[]>([])
   const [selectedRelationFilters, setSelectedRelationFilters] = useState<EntityRelationFilters>({})
-  const [searchQuery, setSearchQuery] = useState('')
   const [selectedStatus, setSelectedStatus] = useState<EntityStatus | undefined>(undefined)
   const [sortKey, setSortKey] = useState<EntitySortKey>('id')
   const [sortOrder, setSortOrder] = useState<EntitySortOrder>('desc')
@@ -132,10 +135,24 @@ export function useManageEntitiesPage(entityTypeId: number) {
     setPage(0)
   }, [])
 
-  const setSearch = useCallback((q: string) => {
-    setSearchQuery(q)
-    setPage(0)
-  }, [])
+  const setSearch = useCallback(
+    (q: string) => {
+      setPage(0)
+      setSearchParams(
+        (prev) => {
+          const next = new URLSearchParams(prev)
+          if (q === '') {
+            next.delete('q')
+          } else {
+            next.set('q', q)
+          }
+          return next
+        },
+        { replace: true },
+      )
+    },
+    [setSearchParams],
+  )
 
   const setSort = useCallback((key: EntitySortKey, order: EntitySortOrder) => {
     setSortKey(key)
