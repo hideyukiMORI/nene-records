@@ -36,15 +36,53 @@ final readonly class WebhookServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(
+                WebhookDeliveryRepositoryInterface::class,
+                static function (ContainerInterface $container): WebhookDeliveryRepositoryInterface {
+                    $query = $container->get(DatabaseQueryExecutorInterface::class);
+
+                    if (!$query instanceof DatabaseQueryExecutorInterface) {
+                        throw new LogicException('Database query executor service is invalid.');
+                    }
+
+                    return new PdoWebhookDeliveryRepository($query);
+                },
+            )
+            ->set(
+                WebhookSenderInterface::class,
+                static fn (): WebhookSenderInterface => new CurlWebhookSender(),
+            )
+            ->set(
                 WebhookDispatcherInterface::class,
                 static function (ContainerInterface $container): WebhookDispatcherInterface {
                     $repo = $container->get(WebhookRepositoryInterface::class);
+                    $deliveries = $container->get(WebhookDeliveryRepositoryInterface::class);
 
                     if (!$repo instanceof WebhookRepositoryInterface) {
                         throw new LogicException('Webhook repository service is invalid.');
                     }
 
-                    return new CurlWebhookDispatcher($repo);
+                    if (!$deliveries instanceof WebhookDeliveryRepositoryInterface) {
+                        throw new LogicException('Webhook delivery repository service is invalid.');
+                    }
+
+                    return new QueueingWebhookDispatcher($repo, $deliveries);
+                },
+            )
+            ->set(
+                WebhookDeliveryProcessor::class,
+                static function (ContainerInterface $container): WebhookDeliveryProcessor {
+                    $deliveries = $container->get(WebhookDeliveryRepositoryInterface::class);
+                    $sender = $container->get(WebhookSenderInterface::class);
+
+                    if (!$deliveries instanceof WebhookDeliveryRepositoryInterface) {
+                        throw new LogicException('Webhook delivery repository service is invalid.');
+                    }
+
+                    if (!$sender instanceof WebhookSenderInterface) {
+                        throw new LogicException('Webhook sender service is invalid.');
+                    }
+
+                    return new WebhookDeliveryProcessor($deliveries, $sender);
                 },
             )
             ->set(
