@@ -98,7 +98,11 @@ export function FieldDefCreateForm({
           )}
         />
         {serverErrorTitle !== null ? <Text muted>{serverErrorTitle}</Text> : null}
-        <Button type="submit" disabled={isSubmitting}>
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          data-testid={isSubmitting ? 'submit-in-flight' : 'submit-idle'}
+        >
           {isSubmitting
             ? t('admin.fieldDefs.createForm.submitting')
             : t('admin.fieldDefs.createForm.submit')}

@@ -65,7 +65,11 @@ export function TagCreateForm({ isSubmitting, serverErrorTitle, onSubmit }: TagC
           )}
         />
         {serverErrorTitle !== null ? <Text muted>{serverErrorTitle}</Text> : null}
-        <Button type="submit" disabled={isSubmitting}>
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          data-testid={isSubmitting ? 'submit-in-flight' : 'submit-idle'}
+        >
           {isSubmitting ? t('admin.tags.createForm.submitting') : t('admin.tags.createForm.submit')}
         </Button>
       </Stack>
