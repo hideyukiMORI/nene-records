@@ -132,6 +132,7 @@ export const entityHandlers = [
     const entityTypeIdParam = url.searchParams.get('entity_type_id')
     const entityTypeId = entityTypeIdParam === null ? null : Number(entityTypeIdParam)
     const statusParam = url.searchParams.get('status')
+    const queryParam = url.searchParams.get('q')
     const tagsParam = url.searchParams.get('tags')
     const tagSlugs =
       tagsParam === null
@@ -147,6 +148,13 @@ export const entityHandlers = [
 
     if (statusParam !== null) {
       filtered = filtered.filter((item) => item.status === statusParam)
+    }
+
+    // Full-text search across slug (partial, case-insensitive). The real API also
+    // searches text field values; the slug subset is enough to exercise the UI here.
+    if (queryParam !== null && queryParam.trim() !== '') {
+      const needle = queryParam.trim().toLowerCase()
+      filtered = filtered.filter((item) => (item.slug ?? '').toLowerCase().includes(needle))
     }
 
     if (tagSlugs.length > 0) {
