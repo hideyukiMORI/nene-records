@@ -1132,8 +1132,8 @@ export interface paths {
         options?: never;
         head?: never;
         /**
-         * Change user email
-         * @description Changes the email address for a user. Admin only.
+         * Request user email change
+         * @description Starts an email change. The new address is stored as pending and a verification link is emailed to it; the change only takes effect once confirmed via `POST /api/v1/auth/verify-email`. Admin only.
          */
         patch: operations["changeUserEmail"];
         trace?: never;
@@ -1278,6 +1278,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/auth/verify-email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Verify a pending email change
+         * @description Confirms a pending email change using the verification token sent to the new address. The token may be supplied in the JSON body or as a `?token=` query parameter. On success the pending address becomes the user's email.
+         */
+        post: operations["verifyEmailChange"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1291,6 +1311,11 @@ export interface components {
             org_role?: string | null;
             /** @enum {string} */
             status: "active" | "invited";
+            /**
+             * Format: email
+             * @description New email awaiting verification, or null when no change is pending.
+             */
+            pending_email?: string | null;
             display_name?: string | null;
             full_name?: string | null;
             job_title?: string | null;
@@ -1308,6 +1333,12 @@ export interface components {
         ChangeUserEmailRequest: {
             /** Format: email */
             email: string;
+            /** @description Base URL used to build the verification link in the email. Optional; defaults to the request origin when omitted. */
+            app_base_url?: string;
+        };
+        VerifyEmailRequest: {
+            /** @description Verification token (may also be supplied as a `?token=` query parameter). */
+            token?: string;
         };
         UpdateUserProfileRequest: {
             display_name?: string | null;
@@ -2001,6 +2032,15 @@ export interface components {
         };
         /** @description Request conflicts with current state. */
         Conflict: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/problem+json": components["schemas"]["ProblemDetails"];
+            };
+        };
+        /** @description The target resource is no longer available (e.g. an expired token). */
+        Gone: {
             headers: {
                 [name: string]: unknown;
             };
@@ -4935,8 +4975,8 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Email address updated. */
-            204: {
+            /** @description Verification email sent; the change is pending confirmation. */
+            202: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -5181,6 +5221,34 @@ export interface operations {
                 };
                 content?: never;
             };
+            422: components["responses"]["ValidationFailed"];
+        };
+    };
+    verifyEmailChange: {
+        parameters: {
+            query?: {
+                /** @description Verification token (alternative to supplying it in the request body). */
+                token?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["VerifyEmailRequest"];
+            };
+        };
+        responses: {
+            /** @description Email change verified and applied. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            409: components["responses"]["Conflict"];
+            410: components["responses"]["Gone"];
             422: components["responses"]["ValidationFailed"];
         };
     };

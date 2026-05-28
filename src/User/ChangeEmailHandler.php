@@ -40,8 +40,18 @@ final readonly class ChangeEmailHandler
             throw new ValidationException($errors);
         }
 
-        $this->useCase->execute(new ChangeEmailInput(userId: $id, email: $email));
+        $appBaseUrl = (string) ($body['app_base_url'] ?? '');
 
-        return $this->responseFactory->createResponse(204);
+        if ($appBaseUrl === '') {
+            $scheme = $request->getUri()->getScheme();
+            $host = $request->getUri()->getHost();
+            $port = $request->getUri()->getPort();
+            $appBaseUrl = $scheme . '://' . $host . ($port !== null ? ':' . $port : '');
+        }
+
+        $this->useCase->execute(new ChangeEmailInput(userId: $id, email: $email, appBaseUrl: $appBaseUrl));
+
+        // 202 Accepted: the change is pending until the new address is verified.
+        return $this->responseFactory->createResponse(202);
     }
 }

@@ -12,6 +12,8 @@ final readonly class PdoUserRepository implements UserRepositoryInterface
         id, email, password_hash, role, organization_id, org_role, status,
         invite_token_hash, invite_expires_at,
         password_reset_token_hash, password_reset_expires_at,
+        pending_email, email_verification_token_hash,
+        UNIX_TIMESTAMP(email_verification_expires_at) AS email_verification_expires_at,
         UNIX_TIMESTAMP(created_at) AS created_at,
         UNIX_TIMESTAMP(updated_at) AS updated_at
     ';
@@ -194,6 +196,55 @@ final readonly class PdoUserRepository implements UserRepositoryInterface
         );
     }
 
+    public function storeEmailVerification(int $id, string $pendingEmail, string $tokenHash, int $expiresAt): void
+    {
+        $expiresAtStr = date('Y-m-d H:i:s', $expiresAt);
+        $this->query->execute(
+            'UPDATE users
+                SET pending_email = ?, email_verification_token_hash = ?, email_verification_expires_at = ?, updated_at = NOW()
+                WHERE id = ?',
+            [$pendingEmail, $tokenHash, $expiresAtStr, $id],
+        );
+    }
+
+    public function findByEmailVerificationToken(string $tokenHash): ?User
+    {
+        $row = $this->query->fetchOne(
+            'SELECT ' . self::SELECT_COLUMNS . ' FROM users WHERE email_verification_token_hash = ?',
+            [$tokenHash],
+        );
+
+        if ($row === null) {
+            return null;
+        }
+
+        return $this->mapRow($row);
+    }
+
+    public function applyPendingEmail(int $id): void
+    {
+        $this->query->execute(
+            'UPDATE users
+                SET email = pending_email,
+                    pending_email = NULL,
+                    email_verification_token_hash = NULL,
+                    email_verification_expires_at = NULL,
+                    updated_at = NOW()
+                WHERE id = ? AND pending_email IS NOT NULL',
+            [$id],
+        );
+    }
+
+    public function clearEmailVerification(int $id): void
+    {
+        $this->query->execute(
+            'UPDATE users
+                SET pending_email = NULL, email_verification_token_hash = NULL, email_verification_expires_at = NULL, updated_at = NOW()
+                WHERE id = ?',
+            [$id],
+        );
+    }
+
     public function delete(int $id): void
     {
         $this->query->execute('DELETE FROM users WHERE id = ?', [$id]);
@@ -224,6 +275,9 @@ final readonly class PdoUserRepository implements UserRepositoryInterface
             inviteExpiresAt: isset($row['invite_expires_at']) ? (int) $row['invite_expires_at'] : null,
             passwordResetTokenHash: isset($row['password_reset_token_hash']) ? (string) $row['password_reset_token_hash'] : null,
             passwordResetExpiresAt: isset($row['password_reset_expires_at']) ? (int) $row['password_reset_expires_at'] : null,
+            pendingEmail: isset($row['pending_email']) ? (string) $row['pending_email'] : null,
+            emailVerificationTokenHash: isset($row['email_verification_token_hash']) ? (string) $row['email_verification_token_hash'] : null,
+            emailVerificationExpiresAt: isset($row['email_verification_expires_at']) ? (int) $row['email_verification_expires_at'] : null,
             createdAt: isset($row['created_at']) ? (int) $row['created_at'] : null,
             updatedAt: isset($row['updated_at']) ? (int) $row['updated_at'] : null,
         );

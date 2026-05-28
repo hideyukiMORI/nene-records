@@ -23,6 +23,7 @@ export {
   useInviteUser,
   useUpdateUserProfile,
   useUpdateUserRole,
+  useVerifyEmailChange,
 } from './mutations'
 export { useUserById, useUserList } from './queries'
 export { userKeys } from './query-keys'

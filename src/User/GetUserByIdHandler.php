@@ -31,6 +31,7 @@ final readonly class GetUserByIdHandler
             'organization_id' => $output->organizationId,
             'org_role'        => $output->orgRole,
             'status'          => $output->status,
+            'pending_email'   => $output->pendingEmail,
             'display_name'    => $output->displayName,
             'full_name'       => $output->fullName,
             'job_title'       => $output->jobTitle,

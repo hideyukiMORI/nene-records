@@ -518,6 +518,9 @@ export const en = {
   'admin.users.edit.email.label': 'Email address',
   'admin.users.edit.email.save': 'Save email',
   'admin.users.edit.email.saved': 'Email address updated.',
+  'admin.users.edit.email.verificationSent':
+    'Verification email sent. Click the link sent to the new address to apply the change.',
+  'admin.users.edit.email.pending': 'Awaiting verification: {{email}}',
   'admin.users.edit.email.error': 'Failed to update email address.',
   'admin.users.edit.profile.title': 'Profile',
   'admin.users.edit.profile.displayName': 'Display name',
@@ -541,6 +544,15 @@ export const en = {
   'admin.resetPassword.submitting': 'Saving…',
   'admin.resetPassword.success': 'Your password has been reset. You can now sign in.',
   'admin.resetPassword.invalidToken': 'This reset link is invalid or has expired.',
+
+  // ── Verify email (email change confirmation) ────────────────────────────
+  'admin.verifyEmail.pageTitle': 'Verify email address',
+  'admin.verifyEmail.verifying': 'Verifying…',
+  'admin.verifyEmail.success': 'Your email address has been changed.',
+  'admin.verifyEmail.expired':
+    'This verification link has expired. Please request the email change again.',
+  'admin.verifyEmail.invalid': 'This verification link is invalid.',
+  'admin.verifyEmail.conflict': 'This email address is already in use by another account.',
 
   // ── Comments (admin) ────────────────────────────────────────────────────
   'admin.nav.comments': 'Comments',

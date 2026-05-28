@@ -17,6 +17,7 @@ import { NavigationPage } from '@/pages/navigation/NavigationPage'
 import { NotFoundPage } from '@/pages/not-found/NotFoundPage'
 import { ResetPasswordPage } from '@/pages/reset-password/ResetPasswordPage'
 import { SiteSettingsPage } from '@/pages/settings/SiteSettingsPage'
+import { VerifyEmailPage } from '@/pages/verify-email/VerifyEmailPage'
 import { CommentsPage } from '@/pages/comments/CommentsPage'
 import { UserEditPage } from '@/pages/users/UserEditPage'
 import { UsersPage } from '@/pages/users/UsersPage'
@@ -58,6 +59,10 @@ const router = createBrowserRouter([
   {
     path: '/admin/reset-password',
     element: <ResetPasswordPage />,
+  },
+  {
+    path: '/admin/verify-email',
+    element: <VerifyEmailPage />,
   },
   {
     path: '/forbidden',

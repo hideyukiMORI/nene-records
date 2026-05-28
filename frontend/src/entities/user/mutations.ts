@@ -155,11 +155,20 @@ export function useChangeEmail(): UseMutationResult<
     mutationFn: async ({ id, input }) => {
       await apiClient.patch(`/api/v1/users/${String(id)}/email`, {
         email: input.email,
+        app_base_url: input.appBaseUrl ?? window.location.origin,
       })
     },
     onSuccess: async (_data, { id }) => {
       await queryClient.invalidateQueries({ queryKey: userKeys.list() })
       await queryClient.invalidateQueries({ queryKey: userKeys.detail(id) })
+    },
+  })
+}
+
+export function useVerifyEmailChange(): UseMutationResult<void, AppError, string> {
+  return useMutation({
+    mutationFn: async (token) => {
+      await apiClient.post('/api/v1/auth/verify-email', { token })
     },
   })
 }
