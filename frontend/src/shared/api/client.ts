@@ -10,6 +10,20 @@ interface RequestOptions {
   signal?: AbortSignal
 }
 
+/**
+ * Reacts to auth-related error responses with a side-effecting redirect.
+ * Shared by request() and upload() so the 401/403 handling stays in one place.
+ */
+function handleErrorResponse(response: Response, path: string): void {
+  if (response.status === 401 && !path.includes('/auth/login')) {
+    authStore.clearSession()
+    window.location.href = '/login'
+  }
+  if (response.status === 403) {
+    window.location.href = '/forbidden'
+  }
+}
+
 async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const base = env.apiBaseUrl.replace(/\/$/, '')
   const url = `${base}${path}`
@@ -31,13 +45,7 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
   })
 
   if (!response.ok) {
-    if (response.status === 401 && !path.includes('/auth/login')) {
-      authStore.clearSession()
-      window.location.href = '/login'
-    }
-    if (response.status === 403) {
-      window.location.href = '/forbidden'
-    }
+    handleErrorResponse(response, path)
     throw await parseProblemDetails(response)
   }
 
@@ -81,13 +89,7 @@ export const apiClient = {
     })
 
     if (!response.ok) {
-      if (response.status === 401 && !path.includes('/auth/login')) {
-        authStore.clearSession()
-        window.location.href = '/login'
-      }
-      if (response.status === 403) {
-        window.location.href = '/forbidden'
-      }
+      handleErrorResponse(response, path)
       throw await parseProblemDetails(response)
     }
 
