@@ -21,7 +21,7 @@ final class OrganizationUseCaseTest extends TestCase
     public function testCreateOrganizationSuccessfully(): void
     {
         $organizations = new InMemoryOrganizationRepository();
-        $useCase = new CreateOrganizationUseCase($organizations);
+        $useCase = new CreateOrganizationUseCase($organizations, new RecordingDefaultContentTypeSeeder());
 
         $output = $useCase->execute(new CreateOrganizationInput(
             name: 'Test Org',
@@ -42,7 +42,7 @@ final class OrganizationUseCaseTest extends TestCase
     public function testCreateOrganizationAssignsSequentialIds(): void
     {
         $organizations = new InMemoryOrganizationRepository();
-        $useCase = new CreateOrganizationUseCase($organizations);
+        $useCase = new CreateOrganizationUseCase($organizations, new RecordingDefaultContentTypeSeeder());
 
         $first = $useCase->execute(new CreateOrganizationInput(
             name: 'First Org',
@@ -60,7 +60,7 @@ final class OrganizationUseCaseTest extends TestCase
     public function testCreateOrganizationThrowsSlugConflictExceptionForDuplicateSlug(): void
     {
         $organizations = new InMemoryOrganizationRepository();
-        $useCase = new CreateOrganizationUseCase($organizations);
+        $useCase = new CreateOrganizationUseCase($organizations, new RecordingDefaultContentTypeSeeder());
 
         $useCase->execute(new CreateOrganizationInput(
             name: 'First Org',
@@ -80,7 +80,7 @@ final class OrganizationUseCaseTest extends TestCase
     public function testUpdateOrganizationUpdatesName(): void
     {
         $organizations = new InMemoryOrganizationRepository();
-        $created = (new CreateOrganizationUseCase($organizations))->execute(
+        $created = (new CreateOrganizationUseCase($organizations, new RecordingDefaultContentTypeSeeder()))->execute(
             new CreateOrganizationInput(name: 'Original Name', slug: 'my-org'),
         );
 
@@ -104,7 +104,7 @@ final class OrganizationUseCaseTest extends TestCase
     public function testUpdateOrganizationUpdatesSlug(): void
     {
         $organizations = new InMemoryOrganizationRepository();
-        $created = (new CreateOrganizationUseCase($organizations))->execute(
+        $created = (new CreateOrganizationUseCase($organizations, new RecordingDefaultContentTypeSeeder()))->execute(
             new CreateOrganizationInput(name: 'My Org', slug: 'old-slug'),
         );
 
@@ -126,7 +126,7 @@ final class OrganizationUseCaseTest extends TestCase
     public function testUpdateOrganizationUpdatesPlan(): void
     {
         $organizations = new InMemoryOrganizationRepository();
-        $created = (new CreateOrganizationUseCase($organizations))->execute(
+        $created = (new CreateOrganizationUseCase($organizations, new RecordingDefaultContentTypeSeeder()))->execute(
             new CreateOrganizationInput(name: 'My Org', slug: 'my-org', plan: 'free'),
         );
 
@@ -148,7 +148,7 @@ final class OrganizationUseCaseTest extends TestCase
     public function testUpdateOrganizationUpdatesIsActive(): void
     {
         $organizations = new InMemoryOrganizationRepository();
-        $created = (new CreateOrganizationUseCase($organizations))->execute(
+        $created = (new CreateOrganizationUseCase($organizations, new RecordingDefaultContentTypeSeeder()))->execute(
             new CreateOrganizationInput(name: 'My Org', slug: 'my-org', isActive: true),
         );
 
@@ -170,7 +170,7 @@ final class OrganizationUseCaseTest extends TestCase
     public function testUpdateOrganizationUpdatesCustomDomain(): void
     {
         $organizations = new InMemoryOrganizationRepository();
-        $created = (new CreateOrganizationUseCase($organizations))->execute(
+        $created = (new CreateOrganizationUseCase($organizations, new RecordingDefaultContentTypeSeeder()))->execute(
             new CreateOrganizationInput(name: 'My Org', slug: 'my-org'),
         );
 
@@ -211,7 +211,7 @@ final class OrganizationUseCaseTest extends TestCase
     public function testUpdateOrganizationThrowsSlugConflictExceptionWhenChangingSlugToExistingSlug(): void
     {
         $organizations = new InMemoryOrganizationRepository();
-        $createUseCase = new CreateOrganizationUseCase($organizations);
+        $createUseCase = new CreateOrganizationUseCase($organizations, new RecordingDefaultContentTypeSeeder());
 
         $createUseCase->execute(new CreateOrganizationInput(name: 'Org A', slug: 'org-a'));
         $createdB = $createUseCase->execute(new CreateOrganizationInput(name: 'Org B', slug: 'org-b'));
@@ -236,7 +236,7 @@ final class OrganizationUseCaseTest extends TestCase
     public function testDeleteOrganizationSuccessfully(): void
     {
         $organizations = new InMemoryOrganizationRepository();
-        $created = (new CreateOrganizationUseCase($organizations))->execute(
+        $created = (new CreateOrganizationUseCase($organizations, new RecordingDefaultContentTypeSeeder()))->execute(
             new CreateOrganizationInput(name: 'My Org', slug: 'my-org'),
         );
 
@@ -256,5 +256,54 @@ final class OrganizationUseCaseTest extends TestCase
         (new DeleteOrganizationUseCase($organizations))->execute(
             new DeleteOrganizationInput(id: 999),
         );
+    }
+
+    // ── DefaultContentTypeSeeder integration ─────────────────────────────
+
+    public function testCreateOrganizationCallsSeederWithNewOrgId(): void
+    {
+        $organizations = new InMemoryOrganizationRepository();
+        $seeder        = new RecordingDefaultContentTypeSeeder();
+        $useCase       = new CreateOrganizationUseCase($organizations, $seeder);
+
+        $output = $useCase->execute(new CreateOrganizationInput(
+            name: 'Seeded Org',
+            slug: 'seeded-org',
+        ));
+
+        self::assertCount(1, $seeder->seededOrgIds);
+        self::assertSame($output->id, $seeder->seededOrgIds[0]);
+    }
+
+    public function testCreateOrganizationCallsSeederForEachCreatedOrg(): void
+    {
+        $organizations = new InMemoryOrganizationRepository();
+        $seeder        = new RecordingDefaultContentTypeSeeder();
+        $useCase       = new CreateOrganizationUseCase($organizations, $seeder);
+
+        $first  = $useCase->execute(new CreateOrganizationInput(name: 'Org A', slug: 'org-a'));
+        $second = $useCase->execute(new CreateOrganizationInput(name: 'Org B', slug: 'org-b'));
+
+        self::assertCount(2, $seeder->seededOrgIds);
+        self::assertSame($first->id, $seeder->seededOrgIds[0]);
+        self::assertSame($second->id, $seeder->seededOrgIds[1]);
+    }
+
+    public function testCreateOrganizationDoesNotCallSeederOnSlugConflict(): void
+    {
+        $organizations = new InMemoryOrganizationRepository();
+        $seeder        = new RecordingDefaultContentTypeSeeder();
+        $useCase       = new CreateOrganizationUseCase($organizations, $seeder);
+
+        $useCase->execute(new CreateOrganizationInput(name: 'Org A', slug: 'conflict'));
+
+        try {
+            $useCase->execute(new CreateOrganizationInput(name: 'Org B', slug: 'conflict'));
+        } catch (OrganizationSlugConflictException) {
+            // expected
+        }
+
+        // seeder must only have been called for the first (successful) creation
+        self::assertCount(1, $seeder->seededOrgIds);
     }
 }

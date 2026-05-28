@@ -8,6 +8,7 @@ final readonly class CreateOrganizationUseCase implements CreateOrganizationUseC
 {
     public function __construct(
         private OrganizationRepositoryInterface $organizations,
+        private DefaultContentTypeSeederInterface $contentTypeSeeder,
     ) {
     }
 
@@ -27,6 +28,8 @@ final readonly class CreateOrganizationUseCase implements CreateOrganizationUseC
             externalId: $input->externalId,
             customDomain: $input->customDomain,
         ));
+
+        $this->contentTypeSeeder->seed($id);
 
         return new CreateOrganizationOutput(
             id: $id,

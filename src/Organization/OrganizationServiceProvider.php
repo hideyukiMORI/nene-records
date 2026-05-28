@@ -19,6 +19,18 @@ final readonly class OrganizationServiceProvider implements ServiceProviderInter
     {
         $builder
             ->set(
+                DefaultContentTypeSeederInterface::class,
+                static function (ContainerInterface $c): DefaultContentTypeSeederInterface {
+                    $query = $c->get(DatabaseQueryExecutorInterface::class);
+
+                    if (!$query instanceof DatabaseQueryExecutorInterface) {
+                        throw new LogicException('Database query executor service is invalid.');
+                    }
+
+                    return new PdoDefaultContentTypeSeeder($query);
+                },
+            )
+            ->set(
                 OrganizationRepositoryInterface::class,
                 static function (ContainerInterface $c): OrganizationRepositoryInterface {
                     $query = $c->get(DatabaseQueryExecutorInterface::class);
@@ -58,13 +70,18 @@ final readonly class OrganizationServiceProvider implements ServiceProviderInter
             ->set(
                 CreateOrganizationUseCaseInterface::class,
                 static function (ContainerInterface $c): CreateOrganizationUseCaseInterface {
-                    $repo = $c->get(OrganizationRepositoryInterface::class);
+                    $repo   = $c->get(OrganizationRepositoryInterface::class);
+                    $seeder = $c->get(DefaultContentTypeSeederInterface::class);
 
                     if (!$repo instanceof OrganizationRepositoryInterface) {
                         throw new LogicException('Organization repository service is invalid.');
                     }
 
-                    return new CreateOrganizationUseCase($repo);
+                    if (!$seeder instanceof DefaultContentTypeSeederInterface) {
+                        throw new LogicException('Default content type seeder service is invalid.');
+                    }
+
+                    return new CreateOrganizationUseCase($repo, $seeder);
                 },
             )
             ->set(
