@@ -780,9 +780,10 @@ The browser is **hostile context**. Treat all rendered user content and all clie
 | --- | --- |
 | Mapper / query-key tests | colocated `*.test.ts` in entity folder |
 | Component tests | `FeatureName.test.tsx` next to component |
+| Feature hook tests | `use-{feature}-page.test.ts(x)` colocated in the feature's `hooks/` folder |
 | MSW handlers | `tests/msw/{resource}.ts` |
 | Factories | `tests/factories/{resource}.ts` — build **models**, not DTOs |
-| `renderWithProviders` | `tests/render/render-with-providers.tsx` |
+| `renderWithProviders` / `renderHookWithProviders` | `tests/render/render-with-providers.tsx` |
 
 ### Testing rules
 
@@ -797,7 +798,12 @@ The browser is **hostile context**. Treat all rendered user content and all clie
 ### Required before merge
 
 - Entity: mapper tests + query-key tests (if non-trivial) + hook test with MSW for primary query/mutation.
-- Feature: component test — happy path + primary error path (Problem Details).
+- **Feature (mandatory): every new feature ships at least one feature-hook test** — render the
+  feature hook (`renderHookWithProviders`) against MSW handlers and assert the primary
+  query loads and each primary mutation drives its observable outcome (list refetch, success
+  flag, or Problem Details error). New `use-{feature}-page` hooks without a colocated
+  `*.test.ts(x)` **block merge**. Bias toward these fast hook tests over adding E2E coverage.
+- Feature UI: component test — happy path + primary error path (Problem Details).
 - `npm run test` green in CI.
 
 ---
