@@ -13,7 +13,12 @@ export const authStore = {
     if (!raw) return null
     try {
       return JSON.parse(raw) as AuthSession
-    } catch {
+    } catch (e) {
+      // Corrupted session JSON is intentionally treated as "no session" (never
+      // honored as valid). In dev, surface it so unexpected logouts are debuggable.
+      if (import.meta.env.DEV) {
+        console.warn('[authStore] Failed to parse session from localStorage:', e)
+      }
       return null
     }
   },
