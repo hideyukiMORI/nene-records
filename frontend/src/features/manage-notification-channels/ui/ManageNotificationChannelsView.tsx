@@ -36,12 +36,14 @@ interface ManageNotificationChannelsViewProps {
   onDeleteCancel: () => void
 }
 
+// テーマ安全なトークン化チップに統一（旧 dark: 変種は data-admin-theme 機構では効かなかった）
+const CHANNEL_TYPE_CHIP = 'bg-surface-overlay text-text-muted'
 const CHANNEL_TYPE_COLORS: Record<string, string> = {
-  email: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-  slack: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
-  discord: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400',
-  chatwork: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400',
-  webhook: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
+  email: CHANNEL_TYPE_CHIP,
+  slack: CHANNEL_TYPE_CHIP,
+  discord: CHANNEL_TYPE_CHIP,
+  chatwork: CHANNEL_TYPE_CHIP,
+  webhook: CHANNEL_TYPE_CHIP,
 }
 
 export function ManageNotificationChannelsView({

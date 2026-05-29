@@ -90,7 +90,7 @@ export function FileFieldInput({ id, label, value, disabled, onChange }: FileFie
           onChange={(e) => {
             onChange(e.target.value)
           }}
-          className="flex-1 rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
+          className="flex-1 rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent disabled:opacity-50"
         />
         <Button
           type="button"
@@ -126,7 +126,7 @@ export function FileFieldInput({ id, label, value, disabled, onChange }: FileFie
                 href={value}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="shrink-0 text-blue-600 hover:underline dark:text-blue-400"
+                className="shrink-0 text-accent hover:underline"
               >
                 {t('admin.media.fileDownload')}
               </a>
@@ -138,7 +138,7 @@ export function FileFieldInput({ id, label, value, disabled, onChange }: FileFie
                 href={value}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="min-w-0 flex-1 truncate text-blue-600 hover:underline dark:text-blue-400"
+                className="min-w-0 flex-1 truncate text-accent hover:underline"
               >
                 {value}
               </a>

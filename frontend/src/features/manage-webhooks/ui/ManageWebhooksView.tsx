@@ -129,7 +129,7 @@ export function ManageWebhooksView({
                       href={webhook.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="truncate font-sans text-body text-blue-600 hover:underline dark:text-blue-400"
+                      className="truncate font-sans text-body text-accent hover:underline"
                     >
                       {webhook.url}
                     </a>

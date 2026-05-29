@@ -40,7 +40,7 @@ export function EntitySeoPanel({
             }}
             placeholder={t('admin.entitySeo.metaTitle.placeholder')}
             maxLength={255}
-            className="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
           />
         </Stack>
 
@@ -59,7 +59,7 @@ export function EntitySeoPanel({
             }}
             placeholder={t('admin.entitySeo.metaDescription.placeholder')}
             rows={3}
-            className="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
           />
         </Stack>
 

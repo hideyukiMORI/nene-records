@@ -66,7 +66,7 @@ export function WebhookForm({
             onChange={(e) => {
               setUrl(e.target.value)
             }}
-            className="rounded-md border border-border bg-surface px-3 py-2 font-sans text-body text-text-primary placeholder:text-text-muted focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
+            className="rounded-md border border-border bg-surface px-3 py-2 font-sans text-body text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent disabled:opacity-50"
           />
         </div>
 
@@ -114,7 +114,7 @@ export function WebhookForm({
             onChange={(e) => {
               setEntityTypeId(e.target.value)
             }}
-            className="rounded-md border border-border bg-surface px-3 py-2 font-sans text-body text-text-primary placeholder:text-text-muted focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
+            className="rounded-md border border-border bg-surface px-3 py-2 font-sans text-body text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent disabled:opacity-50"
           />
         </div>
 
@@ -132,7 +132,7 @@ export function WebhookForm({
             onChange={(e) => {
               setSecret(e.target.value)
             }}
-            className="rounded-md border border-border bg-surface px-3 py-2 font-sans text-body text-text-primary placeholder:text-text-muted focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
+            className="rounded-md border border-border bg-surface px-3 py-2 font-sans text-body text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent disabled:opacity-50"
           />
         </div>
 

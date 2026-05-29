@@ -91,7 +91,7 @@ export function EntityStatusPanel({
             href={publicUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm text-blue-600 underline hover:text-blue-800"
+            className="text-sm text-accent underline hover:text-accent-hover"
           >
             {publicUrl}
           </a>
@@ -165,7 +165,7 @@ export function EntityStatusPanel({
                 href={previewUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 truncate text-sm text-blue-600 underline hover:text-blue-800"
+                className="flex-1 truncate text-sm text-accent underline hover:text-accent-hover"
               >
                 {previewUrl}
               </a>
