@@ -44,7 +44,7 @@ export function Button({
   'data-testid': dataTestId,
 }: ButtonProps) {
   const classes = [
-    'inline-flex items-center justify-center rounded-md border font-sans font-medium transition-colors duration-fast ease-default',
+    'inline-flex items-center justify-center rounded-sm border font-chrome font-semibold tracking-tight transition-colors duration-fast ease-default',
     'focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50',
     variantClasses[variant],
     sizeClasses[size],

@@ -48,7 +48,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
         aria-invalid={error !== undefined}
         aria-describedby={errorId}
         className={[
-          'rounded-md border border-border bg-surface-raised px-inline-md py-stack-sm font-sans text-body text-text-primary shadow-sm',
+          'rounded-sm border border-border bg-surface-raised px-inline-md py-stack-sm font-sans text-body text-text-primary shadow-sm',
           'focus-visible:outline-none focus-visible:shadow-focus disabled:cursor-not-allowed disabled:opacity-50',
           error !== undefined ? 'border-danger' : '',
         ]

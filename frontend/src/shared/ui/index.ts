@@ -1,5 +1,7 @@
 export { ToastProvider, useToast } from './toast'
 export type { Toast, ToastContextValue, ToastType } from './toast'
+export { NeneMark } from './brand/NeneMark'
+export type { NeneMarkProps } from './brand/NeneMark'
 export { Button } from './primitives/Button'
 export type { ButtonProps, ButtonSize, ButtonVariant } from './primitives/Button'
 export { ConfirmDialog } from './components/ConfirmDialog'

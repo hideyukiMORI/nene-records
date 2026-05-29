@@ -39,13 +39,13 @@ function detectTheme(): { id: AdminThemeId; variant: ThemeVariant } {
     }
     // 旧キー (nene-theme) からマイグレーション
     const legacy = localStorage.getItem(LEGACY_STORAGE_KEY)
-    if (legacy === 'dark') return { id: 'default', variant: 'dark' }
-    if (legacy === 'light') return { id: 'default', variant: 'light' }
+    if (legacy === 'dark') return { id: 'ubuntu', variant: 'dark' }
+    if (legacy === 'light') return { id: 'ubuntu', variant: 'light' }
   } catch {
     // localStorage blocked
   }
   const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-  return { id: 'default', variant: prefersDark ? 'dark' : 'light' }
+  return { id: 'ubuntu', variant: prefersDark ? 'dark' : 'light' }
 }
 
 function applyTheme(id: AdminThemeId, variant: ThemeVariant): void {

@@ -2,7 +2,7 @@ import { useState, type SyntheticEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useLogin } from '@/entities/auth'
 import { useTranslation } from '@/shared/i18n'
-import { Button, Input, Stack, Text } from '@/shared/ui'
+import { Button, Input, NeneMark, Stack, Text } from '@/shared/ui'
 
 export function LoginPage() {
   const [email, setEmail] = useState('')
@@ -24,20 +24,28 @@ export function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-surface px-inline-md">
-      <div className="w-full max-w-sm rounded-lg border border-border bg-surface-raised p-stack-lg shadow-sm">
+    <div className="relative flex min-h-screen items-center justify-center bg-surface px-inline-md">
+      <div className="w-full max-w-sm rounded-md border border-border bg-surface-raised p-stack-lg shadow-lg">
         <Stack gap="lg">
-          <Stack gap="xs">
-            <Text as="h1" variant="heading-md">
-              {t('admin.auth.appTitle')}
-            </Text>
-            <Text muted>{t('admin.auth.subtitle')}</Text>
+          <Stack gap="md">
+            <div className="flex items-center gap-inline-sm">
+              <NeneMark size={26} className="text-accent" />
+              <span className="font-chrome text-base font-bold tracking-tight text-text-primary">
+                NeNe Records
+              </span>
+            </div>
+            <Stack gap="xs">
+              <Text as="h1" variant="heading-md">
+                {t('admin.auth.appTitle')}
+              </Text>
+              <Text muted>{t('admin.auth.subtitle')}</Text>
+            </Stack>
           </Stack>
 
           {login.isError && (
             <div
               role="alert"
-              className="rounded-md border border-red-200 bg-red-50 px-inline-sm py-stack-xs text-sm text-red-700"
+              className="rounded-sm border border-danger bg-danger/10 px-inline-sm py-stack-xs text-caption font-medium text-danger"
             >
               {t('admin.auth.invalidCredentials')}
             </div>
@@ -45,45 +53,38 @@ export function LoginPage() {
 
           <form onSubmit={handleSubmit}>
             <Stack gap="md">
-              <Stack gap="xs">
-                <label htmlFor="email" className="text-sm font-medium text-text-primary">
-                  {t('admin.auth.emailLabel')}
-                </label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value)
-                  }}
-                  placeholder={t('admin.auth.emailPlaceholder')}
-                  required
-                />
-              </Stack>
+              <Input
+                id="email"
+                label={t('admin.auth.emailLabel')}
+                type="email"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value)
+                }}
+                autoComplete="email"
+              />
+              <Input
+                id="password"
+                label={t('admin.auth.passwordLabel')}
+                type="password"
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value)
+                }}
+                autoComplete="current-password"
+              />
 
-              <Stack gap="xs">
-                <label htmlFor="password" className="text-sm font-medium text-text-primary">
-                  {t('admin.auth.passwordLabel')}
-                </label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value)
-                  }}
-                  placeholder={t('admin.auth.passwordPlaceholder')}
-                  required
-                />
-              </Stack>
-
-              <Button type="submit" disabled={login.isPending} className="w-full">
+              <Button type="submit" disabled={login.isPending} className="mt-stack-xs w-full">
                 {login.isPending ? t('admin.auth.signingIn') : t('admin.auth.signIn')}
               </Button>
             </Stack>
           </form>
         </Stack>
       </div>
+
+      <p className="absolute bottom-stack-lg left-0 right-0 text-center font-chrome text-tiny tracking-wide text-text-muted">
+        Powered by NENE2 · © 2026 AYANE
+      </p>
     </div>
   )
 }
