@@ -1,4 +1,4 @@
-export type AdminThemeId = 'ubuntu' | 'github' | 'solarized' | 'dracula' | 'monokai'
+export type AdminThemeId = 'default' | 'ubuntu' | 'github' | 'solarized' | 'dracula' | 'monokai'
 export type ThemeVariant = 'light' | 'dark'
 
 export interface ThemePreviewColors {
@@ -15,6 +15,15 @@ export interface AdminThemeDef {
 }
 
 export const ADMIN_THEME_DEFS: readonly AdminThemeDef[] = [
+  {
+    id: 'default',
+    name: 'Default',
+    variants: ['light', 'dark'],
+    preview: {
+      light: { surface: '#f7f3ee', sidebar: '#2d3147', accent: '#c8820a' },
+      dark: { surface: '#1a1d2e', sidebar: '#10121f', accent: '#d4970e' },
+    },
+  },
   {
     id: 'ubuntu',
     name: 'Ubuntu',

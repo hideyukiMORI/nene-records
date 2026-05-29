@@ -1,36 +1,35 @@
-/* Ubuntu Dark — applied when <html data-admin-theme="ubuntu-dark">
-   Values mirror the redesign's base-themes.css `.rd[data-theme='ubuntu-dark']`. */
-[data-admin-theme='ubuntu-dark'] {
+/* Default Dark — applied when <html data-admin-theme="default-dark"> */
+[data-admin-theme='default-dark'] {
   /* ── Surfaces ──────────────────────────────────────────────────────────── */
-  --color-surface: oklch(19% 0.04 350);
-  --color-surface-raised: oklch(24% 0.045 350);
-  --color-surface-overlay: oklch(28% 0.05 350);
+  --color-surface: oklch(13% 0.01 265);
+  --color-surface-raised: oklch(17% 0.01 265);
+  --color-surface-overlay: oklch(22% 0.015 265);
 
   /* ── Sidebar ─────────────────────────────────────────────────────────── */
-  --color-sidebar-bg: oklch(14% 0.04 350);
-  --color-sidebar-text: oklch(92% 0.01 40);
-  --color-sidebar-text-muted: oklch(60% 0.03 30);
-  --color-sidebar-active-bg: oklch(55% 0.18 42);
-  --color-sidebar-active-text: oklch(99% 0.01 60);
-  --color-sidebar-hover-bg: oklch(22% 0.05 350);
-  --color-sidebar-border: oklch(30% 0.05 350);
+  --color-sidebar-bg: oklch(10% 0.01 265);
+  --color-sidebar-text: oklch(78% 0.01 265);
+  --color-sidebar-text-muted: oklch(50% 0.01 265);
+  --color-sidebar-active-bg: oklch(22% 0.02 265);
+  --color-sidebar-active-text: oklch(96% 0.005 75);
+  --color-sidebar-hover-bg: oklch(17% 0.015 265);
+  --color-sidebar-border: oklch(22% 0.01 265);
 
   /* ── Text ─────────────────────────────────────────────────────────────── */
-  --color-text-primary: oklch(94% 0.01 40);
-  --color-text-muted: oklch(64% 0.025 30);
-  --color-text-inverse: oklch(18% 0.04 350);
+  --color-text-primary: oklch(93% 0.008 75);
+  --color-text-muted: oklch(60% 0.01 265);
+  --color-text-inverse: oklch(12% 0.01 265);
 
   /* ── Border ──────────────────────────────────────────────────────────── */
-  --color-border: oklch(33% 0.04 350);
+  --color-border: oklch(28% 0.01 265);
 
   /* ── Accent (brighter for dark bg) ───────────────────────────────────── */
-  --color-accent: oklch(64% 0.18 42);
-  --color-accent-hover: oklch(70% 0.18 42);
+  --color-accent: oklch(72% 0.17 72);
+  --color-accent-hover: oklch(66% 0.17 72);
   --color-accent-weak: color-mix(in oklch, var(--color-accent) 16%, var(--color-surface-raised));
 
   /* ── Danger ──────────────────────────────────────────────────────────── */
-  --color-danger: oklch(62% 0.21 25);
-  --color-danger-hover: oklch(56% 0.21 25);
+  --color-danger: oklch(62% 0.2 25);
+  --color-danger-hover: oklch(56% 0.2 25);
 
   /* ── Status ──────────────────────────────────────────────────────────── */
   --color-ok: oklch(70% 0.15 150);
@@ -38,7 +37,7 @@
   --color-info: oklch(70% 0.13 250);
 
   /* ── Focus ring ──────────────────────────────────────────────────────── */
-  --color-focus-ring: oklch(66% 0.16 42);
+  --color-focus-ring: oklch(74% 0.14 72);
 
   /* ── Shadows (deeper in dark) ────────────────────────────────────────── */
   --shadow-sm: 0 1px 2px oklch(0% 0 0 / 0.4);
