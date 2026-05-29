@@ -1,7 +1,7 @@
 import { useTheme } from '@/shared/theme'
 import { ADMIN_THEME_DEFS, type ThemeVariant } from '@/shared/theme'
 import { useTranslation } from '@/shared/i18n'
-import { Stack, Text } from '@/shared/ui'
+import { Text } from '@/shared/ui'
 import { IconSun, IconMoon } from '@/shared/ui/icons/Icons'
 
 interface ThemePreviewProps {
@@ -46,74 +46,71 @@ export function AppearanceView() {
   const { adminThemeId, themeVariant, setAdminTheme } = useTheme()
 
   return (
-    <Stack gap="sm">
-      <Text variant="heading-sm">{t('admin.settings.appearance.title')}</Text>
-      <div className="grid grid-cols-2 gap-stack-sm sm:grid-cols-3 lg:grid-cols-5">
-        {ADMIN_THEME_DEFS.map((def) => {
-          const isSelected = def.id === adminThemeId
-          // カード表示には現在のバリアントを優先、未選択テーマはデフォルトバリアントのプレビューを表示
-          const displayVariant: ThemeVariant = isSelected
-            ? themeVariant
-            : (def.variants[0] as ThemeVariant)
-          const previewColors = def.preview[displayVariant]
+    <div className="grid grid-cols-2 gap-stack-sm sm:grid-cols-3 lg:grid-cols-5">
+      {ADMIN_THEME_DEFS.map((def) => {
+        const isSelected = def.id === adminThemeId
+        // カード表示には現在のバリアントを優先、未選択テーマはデフォルトバリアントのプレビューを表示
+        const displayVariant: ThemeVariant = isSelected
+          ? themeVariant
+          : (def.variants[0] as ThemeVariant)
+        const previewColors = def.preview[displayVariant]
 
-          return (
-            <div
-              key={def.id}
-              role="button"
-              tabIndex={0}
-              aria-pressed={isSelected}
-              onClick={() => {
+        return (
+          <div
+            key={def.id}
+            role="button"
+            tabIndex={0}
+            aria-pressed={isSelected}
+            onClick={() => {
+              setAdminTheme(def.id)
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
                 setAdminTheme(def.id)
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault()
-                  setAdminTheme(def.id)
-                }
-              }}
-              className={[
-                'cursor-pointer rounded-md border-2 transition-colors duration-fast focus-visible:outline-none focus-visible:shadow-focus',
-                isSelected ? 'border-accent' : 'border-border hover:border-accent',
-              ].join(' ')}
-            >
-              {/* カラープレビュー */}
-              {previewColors !== undefined ? (
-                <ThemePreview
-                  surface={previewColors.surface}
-                  sidebar={previewColors.sidebar}
-                  accent={previewColors.accent}
-                />
-              ) : null}
+              }
+            }}
+            className={[
+              'cursor-pointer rounded-md border-2 transition-colors duration-fast focus-visible:outline-none focus-visible:shadow-focus',
+              isSelected ? 'border-accent' : 'border-border hover:border-accent',
+            ].join(' ')}
+          >
+            {/* カラープレビュー */}
+            {previewColors !== undefined ? (
+              <ThemePreview
+                surface={previewColors.surface}
+                sidebar={previewColors.sidebar}
+                accent={previewColors.accent}
+              />
+            ) : null}
 
-              {/* テーマ名 + バリアントトグル */}
-              <div className="flex items-center justify-between px-inline-sm py-stack-xs">
-                <Text as="span" variant="caption">
-                  {def.name}
-                </Text>
-                {isSelected && def.variants.length > 1 ? (
-                  <button
-                    type="button"
-                    aria-label={
-                      themeVariant === 'dark'
-                        ? t('admin.theme.toggleLight')
-                        : t('admin.theme.toggleDark')
-                    }
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      const next: ThemeVariant = themeVariant === 'light' ? 'dark' : 'light'
-                      setAdminTheme(def.id, next)
-                    }}
-                    className="flex items-center justify-center rounded p-0.5 text-text-muted transition-colors hover:text-text-primary"
-                  >
-                    {themeVariant === 'dark' ? <IconSun size={13} /> : <IconMoon size={13} />}
-                  </button>
-                ) : null}
-              </div>
+            {/* テーマ名 + バリアントトグル */}
+            <div className="flex items-center justify-between px-inline-sm py-stack-xs">
+              <Text as="span" variant="caption" className="font-chrome font-semibold">
+                {def.name}
+              </Text>
+              {isSelected && def.variants.length > 1 ? (
+                <button
+                  type="button"
+                  aria-label={
+                    themeVariant === 'dark'
+                      ? t('admin.theme.toggleLight')
+                      : t('admin.theme.toggleDark')
+                  }
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    const next: ThemeVariant = themeVariant === 'light' ? 'dark' : 'light'
+                    setAdminTheme(def.id, next)
+                  }}
+                  className="flex items-center justify-center rounded p-0.5 text-text-muted transition-colors hover:text-text-primary"
+                >
+                  {themeVariant === 'dark' ? <IconSun size={13} /> : <IconMoon size={13} />}
+                </button>
+              ) : null}
             </div>
-          )
-        })}
-      </div>
-    </Stack>
+          </div>
+        )
+      })}
+    </div>
   )
 }

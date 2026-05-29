@@ -347,6 +347,7 @@ export const ja: Partial<MessageCatalog> = {
 
   // ── Settings ──────────────────────────────────────────────────────────────
   'admin.settings.appearance.title': '外観',
+  'admin.settings.site.title': 'サイト',
   'admin.settings.permalink.title': 'パーマリンク',
   'admin.settings.permalink.description':
     'コンテンツタイプごとに公開 URL の構造を選択します。変更はすぐ反映され、旧 URL は自動リダイレクトされます。',

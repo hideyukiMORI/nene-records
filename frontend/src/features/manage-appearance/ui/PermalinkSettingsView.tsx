@@ -14,7 +14,7 @@ function NoTypeTokenWarning({ pattern }: { pattern: string }) {
   const { t } = useTranslation()
   if (!pattern || pattern.includes('{type}')) return null
   return (
-    <p className="mt-1 text-xs text-warning">
+    <p className="mt-1 text-xs text-warn">
       ⚠ {t('admin.entityTypes.editForm.permalink.noTypeWarning')}
     </p>
   )
@@ -206,11 +206,6 @@ export function PermalinkSettingsView({
 
   return (
     <Stack gap="sm">
-      <Stack gap="xs">
-        <Text variant="heading-sm">{t('admin.settings.permalink.title')}</Text>
-        <Text muted>{t('admin.settings.permalink.description')}</Text>
-      </Stack>
-
       {isLoading && <Text muted>{t('admin.entityTypes.existingList.loading')}</Text>}
 
       {entityTypes.length === 0 && !isLoading && (

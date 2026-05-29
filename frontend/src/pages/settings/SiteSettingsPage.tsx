@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { currentUserHasCapability } from '@/entities/auth'
 import {
   AppearanceView,
@@ -7,6 +8,15 @@ import {
 import { ManageSiteSettingsView, useManageSiteSettingsPage } from '@/features/manage-settings'
 import { useTranslation } from '@/shared/i18n'
 import { Stack, Text } from '@/shared/ui'
+
+/** Console redesign §06 — small chrome eyebrow that heads each settings section. */
+function SectionHeader({ children }: { children: ReactNode }) {
+  return (
+    <p className="font-chrome text-tiny font-bold uppercase tracking-widest text-text-muted">
+      {children}
+    </p>
+  )
+}
 
 export function SiteSettingsPage() {
   const { t } = useTranslation()
@@ -22,9 +32,24 @@ export function SiteSettingsPage() {
         </Text>
         <Text muted>{t('admin.settings.description')}</Text>
       </Stack>
-      <AppearanceView />
-      <ManageSiteSettingsView {...settingsPage} canManageSettings={canManageSettings} />
-      <PermalinkSettingsView {...permalinkPage} />
+
+      <Stack gap="sm">
+        <SectionHeader>{t('admin.settings.appearance.title')}</SectionHeader>
+        <AppearanceView />
+      </Stack>
+
+      <Stack gap="sm">
+        <SectionHeader>{t('admin.settings.site.title')}</SectionHeader>
+        <ManageSiteSettingsView {...settingsPage} canManageSettings={canManageSettings} />
+      </Stack>
+
+      <Stack gap="sm">
+        <SectionHeader>{t('admin.settings.permalink.title')}</SectionHeader>
+        <Text muted variant="caption">
+          {t('admin.settings.permalink.description')}
+        </Text>
+        <PermalinkSettingsView {...permalinkPage} />
+      </Stack>
     </Stack>
   )
 }

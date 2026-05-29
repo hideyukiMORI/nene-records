@@ -346,6 +346,7 @@ export const en = {
 
   // ── Settings ──────────────────────────────────────────────────────────────
   'admin.settings.appearance.title': 'Appearance',
+  'admin.settings.site.title': 'Site',
   'admin.settings.permalink.title': 'Permalinks',
   'admin.settings.permalink.description':
     'Choose the URL structure for each content type. Changes take effect immediately; old URLs redirect automatically.',
