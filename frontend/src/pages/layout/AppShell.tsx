@@ -8,7 +8,6 @@ import {
 } from '@/entities/auth'
 import { getLocalizedEntityTypeName, usePinnedEntityTypes } from '@/entities/entity-type'
 import { LOCALES, SUPPORTED_LOCALE_IDS, useTranslation } from '@/shared/i18n'
-import { useTheme } from '@/shared/theme'
 import { NeneMark, ToastProvider } from '@/shared/ui'
 import {
   IconBuilding,
@@ -23,9 +22,8 @@ import {
   IconLogOut,
   IconMenu,
   IconMessageCircle,
-  IconMoon,
+  IconSearch,
   IconSettings,
-  IconSun,
   IconTag,
   IconUsers,
   IconBell,
@@ -68,10 +66,24 @@ function NavItem({ to, end, icon, label, onClick }: NavItemProps) {
   )
 }
 
+/** Two-letter avatar initials from an email address (e.g. site.admin@… → "SA"). */
+function userInitials(email: string): string {
+  const local = email.split('@')[0] ?? email
+  const parts = local.split(/[._+-]+/).filter(Boolean)
+  const letters =
+    parts.length >= 2 ? `${parts[0]?.[0] ?? ''}${parts[1]?.[0] ?? ''}` : local.slice(0, 2)
+  return letters.toUpperCase()
+}
+
+/** Humanised display name from an email's local part (e.g. admin@… → "Admin"). */
+function userDisplayName(email: string): string {
+  const local = email.split('@')[0] ?? email
+  return local.charAt(0).toUpperCase() + local.slice(1)
+}
+
 export function AppShell() {
   const navigate = useNavigate()
   const { t, locale, setLocale } = useTranslation()
-  const { themeVariant, toggleVariant, canToggleVariant } = useTheme()
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   // Prevent body scroll when drawer is open
@@ -347,78 +359,86 @@ export function AppShell() {
                 </div>
               </>
             ) : null}
-
-            <div className="my-4 border-t border-sidebar-border" />
-
-            <ul className="space-y-0.5">
-              <li>
-                <NavItem
-                  to="/"
-                  icon={<IconGlobe size={16} />}
-                  label={t('admin.nav.publicSite')}
-                  onClick={closeSidebar}
-                />
-              </li>
-            </ul>
           </nav>
 
-          {/* Bottom: user info + controls */}
-          <div className="shrink-0 space-y-2 border-t border-sidebar-border p-3">
+          {/* Bottom: public-site link + language + user row (redesign §06) */}
+          <div className="flex shrink-0 flex-col gap-3 border-t border-sidebar-border p-3">
+            <NavItem
+              to="/"
+              icon={<IconGlobe size={16} />}
+              label={t('admin.nav.publicSite')}
+              onClick={closeSidebar}
+            />
+
+            {/* Language selector */}
+            <select
+              aria-label="Language"
+              value={locale}
+              onChange={(e) => {
+                setLocale(e.target.value as typeof locale)
+              }}
+              className="min-w-0 rounded-sm border border-sidebar-border bg-sidebar-hover-bg px-2 py-1.5 text-xs text-sidebar-text focus:outline-none focus:ring-1 focus:ring-accent"
+            >
+              {SUPPORTED_LOCALE_IDS.map((id) => (
+                <option key={id} value={id}>
+                  {LOCALES[id].label}
+                </option>
+              ))}
+            </select>
+
+            {/* User row */}
             {session && (
-              <div className="truncate px-1 text-xs text-sidebar-text-muted" title={session.email}>
-                {session.email}
-              </div>
-            )}
-
-            <div className="flex items-center gap-1">
-              {/* Language selector */}
-              <select
-                aria-label="Language"
-                value={locale}
-                onChange={(e) => {
-                  setLocale(e.target.value as typeof locale)
-                }}
-                className="min-w-0 flex-1 rounded-md border border-sidebar-border bg-sidebar-hover-bg px-2 py-1.5 text-xs text-sidebar-text focus:outline-none focus:ring-1 focus:ring-accent"
-              >
-                {SUPPORTED_LOCALE_IDS.map((id) => (
-                  <option key={id} value={id}>
-                    {LOCALES[id].label}
-                  </option>
-                ))}
-              </select>
-
-              {/* Theme toggle — both variants available のみ表示 */}
-              {canToggleVariant ? (
+              <div className="pf-userrow">
+                <span className="rd-avatar" aria-hidden="true">
+                  {userInitials(session.email)}
+                </span>
+                <div className="pf-userrow__id">
+                  <div className="pf-userrow__n">{userDisplayName(session.email)}</div>
+                  <div className="pf-userrow__e" title={session.email}>
+                    {session.email}
+                  </div>
+                </div>
                 <button
                   type="button"
-                  onClick={toggleVariant}
-                  aria-label={
-                    themeVariant === 'dark'
-                      ? t('admin.theme.toggleLight')
-                      : t('admin.theme.toggleDark')
-                  }
-                  className="flex shrink-0 items-center justify-center rounded-md border border-sidebar-border bg-sidebar-hover-bg p-1.5 text-sidebar-text transition-colors hover:bg-sidebar-hover-bg hover:text-sidebar-active-text"
+                  onClick={handleLogout}
+                  aria-label={t('admin.nav.logout')}
+                  title={t('admin.nav.logout')}
+                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-sm border border-sidebar-border bg-sidebar-hover-bg text-sidebar-text transition-colors hover:border-danger hover:text-danger"
                 >
-                  {themeVariant === 'dark' ? <IconSun size={15} /> : <IconMoon size={15} />}
+                  <IconLogOut size={15} />
                 </button>
-              ) : null}
-
-              {/* Logout */}
-              <button
-                type="button"
-                onClick={handleLogout}
-                aria-label={t('admin.nav.logout')}
-                title={t('admin.nav.logout')}
-                className="flex shrink-0 items-center justify-center rounded-md border border-sidebar-border bg-sidebar-hover-bg p-1.5 text-sidebar-text transition-colors hover:border-red-800 hover:bg-red-950/60 hover:text-red-300"
-              >
-                <IconLogOut size={15} />
-              </button>
-            </div>
+              </div>
+            )}
           </div>
         </aside>
 
         {/* ── Main content ────────────────────────────────────────────────── */}
         <main className="min-w-0 flex-1 pb-8 pt-14 lg:ml-60 lg:pt-0">
+          {/* Quiet topbar — search + notifications (desktop only) */}
+          <div className="hidden items-center gap-3 border-b border-border bg-surface px-6 py-2.5 lg:flex">
+            <label className="flex max-w-md flex-1 items-center gap-2 rounded-sm border border-border bg-surface-raised px-3 py-1.5 text-text-muted">
+              <IconSearch size={15} className="shrink-0" />
+              <input
+                type="search"
+                placeholder={t('admin.topbar.searchPlaceholder')}
+                className="min-w-0 flex-1 bg-transparent text-sm text-text-primary placeholder:text-text-muted focus:outline-none"
+              />
+              <span className="shrink-0 rounded-sm border border-border bg-surface-overlay px-1.5 py-0.5 font-mono text-tiny text-text-muted">
+                ⌘K
+              </span>
+            </label>
+            <div className="flex-1" />
+            <button
+              type="button"
+              aria-label={t('admin.nav.notifications')}
+              onClick={() => {
+                void navigate('/admin/notifications')
+              }}
+              className="flex h-8 w-8 items-center justify-center rounded-sm border border-border bg-surface-raised text-text-muted transition-colors hover:text-text-primary"
+            >
+              <IconBell size={16} />
+            </button>
+          </div>
           <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8">
             <Outlet />
           </div>

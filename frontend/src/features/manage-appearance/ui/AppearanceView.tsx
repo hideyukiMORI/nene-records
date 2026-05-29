@@ -1,116 +1,87 @@
-import { useTheme } from '@/shared/theme'
-import { ADMIN_THEME_DEFS, type ThemeVariant } from '@/shared/theme'
+import { ADMIN_THEME_DEFS, useTheme, type AdminThemeId, type ThemeVariant } from '@/shared/theme'
 import { useTranslation } from '@/shared/i18n'
-import { Text } from '@/shared/ui'
-import { IconSun, IconMoon } from '@/shared/ui/icons/Icons'
+import { IconCheck } from '@/shared/ui/icons/Icons'
 
-interface ThemePreviewProps {
-  surface: string
+/** A 3-colour mini swatch: sidebar · surface · accent. */
+function Swatch({
+  sidebar,
+  surface,
+  accent,
+}: {
   sidebar: string
+  surface: string
   accent: string
+}) {
+  return (
+    <span className="pf-swatch">
+      <i style={{ background: sidebar }} />
+      <i style={{ background: surface }} />
+      <i style={{ background: accent }} />
+    </span>
+  )
 }
 
-function ThemePreview({ surface, sidebar, accent }: ThemePreviewProps) {
-  return (
-    <div className="flex h-14 overflow-hidden rounded-t-md border-b border-border">
-      {/* Sidebar strip */}
-      <div className="w-8 shrink-0" style={{ backgroundColor: sidebar }}>
-        <div
-          className="mx-auto mt-2 h-1 w-4 rounded-full opacity-60"
-          style={{ backgroundColor: accent }}
-        />
-        <div
-          className="mx-auto mt-1 h-1 w-4 rounded-full opacity-30"
-          style={{ backgroundColor: accent }}
-        />
-        <div
-          className="mx-auto mt-1 h-1 w-4 rounded-full opacity-30"
-          style={{ backgroundColor: accent }}
-        />
-      </div>
-      {/* Main area */}
-      <div className="flex-1 p-2" style={{ backgroundColor: surface }}>
-        <div className="mb-1.5 h-1.5 w-12 rounded-full" style={{ backgroundColor: accent }} />
-        <div
-          className="mb-1 h-1 w-full rounded-full opacity-20"
-          style={{ backgroundColor: sidebar }}
-        />
-        <div className="h-1 w-3/4 rounded-full opacity-20" style={{ backgroundColor: sidebar }} />
-      </div>
-    </div>
-  )
+interface ThemeChoice {
+  id: AdminThemeId
+  variant: ThemeVariant
+  label: string
+  preview: { surface: string; sidebar: string; accent: string }
 }
 
 export function AppearanceView() {
   const { t } = useTranslation()
   const { adminThemeId, themeVariant, setAdminTheme } = useTheme()
 
+  // Flatten themes into one card per (theme × variant): "Ubuntu Light", "Dracula", …
+  const choices: ThemeChoice[] = ADMIN_THEME_DEFS.flatMap((def) =>
+    def.variants.flatMap((variant) => {
+      const preview = def.preview[variant]
+      if (preview === undefined) return []
+      const label =
+        def.variants.length > 1
+          ? `${def.name} ${variant === 'light' ? t('admin.theme.light') : t('admin.theme.dark')}`
+          : def.name
+      return [{ id: def.id, variant, label, preview }]
+    }),
+  )
+
   return (
-    <div className="grid grid-cols-2 gap-stack-sm sm:grid-cols-3 lg:grid-cols-5">
-      {ADMIN_THEME_DEFS.map((def) => {
-        const isSelected = def.id === adminThemeId
-        // カード表示には現在のバリアントを優先、未選択テーマはデフォルトバリアントのプレビューを表示
-        const displayVariant: ThemeVariant = isSelected
-          ? themeVariant
-          : (def.variants[0] as ThemeVariant)
-        const previewColors = def.preview[displayVariant]
-
-        return (
-          <div
-            key={def.id}
-            role="button"
-            tabIndex={0}
-            aria-pressed={isSelected}
-            onClick={() => {
-              setAdminTheme(def.id)
-            }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault()
-                setAdminTheme(def.id)
-              }
-            }}
-            className={[
-              'cursor-pointer rounded-md border-2 transition-colors duration-fast focus-visible:outline-none focus-visible:shadow-focus',
-              isSelected ? 'border-accent' : 'border-border hover:border-accent',
-            ].join(' ')}
-          >
-            {/* カラープレビュー */}
-            {previewColors !== undefined ? (
-              <ThemePreview
-                surface={previewColors.surface}
-                sidebar={previewColors.sidebar}
-                accent={previewColors.accent}
+    <div className="rounded-md border border-border bg-surface-raised p-stack-md shadow-sm">
+      <div className="grid grid-cols-1 gap-stack-sm sm:grid-cols-2">
+        {choices.map((choice) => {
+          const isSelected = choice.id === adminThemeId && choice.variant === themeVariant
+          return (
+            <button
+              key={`${choice.id}-${choice.variant}`}
+              type="button"
+              aria-pressed={isSelected}
+              onClick={() => {
+                setAdminTheme(choice.id, choice.variant)
+              }}
+              className={[
+                'flex items-center gap-inline-sm rounded-sm border bg-surface px-inline-sm py-stack-xs text-left transition-colors duration-fast',
+                'focus-visible:outline-none focus-visible:shadow-focus',
+                isSelected
+                  ? 'border-accent ring-1 ring-accent'
+                  : 'border-border hover:border-accent',
+              ].join(' ')}
+            >
+              <Swatch
+                sidebar={choice.preview.sidebar}
+                surface={choice.preview.surface}
+                accent={choice.preview.accent}
               />
-            ) : null}
-
-            {/* テーマ名 + バリアントトグル */}
-            <div className="flex items-center justify-between px-inline-sm py-stack-xs">
-              <Text as="span" variant="caption" className="font-chrome font-semibold">
-                {def.name}
-              </Text>
-              {isSelected && def.variants.length > 1 ? (
-                <button
-                  type="button"
-                  aria-label={
-                    themeVariant === 'dark'
-                      ? t('admin.theme.toggleLight')
-                      : t('admin.theme.toggleDark')
-                  }
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    const next: ThemeVariant = themeVariant === 'light' ? 'dark' : 'light'
-                    setAdminTheme(def.id, next)
-                  }}
-                  className="flex items-center justify-center rounded p-0.5 text-text-muted transition-colors hover:text-text-primary"
-                >
-                  {themeVariant === 'dark' ? <IconSun size={13} /> : <IconMoon size={13} />}
-                </button>
-              ) : null}
-            </div>
-          </div>
-        )
-      })}
+              <span className="min-w-0 flex-1 truncate font-chrome text-caption font-semibold text-text-primary">
+                {choice.label}
+              </span>
+              {isSelected ? <IconCheck size={15} className="shrink-0 text-accent" /> : null}
+            </button>
+          )
+        })}
+      </div>
+      <p className="mt-stack-sm font-sans text-caption text-text-muted">
+        {t('admin.theme.appliesNote')}
+      </p>
     </div>
   )
 }

@@ -45,6 +45,11 @@ export const ja: Partial<MessageCatalog> = {
   'admin.nav.logout': 'ログアウト',
   'admin.theme.toggleDark': 'ダークモードに切り替え',
   'admin.theme.toggleLight': 'ライトモードに切り替え',
+  'admin.theme.light': 'ライト',
+  'admin.theme.dark': 'ダーク',
+  'admin.topbar.searchPlaceholder': 'レコード・設定を検索…',
+  'admin.theme.appliesNote':
+    '管理画面と公開サイトの両方に適用されます。選択はこの端末に保存されます。',
   'admin.nav.openMenu': 'ナビゲーションメニューを開く',
   'admin.nav.closeMenu': 'ナビゲーションメニューを閉じる',
 
@@ -346,7 +351,8 @@ export const ja: Partial<MessageCatalog> = {
   'admin.entitySeo.saveSuccess': 'SEO 設定を保存しました。',
 
   // ── Settings ──────────────────────────────────────────────────────────────
-  'admin.settings.appearance.title': '外観',
+  'admin.settings.eyebrow': '環境設定',
+  'admin.settings.appearance.title': '外観 · テーマ',
   'admin.settings.site.title': 'サイト',
   'admin.settings.permalink.title': 'パーマリンク',
   'admin.settings.permalink.description':

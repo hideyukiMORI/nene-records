@@ -1,0 +1,58 @@
+/* ============================================================
+   Console chrome pieces (redesign): sidebar user row + avatar,
+   and the theme swatch. Ported from the prototype's
+   prototype.css / directions.css, retokenised to --color-*.
+   Lives in the theme layer so it can use color-mix freely.
+   ============================================================ */
+
+/* ── Sidebar footer user row ─────────────────────────────────────────────── */
+.rd-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  font-family: var(--font-chrome);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--color-sidebar-active-text);
+  background: var(--color-sidebar-hover-bg);
+}
+
+.pf-userrow {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.pf-userrow__id {
+  min-width: 0;
+  flex: 1;
+}
+.pf-userrow__n {
+  font-family: var(--font-chrome);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-sidebar-active-text);
+}
+.pf-userrow__e {
+  font-size: 0.6875rem;
+  color: var(--color-sidebar-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Theme swatch (3-colour mini block) ──────────────────────────────────── */
+.pf-swatch {
+  display: inline-flex;
+  width: 26px;
+  height: 26px;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid color-mix(in oklch, var(--color-text-primary) 18%, transparent);
+  flex-shrink: 0;
+}
+.pf-swatch i {
+  flex: 1;
+}

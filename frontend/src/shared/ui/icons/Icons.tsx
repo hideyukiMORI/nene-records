@@ -265,3 +265,20 @@ export function IconBell({ size = 16, className }: IconProps) {
     </svg>
   )
 }
+
+export function IconCheck({ size = 16, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className} aria-hidden="true">
+      <polyline points="20 6 9 17 4 12" />
+    </svg>
+  )
+}
+
+export function IconSearch({ size = 16, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className} aria-hidden="true">
+      <circle cx="11" cy="11" r="8" />
+      <path d="m21 21-4.3-4.3" />
+    </svg>
+  )
+}

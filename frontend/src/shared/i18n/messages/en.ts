@@ -52,6 +52,11 @@ export const en = {
   'admin.nav.logout': 'Log out',
   'admin.theme.toggleDark': 'Switch to dark mode',
   'admin.theme.toggleLight': 'Switch to light mode',
+  'admin.theme.light': 'Light',
+  'admin.theme.dark': 'Dark',
+  'admin.topbar.searchPlaceholder': 'Search records, settings…',
+  'admin.theme.appliesNote':
+    'Applies across the admin and the public site. Your choice is remembered on this device.',
   'admin.nav.openMenu': 'Open navigation menu',
   'admin.nav.closeMenu': 'Close navigation menu',
 
@@ -345,7 +350,8 @@ export const en = {
   'admin.entitySeo.saveSuccess': 'SEO settings saved.',
 
   // ── Settings ──────────────────────────────────────────────────────────────
-  'admin.settings.appearance.title': 'Appearance',
+  'admin.settings.eyebrow': 'Configuration',
+  'admin.settings.appearance.title': 'Appearance · Theme',
   'admin.settings.site.title': 'Site',
   'admin.settings.permalink.title': 'Permalinks',
   'admin.settings.permalink.description':

@@ -27,6 +27,9 @@ export function SiteSettingsPage() {
   return (
     <Stack gap="lg">
       <Stack gap="xs">
+        <p className="font-chrome text-tiny font-bold uppercase tracking-widest text-accent">
+          {t('admin.settings.eyebrow')}
+        </p>
         <Text as="h1" variant="heading-md">
           {t('admin.settings.pageTitle')}
         </Text>
