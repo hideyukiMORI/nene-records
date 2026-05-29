@@ -3,7 +3,7 @@ import './consumer-theme.css'
 import { Link, Outlet } from 'react-router-dom'
 import { usePublicNavigationItems } from '@/entities/navigation-item'
 import { publicSettingsToMap, usePublicSettings } from '@/entities/setting'
-import { Stack, Text } from '@/shared/ui'
+import { NeneMark, Stack, Text } from '@/shared/ui'
 
 function useSiteDocumentMeta(siteName: string, metaDescription: string): void {
   useEffect(() => {
@@ -51,7 +51,8 @@ export function PublicShell() {
     >
       <header className="border-b border-border bg-surface-raised shadow-sm">
         <div className="mx-auto flex max-w-3xl items-center justify-between px-inline-md py-stack-md">
-          <Link to="/">
+          <Link to="/" className="flex items-center gap-inline-sm">
+            <NeneMark size={22} className="shrink-0 text-accent" />
             <Stack gap="xs">
               <Text as="span" variant="heading-sm">
                 {siteName}
