@@ -32,6 +32,9 @@
   --color-accent: oklch(58% 0.18 42);
   --color-accent-hover: oklch(52% 0.18 42);
   --color-accent-weak: color-mix(in oklch, var(--color-accent) 12%, var(--color-surface-raised));
+  /* sidebar active state — soft accent tint over the dark sidebar (redesign §06).
+     references var(--color-accent) so it tracks each theme's accent automatically. */
+  --color-sidebar-active-tint: color-mix(in oklch, var(--color-accent) 16%, transparent);
 
   /* ── Danger ─────────────────────────────────────────────────────────── */
   --color-danger: oklch(52% 0.21 25);

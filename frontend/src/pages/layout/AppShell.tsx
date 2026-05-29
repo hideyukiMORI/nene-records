@@ -9,7 +9,7 @@ import {
 import { getLocalizedEntityTypeName, usePinnedEntityTypes } from '@/entities/entity-type'
 import { LOCALES, SUPPORTED_LOCALE_IDS, useTranslation } from '@/shared/i18n'
 import { useTheme } from '@/shared/theme'
-import { ToastProvider } from '@/shared/ui'
+import { NeneMark, ToastProvider } from '@/shared/ui'
 import {
   IconBuilding,
   IconChevronRight,
@@ -49,15 +49,21 @@ function NavItem({ to, end, icon, label, onClick }: NavItemProps) {
       onClick={onClick}
       className={({ isActive }) =>
         [
-          'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors duration-fast',
+          'flex items-center gap-2.5 rounded-md px-2.5 py-1.5 font-chrome text-sm font-medium transition-colors duration-fast',
           isActive
-            ? 'bg-sidebar-active-bg text-sidebar-active-text'
+            ? 'bg-sidebar-active-tint text-sidebar-active-text'
             : 'text-sidebar-text hover:bg-sidebar-hover-bg hover:text-sidebar-active-text',
         ].join(' ')
       }
     >
-      <span className="shrink-0 opacity-75">{icon}</span>
-      <span>{label}</span>
+      {({ isActive }) => (
+        <>
+          <span className={['shrink-0', isActive ? 'text-accent' : 'opacity-70'].join(' ')}>
+            {icon}
+          </span>
+          <span>{label}</span>
+        </>
+      )}
     </NavLink>
   )
 }
@@ -116,10 +122,11 @@ export function AppShell() {
           >
             <IconMenu size={20} />
           </button>
-          <span className="text-sm font-semibold tracking-wide text-sidebar-active-text">
+          <NeneMark size={20} className="shrink-0 text-accent" />
+          <span className="font-chrome text-sm font-bold tracking-tight text-sidebar-active-text">
             NeNe Records
           </span>
-          <span className="rounded bg-accent px-1.5 py-0.5 text-caption font-semibold uppercase tracking-wider text-white">
+          <span className="rounded-sm bg-accent px-1.5 py-0.5 font-chrome text-tiny font-bold uppercase tracking-wider text-text-inverse">
             Admin
           </span>
         </header>
@@ -145,10 +152,11 @@ export function AppShell() {
         >
           {/* Brand */}
           <div className="flex h-14 shrink-0 items-center gap-2 border-b border-sidebar-border px-4">
-            <span className="flex-1 text-sm font-semibold tracking-wide text-sidebar-active-text">
+            <NeneMark size={22} className="shrink-0 text-accent" />
+            <span className="flex-1 font-chrome text-sm font-bold tracking-tight text-sidebar-active-text">
               NeNe Records
             </span>
-            <span className="rounded bg-accent px-1.5 py-0.5 text-caption font-semibold uppercase tracking-wider text-white">
+            <span className="rounded-sm bg-accent px-1.5 py-0.5 font-chrome text-tiny font-bold uppercase tracking-wider text-text-inverse">
               Admin
             </span>
             {/* Close button — mobile only */}
@@ -241,7 +249,7 @@ export function AppShell() {
                     onClick={() => {
                       setAppearanceOpen((o) => !o)
                     }}
-                    className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-xs font-semibold uppercase tracking-wider text-sidebar-text-muted transition-colors hover:bg-sidebar-hover-bg hover:text-sidebar-active-text"
+                    className="flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 font-chrome text-tiny font-bold uppercase tracking-widest text-sidebar-text-muted transition-colors hover:bg-sidebar-hover-bg hover:text-sidebar-active-text"
                     aria-expanded={appearanceOpen}
                   >
                     <IconLayout size={12} className="shrink-0" />
@@ -296,7 +304,7 @@ export function AppShell() {
                     onClick={() => {
                       setAdvancedOpen((o) => !o)
                     }}
-                    className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-xs font-semibold uppercase tracking-wider text-sidebar-text-muted transition-colors hover:bg-sidebar-hover-bg hover:text-sidebar-active-text"
+                    className="flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 font-chrome text-tiny font-bold uppercase tracking-widest text-sidebar-text-muted transition-colors hover:bg-sidebar-hover-bg hover:text-sidebar-active-text"
                     aria-expanded={advancedOpen}
                   >
                     <span className="flex-1 text-left">{t('admin.nav.advanced')}</span>
@@ -370,7 +378,7 @@ export function AppShell() {
                 onChange={(e) => {
                   setLocale(e.target.value as typeof locale)
                 }}
-                className="min-w-0 flex-1 rounded-md border border-sidebar-border bg-sidebar-active-bg px-2 py-1.5 text-xs text-sidebar-text focus:outline-none focus:ring-1 focus:ring-accent"
+                className="min-w-0 flex-1 rounded-md border border-sidebar-border bg-sidebar-hover-bg px-2 py-1.5 text-xs text-sidebar-text focus:outline-none focus:ring-1 focus:ring-accent"
               >
                 {SUPPORTED_LOCALE_IDS.map((id) => (
                   <option key={id} value={id}>
@@ -389,7 +397,7 @@ export function AppShell() {
                       ? t('admin.theme.toggleLight')
                       : t('admin.theme.toggleDark')
                   }
-                  className="flex shrink-0 items-center justify-center rounded-md border border-sidebar-border bg-sidebar-active-bg p-1.5 text-sidebar-text transition-colors hover:bg-sidebar-hover-bg hover:text-sidebar-active-text"
+                  className="flex shrink-0 items-center justify-center rounded-md border border-sidebar-border bg-sidebar-hover-bg p-1.5 text-sidebar-text transition-colors hover:bg-sidebar-hover-bg hover:text-sidebar-active-text"
                 >
                   {themeVariant === 'dark' ? <IconSun size={15} /> : <IconMoon size={15} />}
                 </button>
@@ -401,7 +409,7 @@ export function AppShell() {
                 onClick={handleLogout}
                 aria-label={t('admin.nav.logout')}
                 title={t('admin.nav.logout')}
-                className="flex shrink-0 items-center justify-center rounded-md border border-sidebar-border bg-sidebar-active-bg p-1.5 text-sidebar-text transition-colors hover:border-red-800 hover:bg-red-950/60 hover:text-red-300"
+                className="flex shrink-0 items-center justify-center rounded-md border border-sidebar-border bg-sidebar-hover-bg p-1.5 text-sidebar-text transition-colors hover:border-red-800 hover:bg-red-950/60 hover:text-red-300"
               >
                 <IconLogOut size={15} />
               </button>
@@ -418,7 +426,9 @@ export function AppShell() {
 
         {/* ── Footer (fixed bottom-right) ─────────────────────────────────── */}
         <footer className="fixed bottom-0 right-0 pb-3 pl-4 pr-5 pt-2">
-          <p className="font-sans text-caption text-text-muted">Powered by NENE2 · © 2026 AYANE</p>
+          <p className="font-chrome text-tiny tracking-wide text-text-muted">
+            Powered by NENE2 · © 2026 AYANE
+          </p>
         </footer>
       </div>
     </ToastProvider>
