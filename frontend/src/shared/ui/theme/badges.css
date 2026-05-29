@@ -1,0 +1,46 @@
+/* ============================================================
+   Status badges (Console redesign §05)
+   Tinted pill + dot, driven by the --color-ok/warn/info tokens
+   so they adapt to every theme. color-mix lives here in the
+   theme layer (not as Tailwind arbitrary utilities).
+   ============================================================ */
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: var(--radius-full);
+  padding: 1px 8px;
+  font-family: var(--font-chrome);
+  font-size: var(--text-tiny);
+  font-weight: 600;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+
+.status-badge__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: currentColor;
+}
+
+.status-badge--published {
+  background: color-mix(in oklch, var(--color-ok) 18%, var(--color-surface-raised));
+  color: var(--color-ok);
+}
+
+.status-badge--draft {
+  background: color-mix(in oklch, var(--color-warn) 20%, var(--color-surface-raised));
+  color: color-mix(in oklch, var(--color-warn) 80%, var(--color-text-primary));
+}
+
+.status-badge--scheduled {
+  background: color-mix(in oklch, var(--color-info) 18%, var(--color-surface-raised));
+  color: var(--color-info);
+}
+
+.status-badge--archived {
+  background: color-mix(in oklch, var(--color-text-muted) 16%, var(--color-surface-raised));
+  color: var(--color-text-muted);
+}

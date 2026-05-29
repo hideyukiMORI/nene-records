@@ -1,18 +1,7 @@
 import { Link } from 'react-router-dom'
-import type { Entity, EntityStatus } from '@/entities/entity'
+import type { Entity } from '@/entities/entity'
 import { useTranslation } from '@/shared/i18n'
-import { Button, EmptyState, Stack, Text } from '@/shared/ui'
-
-const STATUS_BADGE_CLASS: Record<EntityStatus, string> = {
-  draft:
-    'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-yellow-100 text-yellow-800',
-  published:
-    'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-green-100 text-green-800',
-  archived:
-    'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-600',
-  scheduled:
-    'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-800',
-}
+import { Button, EmptyState, Stack, StatusBadge, Text } from '@/shared/ui'
 
 function formatDate(iso: string | null, locale: string): string {
   if (iso === null) return ''
@@ -114,9 +103,9 @@ export function EntityListPanel({
                 <Text as="span" variant="heading-sm">
                   {label}
                 </Text>
-                <span className={STATUS_BADGE_CLASS[item.status]}>
+                <StatusBadge status={item.status}>
                   {t(`admin.entityStatus.status.${item.status}`)}
-                </span>
+                </StatusBadge>
               </div>
 
               {/* 行2: body 1行（truncate） */}

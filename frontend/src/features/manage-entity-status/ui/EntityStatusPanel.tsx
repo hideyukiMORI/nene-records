@@ -1,19 +1,8 @@
 import type { EntityStatus } from '@/entities/entity'
 import { useTranslation } from '@/shared/i18n'
 import type { MessageKey } from '@/shared/i18n'
-import { Button, Input, Stack, Text } from '@/shared/ui'
+import { Button, Input, Stack, StatusBadge, Text } from '@/shared/ui'
 import type { EntityStatusPanelState } from '../hooks/useEntityStatusPanel'
-
-const STATUS_BADGE_CLASS: Record<EntityStatus, string> = {
-  draft:
-    'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-yellow-100 text-yellow-800',
-  published:
-    'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-green-100 text-green-800',
-  archived:
-    'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-gray-100 text-gray-600',
-  scheduled:
-    'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-blue-100 text-blue-800',
-}
 
 const NEXT_STATUSES: Record<EntityStatus, EntityStatus[]> = {
   draft: ['published', 'archived'],
@@ -63,9 +52,7 @@ export function EntityStatusPanel({
         {t('admin.entityStatus.panelTitle')}
       </Text>
       <div className="flex flex-wrap items-center gap-inline-md">
-        <span className={STATUS_BADGE_CLASS[currentStatus]}>
-          {t(STATUS_LABEL_KEYS[currentStatus])}
-        </span>
+        <StatusBadge status={currentStatus}>{t(STATUS_LABEL_KEYS[currentStatus])}</StatusBadge>
         {entity.publishedAt !== null && (
           <Text as="span" muted>
             {t('admin.entityStatus.publishedAt', {
@@ -150,7 +137,7 @@ export function EntityStatusPanel({
             onChange={(e) => {
               onScheduledAtChange(e.target.value)
             }}
-            className="rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="rounded-sm border border-border bg-surface px-3 py-2 text-sm text-text-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
           />
           <Button
             size="sm"
