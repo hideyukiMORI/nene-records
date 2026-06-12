@@ -27,6 +27,7 @@ final readonly class GetEntityTypeByIdUseCase implements GetEntityTypeByIdUseCas
             labels: $entityType->labels,
             permalinkPattern: $entityType->permalinkPattern,
             previousPermalinkPattern: $entityType->previousPermalinkPattern,
+            displayOrder: $entityType->displayOrder,
         );
     }
 }

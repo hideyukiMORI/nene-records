@@ -6,7 +6,7 @@ import {
   PERMALINK_PRESETS,
   resolvePermalink,
 } from '@/shared/lib/resolve-permalink'
-import { Button, Input, Stack, Text } from '@/shared/ui'
+import { Button, Card, Input, Stack, Text } from '@/shared/ui'
 import {
   EDIT_LABEL_FIELDS,
   useEditEntityTypeForm,
@@ -184,9 +184,9 @@ export function EntityTypeEditForm({
   })
 
   return (
-    <form
+    <Card
+      as="form"
       key={String(entityType.id)}
-      className="rounded-md border border-border bg-surface-raised p-inline-md shadow-sm"
       onSubmit={(event) => {
         void handleSubmit(async (values) => {
           await onSubmit(values)
@@ -305,6 +305,6 @@ export function EntityTypeEditForm({
           </Button>
         </div>
       </Stack>
-    </form>
+    </Card>
   )
 }

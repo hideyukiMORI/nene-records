@@ -9,6 +9,7 @@ describe('entity-type mapper', () => {
       name: 'Article',
       slug: 'article',
       is_pinned: true,
+      display_order: 3,
     })
 
     expect(model).toEqual({
@@ -16,9 +17,15 @@ describe('entity-type mapper', () => {
       name: 'Article',
       slug: 'article',
       isPinned: true,
+      displayOrder: 3,
       permalinkPattern: null,
       previousPermalinkPattern: null,
     })
+  })
+
+  it('defaults displayOrder to 0 when absent', () => {
+    const model = mapEntityTypeDtoToModel({ id: 9, name: 'X', slug: 'x', is_pinned: false })
+    expect(model.displayOrder).toBe(0)
   })
 
   it('maps list dto to model', () => {

@@ -21,7 +21,7 @@ final readonly class PdoEntityTypeRepository implements EntityTypeRepositoryInte
     public function findById(int $id): ?EntityType
     {
         $row = $this->query->fetchOne(
-            'SELECT id, name, slug, is_pinned, labels, permalink_pattern, previous_permalink_pattern FROM entity_types WHERE id = ? AND organization_id = ?',
+            'SELECT id, name, slug, is_pinned, labels, permalink_pattern, previous_permalink_pattern, display_order FROM entity_types WHERE id = ? AND organization_id = ?',
             [$id, $this->orgId->get()],
         );
 
@@ -35,7 +35,7 @@ final readonly class PdoEntityTypeRepository implements EntityTypeRepositoryInte
     public function findBySlug(string $slug): ?EntityType
     {
         $row = $this->query->fetchOne(
-            'SELECT id, name, slug, is_pinned, labels, permalink_pattern, previous_permalink_pattern FROM entity_types WHERE slug = ? AND organization_id = ?',
+            'SELECT id, name, slug, is_pinned, labels, permalink_pattern, previous_permalink_pattern, display_order FROM entity_types WHERE slug = ? AND organization_id = ?',
             [$slug, $this->orgId->get()],
         );
 
@@ -50,7 +50,7 @@ final readonly class PdoEntityTypeRepository implements EntityTypeRepositoryInte
     public function findAll(int $limit, int $offset): array
     {
         $rows = $this->query->fetchAll(
-            'SELECT id, name, slug, is_pinned, labels, permalink_pattern, previous_permalink_pattern FROM entity_types WHERE organization_id = ? ORDER BY id ASC LIMIT ? OFFSET ?',
+            'SELECT id, name, slug, is_pinned, labels, permalink_pattern, previous_permalink_pattern, display_order FROM entity_types WHERE organization_id = ? ORDER BY display_order ASC, id ASC LIMIT ? OFFSET ?',
             [$this->orgId->get(), $limit, $offset],
         );
 
@@ -59,8 +59,15 @@ final readonly class PdoEntityTypeRepository implements EntityTypeRepositoryInte
 
     public function save(EntityType $entityType): int
     {
+        // New types append to the end of the org's ordering.
+        $maxRow = $this->query->fetchOne(
+            'SELECT COALESCE(MAX(display_order), -1) AS max_order FROM entity_types WHERE organization_id = ?',
+            [$this->orgId->get()],
+        );
+        $nextOrder = ((int) ($maxRow['max_order'] ?? -1)) + 1;
+
         $this->query->execute(
-            'INSERT INTO entity_types (organization_id, name, slug, is_pinned, labels, permalink_pattern) VALUES (?, ?, ?, ?, ?, ?)',
+            'INSERT INTO entity_types (organization_id, name, slug, is_pinned, labels, permalink_pattern, display_order) VALUES (?, ?, ?, ?, ?, ?, ?)',
             [
                 $this->orgId->get(),
                 $entityType->name,
@@ -68,10 +75,29 @@ final readonly class PdoEntityTypeRepository implements EntityTypeRepositoryInte
                 $entityType->isPinned ? 1 : 0,
                 $entityType->labels !== null ? json_encode($entityType->labels, JSON_UNESCAPED_UNICODE) : null,
                 $entityType->permalinkPattern,
+                $nextOrder,
             ],
         );
 
         return $this->query->lastInsertId();
+    }
+
+    /**
+     * Persist a new sidebar ordering: each id's display_order becomes its index
+     * in $idsInOrder. Scoped to the current organization; unknown ids are ignored.
+     *
+     * @param list<int> $idsInOrder
+     */
+    public function reorder(array $idsInOrder): void
+    {
+        $position = 0;
+        foreach ($idsInOrder as $id) {
+            $this->query->execute(
+                'UPDATE entity_types SET display_order = ? WHERE id = ? AND organization_id = ?',
+                [$position, $id, $this->orgId->get()],
+            );
+            $position++;
+        }
     }
 
     public function update(EntityType $entityType): void
@@ -125,6 +151,7 @@ final readonly class PdoEntityTypeRepository implements EntityTypeRepositoryInte
             labels: $labels,
             permalinkPattern: $permalinkPattern,
             previousPermalinkPattern: $previousPermalinkPattern,
+            displayOrder: (int) ($row['display_order'] ?? 0),
         );
     }
 }

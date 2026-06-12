@@ -18,6 +18,7 @@ export function mapEntityTypeDtoToModel(dto: EntityTypeDto): EntityType {
     name: dto.name,
     slug: dto.slug,
     isPinned: dto.is_pinned,
+    displayOrder: dto.display_order ?? 0,
     labels: dto.labels && Object.keys(dto.labels).length > 0 ? dto.labels : undefined,
     permalinkPattern: dto.permalink_pattern ?? null,
     previousPermalinkPattern: dto.previous_permalink_pattern ?? null,

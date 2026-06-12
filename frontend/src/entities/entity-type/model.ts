@@ -5,6 +5,8 @@ export interface EntityType {
   name: string
   slug: string
   isPinned: boolean
+  /** Sidebar / pinned ordering (ascending). Lower appears first. */
+  displayOrder: number
   /** Locale-keyed display names. Empty object / undefined = no overrides. */
   labels?: Record<string, string>
   /**

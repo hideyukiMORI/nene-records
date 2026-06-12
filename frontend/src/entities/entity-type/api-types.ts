@@ -3,6 +3,8 @@ export interface EntityTypeDto {
   name: string
   slug: string
   is_pinned: boolean
+  /** Sidebar / pinned ordering (ascending). May be absent on older payloads. */
+  display_order?: number
   /** Locale-keyed display names, e.g. {"ja":"投稿","fr":"Articles"}. Empty object = no overrides. */
   labels?: Record<string, string>
   /**

@@ -68,6 +68,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/entity-types/reorder": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Reorder entity types
+         * @description Persists a new display order for the organization's entity types. Each id's display_order becomes its index in the provided array. This controls the order of pinned types in the admin sidebar and dashboard.
+         */
+        put: operations["reorderEntityTypes"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/entity-types/{id}": {
         parameters: {
             query?: never;
@@ -1415,6 +1435,8 @@ export interface components {
             name: string;
             slug: string;
             is_pinned: boolean;
+            /** @description Sidebar / pinned ordering (ascending). Lower appears first. */
+            display_order?: number;
             /**
              * @description URL pattern for public records. Tokens: {type} {slug} {id} {year} {month} {day}. Null = default "/{type}/{id}".
              * @example /{type}/{slug}
@@ -1437,6 +1459,10 @@ export interface components {
             };
             /** @description URL pattern. Must contain {slug} or {id}. Must start with /. */
             permalink_pattern?: string | null;
+        };
+        ReorderEntityTypesRequest: {
+            /** @description Entity type ids in the desired display order (ascending). */
+            ids: number[];
         };
         EntityTypeListResponse: {
             items: components["schemas"]["EntityTypeResponse"][];
@@ -2272,6 +2298,30 @@ export interface operations {
                 };
             };
             409: components["responses"]["Conflict"];
+            422: components["responses"]["ValidationFailed"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    reorderEntityTypes: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReorderEntityTypesRequest"];
+            };
+        };
+        responses: {
+            /** @description Order updated. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             422: components["responses"]["ValidationFailed"];
             500: components["responses"]["InternalServerError"];
         };
