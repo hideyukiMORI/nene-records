@@ -8,12 +8,14 @@ import {
   useUpdateEntity,
 } from '@/entities/entity'
 import { useTranslation } from '@/shared/i18n'
+import type { PublicLayoutKey } from '@/shared/lib/resolve-layout'
 import { useToast } from '@/shared/ui'
 
 export interface EntityStatusPanelState {
   entity: Entity
   entityTypeSlug?: string
   slugInput: string
+  layout: PublicLayoutKey | null
   showScheduleForm: boolean
   scheduledAtInput: string
   previewUrl: string | null
@@ -24,6 +26,7 @@ export interface EntityStatusPanelState {
   onToggleScheduleForm: () => void
   onCancelScheduleForm: () => void
   onChangeStatus: (nextStatus: EntityStatus) => void
+  onChangeLayout: (nextLayout: PublicLayoutKey | null) => void
   onSaveSlug: () => void
   onSchedulePublish: () => void
   onCancelSchedule: () => void
@@ -63,6 +66,8 @@ export function useEntityStatusPanel(
         entityTypeId: entity.entityTypeId,
         slug: slugInput !== '' ? slugInput : null,
         status: nextStatus,
+        // Preserve layout: the update endpoint is full-replace.
+        layout: entity.layout,
       })
     } catch {
       showToast(t('admin.entityStatus.updateError'), 'error')
@@ -76,10 +81,28 @@ export function useEntityStatusPanel(
         entityTypeId: entity.entityTypeId,
         slug: slugInput !== '' ? slugInput : null,
         status: entity.status,
+        layout: entity.layout,
       })
       showToast(t('admin.entityStatus.slugSaved'), 'success')
     } catch {
       showToast(t('admin.entityStatus.slugError'), 'error')
+    }
+  }
+
+  const onChangeLayout = async (nextLayout: PublicLayoutKey | null) => {
+    try {
+      await updateMutation.mutateAsync({
+        id: Number(entity.id),
+        entityTypeId: entity.entityTypeId,
+        slug: slugInput !== '' ? slugInput : null,
+        status: entity.status,
+        metaTitle: entity.metaTitle,
+        metaDescription: entity.metaDescription,
+        layout: nextLayout,
+      })
+      showToast(t('admin.entityStatus.layoutSaved'), 'success')
+    } catch {
+      showToast(t('admin.entityStatus.updateError'), 'error')
     }
   }
 
@@ -129,6 +152,7 @@ export function useEntityStatusPanel(
     entity,
     entityTypeSlug,
     slugInput,
+    layout: entity.layout,
     showScheduleForm,
     scheduledAtInput,
     previewUrl,
@@ -145,6 +169,9 @@ export function useEntityStatusPanel(
     },
     onChangeStatus: (nextStatus) => {
       void onChangeStatus(nextStatus)
+    },
+    onChangeLayout: (nextLayout) => {
+      void onChangeLayout(nextLayout)
     },
     onSaveSlug: () => {
       void onSaveSlug()

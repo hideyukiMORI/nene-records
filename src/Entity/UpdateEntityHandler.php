@@ -10,6 +10,7 @@ use Nene2\Http\JsonResponseFactory;
 use Nene2\Routing\Router;
 use Nene2\Validation\ValidationError;
 use Nene2\Validation\ValidationException;
+use NeNeRecords\Layout\PublicLayouts;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -61,6 +62,13 @@ final readonly class UpdateEntityHandler
         $rawMetaDescription = $body['meta_description'] ?? null;
         $metaDescription = is_string($rawMetaDescription) && trim($rawMetaDescription) !== '' ? trim($rawMetaDescription) : null;
 
+        // layout: optional override; null/empty = inherit the type's default_layout.
+        $rawLayout = $body['layout'] ?? null;
+        $layout = is_string($rawLayout) && trim($rawLayout) !== '' ? trim($rawLayout) : null;
+        if ($layout !== null && !PublicLayouts::isValid($layout)) {
+            $errors[] = new ValidationError('layout', 'Unknown layout.', 'invalid');
+        }
+
         if ($errors !== []) {
             throw new ValidationException($errors);
         }
@@ -75,6 +83,7 @@ final readonly class UpdateEntityHandler
             metaTitle: $metaTitle,
             metaDescription: $metaDescription,
             scheduledAt: $scheduledAt,
+            layout: $layout,
         ));
 
         return $this->response->create([
@@ -88,6 +97,7 @@ final readonly class UpdateEntityHandler
             'deleted_at' => $output->deletedAtIso,
             'meta_title' => $output->metaTitle,
             'meta_description' => $output->metaDescription,
+            'layout' => $output->layout,
         ]);
     }
 }

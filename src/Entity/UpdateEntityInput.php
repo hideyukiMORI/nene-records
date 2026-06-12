@@ -17,6 +17,7 @@ final readonly class UpdateEntityInput
         public ?string $metaTitle = null,
         public ?string $metaDescription = null,
         public ?DateTimeImmutable $scheduledAt = null,
+        public ?string $layout = null,
     ) {
     }
 }

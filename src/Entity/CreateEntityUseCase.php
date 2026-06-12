@@ -34,6 +34,7 @@ final readonly class CreateEntityUseCase implements CreateEntityUseCaseInterface
             entityTypeId: $input->entityTypeId,
             slug: $slug,
             status: $input->status,
+            layout: $input->layout,
         ));
 
         $this->webhooks?->dispatch('entity.created', $input->entityTypeId, $id);
@@ -46,6 +47,7 @@ final readonly class CreateEntityUseCase implements CreateEntityUseCaseInterface
             publishedAtIso: null,
             isDeleted: false,
             deletedAtIso: null,
+            layout: $input->layout,
         );
     }
 

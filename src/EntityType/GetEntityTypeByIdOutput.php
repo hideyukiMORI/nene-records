@@ -18,6 +18,7 @@ final readonly class GetEntityTypeByIdOutput
         public ?string $permalinkPattern = null,
         public ?string $previousPermalinkPattern = null,
         public int $displayOrder = 0,
+        public string $defaultLayout = 'standard',
     ) {
     }
 }

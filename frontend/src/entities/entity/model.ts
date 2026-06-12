@@ -1,3 +1,4 @@
+import type { PublicLayoutKey } from '@/shared/lib/resolve-layout'
 import type { EntityId } from './ids'
 
 export type EntityStatus = 'draft' | 'published' | 'archived' | 'scheduled'
@@ -6,6 +7,8 @@ export interface Entity {
   id: EntityId
   entityTypeId: number
   slug: string | null
+  /** Per-entity layout override; null = inherit the type's default layout. */
+  layout: PublicLayoutKey | null
   status: EntityStatus
   publishedAt: string | null
   scheduledAt: string | null
@@ -28,6 +31,7 @@ export interface CreateEntityInput {
   entityTypeId: number
   slug?: string | null
   status?: EntityStatus
+  layout?: PublicLayoutKey | null
 }
 
 export interface UpdateEntityInput {
@@ -39,6 +43,7 @@ export interface UpdateEntityInput {
   scheduledAt?: string | null
   metaTitle?: string | null
   metaDescription?: string | null
+  layout?: PublicLayoutKey | null
 }
 
 export interface ScheduleEntityInput {

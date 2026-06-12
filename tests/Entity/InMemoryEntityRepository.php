@@ -274,6 +274,7 @@ final class InMemoryEntityRepository implements EntityRepositoryInterface
             metaTitle: $entity->metaTitle,
             metaDescription: $entity->metaDescription,
             scheduledAt: $entity->scheduledAt,
+            layout: $entity->layout,
         );
 
         $this->revisions[] = new \NeNeRecords\Entity\EntityRevision(

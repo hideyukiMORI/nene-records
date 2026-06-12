@@ -101,6 +101,41 @@ final class EntityTypeHttpTest extends TestCase
         self::assertSame('Conflict', $payload['title']);
     }
 
+    public function testUpdateEntityTypePersistsDefaultLayout(): void
+    {
+        $id = $this->repository->save(new EntityType(name: 'Page', slug: 'page'));
+
+        $body = $this->factory->createStream(json_encode([
+            'name' => 'Page',
+            'slug' => 'page',
+            'default_layout' => 'full',
+        ], JSON_THROW_ON_ERROR));
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('PUT', "https://example.test/api/v1/entity-types/{$id}")->withBody($body),
+        );
+        $payload = $this->decodeJson($response);
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('full', $payload['default_layout']);
+        self::assertSame('full', $this->repository->findById($id)?->defaultLayout);
+    }
+
+    public function testUpdateEntityTypeRejectsUnknownDefaultLayoutWith422(): void
+    {
+        $id = $this->repository->save(new EntityType(name: 'Page', slug: 'page'));
+
+        $body = $this->factory->createStream(json_encode([
+            'name' => 'Page',
+            'slug' => 'page',
+            'default_layout' => 'fancy',
+        ], JSON_THROW_ON_ERROR));
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('PUT', "https://example.test/api/v1/entity-types/{$id}")->withBody($body),
+        );
+
+        self::assertSame(422, $response->getStatusCode());
+    }
+
     public function testGetEntityTypeByIdReturnsEntityType(): void
     {
         $id = $this->repository->save(new EntityType(name: 'Notebook', slug: 'notebook'));

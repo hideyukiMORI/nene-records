@@ -21,6 +21,8 @@ export const editEntityTypeFormSchema = createEntityTypeFormSchema.extend({
   labelDe: z.string().optional(),
   /** null = use default pattern (/{type}/{id}); empty string treated as null */
   permalinkPattern: z.string().nullable().optional(),
+  /** Default public-page layout for records of this type. */
+  defaultLayout: z.enum(['standard', 'full', 'bare']).default('standard'),
 })
 
 export type EditEntityTypeFormValues = z.infer<typeof editEntityTypeFormSchema>

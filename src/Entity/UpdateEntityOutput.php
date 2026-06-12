@@ -17,6 +17,7 @@ final readonly class UpdateEntityOutput
         public ?string $metaTitle = null,
         public ?string $metaDescription = null,
         public ?string $scheduledAtIso = null,
+        public ?string $layout = null,
     ) {
     }
 }

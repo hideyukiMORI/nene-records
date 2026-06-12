@@ -14,6 +14,7 @@ describe('entity mapper', () => {
     expect(model).toEqual({
       id: toEntityId(1),
       entityTypeId: 2,
+      layout: null,
       isDeleted: false,
       deletedAt: null,
     })

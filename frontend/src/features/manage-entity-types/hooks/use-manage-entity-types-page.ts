@@ -58,6 +58,7 @@ export function useManageEntityTypesPage() {
           isPinned: values.isPinned,
           labels: Object.keys(labels).length > 0 ? labels : undefined,
           permalinkPattern,
+          defaultLayout: values.defaultLayout,
         },
       })
       setEditTarget(null)

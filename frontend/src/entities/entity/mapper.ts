@@ -25,6 +25,7 @@ export function mapEntityDtoToModel(dto: EntityDto): Entity {
     id: toEntityId(dto.id),
     entityTypeId: dto.entity_type_id,
     slug: dto.slug,
+    layout: dto.layout ?? null,
     status: dto.status,
     publishedAt: dto.published_at,
     scheduledAt: dto.scheduled_at,
@@ -61,6 +62,7 @@ export function mapCreateInputToDto(input: CreateEntityInput): CreateEntityDto {
     entity_type_id: input.entityTypeId,
     ...(input.slug !== undefined ? { slug: input.slug } : {}),
     ...(input.status !== undefined ? { status: input.status } : {}),
+    ...(input.layout !== undefined ? { layout: input.layout } : {}),
   }
 }
 
@@ -72,6 +74,7 @@ export function mapUpdateInputToDto(input: UpdateEntityInput): UpdateEntityDto {
     ...(input.publishedAt !== undefined ? { published_at: input.publishedAt } : {}),
     ...(input.metaTitle !== undefined ? { meta_title: input.metaTitle } : {}),
     ...(input.metaDescription !== undefined ? { meta_description: input.metaDescription } : {}),
+    ...(input.layout !== undefined ? { layout: input.layout } : {}),
   }
 }
 

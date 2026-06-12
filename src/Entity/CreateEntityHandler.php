@@ -8,6 +8,7 @@ use Nene2\Http\JsonRequestBodyParser;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Validation\ValidationError;
 use Nene2\Validation\ValidationException;
+use NeNeRecords\Layout\PublicLayouts;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -40,6 +41,13 @@ final readonly class CreateEntityHandler
         $rawStatus = $body['status'] ?? null;
         $status = is_string($rawStatus) ? EntityStatus::tryFrom($rawStatus) ?? EntityStatus::Draft : EntityStatus::Draft;
 
+        // layout: optional override; null/empty = inherit the type's default_layout.
+        $rawLayout = $body['layout'] ?? null;
+        $layout = is_string($rawLayout) && trim($rawLayout) !== '' ? trim($rawLayout) : null;
+        if ($layout !== null && !PublicLayouts::isValid($layout)) {
+            $errors[] = new ValidationError('layout', 'Unknown layout.', 'invalid');
+        }
+
         if ($errors !== []) {
             throw new ValidationException($errors);
         }
@@ -49,6 +57,7 @@ final readonly class CreateEntityHandler
             entityTypeId: $entityTypeId,
             slug: $slug,
             status: $status,
+            layout: $layout,
         ));
 
         return $this->response->create(
@@ -60,6 +69,7 @@ final readonly class CreateEntityHandler
                 'published_at' => $output->publishedAtIso,
                 'is_deleted' => $output->isDeleted,
                 'deleted_at' => $output->deletedAtIso,
+                'layout' => $output->layout,
             ],
             201,
             ['Location' => '/api/v1/entities/' . $output->id],

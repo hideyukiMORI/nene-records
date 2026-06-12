@@ -19,6 +19,7 @@ final readonly class GetEntityByIdOutput
         public ?string $scheduledAtIso = null,
         public ?string $createdAtIso = null,
         public ?string $updatedAtIso = null,
+        public ?string $layout = null,
     ) {
     }
 }

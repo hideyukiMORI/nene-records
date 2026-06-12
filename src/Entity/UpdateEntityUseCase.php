@@ -64,6 +64,7 @@ final readonly class UpdateEntityUseCase implements UpdateEntityUseCaseInterface
             metaTitle: $input->metaTitle,
             metaDescription: $input->metaDescription,
             scheduledAt: $scheduledAt,
+            layout: $input->layout,
         );
 
         $this->entities->update($updated);
@@ -81,6 +82,7 @@ final readonly class UpdateEntityUseCase implements UpdateEntityUseCaseInterface
             metaTitle: $input->metaTitle,
             metaDescription: $input->metaDescription,
             scheduledAtIso: $scheduledAt?->format(DateTimeInterface::ATOM),
+            layout: $input->layout,
         );
     }
 

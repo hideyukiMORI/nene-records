@@ -4,13 +4,16 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { PublicIndexPage } from '@/pages/consumer/PublicIndexPage'
 import { resetEntityTypeStore, seedEntityTypes } from '@tests/msw/handlers/entity-type'
 import { mswServer } from '@tests/msw/server'
+import { PublicSiteTestProvider } from '@tests/render/PublicSiteTestProvider'
 import { renderWithProviders } from '@tests/render/render-with-providers'
 
 function renderIndexPage() {
   return renderWithProviders(
     <MemoryRouter initialEntries={['/']}>
       <Routes>
-        <Route path="/" element={<PublicIndexPage />} />
+        <Route element={<PublicSiteTestProvider />}>
+          <Route path="/" element={<PublicIndexPage />} />
+        </Route>
       </Routes>
     </MemoryRouter>,
   )

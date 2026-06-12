@@ -3,6 +3,7 @@ CREATE TABLE entities (
     organization_id INTEGER NOT NULL DEFAULT 0,
     entity_type_id INTEGER UNSIGNED NOT NULL,
     slug VARCHAR(255) NULL,
+    layout VARCHAR(32) NULL,
     status VARCHAR(16) NOT NULL DEFAULT 'draft',
     published_at DATETIME NULL,
     scheduled_at DATETIME NULL,

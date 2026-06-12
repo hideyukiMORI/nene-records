@@ -17,6 +17,7 @@ final readonly class UpdateEntityTypeOutput
         public ?array $labels = null,
         public ?string $permalinkPattern = null,
         public ?string $previousPermalinkPattern = null,
+        public string $defaultLayout = 'standard',
     ) {
     }
 }

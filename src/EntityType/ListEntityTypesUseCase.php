@@ -25,6 +25,7 @@ final readonly class ListEntityTypesUseCase implements ListEntityTypesUseCaseInt
                 permalinkPattern: $entityType->permalinkPattern,
                 previousPermalinkPattern: $entityType->previousPermalinkPattern,
                 displayOrder: $entityType->displayOrder,
+                defaultLayout: $entityType->defaultLayout,
             ),
             $rows,
         );

@@ -1,7 +1,8 @@
 import type { EntityStatus } from '@/entities/entity'
 import { useTranslation } from '@/shared/i18n'
 import type { MessageKey } from '@/shared/i18n'
-import { Button, Input, Stack, StatusBadge, Text } from '@/shared/ui'
+import type { PublicLayoutKey } from '@/shared/lib/resolve-layout'
+import { Button, Input, Select, Stack, StatusBadge, Text } from '@/shared/ui'
 import type { EntityStatusPanelState } from '../hooks/useEntityStatusPanel'
 
 const NEXT_STATUSES: Record<EntityStatus, EntityStatus[]> = {
@@ -27,11 +28,13 @@ export function EntityStatusPanel({
   previewUrl,
   previewExpires,
   isPending,
+  layout,
   onSlugInputChange,
   onScheduledAtChange,
   onToggleScheduleForm,
   onCancelScheduleForm,
   onChangeStatus,
+  onChangeLayout,
   onSaveSlug,
   onSchedulePublish,
   onCancelSchedule,
@@ -96,6 +99,24 @@ export function EntityStatusPanel({
             {publicUrl}
           </a>
         )}
+      </Stack>
+
+      <Stack gap="xs">
+        <Select
+          id="entity-layout"
+          label={t('admin.layout.entityLabel')}
+          disabled={isPending}
+          value={layout ?? ''}
+          onChange={(e) => {
+            const value = e.target.value
+            onChangeLayout(value === '' ? null : (value as PublicLayoutKey))
+          }}
+        >
+          <option value="">{t('admin.layout.inherit')}</option>
+          <option value="standard">{t('admin.layout.standard')}</option>
+          <option value="full">{t('admin.layout.full')}</option>
+          <option value="bare">{t('admin.layout.bare')}</option>
+        </Select>
       </Stack>
 
       <div className="flex flex-wrap gap-inline-sm">
