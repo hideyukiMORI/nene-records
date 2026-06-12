@@ -70,10 +70,11 @@ final readonly class UpdateEntityHandler
         }
 
         // A custom-layout page renders most content inside a sandboxed iframe,
-        // which crawlers attribute weakly. Require a meta description so the page
-        // always carries crawlable text (the dual-representation contract).
-        if ($layout === 'custom' && $metaDescription === null) {
-            $errors[] = new ValidationError('meta_description', 'Custom layout pages require a meta description.', 'required');
+        // which crawlers attribute weakly. Require a meta description so the
+        // *published* page always carries crawlable text (the dual-representation
+        // contract). Drafts are not crawled, so they may omit it while authoring.
+        if ($status === EntityStatus::Published && $layout === 'custom' && $metaDescription === null) {
+            $errors[] = new ValidationError('meta_description', 'Custom layout pages require a meta description before publishing.', 'required');
         }
 
         if ($errors !== []) {
