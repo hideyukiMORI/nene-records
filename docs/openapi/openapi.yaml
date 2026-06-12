@@ -2418,6 +2418,38 @@ paths:
         '413':
           $ref: '#/components/responses/PayloadTooLarge'
   /api/v1/media/{id}:
+    patch:
+      tags:
+        - Media
+      summary: Update media metadata
+      description: Updates editable media metadata. Currently the alt text only; a blank value clears it.
+      operationId: updateMedia
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMediaRequest'
+      responses:
+        '200':
+          description: Updated media item.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MediaResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     delete:
       tags:
         - Media
@@ -3811,6 +3843,20 @@ components:
         size:
           type: integer
           minimum: 0
+        width:
+          type: integer
+          minimum: 0
+          nullable: true
+          description: Pixel width for images; null for non-image files.
+        height:
+          type: integer
+          minimum: 0
+          nullable: true
+          description: Pixel height for images; null for non-image files.
+        alt_text:
+          type: string
+          nullable: true
+          description: Alternative text for accessibility / SEO.
         created_at:
           type: string
           format: date-time
@@ -3823,6 +3869,13 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/MediaResponse'
+    UpdateMediaRequest:
+      type: object
+      properties:
+        alt_text:
+          type: string
+          nullable: true
+          description: Alternative text. A blank or null value clears it.
     EntityResponse:
       type: object
       required:

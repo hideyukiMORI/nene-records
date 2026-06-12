@@ -463,6 +463,8 @@ export const ja: Partial<MessageCatalog> = {
   'admin.media.list.empty.description': '上のエリアからファイルをアップロードしてください。',
   'admin.media.copy': 'URL をコピー',
   'admin.media.copied': 'コピーしました！',
+  'admin.media.alt.label': '代替テキスト',
+  'admin.media.alt.placeholder': '画像の説明',
   'admin.media.delete': '削除',
   'admin.media.delete.confirmTitle': 'ファイルを削除しますか？',
   'admin.media.delete.confirmDescription': '「{{name}}」を削除しますか？この操作は元に戻せません。',

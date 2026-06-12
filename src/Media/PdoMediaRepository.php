@@ -18,11 +18,26 @@ final readonly class PdoMediaRepository implements MediaRepositoryInterface
     ) {
     }
 
+    private const COLUMNS = 'id, original_name, stored_name, mime_type, size, url, storage_key, width, height, alt_text, created_at';
+
     public function save(Media $media): int
     {
         $this->query->execute(
-            'INSERT INTO media (organization_id, original_name, stored_name, mime_type, size, url, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
-            [$this->orgId->get(), $media->originalName, $media->storedName, $media->mimeType, $media->size, $media->url, $media->createdAt],
+            'INSERT INTO media (organization_id, original_name, stored_name, mime_type, size, url, storage_key, width, height, alt_text, created_at)'
+            . ' VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [
+                $this->orgId->get(),
+                $media->originalName,
+                $media->storedName,
+                $media->mimeType,
+                $media->size,
+                $media->url,
+                $media->storageKey,
+                $media->width,
+                $media->height,
+                $media->altText,
+                $media->createdAt,
+            ],
         );
 
         return $this->query->lastInsertId();
@@ -31,7 +46,7 @@ final readonly class PdoMediaRepository implements MediaRepositoryInterface
     public function findById(int $id): ?Media
     {
         $row = $this->query->fetchOne(
-            'SELECT id, original_name, stored_name, mime_type, size, url, created_at FROM media WHERE id = ? AND organization_id = ?',
+            'SELECT ' . self::COLUMNS . ' FROM media WHERE id = ? AND organization_id = ?',
             [$id, $this->orgId->get()],
         );
 
@@ -46,11 +61,19 @@ final readonly class PdoMediaRepository implements MediaRepositoryInterface
     public function list(): array
     {
         $rows = $this->query->fetchAll(
-            'SELECT id, original_name, stored_name, mime_type, size, url, created_at FROM media WHERE organization_id = ? ORDER BY created_at DESC',
+            'SELECT ' . self::COLUMNS . ' FROM media WHERE organization_id = ? ORDER BY created_at DESC',
             [$this->orgId->get()],
         );
 
         return array_map(fn (array $row): Media => $this->mapRow($row), $rows);
+    }
+
+    public function updateAltText(int $id, ?string $altText): void
+    {
+        $this->query->execute(
+            'UPDATE media SET alt_text = ? WHERE id = ? AND organization_id = ?',
+            [$altText, $id, $this->orgId->get()],
+        );
     }
 
     public function delete(int $id): void
@@ -69,6 +92,10 @@ final readonly class PdoMediaRepository implements MediaRepositoryInterface
             size: (int) $row['size'],
             url: (string) $row['url'],
             createdAt: (string) $row['created_at'],
+            storageKey: (string) $row['storage_key'],
+            width: $row['width'] !== null ? (int) $row['width'] : null,
+            height: $row['height'] !== null ? (int) $row['height'] : null,
+            altText: $row['alt_text'] !== null ? (string) $row['alt_text'] : null,
         );
     }
 }

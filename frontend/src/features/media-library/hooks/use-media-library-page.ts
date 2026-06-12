@@ -1,10 +1,17 @@
 import { useCallback, useRef, useState } from 'react'
-import { useDeleteMedia, useMediaList, useUploadMedia, type Media } from '@/entities/media'
+import {
+  useDeleteMedia,
+  useMediaList,
+  useUpdateMediaAlt,
+  useUploadMedia,
+  type Media,
+} from '@/entities/media'
 
 export function useMediaLibraryPage() {
   const listQuery = useMediaList()
   const uploadMutation = useUploadMedia()
   const deleteMutation = useDeleteMedia()
+  const updateAltMutation = useUpdateMediaAlt()
 
   const [deleteTarget, setDeleteTarget] = useState<Media | null>(null)
   const [copiedId, setCopiedId] = useState<number | null>(null)
@@ -31,6 +38,15 @@ export function useMediaLibraryPage() {
       }, 2000)
     })
   }, [])
+
+  const updateAlt = useCallback(
+    (media: Media, altText: string) => {
+      const next = altText.trim() === '' ? null : altText.trim()
+      if (next === (media.altText ?? null)) return
+      void updateAltMutation.mutateAsync({ id: media.id, altText: next })
+    },
+    [updateAltMutation],
+  )
 
   const requestDelete = useCallback((media: Media) => {
     setDeleteTarget(media)
@@ -59,6 +75,9 @@ export function useMediaLibraryPage() {
 
     copiedId,
     copyUrl,
+
+    updateAlt,
+    isUpdatingAlt: updateAltMutation.isPending,
 
     deleteTarget,
     requestDelete,

@@ -13,5 +13,7 @@ interface MediaRepositoryInterface
     /** @return list<Media> */
     public function list(): array;
 
+    public function updateAltText(int $id, ?string $altText): void;
+
     public function delete(int $id): void;
 }

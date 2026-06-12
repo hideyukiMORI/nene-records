@@ -461,6 +461,8 @@ export const en = {
   'admin.media.list.empty.description': 'Upload your first file using the area above.',
   'admin.media.copy': 'Copy URL',
   'admin.media.copied': 'Copied!',
+  'admin.media.alt.label': 'Alt text',
+  'admin.media.alt.placeholder': 'Describe this image',
   'admin.media.delete': 'Delete',
   'admin.media.delete.confirmTitle': 'Delete file?',
   'admin.media.delete.confirmDescription': 'Delete "{{name}}"? This cannot be undone.',

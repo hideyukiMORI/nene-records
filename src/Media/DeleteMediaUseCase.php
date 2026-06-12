@@ -20,8 +20,12 @@ final readonly class DeleteMediaUseCase implements DeleteMediaUseCaseInterface
             throw new MediaNotFoundException($input->id);
         }
 
+        // Prefer the persisted storage key; fall back to reverse-parsing the URL
+        // for rows created before storage_key existed.
+        $key = $media->storageKey !== '' ? $media->storageKey : $this->storage->keyFromUrl($media->url);
+
         // Best-effort: the storage driver tolerates an already-removed object.
-        $this->storage->delete($this->storage->keyFromUrl($media->url));
+        $this->storage->delete($key);
 
         $this->media->delete($input->id);
     }
