@@ -135,7 +135,29 @@ final class EntityHttpTest extends TestCase
         self::assertSame(422, $response->getStatusCode());
     }
 
-    public function testUpdateCustomLayoutWithoutMetaDescriptionReturns422(): void
+    public function testPublishingCustomLayoutWithoutMetaDescriptionReturns422(): void
+    {
+        $typeId = $this->entityTypes->save(new EntityType(name: 'Page', slug: 'page'));
+        $created = $this->decodeJson($this->application->handle(
+            $this->factory->createServerRequest('POST', 'https://example.test/api/v1/entities')->withBody(
+                $this->factory->createStream(json_encode(['entity_type_id' => $typeId], JSON_THROW_ON_ERROR)),
+            ),
+        ));
+        $id = (int) $created['id'];
+
+        $body = $this->factory->createStream(json_encode([
+            'entity_type_id' => $typeId,
+            'status' => 'published',
+            'layout' => 'custom',
+        ], JSON_THROW_ON_ERROR));
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('PUT', "https://example.test/api/v1/entities/{$id}")->withBody($body),
+        );
+
+        self::assertSame(422, $response->getStatusCode());
+    }
+
+    public function testDraftCustomLayoutWithoutMetaDescriptionIsAllowed(): void
     {
         $typeId = $this->entityTypes->save(new EntityType(name: 'Page', slug: 'page'));
         $created = $this->decodeJson($this->application->handle(
@@ -154,7 +176,8 @@ final class EntityHttpTest extends TestCase
             $this->factory->createServerRequest('PUT', "https://example.test/api/v1/entities/{$id}")->withBody($body),
         );
 
-        self::assertSame(422, $response->getStatusCode());
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('custom', $this->decodeJson($response)['layout']);
     }
 
     public function testUpdateCustomLayoutWithMetaDescriptionSucceeds(): void

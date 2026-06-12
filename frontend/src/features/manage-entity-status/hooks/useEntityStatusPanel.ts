@@ -11,6 +11,19 @@ import { useTranslation } from '@/shared/i18n'
 import type { PublicLayoutKey } from '@/shared/lib/resolve-layout'
 import { useToast } from '@/shared/ui'
 
+/** Prefer the server's validation message (e.g. "meta description required") over a generic toast. */
+function serverMessage(error: unknown, fallback: string): string {
+  if (typeof error === 'object' && error !== null) {
+    const e = error as {
+      errors?: ReadonlyArray<{ message?: string }>
+      detail?: string
+      title?: string
+    }
+    return e.errors?.[0]?.message ?? e.detail ?? e.title ?? fallback
+  }
+  return fallback
+}
+
 export interface EntityStatusPanelState {
   entity: Entity
   entityTypeSlug?: string
@@ -69,8 +82,8 @@ export function useEntityStatusPanel(
         // Preserve layout: the update endpoint is full-replace.
         layout: entity.layout,
       })
-    } catch {
-      showToast(t('admin.entityStatus.updateError'), 'error')
+    } catch (e) {
+      showToast(serverMessage(e, t('admin.entityStatus.updateError')), 'error')
     }
   }
 
@@ -101,8 +114,8 @@ export function useEntityStatusPanel(
         layout: nextLayout,
       })
       showToast(t('admin.entityStatus.layoutSaved'), 'success')
-    } catch {
-      showToast(t('admin.entityStatus.updateError'), 'error')
+    } catch (e) {
+      showToast(serverMessage(e, t('admin.entityStatus.updateError')), 'error')
     }
   }
 
