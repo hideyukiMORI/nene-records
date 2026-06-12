@@ -12,7 +12,8 @@ use NeNeRecords\FieldDef\FieldTypeMismatchException;
 
 final readonly class UpdateTextFieldUseCase implements UpdateTextFieldUseCaseInterface
 {
-    private const TEXT_DATA_TYPE = 'text';
+    /** Data types whose values are stored in text_fields. */
+    private const TEXT_BACKED_DATA_TYPES = ['text', 'markdown', 'html', 'image', 'file'];
 
     public function __construct(
         private TextFieldRepositoryInterface $textFields,
@@ -63,8 +64,8 @@ final readonly class UpdateTextFieldUseCase implements UpdateTextFieldUseCaseInt
             throw new FieldKeyNotRegisteredException($fieldKey, $entityTypeId);
         }
 
-        if ($fieldDef->dataType !== self::TEXT_DATA_TYPE) {
-            throw new FieldTypeMismatchException($fieldKey, self::TEXT_DATA_TYPE, $fieldDef->dataType);
+        if (!in_array($fieldDef->dataType, self::TEXT_BACKED_DATA_TYPES, true)) {
+            throw new FieldTypeMismatchException($fieldKey, 'text', $fieldDef->dataType);
         }
     }
 }

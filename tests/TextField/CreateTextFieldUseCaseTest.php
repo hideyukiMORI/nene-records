@@ -73,6 +73,25 @@ final class CreateTextFieldUseCaseTest extends TestCase
         $useCase->execute(new CreateTextFieldInput(entityId: $entityId, fieldKey: 'title', value: 'Hello'));
     }
 
+    public function testAcceptsTextBackedDataTypesIncludingHtml(): void
+    {
+        $entities = new InMemoryEntityRepository([]);
+        $entityId = $entities->save(new Entity(id: null, entityTypeId: 1));
+
+        $fieldDefs = new InMemoryFieldDefRepository([
+            new FieldDef(entityTypeId: 1, fieldKey: 'block', dataType: 'html', id: 1),
+            new FieldDef(entityTypeId: 1, fieldKey: 'body', dataType: 'markdown', id: 2),
+        ]);
+        $textFields = new InMemoryTextFieldRepository([]);
+        $useCase = new CreateTextFieldUseCase($textFields, $entities, $fieldDefs);
+
+        $html = $useCase->execute(new CreateTextFieldInput(entityId: $entityId, fieldKey: 'block', value: '<p>hi</p>'));
+        $md = $useCase->execute(new CreateTextFieldInput(entityId: $entityId, fieldKey: 'body', value: '# Hi'));
+
+        self::assertSame('<p>hi</p>', $html->value);
+        self::assertSame('# Hi', $md->value);
+    }
+
     public function testThrowsFieldTypeMismatchExceptionWhenDataTypeIsNotText(): void
     {
         $entities = new InMemoryEntityRepository([]);

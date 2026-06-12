@@ -202,6 +202,25 @@ final class FieldDefHttpTest extends TestCase
         self::assertSame('int', $payload['data_type']);
     }
 
+    public function testPostFieldDefWithHtmlDataTypeCreatesDefinition(): void
+    {
+        $typeId = $this->entityTypes->save(new EntityType(name: 'Page', slug: 'page'));
+
+        $body = $this->factory->createStream(json_encode([
+            'entity_type_id' => $typeId,
+            'field_key' => 'block',
+            'data_type' => 'html',
+        ], JSON_THROW_ON_ERROR));
+
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('POST', 'https://example.test/api/v1/field-defs')->withBody($body),
+        );
+        $payload = $this->decodeJson($response);
+
+        self::assertSame(201, $response->getStatusCode());
+        self::assertSame('html', $payload['data_type']);
+    }
+
     public function testPostFieldDefWithRelationDataTypeCreatesDefinition(): void
     {
         $articleTypeId = $this->entityTypes->save(new EntityType(name: 'Article', slug: 'article'));

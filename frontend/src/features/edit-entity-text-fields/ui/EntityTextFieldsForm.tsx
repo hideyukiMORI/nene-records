@@ -105,6 +105,35 @@ export function EntityTextFieldsForm({
             )
           }
 
+          if (fieldDef.dataType === 'html') {
+            return (
+              <div key={fieldDef.fieldKey} className="flex flex-col gap-stack-xs">
+                <label
+                  htmlFor={fieldId}
+                  className="font-sans text-body font-medium text-text-primary"
+                >
+                  {label}
+                </label>
+                <textarea
+                  id={fieldId}
+                  rows={10}
+                  disabled={isSubmitting}
+                  value={values[fieldDef.fieldKey] ?? ''}
+                  onChange={(event) => {
+                    setValues((current) => ({
+                      ...current,
+                      [fieldDef.fieldKey]: event.target.value,
+                    }))
+                  }}
+                  className="rounded-sm border border-border bg-surface-raised px-inline-sm py-stack-xs font-mono text-caption text-text-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                />
+                <span className="font-sans text-caption text-text-muted">
+                  {t('admin.fieldDefs.html.hint')}
+                </span>
+              </div>
+            )
+          }
+
           if (fieldDef.dataType === 'bool') {
             return (
               <div key={fieldDef.fieldKey} className="flex flex-col gap-stack-xs">

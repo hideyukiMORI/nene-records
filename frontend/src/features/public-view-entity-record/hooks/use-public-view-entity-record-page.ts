@@ -56,6 +56,11 @@ export function usePublicViewEntityRecordPage(entityTypeId: number, entityId: nu
 
       switch (fieldDef.dataType) {
         case 'text':
+        case 'markdown':
+        case 'html':
+        case 'image':
+        case 'file':
+          // All text-backed types resolve their value from text_fields.
           raw =
             textFieldQuery.data?.items.find((item) => item.fieldKey === fieldDef.fieldKey)?.value ??
             null

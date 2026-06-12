@@ -1653,7 +1653,7 @@ export interface components {
             entity_type_id: number;
             field_key: string;
             /** @enum {string} */
-            data_type: "text" | "markdown" | "int" | "enum" | "bool" | "datetime" | "image" | "file" | "relation";
+            data_type: "text" | "markdown" | "html" | "int" | "enum" | "bool" | "datetime" | "image" | "file" | "relation";
             /**
              * @description Layout region this field renders into. Null = main.
              * @enum {string|null}
@@ -1671,7 +1671,7 @@ export interface components {
             entity_type_id: number;
             field_key: string;
             /** @enum {string} */
-            data_type: "text" | "markdown" | "int" | "enum" | "bool" | "datetime" | "image" | "file" | "relation";
+            data_type: "text" | "markdown" | "html" | "int" | "enum" | "bool" | "datetime" | "image" | "file" | "relation";
             /**
              * @description Layout region this field renders into. Null/omitted = main.
              * @enum {string|null}

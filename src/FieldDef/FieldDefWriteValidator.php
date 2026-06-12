@@ -10,7 +10,7 @@ use NeNeRecords\Layout\ContentRegions;
 final readonly class FieldDefWriteValidator
 {
     /** @var list<string> */
-    public const ALLOWED_DATA_TYPES = ['text', 'markdown', 'int', 'enum', 'bool', 'datetime', 'image', 'file', 'relation'];
+    public const ALLOWED_DATA_TYPES = ['text', 'markdown', 'html', 'int', 'enum', 'bool', 'datetime', 'image', 'file', 'relation'];
 
     /** @var list<string> */
     public const ALLOWED_CARDINALITIES = ['one', 'many'];
@@ -42,7 +42,7 @@ final readonly class FieldDefWriteValidator
         } elseif (!in_array($dataType, self::ALLOWED_DATA_TYPES, true)) {
             $errors[] = new ValidationError(
                 'data_type',
-                'Data type must be one of: text, markdown, int, enum, bool, datetime, image, file, relation.',
+                'Data type must be one of: text, markdown, html, int, enum, bool, datetime, image, file, relation.',
                 'invalid',
             );
         }

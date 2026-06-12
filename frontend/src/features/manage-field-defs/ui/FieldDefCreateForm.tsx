@@ -11,6 +11,7 @@ import {
 const DATA_TYPE_LABEL_KEYS: Record<FieldDataType, MessageKey> = {
   text: 'admin.fieldDefs.dataType.text',
   markdown: 'admin.fieldDefs.dataType.markdown',
+  html: 'admin.fieldDefs.dataType.html',
   int: 'admin.fieldDefs.dataType.int',
   enum: 'admin.fieldDefs.dataType.enum',
   bool: 'admin.fieldDefs.dataType.bool',

@@ -220,6 +220,8 @@ export const en = {
   'admin.fieldDefs.delete.description': '"{{fieldKey}}" will be removed from the schema.',
   'admin.fieldDefs.dataType.text': 'Text',
   'admin.fieldDefs.dataType.markdown': 'Markdown',
+  'admin.fieldDefs.dataType.html': 'HTML (sanitized)',
+  'admin.fieldDefs.html.hint': 'HTML with CSS is allowed; scripts are removed on display.',
   'admin.fieldDefs.dataType.int': 'Integer',
   'admin.fieldDefs.dataType.enum': 'Enum',
   'admin.fieldDefs.dataType.bool': 'Boolean',
