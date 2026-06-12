@@ -7,7 +7,7 @@ import type {
 } from '@/entities/notification-channel'
 import { NOTIFICATION_CHANNEL_TYPES } from '@/entities/notification-channel'
 import { useTranslation } from '@/shared/i18n'
-import { Button, Stack, Text } from '@/shared/ui'
+import { Button, Card, Stack, Text } from '@/shared/ui'
 
 type NotificationChannelFormProps =
   | {
@@ -164,11 +164,11 @@ export function NotificationChannelForm({
   const configFields = getConfigFields(channelType)
 
   return (
-    <form
+    <Card
+      as="form"
       onSubmit={(e) => {
         void handleSubmit(e)
       }}
-      className="rounded-md border border-border bg-surface-raised p-inline-md shadow-sm"
     >
       <Stack gap="sm">
         {serverErrorTitle !== null && (
@@ -273,6 +273,6 @@ export function NotificationChannelForm({
           </Button>
         </div>
       </Stack>
-    </form>
+    </Card>
   )
 }

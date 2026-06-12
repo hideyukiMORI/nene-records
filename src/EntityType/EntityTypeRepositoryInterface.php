@@ -17,5 +17,12 @@ interface EntityTypeRepositoryInterface
 
     public function update(EntityType $entityType): void;
 
+    /**
+     * Persist a new ordering for the current organization's entity types.
+     *
+     * @param list<int> $idsInOrder
+     */
+    public function reorder(array $idsInOrder): void;
+
     public function delete(int $id): void;
 }

@@ -2,7 +2,7 @@ import { Navigate } from 'react-router-dom'
 import { currentUserHasCapability } from '@/entities/auth'
 import { MediaLibraryView, useMediaLibraryPage } from '@/features/media-library'
 import { useTranslation } from '@/shared/i18n'
-import { Stack, Text } from '@/shared/ui'
+import { PageHeader, Stack } from '@/shared/ui'
 
 export function MediaPage() {
   const { t } = useTranslation()
@@ -15,10 +15,7 @@ export function MediaPage() {
 
   return (
     <Stack gap="md">
-      <Text as="h1" variant="heading-md">
-        {t('admin.media.pageTitle')}
-      </Text>
-      <Text muted>{t('admin.media.description')}</Text>
+      <PageHeader title={t('admin.media.pageTitle')} description={t('admin.media.description')} />
       <MediaLibraryView
         items={page.items}
         isLoading={page.isLoading}

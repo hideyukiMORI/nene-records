@@ -1,7 +1,7 @@
 import { useCallback } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from '@/shared/i18n'
-import { Button, Input, Stack, Text } from '@/shared/ui'
+import { Button, Card, Input, Select, Stack, Text } from '@/shared/ui'
 import type { InviteFormValues } from '../hooks/use-manage-users-page'
 
 export interface UserInviteFormProps {
@@ -36,8 +36,8 @@ export function UserInviteForm({
   )
 
   return (
-    <form
-      className="rounded-md border border-border bg-surface-raised p-inline-md shadow-sm"
+    <Card
+      as="form"
       onSubmit={(event) => {
         void handleSubmit(submit)(event)
       }}
@@ -56,20 +56,16 @@ export function UserInviteForm({
           disabled={isSubmitting}
           {...register('email', { required: t('admin.users.validation.emailRequired') })}
         />
-        <div>
-          <label htmlFor="invite-role" className="mb-1 block text-sm font-medium text-text-primary">
-            {t('admin.users.invite.roleLabel')}
-          </label>
-          <select
-            id="invite-role"
-            disabled={isSubmitting}
-            className="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent disabled:cursor-not-allowed disabled:opacity-50"
-            {...register('role')}
-          >
-            <option value="editor">{t('admin.users.role.editor')}</option>
-            <option value="admin">{t('admin.users.role.admin')}</option>
-          </select>
-        </div>
+        <Select
+          id="invite-role"
+          label={t('admin.users.invite.roleLabel')}
+          disabled={isSubmitting}
+          className="w-full"
+          {...register('role')}
+        >
+          <option value="editor">{t('admin.users.role.editor')}</option>
+          <option value="admin">{t('admin.users.role.admin')}</option>
+        </Select>
         {serverErrorTitle !== null ? (
           <Text muted className="text-red-500">
             {serverErrorTitle}
@@ -84,6 +80,6 @@ export function UserInviteForm({
           </Button>
         </div>
       </Stack>
-    </form>
+    </Card>
   )
 }

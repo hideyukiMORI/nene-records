@@ -1,4 +1,4 @@
-export type AdminThemeId = 'default' | 'github' | 'solarized' | 'dracula' | 'monokai'
+export type AdminThemeId = 'default' | 'ubuntu' | 'github' | 'solarized' | 'dracula' | 'monokai'
 export type ThemeVariant = 'light' | 'dark'
 
 export interface ThemePreviewColors {
@@ -25,12 +25,21 @@ export const ADMIN_THEME_DEFS: readonly AdminThemeDef[] = [
     },
   },
   {
+    id: 'ubuntu',
+    name: 'Ubuntu',
+    variants: ['light', 'dark'],
+    preview: {
+      light: { surface: '#f6f1ed', sidebar: '#2c0a23', accent: '#e2531d' },
+      dark: { surface: '#2a1622', sidebar: '#1c0c17', accent: '#f06a32' },
+    },
+  },
+  {
     id: 'github',
     name: 'GitHub',
     variants: ['light', 'dark'],
     preview: {
-      light: { surface: '#ffffff', sidebar: '#24292f', accent: '#0969da' },
-      dark: { surface: '#0d1117', sidebar: '#010409', accent: '#58a6ff' },
+      light: { surface: '#fbfcfd', sidebar: '#1f242b', accent: '#1f6feb' },
+      dark: { surface: '#14181f', sidebar: '#0b0e13', accent: '#69a7ff' },
     },
   },
   {
@@ -47,7 +56,7 @@ export const ADMIN_THEME_DEFS: readonly AdminThemeDef[] = [
     name: 'Dracula',
     variants: ['dark'],
     preview: {
-      dark: { surface: '#282a36', sidebar: '#21222c', accent: '#bd93f9' },
+      dark: { surface: '#282a36', sidebar: '#21222c', accent: '#d896f0' },
     },
   },
   {

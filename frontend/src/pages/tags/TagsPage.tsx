@@ -2,7 +2,7 @@ import { Navigate } from 'react-router-dom'
 import { ManageTagsView, useManageTagsPage } from '@/features/manage-tags'
 import { currentUserHasCapability } from '@/entities/auth'
 import { useTranslation } from '@/shared/i18n'
-import { Stack, Text } from '@/shared/ui'
+import { PageHeader, Stack } from '@/shared/ui'
 
 export function TagsPage() {
   const { t } = useTranslation()
@@ -35,9 +35,8 @@ export function TagsPage() {
 
   return (
     <Stack gap="md">
-      <Text as="h1" variant="heading-md">
-        {t('admin.tags.pageTitle')}
-      </Text>
+      {/* ── Page head: accent eyebrow + title (参考 redesign_05 .rd-eyebrow) ── */}
+      <PageHeader eyebrow={t('admin.tags.eyebrow')} title={t('admin.tags.pageTitle')} />
       <ManageTagsView
         items={items}
         isLoading={isLoading}

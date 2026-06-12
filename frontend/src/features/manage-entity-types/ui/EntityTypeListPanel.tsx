@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom'
 import { getLocalizedEntityTypeName, type EntityType } from '@/entities/entity-type'
 import { useTranslation } from '@/shared/i18n'
-import { Button, EmptyState, Stack, Text } from '@/shared/ui'
+import { Button, Card, EmptyState, ErrorState, LoadingState, Stack, Text } from '@/shared/ui'
+import { IconChevronDown, IconChevronUp } from '@/shared/ui/icons/Icons'
 
 export interface EntityTypeListPanelProps {
   items: EntityType[]
@@ -10,9 +11,11 @@ export interface EntityTypeListPanelProps {
   isError: boolean
   errorTitle: string | null
   isDeleting: boolean
+  isReordering: boolean
   onRetry: () => void
   onEdit: (entityType: EntityType) => void
   onDelete: (entityType: EntityType) => void
+  onMove: (entityType: EntityType, direction: 'up' | 'down') => void
 }
 
 export function EntityTypeListPanel({
@@ -22,25 +25,26 @@ export function EntityTypeListPanel({
   isError,
   errorTitle,
   isDeleting,
+  isReordering,
   onRetry,
   onEdit,
   onDelete,
+  onMove,
 }: EntityTypeListPanelProps) {
   const { t, locale } = useTranslation()
 
   if (isLoading) {
-    return <Text muted>{t('admin.entityTypes.existingList.loading')}</Text>
+    return <LoadingState>{t('admin.entityTypes.existingList.loading')}</LoadingState>
   }
 
   if (isError) {
     return (
-      <Stack gap="sm">
-        <Text variant="heading-sm">{t('admin.entityTypes.existingList.error')}</Text>
-        <Text muted>{errorTitle ?? t('common.error.unknown')}</Text>
-        <Button variant="secondary" onClick={onRetry}>
-          {t('common.actions.retry')}
-        </Button>
-      </Stack>
+      <ErrorState
+        title={t('admin.entityTypes.existingList.error')}
+        message={errorTitle ?? t('common.error.unknown')}
+        onRetry={onRetry}
+        retryLabel={t('common.actions.retry')}
+      />
     )
   }
 
@@ -55,19 +59,49 @@ export function EntityTypeListPanel({
 
   return (
     <ul className="flex flex-col gap-stack-sm">
-      {items.map((item) => (
-        <li
+      {items.map((item, index) => (
+        <Card
+          as="li"
           key={String(item.id)}
-          className="flex items-center justify-between gap-inline-md rounded-md border border-border bg-surface-raised px-inline-md py-stack-sm shadow-sm"
+          padding="row"
+          className="flex items-center justify-between gap-inline-md"
         >
-          <Stack gap="xs">
-            <Text as="span" variant="heading-sm">
-              {getLocalizedEntityTypeName(item, locale)}
-            </Text>
-            <Text as="span" muted>
-              {item.slug}
-            </Text>
-          </Stack>
+          <div className="flex min-w-0 items-center gap-inline-sm">
+            {canManageSchema ? (
+              <div className="flex shrink-0 flex-col">
+                <button
+                  type="button"
+                  aria-label={t('admin.entityTypes.actions.moveUp')}
+                  disabled={index === 0 || isReordering}
+                  onClick={() => {
+                    onMove(item, 'up')
+                  }}
+                  className="rounded-sm p-0.5 text-text-muted transition-colors hover:text-text-primary disabled:cursor-not-allowed disabled:opacity-30"
+                >
+                  <IconChevronUp size={14} />
+                </button>
+                <button
+                  type="button"
+                  aria-label={t('admin.entityTypes.actions.moveDown')}
+                  disabled={index === items.length - 1 || isReordering}
+                  onClick={() => {
+                    onMove(item, 'down')
+                  }}
+                  className="rounded-sm p-0.5 text-text-muted transition-colors hover:text-text-primary disabled:cursor-not-allowed disabled:opacity-30"
+                >
+                  <IconChevronDown size={14} />
+                </button>
+              </div>
+            ) : null}
+            <Stack gap="xs">
+              <Text as="span" variant="heading-sm">
+                {getLocalizedEntityTypeName(item, locale)}
+              </Text>
+              <Text as="span" muted>
+                {item.slug}
+              </Text>
+            </Stack>
+          </div>
           <div className="flex items-center gap-inline-sm">
             {canManageSchema ? (
               <Link to={`/admin/entity-types/${item.slug}/fields`}>
@@ -105,7 +139,7 @@ export function EntityTypeListPanel({
               </>
             ) : null}
           </div>
-        </li>
+        </Card>
       ))}
     </ul>
   )

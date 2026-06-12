@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { currentUserIsAdmin } from '@/entities/auth'
 import { useChangeEmail, useUpdateUserProfile, useUserById } from '@/entities/user'
 import { useTranslation } from '@/shared/i18n'
-import { Button, Input, Stack, Text } from '@/shared/ui'
+import { Button, Card, Input, PageHeader, Stack, Text } from '@/shared/ui'
 
 export function UserEditPage() {
   const { t } = useTranslation()
@@ -39,10 +39,10 @@ export function UserEditPage() {
   if (!isAdmin) {
     return (
       <Stack gap="md">
-        <Text as="h1" variant="heading-md">
-          {t('admin.users.edit.pageTitle')}
-        </Text>
-        <Text muted>{t('admin.users.edit.forbidden')}</Text>
+        <PageHeader
+          title={t('admin.users.edit.pageTitle')}
+          description={t('admin.users.edit.forbidden')}
+        />
       </Stack>
     )
   }
@@ -112,14 +112,11 @@ export function UserEditPage() {
             ← {t('admin.users.edit.backToList')}
           </Link>
         </div>
-        <Text as="h1" variant="heading-md">
-          {t('admin.users.edit.pageTitle')}
-        </Text>
-        <Text muted>{user.email}</Text>
+        <PageHeader title={t('admin.users.edit.pageTitle')} description={user.email} />
       </Stack>
 
       {/* Email section */}
-      <section className="rounded-lg border border-border bg-surface-raised p-6">
+      <Card as="section" padding="none" className="p-6">
         <Stack gap="md">
           <Text as="h2" variant="heading-sm">
             {t('admin.users.edit.email.title')}
@@ -158,10 +155,10 @@ export function UserEditPage() {
             </Button>
           </div>
         </Stack>
-      </section>
+      </Card>
 
       {/* Profile section */}
-      <section className="rounded-lg border border-border bg-surface-raised p-6">
+      <Card as="section" padding="none" className="p-6">
         <Stack gap="md">
           <Text as="h2" variant="heading-sm">
             {t('admin.users.edit.profile.title')}
@@ -212,7 +209,7 @@ export function UserEditPage() {
             </Button>
           </div>
         </Stack>
-      </section>
+      </Card>
     </Stack>
   )
 }

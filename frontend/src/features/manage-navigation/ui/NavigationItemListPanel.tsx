@@ -1,6 +1,6 @@
 import type { NavigationItem } from '@/entities/navigation-item'
 import { useTranslation } from '@/shared/i18n'
-import { Button, EmptyState, Stack, Text } from '@/shared/ui'
+import { Button, Card, EmptyState, ErrorState, LoadingState, Stack, Text } from '@/shared/ui'
 
 export interface NavigationItemListPanelProps {
   items: NavigationItem[]
@@ -26,17 +26,16 @@ export function NavigationItemListPanel({
   const { t } = useTranslation()
 
   if (isLoading) {
-    return <Text muted>{t('admin.navigation.loading')}</Text>
+    return <LoadingState>{t('admin.navigation.loading')}</LoadingState>
   }
 
   if (isError) {
     return (
-      <Stack gap="sm">
-        <Text muted>{errorTitle ?? t('common.error.unknown')}</Text>
-        <Button variant="secondary" onClick={onRetry}>
-          {t('common.actions.retry')}
-        </Button>
-      </Stack>
+      <ErrorState
+        message={errorTitle ?? t('common.error.unknown')}
+        onRetry={onRetry}
+        retryLabel={t('common.actions.retry')}
+      />
     )
   }
 
@@ -53,9 +52,11 @@ export function NavigationItemListPanel({
   return (
     <ul className="flex flex-col gap-stack-sm">
       {items.map((item) => (
-        <li
+        <Card
+          as="li"
           key={String(item.id)}
-          className="flex items-center justify-between gap-inline-md rounded-md border border-border bg-surface-raised px-inline-md py-stack-sm shadow-sm"
+          padding="row"
+          className="flex items-center justify-between gap-inline-md"
         >
           <Stack gap="xs">
             <Text as="span" variant="heading-sm">
@@ -89,7 +90,7 @@ export function NavigationItemListPanel({
               {t('common.actions.delete')}
             </Button>
           </div>
-        </li>
+        </Card>
       ))}
     </ul>
   )

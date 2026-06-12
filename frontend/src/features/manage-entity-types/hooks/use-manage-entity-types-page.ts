@@ -3,6 +3,7 @@ import {
   useCreateEntityType,
   useDeleteEntityType,
   useEntityTypeList,
+  useReorderEntityTypes,
   useUpdateEntityType,
   type EntityType,
   type EntityTypeId,
@@ -18,6 +19,7 @@ export function useManageEntityTypesPage() {
   const createMutation = useCreateEntityType()
   const updateMutation = useUpdateEntityType()
   const deleteMutation = useDeleteEntityType()
+  const reorderMutation = useReorderEntityTypes()
   const [editTarget, setEditTarget] = useState<EntityType | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<EntityType | null>(null)
 
@@ -76,6 +78,29 @@ export function useManageEntityTypesPage() {
     setDeleteTarget(null)
   }, [deleteMutation])
 
+  // Move a type one slot up/down and persist the whole order.
+  const moveEntityType = useCallback(
+    async (id: EntityTypeId, direction: 'up' | 'down') => {
+      const ids = (listQuery.data?.items ?? []).map((item) => item.id)
+      const from = ids.indexOf(id)
+      if (from === -1) {
+        return
+      }
+      const to = direction === 'up' ? from - 1 : from + 1
+      if (to < 0 || to >= ids.length) {
+        return
+      }
+      const next = [...ids]
+      const [removed] = next.splice(from, 1)
+      if (removed === undefined) {
+        return
+      }
+      next.splice(to, 0, removed)
+      await reorderMutation.mutateAsync(next)
+    },
+    [listQuery.data, reorderMutation],
+  )
+
   const confirmDelete = useCallback(async () => {
     if (deleteTarget === null) {
       return
@@ -107,5 +132,7 @@ export function useManageEntityTypesPage() {
     confirmDelete,
     isDeleting: deleteMutation.isPending,
     deleteErrorDetail: deleteMutation.error?.detail ?? deleteMutation.error?.title ?? null,
+    moveEntityType,
+    isReordering: reorderMutation.isPending,
   }
 }

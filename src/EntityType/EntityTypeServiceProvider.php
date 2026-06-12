@@ -194,6 +194,35 @@ final readonly class EntityTypeServiceProvider implements ServiceProviderInterfa
                 },
             )
             ->set(
+                ReorderEntityTypesUseCaseInterface::class,
+                static function (ContainerInterface $c): ReorderEntityTypesUseCaseInterface {
+                    $repository = $c->get(EntityTypeRepositoryInterface::class);
+
+                    if (!$repository instanceof EntityTypeRepositoryInterface) {
+                        throw new LogicException('Entity type repository service is invalid.');
+                    }
+
+                    return new ReorderEntityTypesUseCase($repository);
+                },
+            )
+            ->set(
+                ReorderEntityTypesHandler::class,
+                static function (ContainerInterface $c): ReorderEntityTypesHandler {
+                    $useCase = $c->get(ReorderEntityTypesUseCaseInterface::class);
+                    $responseFactory = $c->get(ResponseFactoryInterface::class);
+
+                    if (!$useCase instanceof ReorderEntityTypesUseCaseInterface) {
+                        throw new LogicException('ReorderEntityTypes use case service is invalid.');
+                    }
+
+                    if (!$responseFactory instanceof ResponseFactoryInterface) {
+                        throw new LogicException('Response factory service is invalid.');
+                    }
+
+                    return new ReorderEntityTypesHandler($useCase, $responseFactory);
+                },
+            )
+            ->set(
                 EntityTypeNotFoundExceptionHandler::class,
                 static function (ContainerInterface $c): EntityTypeNotFoundExceptionHandler {
                     $problemDetails = $c->get(ProblemDetailsResponseFactory::class);
@@ -237,6 +266,7 @@ final readonly class EntityTypeServiceProvider implements ServiceProviderInterfa
                     $update = $c->get(UpdateEntityTypeHandler::class);
                     $delete = $c->get(DeleteEntityTypeHandler::class);
                     $list = $c->get(ListEntityTypesHandler::class);
+                    $reorder = $c->get(ReorderEntityTypesHandler::class);
 
                     if (!$get instanceof GetEntityTypeByIdHandler) {
                         throw new LogicException('GetEntityTypeById handler service is invalid.');
@@ -258,7 +288,11 @@ final readonly class EntityTypeServiceProvider implements ServiceProviderInterfa
                         throw new LogicException('ListEntityTypes handler service is invalid.');
                     }
 
-                    return new EntityTypeRouteRegistrar($get, $create, $update, $delete, $list);
+                    if (!$reorder instanceof ReorderEntityTypesHandler) {
+                        throw new LogicException('ReorderEntityTypes handler service is invalid.');
+                    }
+
+                    return new EntityTypeRouteRegistrar($get, $create, $update, $delete, $list, $reorder);
                 },
             );
     }

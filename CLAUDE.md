@@ -51,14 +51,28 @@ npm run test --prefix frontend
 
 ## Local stack
 
-| Service | URL |
-| --- | --- |
-| API | http://localhost:8082 |
-| phpMyAdmin | http://localhost:8083 |
-| Mailpit | http://localhost:8026 |
-| Frontend dev | http://localhost:5173 |
+| Service | URL | env var |
+| --- | --- | --- |
+| API | http://localhost:18082 | `NENE_RECORDS_PORT` |
+| phpMyAdmin | http://localhost:18083 | `NENE_RECORDS_PHPMYADMIN_PORT` |
+| Mailpit | http://localhost:18026 | `NENE_RECORDS_MAILPIT_WEB_PORT` |
+| MySQL (host) | localhost:13308 | `NENE_RECORDS_MYSQL_PORT` |
+| Frontend dev | http://localhost:18084 | `NENE_RECORDS_FRONTEND_PORT` |
 
-Health check: `curl -fsS http://localhost:8082/health`
+Health check: `curl -fsS http://localhost:18082/health`
+
+Frontend dev: `npm run dev --prefix frontend` → http://localhost:18084
+
+### Port assignment rule
+
+NeNe Records uses the **180xx / 133xx** range to avoid conflicts with other local stacks:
+
+| Range | Owner |
+| --- | --- |
+| 83xx | NeNeClear |
+| 180xx + 133xx | NeNe Records (this project) |
+
+Do not revert ports to 80xx defaults. Set them in `.env` (committed values live in `.env.example` comments).
 
 ## Database migrations
 

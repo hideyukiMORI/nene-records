@@ -1,6 +1,6 @@
 import type { Tag } from '@/entities/tag'
 import { useTranslation } from '@/shared/i18n'
-import { Button, EmptyState, Stack, Text } from '@/shared/ui'
+import { Button, Card, EmptyState, ErrorState, LoadingState, Stack, Text } from '@/shared/ui'
 
 export interface TagListPanelProps {
   items: Tag[]
@@ -26,18 +26,17 @@ export function TagListPanel({
   const { t } = useTranslation()
 
   if (isLoading) {
-    return <Text muted>{t('admin.tags.list.loading')}</Text>
+    return <LoadingState>{t('admin.tags.list.loading')}</LoadingState>
   }
 
   if (isError) {
     return (
-      <Stack gap="sm">
-        <Text variant="heading-sm">{t('admin.tags.list.error')}</Text>
-        <Text muted>{errorTitle ?? t('common.error.unknown')}</Text>
-        <Button variant="secondary" onClick={onRetry}>
-          {t('common.actions.retry')}
-        </Button>
-      </Stack>
+      <ErrorState
+        title={t('admin.tags.list.error')}
+        message={errorTitle ?? t('common.error.unknown')}
+        onRetry={onRetry}
+        retryLabel={t('common.actions.retry')}
+      />
     )
   }
 
@@ -53,9 +52,11 @@ export function TagListPanel({
   return (
     <ul className="flex flex-col gap-stack-sm">
       {items.map((item) => (
-        <li
+        <Card
+          as="li"
           key={String(item.id)}
-          className="flex items-center justify-between gap-inline-md rounded-md border border-border bg-surface-raised px-inline-md py-stack-sm shadow-sm"
+          padding="row"
+          className="flex items-center justify-between gap-inline-md"
         >
           <Stack gap="xs">
             <Text as="span" variant="heading-sm">
@@ -86,7 +87,7 @@ export function TagListPanel({
               {t('common.actions.delete')}
             </Button>
           </div>
-        </li>
+        </Card>
       ))}
     </ul>
   )

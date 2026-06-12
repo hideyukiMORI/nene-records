@@ -23,6 +23,7 @@ export interface ManageEntityTypesViewProps {
   deleteTarget: EntityType | null
   isDeleting: boolean
   deleteErrorDetail: string | null
+  isReordering: boolean
   onRetry: () => void
   onCreate: (values: CreateEntityTypeFormValues) => Promise<void>
   onRequestEdit: (entityType: EntityType) => void
@@ -31,6 +32,7 @@ export interface ManageEntityTypesViewProps {
   onRequestDelete: (entityType: EntityType) => void
   onCancelDelete: () => void
   onConfirmDelete: () => Promise<void>
+  onMove: (entityType: EntityType, direction: 'up' | 'down') => void
 }
 
 export function ManageEntityTypesView({
@@ -47,6 +49,7 @@ export function ManageEntityTypesView({
   deleteTarget,
   isDeleting,
   deleteErrorDetail,
+  isReordering,
   onRetry,
   onCreate,
   onRequestEdit,
@@ -55,6 +58,7 @@ export function ManageEntityTypesView({
   onRequestDelete,
   onCancelDelete,
   onConfirmDelete,
+  onMove,
 }: ManageEntityTypesViewProps) {
   const { t } = useTranslation()
 
@@ -88,9 +92,11 @@ export function ManageEntityTypesView({
             isError={isError}
             errorTitle={errorTitle}
             isDeleting={isDeleting}
+            isReordering={isReordering}
             onRetry={onRetry}
             onEdit={onRequestEdit}
             onDelete={onRequestDelete}
+            onMove={onMove}
           />
         </Stack>
       </Stack>

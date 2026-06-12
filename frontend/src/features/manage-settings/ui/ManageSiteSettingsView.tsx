@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { SettingItem, SettingRevision } from '@/entities/setting'
 import { useTranslation } from '@/shared/i18n'
-import { Button, Stack, Text } from '@/shared/ui'
+import { Button, Card, ErrorState, LoadingState, Stack, Text, Textarea } from '@/shared/ui'
 
 // ── Revisions panel (props-driven) ───────────────────────────────────────────
 
@@ -72,7 +72,7 @@ function SettingCard({
     'rounded-md border border-border bg-surface px-inline-sm py-stack-sm font-sans text-body text-text-primary shadow-sm focus-visible:outline-none focus-visible:shadow-focus disabled:cursor-not-allowed disabled:opacity-50'
 
   return (
-    <section className="rounded-md border border-border bg-surface-raised p-inline-md shadow-sm">
+    <Card as="section">
       {/* ── Header row: label + history toggle ── */}
       <div className="mb-stack-sm flex items-center justify-between gap-inline-md">
         <label htmlFor={inputId} className="font-sans text-body font-medium text-text-primary">
@@ -96,7 +96,7 @@ function SettingCard({
               ? t('admin.settings.visibility.public')
               : t('admin.settings.visibility.adminOnly')}
           </Text>
-          <textarea
+          <Textarea
             id={inputId}
             value={value}
             disabled={isSaving || !canManageSettings}
@@ -104,7 +104,7 @@ function SettingCard({
             onChange={(e) => {
               setValue(e.target.value)
             }}
-            className={`w-full resize-y ${inputClass}`}
+            className="w-full resize-y"
           />
           {canManageSettings ? (
             <div className="flex justify-end">
@@ -158,7 +158,7 @@ function SettingCard({
           />
         </div>
       ) : null}
-    </section>
+    </Card>
   )
 }
 
@@ -196,17 +196,16 @@ export function ManageSiteSettingsView({
   const { t } = useTranslation()
 
   if (isLoading) {
-    return <Text muted>{t('admin.settings.loading')}</Text>
+    return <LoadingState>{t('admin.settings.loading')}</LoadingState>
   }
 
   if (isError) {
     return (
-      <Stack gap="sm">
-        <Text muted>{t('admin.settings.error')}</Text>
-        <Button variant="secondary" size="sm" onClick={onRetry}>
-          {t('common.actions.retry')}
-        </Button>
-      </Stack>
+      <ErrorState
+        message={t('admin.settings.error')}
+        onRetry={onRetry}
+        retryLabel={t('common.actions.retry')}
+      />
     )
   }
 

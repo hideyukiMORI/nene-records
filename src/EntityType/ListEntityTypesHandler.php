@@ -35,6 +35,7 @@ final readonly class ListEntityTypesHandler
                         'labels'                      => $item->labels ?? new \stdClass(),
                         'permalink_pattern'           => $item->permalinkPattern,
                         'previous_permalink_pattern'  => $item->previousPermalinkPattern,
+                        'display_order'               => $item->displayOrder,
                     ],
                     $output->items,
                 ),

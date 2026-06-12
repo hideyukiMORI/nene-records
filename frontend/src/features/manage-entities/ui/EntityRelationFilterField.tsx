@@ -1,5 +1,5 @@
 import type { RelationFieldDef } from '@/entities/field-def'
-import { Button, Stack, Text } from '@/shared/ui'
+import { Button, Select, Stack, Text } from '@/shared/ui'
 import { useEntityRelationFilterField } from '../hooks/use-entity-relation-filter-field'
 
 export interface EntityRelationFilterFieldProps {
@@ -39,7 +39,7 @@ export function EntityRelationFilterField({
       <label htmlFor={selectId} className="font-sans text-body font-medium text-text-primary">
         {fieldDef.fieldKey}
       </label>
-      <select
+      <Select
         id={selectId}
         disabled={targetOptions.length === 0}
         value={selectedTargetId === undefined ? '' : String(selectedTargetId)}
@@ -47,7 +47,6 @@ export function EntityRelationFilterField({
           const value = event.target.value
           onSelectTarget(value === '' ? undefined : Number(value))
         }}
-        className="rounded-md border border-border bg-surface-raised px-inline-md py-stack-sm font-sans text-body text-text-primary shadow-sm focus-visible:outline-none focus-visible:shadow-focus disabled:cursor-not-allowed disabled:opacity-50"
       >
         <option value="">
           {targetOptions.length === 0 ? 'No targets available' : 'Any target'}
@@ -57,7 +56,7 @@ export function EntityRelationFilterField({
             {option.label}
           </option>
         ))}
-      </select>
+      </Select>
     </div>
   )
 }

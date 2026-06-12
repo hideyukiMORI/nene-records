@@ -7,7 +7,7 @@ import {
 import { currentUserHasCapability } from '@/entities/auth'
 import { ManageFieldDefsView, useManageFieldDefsPage } from '@/features/manage-field-defs'
 import { useTranslation } from '@/shared/i18n'
-import { Button, Stack, Text } from '@/shared/ui'
+import { Button, PageHeader, Stack, Text } from '@/shared/ui'
 
 export function FieldDefsPage() {
   const { t } = useTranslation()
@@ -64,9 +64,7 @@ function FieldDefsContent({ entityType }: { entityType: EntityType }) {
             {t('admin.entityTypes.actions.backToTypes')}
           </Button>
         </Link>
-        <Text as="h1" variant="heading-md">
-          {getLocalizedEntityTypeName(entityType, locale)}
-        </Text>
+        <PageHeader title={getLocalizedEntityTypeName(entityType, locale)} />
       </Stack>
       <ManageFieldDefsView
         entityTypeSlug={entityType.slug}

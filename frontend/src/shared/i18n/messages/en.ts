@@ -52,6 +52,11 @@ export const en = {
   'admin.nav.logout': 'Log out',
   'admin.theme.toggleDark': 'Switch to dark mode',
   'admin.theme.toggleLight': 'Switch to light mode',
+  'admin.theme.light': 'Light',
+  'admin.theme.dark': 'Dark',
+  'admin.topbar.searchPlaceholder': 'Search records, settings…',
+  'admin.theme.appliesNote':
+    'Applies across the admin and the public site. Your choice is remembered on this device.',
   'admin.nav.openMenu': 'Open navigation menu',
   'admin.nav.closeMenu': 'Close navigation menu',
 
@@ -79,6 +84,9 @@ export const en = {
 
   // ── Home page ────────────────────────────────────────────────────────────
   'admin.home.title': 'Dashboard',
+  'admin.home.eyebrow': 'Overview',
+  'admin.home.subtitle': "What's happening across your content today.",
+  'admin.home.newRecord': 'New record',
   'admin.home.description': 'Welcome to NeNe Records.',
   'admin.home.openPublicSite': 'Open public site →',
   'admin.home.quickAccess': 'Quick access',
@@ -87,6 +95,7 @@ export const en = {
   'admin.home.quickAccess.empty':
     'No pinned content types yet. Pin a content type from the Content types settings to get started.',
   'admin.home.dashboard.todayAccess': "Today's accesses",
+  'admin.home.dashboard.accessTrend': 'Access trend over the last 8 days',
   'admin.home.dashboard.monthAccess': "This month's accesses",
   'admin.home.dashboard.recentPublished': 'Recently published',
   'admin.home.dashboard.entityTypeSummary': 'Content summary',
@@ -138,6 +147,8 @@ export const en = {
   'admin.entityTypes.delete.description': '"{{name}}" will be removed. This cannot be undone.',
   'admin.entityTypes.actions.fields': 'Fields',
   'admin.entityTypes.actions.records': 'Contents',
+  'admin.entityTypes.actions.moveUp': 'Move up',
+  'admin.entityTypes.actions.moveDown': 'Move down',
   'admin.entityTypes.actions.backToTypes': 'Back to content types',
 
   // ── Entity records ───────────────────────────────────────────────────────
@@ -235,6 +246,7 @@ export const en = {
   'admin.markdownEditor.empty': 'Nothing to preview.',
 
   // ── Tags ─────────────────────────────────────────────────────────────────
+  'admin.tags.eyebrow': 'Manage',
   'admin.tags.pageTitle': 'Tags',
   'admin.tags.list.title': 'Existing tags',
   'admin.tags.list.loading': 'Loading tags…',
@@ -242,6 +254,7 @@ export const en = {
   'admin.tags.list.empty.title': 'No tags yet',
   'admin.tags.list.empty.description': 'Create your first tag using the form above.',
   'admin.tags.createForm.title': 'Create tag',
+  'admin.tags.createForm.slugPlaceholder': 'auto from name',
   'admin.tags.createForm.submit': 'Create tag',
   'admin.tags.createForm.submitting': 'Creating…',
   'admin.tags.editForm.title': 'Edit tag',
@@ -345,7 +358,9 @@ export const en = {
   'admin.entitySeo.saveSuccess': 'SEO settings saved.',
 
   // ── Settings ──────────────────────────────────────────────────────────────
-  'admin.settings.appearance.title': 'Appearance',
+  'admin.settings.eyebrow': 'Configuration',
+  'admin.settings.appearance.title': 'Appearance · Theme',
+  'admin.settings.site.title': 'Site',
   'admin.settings.permalink.title': 'Permalinks',
   'admin.settings.permalink.description':
     'Choose the URL structure for each content type. Changes take effect immediately; old URLs redirect automatically.',
@@ -472,6 +487,7 @@ export const en = {
     'In use by {{count}} field(s). Remove the references below before deleting.',
 
   // ── Users ────────────────────────────────────────────────────────────────
+  'admin.users.eyebrow': 'Manage',
   'admin.users.pageTitle': 'Users',
   'admin.users.description': 'Manage user accounts, roles, and invitations.',
   'admin.nav.users': 'Users',

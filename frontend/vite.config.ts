@@ -14,6 +14,8 @@ export default defineConfig(({ mode }) => {
   const appPort = projectEnv['NENE_RECORDS_PORT'] ?? '8080'
   const target = `http://localhost:${appPort}`
 
+  const frontendPort = parseInt(projectEnv['NENE_RECORDS_FRONTEND_PORT'] ?? '18084', 10)
+
   return {
     plugins: [react(), tailwindcss()],
     resolve: {
@@ -23,6 +25,7 @@ export default defineConfig(({ mode }) => {
       },
     },
     server: {
+      port: frontendPort,
       proxy: {
         '/api': { target, changeOrigin: true },
         '/health': { target, changeOrigin: true },

@@ -1,4 +1,4 @@
-import { Button, EmptyState, Stack, Text } from '@/shared/ui'
+import { Card, EmptyState, ErrorState, LoadingState, Stack, Text } from '@/shared/ui'
 import type { EntityTypeListItem } from '../hooks/use-entity-type-list-page'
 
 export interface EntityTypeListViewProps {
@@ -17,18 +17,17 @@ export function EntityTypeListView({
   onRetry,
 }: EntityTypeListViewProps) {
   if (isLoading) {
-    return <Text muted>Loading entity types…</Text>
+    return <LoadingState>Loading entity types…</LoadingState>
   }
 
   if (isError) {
     return (
-      <Stack gap="sm">
-        <Text variant="heading-sm">Could not load entity types</Text>
-        <Text muted>{errorTitle ?? 'Unknown error'}</Text>
-        <Button variant="secondary" onClick={onRetry}>
-          Retry
-        </Button>
-      </Stack>
+      <ErrorState
+        title="Could not load entity types"
+        message={errorTitle ?? 'Unknown error'}
+        onRetry={onRetry}
+        retryLabel="Retry"
+      />
     )
   }
 
@@ -44,10 +43,7 @@ export function EntityTypeListView({
   return (
     <ul className="flex flex-col gap-stack-sm">
       {items.map((item) => (
-        <li
-          key={String(item.id)}
-          className="rounded-md border border-border bg-surface-raised px-inline-md py-stack-sm shadow-sm"
-        >
+        <Card as="li" key={String(item.id)} padding="row">
           <Stack gap="xs">
             <Text as="span" variant="heading-sm">
               {item.name}
@@ -56,7 +52,7 @@ export function EntityTypeListView({
               {item.slug}
             </Text>
           </Stack>
-        </li>
+        </Card>
       ))}
     </ul>
   )

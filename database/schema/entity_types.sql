@@ -4,6 +4,7 @@ CREATE TABLE entity_types (
     name VARCHAR(255) NOT NULL,
     slug VARCHAR(255) NOT NULL,
     is_pinned BOOLEAN NOT NULL DEFAULT 0,
+    display_order INTEGER NOT NULL DEFAULT 0,
     labels TEXT NULL DEFAULT NULL,
     permalink_pattern VARCHAR(255) NULL DEFAULT NULL,
     previous_permalink_pattern VARCHAR(255) NULL DEFAULT NULL

@@ -1,0 +1,80 @@
+/* ============================================================
+   Ubuntu theme (Console redesign — aubergine + orange)
+   Values mirror the redesign's base-themes.css `.rd[data-theme='ubuntu-*']`.
+   ============================================================ */
+
+/* ── Ubuntu Light ─────────────────────────────────────────── */
+[data-admin-theme='ubuntu-light'] {
+  --color-surface: oklch(97% 0.006 40);
+  --color-surface-raised: oklch(100% 0 0);
+  --color-surface-overlay: oklch(95% 0.01 40);
+
+  --color-sidebar-bg: oklch(20% 0.05 350);
+  --color-sidebar-text: oklch(90% 0.01 40);
+  --color-sidebar-text-muted: oklch(64% 0.03 30);
+  --color-sidebar-active-bg: oklch(55% 0.18 42);
+  --color-sidebar-active-text: oklch(99% 0.01 60);
+  --color-sidebar-hover-bg: oklch(26% 0.06 350);
+  --color-sidebar-border: oklch(28% 0.06 350);
+
+  --color-text-primary: oklch(24% 0.02 30);
+  --color-text-muted: oklch(48% 0.025 30);
+  --color-text-inverse: oklch(99% 0.005 60);
+
+  --color-border: oklch(88% 0.012 40);
+
+  --color-accent: oklch(58% 0.18 42);
+  --color-accent-hover: oklch(52% 0.18 42);
+  --color-accent-weak: color-mix(in oklch, var(--color-accent) 12%, var(--color-surface-raised));
+
+  --color-danger: oklch(52% 0.21 25);
+  --color-danger-hover: oklch(46% 0.21 25);
+
+  --color-ok: oklch(58% 0.14 150);
+  --color-warn: oklch(70% 0.15 75);
+  --color-info: oklch(58% 0.14 250);
+
+  --color-focus-ring: oklch(62% 0.16 42);
+
+  --shadow-sm: 0 1px 2px oklch(0% 0 0 / 0.05);
+  --shadow-md: 0 6px 20px oklch(0% 0 0 / 0.08);
+  --shadow-lg: 0 16px 40px oklch(0% 0 0 / 0.1);
+}
+
+/* ── Ubuntu Dark ──────────────────────────────────────────── */
+[data-admin-theme='ubuntu-dark'] {
+  --color-surface: oklch(19% 0.04 350);
+  --color-surface-raised: oklch(24% 0.045 350);
+  --color-surface-overlay: oklch(28% 0.05 350);
+
+  --color-sidebar-bg: oklch(14% 0.04 350);
+  --color-sidebar-text: oklch(92% 0.01 40);
+  --color-sidebar-text-muted: oklch(60% 0.03 30);
+  --color-sidebar-active-bg: oklch(55% 0.18 42);
+  --color-sidebar-active-text: oklch(99% 0.01 60);
+  --color-sidebar-hover-bg: oklch(22% 0.05 350);
+  --color-sidebar-border: oklch(30% 0.05 350);
+
+  --color-text-primary: oklch(94% 0.01 40);
+  --color-text-muted: oklch(64% 0.025 30);
+  --color-text-inverse: oklch(18% 0.04 350);
+
+  --color-border: oklch(33% 0.04 350);
+
+  --color-accent: oklch(64% 0.18 42);
+  --color-accent-hover: oklch(70% 0.18 42);
+  --color-accent-weak: color-mix(in oklch, var(--color-accent) 16%, var(--color-surface-raised));
+
+  --color-danger: oklch(62% 0.21 25);
+  --color-danger-hover: oklch(56% 0.21 25);
+
+  --color-ok: oklch(70% 0.15 150);
+  --color-warn: oklch(76% 0.15 80);
+  --color-info: oklch(70% 0.13 250);
+
+  --color-focus-ring: oklch(66% 0.16 42);
+
+  --shadow-sm: 0 1px 2px oklch(0% 0 0 / 0.4);
+  --shadow-md: 0 8px 24px oklch(0% 0 0 / 0.5);
+  --shadow-lg: 0 18px 44px oklch(0% 0 0 / 0.6);
+}

@@ -20,6 +20,7 @@ final readonly class EntityType
         public ?array $labels = null,
         public ?string $permalinkPattern = null,
         public ?string $previousPermalinkPattern = null,
+        public int $displayOrder = 0,
     ) {
     }
 }

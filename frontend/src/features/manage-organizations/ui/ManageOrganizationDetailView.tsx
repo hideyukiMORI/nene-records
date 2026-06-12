@@ -1,7 +1,7 @@
 import { useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { PLANS } from '@/entities/organization'
-import { Button, ConfirmDialog, Input, Stack, Text } from '@/shared/ui'
+import { Button, Card, ConfirmDialog, Input, PageHeader, Select, Stack, Text } from '@/shared/ui'
 import { IconChevronLeft, IconDownload, IconUpload } from '@/shared/ui/icons/Icons'
 import type { ManageOrganizationDetailPageState } from '../hooks/useManageOrganizationDetailPage'
 
@@ -61,17 +61,19 @@ export function ManageOrganizationDetailView({
           <IconChevronLeft size={14} />
           Organizations
         </Link>
-        <Text as="h1" variant="heading-md">
-          {org.name}
-        </Text>
-        <Text muted>
-          ID: {org.id} · Created: {org.createdAt ?? '—'}
-        </Text>
+        <PageHeader
+          title={org.name}
+          description={
+            <>
+              ID: {org.id} · Created: {org.createdAt ?? '—'}
+            </>
+          }
+        />
       </div>
 
       {/* Edit form */}
       <form onSubmit={onUpdate}>
-        <div className="rounded-lg border border-border bg-surface-raised p-6">
+        <Card padding="none" className="p-6">
           <Text as="h2" variant="heading-sm">
             Organization Settings
           </Text>
@@ -121,20 +123,20 @@ export function ManageOrganizationDetailView({
               >
                 Plan *
               </label>
-              <select
+              <Select
                 id="edit-org-plan"
                 value={currentPlan}
                 onChange={(e) => {
                   onPlanChange(e.target.value)
                 }}
-                className="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary focus:border-accent focus:outline-none"
+                className="w-full"
               >
                 {PLANS.map((p) => (
                   <option key={p} value={p}>
                     {p.charAt(0).toUpperCase() + p.slice(1)}
                   </option>
                 ))}
-              </select>
+              </Select>
             </div>
 
             <div>
@@ -175,11 +177,11 @@ export function ManageOrganizationDetailView({
               </Button>
             </div>
           </Stack>
-        </div>
+        </Card>
       </form>
 
       {/* Export / Import */}
-      <div className="rounded-lg border border-border bg-surface-raised p-6">
+      <Card padding="none" className="p-6">
         <Text as="h2" variant="heading-sm">
           Export &amp; Import
         </Text>
@@ -227,7 +229,7 @@ export function ManageOrganizationDetailView({
             }}
           />
         </div>
-      </div>
+      </Card>
 
       {/* Danger zone */}
       <div className="rounded-lg border border-red-200 bg-red-50 p-6 dark:border-red-900/40 dark:bg-red-950/20">

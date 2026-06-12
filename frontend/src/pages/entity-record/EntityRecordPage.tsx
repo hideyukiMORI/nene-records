@@ -24,7 +24,7 @@ import {
 } from '@/features/manage-entity-relations'
 import { InverseEntityRelationsView } from '@/features/inverse-entity-relations'
 import { useTranslation } from '@/shared/i18n'
-import { Button, Stack, Text } from '@/shared/ui'
+import { Button, PageHeader, Stack, Text } from '@/shared/ui'
 
 export function EntityRecordPage() {
   const { t } = useTranslation()
@@ -116,9 +116,7 @@ function EntityRecordContent({
             {t('admin.entityRecord.backToRecords')}
           </Button>
         </Link>
-        <Text as="h1" variant="heading-md">
-          {getLocalizedEntityTypeName(entityType, locale)}
-        </Text>
+        <PageHeader title={getLocalizedEntityTypeName(entityType, locale)} />
       </Stack>
       {entity !== null && (
         <EntityStatusPanelSection entity={entity} entityTypeSlug={entityType.slug} />

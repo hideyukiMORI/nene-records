@@ -1,6 +1,6 @@
 import { Controller } from 'react-hook-form'
 import { useTranslation } from '@/shared/i18n'
-import { Button, Input, Stack, Text } from '@/shared/ui'
+import { Button, Card, Input, Stack, Text } from '@/shared/ui'
 import type { CreateEntityTypeFormValues } from '../hooks/use-create-entity-type-form'
 import { useCreateEntityTypeForm } from '../hooks/use-create-entity-type-form'
 
@@ -24,8 +24,8 @@ export function EntityTypeCreateForm({
   } = useCreateEntityTypeForm()
 
   return (
-    <form
-      className="rounded-md border border-border bg-surface-raised p-inline-md shadow-sm"
+    <Card
+      as="form"
       onSubmit={(event) => {
         void handleSubmit(async (values) => {
           await onSubmit(values)
@@ -80,6 +80,6 @@ export function EntityTypeCreateForm({
             : t('admin.entityTypes.createForm.submit')}
         </Button>
       </Stack>
-    </form>
+    </Card>
   )
 }

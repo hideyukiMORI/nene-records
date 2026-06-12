@@ -25,15 +25,22 @@
   /* ── Accent (brighter for dark bg) ───────────────────────────────────── */
   --color-accent: oklch(72% 0.17 72);
   --color-accent-hover: oklch(66% 0.17 72);
+  --color-accent-weak: color-mix(in oklch, var(--color-accent) 16%, var(--color-surface-raised));
 
   /* ── Danger ──────────────────────────────────────────────────────────── */
   --color-danger: oklch(62% 0.2 25);
   --color-danger-hover: oklch(56% 0.2 25);
 
+  /* ── Status ──────────────────────────────────────────────────────────── */
+  --color-ok: oklch(70% 0.15 150);
+  --color-warn: oklch(76% 0.15 80);
+  --color-info: oklch(70% 0.13 250);
+
   /* ── Focus ring ──────────────────────────────────────────────────────── */
   --color-focus-ring: oklch(74% 0.14 72);
 
-  /* ── Shadows (subtler in dark) ───────────────────────────────────────── */
-  --shadow-sm: 0 1px 2px oklch(0% 0 0 / 0.2);
-  --shadow-md: 0 4px 12px oklch(0% 0 0 / 0.4);
+  /* ── Shadows (deeper in dark) ────────────────────────────────────────── */
+  --shadow-sm: 0 1px 2px oklch(0% 0 0 / 0.4);
+  --shadow-md: 0 8px 24px oklch(0% 0 0 / 0.5);
+  --shadow-lg: 0 18px 44px oklch(0% 0 0 / 0.6);
 }

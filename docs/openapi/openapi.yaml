@@ -163,6 +163,29 @@ paths:
           $ref: '#/components/responses/ValidationFailed'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /api/v1/entity-types/reorder:
+    put:
+      tags:
+        - EntityTypes
+      summary: Reorder entity types
+      description: >-
+        Persists a new display order for the organization's entity types.
+        Each id's display_order becomes its index in the provided array.
+        This controls the order of pinned types in the admin sidebar and dashboard.
+      operationId: reorderEntityTypes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReorderEntityTypesRequest'
+      responses:
+        '204':
+          description: Order updated.
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /api/v1/entity-types/{id}:
     get:
       tags:
@@ -3804,6 +3827,9 @@ components:
           type: string
         is_pinned:
           type: boolean
+        display_order:
+          type: integer
+          description: 'Sidebar / pinned ordering (ascending). Lower appears first.'
         permalink_pattern:
           type: string
           nullable: true
@@ -3850,6 +3876,18 @@ components:
           type: string
           nullable: true
           description: 'URL pattern. Must contain {slug} or {id}. Must start with /.'
+      additionalProperties: false
+    ReorderEntityTypesRequest:
+      type: object
+      required:
+        - ids
+      properties:
+        ids:
+          type: array
+          description: 'Entity type ids in the desired display order (ascending).'
+          items:
+            type: integer
+            format: int64
       additionalProperties: false
     EntityTypeListResponse:
       type: object

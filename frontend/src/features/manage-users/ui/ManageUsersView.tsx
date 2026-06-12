@@ -1,6 +1,6 @@
 import type { User, UserRole } from '@/entities/user'
 import { useTranslation } from '@/shared/i18n'
-import { Button, ConfirmDialog, Stack, Text } from '@/shared/ui'
+import { ConfirmDialog, SectionHeader, Stack } from '@/shared/ui'
 import type {
   AdminResetPasswordFormValues,
   ChangeOwnPasswordFormValues,
@@ -21,7 +21,6 @@ export interface ManageUsersViewProps {
   showInviteForm: boolean
   isInviting: boolean
   inviteErrorTitle: string | null
-  onOpenInviteForm: () => void
   onCloseInviteForm: () => void
   onInvite: (values: InviteFormValues) => Promise<void>
 
@@ -38,7 +37,6 @@ export interface ManageUsersViewProps {
   showChangeOwnPassword: boolean
   isChangingOwnPassword: boolean
   changeOwnPasswordErrorTitle: string | null
-  onOpenChangeOwnPassword: () => void
   onCloseChangeOwnPassword: () => void
   onChangeOwnPassword: (values: ChangeOwnPasswordFormValues) => Promise<void>
 
@@ -61,7 +59,6 @@ export function ManageUsersView({
   showInviteForm,
   isInviting,
   inviteErrorTitle,
-  onOpenInviteForm,
   onCloseInviteForm,
   onInvite,
 
@@ -78,7 +75,6 @@ export function ManageUsersView({
   showChangeOwnPassword,
   isChangingOwnPassword,
   changeOwnPasswordErrorTitle,
-  onOpenChangeOwnPassword,
   onCloseChangeOwnPassword,
   onChangeOwnPassword,
 
@@ -95,20 +91,6 @@ export function ManageUsersView({
   return (
     <>
       <Stack gap="lg">
-        {/* Toolbar */}
-        <div className="flex items-center gap-2">
-          <Button onClick={onOpenInviteForm} disabled={showInviteForm}>
-            {t('admin.users.invite.button')}
-          </Button>
-          <Button
-            variant="secondary"
-            onClick={onOpenChangeOwnPassword}
-            disabled={showChangeOwnPassword}
-          >
-            {t('admin.users.changeOwnPassword.button')}
-          </Button>
-        </div>
-
         {/* Invite form */}
         {showInviteForm ? (
           <UserInviteForm
@@ -142,9 +124,7 @@ export function ManageUsersView({
 
         {/* User list */}
         <Stack gap="sm">
-          <Text as="h2" variant="heading-sm">
-            {t('admin.users.list.title')}
-          </Text>
+          <SectionHeader>{t('admin.users.list.title')}</SectionHeader>
           <UserListPanel
             users={users}
             isLoading={isLoading || isUpdatingRole}

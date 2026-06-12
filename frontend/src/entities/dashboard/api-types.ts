@@ -21,3 +21,15 @@ export interface DashboardSummaryDto {
   this_month_access_count: number
   entity_type_summary: DashboardEntityTypeSummaryDto[]
 }
+
+export interface AccessStatsDayItemDto {
+  date: string
+  request_count: number
+  avg_duration_ms: number
+}
+
+export interface AccessStatsByDateDto {
+  from: string
+  to: string
+  items: AccessStatsDayItemDto[]
+}

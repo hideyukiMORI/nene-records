@@ -5,7 +5,7 @@ import type {
   UpdateNotificationChannelInput,
 } from '@/entities/notification-channel'
 import { useTranslation } from '@/shared/i18n'
-import { Button, ConfirmDialog, EmptyState, Stack, Text } from '@/shared/ui'
+import { Button, Card, ConfirmDialog, EmptyState, PageHeader, Stack, Text } from '@/shared/ui'
 import { NotificationChannelForm } from './NotificationChannelForm'
 
 interface ManageNotificationChannelsViewProps {
@@ -36,12 +36,14 @@ interface ManageNotificationChannelsViewProps {
   onDeleteCancel: () => void
 }
 
+// テーマ安全なトークン化チップに統一（旧 dark: 変種は data-admin-theme 機構では効かなかった）
+const CHANNEL_TYPE_CHIP = 'bg-surface-overlay text-text-muted'
 const CHANNEL_TYPE_COLORS: Record<string, string> = {
-  email: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-  slack: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
-  discord: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400',
-  chatwork: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400',
-  webhook: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
+  email: CHANNEL_TYPE_CHIP,
+  slack: CHANNEL_TYPE_CHIP,
+  discord: CHANNEL_TYPE_CHIP,
+  chatwork: CHANNEL_TYPE_CHIP,
+  webhook: CHANNEL_TYPE_CHIP,
 }
 
 export function ManageNotificationChannelsView({
@@ -83,19 +85,17 @@ export function ManageNotificationChannelsView({
 
   return (
     <Stack gap="lg">
-      <div className="flex items-center justify-between gap-4">
-        <Stack gap="xs">
-          <Text as="h1" variant="heading-md">
-            {t('admin.notifications.title')}
-          </Text>
-          <Text muted>{t('admin.notifications.description')}</Text>
-        </Stack>
-        {!showCreateForm && (
-          <Button type="button" size="sm" onClick={onShowCreateForm}>
-            {t('admin.notifications.addButton')}
-          </Button>
-        )}
-      </div>
+      <PageHeader
+        title={t('admin.notifications.title')}
+        description={t('admin.notifications.description')}
+        actions={
+          !showCreateForm ? (
+            <Button type="button" size="sm" onClick={onShowCreateForm}>
+              {t('admin.notifications.addButton')}
+            </Button>
+          ) : undefined
+        }
+      />
 
       {showCreateForm && (
         <NotificationChannelForm
@@ -126,9 +126,9 @@ export function ManageNotificationChannelsView({
                 onCancel={onCancelEdit}
               />
             ) : (
-              <div
+              <Card
                 key={channel.id}
-                className="flex flex-col gap-2 rounded-md border border-border bg-surface-raised p-inline-md shadow-sm sm:flex-row sm:items-center sm:justify-between"
+                className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
               >
                 <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
                   <span
@@ -207,7 +207,7 @@ export function ManageNotificationChannelsView({
                     {t('common.actions.delete')}
                   </Button>
                 </div>
-              </div>
+              </Card>
             ),
           )}
         </Stack>

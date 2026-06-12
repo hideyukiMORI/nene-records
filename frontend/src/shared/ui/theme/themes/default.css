@@ -1,4 +1,11 @@
 @theme {
+  /* ============================================================
+     Default theme = Default Light (initial theme).
+     The original warm amber-gold default, kept alongside the
+     Console redesign's Ubuntu theme. New design tokens (fonts,
+     status colours, radii, shadows) are shared by every theme.
+     ============================================================ */
+
   /* ── Surfaces ──────────────────────────────────────────────────────────── */
   --color-surface: oklch(97% 0.006 75);
   --color-surface-raised: oklch(100% 0 0);
@@ -21,13 +28,22 @@
   /* ── Border ─────────────────────────────────────────────────────────── */
   --color-border: oklch(88% 0.01 75);
 
-  /* ── Accent (warm amber-gold — Claude.ai ひねり版) ──────────────────── */
+  /* ── Accent (warm amber-gold) ───────────────────────────────────────── */
   --color-accent: oklch(62% 0.17 72);
   --color-accent-hover: oklch(56% 0.17 72);
+  --color-accent-weak: color-mix(in oklch, var(--color-accent) 12%, var(--color-surface-raised));
+  /* sidebar active state — soft accent tint over the dark sidebar (redesign §06).
+     references var(--color-accent) so it tracks each theme's accent automatically. */
+  --color-sidebar-active-tint: color-mix(in oklch, var(--color-accent) 16%, transparent);
 
   /* ── Danger ─────────────────────────────────────────────────────────── */
   --color-danger: oklch(52% 0.2 25);
   --color-danger-hover: oklch(46% 0.2 25);
+
+  /* ── Status (badges: published / draft / scheduled / archived) ──────── */
+  --color-ok: oklch(58% 0.14 150);
+  --color-warn: oklch(70% 0.15 75);
+  --color-info: oklch(58% 0.14 250);
 
   /* ── Focus ring ─────────────────────────────────────────────────────── */
   --color-focus-ring: oklch(70% 0.14 72);
@@ -45,30 +61,34 @@
   --spacing-stack-xl: 2rem;
 
   /* ── Typography ──────────────────────────────────────────────────────── */
-  /* Tailwind v4 の font-sans ユーティリティが参照する変数を上書き */
-  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
-  --font-mono: ui-monospace, 'Cascadia Code', monospace;
+  /* Three roles (redesign §03): Saira SC = display, Space Grotesk = chrome,
+     Inter = body, JetBrains Mono = data. Noto Sans JP covers Japanese. */
+  --font-sans: 'Inter', 'Noto Sans JP', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Saira Semi Condensed', 'Noto Sans JP', sans-serif;
+  --font-chrome: 'Space Grotesk', 'Noto Sans JP', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Code', monospace;
   /* font-size: Tailwind v4 は --text-* 命名規則を使用（--font-size-* は無効） */
   --text-tiny: 0.625rem;
   --text-caption: 0.75rem;
   --text-body: 0.875rem;
   --text-heading-sm: 1.125rem;
-  --text-heading-md: 1.5rem;
+  --text-heading-md: 1.75rem;
   /* line-height: Tailwind v4 は --leading-* 命名規則を使用（--line-height-* は無効） */
   --leading-body: 1.5;
-  --leading-heading: 1.25;
+  --leading-heading: 1.05;
   --font-weight-normal: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
 
-  /* ── Radius ──────────────────────────────────────────────────────────── */
+  /* ── Radius (small + sharp — redesign §04: sm 4px, cards 6px) ───────── */
   --radius-sm: 0.25rem;
-  --radius-md: 0.5rem;
+  --radius-md: 0.375rem;
   --radius-full: 9999px;
 
-  /* ── Shadow ──────────────────────────────────────────────────────────── */
-  --shadow-sm: 0 1px 2px oklch(0% 0 0 / 0.06);
-  --shadow-md: 0 4px 12px oklch(0% 0 0 / 0.08);
+  /* ── Shadow (borders do most separation; shadows restrained) ────────── */
+  --shadow-sm: 0 1px 2px oklch(0% 0 0 / 0.05);
+  --shadow-md: 0 6px 20px oklch(0% 0 0 / 0.08);
+  --shadow-lg: 0 16px 40px oklch(0% 0 0 / 0.1);
   --shadow-focus: 0 0 0 3px color-mix(in oklch, var(--color-focus-ring) 35%, transparent);
 
   /* ── Border width ────────────────────────────────────────────────────── */

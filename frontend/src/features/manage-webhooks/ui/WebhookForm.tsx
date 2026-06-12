@@ -2,7 +2,7 @@ import { useState } from 'react'
 import type { CreateWebhookInput, WebhookEvent } from '@/entities/webhook'
 import { WEBHOOK_EVENTS } from '@/entities/webhook'
 import { useTranslation } from '@/shared/i18n'
-import { Button, Stack, Text } from '@/shared/ui'
+import { Button, Card, Stack, Text } from '@/shared/ui'
 
 export interface WebhookFormProps {
   defaultValues?: Partial<CreateWebhookInput>
@@ -46,10 +46,7 @@ export function WebhookForm({
   }
 
   return (
-    <form
-      className="rounded-md border border-border bg-surface-raised p-inline-md shadow-sm"
-      onSubmit={(e) => void handleSubmit(e)}
-    >
+    <Card as="form" onSubmit={(e) => void handleSubmit(e)}>
       <Stack gap="md">
         {/* URL */}
         <div className="flex flex-col gap-stack-xs">
@@ -66,7 +63,7 @@ export function WebhookForm({
             onChange={(e) => {
               setUrl(e.target.value)
             }}
-            className="rounded-md border border-border bg-surface px-3 py-2 font-sans text-body text-text-primary placeholder:text-text-muted focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
+            className="rounded-md border border-border bg-surface px-3 py-2 font-sans text-body text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent disabled:opacity-50"
           />
         </div>
 
@@ -114,7 +111,7 @@ export function WebhookForm({
             onChange={(e) => {
               setEntityTypeId(e.target.value)
             }}
-            className="rounded-md border border-border bg-surface px-3 py-2 font-sans text-body text-text-primary placeholder:text-text-muted focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
+            className="rounded-md border border-border bg-surface px-3 py-2 font-sans text-body text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent disabled:opacity-50"
           />
         </div>
 
@@ -132,7 +129,7 @@ export function WebhookForm({
             onChange={(e) => {
               setSecret(e.target.value)
             }}
-            className="rounded-md border border-border bg-surface px-3 py-2 font-sans text-body text-text-primary placeholder:text-text-muted focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
+            className="rounded-md border border-border bg-surface px-3 py-2 font-sans text-body text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent disabled:opacity-50"
           />
         </div>
 
@@ -163,6 +160,6 @@ export function WebhookForm({
           )}
         </div>
       </Stack>
-    </form>
+    </Card>
   )
 }

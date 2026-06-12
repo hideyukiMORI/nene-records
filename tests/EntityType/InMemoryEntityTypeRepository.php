@@ -35,6 +35,7 @@ final class InMemoryEntityTypeRepository implements EntityTypeRepositoryInterfac
                     labels: $entityType->labels,
                     permalinkPattern: $entityType->permalinkPattern,
                     previousPermalinkPattern: $entityType->previousPermalinkPattern,
+                    displayOrder: $entityType->displayOrder,
                 );
                 $this->byId[$id] = $stored;
                 $this->slugToId[$stored->slug] = $id;
@@ -63,7 +64,10 @@ final class InMemoryEntityTypeRepository implements EntityTypeRepositoryInterfac
     public function findAll(int $limit, int $offset): array
     {
         $types = array_values($this->byId);
-        usort($types, static fn (EntityType $a, EntityType $b): int => ($a->id ?? 0) <=> ($b->id ?? 0));
+        usort(
+            $types,
+            static fn (EntityType $a, EntityType $b): int => [$a->displayOrder, $a->id ?? 0] <=> [$b->displayOrder, $b->id ?? 0],
+        );
 
         return array_slice($types, $offset, $limit);
     }
@@ -99,6 +103,28 @@ final class InMemoryEntityTypeRepository implements EntityTypeRepositoryInterfac
 
         $this->slugToId[$entityType->slug] = $id;
         $this->byId[$id] = $entityType;
+    }
+
+    /** @param list<int> $idsInOrder */
+    public function reorder(array $idsInOrder): void
+    {
+        $position = 0;
+        foreach ($idsInOrder as $id) {
+            $existing = $this->byId[$id] ?? null;
+            if ($existing !== null) {
+                $this->byId[$id] = new EntityType(
+                    name: $existing->name,
+                    slug: $existing->slug,
+                    isPinned: $existing->isPinned,
+                    id: $existing->id,
+                    labels: $existing->labels,
+                    permalinkPattern: $existing->permalinkPattern,
+                    previousPermalinkPattern: $existing->previousPermalinkPattern,
+                    displayOrder: $position,
+                );
+            }
+            $position++;
+        }
     }
 
     public function delete(int $id): void

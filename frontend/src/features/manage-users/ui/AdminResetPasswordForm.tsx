@@ -2,7 +2,7 @@ import { useCallback } from 'react'
 import { useForm } from 'react-hook-form'
 import type { User } from '@/entities/user'
 import { useTranslation } from '@/shared/i18n'
-import { Button, Input, Stack, Text } from '@/shared/ui'
+import { Button, Card, Input, Stack, Text } from '@/shared/ui'
 import type { AdminResetPasswordFormValues } from '../hooks/use-manage-users-page'
 
 export interface AdminResetPasswordFormProps {
@@ -39,8 +39,8 @@ export function AdminResetPasswordForm({
   )
 
   return (
-    <form
-      className="rounded-md border border-border bg-surface-raised p-inline-md shadow-sm"
+    <Card
+      as="form"
       onSubmit={(event) => {
         void handleSubmit(submit)(event)
       }}
@@ -77,6 +77,6 @@ export function AdminResetPasswordForm({
           </Button>
         </div>
       </Stack>
-    </form>
+    </Card>
   )
 }

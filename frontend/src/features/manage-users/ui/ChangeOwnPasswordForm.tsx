@@ -1,7 +1,7 @@
 import { useCallback } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from '@/shared/i18n'
-import { Button, Input, Stack, Text } from '@/shared/ui'
+import { Button, Card, Input, Stack, Text } from '@/shared/ui'
 import type { ChangeOwnPasswordFormValues } from '../hooks/use-manage-users-page'
 
 export interface ChangeOwnPasswordFormProps {
@@ -36,8 +36,8 @@ export function ChangeOwnPasswordForm({
   )
 
   return (
-    <form
-      className="rounded-md border border-border bg-surface-raised p-inline-md shadow-sm"
+    <Card
+      as="form"
       onSubmit={(event) => {
         void handleSubmit(submit)(event)
       }}
@@ -84,6 +84,6 @@ export function ChangeOwnPasswordForm({
           </Button>
         </div>
       </Stack>
-    </form>
+    </Card>
   )
 }

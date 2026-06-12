@@ -51,6 +51,25 @@ export function useUpdateEntityType(): UseMutationResult<
   })
 }
 
+/**
+ * Persists a new sidebar/pinned display order. Pass entity type ids in the
+ * desired order; the server assigns display_order = index.
+ */
+export function useReorderEntityTypes(): UseMutationResult<void, AppError, EntityTypeId[]> {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (ids) => {
+      await apiClient.put<undefined>('/api/v1/entity-types/reorder', {
+        ids: ids.map((id) => Number(id)),
+      })
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: entityTypeKeys.lists() })
+    },
+  })
+}
+
 export function useDeleteEntityType(): UseMutationResult<void, AppError, EntityTypeId> {
   const queryClient = useQueryClient()
 

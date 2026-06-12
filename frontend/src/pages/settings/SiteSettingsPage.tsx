@@ -6,7 +6,7 @@ import {
 } from '@/features/manage-appearance'
 import { ManageSiteSettingsView, useManageSiteSettingsPage } from '@/features/manage-settings'
 import { useTranslation } from '@/shared/i18n'
-import { Stack, Text } from '@/shared/ui'
+import { PageHeader, SectionHeader, Stack, Text } from '@/shared/ui'
 
 export function SiteSettingsPage() {
   const { t } = useTranslation()
@@ -16,15 +16,29 @@ export function SiteSettingsPage() {
 
   return (
     <Stack gap="lg">
-      <Stack gap="xs">
-        <Text as="h1" variant="heading-md">
-          {t('admin.settings.pageTitle')}
-        </Text>
-        <Text muted>{t('admin.settings.description')}</Text>
+      <PageHeader
+        eyebrow={t('admin.settings.eyebrow')}
+        title={t('admin.settings.pageTitle')}
+        description={t('admin.settings.description')}
+      />
+
+      <Stack gap="sm">
+        <SectionHeader>{t('admin.settings.appearance.title')}</SectionHeader>
+        <AppearanceView />
       </Stack>
-      <AppearanceView />
-      <ManageSiteSettingsView {...settingsPage} canManageSettings={canManageSettings} />
-      <PermalinkSettingsView {...permalinkPage} />
+
+      <Stack gap="sm">
+        <SectionHeader>{t('admin.settings.site.title')}</SectionHeader>
+        <ManageSiteSettingsView {...settingsPage} canManageSettings={canManageSettings} />
+      </Stack>
+
+      <Stack gap="sm">
+        <SectionHeader>{t('admin.settings.permalink.title')}</SectionHeader>
+        <Text muted variant="caption">
+          {t('admin.settings.permalink.description')}
+        </Text>
+        <PermalinkSettingsView {...permalinkPage} />
+      </Stack>
     </Stack>
   )
 }

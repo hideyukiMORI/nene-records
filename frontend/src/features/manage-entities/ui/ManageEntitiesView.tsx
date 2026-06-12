@@ -9,7 +9,7 @@ import type {
 import type { RelationFieldDef } from '@/entities/field-def'
 import type { Tag } from '@/entities/tag'
 import { useTranslation } from '@/shared/i18n'
-import { Button, ConfirmDialog, Stack, Text } from '@/shared/ui'
+import { Button, ConfirmDialog, Select, Stack, Text } from '@/shared/ui'
 import { buildExportUrl } from '../lib/build-export-url'
 import { EntityListPanel } from './EntityListPanel'
 import { EntityRelationFilterPanel } from './EntityRelationFilterPanel'
@@ -192,8 +192,9 @@ export function ManageEntitiesView({
                 >
                   {t('admin.entityRecords.sort.label')}
                 </label>
-                <select
+                <Select
                   id="entity-sort-select"
+                  size="sm"
                   value={currentSortValue}
                   onChange={(e) => {
                     const opt = SORT_OPTIONS.find((o) => o.value === e.target.value)
@@ -201,14 +202,13 @@ export function ManageEntitiesView({
                       onSortChange(opt.key, opt.order)
                     }
                   }}
-                  className="rounded-md border border-border bg-surface-raised px-inline-sm py-stack-xs font-sans text-caption text-text-primary shadow-sm focus-visible:outline-none focus-visible:shadow-focus"
                 >
                   {SORT_OPTIONS.map((opt) => (
                     <option key={opt.value} value={opt.value}>
                       {t(opt.labelKey)}
                     </option>
                   ))}
-                </select>
+                </Select>
               </div>
 
               <div className="flex-1" />

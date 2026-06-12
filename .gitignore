@@ -12,3 +12,6 @@
 
 # E2E test artifacts
 test-results/
+
+# Design export for ClaudeDesign (generated, not tracked)
+/design-export/

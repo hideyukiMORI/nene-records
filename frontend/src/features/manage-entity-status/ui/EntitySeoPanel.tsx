@@ -1,5 +1,5 @@
 import { useTranslation } from '@/shared/i18n'
-import { Button, Stack, Text } from '@/shared/ui'
+import { Button, Stack, Text, Textarea } from '@/shared/ui'
 
 interface EntitySeoPanelProps {
   metaTitle: string
@@ -40,28 +40,20 @@ export function EntitySeoPanel({
             }}
             placeholder={t('admin.entitySeo.metaTitle.placeholder')}
             maxLength={255}
-            className="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
           />
         </Stack>
 
-        <Stack gap="xs">
-          <label
-            htmlFor="entity-meta-description"
-            className="text-sm font-medium text-text-primary"
-          >
-            {t('admin.entitySeo.metaDescription')}
-          </label>
-          <textarea
-            id="entity-meta-description"
-            value={metaDescription}
-            onChange={(e) => {
-              onMetaDescriptionChange(e.target.value)
-            }}
-            placeholder={t('admin.entitySeo.metaDescription.placeholder')}
-            rows={3}
-            className="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-          />
-        </Stack>
+        <Textarea
+          id="entity-meta-description"
+          label={t('admin.entitySeo.metaDescription')}
+          value={metaDescription}
+          onChange={(e) => {
+            onMetaDescriptionChange(e.target.value)
+          }}
+          placeholder={t('admin.entitySeo.metaDescription.placeholder')}
+          rows={3}
+        />
 
         <div className="flex items-center gap-inline-sm">
           <Button variant="secondary" size="sm" disabled={isPending} onClick={onSave}>

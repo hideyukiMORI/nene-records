@@ -20,6 +20,8 @@ use NeNeRecords\EntityType\GetEntityTypeByIdHandler;
 use NeNeRecords\EntityType\GetEntityTypeByIdUseCase;
 use NeNeRecords\EntityType\ListEntityTypesHandler;
 use NeNeRecords\EntityType\ListEntityTypesUseCase;
+use NeNeRecords\EntityType\ReorderEntityTypesHandler;
+use NeNeRecords\EntityType\ReorderEntityTypesUseCase;
 use NeNeRecords\EntityType\UpdateEntityTypeHandler;
 use NeNeRecords\EntityType\UpdateEntityTypeUseCase;
 use NeNeRecords\Tests\Entity\InMemoryEntityRepository;
@@ -54,6 +56,7 @@ final class EntityTypeHttpTest extends TestCase
             new UpdateEntityTypeHandler(new UpdateEntityTypeUseCase($this->repository), $jsonResponse),
             new DeleteEntityTypeHandler(new DeleteEntityTypeUseCase($this->repository, $entityRepository, $archiveRepository), $this->factory),
             new ListEntityTypesHandler(new ListEntityTypesUseCase($this->repository), $jsonResponse),
+            new ReorderEntityTypesHandler(new ReorderEntityTypesUseCase($this->repository), $this->factory),
         );
 
         $this->application = (new RuntimeApplicationFactory(
@@ -148,6 +151,40 @@ final class EntityTypeHttpTest extends TestCase
         self::assertSame([], $payload['items']);
         self::assertSame(20, $payload['limit']);
         self::assertSame(0, $payload['offset']);
+    }
+
+    public function testReorderEntityTypesPersistsNewOrderAndReturns204(): void
+    {
+        $first = $this->repository->save(new EntityType(name: 'Posts', slug: 'posts'));
+        $second = $this->repository->save(new EntityType(name: 'Pages', slug: 'pages'));
+
+        $body = $this->factory->createStream(
+            json_encode(['ids' => [$second, $first]], JSON_THROW_ON_ERROR),
+        );
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('PUT', 'https://example.test/api/v1/entity-types/reorder')->withBody($body),
+        );
+
+        self::assertSame(204, $response->getStatusCode());
+
+        // The list now reflects the new order (Pages before Posts).
+        $list = $this->decodeJson(
+            $this->application->handle(
+                $this->factory->createServerRequest('GET', 'https://example.test/api/v1/entity-types'),
+            ),
+        );
+        $slugs = array_map(static fn (array $item): string => (string) $item['slug'], $list['items']);
+        self::assertSame(['pages', 'posts'], $slugs);
+    }
+
+    public function testReorderEntityTypesWithNonArrayIdsReturns422(): void
+    {
+        $body = $this->factory->createStream(json_encode(['ids' => 'nope'], JSON_THROW_ON_ERROR));
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('PUT', 'https://example.test/api/v1/entity-types/reorder')->withBody($body),
+        );
+
+        self::assertSame(422, $response->getStatusCode());
     }
 
     /**

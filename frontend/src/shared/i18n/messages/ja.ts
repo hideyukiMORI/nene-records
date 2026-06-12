@@ -45,6 +45,11 @@ export const ja: Partial<MessageCatalog> = {
   'admin.nav.logout': 'ログアウト',
   'admin.theme.toggleDark': 'ダークモードに切り替え',
   'admin.theme.toggleLight': 'ライトモードに切り替え',
+  'admin.theme.light': 'ライト',
+  'admin.theme.dark': 'ダーク',
+  'admin.topbar.searchPlaceholder': 'レコード・設定を検索…',
+  'admin.theme.appliesNote':
+    '管理画面と公開サイトの両方に適用されます。選択はこの端末に保存されます。',
   'admin.nav.openMenu': 'ナビゲーションメニューを開く',
   'admin.nav.closeMenu': 'ナビゲーションメニューを閉じる',
 
@@ -72,6 +77,9 @@ export const ja: Partial<MessageCatalog> = {
 
   // ── Home ─────────────────────────────────────────────────────────────────
   'admin.home.title': 'ダッシュボード',
+  'admin.home.eyebrow': '概要',
+  'admin.home.subtitle': '今日のコンテンツの動きをまとめて確認できます。',
+  'admin.home.newRecord': 'レコードを追加',
   'admin.home.description': 'NeNe Records へようこそ。',
   'admin.home.openPublicSite': 'パブリックサイトを開く →',
   'admin.home.quickAccess': 'クイックアクセス',
@@ -80,6 +88,7 @@ export const ja: Partial<MessageCatalog> = {
   'admin.home.quickAccess.empty':
     'ピン留めされたコンテンツタイプがありません。コンテンツタイプの設定からピン留めを有効にしてください。',
   'admin.home.dashboard.todayAccess': '本日のアクセス数',
+  'admin.home.dashboard.accessTrend': '直近8日間のアクセス推移',
   'admin.home.dashboard.monthAccess': '今月のアクセス数',
   'admin.home.dashboard.recentPublished': '最近公開されたコンテンツ',
   'admin.home.dashboard.entityTypeSummary': 'コンテンツ集計',
@@ -132,6 +141,8 @@ export const ja: Partial<MessageCatalog> = {
   'admin.entityTypes.delete.description': '「{{name}}」が削除されます。この操作は元に戻せません。',
   'admin.entityTypes.actions.fields': 'フィールド',
   'admin.entityTypes.actions.records': 'コンテンツ',
+  'admin.entityTypes.actions.moveUp': '上へ移動',
+  'admin.entityTypes.actions.moveDown': '下へ移動',
   'admin.entityTypes.actions.backToTypes': 'コンテンツタイプに戻る',
 
   // ── Entity records ───────────────────────────────────────────────────────
@@ -232,6 +243,7 @@ export const ja: Partial<MessageCatalog> = {
   'admin.markdownEditor.empty': 'プレビューする内容がありません。',
 
   // ── Tags ─────────────────────────────────────────────────────────────────
+  'admin.tags.eyebrow': '管理',
   'admin.tags.pageTitle': 'タグ',
   'admin.tags.list.title': '既存のタグ',
   'admin.tags.list.loading': 'タグを読み込み中…',
@@ -239,6 +251,7 @@ export const ja: Partial<MessageCatalog> = {
   'admin.tags.list.empty.title': 'タグがまだありません',
   'admin.tags.list.empty.description': '上のフォームから最初のタグを作成してください。',
   'admin.tags.createForm.title': 'タグを作成',
+  'admin.tags.createForm.slugPlaceholder': '名前から自動生成',
   'admin.tags.createForm.submit': 'タグを作成',
   'admin.tags.createForm.submitting': '作成中…',
   'admin.tags.editForm.title': 'タグを編集',
@@ -346,7 +359,9 @@ export const ja: Partial<MessageCatalog> = {
   'admin.entitySeo.saveSuccess': 'SEO 設定を保存しました。',
 
   // ── Settings ──────────────────────────────────────────────────────────────
-  'admin.settings.appearance.title': '外観',
+  'admin.settings.eyebrow': '環境設定',
+  'admin.settings.appearance.title': '外観 · テーマ',
+  'admin.settings.site.title': 'サイト',
   'admin.settings.permalink.title': 'パーマリンク',
   'admin.settings.permalink.description':
     'コンテンツタイプごとに公開 URL の構造を選択します。変更はすぐ反映され、旧 URL は自動リダイレクトされます。',
@@ -474,6 +489,7 @@ export const ja: Partial<MessageCatalog> = {
     '{{count}} 件のフィールドで使用中です。削除する前に下記の参照を解除してください。',
 
   // ── Users ────────────────────────────────────────────────────────────────
+  'admin.users.eyebrow': '管理',
   'admin.users.pageTitle': 'ユーザー',
   'admin.users.description': 'ユーザーアカウント・ロール・招待を管理します。',
   'admin.nav.users': 'ユーザー',

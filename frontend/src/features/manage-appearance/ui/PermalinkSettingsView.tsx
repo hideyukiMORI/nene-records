@@ -6,7 +6,7 @@ import {
   PERMALINK_PRESETS,
   resolvePermalink,
 } from '@/shared/lib/resolve-permalink'
-import { Button, Stack, Text } from '@/shared/ui'
+import { Button, Card, Stack, Text } from '@/shared/ui'
 
 // ── Warning for patterns without {type} ──────────────────────────────────────
 
@@ -14,7 +14,7 @@ function NoTypeTokenWarning({ pattern }: { pattern: string }) {
   const { t } = useTranslation()
   if (!pattern || pattern.includes('{type}')) return null
   return (
-    <p className="mt-1 text-xs text-warning">
+    <p className="mt-1 text-xs text-warn">
       ⚠ {t('admin.entityTypes.editForm.permalink.noTypeWarning')}
     </p>
   )
@@ -71,7 +71,7 @@ function PermalinkRow({ entityType, onSaved }: { entityType: EntityType; onSaved
   }
 
   return (
-    <div className="rounded-md border border-border bg-surface-raised p-inline-md">
+    <Card>
       <Stack gap="sm">
         <div className="flex items-center justify-between">
           <Text variant="heading-sm">{entityType.name}</Text>
@@ -185,7 +185,7 @@ function PermalinkRow({ entityType, onSaved }: { entityType: EntityType; onSaved
           </div>
         )}
       </Stack>
-    </div>
+    </Card>
   )
 }
 
@@ -206,11 +206,6 @@ export function PermalinkSettingsView({
 
   return (
     <Stack gap="sm">
-      <Stack gap="xs">
-        <Text variant="heading-sm">{t('admin.settings.permalink.title')}</Text>
-        <Text muted>{t('admin.settings.permalink.description')}</Text>
-      </Stack>
-
       {isLoading && <Text muted>{t('admin.entityTypes.existingList.loading')}</Text>}
 
       {entityTypes.length === 0 && !isLoading && (

@@ -2,7 +2,7 @@ import type { FieldDef } from '@/entities/field-def'
 import { useTranslation } from '@/shared/i18n'
 import type { MessageKey } from '@/shared/i18n'
 import type { FieldDataType } from '@/entities/field-def'
-import { Button, EmptyState, Stack, Text } from '@/shared/ui'
+import { Button, Card, EmptyState, ErrorState, LoadingState, Stack, Text } from '@/shared/ui'
 
 const DATA_TYPE_LABEL_KEYS: Record<FieldDataType, MessageKey> = {
   text: 'admin.fieldDefs.dataType.text',
@@ -40,18 +40,17 @@ export function FieldDefListPanel({
   const { t } = useTranslation()
 
   if (isLoading) {
-    return <Text muted>{t('admin.fieldDefs.list.loading')}</Text>
+    return <LoadingState>{t('admin.fieldDefs.list.loading')}</LoadingState>
   }
 
   if (isError) {
     return (
-      <Stack gap="sm">
-        <Text variant="heading-sm">{t('admin.fieldDefs.list.error')}</Text>
-        <Text muted>{errorTitle ?? t('common.error.unknown')}</Text>
-        <Button variant="secondary" onClick={onRetry}>
-          {t('common.actions.retry')}
-        </Button>
-      </Stack>
+      <ErrorState
+        title={t('admin.fieldDefs.list.error')}
+        message={errorTitle ?? t('common.error.unknown')}
+        onRetry={onRetry}
+        retryLabel={t('common.actions.retry')}
+      />
     )
   }
 
@@ -67,9 +66,11 @@ export function FieldDefListPanel({
   return (
     <ul className="flex flex-col gap-stack-sm">
       {items.map((item) => (
-        <li
+        <Card
+          as="li"
           key={String(item.id)}
-          className="flex items-center justify-between gap-inline-md rounded-md border border-border bg-surface-raised px-inline-md py-stack-sm shadow-sm"
+          padding="row"
+          className="flex items-center justify-between gap-inline-md"
         >
           <Stack gap="xs">
             <Text as="span" variant="heading-sm">
@@ -104,7 +105,7 @@ export function FieldDefListPanel({
               </>
             ) : null}
           </div>
-        </li>
+        </Card>
       ))}
     </ul>
   )

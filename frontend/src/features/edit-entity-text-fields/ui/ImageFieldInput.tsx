@@ -46,7 +46,7 @@ export function ImageFieldInput({ id, label, value, disabled, onChange }: ImageF
           onChange={(e) => {
             onChange(e.target.value)
           }}
-          className="flex-1 rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
+          className="flex-1 rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent disabled:opacity-50"
         />
         <Button
           type="button"

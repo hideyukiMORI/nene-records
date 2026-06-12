@@ -1,4 +1,4 @@
-import { Button, Stack, Text } from '@/shared/ui'
+import { Button, Card, PageHeader, Select, Stack, Text } from '@/shared/ui'
 import type { DataMigrationPageState } from '../hooks/useDataMigrationPage'
 
 export function DataMigrationView({
@@ -15,18 +15,18 @@ export function DataMigrationView({
 
   return (
     <Stack gap="lg">
-      <div>
-        <Text as="h1" variant="heading-md">
-          Data Migration
-        </Text>
-        <Text muted>
-          Assign legacy records (organization_id&nbsp;= 0) to a specific organization. Use this when
-          migrating from single-tenant to multi-tenant mode.
-        </Text>
-      </div>
+      <PageHeader
+        title="Data Migration"
+        description={
+          <>
+            Assign legacy records (organization_id&nbsp;= 0) to a specific organization. Use this
+            when migrating from single-tenant to multi-tenant mode.
+          </>
+        }
+      />
 
       {/* Status panel */}
-      <div className="rounded-lg border border-border bg-surface-raised p-6">
+      <Card padding="none" className="p-6">
         <Text as="h2" variant="heading-sm">
           Unassigned Records
         </Text>
@@ -89,11 +89,11 @@ export function DataMigrationView({
             )}
           </>
         )}
-      </div>
+      </Card>
 
       {/* Assign panel */}
       {hasUnassigned && (
-        <div className="rounded-lg border border-border bg-surface-raised p-6">
+        <Card padding="none" className="p-6">
           <Text as="h2" variant="heading-sm">
             Assign to Organization
           </Text>
@@ -110,13 +110,13 @@ export function DataMigrationView({
               >
                 Target organization *
               </label>
-              <select
+              <Select
                 id="target-org"
                 value={targetOrgId}
                 onChange={(e) => {
                   onTargetOrgIdChange(Number(e.target.value))
                 }}
-                className="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary focus:border-accent focus:outline-none"
+                className="w-full"
               >
                 <option value={0}>— Select organization —</option>
                 {organizations.map((org) => (
@@ -124,7 +124,7 @@ export function DataMigrationView({
                     {org.name} ({org.slug})
                   </option>
                 ))}
-              </select>
+              </Select>
             </div>
 
             <div>
@@ -137,7 +137,7 @@ export function DataMigrationView({
               </Button>
             </div>
           </Stack>
-        </div>
+        </Card>
       )}
     </Stack>
   )

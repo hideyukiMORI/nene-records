@@ -36,6 +36,7 @@ final readonly class GetEntityTypeByIdHandler
             'labels'                     => $output->labels ?? new \stdClass(),
             'permalink_pattern'          => $output->permalinkPattern,
             'previous_permalink_pattern' => $output->previousPermalinkPattern,
+            'display_order'              => $output->displayOrder,
         ]);
     }
 }

@@ -15,6 +15,7 @@ final readonly class EntityTypeRouteRegistrar
         private UpdateEntityTypeHandler $updateHandler,
         private DeleteEntityTypeHandler $deleteHandler,
         private ListEntityTypesHandler $listHandler,
+        private ReorderEntityTypesHandler $reorderHandler,
     ) {
     }
 
@@ -25,8 +26,11 @@ final readonly class EntityTypeRouteRegistrar
         $updateHandler = $this->updateHandler;
         $deleteHandler = $this->deleteHandler;
         $listHandler = $this->listHandler;
+        $reorderHandler = $this->reorderHandler;
 
         $router->get('/api/v1/entity-types', static fn (ServerRequestInterface $request) => $listHandler->handle($request));
+        // Register before the dynamic {id} routes so "reorder" is not parsed as an id.
+        $router->put('/api/v1/entity-types/reorder', static fn (ServerRequestInterface $request) => $reorderHandler->handle($request));
         $router->get('/api/v1/entity-types/{id}', static fn (ServerRequestInterface $request) => $getHandler->handle($request));
         $router->post('/api/v1/entity-types', static fn (ServerRequestInterface $request) => $createHandler->handle($request));
         $router->put('/api/v1/entity-types/{id}', static fn (ServerRequestInterface $request) => $updateHandler->handle($request));
