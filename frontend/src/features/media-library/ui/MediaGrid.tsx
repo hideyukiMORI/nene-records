@@ -1,6 +1,6 @@
 import type { Media } from '@/entities/media'
 import { useTranslation } from '@/shared/i18n'
-import { Button, EmptyState, Stack, Text } from '@/shared/ui'
+import { Button, EmptyState, ResponsiveImage, Stack, Text } from '@/shared/ui'
 import { IconCopy, IconImage } from '@/shared/ui/icons/Icons'
 
 export interface MediaGridProps {
@@ -72,11 +72,11 @@ export function MediaGrid({
           {/* Thumbnail */}
           <div className="flex h-32 items-center justify-center bg-surface-overlay">
             {isImageMime(media.mimeType) ? (
-              <img
+              <ResponsiveImage
                 src={media.url}
-                alt={media.originalName}
+                alt={media.altText ?? media.originalName}
+                sizes="(max-width: 640px) 50vw, 20vw"
                 className="h-full w-full object-cover"
-                loading="lazy"
               />
             ) : (
               <IconImage size={32} className="text-text-muted" />

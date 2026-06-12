@@ -59,13 +59,18 @@ final readonly class ServeDerivativeHandler
         $derivativeKey = "derivatives/{$preset}/{$format}/{$year}/{$month}/{$base}.{$ext}";
 
         if (!$this->storage->exists($derivativeKey)) {
-            $original = stream_get_contents($this->storage->readStream($originalKey));
-            $derived = $this->processor->resize(
-                $original === false ? '' : $original,
-                MediaImagePresets::maxWidth($preset),
-                $format,
-            );
-            $this->storage->write($derivativeKey, $derived);
+            try {
+                $original = stream_get_contents($this->storage->readStream($originalKey));
+                $derived = $this->processor->resize(
+                    $original === false ? '' : $original,
+                    MediaImagePresets::maxWidth($preset),
+                    $format,
+                );
+                $this->storage->write($derivativeKey, $derived);
+            } catch (\RuntimeException) {
+                // Source could not be decoded/encoded (corrupt or unsupported payload).
+                return $this->responseFactory->createResponse(404);
+            }
         }
 
         $etag = '"' . md5($derivativeKey) . '"';
