@@ -41,6 +41,10 @@ final readonly class MediaServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(
+                ImageProcessorInterface::class,
+                static fn (ContainerInterface $c): ImageProcessorInterface => new GdImageProcessor(),
+            )
+            ->set(
                 MediaRepositoryInterface::class,
                 static function (ContainerInterface $c): MediaRepositoryInterface {
                     $query = $c->get(DatabaseQueryExecutorInterface::class);
@@ -206,6 +210,33 @@ final readonly class MediaServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(
+                ServeDerivativeHandler::class,
+                static function (ContainerInterface $c): ServeDerivativeHandler {
+                    $storage = $c->get(StorageInterface::class);
+                    $processor = $c->get(ImageProcessorInterface::class);
+                    $responseFactory = $c->get(ResponseFactoryInterface::class);
+                    $streamFactory = $c->get(StreamFactoryInterface::class);
+
+                    if (!$storage instanceof StorageInterface) {
+                        throw new LogicException('Media storage service is invalid.');
+                    }
+
+                    if (!$processor instanceof ImageProcessorInterface) {
+                        throw new LogicException('Image processor service is invalid.');
+                    }
+
+                    if (!$responseFactory instanceof ResponseFactoryInterface) {
+                        throw new LogicException('Response factory service is invalid.');
+                    }
+
+                    if (!$streamFactory instanceof StreamFactoryInterface) {
+                        throw new LogicException('Stream factory service is invalid.');
+                    }
+
+                    return new ServeDerivativeHandler($storage, $processor, $responseFactory, $streamFactory);
+                },
+            )
+            ->set(
                 MediaInvalidTypeExceptionHandler::class,
                 static function (ContainerInterface $c): MediaInvalidTypeExceptionHandler {
                     $problemDetails = $c->get(ProblemDetailsResponseFactory::class);
@@ -249,6 +280,7 @@ final readonly class MediaServiceProvider implements ServiceProviderInterface
                     $delete = $c->get(DeleteMediaHandler::class);
                     $serve = $c->get(ServeMediaHandler::class);
                     $updateAlt = $c->get(UpdateMediaAltHandler::class);
+                    $serveDerivative = $c->get(ServeDerivativeHandler::class);
 
                     if (!$upload instanceof UploadMediaHandler) {
                         throw new LogicException('UploadMedia handler service is invalid.');
@@ -270,7 +302,11 @@ final readonly class MediaServiceProvider implements ServiceProviderInterface
                         throw new LogicException('UpdateMediaAlt handler service is invalid.');
                     }
 
-                    return new MediaRouteRegistrar($upload, $list, $delete, $serve, $updateAlt);
+                    if (!$serveDerivative instanceof ServeDerivativeHandler) {
+                        throw new LogicException('ServeDerivative handler service is invalid.');
+                    }
+
+                    return new MediaRouteRegistrar($upload, $list, $delete, $serve, $updateAlt, $serveDerivative);
                 },
             );
     }

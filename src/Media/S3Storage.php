@@ -47,6 +47,15 @@ final readonly class S3Storage implements StorageInterface
         ])->resolve();
     }
 
+    public function write(string $key, string $contents): void
+    {
+        $this->client->putObject([
+            'Bucket' => $this->bucket,
+            'Key' => $this->object($key),
+            'Body' => $contents,
+        ])->resolve();
+    }
+
     public function exists(string $key): bool
     {
         return $this->client->objectExists([
