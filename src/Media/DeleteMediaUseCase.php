@@ -20,6 +20,13 @@ final readonly class DeleteMediaUseCase implements DeleteMediaUseCaseInterface
             throw new MediaNotFoundException($input->id);
         }
 
+        // Guard against orphaning references: block deletion while any entity
+        // field still points at this media URL.
+        $usages = $this->media->findUsages($media->url);
+        if ($usages !== []) {
+            throw new MediaInUseException($input->id, $usages);
+        }
+
         // Prefer the persisted storage key; fall back to reverse-parsing the URL
         // for rows created before storage_key existed.
         $key = $media->storageKey !== '' ? $media->storageKey : $this->storage->keyFromUrl($media->url);

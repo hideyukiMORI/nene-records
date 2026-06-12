@@ -1,8 +1,9 @@
-import type { Media } from '@/entities/media'
+import type { Media, MediaUsage } from '@/entities/media'
 import { useTranslation } from '@/shared/i18n'
 import { ConfirmDialog, Stack, Text } from '@/shared/ui'
 import { MediaDropzone } from './MediaDropzone'
 import { MediaGrid } from './MediaGrid'
+import { MediaUsageList } from './MediaUsageList'
 
 export interface MediaLibraryViewProps {
   items: Media[]
@@ -20,6 +21,9 @@ export interface MediaLibraryViewProps {
 
   deleteTarget: Media | null
   isDeleting: boolean
+  usages: MediaUsage[]
+  hasUsages: boolean
+  isLoadingUsages: boolean
   onRequestDelete: (media: Media) => void
   onCancelDelete: () => void
   onConfirmDelete: () => Promise<void>
@@ -40,6 +44,9 @@ export function MediaLibraryView({
   onUpdateAlt,
   deleteTarget,
   isDeleting,
+  usages,
+  hasUsages,
+  isLoadingUsages,
   onRequestDelete,
   onCancelDelete,
   onConfirmDelete,
@@ -84,11 +91,14 @@ export function MediaLibraryView({
         }
         confirmLabel={isDeleting ? t('admin.media.delete.deleting') : t('admin.media.delete')}
         isPending={isDeleting}
+        confirmDisabled={hasUsages || isLoadingUsages}
         onCancel={onCancelDelete}
         onConfirm={() => {
           void onConfirmDelete()
         }}
-      />
+      >
+        <MediaUsageList usages={usages} isLoading={isLoadingUsages} />
+      </ConfirmDialog>
     </>
   )
 }

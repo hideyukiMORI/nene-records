@@ -58,6 +58,7 @@ use NeNeRecords\FieldDef\FieldTypeMismatchExceptionHandler;
 use NeNeRecords\IntField\IntFieldNotFoundExceptionHandler;
 use NeNeRecords\IntField\IntFieldRouteRegistrar;
 use NeNeRecords\IntField\IntFieldServiceProvider;
+use NeNeRecords\Media\MediaInUseExceptionHandler;
 use NeNeRecords\Media\MediaInvalidTypeExceptionHandler;
 use NeNeRecords\Media\MediaNotFoundExceptionHandler;
 use NeNeRecords\Media\MediaRouteRegistrar;
@@ -295,6 +296,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $mediaInvalidType = $container->get(MediaInvalidTypeExceptionHandler::class);
                     $mediaTooLarge = $container->get(MediaTooLargeExceptionHandler::class);
                     $mediaNotFound = $container->get(MediaNotFoundExceptionHandler::class);
+                    $mediaInUse = $container->get(MediaInUseExceptionHandler::class);
                     $navigationItemNotFound = $container->get(NavigationItemNotFoundExceptionHandler::class);
                     $webhookNotFound = $container->get(WebhookNotFoundExceptionHandler::class);
                     $previewTokenNotFound = $container->get(PreviewTokenNotFoundExceptionHandler::class);
@@ -341,6 +343,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $mediaInvalidType,
                         $mediaTooLarge,
                         $mediaNotFound,
+                        $mediaInUse,
                         $navigationItemNotFound,
                         $webhookNotFound,
                         $previewTokenNotFound,
@@ -392,6 +395,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $mediaInvalidType,
                         $mediaTooLarge,
                         $mediaNotFound,
+                        $mediaInUse,
                         $navigationItemNotFound,
                         $webhookNotFound,
                         $previewTokenNotFound,

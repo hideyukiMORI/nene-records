@@ -9,13 +9,17 @@ use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RuntimeApplicationFactory;
 use NeNeRecords\Media\DeleteMediaHandler;
 use NeNeRecords\Media\DeleteMediaUseCase;
+use NeNeRecords\Media\FindMediaUsagesUseCase;
 use NeNeRecords\Media\GdImageProcessor;
 use NeNeRecords\Media\ListMediaHandler;
+use NeNeRecords\Media\ListMediaUsagesHandler;
 use NeNeRecords\Media\ListMediaUseCase;
 use NeNeRecords\Media\LocalStorage;
 use NeNeRecords\Media\Media;
+use NeNeRecords\Media\MediaInUseExceptionHandler;
 use NeNeRecords\Media\MediaNotFoundExceptionHandler;
 use NeNeRecords\Media\MediaRouteRegistrar;
+use NeNeRecords\Media\MediaUsage;
 use NeNeRecords\Media\ServeDerivativeHandler;
 use NeNeRecords\Media\ServeMediaHandler;
 use NeNeRecords\Media\UpdateMediaAltHandler;
@@ -87,6 +91,10 @@ final class MediaHttpTest extends TestCase
                 $jsonResponse,
             ),
             new ServeDerivativeHandler($this->storage, new GdImageProcessor(), $this->factory, $this->factory),
+            new ListMediaUsagesHandler(
+                new FindMediaUsagesUseCase($this->repository),
+                $jsonResponse,
+            ),
         );
 
         $this->application = (new RuntimeApplicationFactory(
@@ -94,6 +102,7 @@ final class MediaHttpTest extends TestCase
             $this->factory,
             domainExceptionHandlers: [
                 new MediaNotFoundExceptionHandler($problemDetails),
+                new MediaInUseExceptionHandler($problemDetails),
             ],
             routeRegistrars: [$registrar],
         ))->create();
@@ -162,6 +171,7 @@ final class MediaHttpTest extends TestCase
             new ServeMediaHandler($this->storage, $this->factory, $this->factory),
             new UpdateMediaAltHandler(new UpdateMediaAltUseCase($emptyRepo), $jsonResponse),
             new ServeDerivativeHandler($this->storage, new GdImageProcessor(), $this->factory, $this->factory),
+            new ListMediaUsagesHandler(new FindMediaUsagesUseCase($emptyRepo), $jsonResponse),
         );
 
         $app = (new RuntimeApplicationFactory(
@@ -230,6 +240,80 @@ final class MediaHttpTest extends TestCase
         );
 
         self::assertFileDoesNotExist($filePath);
+    }
+
+    // ── Usages (reverse-lookup) ──────────────────────────────────────────────
+
+    public function testGetMediaUsagesReturnsReferencingEntities(): void
+    {
+        $this->repository->setUsages('/media/2026/05/abc123.jpg', [
+            new MediaUsage(
+                entityId: 7,
+                entityTypeSlug: 'post',
+                entitySlug: 'hello-world',
+                status: 'published',
+                fieldKey: 'cover',
+                title: 'Hello World',
+            ),
+        ]);
+
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/api/v1/media/1/usages'),
+        );
+        $payload = $this->decodeJson($response);
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertCount(1, $payload['items']);
+        self::assertSame(7, $payload['items'][0]['entity_id']);
+        self::assertSame('post', $payload['items'][0]['entity_type_slug']);
+        self::assertSame('cover', $payload['items'][0]['field_key']);
+        self::assertSame('Hello World', $payload['items'][0]['title']);
+    }
+
+    public function testGetMediaUsagesReturnsEmptyWhenUnused(): void
+    {
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/api/v1/media/1/usages'),
+        );
+        $payload = $this->decodeJson($response);
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame([], $payload['items']);
+    }
+
+    public function testGetUsagesForMissingMediaReturns404(): void
+    {
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/api/v1/media/999/usages'),
+        );
+
+        self::assertSame(404, $response->getStatusCode());
+    }
+
+    public function testDeleteInUseMediaReturns409WithUsages(): void
+    {
+        $this->repository->setUsages('/media/2026/05/abc123.jpg', [
+            new MediaUsage(
+                entityId: 7,
+                entityTypeSlug: 'post',
+                entitySlug: 'hello-world',
+                status: 'published',
+                fieldKey: 'cover',
+                title: 'Hello World',
+            ),
+        ]);
+
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('DELETE', 'https://example.test/api/v1/media/1'),
+        );
+        $payload = $this->decodeJson($response);
+
+        self::assertSame(409, $response->getStatusCode());
+        self::assertSame('media-in-use', basename($payload['type']));
+        self::assertCount(1, $payload['usages']);
+        self::assertSame(7, $payload['usages'][0]['entity_id']);
+        // The media row must survive a blocked delete.
+        self::assertNotNull($this->repository->findById(1));
     }
 
     // ── Update alt text ───────────────────────────────────────────────────────

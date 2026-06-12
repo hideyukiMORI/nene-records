@@ -76,6 +76,48 @@ final readonly class PdoMediaRepository implements MediaRepositoryInterface
         );
     }
 
+    /** @return list<MediaUsage> */
+    public function findUsages(string $url): array
+    {
+        // Match the media URL anywhere inside a stored field value: image/file
+        // fields hold the bare URL, markdown bodies hold it inside `![](...)`.
+        // Escape LIKE metacharacters so filenames containing _ or % stay literal.
+        $pattern = '%' . addcslashes($url, '\\%_') . '%';
+
+        $rows = $this->query->fetchAll(
+            "SELECT
+                e.id AS entity_id,
+                MAX(e.slug) AS entity_slug,
+                MAX(e.status) AS status,
+                MAX(et.slug) AS entity_type_slug,
+                tf.field_key AS field_key,
+                MAX(tf_title.value) AS title
+             FROM text_fields tf
+             JOIN entities e ON e.id = tf.entity_id AND e.is_deleted = 0
+             JOIN entity_types et ON et.id = e.entity_type_id
+             LEFT JOIN text_fields tf_title
+                ON tf_title.entity_id = e.id AND tf_title.field_key = 'title' AND tf_title.is_deleted = 0
+             WHERE tf.organization_id = ?
+               AND tf.is_deleted = 0
+               AND tf.value LIKE ? ESCAPE '\\\\'
+             GROUP BY e.id, tf.field_key
+             ORDER BY e.id, tf.field_key",
+            [$this->orgId->get(), $pattern],
+        );
+
+        return array_map(
+            static fn (array $row): MediaUsage => new MediaUsage(
+                entityId: (int) $row['entity_id'],
+                entityTypeSlug: (string) $row['entity_type_slug'],
+                entitySlug: (string) $row['entity_slug'],
+                status: (string) $row['status'],
+                fieldKey: (string) $row['field_key'],
+                title: $row['title'] !== null ? (string) $row['title'] : null,
+            ),
+            $rows,
+        );
+    }
+
     public function delete(int $id): void
     {
         $this->query->execute('DELETE FROM media WHERE id = ? AND organization_id = ?', [$id, $this->orgId->get()]);

@@ -2,6 +2,7 @@ import { useCallback, useRef, useState } from 'react'
 import {
   useDeleteMedia,
   useMediaList,
+  useMediaUsages,
   useUpdateMediaAlt,
   useUploadMedia,
   type Media,
@@ -14,6 +15,7 @@ export function useMediaLibraryPage() {
   const updateAltMutation = useUpdateMediaAlt()
 
   const [deleteTarget, setDeleteTarget] = useState<Media | null>(null)
+  const usagesQuery = useMediaUsages(deleteTarget?.id ?? null)
   const [copiedId, setCopiedId] = useState<number | null>(null)
   const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -56,11 +58,14 @@ export function useMediaLibraryPage() {
     setDeleteTarget(null)
   }, [])
 
+  const usages = usagesQuery.data?.items ?? []
+  const hasUsages = usages.length > 0
+
   const confirmDelete = useCallback(async () => {
-    if (deleteTarget === null) return
+    if (deleteTarget === null || hasUsages) return
     await deleteMutation.mutateAsync(deleteTarget.id)
     setDeleteTarget(null)
-  }, [deleteMutation, deleteTarget])
+  }, [deleteMutation, deleteTarget, hasUsages])
 
   return {
     items: listQuery.data?.items ?? [],
@@ -84,5 +89,8 @@ export function useMediaLibraryPage() {
     cancelDelete,
     confirmDelete,
     isDeleting: deleteMutation.isPending,
+    usages,
+    hasUsages,
+    isLoadingUsages: usagesQuery.isLoading && deleteTarget !== null,
   }
 }

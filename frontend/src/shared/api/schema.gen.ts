@@ -906,7 +906,7 @@ export interface paths {
         post?: never;
         /**
          * Delete media item
-         * @description Deletes a media item and its physical file from storage.
+         * @description Deletes a media item and its physical file. Blocked with 409 while the media is still referenced by any entity field.
          */
         delete: operations["deleteMedia"];
         options?: never;
@@ -916,6 +916,26 @@ export interface paths {
          * @description Updates editable media metadata. Currently the alt text only; a blank value clears it.
          */
         patch: operations["updateMedia"];
+        trace?: never;
+    };
+    "/api/v1/media/{id}/usages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List media usages (reverse-lookup)
+         * @description Returns the entity fields that reference this media item (image/file fields and markdown bodies), scoped to the caller's organization.
+         */
+        get: operations["listMediaUsages"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/v1/navigation-items": {
@@ -1467,6 +1487,23 @@ export interface components {
         };
         MediaListResponse: {
             items: components["schemas"]["MediaResponse"][];
+        };
+        MediaUsage: {
+            /** Format: int64 */
+            entity_id: number;
+            /** @description Slug of the entity type that owns the referencing entity. */
+            entity_type_slug: string;
+            /** @description Slug of the referencing entity. */
+            entity_slug: string;
+            /** @description Publish status of the referencing entity (e.g. draft / published). */
+            status: string;
+            /** @description Field key whose stored value references the media URL. */
+            field_key: string;
+            /** @description Title of the referencing entity, when it has a title field. */
+            title: string | null;
+        };
+        MediaUsageListResponse: {
+            items: components["schemas"]["MediaUsage"][];
         };
         UpdateMediaRequest: {
             /** @description Alternative text. A blank or null value clears it. */
@@ -2051,6 +2088,17 @@ export interface components {
             };
             content: {
                 "application/problem+json": components["schemas"]["ProblemDetails"];
+            };
+        };
+        /** @description The media item is still referenced by one or more entity fields and cannot be deleted. */
+        MediaInUse: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/problem+json": components["schemas"]["ProblemDetails"] & {
+                    usages?: components["schemas"]["MediaUsage"][];
+                };
             };
         };
         /** @description The target resource is no longer available (e.g. an expired token). */
@@ -4504,6 +4552,7 @@ export interface operations {
                 content?: never;
             };
             404: components["responses"]["NotFound"];
+            409: components["responses"]["MediaInUse"];
             500: components["responses"]["InternalServerError"];
         };
     };
@@ -4533,6 +4582,30 @@ export interface operations {
             };
             404: components["responses"]["NotFound"];
             422: components["responses"]["ValidationFailed"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    listMediaUsages: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Usage list (possibly empty). */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MediaUsageListResponse"];
+                };
+            };
+            404: components["responses"]["NotFound"];
             500: components["responses"]["InternalServerError"];
         };
     };
