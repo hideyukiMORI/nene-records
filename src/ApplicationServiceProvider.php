@@ -111,6 +111,9 @@ use NeNeRecords\UserInvite\UserInviteServiceProvider;
 use NeNeRecords\Webhook\WebhookNotFoundExceptionHandler;
 use NeNeRecords\Webhook\WebhookRouteRegistrar;
 use NeNeRecords\Webhook\WebhookServiceProvider;
+use NeNeRecords\Widget\WidgetNotFoundExceptionHandler;
+use NeNeRecords\Widget\WidgetRouteRegistrar;
+use NeNeRecords\Widget\WidgetServiceProvider;
 use Psr\Container\ContainerInterface;
 
 final readonly class ApplicationServiceProvider implements ServiceProviderInterface
@@ -151,6 +154,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
             ->addProvider(new PublicRecordServiceProvider())
             ->addProvider(new SettingServiceProvider())
             ->addProvider(new NavigationItemServiceProvider())
+            ->addProvider(new WidgetServiceProvider())
             ->addProvider(new WebhookServiceProvider())
             ->addProvider(new PreviewTokenServiceProvider())
             ->addProvider(new DashboardServiceProvider())
@@ -184,6 +188,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $publicRecord = $container->get('nene-records.route_registrar.public_record');
                     $setting = $container->get('nene-records.route_registrar.setting');
                     $navigationItem = $container->get('nene-records.route_registrar.navigation_item');
+                    $widget = $container->get('nene-records.route_registrar.widget');
                     $webhook = $container->get('nene-records.route_registrar.webhook');
                     $previewToken = $container->get('nene-records.route_registrar.preview_token');
                     $dashboard = $container->get('nene-records.route_registrar.dashboard');
@@ -215,6 +220,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         || !$publicRecord instanceof PublicRecordRouteRegistrar
                         || !$setting instanceof SettingRouteRegistrar
                         || !$navigationItem instanceof NavigationItemRouteRegistrar
+                        || !$widget instanceof WidgetRouteRegistrar
                         || !$webhook instanceof WebhookRouteRegistrar
                         || !$previewToken instanceof PreviewTokenRouteRegistrar
                         || !$dashboard instanceof DashboardRouteRegistrar
@@ -250,6 +256,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $publicRecord,
                         $setting,
                         $navigationItem,
+                        $widget,
                         $webhook,
                         $previewToken,
                         $dashboard,
@@ -298,6 +305,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $mediaNotFound = $container->get(MediaNotFoundExceptionHandler::class);
                     $mediaInUse = $container->get(MediaInUseExceptionHandler::class);
                     $navigationItemNotFound = $container->get(NavigationItemNotFoundExceptionHandler::class);
+                    $widgetNotFound = $container->get(WidgetNotFoundExceptionHandler::class);
                     $webhookNotFound = $container->get(WebhookNotFoundExceptionHandler::class);
                     $previewTokenNotFound = $container->get(PreviewTokenNotFoundExceptionHandler::class);
                     $userNotFound = $container->get(UserNotFoundExceptionHandler::class);
@@ -345,6 +353,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $mediaNotFound,
                         $mediaInUse,
                         $navigationItemNotFound,
+                        $widgetNotFound,
                         $webhookNotFound,
                         $previewTokenNotFound,
                         $userNotFound,
@@ -397,6 +406,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $mediaNotFound,
                         $mediaInUse,
                         $navigationItemNotFound,
+                        $widgetNotFound,
                         $webhookNotFound,
                         $previewTokenNotFound,
                         $userNotFound,

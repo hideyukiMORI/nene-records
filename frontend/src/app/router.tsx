@@ -14,6 +14,7 @@ import { AppShell } from '@/pages/layout/AppShell'
 import { LoginPage } from '@/pages/login/LoginPage'
 import { MediaPage } from '@/pages/media/MediaPage'
 import { NavigationPage } from '@/pages/navigation/NavigationPage'
+import { WidgetsPage } from '@/pages/widgets/WidgetsPage'
 import { NotFoundPage } from '@/pages/not-found/NotFoundPage'
 import { ResetPasswordPage } from '@/pages/reset-password/ResetPasswordPage'
 import { SiteSettingsPage } from '@/pages/settings/SiteSettingsPage'
@@ -82,6 +83,7 @@ const router = createBrowserRouter([
       { path: 'tags', element: <TagsPage /> },
       { path: 'comments', element: <CommentsPage /> },
       { path: 'navigation', element: <NavigationPage /> },
+      { path: 'widgets', element: <WidgetsPage /> },
       { path: 'media', element: <MediaPage /> },
       { path: 'webhooks', element: <WebhooksPage /> },
       { path: 'notifications', element: <NotificationChannelsPage /> },

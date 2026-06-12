@@ -978,6 +978,68 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/widgets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List widgets
+         * @description Returns all site widgets ordered by region, display_order, then id.
+         */
+        get: operations["listWidgets"];
+        put?: never;
+        /**
+         * Create widget
+         * @description Creates a site widget placed into a layout region.
+         */
+        post: operations["createWidget"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/widgets/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Update widget */
+        put: operations["updateWidget"];
+        post?: never;
+        /** Delete widget */
+        delete: operations["deleteWidget"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/public/widgets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List public widgets
+         * @description Returns all widgets for public rendering. No authentication required.
+         */
+        get: operations["listPublicWidgets"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/navigation-items": {
         parameters: {
             query?: never;
@@ -1963,6 +2025,38 @@ export interface components {
             /** Format: email */
             email: string;
             role: string;
+        };
+        WidgetResponse: {
+            id: number;
+            /** @enum {string} */
+            widget_type: "recent-posts";
+            /** @enum {string} */
+            region: "main" | "sidebar" | "aside";
+            display_order: number;
+            title: string | null;
+            /** @description Widget-type-specific configuration. */
+            settings: {
+                [key: string]: unknown;
+            };
+            /** Format: date-time */
+            created_at: string;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        WidgetListResponse: {
+            items: components["schemas"]["WidgetResponse"][];
+        };
+        CreateWidgetRequest: {
+            /** @enum {string} */
+            widget_type: "recent-posts";
+            /** @enum {string} */
+            region: "main" | "sidebar" | "aside";
+            /** @default 0 */
+            display_order: number;
+            title?: string | null;
+            settings?: {
+                [key: string]: unknown;
+            };
         };
         NavigationItemResponse: {
             id: number;
@@ -4733,6 +4827,125 @@ export interface operations {
                 };
             };
             404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    listWidgets: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Widget list. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WidgetListResponse"];
+                };
+            };
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    createWidget: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateWidgetRequest"];
+            };
+        };
+        responses: {
+            /** @description Created widget. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WidgetResponse"];
+                };
+            };
+            422: components["responses"]["ValidationFailed"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    updateWidget: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateWidgetRequest"];
+            };
+        };
+        responses: {
+            /** @description Updated widget. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WidgetResponse"];
+                };
+            };
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["ValidationFailed"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    deleteWidget: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted successfully. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    listPublicWidgets: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Widget list. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WidgetListResponse"];
+                };
+            };
             500: components["responses"]["InternalServerError"];
         };
     };
