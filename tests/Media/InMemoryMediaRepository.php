@@ -6,12 +6,16 @@ namespace NeNeRecords\Tests\Media;
 
 use NeNeRecords\Media\Media;
 use NeNeRecords\Media\MediaRepositoryInterface;
+use NeNeRecords\Media\MediaUsage;
 
 final class InMemoryMediaRepository implements MediaRepositoryInterface
 {
     /** @var array<int, Media> */
     private array $store = [];
     private int $nextId = 1;
+
+    /** @var array<string, list<MediaUsage>> keyed by media URL */
+    private array $usages = [];
 
     /** @param list<Media> $initial */
     public function __construct(array $initial = [])
@@ -80,6 +84,22 @@ final class InMemoryMediaRepository implements MediaRepositoryInterface
             height: $media->height,
             altText: $altText,
         );
+    }
+
+    /**
+     * Test seam: stub the reverse-lookup result for a given media URL.
+     *
+     * @param list<MediaUsage> $usages
+     */
+    public function setUsages(string $url, array $usages): void
+    {
+        $this->usages[$url] = $usages;
+    }
+
+    /** @return list<MediaUsage> */
+    public function findUsages(string $url): array
+    {
+        return $this->usages[$url] ?? [];
     }
 
     public function delete(int $id): void
