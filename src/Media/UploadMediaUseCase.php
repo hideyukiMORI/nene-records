@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace NeNeRecords\Media;
 
-use RuntimeException;
-
 final readonly class UploadMediaUseCase implements UploadMediaUseCaseInterface
 {
     /** @var list<string> */
@@ -41,7 +39,7 @@ final readonly class UploadMediaUseCase implements UploadMediaUseCaseInterface
 
     public function __construct(
         private MediaRepositoryInterface $mediaRepository,
-        private string $storageRoot,
+        private StorageInterface $storage,
     ) {
     }
 
@@ -55,27 +53,13 @@ final readonly class UploadMediaUseCase implements UploadMediaUseCaseInterface
             throw new MediaTooLargeException($input->size, self::MAX_SIZE_BYTES);
         }
 
-        $year = date('Y');
-        $month = date('m');
         $ext = $this->extensionForMimeType($input->mimeType);
         $storedName = bin2hex(random_bytes(16)) . '.' . $ext;
-        $relativePath = $year . '/' . $month . '/' . $storedName;
-        $absoluteDir = $this->storageRoot . '/' . $year . '/' . $month;
+        $key = date('Y') . '/' . date('m') . '/' . $storedName;
 
-        if (!is_dir($absoluteDir) && !mkdir($absoluteDir, 0755, true) && !is_dir($absoluteDir)) {
-            throw new RuntimeException('Failed to create media directory: ' . $absoluteDir);
-        }
+        $this->storage->writeFromUpload($key, $input->tmpPath);
 
-        $dest = $this->storageRoot . '/' . $relativePath;
-
-        if (!move_uploaded_file($input->tmpPath, $dest)) {
-            // Fallback for test environments where move_uploaded_file is not available
-            if (!copy($input->tmpPath, $dest)) {
-                throw new RuntimeException('Failed to move uploaded file to: ' . $dest);
-            }
-        }
-
-        $url = '/media/' . $relativePath;
+        $url = $this->storage->publicUrl($key);
         $now = date('Y-m-d H:i:s');
 
         $media = new Media(

@@ -11,6 +11,7 @@ use NeNeRecords\Media\DeleteMediaHandler;
 use NeNeRecords\Media\DeleteMediaUseCase;
 use NeNeRecords\Media\ListMediaHandler;
 use NeNeRecords\Media\ListMediaUseCase;
+use NeNeRecords\Media\LocalStorage;
 use NeNeRecords\Media\Media;
 use NeNeRecords\Media\MediaNotFoundExceptionHandler;
 use NeNeRecords\Media\MediaRouteRegistrar;
@@ -27,6 +28,7 @@ final class MediaHttpTest extends TestCase
     private Psr17Factory $factory;
     private InMemoryMediaRepository $repository;
     private string $storageRoot;
+    private LocalStorage $storage;
     private RequestHandlerInterface $application;
 
     protected function setUp(): void
@@ -36,6 +38,7 @@ final class MediaHttpTest extends TestCase
         $this->factory = new Psr17Factory();
         $this->storageRoot = sys_get_temp_dir() . '/nene-media-test-' . bin2hex(random_bytes(4));
         mkdir($this->storageRoot, 0755, true);
+        $this->storage = new LocalStorage($this->storageRoot);
 
         $this->repository = new InMemoryMediaRepository([
             new Media(
@@ -63,7 +66,7 @@ final class MediaHttpTest extends TestCase
 
         $registrar = new MediaRouteRegistrar(
             new UploadMediaHandler(
-                new UploadMediaUseCase($this->repository, $this->storageRoot),
+                new UploadMediaUseCase($this->repository, $this->storage),
                 $jsonResponse,
             ),
             new ListMediaHandler(
@@ -71,11 +74,10 @@ final class MediaHttpTest extends TestCase
                 $jsonResponse,
             ),
             new DeleteMediaHandler(
-                new DeleteMediaUseCase($this->repository),
+                new DeleteMediaUseCase($this->repository, $this->storage),
                 $this->factory,
-                $this->storageRoot,
             ),
-            new ServeMediaHandler($this->storageRoot, $this->factory, $this->factory),
+            new ServeMediaHandler($this->storage, $this->factory, $this->factory),
         );
 
         $this->application = (new RuntimeApplicationFactory(
@@ -145,10 +147,10 @@ final class MediaHttpTest extends TestCase
         $problemDetails = new ProblemDetailsResponseFactory($this->factory, $this->factory);
 
         $registrar = new MediaRouteRegistrar(
-            new UploadMediaHandler(new UploadMediaUseCase($emptyRepo, $this->storageRoot), $jsonResponse),
+            new UploadMediaHandler(new UploadMediaUseCase($emptyRepo, $this->storage), $jsonResponse),
             new ListMediaHandler(new ListMediaUseCase($emptyRepo), $jsonResponse),
-            new DeleteMediaHandler(new DeleteMediaUseCase($emptyRepo), $this->factory, $this->storageRoot),
-            new ServeMediaHandler($this->storageRoot, $this->factory, $this->factory),
+            new DeleteMediaHandler(new DeleteMediaUseCase($emptyRepo, $this->storage), $this->factory),
+            new ServeMediaHandler($this->storage, $this->factory, $this->factory),
         );
 
         $app = (new RuntimeApplicationFactory(
