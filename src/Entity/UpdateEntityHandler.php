@@ -69,6 +69,13 @@ final readonly class UpdateEntityHandler
             $errors[] = new ValidationError('layout', 'Unknown layout.', 'invalid');
         }
 
+        // A custom-layout page renders most content inside a sandboxed iframe,
+        // which crawlers attribute weakly. Require a meta description so the page
+        // always carries crawlable text (the dual-representation contract).
+        if ($layout === 'custom' && $metaDescription === null) {
+            $errors[] = new ValidationError('meta_description', 'Custom layout pages require a meta description.', 'required');
+        }
+
         if ($errors !== []) {
             throw new ValidationException($errors);
         }

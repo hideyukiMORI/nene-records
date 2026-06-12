@@ -18,10 +18,12 @@ describe('SandboxedBundle', () => {
     expect(sandbox).not.toContain('allow-same-origin')
   })
 
-  it('passes the raw html through srcdoc (no sanitization)', () => {
+  it('passes the raw html through srcdoc (no sanitization) and injects the height reporter', () => {
     const html = '<h1>Hi</h1><script>window.x=1</script>'
     const { container } = render(<SandboxedBundle html={html} />)
-    expect(container.querySelector('iframe')?.getAttribute('srcdoc')).toBe(html)
+    const srcdoc = container.querySelector('iframe')?.getAttribute('srcdoc') ?? ''
+    expect(srcdoc).toContain(html)
+    expect(srcdoc).toContain('nene:bundle-height')
   })
 
   it('renders nothing for empty input', () => {
