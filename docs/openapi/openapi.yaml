@@ -4292,6 +4292,7 @@ components:
           enum:
             - text
             - markdown
+            - html
             - int
             - enum
             - bool
@@ -4336,6 +4337,7 @@ components:
           enum:
             - text
             - markdown
+            - html
             - int
             - enum
             - bool

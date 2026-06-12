@@ -217,6 +217,8 @@ export const ja: Partial<MessageCatalog> = {
   'admin.fieldDefs.delete.description': '「{{fieldKey}}」がスキーマから削除されます。',
   'admin.fieldDefs.dataType.text': 'テキスト',
   'admin.fieldDefs.dataType.markdown': 'Markdown',
+  'admin.fieldDefs.dataType.html': 'HTML（サニタイズ）',
+  'admin.fieldDefs.html.hint': 'CSS込みのHTMLを使えます。表示時にスクリプトは除去されます。',
   'admin.fieldDefs.dataType.int': '整数',
   'admin.fieldDefs.dataType.enum': '列挙型',
   'admin.fieldDefs.dataType.bool': 'ブール値',
