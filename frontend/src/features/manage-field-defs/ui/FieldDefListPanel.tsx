@@ -2,7 +2,14 @@ import type { FieldDef } from '@/entities/field-def'
 import { useTranslation } from '@/shared/i18n'
 import type { MessageKey } from '@/shared/i18n'
 import type { FieldDataType } from '@/entities/field-def'
+import type { ContentRegion } from '@/shared/lib/resolve-layout'
 import { Button, Card, EmptyState, ErrorState, LoadingState, Stack, Text } from '@/shared/ui'
+
+const REGION_LABEL_KEYS: Record<ContentRegion, MessageKey> = {
+  main: 'admin.region.main',
+  sidebar: 'admin.region.sidebar',
+  aside: 'admin.region.aside',
+}
 
 const DATA_TYPE_LABEL_KEYS: Record<FieldDataType, MessageKey> = {
   text: 'admin.fieldDefs.dataType.text',
@@ -80,6 +87,7 @@ export function FieldDefListPanel({
             </Text>
             <Text as="span" muted>
               {t(DATA_TYPE_LABEL_KEYS[item.dataType])}
+              {item.region !== null ? ` · ${t(REGION_LABEL_KEYS[item.region])}` : ''}
             </Text>
           </Stack>
           <div className="flex items-center gap-inline-sm">
