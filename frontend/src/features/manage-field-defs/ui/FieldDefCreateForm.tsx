@@ -106,6 +106,41 @@ export function FieldDefCreateForm({
             </div>
           )}
         />
+        <Controller
+          name="region"
+          control={control}
+          render={({ field }) => (
+            <Select
+              id="field-def-region"
+              label={t('admin.region.label')}
+              disabled={isSubmitting}
+              value={field.value}
+              onChange={field.onChange}
+              onBlur={field.onBlur}
+            >
+              <option value="main">{t('admin.region.main')}</option>
+              <option value="sidebar">{t('admin.region.sidebar')}</option>
+              <option value="aside">{t('admin.region.aside')}</option>
+            </Select>
+          )}
+        />
+        <Controller
+          name="displayOrder"
+          control={control}
+          render={({ field }) => (
+            <Input
+              id="field-def-order"
+              type="number"
+              label={t('admin.fieldDefs.displayOrder')}
+              disabled={isSubmitting}
+              value={String(field.value)}
+              onChange={(e) => {
+                field.onChange(Number(e.target.value) || 0)
+              }}
+              onBlur={field.onBlur}
+            />
+          )}
+        />
         {serverErrorTitle !== null ? <Text muted>{serverErrorTitle}</Text> : null}
         <Button
           type="submit"
