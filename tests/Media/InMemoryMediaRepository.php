@@ -36,6 +36,10 @@ final class InMemoryMediaRepository implements MediaRepositoryInterface
             size: $media->size,
             url: $media->url,
             createdAt: $media->createdAt,
+            storageKey: $media->storageKey,
+            width: $media->width,
+            height: $media->height,
+            altText: $media->altText,
         );
 
         return $id;
@@ -53,6 +57,29 @@ final class InMemoryMediaRepository implements MediaRepositoryInterface
         usort($items, static fn (Media $a, Media $b): int => strcmp($b->createdAt, $a->createdAt));
 
         return $items;
+    }
+
+    public function updateAltText(int $id, ?string $altText): void
+    {
+        $media = $this->store[$id] ?? null;
+
+        if ($media === null) {
+            return;
+        }
+
+        $this->store[$id] = new Media(
+            id: $media->id,
+            originalName: $media->originalName,
+            storedName: $media->storedName,
+            mimeType: $media->mimeType,
+            size: $media->size,
+            url: $media->url,
+            createdAt: $media->createdAt,
+            storageKey: $media->storageKey,
+            width: $media->width,
+            height: $media->height,
+            altText: $altText,
+        );
     }
 
     public function delete(int $id): void

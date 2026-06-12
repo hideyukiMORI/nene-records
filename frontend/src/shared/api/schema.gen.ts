@@ -911,7 +911,11 @@ export interface paths {
         delete: operations["deleteMedia"];
         options?: never;
         head?: never;
-        patch?: never;
+        /**
+         * Update media metadata
+         * @description Updates editable media metadata. Currently the alt text only; a blank value clears it.
+         */
+        patch: operations["updateMedia"];
         trace?: never;
     };
     "/api/v1/navigation-items": {
@@ -1452,11 +1456,21 @@ export interface components {
             original_name: string;
             mime_type: string;
             size: number;
+            /** @description Pixel width for images; null for non-image files. */
+            width?: number | null;
+            /** @description Pixel height for images; null for non-image files. */
+            height?: number | null;
+            /** @description Alternative text for accessibility / SEO. */
+            alt_text?: string | null;
             /** Format: date-time */
             created_at: string;
         };
         MediaListResponse: {
             items: components["schemas"]["MediaResponse"][];
+        };
+        UpdateMediaRequest: {
+            /** @description Alternative text. A blank or null value clears it. */
+            alt_text?: string | null;
         };
         EntityResponse: {
             /** Format: int64 */
@@ -4490,6 +4504,35 @@ export interface operations {
                 content?: never;
             };
             404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    updateMedia: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateMediaRequest"];
+            };
+        };
+        responses: {
+            /** @description Updated media item. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MediaResponse"];
+                };
+            };
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["ValidationFailed"];
             500: components["responses"]["InternalServerError"];
         };
     };

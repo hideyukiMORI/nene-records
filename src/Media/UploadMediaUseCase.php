@@ -57,6 +57,10 @@ final readonly class UploadMediaUseCase implements UploadMediaUseCaseInterface
         $storedName = bin2hex(random_bytes(16)) . '.' . $ext;
         $key = date('Y') . '/' . date('m') . '/' . $storedName;
 
+        // Read pixel dimensions from the header only (no full decode) before the
+        // temp file is moved into storage. Returns null for non-image uploads.
+        [$width, $height] = $this->imageDimensions($input->tmpPath);
+
         $this->storage->writeFromUpload($key, $input->tmpPath);
 
         $url = $this->storage->publicUrl($key);
@@ -70,6 +74,9 @@ final readonly class UploadMediaUseCase implements UploadMediaUseCaseInterface
             size: $input->size,
             url: $url,
             createdAt: $now,
+            storageKey: $key,
+            width: $width,
+            height: $height,
         );
 
         $id = $this->mediaRepository->save($media);
@@ -81,7 +88,23 @@ final readonly class UploadMediaUseCase implements UploadMediaUseCaseInterface
             mimeType: $input->mimeType,
             size: $input->size,
             createdAt: $now,
+            width: $width,
+            height: $height,
         );
+    }
+
+    /**
+     * @return array{0: ?int, 1: ?int}
+     */
+    private function imageDimensions(string $path): array
+    {
+        $info = @getimagesize($path);
+
+        if ($info === false) {
+            return [null, null];
+        }
+
+        return [$info[0], $info[1]];
     }
 
     private function extensionForMimeType(string $mimeType): string

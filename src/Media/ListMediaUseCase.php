@@ -21,6 +21,9 @@ final readonly class ListMediaUseCase implements ListMediaUseCaseInterface
                 mimeType: $m->mimeType,
                 size: $m->size,
                 createdAt: $m->createdAt,
+                width: $m->width,
+                height: $m->height,
+                altText: $m->altText,
             ),
             $this->media->list(),
         );

@@ -16,6 +16,7 @@ export interface MediaLibraryViewProps {
 
   copiedId: number | null
   onCopy: (media: Media) => void
+  onUpdateAlt: (media: Media, altText: string) => void
 
   deleteTarget: Media | null
   isDeleting: boolean
@@ -36,6 +37,7 @@ export function MediaLibraryView({
   onUpload,
   copiedId,
   onCopy,
+  onUpdateAlt,
   deleteTarget,
   isDeleting,
   onRequestDelete,
@@ -66,6 +68,7 @@ export function MediaLibraryView({
             copiedId={copiedId}
             onRetry={onRetry}
             onCopy={onCopy}
+            onUpdateAlt={onUpdateAlt}
             onDelete={onRequestDelete}
           />
         </Stack>

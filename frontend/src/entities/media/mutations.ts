@@ -21,6 +21,26 @@ export function useUploadMedia(): UseMutationResult<Media, AppError, File> {
   })
 }
 
+export function useUpdateMediaAlt(): UseMutationResult<
+  Media,
+  AppError,
+  { id: number; altText: string | null }
+> {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({ id, altText }) => {
+      const dto = await apiClient.patch<MediaDto>(`/api/v1/media/${String(id)}`, {
+        alt_text: altText,
+      })
+      return mapMediaDtoToModel(dto)
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: mediaKeys.list() })
+    },
+  })
+}
+
 export function useDeleteMedia(): UseMutationResult<void, AppError, number> {
   const queryClient = useQueryClient()
 

@@ -13,6 +13,9 @@ final readonly class ListMediaItem
         public string $mimeType,
         public int $size,
         public string $createdAt,
+        public ?int $width = null,
+        public ?int $height = null,
+        public ?string $altText = null,
     ) {
     }
 }

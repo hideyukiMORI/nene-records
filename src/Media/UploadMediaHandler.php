@@ -62,6 +62,9 @@ final readonly class UploadMediaHandler
             'original_name' => $output->originalName,
             'mime_type' => $output->mimeType,
             'size' => $output->size,
+            'width' => $output->width,
+            'height' => $output->height,
+            'alt_text' => $output->altText,
             'created_at' => $output->createdAt,
         ], 201);
     }

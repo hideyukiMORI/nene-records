@@ -16,6 +16,8 @@ use NeNeRecords\Media\Media;
 use NeNeRecords\Media\MediaNotFoundExceptionHandler;
 use NeNeRecords\Media\MediaRouteRegistrar;
 use NeNeRecords\Media\ServeMediaHandler;
+use NeNeRecords\Media\UpdateMediaAltHandler;
+use NeNeRecords\Media\UpdateMediaAltUseCase;
 use NeNeRecords\Media\UploadMediaHandler;
 use NeNeRecords\Media\UploadMediaUseCase;
 use Nyholm\Psr7\Factory\Psr17Factory;
@@ -78,6 +80,10 @@ final class MediaHttpTest extends TestCase
                 $this->factory,
             ),
             new ServeMediaHandler($this->storage, $this->factory, $this->factory),
+            new UpdateMediaAltHandler(
+                new UpdateMediaAltUseCase($this->repository),
+                $jsonResponse,
+            ),
         );
 
         $this->application = (new RuntimeApplicationFactory(
@@ -151,6 +157,7 @@ final class MediaHttpTest extends TestCase
             new ListMediaHandler(new ListMediaUseCase($emptyRepo), $jsonResponse),
             new DeleteMediaHandler(new DeleteMediaUseCase($emptyRepo, $this->storage), $this->factory),
             new ServeMediaHandler($this->storage, $this->factory, $this->factory),
+            new UpdateMediaAltHandler(new UpdateMediaAltUseCase($emptyRepo), $jsonResponse),
         );
 
         $app = (new RuntimeApplicationFactory(
@@ -219,6 +226,58 @@ final class MediaHttpTest extends TestCase
         );
 
         self::assertFileDoesNotExist($filePath);
+    }
+
+    // ── Update alt text ───────────────────────────────────────────────────────
+
+    public function testUpdateMediaAltSetsAltText(): void
+    {
+        $body = $this->factory->createStream(json_encode(['alt_text' => 'A red car'], JSON_THROW_ON_ERROR));
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('PATCH', 'https://example.test/api/v1/media/1')->withBody($body),
+        );
+        $payload = $this->decodeJson($response);
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('A red car', $payload['alt_text']);
+        self::assertSame('A red car', $this->repository->findById(1)?->altText);
+    }
+
+    public function testUpdateMediaAltClearsAltTextWhenBlank(): void
+    {
+        $this->repository->updateAltText(1, 'existing');
+
+        $body = $this->factory->createStream(json_encode(['alt_text' => '   '], JSON_THROW_ON_ERROR));
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('PATCH', 'https://example.test/api/v1/media/1')->withBody($body),
+        );
+        $payload = $this->decodeJson($response);
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertNull($payload['alt_text']);
+        self::assertNull($this->repository->findById(1)?->altText);
+    }
+
+    public function testUpdateMediaAltOnMissingReturns404(): void
+    {
+        $body = $this->factory->createStream(json_encode(['alt_text' => 'x'], JSON_THROW_ON_ERROR));
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('PATCH', 'https://example.test/api/v1/media/999')->withBody($body),
+        );
+
+        self::assertSame(404, $response->getStatusCode());
+    }
+
+    public function testListItemsExposeDimensionAndAltKeys(): void
+    {
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/api/v1/media'),
+        );
+        $item = $this->decodeJson($response)['items'][0];
+
+        self::assertArrayHasKey('width', $item);
+        self::assertArrayHasKey('height', $item);
+        self::assertArrayHasKey('alt_text', $item);
     }
 
     /** @return array<string, mixed> */

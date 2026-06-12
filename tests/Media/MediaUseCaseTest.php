@@ -47,6 +47,43 @@ final class MediaUseCaseTest extends TestCase
         unlink($tmpFile);
     }
 
+    public function testUploadCapturesImageDimensionsAndStorageKey(): void
+    {
+        $storageRoot = sys_get_temp_dir() . '/nene_media_test_' . uniqid('', true);
+        mkdir($storageRoot, 0755, true);
+
+        // 1x1 PNG.
+        $png = base64_decode(
+            'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',
+            true,
+        );
+        self::assertIsString($png);
+        $tmpFile = tempnam(sys_get_temp_dir(), 'nene_upload_');
+        file_put_contents($tmpFile, $png);
+
+        $mediaRepo = new InMemoryMediaRepository();
+        $useCase = new UploadMediaUseCase($mediaRepo, new LocalStorage($storageRoot));
+
+        $output = $useCase->execute(new UploadMediaInput(
+            tmpPath: $tmpFile,
+            originalName: 'pixel.png',
+            mimeType: 'image/png',
+            size: strlen($png),
+        ));
+
+        self::assertSame(1, $output->width);
+        self::assertSame(1, $output->height);
+
+        $saved = $mediaRepo->findById($output->id);
+        self::assertNotNull($saved);
+        self::assertSame(1, $saved->width);
+        self::assertSame(1, $saved->height);
+        self::assertNotSame('', $saved->storageKey);
+        self::assertStringEndsWith('.png', $saved->storageKey);
+
+        unlink($tmpFile);
+    }
+
     public function testUploadThrowsMediaInvalidTypeExceptionForUnsupportedMimeType(): void
     {
         $storageRoot = sys_get_temp_dir() . '/nene_media_test_' . uniqid('', true);

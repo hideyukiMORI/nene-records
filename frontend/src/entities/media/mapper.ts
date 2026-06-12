@@ -8,6 +8,9 @@ export function mapMediaDtoToModel(dto: MediaDto): Media {
     originalName: dto.original_name,
     mimeType: dto.mime_type,
     size: dto.size,
+    width: dto.width,
+    height: dto.height,
+    altText: dto.alt_text,
     createdAt: dto.created_at,
   }
 }

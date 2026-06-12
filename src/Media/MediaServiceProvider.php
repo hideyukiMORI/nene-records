@@ -87,6 +87,18 @@ final readonly class MediaServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(
+                UpdateMediaAltUseCaseInterface::class,
+                static function (ContainerInterface $c): UpdateMediaAltUseCaseInterface {
+                    $repository = $c->get(MediaRepositoryInterface::class);
+
+                    if (!$repository instanceof MediaRepositoryInterface) {
+                        throw new LogicException('Media repository service is invalid.');
+                    }
+
+                    return new UpdateMediaAltUseCase($repository);
+                },
+            )
+            ->set(
                 DeleteMediaUseCaseInterface::class,
                 static function (ContainerInterface $c): DeleteMediaUseCaseInterface {
                     $repository = $c->get(MediaRepositoryInterface::class);
@@ -155,6 +167,23 @@ final readonly class MediaServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(
+                UpdateMediaAltHandler::class,
+                static function (ContainerInterface $c): UpdateMediaAltHandler {
+                    $useCase = $c->get(UpdateMediaAltUseCaseInterface::class);
+                    $response = $c->get(JsonResponseFactory::class);
+
+                    if (!$useCase instanceof UpdateMediaAltUseCaseInterface) {
+                        throw new LogicException('UpdateMediaAlt use case service is invalid.');
+                    }
+
+                    if (!$response instanceof JsonResponseFactory) {
+                        throw new LogicException('JSON response factory service is invalid.');
+                    }
+
+                    return new UpdateMediaAltHandler($useCase, $response);
+                },
+            )
+            ->set(
                 ServeMediaHandler::class,
                 static function (ContainerInterface $c): ServeMediaHandler {
                     $storage = $c->get(StorageInterface::class);
@@ -219,6 +248,7 @@ final readonly class MediaServiceProvider implements ServiceProviderInterface
                     $list = $c->get(ListMediaHandler::class);
                     $delete = $c->get(DeleteMediaHandler::class);
                     $serve = $c->get(ServeMediaHandler::class);
+                    $updateAlt = $c->get(UpdateMediaAltHandler::class);
 
                     if (!$upload instanceof UploadMediaHandler) {
                         throw new LogicException('UploadMedia handler service is invalid.');
@@ -236,7 +266,11 @@ final readonly class MediaServiceProvider implements ServiceProviderInterface
                         throw new LogicException('ServeMedia handler service is invalid.');
                     }
 
-                    return new MediaRouteRegistrar($upload, $list, $delete, $serve);
+                    if (!$updateAlt instanceof UpdateMediaAltHandler) {
+                        throw new LogicException('UpdateMediaAlt handler service is invalid.');
+                    }
+
+                    return new MediaRouteRegistrar($upload, $list, $delete, $serve, $updateAlt);
                 },
             );
     }

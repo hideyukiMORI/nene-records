@@ -14,6 +14,10 @@ final readonly class Media
         public int $size,
         public string $url,
         public string $createdAt,
+        public string $storageKey = '',
+        public ?int $width = null,
+        public ?int $height = null,
+        public ?string $altText = null,
     ) {
     }
 }
