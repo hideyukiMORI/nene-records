@@ -37,6 +37,20 @@ final readonly class LocalStorage implements StorageInterface
         }
     }
 
+    public function write(string $key, string $contents): void
+    {
+        $dest = $this->resolve($key);
+        $dir = dirname($dest);
+
+        if (!is_dir($dir) && !mkdir($dir, 0755, true) && !is_dir($dir)) {
+            throw new RuntimeException('Failed to create media directory: ' . $dir);
+        }
+
+        if (file_put_contents($dest, $contents) === false) {
+            throw new RuntimeException('Failed to write media object: ' . $key);
+        }
+    }
+
     public function exists(string $key): bool
     {
         return is_file($this->resolve($key));

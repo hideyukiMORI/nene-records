@@ -9,12 +9,14 @@ use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RuntimeApplicationFactory;
 use NeNeRecords\Media\DeleteMediaHandler;
 use NeNeRecords\Media\DeleteMediaUseCase;
+use NeNeRecords\Media\GdImageProcessor;
 use NeNeRecords\Media\ListMediaHandler;
 use NeNeRecords\Media\ListMediaUseCase;
 use NeNeRecords\Media\LocalStorage;
 use NeNeRecords\Media\Media;
 use NeNeRecords\Media\MediaNotFoundExceptionHandler;
 use NeNeRecords\Media\MediaRouteRegistrar;
+use NeNeRecords\Media\ServeDerivativeHandler;
 use NeNeRecords\Media\ServeMediaHandler;
 use NeNeRecords\Media\UpdateMediaAltHandler;
 use NeNeRecords\Media\UpdateMediaAltUseCase;
@@ -84,6 +86,7 @@ final class MediaHttpTest extends TestCase
                 new UpdateMediaAltUseCase($this->repository),
                 $jsonResponse,
             ),
+            new ServeDerivativeHandler($this->storage, new GdImageProcessor(), $this->factory, $this->factory),
         );
 
         $this->application = (new RuntimeApplicationFactory(
@@ -158,6 +161,7 @@ final class MediaHttpTest extends TestCase
             new DeleteMediaHandler(new DeleteMediaUseCase($emptyRepo, $this->storage), $this->factory),
             new ServeMediaHandler($this->storage, $this->factory, $this->factory),
             new UpdateMediaAltHandler(new UpdateMediaAltUseCase($emptyRepo), $jsonResponse),
+            new ServeDerivativeHandler($this->storage, new GdImageProcessor(), $this->factory, $this->factory),
         );
 
         $app = (new RuntimeApplicationFactory(
@@ -278,6 +282,89 @@ final class MediaHttpTest extends TestCase
         self::assertArrayHasKey('width', $item);
         self::assertArrayHasKey('height', $item);
         self::assertArrayHasKey('alt_text', $item);
+    }
+
+    // ── Derivatives ────────────────────────────────────────────────────────────
+
+    public function testDerivativeGeneratesResizedImageAndCachesIt(): void
+    {
+        $this->seedStorageImage('2026/05/pic.png', 800, 400);
+
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/media/sm/2026/05/pic.png'),
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('image/png', $response->getHeaderLine('Content-Type'));
+
+        $info = getimagesizefromstring((string) $response->getBody());
+        self::assertNotFalse($info);
+        self::assertSame(320, $info[0], 'sm preset constrains width to 320');
+        self::assertSame(160, $info[1]);
+
+        self::assertFileExists($this->storageRoot . '/derivatives/sm/png/2026/05/pic.png');
+    }
+
+    public function testDerivativeNegotiatesWebpFromAcceptHeader(): void
+    {
+        $this->seedStorageImage('2026/05/pic.png', 200, 200);
+
+        $response = $this->application->handle(
+            $this->factory
+                ->createServerRequest('GET', 'https://example.test/media/thumb/2026/05/pic.png')
+                ->withHeader('Accept', 'image/avif,image/webp,image/*'),
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+        // libavif is not guaranteed in CI; AVIF is preferred but at least webp/avif, not png.
+        self::assertContains($response->getHeaderLine('Content-Type'), ['image/avif', 'image/webp']);
+    }
+
+    public function testDerivativeWithFormatOverrideReturnsWebp(): void
+    {
+        $this->seedStorageImage('2026/05/pic.png', 200, 200);
+
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/media/thumb/2026/05/pic.png?fm=webp'),
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('image/webp', $response->getHeaderLine('Content-Type'));
+    }
+
+    public function testDerivativeWithUnknownPresetReturns404(): void
+    {
+        $this->seedStorageImage('2026/05/pic.png', 200, 200);
+
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/media/huge/2026/05/pic.png'),
+        );
+
+        self::assertSame(404, $response->getStatusCode());
+    }
+
+    public function testDerivativeForMissingOriginalReturns404(): void
+    {
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/media/sm/2026/05/nope.png'),
+        );
+
+        self::assertSame(404, $response->getStatusCode());
+    }
+
+    /**
+     * @param positive-int $width
+     * @param positive-int $height
+     */
+    private function seedStorageImage(string $key, int $width, int $height): void
+    {
+        $image = imagecreatetruecolor($width, $height);
+        self::assertNotFalse($image);
+        imagefilledrectangle($image, 0, 0, $width, $height, (int) imagecolorallocate($image, 10, 120, 200));
+        $dir = $this->storageRoot . '/' . dirname($key);
+        mkdir($dir, 0755, true);
+        imagepng($image, $this->storageRoot . '/' . $key);
+        imagedestroy($image);
     }
 
     /** @return array<string, mixed> */

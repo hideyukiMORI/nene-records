@@ -22,6 +22,13 @@ interface StorageInterface
      */
     public function writeFromUpload(string $key, string $tmpPath): void;
 
+    /**
+     * Write raw bytes to $key (used for cached image derivatives).
+     *
+     * @throws \RuntimeException when the object cannot be written.
+     */
+    public function write(string $key, string $contents): void;
+
     public function exists(string $key): bool;
 
     /**
