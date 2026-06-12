@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NeNeRecords\Media;
 
+use AsyncAws\S3\S3Client;
 use LogicException;
 use Nene2\Database\DatabaseQueryExecutorInterface;
 use Nene2\DependencyInjection\ContainerBuilder;
@@ -34,7 +35,7 @@ final readonly class MediaServiceProvider implements ServiceProviderInterface
 
                     return match ($driver) {
                         'local' => new LocalStorage($projectRoot . '/var/media'),
-                        // S3-compatible driver lands in a follow-up (see #299 Phase A).
+                        's3' => self::createS3Storage(),
                         default => throw new LogicException('Unsupported media storage driver: ' . $driver),
                     };
                 },
@@ -238,5 +239,40 @@ final readonly class MediaServiceProvider implements ServiceProviderInterface
                     return new MediaRouteRegistrar($upload, $list, $delete, $serve);
                 },
             );
+    }
+
+    /**
+     * Build the S3-compatible driver from MEDIA_S3_* env vars. Supports AWS S3
+     * as well as MinIO / Cloudflare R2 via a custom endpoint + path-style.
+     */
+    private static function createS3Storage(): S3Storage
+    {
+        $bucket = (string) (getenv('MEDIA_S3_BUCKET') ?: '');
+        $publicBaseUrl = (string) (getenv('MEDIA_S3_PUBLIC_BASE_URL') ?: '');
+
+        if ($bucket === '' || $publicBaseUrl === '') {
+            throw new LogicException('MEDIA_S3_BUCKET and MEDIA_S3_PUBLIC_BASE_URL are required for the s3 driver.');
+        }
+
+        $config = ['region' => (string) (getenv('MEDIA_S3_REGION') ?: 'us-east-1')];
+
+        $endpoint = (string) (getenv('MEDIA_S3_ENDPOINT') ?: '');
+        if ($endpoint !== '') {
+            $config['endpoint'] = $endpoint;
+            $config['pathStyleEndpoint'] = filter_var(getenv('MEDIA_S3_PATH_STYLE'), FILTER_VALIDATE_BOOL) ? 'true' : 'false';
+        }
+
+        $accessKey = (string) (getenv('MEDIA_S3_ACCESS_KEY') ?: '');
+        if ($accessKey !== '') {
+            $config['accessKeyId'] = $accessKey;
+            $config['accessKeySecret'] = (string) (getenv('MEDIA_S3_SECRET_KEY') ?: '');
+        }
+
+        return new S3Storage(
+            new S3Client($config),
+            $bucket,
+            $publicBaseUrl,
+            (string) (getenv('MEDIA_S3_PREFIX') ?: ''),
+        );
     }
 }
