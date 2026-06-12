@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import type { RelationFieldDef } from '@/entities/field-def'
 import { useTranslation } from '@/shared/i18n'
-import { Button, Stack, Text } from '@/shared/ui'
+import { Button, Card, ErrorState, LoadingState, Stack, Text } from '@/shared/ui'
 import { useInverseRelationPanel } from '../hooks/use-inverse-relation-panel'
 
 export interface InverseRelationPanelProps {
@@ -27,18 +27,17 @@ export function InverseRelationPanel({ fieldDef, targetEntityId }: InverseRelati
       : fieldDef.fieldKey
 
   if (isLoading) {
-    return <Text muted>{t('admin.inverseRelations.loadingPanel', { panelTitle })}</Text>
+    return <LoadingState>{t('admin.inverseRelations.loadingPanel', { panelTitle })}</LoadingState>
   }
 
   if (isError) {
     return (
-      <Stack gap="sm">
-        <Text variant="heading-sm">{t('admin.inverseRelations.panelError', { panelTitle })}</Text>
-        <Text muted>{errorTitle ?? t('common.error.unknown')}</Text>
-        <Button variant="secondary" onClick={() => void refetch()}>
-          {t('common.actions.retry')}
-        </Button>
-      </Stack>
+      <ErrorState
+        title={t('admin.inverseRelations.panelError', { panelTitle })}
+        message={errorTitle ?? t('common.error.unknown')}
+        onRetry={() => void refetch()}
+        retryLabel={t('common.actions.retry')}
+      />
     )
   }
 
@@ -54,9 +53,11 @@ export function InverseRelationPanel({ fieldDef, targetEntityId }: InverseRelati
       ) : (
         <ul className="flex flex-col gap-stack-sm">
           {items.map((item) => (
-            <li
+            <Card
+              as="li"
               key={String(item.id)}
-              className="flex items-center justify-between gap-inline-md rounded-md border border-border bg-surface-raised px-inline-md py-stack-sm shadow-sm"
+              padding="row"
+              className="flex items-center justify-between gap-inline-md"
             >
               <Stack gap="xs">
                 <Text as="span" variant="heading-sm">
@@ -77,7 +78,7 @@ export function InverseRelationPanel({ fieldDef, targetEntityId }: InverseRelati
                   {t('admin.inverseRelations.open')}
                 </Button>
               </Link>
-            </li>
+            </Card>
           ))}
         </ul>
       )}

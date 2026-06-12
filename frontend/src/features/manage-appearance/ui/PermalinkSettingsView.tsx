@@ -6,7 +6,7 @@ import {
   PERMALINK_PRESETS,
   resolvePermalink,
 } from '@/shared/lib/resolve-permalink'
-import { Button, Stack, Text } from '@/shared/ui'
+import { Button, Card, Stack, Text } from '@/shared/ui'
 
 // ── Warning for patterns without {type} ──────────────────────────────────────
 
@@ -71,7 +71,7 @@ function PermalinkRow({ entityType, onSaved }: { entityType: EntityType; onSaved
   }
 
   return (
-    <div className="rounded-md border border-border bg-surface-raised p-inline-md">
+    <Card>
       <Stack gap="sm">
         <div className="flex items-center justify-between">
           <Text variant="heading-sm">{entityType.name}</Text>
@@ -185,7 +185,7 @@ function PermalinkRow({ entityType, onSaved }: { entityType: EntityType; onSaved
           </div>
         )}
       </Stack>
-    </div>
+    </Card>
   )
 }
 

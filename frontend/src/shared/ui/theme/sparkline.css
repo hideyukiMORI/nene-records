@@ -1,0 +1,24 @@
+/* ============================================================
+   Sparkline (Console redesign §05)
+   Mini bar chart of daily access counts on the dashboard stat
+   card (the reference `.rd-spark`). Bar heights are set inline
+   as a percentage; colours use the --color-accent token so the
+   chart adapts to every theme. Lives in the theme layer rather
+   than as Tailwind arbitrary utilities.
+   ============================================================ */
+
+.sparkline {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 34px;
+  margin-top: 10px;
+}
+
+.sparkline__bar {
+  flex: 1;
+  min-height: 8%;
+  background: var(--color-accent);
+  border-radius: 2px 2px 0 0;
+  opacity: 0.85;
+}

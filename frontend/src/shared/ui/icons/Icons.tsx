@@ -120,6 +120,22 @@ export function IconChevronLeft({ size = 16, className }: IconProps) {
   )
 }
 
+export function IconChevronUp({ size = 16, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className} aria-hidden="true">
+      <polyline points="6 15 12 9 18 15" />
+    </svg>
+  )
+}
+
+export function IconChevronDown({ size = 16, className }: IconProps) {
+  return (
+    <svg {...base(size)} className={className} aria-hidden="true">
+      <polyline points="6 9 12 15 18 9" />
+    </svg>
+  )
+}
+
 export function IconMenu({ size = 16, className }: IconProps) {
   return (
     <svg {...base(size)} className={className} aria-hidden="true">

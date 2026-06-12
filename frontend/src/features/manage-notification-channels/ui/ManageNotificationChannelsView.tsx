@@ -5,7 +5,7 @@ import type {
   UpdateNotificationChannelInput,
 } from '@/entities/notification-channel'
 import { useTranslation } from '@/shared/i18n'
-import { Button, ConfirmDialog, EmptyState, Stack, Text } from '@/shared/ui'
+import { Button, Card, ConfirmDialog, EmptyState, PageHeader, Stack, Text } from '@/shared/ui'
 import { NotificationChannelForm } from './NotificationChannelForm'
 
 interface ManageNotificationChannelsViewProps {
@@ -85,19 +85,17 @@ export function ManageNotificationChannelsView({
 
   return (
     <Stack gap="lg">
-      <div className="flex items-center justify-between gap-4">
-        <Stack gap="xs">
-          <Text as="h1" variant="heading-md">
-            {t('admin.notifications.title')}
-          </Text>
-          <Text muted>{t('admin.notifications.description')}</Text>
-        </Stack>
-        {!showCreateForm && (
-          <Button type="button" size="sm" onClick={onShowCreateForm}>
-            {t('admin.notifications.addButton')}
-          </Button>
-        )}
-      </div>
+      <PageHeader
+        title={t('admin.notifications.title')}
+        description={t('admin.notifications.description')}
+        actions={
+          !showCreateForm ? (
+            <Button type="button" size="sm" onClick={onShowCreateForm}>
+              {t('admin.notifications.addButton')}
+            </Button>
+          ) : undefined
+        }
+      />
 
       {showCreateForm && (
         <NotificationChannelForm
@@ -128,9 +126,9 @@ export function ManageNotificationChannelsView({
                 onCancel={onCancelEdit}
               />
             ) : (
-              <div
+              <Card
                 key={channel.id}
-                className="flex flex-col gap-2 rounded-md border border-border bg-surface-raised p-inline-md shadow-sm sm:flex-row sm:items-center sm:justify-between"
+                className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
               >
                 <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
                   <span
@@ -209,7 +207,7 @@ export function ManageNotificationChannelsView({
                     {t('common.actions.delete')}
                   </Button>
                 </div>
-              </div>
+              </Card>
             ),
           )}
         </Stack>

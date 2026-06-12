@@ -17,7 +17,9 @@ function renderTagsPage() {
 }
 
 function getCreateForm(): HTMLElement {
-  const form = screen.getByRole('heading', { name: 'Create tag' }).closest('form')
+  // The panel header is a muted chrome eyebrow <p> (not a heading); scope to <p>
+  // to avoid matching the "Create tag" submit button text.
+  const form = screen.getByText('Create tag', { selector: 'p' }).closest('form')
   if (form === null) {
     throw new Error('Create tag form not found')
   }

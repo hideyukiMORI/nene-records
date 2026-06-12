@@ -1,7 +1,7 @@
 import type { EntityTag } from '@/entities/entity-tag'
 import type { Tag } from '@/entities/tag'
 import { useTranslation } from '@/shared/i18n'
-import { Button, Stack, Text } from '@/shared/ui'
+import { Button, Card, ErrorState, LoadingState, Select, Stack, Text } from '@/shared/ui'
 
 export interface ManageEntityTagsViewProps {
   attachedTags: EntityTag[]
@@ -37,18 +37,17 @@ export function ManageEntityTagsView({
   const { t } = useTranslation()
 
   if (isLoading) {
-    return <Text muted>{t('admin.entityTags.loading')}</Text>
+    return <LoadingState>{t('admin.entityTags.loading')}</LoadingState>
   }
 
   if (isError) {
     return (
-      <Stack gap="sm">
-        <Text variant="heading-sm">{t('admin.entityTags.error')}</Text>
-        <Text muted>{errorTitle ?? t('common.error.unknown')}</Text>
-        <Button variant="secondary" onClick={onRetry}>
-          {t('common.actions.retry')}
-        </Button>
-      </Stack>
+      <ErrorState
+        title={t('admin.entityTags.error')}
+        message={errorTitle ?? t('common.error.unknown')}
+        onRetry={onRetry}
+        retryLabel={t('common.actions.retry')}
+      />
     )
   }
 
@@ -62,9 +61,11 @@ export function ManageEntityTagsView({
       ) : (
         <ul className="flex flex-col gap-stack-sm">
           {attachedTags.map((tag) => (
-            <li
+            <Card
+              as="li"
               key={String(tag.id)}
-              className="flex items-center justify-between gap-inline-md rounded-md border border-border bg-surface-raised px-inline-md py-stack-sm shadow-sm"
+              padding="row"
+              className="flex items-center justify-between gap-inline-md"
             >
               <Stack gap="xs">
                 <Text as="span" variant="heading-sm">
@@ -84,39 +85,31 @@ export function ManageEntityTagsView({
               >
                 {t('admin.entityTags.remove')}
               </Button>
-            </li>
+            </Card>
           ))}
         </ul>
       )}
       <Stack gap="sm">
-        <div className="flex flex-col gap-stack-xs">
-          <label
-            htmlFor="entity-tag-select"
-            className="font-sans text-body font-medium text-text-primary"
-          >
-            {t('admin.entityTags.addLabel')}
-          </label>
-          <select
-            id="entity-tag-select"
-            disabled={isAttaching || availableTags.length === 0}
-            value={selectedTagId}
-            onChange={(event) => {
-              onSelectedTagIdChange(event.target.value)
-            }}
-            className="rounded-md border border-border bg-surface-raised px-inline-md py-stack-sm font-sans text-body text-text-primary shadow-sm focus-visible:outline-none focus-visible:shadow-focus disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <option value="">
-              {availableTags.length === 0
-                ? t('admin.entityTags.noAvailable')
-                : t('admin.entityTags.selectPlaceholder')}
+        <Select
+          id="entity-tag-select"
+          label={t('admin.entityTags.addLabel')}
+          disabled={isAttaching || availableTags.length === 0}
+          value={selectedTagId}
+          onChange={(event) => {
+            onSelectedTagIdChange(event.target.value)
+          }}
+        >
+          <option value="">
+            {availableTags.length === 0
+              ? t('admin.entityTags.noAvailable')
+              : t('admin.entityTags.selectPlaceholder')}
+          </option>
+          {availableTags.map((tag) => (
+            <option key={String(tag.id)} value={String(tag.id)}>
+              {tag.name}
             </option>
-            {availableTags.map((tag) => (
-              <option key={String(tag.id)} value={String(tag.id)}>
-                {tag.name}
-              </option>
-            ))}
-          </select>
-        </div>
+          ))}
+        </Select>
         {attachErrorTitle !== null ? <Text muted>{attachErrorTitle}</Text> : null}
         <Button
           variant="secondary"

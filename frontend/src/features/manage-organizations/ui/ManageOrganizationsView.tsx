@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { PLANS } from '@/entities/organization'
 import type { CreateOrganizationInput, Organization } from '@/entities/organization'
-import { Button, ConfirmDialog, Input, Stack, Text } from '@/shared/ui'
+import { Button, Card, ConfirmDialog, Input, PageHeader, Select, Stack, Text } from '@/shared/ui'
 import { IconBuilding, IconX } from '@/shared/ui/icons/Icons'
 import type { ManageOrganizationsPageState } from '../hooks/useManageOrganizationsPage'
 
@@ -31,7 +31,7 @@ function CreateOrganizationForm({ isCreating, onClose, onSubmit }: CreateOrganiz
   }
 
   return (
-    <div className="rounded-lg border border-border bg-surface-raised p-6">
+    <Card padding="none" className="p-6">
       <div className="mb-4 flex items-center justify-between">
         <Text as="h2" variant="heading-sm">
           New Organization
@@ -87,20 +87,20 @@ function CreateOrganizationForm({ isCreating, onClose, onSubmit }: CreateOrganiz
             <label htmlFor="org-plan" className="mb-1 block text-sm font-medium text-text-primary">
               Plan *
             </label>
-            <select
+            <Select
               id="org-plan"
               value={plan}
               onChange={(e) => {
                 setPlan(e.target.value)
               }}
-              className="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary focus:border-accent focus:outline-none"
+              className="w-full"
             >
               {PLANS.map((p) => (
                 <option key={p} value={p}>
                   {p.charAt(0).toUpperCase() + p.slice(1)}
                 </option>
               ))}
-            </select>
+            </Select>
           </div>
 
           <div>
@@ -131,7 +131,7 @@ function CreateOrganizationForm({ isCreating, onClose, onSubmit }: CreateOrganiz
           </div>
         </Stack>
       </form>
-    </div>
+    </Card>
   )
 }
 
@@ -154,19 +154,17 @@ export function ManageOrganizationsView({
 }: ManageOrganizationsPageState) {
   return (
     <Stack gap="lg">
-      <div className="flex items-start justify-between">
-        <div>
-          <Text as="h1" variant="heading-md">
-            Organizations
-          </Text>
-          <Text muted>Manage all tenant organizations.</Text>
-        </div>
-        {!showCreateForm && (
-          <Button variant="primary" onClick={onShowCreateForm}>
-            New Organization
-          </Button>
-        )}
-      </div>
+      <PageHeader
+        title="Organizations"
+        description="Manage all tenant organizations."
+        actions={
+          !showCreateForm ? (
+            <Button variant="primary" onClick={onShowCreateForm}>
+              New Organization
+            </Button>
+          ) : undefined
+        }
+      />
 
       {showCreateForm && (
         <CreateOrganizationForm

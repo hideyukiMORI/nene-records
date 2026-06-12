@@ -2,7 +2,7 @@ import { Controller } from 'react-hook-form'
 import { FIELD_DATA_TYPES, type FieldDataType, type FieldDef } from '@/entities/field-def'
 import { useTranslation } from '@/shared/i18n'
 import type { MessageKey } from '@/shared/i18n'
-import { Button, Input, Stack, Text } from '@/shared/ui'
+import { Button, Card, Input, Select, Stack, Text } from '@/shared/ui'
 import { useEditFieldDefForm } from '../hooks/use-create-field-def-form'
 
 const DATA_TYPE_LABEL_KEYS: Record<FieldDataType, MessageKey> = {
@@ -41,9 +41,9 @@ export function FieldDefEditForm({
   })
 
   return (
-    <form
+    <Card
+      as="form"
       key={String(fieldDef.id)}
-      className="rounded-md border border-border bg-surface-raised p-inline-md shadow-sm"
       onSubmit={(event) => {
         void handleSubmit(async (values) => {
           await onSubmit(values)
@@ -81,20 +81,19 @@ export function FieldDefEditForm({
               >
                 {t('admin.fieldDefs.createForm.dataTypeLabel')}
               </label>
-              <select
+              <Select
                 id="field-def-edit-data-type"
                 disabled={isSubmitting}
                 value={field.value}
                 onChange={field.onChange}
                 onBlur={field.onBlur}
-                className="rounded-md border border-border bg-surface-raised px-inline-md py-stack-sm font-sans text-body text-text-primary shadow-sm focus-visible:outline-none focus-visible:shadow-focus disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {FIELD_DATA_TYPES.map((dataType) => (
                   <option key={dataType} value={dataType}>
                     {t(DATA_TYPE_LABEL_KEYS[dataType])}
                   </option>
                 ))}
-              </select>
+              </Select>
               {errors.dataType?.message !== undefined ? (
                 <span className="font-sans text-caption text-danger">
                   {errors.dataType.message}
@@ -115,6 +114,6 @@ export function FieldDefEditForm({
           </Button>
         </div>
       </Stack>
-    </form>
+    </Card>
   )
 }

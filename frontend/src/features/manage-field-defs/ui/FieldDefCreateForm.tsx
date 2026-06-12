@@ -2,7 +2,7 @@ import { Controller } from 'react-hook-form'
 import { FIELD_DATA_TYPES, type FieldDataType } from '@/entities/field-def'
 import { useTranslation } from '@/shared/i18n'
 import type { MessageKey } from '@/shared/i18n'
-import { Button, Input, Stack, Text } from '@/shared/ui'
+import { Button, Card, Input, Select, Stack, Text } from '@/shared/ui'
 import { useCreateFieldDefForm } from '../hooks/use-create-field-def-form'
 
 const DATA_TYPE_LABEL_KEYS: Record<FieldDataType, MessageKey> = {
@@ -35,8 +35,8 @@ export function FieldDefCreateForm({
   } = useCreateFieldDefForm()
 
   return (
-    <form
-      className="rounded-md border border-border bg-surface-raised p-inline-md shadow-sm"
+    <Card
+      as="form"
       onSubmit={(event) => {
         void handleSubmit(async (values) => {
           await onSubmit(values)
@@ -75,20 +75,19 @@ export function FieldDefCreateForm({
               >
                 {t('admin.fieldDefs.createForm.dataTypeLabel')}
               </label>
-              <select
+              <Select
                 id="field-def-data-type"
                 disabled={isSubmitting}
                 value={field.value}
                 onChange={field.onChange}
                 onBlur={field.onBlur}
-                className="rounded-md border border-border bg-surface-raised px-inline-md py-stack-sm font-sans text-body text-text-primary shadow-sm focus-visible:outline-none focus-visible:shadow-focus disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {FIELD_DATA_TYPES.map((dataType) => (
                   <option key={dataType} value={dataType}>
                     {t(DATA_TYPE_LABEL_KEYS[dataType])}
                   </option>
                 ))}
-              </select>
+              </Select>
               {errors.dataType?.message !== undefined ? (
                 <span className="font-sans text-caption text-danger">
                   {errors.dataType.message}
@@ -108,6 +107,6 @@ export function FieldDefCreateForm({
             : t('admin.fieldDefs.createForm.submit')}
         </Button>
       </Stack>
-    </form>
+    </Card>
   )
 }

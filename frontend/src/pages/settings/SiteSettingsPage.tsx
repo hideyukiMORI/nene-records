@@ -1,4 +1,3 @@
-import type { ReactNode } from 'react'
 import { currentUserHasCapability } from '@/entities/auth'
 import {
   AppearanceView,
@@ -7,16 +6,7 @@ import {
 } from '@/features/manage-appearance'
 import { ManageSiteSettingsView, useManageSiteSettingsPage } from '@/features/manage-settings'
 import { useTranslation } from '@/shared/i18n'
-import { Stack, Text } from '@/shared/ui'
-
-/** Console redesign §06 — small chrome eyebrow that heads each settings section. */
-function SectionHeader({ children }: { children: ReactNode }) {
-  return (
-    <p className="font-chrome text-tiny font-bold uppercase tracking-widest text-text-muted">
-      {children}
-    </p>
-  )
-}
+import { PageHeader, SectionHeader, Stack, Text } from '@/shared/ui'
 
 export function SiteSettingsPage() {
   const { t } = useTranslation()
@@ -26,15 +16,11 @@ export function SiteSettingsPage() {
 
   return (
     <Stack gap="lg">
-      <Stack gap="xs">
-        <p className="font-chrome text-tiny font-bold uppercase tracking-widest text-accent">
-          {t('admin.settings.eyebrow')}
-        </p>
-        <Text as="h1" variant="heading-md">
-          {t('admin.settings.pageTitle')}
-        </Text>
-        <Text muted>{t('admin.settings.description')}</Text>
-      </Stack>
+      <PageHeader
+        eyebrow={t('admin.settings.eyebrow')}
+        title={t('admin.settings.pageTitle')}
+        description={t('admin.settings.description')}
+      />
 
       <Stack gap="sm">
         <SectionHeader>{t('admin.settings.appearance.title')}</SectionHeader>

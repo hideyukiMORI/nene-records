@@ -1,6 +1,6 @@
 import type { Tag } from '@/entities/tag'
 import { useTranslation } from '@/shared/i18n'
-import { ConfirmDialog, Stack, Text } from '@/shared/ui'
+import { ConfirmDialog, SectionHeader, Stack } from '@/shared/ui'
 import { TagCreateForm } from './TagCreateForm'
 import { TagEditForm } from './TagEditForm'
 import { TagListPanel } from './TagListPanel'
@@ -68,9 +68,7 @@ export function ManageTagsView({
           />
         ) : null}
         <Stack gap="sm">
-          <Text as="h2" variant="heading-sm">
-            {t('admin.tags.list.title')}
-          </Text>
+          <SectionHeader>{t('admin.tags.list.title')}</SectionHeader>
           <TagListPanel
             items={items}
             isLoading={isLoading}

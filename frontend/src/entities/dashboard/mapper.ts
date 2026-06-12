@@ -1,9 +1,15 @@
 import type {
+  AccessStatsByDateDto,
   DashboardEntityTypeSummaryDto,
   DashboardRecentEntityDto,
   DashboardSummaryDto,
 } from './api-types'
-import type { DashboardEntityTypeSummary, DashboardRecentEntity, DashboardSummary } from './model'
+import type {
+  AccessStatsByDate,
+  DashboardEntityTypeSummary,
+  DashboardRecentEntity,
+  DashboardSummary,
+} from './model'
 
 function mapRecentEntityDtoToModel(dto: DashboardRecentEntityDto): DashboardRecentEntity {
   return {
@@ -34,5 +40,17 @@ export function mapDashboardSummaryDtoToModel(dto: DashboardSummaryDto): Dashboa
     todayAccessCount: dto.today_access_count,
     thisMonthAccessCount: dto.this_month_access_count,
     entityTypeSummary: dto.entity_type_summary.map(mapEntityTypeSummaryDtoToModel),
+  }
+}
+
+export function mapAccessStatsByDateDtoToModel(dto: AccessStatsByDateDto): AccessStatsByDate {
+  return {
+    from: dto.from,
+    to: dto.to,
+    items: dto.items.map((item) => ({
+      date: item.date,
+      requestCount: item.request_count,
+      avgDurationMs: item.avg_duration_ms,
+    })),
   }
 }

@@ -1,6 +1,15 @@
 import type { AdminComment } from '@/entities/comment'
 import { useTranslation } from '@/shared/i18n'
-import { Button, ConfirmDialog, EmptyState, Stack, Text } from '@/shared/ui'
+import {
+  Button,
+  Card,
+  ConfirmDialog,
+  EmptyState,
+  ErrorState,
+  LoadingState,
+  Stack,
+  Text,
+} from '@/shared/ui'
 
 interface ManageCommentsViewProps {
   comments: AdminComment[]
@@ -32,17 +41,16 @@ export function ManageCommentsView({
   const { t } = useTranslation()
 
   if (isLoading) {
-    return <Text muted>{t('admin.comments.loading')}</Text>
+    return <LoadingState>{t('admin.comments.loading')}</LoadingState>
   }
 
   if (isError) {
     return (
-      <Stack gap="sm">
-        <Text muted>{t('admin.comments.loadError')}</Text>
-        <Button variant="secondary" onClick={onRetry}>
-          {t('common.actions.retry')}
-        </Button>
-      </Stack>
+      <ErrorState
+        message={t('admin.comments.loadError')}
+        onRetry={onRetry}
+        retryLabel={t('common.actions.retry')}
+      />
     )
   }
 
@@ -56,10 +64,7 @@ export function ManageCommentsView({
       ) : (
         <Stack gap="md">
           {comments.map((comment) => (
-            <div
-              key={comment.id}
-              className="rounded-lg border border-border bg-surface-raised px-inline-md py-stack-sm"
-            >
+            <Card key={comment.id} padding="row">
               <Stack gap="sm">
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <Stack gap="xs">
@@ -118,7 +123,7 @@ export function ManageCommentsView({
                 </div>
                 <Text>{comment.body}</Text>
               </Stack>
-            </div>
+            </Card>
           ))}
         </Stack>
       )}

@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import type { Entity } from '@/entities/entity'
 import { useTranslation } from '@/shared/i18n'
-import { Button, EmptyState, Stack, StatusBadge, Text } from '@/shared/ui'
+import { Button, Card, EmptyState, ErrorState, LoadingState, StatusBadge, Text } from '@/shared/ui'
 
 function formatDate(iso: string | null, locale: string): string {
   if (iso === null) return ''
@@ -48,18 +48,17 @@ export function EntityListPanel({
   const { t, locale } = useTranslation()
 
   if (isLoading) {
-    return <Text muted>{t('admin.entityRecords.list.loading')}</Text>
+    return <LoadingState>{t('admin.entityRecords.list.loading')}</LoadingState>
   }
 
   if (isError) {
     return (
-      <Stack gap="sm">
-        <Text variant="heading-sm">{t('admin.entityRecords.list.error')}</Text>
-        <Text muted>{errorTitle ?? t('common.error.unknown')}</Text>
-        <Button variant="secondary" onClick={onRetry}>
-          {t('common.actions.retry')}
-        </Button>
-      </Stack>
+      <ErrorState
+        title={t('admin.entityRecords.list.error')}
+        message={errorTitle ?? t('common.error.unknown')}
+        onRetry={onRetry}
+        retryLabel={t('common.actions.retry')}
+      />
     )
   }
 
@@ -89,17 +88,21 @@ export function EntityListPanel({
         const showUpdated = item.updatedAt !== null && item.updatedAt !== item.createdAt
 
         return (
-          <li
+          <Card
+            as="li"
             key={String(item.id)}
-            className="flex items-start justify-between gap-inline-md rounded-md border border-border bg-surface-raised px-inline-md py-stack-sm shadow-sm"
+            padding="row"
+            className="flex items-center gap-inline-md"
           >
-            {/* 左カラム: ID・タイトル・ステータス・body・日時 */}
+            {/* #id 列（等幅・固定幅・muted）— 参考 posts.html の .rd-rec__id */}
+            <span className="w-7 shrink-0 font-mono text-caption text-text-muted">
+              #{String(item.id)}
+            </span>
+
+            {/* 中央カラム: タイトル・ステータス・body・日時 */}
             <div className="min-w-0 flex-1">
-              {/* 行1: #id + タイトル + ステータスバッジ */}
+              {/* 行1: タイトル + ステータスバッジ */}
               <div className="flex flex-wrap items-center gap-x-inline-sm gap-y-0.5">
-                <span className="shrink-0 font-sans text-caption text-text-muted">
-                  #{String(item.id)}
-                </span>
                 <Text as="span" variant="heading-sm">
                   {label}
                 </Text>
@@ -148,7 +151,7 @@ export function EntityListPanel({
                 {t('common.actions.delete')}
               </Button>
             </div>
-          </li>
+          </Card>
         )
       })}
     </ul>

@@ -1,87 +1,160 @@
-import { Link } from 'react-router-dom'
-import { useDashboardSummary } from '@/entities/dashboard'
-import { usePinnedEntityTypes } from '@/entities/entity-type'
+import { useMemo } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { useAccessStats, useDashboardSummary } from '@/entities/dashboard'
+import { getLocalizedEntityTypeName, usePinnedEntityTypes } from '@/entities/entity-type'
 import { currentUserHasCapability } from '@/entities/auth'
 import { useTranslation } from '@/shared/i18n'
-import { Stack, Text } from '@/shared/ui'
-import { IconFileText, IconLink } from '@/shared/ui/icons/Icons'
+import { Button, Card, PageHeader, Stack, Text } from '@/shared/ui'
+import { IconChevronRight, IconFileText, IconGlobe, IconLayers } from '@/shared/ui/icons/Icons'
+
+interface StatCardProps {
+  icon: React.ReactNode
+  label: string
+  value: string
+  delta?: string
+  chart?: React.ReactNode
+}
+
+function StatCard({ icon, label, value, delta, chart }: StatCardProps) {
+  return (
+    <Card padding="none" className="p-4">
+      <div className="flex items-center gap-2 text-xs text-text-muted">
+        <span className="opacity-70">{icon}</span>
+        <span>{label}</span>
+      </div>
+      <p className="mt-2 font-display text-heading-md leading-heading font-semibold tracking-tight tabular-nums text-text-primary">
+        {value}
+      </p>
+      {chart ? chart : delta ? <p className="mt-1 text-xs text-text-muted">{delta}</p> : null}
+    </Card>
+  )
+}
+
+/** Console redesign §05 — mini bar sparkline (`.rd-spark`) of daily access counts. */
+function Sparkline({ values, label }: { values: number[]; label: string }) {
+  const max = Math.max(1, ...values)
+  return (
+    <div className="sparkline" role="img" aria-label={label}>
+      {values.map((value, i) => (
+        <span
+          key={i}
+          className="sparkline__bar"
+          style={{ height: `${String(Math.round((value / max) * 100))}%` }}
+        />
+      ))}
+    </div>
+  )
+}
+
+const SPARK_DAYS = 8
+
+function toIsoDate(date: Date): string {
+  const year = String(date.getFullYear())
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
 
 export function HomePage() {
-  const { t } = useTranslation()
+  const { t, locale } = useTranslation()
+  const navigate = useNavigate()
   const { data, isLoading, isError } = useDashboardSummary()
   const pinnedQuery = usePinnedEntityTypes()
   const pinnedTypes = pinnedQuery.data ?? []
-  const canManageSettings = currentUserHasCapability('manage_settings')
+  const canManageEntities = currentUserHasCapability('manage_entities')
 
-  // Show "Getting started" when no published content yet — heuristic for fresh installs
-  const hasNoContent =
-    data !== undefined &&
-    data.entityTypeSummary.every((s) => s.publishedCount === 0 && s.draftCount === 0)
-  const showGettingStarted = hasNoContent || data === undefined
+  // Daily access counts for the sparkline — last SPARK_DAYS days ending today.
+  const range = useMemo(() => {
+    const today = new Date()
+    const fromDate = new Date(today)
+    fromDate.setDate(today.getDate() - (SPARK_DAYS - 1))
+    const days: string[] = []
+    for (let i = SPARK_DAYS - 1; i >= 0; i--) {
+      const d = new Date(today)
+      d.setDate(today.getDate() - i)
+      days.push(toIsoDate(d))
+    }
+    return { from: toIsoDate(fromDate), to: toIsoDate(today), days }
+  }, [])
+  const { data: accessStats } = useAccessStats(range.from, range.to)
+  const sparkValues = useMemo(() => {
+    const byDate = new Map(accessStats?.items.map((item) => [item.date, item.requestCount]))
+    return range.days.map((day) => byDate.get(day) ?? 0)
+  }, [accessStats, range.days])
+
+  const summary = data?.entityTypeSummary ?? []
+  const totalPublished = summary.reduce((sum, s) => sum + s.publishedCount, 0)
+  const totalDrafts = summary.reduce((sum, s) => sum + s.draftCount, 0)
+
+  // "New record" creates within a content type; target the first one available.
+  const newRecordSlug = pinnedTypes[0]?.slug ?? summary[0]?.entityTypeSlug
 
   return (
     <Stack gap="lg">
-      <Text as="h1" variant="heading-md">
-        {t('admin.home.title')}
-      </Text>
+      {/* ── Page head ── */}
+      <PageHeader
+        eyebrow={t('admin.home.eyebrow')}
+        title={t('admin.home.title')}
+        description={t('admin.home.subtitle')}
+        actions={
+          canManageEntities && newRecordSlug ? (
+            <Button
+              variant="primary"
+              leftIcon={<span aria-hidden="true">+</span>}
+              onClick={() => {
+                void navigate(`/admin/${newRecordSlug}`)
+              }}
+            >
+              {t('admin.home.newRecord')}
+            </Button>
+          ) : undefined
+        }
+      />
 
-      {/* ── Getting started ── */}
-      {showGettingStarted && !isLoading && (pinnedTypes.length > 0 || canManageSettings) ? (
-        <section className="rounded-lg border border-accent/30 bg-accent/5 p-5">
-          <Text as="h2" variant="heading-sm">
-            {t('admin.home.gettingStarted')}
-          </Text>
-          <Text muted>{t('admin.home.gettingStarted.description')}</Text>
-          <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-            {pinnedTypes.length > 0 ? (
-              <Link
-                to={`/admin/${pinnedTypes[0].slug}`}
-                className="group flex items-start gap-3 rounded-md border border-border bg-surface-raised p-4 transition-colors hover:border-accent"
-              >
-                <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-accent/10 text-accent">
-                  <IconFileText size={16} />
-                </span>
-                <span>
-                  <span className="block font-medium text-text-primary group-hover:text-accent">
-                    {t('admin.home.gettingStarted.content')}
-                  </span>
-                  <span className="mt-0.5 block text-xs text-text-muted">
-                    {t('admin.home.gettingStarted.content.description')}
-                  </span>
-                </span>
-              </Link>
-            ) : null}
-            {canManageSettings ? (
-              <Link
-                to="/admin/navigation"
-                className="group flex items-start gap-3 rounded-md border border-border bg-surface-raised p-4 transition-colors hover:border-accent"
-              >
-                <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-accent/10 text-accent">
-                  <IconLink size={16} />
-                </span>
-                <span>
-                  <span className="block font-medium text-text-primary group-hover:text-accent">
-                    {t('admin.home.gettingStarted.menus')}
-                  </span>
-                  <span className="mt-0.5 block text-xs text-text-muted">
-                    {t('admin.home.gettingStarted.menus.description')}
-                  </span>
-                </span>
-              </Link>
-            ) : null}
+      {isLoading ? <Text muted>{t('admin.home.dashboard.loading')}</Text> : null}
+      {isError ? <Text muted>{t('admin.home.dashboard.error')}</Text> : null}
+
+      {data ? (
+        <>
+          {/* ── Stat cards ── */}
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <StatCard
+              icon={<IconGlobe size={14} />}
+              label={t('admin.home.dashboard.todayAccess')}
+              value={data.todayAccessCount.toLocaleString()}
+              chart={
+                <Sparkline values={sparkValues} label={t('admin.home.dashboard.accessTrend')} />
+              }
+            />
+            <StatCard
+              icon={<IconGlobe size={14} />}
+              label={t('admin.home.dashboard.monthAccess')}
+              value={data.thisMonthAccessCount.toLocaleString()}
+            />
+            <StatCard
+              icon={<IconFileText size={14} />}
+              label={t('admin.home.dashboard.published')}
+              value={totalPublished.toLocaleString()}
+              delta={`${totalDrafts.toLocaleString()} ${t('admin.home.dashboard.draft').toLowerCase()}`}
+            />
+            <StatCard
+              icon={<IconLayers size={14} />}
+              label={t('admin.home.dashboard.entityTypeSummary')}
+              value={summary.length.toLocaleString()}
+            />
           </div>
-        </section>
+        </>
       ) : null}
 
       {/* ── Quick access ── */}
-      <section>
+      <Stack gap="sm">
         <Text as="h2" variant="heading-sm">
           {t('admin.home.quickAccess')}
         </Text>
         {pinnedTypes.length === 0 && !pinnedQuery.isLoading ? (
           <Text muted>{t('admin.home.quickAccess.empty')}</Text>
         ) : (
-          <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {pinnedTypes.map((entityType) => (
               <Link
                 key={entityType.id}
@@ -93,96 +166,57 @@ export function HomePage() {
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate font-medium text-text-primary">
-                    {entityType.name}
+                    {getLocalizedEntityTypeName(entityType, locale)}
                   </span>
                   <span className="block text-xs text-text-muted">
                     {t('admin.home.quickAccess.manage')}
                   </span>
                 </span>
+                <span className="shrink-0 text-text-muted">
+                  <IconChevronRight size={16} />
+                </span>
               </Link>
             ))}
           </div>
         )}
-      </section>
+      </Stack>
 
-      {isLoading && <Text muted>{t('admin.home.dashboard.loading')}</Text>}
-      {isError && <Text muted>{t('admin.home.dashboard.error')}</Text>}
-
-      {data && (
-        <Stack gap="md">
-          {/* Access count cards */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="rounded border border-border bg-surface-raised p-4">
-              <Text muted>{t('admin.home.dashboard.todayAccess')}</Text>
-              <Text as="p" variant="heading-md">
-                {data.todayAccessCount.toLocaleString()}
-              </Text>
-            </div>
-            <div className="rounded border border-border bg-surface-raised p-4">
-              <Text muted>{t('admin.home.dashboard.monthAccess')}</Text>
-              <Text as="p" variant="heading-md">
-                {data.thisMonthAccessCount.toLocaleString()}
-              </Text>
-            </div>
-          </div>
-
-          {/* Entity type summary */}
-          {data.entityTypeSummary.length > 0 && (
-            <div>
-              <Text as="h2" variant="heading-sm">
-                {t('admin.home.dashboard.entityTypeSummary')}
-              </Text>
-              <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
-                {data.entityTypeSummary.map((summary) => (
-                  <div
-                    key={summary.entityTypeId}
-                    className="rounded border border-border bg-surface-raised p-3"
-                  >
-                    <Text as="p">{summary.entityTypeName}</Text>
-                    <div className="mt-1 flex gap-4">
-                      <Text muted>
-                        {t('admin.home.dashboard.published')}: {summary.publishedCount}
-                      </Text>
-                      <Text muted>
-                        {t('admin.home.dashboard.draft')}: {summary.draftCount}
-                      </Text>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Recent published */}
-          <div>
-            <Text as="h2" variant="heading-sm">
-              {t('admin.home.dashboard.recentPublished')}
-            </Text>
-            {data.recentPublished.length === 0 ? (
-              <Text muted>{t('admin.home.dashboard.noRecentPublished')}</Text>
-            ) : (
-              <ul className="mt-2 space-y-1">
-                {data.recentPublished.map((entity) => (
-                  <li key={entity.id}>
-                    <Link
-                      to={`/admin/entity-types/${entity.entityTypeSlug}/entities/${String(entity.id)}`}
-                      className="text-body text-accent hover:text-accent-hover"
-                    >
-                      {entity.entityTypeName} / {entity.slug ?? String(entity.id)}
-                    </Link>
-                    {entity.publishedAt && (
-                      <Text as="span" muted>
-                        {' '}
-                        — {new Date(entity.publishedAt).toLocaleDateString()}
-                      </Text>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </Stack>
-      )}
+      {/* ── Recently published ── */}
+      <Stack gap="sm">
+        <Text as="h2" variant="heading-sm">
+          {t('admin.home.dashboard.recentPublished')}
+        </Text>
+        {data && data.recentPublished.length === 0 ? (
+          <Text muted>{t('admin.home.dashboard.noRecentPublished')}</Text>
+        ) : null}
+        {data && data.recentPublished.length > 0 ? (
+          <Card padding="none" className="divide-y divide-border overflow-hidden">
+            {data.recentPublished.map((entity, i) => (
+              <Link
+                key={entity.id}
+                to={`/admin/entity-types/${entity.entityTypeSlug}/entities/${String(entity.id)}`}
+                className="group flex items-center gap-4 px-4 py-3 transition-colors hover:bg-surface"
+              >
+                <span className="w-6 shrink-0 font-mono text-xs text-text-muted">#{i + 1}</span>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate font-medium text-text-primary group-hover:text-accent">
+                    {entity.slug ?? String(entity.id)}
+                  </span>
+                  <span className="block text-xs text-text-muted">
+                    {entity.entityTypeName}
+                    {entity.publishedAt
+                      ? ` · ${new Date(entity.publishedAt).toLocaleDateString()}`
+                      : ''}
+                  </span>
+                </span>
+                <span className="shrink-0 text-text-muted">
+                  <IconChevronRight size={16} />
+                </span>
+              </Link>
+            ))}
+          </Card>
+        ) : null}
+      </Stack>
 
       <Link to="/" className="text-body font-medium text-accent hover:text-accent-hover">
         {t('admin.home.openPublicSite')}

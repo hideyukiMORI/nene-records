@@ -1,6 +1,6 @@
 import type { Media } from '@/entities/media'
 import { useTranslation } from '@/shared/i18n'
-import { Button, EmptyState, Stack, Text } from '@/shared/ui'
+import { Button, Card, EmptyState, ErrorState, LoadingState } from '@/shared/ui'
 import { IconCopy, IconImage } from '@/shared/ui/icons/Icons'
 
 export interface MediaGridProps {
@@ -37,17 +37,16 @@ export function MediaGrid({
   const { t } = useTranslation()
 
   if (isLoading) {
-    return <Text muted>{t('admin.media.list.loading')}</Text>
+    return <LoadingState>{t('admin.media.list.loading')}</LoadingState>
   }
 
   if (isError) {
     return (
-      <Stack gap="sm">
-        <Text muted>{errorTitle ?? t('admin.media.list.error')}</Text>
-        <Button variant="secondary" size="sm" onClick={onRetry}>
-          {t('admin.media.list.retry')}
-        </Button>
-      </Stack>
+      <ErrorState
+        message={errorTitle ?? t('admin.media.list.error')}
+        onRetry={onRetry}
+        retryLabel={t('admin.media.list.retry')}
+      />
     )
   }
 
@@ -63,9 +62,10 @@ export function MediaGrid({
   return (
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
       {items.map((media) => (
-        <div
+        <Card
           key={media.id}
-          className="group relative flex flex-col overflow-hidden rounded-md border border-border bg-surface-raised"
+          padding="none"
+          className="group relative flex flex-col overflow-hidden"
         >
           {/* Thumbnail */}
           <div className="flex h-32 items-center justify-center bg-surface-overlay">
@@ -119,7 +119,7 @@ export function MediaGrid({
               ×
             </Button>
           </div>
-        </div>
+        </Card>
       ))}
     </div>
   )

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useSystemConfig, useUpdateSystemConfig } from '@/entities/system-config'
 import type { TenantResolutionMode } from '@/entities/system-config'
-import { Button, Input, Stack, Text } from '@/shared/ui'
+import { Button, Card, Input, PageHeader, Stack, Text } from '@/shared/ui'
 import { useToast } from '@/shared/ui'
 
 const MODES: { value: TenantResolutionMode; label: string; description: string }[] = [
@@ -61,15 +61,13 @@ export function SettingsPage() {
 
   return (
     <Stack gap="lg">
-      <div>
-        <Text as="h1" variant="heading-md">
-          システム設定
-        </Text>
-        <Text muted>テナント解決方式など、システム全体の設定を管理します。</Text>
-      </div>
+      <PageHeader
+        title="システム設定"
+        description="テナント解決方式など、システム全体の設定を管理します。"
+      />
 
       <form onSubmit={handleSubmit}>
-        <div className="rounded-lg border border-border bg-surface-raised p-6">
+        <Card padding="none" className="p-6">
           <Text as="h2" variant="heading-sm">
             テナント解決方式
           </Text>
@@ -175,12 +173,12 @@ export function SettingsPage() {
               {update.isPending ? '保存中…' : '設定を保存'}
             </Button>
           </div>
-        </div>
+        </Card>
       </form>
 
       {/* 現在の DB 保存済み設定 */}
       {data !== undefined && (
-        <div className="rounded-lg border border-border bg-surface-raised p-6">
+        <Card padding="none" className="p-6">
           <Text as="h2" variant="heading-sm">
             現在の設定（DB 保存値）
           </Text>
@@ -202,7 +200,7 @@ export function SettingsPage() {
               </div>
             )}
           </dl>
-        </div>
+        </Card>
       )}
     </Stack>
   )

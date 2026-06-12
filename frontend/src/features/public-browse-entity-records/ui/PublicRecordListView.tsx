@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Button, EmptyState, Stack, Text } from '@/shared/ui'
+import { Button, Card, EmptyState, ErrorState, LoadingState, Stack, Text } from '@/shared/ui'
 import type { PublicRecordListItem } from '../hooks/use-public-browse-entity-records-page'
 
 export interface PublicRecordListViewProps {
@@ -38,18 +38,17 @@ export function PublicRecordListView({
   onRetry,
 }: PublicRecordListViewProps) {
   if (isLoading) {
-    return <Text muted>Loading…</Text>
+    return <LoadingState>Loading…</LoadingState>
   }
 
   if (isError) {
     return (
-      <Stack gap="sm">
-        <Text variant="heading-sm">Could not load records</Text>
-        <Text muted>{errorTitle ?? 'Unknown error'}</Text>
-        <Button variant="secondary" onClick={onRetry}>
-          Retry
-        </Button>
-      </Stack>
+      <ErrorState
+        title="Could not load records"
+        message={errorTitle ?? 'Unknown error'}
+        onRetry={onRetry}
+        retryLabel="Retry"
+      />
     )
   }
 
@@ -81,17 +80,14 @@ export function PublicRecordListView({
       </Text>
       <ul className="flex flex-col gap-stack-sm">
         {items.map((item) => (
-          <li
-            key={String(item.id)}
-            className="rounded-md border border-border bg-surface-raised px-inline-md py-stack-sm shadow-sm"
-          >
+          <Card as="li" key={String(item.id)} padding="row">
             <Link
               to={item.publicUrl}
               className="font-sans text-heading-sm font-semibold text-text-primary hover:text-accent"
             >
               {item.label}
             </Link>
-          </li>
+          </Card>
         ))}
       </ul>
       {(hasPreviousPage || hasNextPage) && (

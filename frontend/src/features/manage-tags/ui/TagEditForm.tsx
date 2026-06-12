@@ -1,7 +1,7 @@
 import { Controller } from 'react-hook-form'
 import type { Tag } from '@/entities/tag'
 import { useTranslation } from '@/shared/i18n'
-import { Button, Input, Stack, Text } from '@/shared/ui'
+import { Button, Card, Input, Stack, Text } from '@/shared/ui'
 import { useEditTagForm } from '../hooks/use-create-tag-form'
 
 export interface TagEditFormProps {
@@ -30,9 +30,9 @@ export function TagEditForm({
   })
 
   return (
-    <form
+    <Card
+      as="form"
       key={String(tag.id)}
-      className="rounded-md border border-border bg-surface-raised p-inline-md shadow-sm"
       onSubmit={(event) => {
         void handleSubmit(async (values) => {
           await onSubmit(values)
@@ -85,6 +85,6 @@ export function TagEditForm({
           </Button>
         </div>
       </Stack>
-    </form>
+    </Card>
   )
 }

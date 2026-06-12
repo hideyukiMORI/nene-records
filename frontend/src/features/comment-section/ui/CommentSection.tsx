@@ -1,6 +1,6 @@
 import type { Comment } from '@/entities/comment'
 import { useTranslation } from '@/shared/i18n'
-import { Button, Input, Stack, Text } from '@/shared/ui'
+import { Button, Card, Input, Stack, Text, Textarea } from '@/shared/ui'
 
 interface Props {
   comments: Comment[]
@@ -55,10 +55,7 @@ export function CommentSection({
       ) : (
         <Stack gap="md">
           {comments.map((comment) => (
-            <div
-              key={comment.id}
-              className="rounded-lg border border-border bg-surface-raised px-inline-md py-stack-sm"
-            >
+            <Card key={comment.id} padding="row">
               <Stack gap="xs">
                 <div className="flex items-baseline gap-2">
                   <Text variant="heading-sm">{comment.authorName}</Text>
@@ -70,7 +67,7 @@ export function CommentSection({
                 </div>
                 <Text>{comment.body}</Text>
               </Stack>
-            </div>
+            </Card>
           ))}
         </Stack>
       )}
@@ -134,24 +131,16 @@ export function CommentSection({
               }}
               disabled={isPending}
             />
-            <div className="flex flex-col gap-stack-xs">
-              <label
-                htmlFor="comment-body"
-                className="font-sans text-body font-medium text-text-primary"
-              >
-                {t('public.comments.form.body')}
-              </label>
-              <textarea
-                id="comment-body"
-                value={body}
-                onChange={(e) => {
-                  onBodyChange(e.target.value)
-                }}
-                disabled={isPending}
-                rows={4}
-                className="rounded-md border border-border bg-surface-raised px-inline-md py-stack-sm font-sans text-body text-text-primary shadow-sm focus-visible:outline-none focus-visible:shadow-focus disabled:cursor-not-allowed disabled:opacity-50"
-              />
-            </div>
+            <Textarea
+              id="comment-body"
+              label={t('public.comments.form.body')}
+              value={body}
+              onChange={(e) => {
+                onBodyChange(e.target.value)
+              }}
+              disabled={isPending}
+              rows={4}
+            />
             {isPostError ? <Text muted>{t('public.comments.form.error')}</Text> : null}
             <div>
               <Button type="submit" disabled={isPending}>

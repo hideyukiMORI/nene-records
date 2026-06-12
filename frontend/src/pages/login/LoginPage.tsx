@@ -2,7 +2,7 @@ import { useState, type SyntheticEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useLogin } from '@/entities/auth'
 import { useTranslation } from '@/shared/i18n'
-import { Button, Input, NeneMark, Stack, Text } from '@/shared/ui'
+import { Button, Card, Input, NeneMark, Stack, Text } from '@/shared/ui'
 
 export function LoginPage() {
   const [email, setEmail] = useState('')
@@ -25,7 +25,7 @@ export function LoginPage() {
 
   return (
     <div className="relative flex min-h-screen items-center justify-center bg-surface px-inline-md">
-      <div className="w-full max-w-sm rounded-md border border-border bg-surface-raised p-stack-lg shadow-lg">
+      <Card padding="lg" className="w-full max-w-sm">
         <Stack gap="lg">
           <Stack gap="md">
             <div className="flex items-center gap-inline-sm">
@@ -80,7 +80,7 @@ export function LoginPage() {
             </Stack>
           </form>
         </Stack>
-      </div>
+      </Card>
 
       <p className="absolute bottom-stack-lg left-0 right-0 text-center font-chrome text-tiny tracking-wide text-text-muted">
         Powered by NENE2 · © 2026 AYANE

@@ -6,7 +6,7 @@ import {
 } from '@/entities/entity-type'
 import { ManageEntitiesView, useManageEntitiesPage } from '@/features/manage-entities'
 import { useTranslation } from '@/shared/i18n'
-import { Button, Stack, Text } from '@/shared/ui'
+import { Button, PageHeader, Stack, Text } from '@/shared/ui'
 import { IconChevronLeft } from '@/shared/ui/icons/Icons'
 
 export function EntityRecordsPage() {
@@ -87,21 +87,21 @@ function EntityRecordsContent({ entityType }: { entityType: EntityType }) {
           </Link>
         </nav>
         {/* ── Page header ── */}
-        <div className="flex items-center justify-between gap-4">
-          <Text as="h1" variant="heading-md">
-            {localizedName}
-          </Text>
-          <Button
-            disabled={isCreating}
-            onClick={() => {
-              void handleCreate()
-            }}
-          >
-            {isCreating
-              ? t('admin.entityRecords.create.submitting')
-              : t('admin.entityRecords.create.newButton')}
-          </Button>
-        </div>
+        <PageHeader
+          title={localizedName}
+          actions={
+            <Button
+              disabled={isCreating}
+              onClick={() => {
+                void handleCreate()
+              }}
+            >
+              {isCreating
+                ? t('admin.entityRecords.create.submitting')
+                : t('admin.entityRecords.create.newButton')}
+            </Button>
+          }
+        />
       </Stack>
       <ManageEntitiesView
         entityTypeId={Number(entityType.id)}

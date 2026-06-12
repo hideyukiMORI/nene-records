@@ -2,7 +2,7 @@ import { useCallback } from 'react'
 import { useForm } from 'react-hook-form'
 import type { NavigationItem } from '@/entities/navigation-item'
 import { useTranslation } from '@/shared/i18n'
-import { Button, Input, Stack, Text } from '@/shared/ui'
+import { Button, Card, Input, Stack, Text } from '@/shared/ui'
 import type { NavigationItemFormValues } from '../hooks/use-manage-navigation-page'
 
 export interface NavigationItemEditFormProps {
@@ -37,8 +37,8 @@ export function NavigationItemEditForm({
   )
 
   return (
-    <form
-      className="rounded-md border border-border bg-surface-raised p-inline-md shadow-sm"
+    <Card
+      as="form"
       onSubmit={(event) => {
         void handleSubmit(submit)(event)
       }}
@@ -83,6 +83,6 @@ export function NavigationItemEditForm({
           </Button>
         </div>
       </Stack>
-    </form>
+    </Card>
   )
 }

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { FieldDataType, FieldDef } from '@/entities/field-def'
 import { useTranslation } from '@/shared/i18n'
-import { Button, EmptyState, Input, Stack, Text } from '@/shared/ui'
+import { Button, Card, EmptyState, Input, Stack, Text } from '@/shared/ui'
 import { FileFieldInput } from './FileFieldInput'
 import { ImageFieldInput } from './ImageFieldInput'
 import { MarkdownFieldInput } from './MarkdownFieldInput'
@@ -45,8 +45,8 @@ export function EntityTextFieldsForm({
   }
 
   return (
-    <form
-      className="rounded-md border border-border bg-surface-raised p-inline-md shadow-sm"
+    <Card
+      as="form"
       onSubmit={(event) => {
         event.preventDefault()
         void onSubmit(values)
@@ -155,6 +155,6 @@ export function EntityTextFieldsForm({
           </Button>
         </div>
       </Stack>
-    </form>
+    </Card>
   )
 }

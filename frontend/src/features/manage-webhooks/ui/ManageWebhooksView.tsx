@@ -1,6 +1,6 @@
 import type { CreateWebhookInput, Webhook, WebhookList } from '@/entities/webhook'
 import { useTranslation } from '@/shared/i18n'
-import { Button, ConfirmDialog, EmptyState, Stack, Text } from '@/shared/ui'
+import { Button, Card, ConfirmDialog, EmptyState, PageHeader, Stack, Text } from '@/shared/ui'
 import { WebhookForm } from './WebhookForm'
 
 interface ManageWebhooksViewProps {
@@ -60,18 +60,17 @@ export function ManageWebhooksView({
 
   return (
     <Stack gap="lg">
-      <div className="flex items-center justify-between gap-4">
-        <Text as="h1" variant="heading-md">
-          {t('admin.webhooks.title')}
-        </Text>
-        {!showCreateForm && (
-          <Button type="button" size="sm" onClick={onShowCreateForm}>
-            {t('admin.webhooks.addButton')}
-          </Button>
-        )}
-      </div>
-
-      <Text muted>{t('admin.webhooks.description')}</Text>
+      <PageHeader
+        title={t('admin.webhooks.title')}
+        description={t('admin.webhooks.description')}
+        actions={
+          !showCreateForm ? (
+            <Button type="button" size="sm" onClick={onShowCreateForm}>
+              {t('admin.webhooks.addButton')}
+            </Button>
+          ) : undefined
+        }
+      />
 
       {showCreateForm && (
         <WebhookForm
@@ -108,9 +107,9 @@ export function ManageWebhooksView({
                 onCancel={onCancelEdit}
               />
             ) : (
-              <div
+              <Card
                 key={webhook.id}
-                className="flex flex-col gap-2 rounded-md border border-border bg-surface-raised p-inline-md shadow-sm sm:flex-row sm:items-start sm:justify-between"
+                className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between"
               >
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
@@ -172,7 +171,7 @@ export function ManageWebhooksView({
                     {t('common.actions.delete')}
                   </Button>
                 </div>
-              </div>
+              </Card>
             ),
           )}
         </Stack>

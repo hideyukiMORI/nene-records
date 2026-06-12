@@ -11,6 +11,7 @@ export interface InputProps {
   disabled?: boolean
   error?: string | undefined
   autoComplete?: string
+  placeholder?: string
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
@@ -25,6 +26,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
     disabled = false,
     error,
     autoComplete,
+    placeholder,
   },
   ref,
 ) {
@@ -44,6 +46,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
         onChange={onChange}
         onBlur={onBlur}
         disabled={disabled}
+        placeholder={placeholder}
         autoComplete={autoComplete}
         aria-invalid={error !== undefined}
         aria-describedby={errorId}

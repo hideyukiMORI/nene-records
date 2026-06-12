@@ -22,10 +22,10 @@ Open:
 
 | Service | URL |
 | --- | --- |
-| **API** | http://localhost:8080/health |
-| **OpenAPI** | http://localhost:8080/openapi.php |
-| **phpMyAdmin** | http://localhost:8081/ |
-| **Mailpit** | http://localhost:8025/ |
+| **API** | http://localhost:18082/health |
+| **OpenAPI** | http://localhost:18082/openapi.php |
+| **phpMyAdmin** | http://localhost:18083/ |
+| **Mailpit** | http://localhost:18026/ |
 
 Admin frontend (host, not in Compose):
 
@@ -33,22 +33,21 @@ Admin frontend (host, not in Compose):
 npm run dev --prefix frontend
 ```
 
-→ http://localhost:5173/entity-types (proxies `/api` to `:8080`)
+→ http://localhost:18084/entity-types (proxies `/api` to `:18082`)
 
 ## Default ports
 
+Ports are fixed in the **180xx / 133xx** range to avoid conflicts with other local stacks (NeNeClear uses 83xx, common tools use 80xx).
+
 | Variable | Default | Service |
 | --- | --- | --- |
-| `NENE_RECORDS_PORT` | `8080` | API (Apache) |
-| `NENE_RECORDS_PHPMYADMIN_PORT` | `8081` | phpMyAdmin |
-| `NENE_RECORDS_MYSQL_PORT` | `3307` | MySQL (host) |
-| `NENE_RECORDS_MAILPIT_WEB_PORT` | `8025` | Mailpit web UI |
+| `NENE_RECORDS_PORT` | `18082` | API (Apache) |
+| `NENE_RECORDS_PHPMYADMIN_PORT` | `18083` | phpMyAdmin |
+| `NENE_RECORDS_MYSQL_PORT` | `13308` | MySQL (host) |
+| `NENE_RECORDS_MAILPIT_WEB_PORT` | `18026` | Mailpit web UI |
+| `NENE_RECORDS_FRONTEND_PORT` | `18084` | Vite dev server |
 
-Change ports when another stack already uses them:
-
-```bash
-NENE_RECORDS_PORT=8082 docker compose up --build
-```
+Override in `.env` if needed — the compose.yaml defaults already match.
 
 ## phpMyAdmin (darkwolf)
 
@@ -79,7 +78,7 @@ MAIL_DSN=smtp://mailpit:1025
 MAIL_FROM=noreply@nene-records.local
 ```
 
-Inspect sent messages at http://localhost:8025/. Production and staging should use a real SMTP relay via environment variables — not Mailpit.
+Inspect sent messages at http://localhost:18026/. Production and staging should use a real SMTP relay via environment variables — not Mailpit.
 
 Mail sending in application code is planned; Compose wiring is ready for when the feature lands.
 
@@ -103,8 +102,8 @@ PHPUnit on the **host** still defaults to SQLite (see `.env.example`). Docker My
 With the stack running:
 
 ```bash
-curl http://localhost:8080/health
-curl http://localhost:8080/api/v1/entity-types
+curl http://localhost:18082/health
+curl http://localhost:18082/api/v1/entity-types
 composer check   # host PHP + SQLite — unchanged
 ```
 
@@ -122,7 +121,7 @@ To populate Consumer View with ~50 English blog posts via the HTTP API:
 docker compose exec app php tools/seed-blog-demo.php http://localhost
 ```
 
-Then browse http://localhost:5173/view/blog (frontend dev server required).
+Then browse http://localhost:18084/view/blog (frontend dev server required, proxies to :18082).
 
 See [`tools/README.md`](../tools/README.md) for details. The seed script is idempotent.
 

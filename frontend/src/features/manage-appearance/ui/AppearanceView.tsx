@@ -1,5 +1,6 @@
 import { ADMIN_THEME_DEFS, useTheme, type AdminThemeId, type ThemeVariant } from '@/shared/theme'
 import { useTranslation } from '@/shared/i18n'
+import { Card } from '@/shared/ui'
 import { IconCheck } from '@/shared/ui/icons/Icons'
 
 /** A 3-colour mini swatch: sidebar · surface · accent. */
@@ -46,7 +47,7 @@ export function AppearanceView() {
   )
 
   return (
-    <div className="rounded-md border border-border bg-surface-raised p-stack-md shadow-sm">
+    <Card padding="none" className="p-stack-md">
       <div className="grid grid-cols-1 gap-stack-sm sm:grid-cols-2">
         {choices.map((choice) => {
           const isSelected = choice.id === adminThemeId && choice.variant === themeVariant
@@ -82,6 +83,6 @@ export function AppearanceView() {
       <p className="mt-stack-sm font-sans text-caption text-text-muted">
         {t('admin.theme.appliesNote')}
       </p>
-    </div>
+    </Card>
   )
 }

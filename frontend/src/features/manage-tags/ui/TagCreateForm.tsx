@@ -1,6 +1,6 @@
 import { Controller } from 'react-hook-form'
 import { useTranslation } from '@/shared/i18n'
-import { Button, Input, Stack, Text } from '@/shared/ui'
+import { Button, Card, Input, SectionHeader, Stack, Text } from '@/shared/ui'
 import { useCreateTagForm } from '../hooks/use-create-tag-form'
 
 export interface TagCreateFormProps {
@@ -19,8 +19,8 @@ export function TagCreateForm({ isSubmitting, serverErrorTitle, onSubmit }: TagC
   } = useCreateTagForm()
 
   return (
-    <form
-      className="rounded-md border border-border bg-surface-raised p-inline-md shadow-sm"
+    <Card
+      as="form"
       onSubmit={(event) => {
         void handleSubmit(async (values) => {
           await onSubmit(values)
@@ -29,41 +29,44 @@ export function TagCreateForm({ isSubmitting, serverErrorTitle, onSubmit }: TagC
       }}
     >
       <Stack gap="md">
-        <Text as="h2" variant="heading-sm">
-          {t('admin.tags.createForm.title')}
-        </Text>
-        <Controller
-          name="name"
-          control={control}
-          render={({ field }) => (
-            <Input
-              id="tag-name"
-              label={t('common.field.name')}
-              error={errors.name?.message}
-              autoComplete="off"
-              disabled={isSubmitting}
-              value={field.value}
-              onChange={field.onChange}
-              onBlur={field.onBlur}
-            />
-          )}
-        />
-        <Controller
-          name="slug"
-          control={control}
-          render={({ field }) => (
-            <Input
-              id="tag-slug"
-              label={t('common.field.slug')}
-              error={errors.slug?.message}
-              autoComplete="off"
-              disabled={isSubmitting}
-              value={field.value}
-              onChange={field.onChange}
-              onBlur={field.onBlur}
-            />
-          )}
-        />
+        {/* Panel header — muted chrome eyebrow (参考 redesign_05 .pf-panel__h) */}
+        <SectionHeader>{t('admin.tags.createForm.title')}</SectionHeader>
+        {/* Name と Slug は横並び（参考 redesign_05 .pf-formgrid: 1fr 1fr） */}
+        <div className="grid grid-cols-1 gap-inline-md sm:grid-cols-2">
+          <Controller
+            name="name"
+            control={control}
+            render={({ field }) => (
+              <Input
+                id="tag-name"
+                label={t('common.field.name')}
+                error={errors.name?.message}
+                autoComplete="off"
+                disabled={isSubmitting}
+                value={field.value}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+              />
+            )}
+          />
+          <Controller
+            name="slug"
+            control={control}
+            render={({ field }) => (
+              <Input
+                id="tag-slug"
+                label={t('common.field.slug')}
+                placeholder={t('admin.tags.createForm.slugPlaceholder')}
+                error={errors.slug?.message}
+                autoComplete="off"
+                disabled={isSubmitting}
+                value={field.value}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+              />
+            )}
+          />
+        </div>
         {serverErrorTitle !== null ? <Text muted>{serverErrorTitle}</Text> : null}
         <Button
           type="submit"
@@ -73,6 +76,6 @@ export function TagCreateForm({ isSubmitting, serverErrorTitle, onSubmit }: TagC
           {isSubmitting ? t('admin.tags.createForm.submitting') : t('admin.tags.createForm.submit')}
         </Button>
       </Stack>
-    </form>
+    </Card>
   )
 }

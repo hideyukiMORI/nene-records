@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useVerifyEmailChange } from '@/entities/user'
 import { useTranslation } from '@/shared/i18n'
-import { Button, Stack, Text } from '@/shared/ui'
+import { Button, Card, Stack, Text } from '@/shared/ui'
 
 /**
  * Landing page for the verification link emailed to a user's new address (#283).
@@ -39,7 +39,7 @@ export function VerifyEmailPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-surface px-inline-md">
-      <div className="w-full max-w-sm rounded-lg border border-border bg-surface-raised p-stack-lg shadow-sm">
+      <Card padding="lg" className="w-full max-w-sm">
         <Stack gap="lg">
           <Text as="h1" variant="heading-md">
             {t('admin.verifyEmail.pageTitle')}
@@ -72,7 +72,7 @@ export function VerifyEmailPage() {
             <Text muted>{t('admin.verifyEmail.verifying')}</Text>
           )}
         </Stack>
-      </div>
+      </Card>
     </div>
   )
 }

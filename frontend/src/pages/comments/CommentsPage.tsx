@@ -2,7 +2,7 @@ import { Navigate } from 'react-router-dom'
 import { currentUserHasCapability } from '@/entities/auth'
 import { ManageCommentsView, useManageCommentsPage } from '@/features/manage-comments'
 import { useTranslation } from '@/shared/i18n'
-import { Stack, Text } from '@/shared/ui'
+import { PageHeader, Stack } from '@/shared/ui'
 
 export function CommentsPage() {
   const { t } = useTranslation()
@@ -15,10 +15,10 @@ export function CommentsPage() {
 
   return (
     <Stack gap="md">
-      <Text as="h1" variant="heading-md">
-        {t('admin.comments.pageTitle')}
-      </Text>
-      <Text muted>{t('admin.comments.description')}</Text>
+      <PageHeader
+        title={t('admin.comments.pageTitle')}
+        description={t('admin.comments.description')}
+      />
       <ManageCommentsView {...commentsPage} />
     </Stack>
   )

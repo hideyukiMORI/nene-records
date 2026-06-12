@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useConfirmPasswordReset } from '@/entities/user'
 import { useTranslation } from '@/shared/i18n'
-import { Button, Input, Stack, Text } from '@/shared/ui'
+import { Button, Card, Input, Stack, Text } from '@/shared/ui'
 
 interface FormValues {
   newPassword: string
@@ -34,16 +34,16 @@ export function ResetPasswordPage() {
   if (!token) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-surface px-inline-md">
-        <div className="w-full max-w-sm rounded-lg border border-border bg-surface-raised p-stack-lg shadow-sm">
+        <Card padding="lg" className="w-full max-w-sm">
           <Text muted>{t('admin.resetPassword.invalidToken')}</Text>
-        </div>
+        </Card>
       </div>
     )
   }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-surface px-inline-md">
-      <div className="w-full max-w-sm rounded-lg border border-border bg-surface-raised p-stack-lg shadow-sm">
+      <Card padding="lg" className="w-full max-w-sm">
         <Stack gap="lg">
           <Stack gap="xs">
             <Text as="h1" variant="heading-md">
@@ -107,7 +107,7 @@ export function ResetPasswordPage() {
             </form>
           )}
         </Stack>
-      </div>
+      </Card>
     </div>
   )
 }

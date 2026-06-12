@@ -77,6 +77,9 @@ export const ja: Partial<MessageCatalog> = {
 
   // ── Home ─────────────────────────────────────────────────────────────────
   'admin.home.title': 'ダッシュボード',
+  'admin.home.eyebrow': '概要',
+  'admin.home.subtitle': '今日のコンテンツの動きをまとめて確認できます。',
+  'admin.home.newRecord': 'レコードを追加',
   'admin.home.description': 'NeNe Records へようこそ。',
   'admin.home.openPublicSite': 'パブリックサイトを開く →',
   'admin.home.quickAccess': 'クイックアクセス',
@@ -85,6 +88,7 @@ export const ja: Partial<MessageCatalog> = {
   'admin.home.quickAccess.empty':
     'ピン留めされたコンテンツタイプがありません。コンテンツタイプの設定からピン留めを有効にしてください。',
   'admin.home.dashboard.todayAccess': '本日のアクセス数',
+  'admin.home.dashboard.accessTrend': '直近8日間のアクセス推移',
   'admin.home.dashboard.monthAccess': '今月のアクセス数',
   'admin.home.dashboard.recentPublished': '最近公開されたコンテンツ',
   'admin.home.dashboard.entityTypeSummary': 'コンテンツ集計',
@@ -137,6 +141,8 @@ export const ja: Partial<MessageCatalog> = {
   'admin.entityTypes.delete.description': '「{{name}}」が削除されます。この操作は元に戻せません。',
   'admin.entityTypes.actions.fields': 'フィールド',
   'admin.entityTypes.actions.records': 'コンテンツ',
+  'admin.entityTypes.actions.moveUp': '上へ移動',
+  'admin.entityTypes.actions.moveDown': '下へ移動',
   'admin.entityTypes.actions.backToTypes': 'コンテンツタイプに戻る',
 
   // ── Entity records ───────────────────────────────────────────────────────
@@ -237,6 +243,7 @@ export const ja: Partial<MessageCatalog> = {
   'admin.markdownEditor.empty': 'プレビューする内容がありません。',
 
   // ── Tags ─────────────────────────────────────────────────────────────────
+  'admin.tags.eyebrow': '管理',
   'admin.tags.pageTitle': 'タグ',
   'admin.tags.list.title': '既存のタグ',
   'admin.tags.list.loading': 'タグを読み込み中…',
@@ -244,6 +251,7 @@ export const ja: Partial<MessageCatalog> = {
   'admin.tags.list.empty.title': 'タグがまだありません',
   'admin.tags.list.empty.description': '上のフォームから最初のタグを作成してください。',
   'admin.tags.createForm.title': 'タグを作成',
+  'admin.tags.createForm.slugPlaceholder': '名前から自動生成',
   'admin.tags.createForm.submit': 'タグを作成',
   'admin.tags.createForm.submitting': '作成中…',
   'admin.tags.editForm.title': 'タグを編集',
@@ -476,6 +484,7 @@ export const ja: Partial<MessageCatalog> = {
   'admin.media.delete.deleting': '削除中…',
 
   // ── Users ────────────────────────────────────────────────────────────────
+  'admin.users.eyebrow': '管理',
   'admin.users.pageTitle': 'ユーザー',
   'admin.users.description': 'ユーザーアカウント・ロール・招待を管理します。',
   'admin.nav.users': 'ユーザー',

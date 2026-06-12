@@ -1,6 +1,6 @@
 import type { EntityRevision } from '@/entities/entity'
 import { useTranslation } from '@/shared/i18n'
-import { Button, Stack, Text } from '@/shared/ui'
+import { Button, Card, Stack, Text } from '@/shared/ui'
 
 interface EntityRevisionsPanelProps {
   revisions: EntityRevision[]
@@ -20,7 +20,7 @@ export function EntityRevisionsPanel({
   const { t } = useTranslation()
 
   return (
-    <section className="rounded-md border border-border bg-surface-raised p-inline-md shadow-sm">
+    <Card as="section">
       <Stack gap="md">
         <div className="flex items-center justify-between">
           <Text as="h2" variant="heading-sm">
@@ -53,6 +53,6 @@ export function EntityRevisionsPanel({
           )
         ) : null}
       </Stack>
-    </section>
+    </Card>
   )
 }

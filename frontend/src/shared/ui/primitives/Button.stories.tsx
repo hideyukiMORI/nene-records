@@ -18,7 +18,10 @@ const meta = {
     onClick: fn(),
   },
   argTypes: {
-    variant: { control: 'select', options: ['primary', 'secondary', 'danger'] },
+    variant: {
+      control: 'select',
+      options: ['primary', 'ghost', 'subtle', 'danger', 'secondary'],
+    },
     size: { control: 'select', options: ['sm', 'md'] },
   },
 } satisfies Meta<typeof Button>

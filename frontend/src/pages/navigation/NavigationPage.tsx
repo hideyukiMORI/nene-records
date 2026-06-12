@@ -2,7 +2,7 @@ import { Navigate } from 'react-router-dom'
 import { currentUserHasCapability } from '@/entities/auth'
 import { useManageNavigationPage, ManageNavigationView } from '@/features/manage-navigation'
 import { useTranslation } from '@/shared/i18n'
-import { Stack, Text } from '@/shared/ui'
+import { PageHeader, Stack } from '@/shared/ui'
 
 export function NavigationPage() {
   const { t } = useTranslation()
@@ -15,10 +15,10 @@ export function NavigationPage() {
 
   return (
     <Stack gap="md">
-      <Text as="h1" variant="heading-md">
-        {t('admin.navigation.pageTitle')}
-      </Text>
-      <Text muted>{t('admin.navigation.description')}</Text>
+      <PageHeader
+        title={t('admin.navigation.pageTitle')}
+        description={t('admin.navigation.description')}
+      />
       <ManageNavigationView
         items={page.items}
         isLoading={page.isLoading}
