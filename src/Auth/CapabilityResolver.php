@@ -41,6 +41,14 @@ final class CapabilityResolver
             };
         }
 
+        if (str_starts_with($path, '/api/v1/widgets')) {
+            return match ($method) {
+                'POST', 'PUT', 'DELETE' => Capability::ManageSettings,
+                'GET', 'HEAD' => Capability::ReadSettings,
+                default => null,
+            };
+        }
+
         if (str_starts_with($path, '/api/v1/entity-types')) {
             if (str_contains($path, '/archive.csv')) {
                 return Capability::ManageSchema;

@@ -292,6 +292,14 @@ export function AppShell() {
                       </li>
                       <li>
                         <NavItem
+                          to="/admin/widgets"
+                          icon={<IconLink size={16} />}
+                          label={t('admin.nav.widgets')}
+                          onClick={closeSidebar}
+                        />
+                      </li>
+                      <li>
+                        <NavItem
                           to="/admin/media"
                           icon={<IconImage size={16} />}
                           label={t('admin.nav.media')}

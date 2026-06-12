@@ -1,3 +1,4 @@
+import { SiteWidgets } from '@/features/render-widgets'
 import type { Entity } from '@/entities/entity'
 import { layoutRegions, type PublicLayoutKey, regionForLayout } from '@/shared/lib/resolve-layout'
 import type { PublicFieldRow } from '../hooks/use-public-view-entity-record-page'
@@ -36,7 +37,7 @@ export function PublicRecordRegionGrid({
         const rows = fieldRows.filter((row) => regionForLayout(row.region, layout) === region)
 
         return (
-          <div key={region} data-region={region}>
+          <div key={region} data-region={region} className="flex flex-col gap-stack-lg">
             {rows.length > 0 ? (
               <PublicRecordFieldList
                 entity={entity}
@@ -45,6 +46,8 @@ export function PublicRecordRegionGrid({
                 entityTypePatternById={entityTypePatternById}
               />
             ) : null}
+            {/* Site widgets live in the secondary columns, not the main content. */}
+            {region !== 'main' ? <SiteWidgets region={region} /> : null}
           </div>
         )
       })}
