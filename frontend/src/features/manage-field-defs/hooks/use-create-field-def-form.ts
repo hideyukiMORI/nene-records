@@ -10,6 +10,8 @@ export const createFieldDefFormSchema = z.object({
     .min(1, 'Field key is required')
     .regex(/^[a-z][a-z0-9_]*$/, 'Use lowercase letters, numbers, and underscores'),
   dataType: z.enum(FIELD_DATA_TYPES),
+  region: z.enum(['main', 'sidebar', 'aside']),
+  displayOrder: z.number().int().min(0),
 })
 
 export type CreateFieldDefFormValues = z.infer<typeof createFieldDefFormSchema>
@@ -20,6 +22,8 @@ export function useCreateFieldDefForm() {
     defaultValues: {
       fieldKey: '',
       dataType: 'text',
+      region: 'main',
+      displayOrder: 0,
     },
   })
 }

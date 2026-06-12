@@ -3,7 +3,10 @@ import { FIELD_DATA_TYPES, type FieldDataType, type FieldDef } from '@/entities/
 import { useTranslation } from '@/shared/i18n'
 import type { MessageKey } from '@/shared/i18n'
 import { Button, Card, Input, Select, Stack, Text } from '@/shared/ui'
-import { useEditFieldDefForm } from '../hooks/use-create-field-def-form'
+import {
+  type CreateFieldDefFormValues,
+  useEditFieldDefForm,
+} from '../hooks/use-create-field-def-form'
 
 const DATA_TYPE_LABEL_KEYS: Record<FieldDataType, MessageKey> = {
   text: 'admin.fieldDefs.dataType.text',
@@ -19,7 +22,7 @@ export interface FieldDefEditFormProps {
   fieldDef: FieldDef
   isSubmitting: boolean
   serverErrorTitle: string | null
-  onSubmit: (values: { fieldKey: string; dataType: FieldDataType }) => Promise<void>
+  onSubmit: (values: CreateFieldDefFormValues) => Promise<void>
   onCancel: () => void
 }
 
@@ -38,6 +41,8 @@ export function FieldDefEditForm({
   } = useEditFieldDefForm({
     fieldKey: fieldDef.fieldKey,
     dataType: fieldDef.dataType,
+    region: fieldDef.region ?? 'main',
+    displayOrder: fieldDef.displayOrder,
   })
 
   return (
@@ -100,6 +105,41 @@ export function FieldDefEditForm({
                 </span>
               ) : null}
             </div>
+          )}
+        />
+        <Controller
+          name="region"
+          control={control}
+          render={({ field }) => (
+            <Select
+              id="field-def-edit-region"
+              label={t('admin.region.label')}
+              disabled={isSubmitting}
+              value={field.value}
+              onChange={field.onChange}
+              onBlur={field.onBlur}
+            >
+              <option value="main">{t('admin.region.main')}</option>
+              <option value="sidebar">{t('admin.region.sidebar')}</option>
+              <option value="aside">{t('admin.region.aside')}</option>
+            </Select>
+          )}
+        />
+        <Controller
+          name="displayOrder"
+          control={control}
+          render={({ field }) => (
+            <Input
+              id="field-def-edit-order"
+              type="number"
+              label={t('admin.fieldDefs.displayOrder')}
+              disabled={isSubmitting}
+              value={String(field.value)}
+              onChange={(e) => {
+                field.onChange(Number(e.target.value) || 0)
+              }}
+              onBlur={field.onBlur}
+            />
           )}
         />
         {serverErrorTitle !== null ? <Text muted>{serverErrorTitle}</Text> : null}

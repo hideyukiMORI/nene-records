@@ -37,6 +37,8 @@ final class InMemoryFieldDefRepository implements FieldDefRepositoryInterface
                     deletedAt: $fieldDef->deletedAt,
                     targetEntityTypeId: $fieldDef->targetEntityTypeId,
                     cardinality: $fieldDef->cardinality,
+                    region: $fieldDef->region,
+                    displayOrder: $fieldDef->displayOrder,
                 );
                 $this->byId[$id] = $stored;
                 if (!$stored->isDeleted) {
@@ -77,7 +79,10 @@ final class InMemoryFieldDefRepository implements FieldDefRepositoryInterface
             static fn (FieldDef $fieldDef): bool => !$fieldDef->isDeleted
                 && ($entityTypeId === null || $fieldDef->entityTypeId === $entityTypeId),
         ));
-        usort($defs, static fn (FieldDef $a, FieldDef $b): int => ($a->id ?? 0) <=> ($b->id ?? 0));
+        usort(
+            $defs,
+            static fn (FieldDef $a, FieldDef $b): int => [$a->displayOrder, $a->id ?? 0] <=> [$b->displayOrder, $b->id ?? 0],
+        );
 
         return array_slice($defs, $offset, $limit);
     }
@@ -92,6 +97,8 @@ final class InMemoryFieldDefRepository implements FieldDefRepositoryInterface
             id: $id,
             targetEntityTypeId: $fieldDef->targetEntityTypeId,
             cardinality: $fieldDef->cardinality,
+            region: $fieldDef->region,
+            displayOrder: $fieldDef->displayOrder,
         );
         $this->byId[$id] = $stored;
         $this->entityTypeFieldKeyToId[$this->compositeKey($stored->entityTypeId, $stored->fieldKey)] = $id;
@@ -133,6 +140,8 @@ final class InMemoryFieldDefRepository implements FieldDefRepositoryInterface
             deletedAt: new DateTimeImmutable(),
             targetEntityTypeId: $fieldDef->targetEntityTypeId,
             cardinality: $fieldDef->cardinality,
+            region: $fieldDef->region,
+            displayOrder: $fieldDef->displayOrder,
         );
     }
 

@@ -4299,6 +4299,15 @@ components:
             - image
             - file
             - relation
+        region:
+          type:
+            - string
+            - 'null'
+          enum: [main, sidebar, aside, null]
+          description: 'Layout region this field renders into. Null = main.'
+        display_order:
+          type: integer
+          description: 'Ascending display order within the entity type.'
         target_entity_type_id:
           type: integer
           format: int64
@@ -4334,6 +4343,15 @@ components:
             - image
             - file
             - relation
+        region:
+          type:
+            - string
+            - 'null'
+          enum: [main, sidebar, aside, null]
+          description: 'Layout region this field renders into. Null/omitted = main.'
+        display_order:
+          type: integer
+          description: 'Ascending display order within the entity type.'
         target_entity_type_id:
           type: integer
           format: int64

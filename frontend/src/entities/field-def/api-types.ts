@@ -1,3 +1,4 @@
+import type { ContentRegion } from '@/shared/lib/resolve-layout'
 import type { FieldDataType, RelationCardinality } from './enum'
 
 export interface FieldDefDto {
@@ -7,6 +8,8 @@ export interface FieldDefDto {
   data_type: FieldDataType
   target_entity_type_id?: number
   cardinality?: RelationCardinality
+  region?: ContentRegion | null
+  display_order?: number
 }
 
 export interface FieldDefListDto {
@@ -21,6 +24,8 @@ export interface CreateFieldDefDto {
   data_type: FieldDataType
   target_entity_type_id?: number
   cardinality?: RelationCardinality
+  region?: ContentRegion | null
+  display_order?: number
 }
 
 export type UpdateFieldDefDto = CreateFieldDefDto

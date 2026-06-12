@@ -26,6 +26,8 @@ final readonly class GetFieldDefByIdUseCase implements GetFieldDefByIdUseCaseInt
             dataType: $fieldDef->dataType,
             targetEntityTypeId: $fieldDef->targetEntityTypeId,
             cardinality: $fieldDef->cardinality,
+            region: $fieldDef->region,
+            displayOrder: $fieldDef->displayOrder,
         );
     }
 }

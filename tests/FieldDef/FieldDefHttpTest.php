@@ -90,6 +90,61 @@ final class FieldDefHttpTest extends TestCase
         self::assertIsInt($payload['id']);
     }
 
+    public function testPostFieldDefPersistsRegionAndDisplayOrder(): void
+    {
+        $typeId = $this->entityTypes->save(new EntityType(name: 'Article', slug: 'article'));
+
+        $body = $this->factory->createStream(json_encode([
+            'entity_type_id' => $typeId,
+            'field_key' => 'blurb',
+            'data_type' => 'text',
+            'region' => 'sidebar',
+            'display_order' => 5,
+        ], JSON_THROW_ON_ERROR));
+
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('POST', 'https://example.test/api/v1/field-defs')->withBody($body),
+        );
+        $payload = $this->decodeJson($response);
+
+        self::assertSame(201, $response->getStatusCode());
+        self::assertSame('sidebar', $payload['region']);
+        self::assertSame(5, $payload['display_order']);
+    }
+
+    public function testPostFieldDefRejectsUnknownRegionWith422(): void
+    {
+        $typeId = $this->entityTypes->save(new EntityType(name: 'Article', slug: 'article'));
+
+        $body = $this->factory->createStream(json_encode([
+            'entity_type_id' => $typeId,
+            'field_key' => 'blurb',
+            'data_type' => 'text',
+            'region' => 'footer',
+        ], JSON_THROW_ON_ERROR));
+
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('POST', 'https://example.test/api/v1/field-defs')->withBody($body),
+        );
+
+        self::assertSame(422, $response->getStatusCode());
+    }
+
+    public function testListFieldDefsOrdersByDisplayOrder(): void
+    {
+        $typeId = $this->entityTypes->save(new EntityType(name: 'Article', slug: 'article'));
+        $this->fieldDefs->save(new FieldDef(entityTypeId: $typeId, fieldKey: 'b', dataType: 'text', displayOrder: 2));
+        $this->fieldDefs->save(new FieldDef(entityTypeId: $typeId, fieldKey: 'a', dataType: 'text', displayOrder: 1));
+
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('GET', "https://example.test/api/v1/field-defs?entity_type_id={$typeId}"),
+        );
+        $payload = $this->decodeJson($response);
+
+        self::assertSame('a', $payload['items'][0]['field_key']);
+        self::assertSame('b', $payload['items'][1]['field_key']);
+    }
+
     public function testPostDuplicateKeyReturns409WithConflictProblemType(): void
     {
         $typeId = $this->entityTypes->save(new EntityType(name: 'Article', slug: 'article'));

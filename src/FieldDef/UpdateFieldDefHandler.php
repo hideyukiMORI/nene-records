@@ -42,6 +42,8 @@ final readonly class UpdateFieldDefHandler
             dataType: trim((string) $body['data_type']),
             targetEntityTypeId: FieldDefWriteValidator::parseTargetEntityTypeId($body),
             cardinality: FieldDefWriteValidator::parseCardinality($body),
+            region: FieldDefWriteValidator::parseRegion($body),
+            displayOrder: FieldDefWriteValidator::parseDisplayOrder($body),
         ));
 
         return $this->response->create(FieldDefHttpMapper::toResponse(
@@ -51,6 +53,8 @@ final readonly class UpdateFieldDefHandler
             dataType: $output->dataType,
             targetEntityTypeId: $output->targetEntityTypeId,
             cardinality: $output->cardinality,
+            region: $output->region,
+            displayOrder: $output->displayOrder,
         ));
     }
 }

@@ -281,6 +281,8 @@ export function EntityTypeEditForm({
             >
               <option value="standard">{t('admin.layout.standard')}</option>
               <option value="full">{t('admin.layout.full')}</option>
+              <option value="two-col">{t('admin.layout.twoCol')}</option>
+              <option value="three-col">{t('admin.layout.threeCol')}</option>
               <option value="bare">{t('admin.layout.bare')}</option>
             </Select>
           )}
