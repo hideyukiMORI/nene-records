@@ -44,12 +44,17 @@ final readonly class LoginHandler
 
         $output = $this->useCase->execute(new LoginInput(email: $email, password: $password));
 
+        // Set the session token as an HttpOnly cookie so page JS can't read it.
+        // The token is still returned in the body for non-browser/machine clients.
+        $maxAge = $output->expiresAt - time();
+        $cookie = SessionCookie::build($output->token, $maxAge, SessionCookie::isSecureRequest($request));
+
         return $this->response->create([
             'token'      => $output->token,
             'expires_at' => (new DateTimeImmutable('@' . $output->expiresAt))->format(DateTimeInterface::ATOM),
             'email'      => $output->email,
             'role'       => $output->role,
             'org_id'     => $output->orgId,
-        ]);
+        ], 200, ['Set-Cookie' => $cookie]);
     }
 }

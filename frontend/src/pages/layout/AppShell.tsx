@@ -5,6 +5,7 @@ import {
   currentUserHasCapability,
   currentUserIsAdmin,
   currentUserIsSuperadmin,
+  useLogout,
 } from '@/entities/auth'
 import { getLocalizedEntityTypeName, usePinnedEntityTypes } from '@/entities/entity-type'
 import { LOCALES, SUPPORTED_LOCALE_IDS, useTranslation } from '@/shared/i18n'
@@ -98,9 +99,14 @@ export function AppShell() {
     }
   }, [sidebarOpen])
 
+  const logout = useLogout()
   const handleLogout = () => {
-    authStore.clearSession()
-    void navigate('/login')
+    // Clears the HttpOnly cookie server-side, then the local profile.
+    logout.mutate(undefined, {
+      onSettled: () => {
+        void navigate('/login')
+      },
+    })
   }
 
   const session = authStore.getSession()

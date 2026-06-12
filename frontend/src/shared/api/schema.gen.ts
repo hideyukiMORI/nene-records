@@ -15,9 +15,29 @@ export interface paths {
         put?: never;
         /**
          * Admin login
-         * @description Authenticates with email/password and returns a bearer token.
+         * @description Authenticates with email/password. Sets the session token as an HttpOnly `nene_session` cookie (SameSite=Lax) and also returns it in the body for non-browser/machine clients.
          */
         post: operations["login"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Logout
+         * @description Clears the session cookie. Open endpoint (no authentication required).
+         */
+        post: operations["logout"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2326,6 +2346,24 @@ export interface operations {
                 };
             };
             401: components["responses"]["InvalidCredentials"];
+        };
+    };
+    logout: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Session cookie cleared. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
     };
     getHealth: {

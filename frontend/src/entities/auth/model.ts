@@ -1,11 +1,15 @@
+/**
+ * Non-secret session profile kept in localStorage for UI gating (role-based
+ * rendering, expiry checks). The actual session token lives in an HttpOnly
+ * cookie set by the API and is never readable from JS.
+ */
 export interface AuthSession {
-  token: string
   expiresAt: string
   email: string
   role: string
 }
 
-const STORAGE_KEY = 'nene_records_token'
+const STORAGE_KEY = 'nene_records_session'
 
 export const authStore = {
   getSession(): AuthSession | null {
@@ -29,10 +33,6 @@ export const authStore = {
 
   clearSession(): void {
     localStorage.removeItem(STORAGE_KEY)
-  },
-
-  getToken(): string | null {
-    return this.getSession()?.token ?? null
   },
 
   isAuthenticated(): boolean {

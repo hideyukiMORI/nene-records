@@ -52,7 +52,10 @@ paths:
       tags:
         - Auth
       summary: Admin login
-      description: Authenticates with email/password and returns a bearer token.
+      description: >-
+        Authenticates with email/password. Sets the session token as an HttpOnly
+        `nene_session` cookie (SameSite=Lax) and also returns it in the body for
+        non-browser/machine clients.
       operationId: login
       requestBody:
         required: true
@@ -77,6 +80,16 @@ paths:
                 role: admin
         '401':
           $ref: '#/components/responses/InvalidCredentials'
+  /api/v1/auth/logout:
+    post:
+      tags:
+        - Auth
+      summary: Logout
+      description: Clears the session cookie. Open endpoint (no authentication required).
+      operationId: logout
+      responses:
+        '204':
+          description: Session cookie cleared.
   /health:
     get:
       tags:
