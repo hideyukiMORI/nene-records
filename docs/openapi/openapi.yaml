@@ -3839,6 +3839,10 @@ components:
           type: string
           nullable: true
           description: 'Previous URL pattern, automatically saved when permalink_pattern changes. Used to redirect old URLs.'
+        default_layout:
+          type: string
+          enum: [standard, full, bare]
+          description: 'Default public-page layout (scaffold preset) for records of this type. Overridable per entity.'
     CreateEntityTypeRequest:
       type: object
       required:
@@ -3876,6 +3880,10 @@ components:
           type: string
           nullable: true
           description: 'URL pattern. Must contain {slug} or {id}. Must start with /.'
+        default_layout:
+          type: string
+          enum: [standard, full, bare]
+          description: 'Default public-page layout for records of this type. Defaults to standard.'
       additionalProperties: false
     ReorderEntityTypesRequest:
       type: object
@@ -4024,6 +4032,7 @@ components:
         - meta_description
         - created_at
         - updated_at
+        - layout
       properties:
         id:
           type: integer
@@ -4036,6 +4045,12 @@ components:
             - string
             - 'null'
           minLength: 1
+        layout:
+          type:
+            - string
+            - 'null'
+          enum: [standard, full, bare, null]
+          description: 'Per-entity layout override. Null = inherit the type''s default_layout.'
         status:
           $ref: '#/components/schemas/EntityStatus'
         published_at:
@@ -4088,6 +4103,12 @@ components:
           minLength: 1
         status:
           $ref: '#/components/schemas/EntityStatus'
+        layout:
+          type:
+            - string
+            - 'null'
+          enum: [standard, full, bare, null]
+          description: 'Per-entity layout override. Null/omitted = inherit the type''s default_layout.'
       additionalProperties: false
     UpdateEntityRequest:
       type: object
@@ -4122,6 +4143,12 @@ components:
           type:
             - string
             - 'null'
+        layout:
+          type:
+            - string
+            - 'null'
+          enum: [standard, full, bare, null]
+          description: 'Per-entity layout override. Null = inherit the type''s default_layout.'
       additionalProperties: false
     ScheduleEntityRequest:
       type: object

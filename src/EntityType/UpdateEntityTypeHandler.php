@@ -9,6 +9,7 @@ use Nene2\Http\JsonResponseFactory;
 use Nene2\Routing\Router;
 use Nene2\Validation\ValidationError;
 use Nene2\Validation\ValidationException;
+use NeNeRecords\Layout\PublicLayouts;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -44,6 +45,14 @@ final readonly class UpdateEntityTypeHandler
         $name = trim((string) ($body['name'] ?? ''));
         $slug = trim((string) ($body['slug'] ?? ''));
         $isPinned = (bool) ($body['is_pinned'] ?? false);
+
+        // default_layout: optional, whitelisted scaffold preset (falls back to standard)
+        $defaultLayout = trim((string) ($body['default_layout'] ?? PublicLayouts::DEFAULT));
+        if ($defaultLayout === '') {
+            $defaultLayout = PublicLayouts::DEFAULT;
+        } elseif (!PublicLayouts::isValid($defaultLayout)) {
+            $errors[] = new ValidationError('default_layout', 'Unknown layout.', 'invalid');
+        }
 
         // labels: optional {"ja":"投稿","fr":"Articles"} – only string values are kept
         $rawLabels = $body['labels'] ?? null;
@@ -102,6 +111,7 @@ final readonly class UpdateEntityTypeHandler
             isPinned: $isPinned,
             labels: $labels,
             permalinkPattern: $permalinkPattern,
+            defaultLayout: $defaultLayout,
         ));
 
         return $this->response->create([
@@ -112,6 +122,7 @@ final readonly class UpdateEntityTypeHandler
             'labels'                     => $output->labels ?? new \stdClass(),
             'permalink_pattern'          => $output->permalinkPattern,
             'previous_permalink_pattern' => $output->previousPermalinkPattern,
+            'default_layout'             => $output->defaultLayout,
         ]);
     }
 }

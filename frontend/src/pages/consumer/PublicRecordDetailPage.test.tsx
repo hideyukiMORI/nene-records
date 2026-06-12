@@ -10,13 +10,16 @@ import { resetFieldDefStore, seedFieldDefs } from '@tests/msw/handlers/field-def
 import { resetIntFieldStore, seedIntFields } from '@tests/msw/handlers/int-field'
 import { resetTextFieldStore, seedTextFields } from '@tests/msw/handlers/text-field'
 import { mswServer } from '@tests/msw/server'
+import { PublicSiteTestProvider } from '@tests/render/PublicSiteTestProvider'
 import { renderWithProviders } from '@tests/render/render-with-providers'
 
 function renderDetailPage(entityTypeSlug = 'article', entityId = 1) {
   return renderWithProviders(
     <MemoryRouter initialEntries={[`/${entityTypeSlug}/${String(entityId)}`]}>
       <Routes>
-        <Route path="/:entityTypeSlug/*" element={<PublicRecordDetailPage />} />
+        <Route element={<PublicSiteTestProvider />}>
+          <Route path="/:entityTypeSlug/*" element={<PublicRecordDetailPage />} />
+        </Route>
       </Routes>
     </MemoryRouter>,
   )

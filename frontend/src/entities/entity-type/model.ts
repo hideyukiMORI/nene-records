@@ -1,3 +1,4 @@
+import type { PublicLayoutKey } from '@/shared/lib/resolve-layout'
 import type { EntityTypeId } from './ids'
 
 export interface EntityType {
@@ -5,6 +6,8 @@ export interface EntityType {
   name: string
   slug: string
   isPinned: boolean
+  /** Default public-page layout for records of this type. Overridable per entity. */
+  defaultLayout: PublicLayoutKey
   /** Sidebar / pinned ordering (ascending). Lower appears first. */
   displayOrder: number
   /** Locale-keyed display names. Empty object / undefined = no overrides. */
@@ -37,4 +40,5 @@ export interface UpdateEntityTypeInput {
   isPinned?: boolean
   labels?: Record<string, string>
   permalinkPattern?: string | null
+  defaultLayout?: PublicLayoutKey
 }

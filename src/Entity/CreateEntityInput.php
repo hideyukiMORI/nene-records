@@ -10,6 +10,7 @@ final readonly class CreateEntityInput
         public int $entityTypeId,
         public ?string $slug = null,
         public EntityStatus $status = EntityStatus::Draft,
+        public ?string $layout = null,
     ) {
     }
 }

@@ -98,6 +98,43 @@ final class EntityHttpTest extends TestCase
         self::assertIsInt($payload['id']);
     }
 
+    public function testPostEntityPersistsLayoutOverride(): void
+    {
+        $typeId = $this->entityTypes->save(new EntityType(name: 'Doc', slug: 'doc'));
+
+        $body = $this->factory->createStream(json_encode([
+            'entity_type_id' => $typeId,
+            'layout' => 'bare',
+        ], JSON_THROW_ON_ERROR));
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('POST', 'https://example.test/api/v1/entities')->withBody($body),
+        );
+        $payload = $this->decodeJson($response);
+
+        self::assertSame(201, $response->getStatusCode());
+        self::assertSame('bare', $payload['layout']);
+
+        $get = $this->application->handle(
+            $this->factory->createServerRequest('GET', "https://example.test/api/v1/entities/{$payload['id']}"),
+        );
+        self::assertSame('bare', $this->decodeJson($get)['layout']);
+    }
+
+    public function testPostEntityRejectsUnknownLayoutWith422(): void
+    {
+        $typeId = $this->entityTypes->save(new EntityType(name: 'Doc', slug: 'doc'));
+
+        $body = $this->factory->createStream(json_encode([
+            'entity_type_id' => $typeId,
+            'layout' => 'fancy',
+        ], JSON_THROW_ON_ERROR));
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('POST', 'https://example.test/api/v1/entities')->withBody($body),
+        );
+
+        self::assertSame(422, $response->getStatusCode());
+    }
+
     public function testAfterDeleteGetEntityReturns404(): void
     {
         $typeId = $this->entityTypes->save(new EntityType(name: 'Thing', slug: 'thing'));

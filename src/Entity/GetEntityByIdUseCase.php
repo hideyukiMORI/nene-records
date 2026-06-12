@@ -41,6 +41,7 @@ final readonly class GetEntityByIdUseCase implements GetEntityByIdUseCaseInterfa
             scheduledAtIso: $entity->scheduledAt?->format(DateTimeInterface::ATOM),
             createdAtIso: $entity->createdAt?->format(DateTimeInterface::ATOM),
             updatedAtIso: $entity->updatedAt?->format(DateTimeInterface::ATOM),
+            layout: $entity->layout,
         );
     }
 }

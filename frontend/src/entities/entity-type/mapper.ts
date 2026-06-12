@@ -18,6 +18,7 @@ export function mapEntityTypeDtoToModel(dto: EntityTypeDto): EntityType {
     name: dto.name,
     slug: dto.slug,
     isPinned: dto.is_pinned,
+    defaultLayout: dto.default_layout ?? 'standard',
     displayOrder: dto.display_order ?? 0,
     labels: dto.labels && Object.keys(dto.labels).length > 0 ? dto.labels : undefined,
     permalinkPattern: dto.permalink_pattern ?? null,
@@ -48,5 +49,6 @@ export function mapUpdateInputToDto(input: UpdateEntityTypeInput): UpdateEntityT
     is_pinned: input.isPinned ?? false,
     labels: input.labels,
     permalink_pattern: input.permalinkPattern,
+    ...(input.defaultLayout !== undefined ? { default_layout: input.defaultLayout } : {}),
   }
 }

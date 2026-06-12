@@ -1,9 +1,12 @@
 export type EntityStatusDto = 'draft' | 'published' | 'archived' | 'scheduled'
 
+export type LayoutDto = 'standard' | 'full' | 'bare'
+
 export interface EntityDto {
   id: number
   entity_type_id: number
   slug: string | null
+  layout: LayoutDto | null
   status: EntityStatusDto
   published_at: string | null
   scheduled_at: string | null
@@ -26,6 +29,7 @@ export interface CreateEntityDto {
   entity_type_id: number
   slug?: string | null
   status?: EntityStatusDto
+  layout?: LayoutDto | null
 }
 
 export interface UpdateEntityDto {
@@ -36,6 +40,7 @@ export interface UpdateEntityDto {
   scheduled_at?: string | null
   meta_title?: string | null
   meta_description?: string | null
+  layout?: LayoutDto | null
 }
 
 export interface ScheduleEntityDto {

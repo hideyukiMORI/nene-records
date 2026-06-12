@@ -6,7 +6,7 @@ import {
   PERMALINK_PRESETS,
   resolvePermalink,
 } from '@/shared/lib/resolve-permalink'
-import { Button, Card, Input, Stack, Text } from '@/shared/ui'
+import { Button, Card, Input, Select, Stack, Text } from '@/shared/ui'
 import {
   EDIT_LABEL_FIELDS,
   useEditEntityTypeForm,
@@ -181,6 +181,7 @@ export function EntityTypeEditForm({
     labelDe: entityType.labels?.['de'] ?? '',
     // null/undefined → store null; will default to DEFAULT_PERMALINK_PATTERN in the UI
     permalinkPattern: entityType.permalinkPattern ?? null,
+    defaultLayout: entityType.defaultLayout,
   })
 
   return (
@@ -263,6 +264,26 @@ export function EntityTypeEditForm({
           control={control}
           isSubmitting={isSubmitting}
           entityTypeSlug={entityType.slug}
+        />
+
+        {/* ── Default public-page layout ── */}
+        <Controller
+          name="defaultLayout"
+          control={control}
+          render={({ field }) => (
+            <Select
+              id="entity-type-edit-default-layout"
+              label={t('admin.layout.defaultLayout')}
+              disabled={isSubmitting}
+              value={field.value}
+              onChange={field.onChange}
+              onBlur={field.onBlur}
+            >
+              <option value="standard">{t('admin.layout.standard')}</option>
+              <option value="full">{t('admin.layout.full')}</option>
+              <option value="bare">{t('admin.layout.bare')}</option>
+            </Select>
+          )}
         />
 
         {/* ── Display names by language ── */}

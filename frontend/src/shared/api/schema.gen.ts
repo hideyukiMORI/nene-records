@@ -1468,6 +1468,11 @@ export interface components {
             permalink_pattern?: string | null;
             /** @description Previous URL pattern, automatically saved when permalink_pattern changes. Used to redirect old URLs. */
             previous_permalink_pattern?: string | null;
+            /**
+             * @description Default public-page layout (scaffold preset) for records of this type. Overridable per entity.
+             * @enum {string}
+             */
+            default_layout?: "standard" | "full" | "bare";
         };
         CreateEntityTypeRequest: {
             name: string;
@@ -1483,6 +1488,11 @@ export interface components {
             };
             /** @description URL pattern. Must contain {slug} or {id}. Must start with /. */
             permalink_pattern?: string | null;
+            /**
+             * @description Default public-page layout for records of this type. Defaults to standard.
+             * @enum {string}
+             */
+            default_layout?: "standard" | "full" | "bare";
         };
         ReorderEntityTypesRequest: {
             /** @description Entity type ids in the desired display order (ascending). */
@@ -1541,6 +1551,11 @@ export interface components {
             /** Format: int64 */
             entity_type_id: number;
             slug: string | null;
+            /**
+             * @description Per-entity layout override. Null = inherit the type's default_layout.
+             * @enum {string|null}
+             */
+            layout: "standard" | "full" | "bare" | null;
             status: components["schemas"]["EntityStatus"];
             /** Format: date-time */
             published_at: string | null;
@@ -1561,6 +1576,11 @@ export interface components {
             entity_type_id: number;
             slug?: string;
             status?: components["schemas"]["EntityStatus"];
+            /**
+             * @description Per-entity layout override. Null/omitted = inherit the type's default_layout.
+             * @enum {string|null}
+             */
+            layout?: "standard" | "full" | "bare" | null;
         };
         UpdateEntityRequest: {
             /** Format: int64 */
@@ -1573,6 +1593,11 @@ export interface components {
             scheduled_at?: string | null;
             meta_title?: string | null;
             meta_description?: string | null;
+            /**
+             * @description Per-entity layout override. Null = inherit the type's default_layout.
+             * @enum {string|null}
+             */
+            layout?: "standard" | "full" | "bare" | null;
         };
         ScheduleEntityRequest: {
             /**

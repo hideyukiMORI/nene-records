@@ -9,6 +9,7 @@ import {
 } from '@/features/public-view-entity-record'
 import { useTranslation } from '@/shared/i18n'
 import { findEntityTypeBySlug } from '@/shared/lib/find-entity-type-by-slug'
+import { type PublicLayoutKey, resolveLayout } from '@/shared/lib/resolve-layout'
 import {
   DEFAULT_PERMALINK_PATTERN,
   extractEntityKeyFromSplat,
@@ -16,6 +17,8 @@ import {
 } from '@/shared/lib/resolve-permalink'
 import { Button, EmptyState, Stack, Text } from '@/shared/ui'
 import { useEntityIdBySlug } from './hooks/use-entity-id-by-slug'
+import { PublicLayout } from './PublicLayout'
+import { usePublicSite } from './public-site-context'
 
 // ── Canonical redirect helper ─────────────────────────────────────────────────
 
@@ -50,6 +53,7 @@ function PublicRecordDetailContent({
   entityTypeSlugById,
   entityTypePatternById,
   currentPattern,
+  entityTypeDefaultLayout,
 }: {
   entityTypeSlug: string
   entityTypeName: string
@@ -58,10 +62,14 @@ function PublicRecordDetailContent({
   entityTypeSlugById: Record<number, string>
   entityTypePatternById: Record<number, string | null | undefined>
   currentPattern: string | null | undefined
+  entityTypeDefaultLayout: PublicLayoutKey
 }) {
+  const site = usePublicSite()
   const { entity, fieldRows, isLoading, isError, errorTitle, refetch } =
     usePublicViewEntityRecordPage(entityTypeId, entityId)
   const commentSection = useCommentSection(entityId)
+
+  const variant = resolveLayout(entity?.layout ?? null, entityTypeDefaultLayout)
 
   // Redirect if the current URL doesn't match the canonical URL for this entity.
   // This handles pattern changes (e.g. /{type}/{id} → /{type}/{slug}) transparently.
@@ -77,31 +85,33 @@ function PublicRecordDetailContent({
   }
 
   return (
-    <Stack gap="md">
-      <Stack gap="sm">
-        <Link to={`/${entityTypeSlug}`}>
-          <Button variant="secondary" size="sm">
-            Back to {entityTypeName}
-          </Button>
-        </Link>
-        <Text as="h1" variant="heading-md">
-          {entityTypeName}
-        </Text>
+    <PublicLayout variant={variant} site={site}>
+      <Stack gap="md">
+        <Stack gap="sm">
+          <Link to={`/${entityTypeSlug}`}>
+            <Button variant="secondary" size="sm">
+              Back to {entityTypeName}
+            </Button>
+          </Link>
+          <Text as="h1" variant="heading-md">
+            {entityTypeName}
+          </Text>
+        </Stack>
+        <PublicRecordDetailView
+          entity={entity}
+          fieldRows={fieldRows}
+          entityTypeSlugById={entityTypeSlugById}
+          entityTypePatternById={entityTypePatternById}
+          isLoading={isLoading}
+          isError={isError}
+          errorTitle={errorTitle}
+          onRetry={() => {
+            void refetch()
+          }}
+        />
+        {entity !== null && !isLoading && !isError ? <CommentSection {...commentSection} /> : null}
       </Stack>
-      <PublicRecordDetailView
-        entity={entity}
-        fieldRows={fieldRows}
-        entityTypeSlugById={entityTypeSlugById}
-        entityTypePatternById={entityTypePatternById}
-        isLoading={isLoading}
-        isError={isError}
-        errorTitle={errorTitle}
-        onRetry={() => {
-          void refetch()
-        }}
-      />
-      {entity !== null && !isLoading && !isError ? <CommentSection {...commentSection} /> : null}
-    </Stack>
+    </PublicLayout>
   )
 }
 
@@ -175,6 +185,7 @@ function PublicRecordDetailBySlug({
   currentPattern,
   previousPattern,
   splat,
+  entityTypeDefaultLayout,
 }: {
   entityTypeSlug: string
   entityTypeName: string
@@ -185,8 +196,10 @@ function PublicRecordDetailBySlug({
   currentPattern: string | null | undefined
   previousPattern: string | null | undefined
   splat: string
+  entityTypeDefaultLayout: PublicLayoutKey
 }) {
   const { t } = useTranslation()
+  const site = usePublicSite()
   const { entityId, isLoading, isError } = useEntityIdWithFallback(
     entityTypeId,
     entitySlug,
@@ -194,13 +207,21 @@ function PublicRecordDetailBySlug({
     splat,
   )
 
-  if (isLoading) return <Text muted>Loading…</Text>
+  if (isLoading) {
+    return (
+      <PublicLayout variant="standard" site={site}>
+        <Text muted>Loading…</Text>
+      </PublicLayout>
+    )
+  }
   if (isError || entityId === null) {
     return (
-      <EmptyState
-        title={t('public.record.notFound.title')}
-        description={t('public.record.notFound.description', { slug: entitySlug })}
-      />
+      <PublicLayout variant="standard" site={site}>
+        <EmptyState
+          title={t('public.record.notFound.title')}
+          description={t('public.record.notFound.description', { slug: entitySlug })}
+        />
+      </PublicLayout>
     )
   }
 
@@ -213,6 +234,7 @@ function PublicRecordDetailBySlug({
       entityTypeSlugById={entityTypeSlugById}
       entityTypePatternById={entityTypePatternById}
       currentPattern={currentPattern}
+      entityTypeDefaultLayout={entityTypeDefaultLayout}
     />
   )
 }
@@ -237,6 +259,7 @@ function PublicRecordDetailById({
   entityTypeSlugById,
   entityTypePatternById,
   currentPattern,
+  entityTypeDefaultLayout,
 }: {
   entityTypeSlug: string
   entityTypeName: string
@@ -245,6 +268,7 @@ function PublicRecordDetailById({
   entityTypeSlugById: Record<number, string>
   entityTypePatternById: Record<number, string | null | undefined>
   currentPattern: string | null | undefined
+  entityTypeDefaultLayout: PublicLayoutKey
 }) {
   return (
     <PublicRecordDetailContent
@@ -255,6 +279,7 @@ function PublicRecordDetailById({
       entityTypeSlugById={entityTypeSlugById}
       entityTypePatternById={entityTypePatternById}
       currentPattern={currentPattern}
+      entityTypeDefaultLayout={entityTypeDefaultLayout}
     />
   )
 }
@@ -265,6 +290,7 @@ export function PublicRecordDetailPage() {
   // React Router v6: splat param is '*'
   const { entityTypeSlug = '', '*': splat = '' } = useParams()
   const { t } = useTranslation()
+  const site = usePublicSite()
 
   const entityTypeQuery = useEntityTypeList({ limit: 100, offset: 0 })
   const entityType = useMemo(
@@ -288,15 +314,21 @@ export function PublicRecordDetailPage() {
   )
 
   if (entityTypeQuery.isLoading) {
-    return <Text muted>Loading…</Text>
+    return (
+      <PublicLayout variant="standard" site={site}>
+        <Text muted>Loading…</Text>
+      </PublicLayout>
+    )
   }
 
   if (entityType === undefined) {
     return (
-      <EmptyState
-        title={t('public.entityType.notFound.title')}
-        description={t('public.entityType.notFound.description', { slug: entityTypeSlug })}
-      />
+      <PublicLayout variant="standard" site={site}>
+        <EmptyState
+          title={t('public.entityType.notFound.title')}
+          description={t('public.entityType.notFound.description', { slug: entityTypeSlug })}
+        />
+      </PublicLayout>
     )
   }
 
@@ -313,6 +345,7 @@ export function PublicRecordDetailPage() {
         entityTypeSlugById={entityTypeSlugById}
         entityTypePatternById={entityTypePatternById}
         currentPattern={entityType.permalinkPattern}
+        entityTypeDefaultLayout={entityType.defaultLayout}
       />
     )
   }
@@ -328,6 +361,7 @@ export function PublicRecordDetailPage() {
       currentPattern={entityType.permalinkPattern}
       previousPattern={entityType.previousPermalinkPattern}
       splat={splat}
+      entityTypeDefaultLayout={entityType.defaultLayout}
     />
   )
 }

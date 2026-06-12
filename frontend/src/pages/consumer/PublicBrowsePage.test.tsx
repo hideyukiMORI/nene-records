@@ -9,15 +9,18 @@ import { resetEntityStore, seedEntities } from '@tests/msw/handlers/entity'
 import { resetEntityTypeStore, seedEntityTypes } from '@tests/msw/handlers/entity-type'
 import { resetTextFieldStore, seedTextFields } from '@tests/msw/handlers/text-field'
 import { mswServer } from '@tests/msw/server'
+import { PublicSiteTestProvider } from '@tests/render/PublicSiteTestProvider'
 import { renderWithProviders } from '@tests/render/render-with-providers'
 
 function renderBrowsePage(initialEntry = '/article') {
   return renderWithProviders(
     <MemoryRouter initialEntries={[initialEntry]}>
       <Routes>
-        <Route path="/" element={<PublicIndexPage />} />
-        <Route path="/:entityTypeSlug" element={<PublicBrowsePage />} />
-        <Route path="/:entityTypeSlug/:entityId" element={<PublicRecordDetailPage />} />
+        <Route element={<PublicSiteTestProvider />}>
+          <Route path="/" element={<PublicIndexPage />} />
+          <Route path="/:entityTypeSlug" element={<PublicBrowsePage />} />
+          <Route path="/:entityTypeSlug/:entityId" element={<PublicRecordDetailPage />} />
+        </Route>
       </Routes>
     </MemoryRouter>,
   )
