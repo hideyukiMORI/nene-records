@@ -22,6 +22,24 @@ final readonly class MediaServiceProvider implements ServiceProviderInterface
     {
         $builder
             ->set(
+                StorageInterface::class,
+                static function (ContainerInterface $c): StorageInterface {
+                    $projectRoot = $c->get(RuntimeServiceProvider::PROJECT_ROOT);
+
+                    if (!is_string($projectRoot) || $projectRoot === '') {
+                        throw new LogicException('Project root service is invalid.');
+                    }
+
+                    $driver = getenv('MEDIA_STORAGE_DRIVER') ?: 'local';
+
+                    return match ($driver) {
+                        'local' => new LocalStorage($projectRoot . '/var/media'),
+                        // S3-compatible driver lands in a follow-up (see #299 Phase A).
+                        default => throw new LogicException('Unsupported media storage driver: ' . $driver),
+                    };
+                },
+            )
+            ->set(
                 MediaRepositoryInterface::class,
                 static function (ContainerInterface $c): MediaRepositoryInterface {
                     $query = $c->get(DatabaseQueryExecutorInterface::class);
@@ -42,19 +60,17 @@ final readonly class MediaServiceProvider implements ServiceProviderInterface
                 UploadMediaUseCaseInterface::class,
                 static function (ContainerInterface $c): UploadMediaUseCaseInterface {
                     $repository = $c->get(MediaRepositoryInterface::class);
-                    $projectRoot = $c->get(RuntimeServiceProvider::PROJECT_ROOT);
+                    $storage = $c->get(StorageInterface::class);
 
                     if (!$repository instanceof MediaRepositoryInterface) {
                         throw new LogicException('Media repository service is invalid.');
                     }
 
-                    if (!is_string($projectRoot) || $projectRoot === '') {
-                        throw new LogicException('Project root service is invalid.');
+                    if (!$storage instanceof StorageInterface) {
+                        throw new LogicException('Media storage service is invalid.');
                     }
 
-                    $storageRoot = $projectRoot . '/var/media';
-
-                    return new UploadMediaUseCase($repository, $storageRoot);
+                    return new UploadMediaUseCase($repository, $storage);
                 },
             )
             ->set(
@@ -73,12 +89,17 @@ final readonly class MediaServiceProvider implements ServiceProviderInterface
                 DeleteMediaUseCaseInterface::class,
                 static function (ContainerInterface $c): DeleteMediaUseCaseInterface {
                     $repository = $c->get(MediaRepositoryInterface::class);
+                    $storage = $c->get(StorageInterface::class);
 
                     if (!$repository instanceof MediaRepositoryInterface) {
                         throw new LogicException('Media repository service is invalid.');
                     }
 
-                    return new DeleteMediaUseCase($repository);
+                    if (!$storage instanceof StorageInterface) {
+                        throw new LogicException('Media storage service is invalid.');
+                    }
+
+                    return new DeleteMediaUseCase($repository, $storage);
                 },
             )
             ->set(
@@ -119,33 +140,28 @@ final readonly class MediaServiceProvider implements ServiceProviderInterface
                 DeleteMediaHandler::class,
                 static function (ContainerInterface $c): DeleteMediaHandler {
                     $useCase = $c->get(DeleteMediaUseCaseInterface::class);
-                    $projectRoot = $c->get(RuntimeServiceProvider::PROJECT_ROOT);
                     $responseFactory = $c->get(ResponseFactoryInterface::class);
 
                     if (!$useCase instanceof DeleteMediaUseCaseInterface) {
                         throw new LogicException('DeleteMedia use case service is invalid.');
                     }
 
-                    if (!is_string($projectRoot) || $projectRoot === '') {
-                        throw new LogicException('Project root service is invalid.');
-                    }
-
                     if (!$responseFactory instanceof ResponseFactoryInterface) {
                         throw new LogicException('Response factory service is invalid.');
                     }
 
-                    return new DeleteMediaHandler($useCase, $responseFactory, $projectRoot . '/var/media');
+                    return new DeleteMediaHandler($useCase, $responseFactory);
                 },
             )
             ->set(
                 ServeMediaHandler::class,
                 static function (ContainerInterface $c): ServeMediaHandler {
-                    $projectRoot = $c->get(RuntimeServiceProvider::PROJECT_ROOT);
+                    $storage = $c->get(StorageInterface::class);
                     $responseFactory = $c->get(ResponseFactoryInterface::class);
                     $streamFactory = $c->get(StreamFactoryInterface::class);
 
-                    if (!is_string($projectRoot) || $projectRoot === '') {
-                        throw new LogicException('Project root service is invalid.');
+                    if (!$storage instanceof StorageInterface) {
+                        throw new LogicException('Media storage service is invalid.');
                     }
 
                     if (!$responseFactory instanceof ResponseFactoryInterface) {
@@ -156,9 +172,7 @@ final readonly class MediaServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Stream factory service is invalid.');
                     }
 
-                    $storageRoot = $projectRoot . '/var/media';
-
-                    return new ServeMediaHandler($storageRoot, $responseFactory, $streamFactory);
+                    return new ServeMediaHandler($storage, $responseFactory, $streamFactory);
                 },
             )
             ->set(

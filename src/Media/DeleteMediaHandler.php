@@ -14,7 +14,6 @@ final readonly class DeleteMediaHandler
     public function __construct(
         private DeleteMediaUseCaseInterface $useCase,
         private ResponseFactoryInterface $responseFactory,
-        private string $storageRoot,
     ) {
     }
 
@@ -27,10 +26,7 @@ final readonly class DeleteMediaHandler
             throw new MediaNotFoundException($id);
         }
 
-        $this->useCase->execute(new DeleteMediaInput(
-            id: $id,
-            storageRoot: $this->storageRoot,
-        ));
+        $this->useCase->execute(new DeleteMediaInput(id: $id));
 
         return $this->responseFactory->createResponse(204);
     }

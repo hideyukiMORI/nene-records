@@ -6,6 +6,7 @@ namespace NeNeRecords\Tests\Media;
 
 use NeNeRecords\Media\DeleteMediaInput;
 use NeNeRecords\Media\DeleteMediaUseCase;
+use NeNeRecords\Media\LocalStorage;
 use NeNeRecords\Media\Media;
 use NeNeRecords\Media\MediaInvalidTypeException;
 use NeNeRecords\Media\MediaNotFoundException;
@@ -25,7 +26,7 @@ final class MediaUseCaseTest extends TestCase
         file_put_contents($tmpFile, 'fake image content');
 
         $mediaRepo = new InMemoryMediaRepository();
-        $useCase = new UploadMediaUseCase($mediaRepo, $storageRoot);
+        $useCase = new UploadMediaUseCase($mediaRepo, new LocalStorage($storageRoot));
 
         $input = new UploadMediaInput(
             tmpPath: $tmpFile,
@@ -50,7 +51,7 @@ final class MediaUseCaseTest extends TestCase
     {
         $storageRoot = sys_get_temp_dir() . '/nene_media_test_' . uniqid('', true);
         $mediaRepo = new InMemoryMediaRepository();
-        $useCase = new UploadMediaUseCase($mediaRepo, $storageRoot);
+        $useCase = new UploadMediaUseCase($mediaRepo, new LocalStorage($storageRoot));
 
         $input = new UploadMediaInput(
             tmpPath: '/tmp/irrelevant',
@@ -68,7 +69,7 @@ final class MediaUseCaseTest extends TestCase
     {
         $storageRoot = sys_get_temp_dir() . '/nene_media_test_' . uniqid('', true);
         $mediaRepo = new InMemoryMediaRepository();
-        $useCase = new UploadMediaUseCase($mediaRepo, $storageRoot);
+        $useCase = new UploadMediaUseCase($mediaRepo, new LocalStorage($storageRoot));
 
         $tenMibPlusOne = 10 * 1024 * 1024 + 1;
 
@@ -96,12 +97,12 @@ final class MediaUseCaseTest extends TestCase
             createdAt: '2024-01-01 00:00:00',
         );
 
-        $mediaRepo = new InMemoryMediaRepository([$seeded]);
-        $useCase = new DeleteMediaUseCase($mediaRepo);
-
         $storageRoot = sys_get_temp_dir() . '/nene_no_file_' . uniqid('', true);
 
-        $useCase->execute(new DeleteMediaInput(id: 1, storageRoot: $storageRoot));
+        $mediaRepo = new InMemoryMediaRepository([$seeded]);
+        $useCase = new DeleteMediaUseCase($mediaRepo, new LocalStorage($storageRoot));
+
+        $useCase->execute(new DeleteMediaInput(id: 1));
 
         self::assertNull($mediaRepo->findById(1));
     }
@@ -109,10 +110,10 @@ final class MediaUseCaseTest extends TestCase
     public function testDeleteThrowsMediaNotFoundExceptionWhenMediaDoesNotExist(): void
     {
         $mediaRepo = new InMemoryMediaRepository();
-        $useCase = new DeleteMediaUseCase($mediaRepo);
+        $useCase = new DeleteMediaUseCase($mediaRepo, new LocalStorage(sys_get_temp_dir()));
 
         $this->expectException(MediaNotFoundException::class);
 
-        $useCase->execute(new DeleteMediaInput(id: 999, storageRoot: sys_get_temp_dir()));
+        $useCase->execute(new DeleteMediaInput(id: 999));
     }
 }
