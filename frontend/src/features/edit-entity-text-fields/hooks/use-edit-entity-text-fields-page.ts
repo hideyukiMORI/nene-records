@@ -153,6 +153,7 @@ export function useEditEntityTextFieldsPage(entityTypeId: number, entityId: numb
           case 'text':
           case 'markdown':
           case 'html':
+          case 'bundle':
           case 'image': {
             const existing = textFieldsForLocale.find((item) => item.fieldKey === fieldDef.fieldKey)
             return [fieldDef.fieldKey, existing?.value ?? '']
@@ -201,6 +202,7 @@ export function useEditEntityTextFieldsPage(entityTypeId: number, entityId: numb
           case 'text':
           case 'markdown':
           case 'html':
+          case 'bundle':
           case 'image': {
             const existing = textFieldsForLocale.find((item) => item.fieldKey === fieldDef.fieldKey)
 

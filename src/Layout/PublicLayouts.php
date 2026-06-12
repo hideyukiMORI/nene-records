@@ -17,13 +17,14 @@ namespace NeNeRecords\Layout;
  * - two-col:   header / [main | sidebar] / footer.
  * - three-col: header / [main | sidebar | aside] / footer.
  * - bare:      no header/footer, no theme — fully custom page (CSS in content).
+ * - custom:    full-width host for a sandboxed bundle field + crawlable text.
  */
 final class PublicLayouts
 {
     public const DEFAULT = 'standard';
 
     /** @var list<string> */
-    private const LAYOUTS = ['standard', 'full', 'two-col', 'three-col', 'bare'];
+    private const LAYOUTS = ['standard', 'full', 'two-col', 'three-col', 'bare', 'custom'];
 
     /**
      * Regions each layout renders, in display order. Fields assigned to a region
@@ -37,6 +38,7 @@ final class PublicLayouts
         'two-col' => ['main', 'sidebar'],
         'three-col' => ['main', 'sidebar', 'aside'],
         'bare' => ['main'],
+        'custom' => ['main'],
     ];
 
     public static function isValid(string $layout): bool

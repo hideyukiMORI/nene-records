@@ -118,6 +118,7 @@ export function EntityStatusPanel({
           <option value="two-col">{t('admin.layout.twoCol')}</option>
           <option value="three-col">{t('admin.layout.threeCol')}</option>
           <option value="bare">{t('admin.layout.bare')}</option>
+          <option value="custom">{t('admin.layout.custom')}</option>
         </Select>
       </Stack>
 

@@ -1492,7 +1492,7 @@ export interface components {
              * @description Default public-page layout (scaffold preset) for records of this type. Overridable per entity.
              * @enum {string}
              */
-            default_layout?: "standard" | "full" | "bare";
+            default_layout?: "standard" | "full" | "two-col" | "three-col" | "bare" | "custom";
         };
         CreateEntityTypeRequest: {
             name: string;
@@ -1512,7 +1512,7 @@ export interface components {
              * @description Default public-page layout for records of this type. Defaults to standard.
              * @enum {string}
              */
-            default_layout?: "standard" | "full" | "bare";
+            default_layout?: "standard" | "full" | "two-col" | "three-col" | "bare" | "custom";
         };
         ReorderEntityTypesRequest: {
             /** @description Entity type ids in the desired display order (ascending). */
@@ -1575,7 +1575,7 @@ export interface components {
              * @description Per-entity layout override. Null = inherit the type's default_layout.
              * @enum {string|null}
              */
-            layout: "standard" | "full" | "bare" | null;
+            layout: "standard" | "full" | "two-col" | "three-col" | "bare" | "custom" | null;
             status: components["schemas"]["EntityStatus"];
             /** Format: date-time */
             published_at: string | null;
@@ -1600,7 +1600,7 @@ export interface components {
              * @description Per-entity layout override. Null/omitted = inherit the type's default_layout.
              * @enum {string|null}
              */
-            layout?: "standard" | "full" | "bare" | null;
+            layout?: "standard" | "full" | "two-col" | "three-col" | "bare" | "custom" | null;
         };
         UpdateEntityRequest: {
             /** Format: int64 */
@@ -1617,7 +1617,7 @@ export interface components {
              * @description Per-entity layout override. Null = inherit the type's default_layout.
              * @enum {string|null}
              */
-            layout?: "standard" | "full" | "bare" | null;
+            layout?: "standard" | "full" | "two-col" | "three-col" | "bare" | "custom" | null;
         };
         ScheduleEntityRequest: {
             /**
@@ -1673,7 +1673,7 @@ export interface components {
             entity_type_id: number;
             field_key: string;
             /** @enum {string} */
-            data_type: "text" | "markdown" | "html" | "int" | "enum" | "bool" | "datetime" | "image" | "file" | "relation";
+            data_type: "text" | "markdown" | "html" | "bundle" | "int" | "enum" | "bool" | "datetime" | "image" | "file" | "relation";
             /**
              * @description Layout region this field renders into. Null = main.
              * @enum {string|null}
@@ -1691,7 +1691,7 @@ export interface components {
             entity_type_id: number;
             field_key: string;
             /** @enum {string} */
-            data_type: "text" | "markdown" | "html" | "int" | "enum" | "bool" | "datetime" | "image" | "file" | "relation";
+            data_type: "text" | "markdown" | "html" | "bundle" | "int" | "enum" | "bool" | "datetime" | "image" | "file" | "relation";
             /**
              * @description Layout region this field renders into. Null/omitted = main.
              * @enum {string|null}

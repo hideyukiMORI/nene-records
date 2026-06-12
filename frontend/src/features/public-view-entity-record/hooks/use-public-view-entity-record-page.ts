@@ -58,6 +58,7 @@ export function usePublicViewEntityRecordPage(entityTypeId: number, entityId: nu
         case 'text':
         case 'markdown':
         case 'html':
+        case 'bundle':
         case 'image':
         case 'file':
           // All text-backed types resolve their value from text_fields.

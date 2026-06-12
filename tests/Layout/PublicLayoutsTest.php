@@ -51,6 +51,12 @@ final class PublicLayoutsTest extends TestCase
         self::assertTrue(PublicLayouts::isValid('three-col'));
     }
 
+    public function testCustomLayoutIsValid(): void
+    {
+        self::assertTrue(PublicLayouts::isValid('custom'));
+        self::assertSame(['main'], PublicLayouts::regions('custom'));
+    }
+
     public function testRegionsPerLayout(): void
     {
         self::assertSame(['main'], PublicLayouts::regions('standard'));
