@@ -352,6 +352,20 @@ final class MediaHttpTest extends TestCase
         self::assertSame(404, $response->getStatusCode());
     }
 
+    public function testDerivativeForUndecodableSourceReturns404(): void
+    {
+        // A file with an image extension but non-image bytes must not 500.
+        $dir = $this->storageRoot . '/2026/05';
+        mkdir($dir, 0755, true);
+        file_put_contents($dir . '/broken.png', 'not really a png');
+
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/media/sm/2026/05/broken.png'),
+        );
+
+        self::assertSame(404, $response->getStatusCode());
+    }
+
     /**
      * @param positive-int $width
      * @param positive-int $height

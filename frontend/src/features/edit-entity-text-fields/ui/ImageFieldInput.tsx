@@ -1,7 +1,7 @@
 import { useRef } from 'react'
 import { useUploadMedia } from '@/entities/media'
 import { useTranslation } from '@/shared/i18n'
-import { Button, Stack, Text } from '@/shared/ui'
+import { Button, ResponsiveImage, Stack, Text } from '@/shared/ui'
 
 interface ImageFieldInputProps {
   id: string
@@ -67,9 +67,10 @@ export function ImageFieldInput({ id, label, value, disabled, onChange }: ImageF
       </div>
       {uploadMutation.isError && <Text muted>{t('admin.media.uploadError')}</Text>}
       {value !== '' && (
-        <img
+        <ResponsiveImage
           src={value}
           alt={t('admin.media.imagePreview')}
+          sizes="(max-width: 768px) 100vw, 24rem"
           className="mt-1 max-h-48 max-w-full rounded-md border border-border object-contain"
         />
       )}
