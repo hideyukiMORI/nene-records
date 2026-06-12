@@ -26,8 +26,12 @@ export function MediaPage() {
         onUpload={page.uploadFiles}
         copiedId={page.copiedId}
         onCopy={page.copyUrl}
+        onUpdateAlt={page.updateAlt}
         deleteTarget={page.deleteTarget}
         isDeleting={page.isDeleting}
+        usages={page.usages}
+        hasUsages={page.hasUsages}
+        isLoadingUsages={page.isLoadingUsages}
         onRequestDelete={page.requestDelete}
         onCancelDelete={page.cancelDelete}
         onConfirmDelete={page.confirmDelete}

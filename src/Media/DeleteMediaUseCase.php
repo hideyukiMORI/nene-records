@@ -8,6 +8,7 @@ final readonly class DeleteMediaUseCase implements DeleteMediaUseCaseInterface
 {
     public function __construct(
         private MediaRepositoryInterface $media,
+        private StorageInterface $storage,
     ) {
     }
 
@@ -19,11 +20,19 @@ final readonly class DeleteMediaUseCase implements DeleteMediaUseCaseInterface
             throw new MediaNotFoundException($input->id);
         }
 
-        // Delete physical file (best-effort — don't fail if already removed)
-        $absolutePath = rtrim($input->storageRoot, '/') . '/' . ltrim($media->url, '/media/');
-        if (is_file($absolutePath)) {
-            @unlink($absolutePath);
+        // Guard against orphaning references: block deletion while any entity
+        // field still points at this media URL.
+        $usages = $this->media->findUsages($media->url);
+        if ($usages !== []) {
+            throw new MediaInUseException($input->id, $usages);
         }
+
+        // Prefer the persisted storage key; fall back to reverse-parsing the URL
+        // for rows created before storage_key existed.
+        $key = $media->storageKey !== '' ? $media->storageKey : $this->storage->keyFromUrl($media->url);
+
+        // Best-effort: the storage driver tolerates an already-removed object.
+        $this->storage->delete($key);
 
         $this->media->delete($input->id);
     }

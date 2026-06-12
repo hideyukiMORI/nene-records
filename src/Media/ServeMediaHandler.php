@@ -13,7 +13,7 @@ use Psr\Http\Message\StreamFactoryInterface;
 final readonly class ServeMediaHandler
 {
     public function __construct(
-        private string $storageRoot,
+        private StorageInterface $storage,
         private ResponseFactoryInterface $responseFactory,
         private StreamFactoryInterface $streamFactory,
     ) {
@@ -36,18 +36,17 @@ final readonly class ServeMediaHandler
             return $this->responseFactory->createResponse(404);
         }
 
-        $path = $this->storageRoot . '/' . $year . '/' . $month . '/' . $filename;
+        $key = $year . '/' . $month . '/' . $filename;
 
-        if (!is_file($path)) {
+        if (!$this->storage->exists($key)) {
             return $this->responseFactory->createResponse(404);
         }
 
-        $mimeType = mime_content_type($path) ?: 'application/octet-stream';
-        $stream = $this->streamFactory->createStreamFromFile($path);
+        $stream = $this->streamFactory->createStreamFromResource($this->storage->readStream($key));
 
         return $this->responseFactory->createResponse(200)
-            ->withHeader('Content-Type', $mimeType)
-            ->withHeader('Content-Length', (string) filesize($path))
+            ->withHeader('Content-Type', $this->storage->mimeType($key))
+            ->withHeader('Content-Length', (string) $this->storage->size($key))
             ->withHeader('Cache-Control', 'public, max-age=31536000, immutable')
             ->withBody($stream);
     }

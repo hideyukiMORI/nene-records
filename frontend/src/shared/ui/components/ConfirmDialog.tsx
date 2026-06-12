@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { Button } from '@/shared/ui/primitives/Button'
 import { Stack } from '@/shared/ui/primitives/Stack'
 import { Text } from '@/shared/ui/primitives/Text'
@@ -10,6 +11,8 @@ export interface ConfirmDialogProps {
   confirmLabel?: string
   cancelLabel?: string
   isPending?: boolean
+  confirmDisabled?: boolean
+  children?: ReactNode
   onConfirm: () => void
   onCancel: () => void
 }
@@ -17,7 +20,8 @@ export interface ConfirmDialogProps {
 /**
  * ConfirmDialog — destructive or important action confirmation.
  *
- * In:  open, title, description, confirmLabel, cancelLabel, isPending
+ * In:  open, title, description, confirmLabel, cancelLabel, isPending,
+ *      confirmDisabled, children (extra content under the description)
  * Out: onConfirm(), onCancel()
  *
  * Does not: perform mutations or know entity ids.
@@ -30,6 +34,8 @@ export function ConfirmDialog({
   confirmLabel = 'Confirm',
   cancelLabel = 'Cancel',
   isPending = false,
+  confirmDisabled = false,
+  children,
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
@@ -58,6 +64,7 @@ export function ConfirmDialog({
             </Text>
             {description !== undefined ? <Text muted>{description}</Text> : null}
           </Stack>
+          {children}
           {errorDetail !== null ? (
             <div
               role="alert"
@@ -70,7 +77,7 @@ export function ConfirmDialog({
             <Button variant="secondary" disabled={isPending} onClick={onCancel}>
               {cancelLabel}
             </Button>
-            <Button variant="danger" disabled={isPending} onClick={onConfirm}>
+            <Button variant="danger" disabled={isPending || confirmDisabled} onClick={onConfirm}>
               {confirmLabel}
             </Button>
           </Stack>

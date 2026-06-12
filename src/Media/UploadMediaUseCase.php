@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace NeNeRecords\Media;
 
-use RuntimeException;
-
 final readonly class UploadMediaUseCase implements UploadMediaUseCaseInterface
 {
     /** @var list<string> */
@@ -41,7 +39,7 @@ final readonly class UploadMediaUseCase implements UploadMediaUseCaseInterface
 
     public function __construct(
         private MediaRepositoryInterface $mediaRepository,
-        private string $storageRoot,
+        private StorageInterface $storage,
     ) {
     }
 
@@ -55,27 +53,17 @@ final readonly class UploadMediaUseCase implements UploadMediaUseCaseInterface
             throw new MediaTooLargeException($input->size, self::MAX_SIZE_BYTES);
         }
 
-        $year = date('Y');
-        $month = date('m');
         $ext = $this->extensionForMimeType($input->mimeType);
         $storedName = bin2hex(random_bytes(16)) . '.' . $ext;
-        $relativePath = $year . '/' . $month . '/' . $storedName;
-        $absoluteDir = $this->storageRoot . '/' . $year . '/' . $month;
+        $key = date('Y') . '/' . date('m') . '/' . $storedName;
 
-        if (!is_dir($absoluteDir) && !mkdir($absoluteDir, 0755, true) && !is_dir($absoluteDir)) {
-            throw new RuntimeException('Failed to create media directory: ' . $absoluteDir);
-        }
+        // Read pixel dimensions from the header only (no full decode) before the
+        // temp file is moved into storage. Returns null for non-image uploads.
+        [$width, $height] = $this->imageDimensions($input->tmpPath);
 
-        $dest = $this->storageRoot . '/' . $relativePath;
+        $this->storage->writeFromUpload($key, $input->tmpPath);
 
-        if (!move_uploaded_file($input->tmpPath, $dest)) {
-            // Fallback for test environments where move_uploaded_file is not available
-            if (!copy($input->tmpPath, $dest)) {
-                throw new RuntimeException('Failed to move uploaded file to: ' . $dest);
-            }
-        }
-
-        $url = '/media/' . $relativePath;
+        $url = $this->storage->publicUrl($key);
         $now = date('Y-m-d H:i:s');
 
         $media = new Media(
@@ -86,6 +74,9 @@ final readonly class UploadMediaUseCase implements UploadMediaUseCaseInterface
             size: $input->size,
             url: $url,
             createdAt: $now,
+            storageKey: $key,
+            width: $width,
+            height: $height,
         );
 
         $id = $this->mediaRepository->save($media);
@@ -97,7 +88,23 @@ final readonly class UploadMediaUseCase implements UploadMediaUseCaseInterface
             mimeType: $input->mimeType,
             size: $input->size,
             createdAt: $now,
+            width: $width,
+            height: $height,
         );
+    }
+
+    /**
+     * @return array{0: ?int, 1: ?int}
+     */
+    private function imageDimensions(string $path): array
+    {
+        $info = @getimagesize($path);
+
+        if ($info === false) {
+            return [null, null];
+        }
+
+        return [$info[0], $info[1]];
     }
 
     private function extensionForMimeType(string $mimeType): string

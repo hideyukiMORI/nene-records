@@ -2441,11 +2441,43 @@ paths:
         '413':
           $ref: '#/components/responses/PayloadTooLarge'
   /api/v1/media/{id}:
+    patch:
+      tags:
+        - Media
+      summary: Update media metadata
+      description: Updates editable media metadata. Currently the alt text only; a blank value clears it.
+      operationId: updateMedia
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMediaRequest'
+      responses:
+        '200':
+          description: Updated media item.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MediaResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     delete:
       tags:
         - Media
       summary: Delete media item
-      description: Deletes a media item and its physical file from storage.
+      description: Deletes a media item and its physical file. Blocked with 409 while the media is still referenced by any entity field.
       operationId: deleteMedia
       parameters:
         - name: id
@@ -2457,6 +2489,33 @@ paths:
       responses:
         '204':
           description: Media deleted.
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/MediaInUse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/media/{id}/usages:
+    get:
+      tags:
+        - Media
+      summary: List media usages (reverse-lookup)
+      description: Returns the entity fields that reference this media item (image/file fields and markdown bodies), scoped to the caller's organization.
+      operationId: listMediaUsages
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Usage list (possibly empty).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MediaUsageListResponse'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -3326,6 +3385,34 @@ components:
                 status: 409
                 detail: The slug is already in use.
                 instance: /api/v1/entity-types
+    MediaInUse:
+      description: The media item is still referenced by one or more entity fields and cannot be deleted.
+      content:
+        application/problem+json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ProblemDetails'
+              - type: object
+                properties:
+                  usages:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MediaUsage'
+          examples:
+            mediaInUse:
+              value:
+                type: https://nene-records.dev/problems/media-in-use
+                title: Media in use
+                status: 409
+                detail: Media 1 is still in use by 1 field(s).
+                instance: /api/v1/media/1
+                usages:
+                  - entity_id: 7
+                    entity_type_slug: post
+                    entity_slug: hello-world
+                    status: published
+                    field_key: cover
+                    title: Hello World
     Gone:
       description: The target resource is no longer available (e.g. an expired token).
       content:
@@ -3849,6 +3936,20 @@ components:
         size:
           type: integer
           minimum: 0
+        width:
+          type: integer
+          minimum: 0
+          nullable: true
+          description: Pixel width for images; null for non-image files.
+        height:
+          type: integer
+          minimum: 0
+          nullable: true
+          description: Pixel height for images; null for non-image files.
+        alt_text:
+          type: string
+          nullable: true
+          description: Alternative text for accessibility / SEO.
         created_at:
           type: string
           format: date-time
@@ -3861,6 +3962,53 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/MediaResponse'
+    MediaUsage:
+      type: object
+      required:
+        - entity_id
+        - entity_type_slug
+        - entity_slug
+        - status
+        - field_key
+        - title
+      properties:
+        entity_id:
+          type: integer
+          format: int64
+        entity_type_slug:
+          type: string
+          minLength: 1
+          description: Slug of the entity type that owns the referencing entity.
+        entity_slug:
+          type: string
+          description: Slug of the referencing entity.
+        status:
+          type: string
+          description: Publish status of the referencing entity (e.g. draft / published).
+        field_key:
+          type: string
+          minLength: 1
+          description: Field key whose stored value references the media URL.
+        title:
+          type: string
+          nullable: true
+          description: Title of the referencing entity, when it has a title field.
+    MediaUsageListResponse:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/MediaUsage'
+    UpdateMediaRequest:
+      type: object
+      properties:
+        alt_text:
+          type: string
+          nullable: true
+          description: Alternative text. A blank or null value clears it.
     EntityResponse:
       type: object
       required:

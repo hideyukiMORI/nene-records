@@ -9,12 +9,21 @@ use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RuntimeApplicationFactory;
 use NeNeRecords\Media\DeleteMediaHandler;
 use NeNeRecords\Media\DeleteMediaUseCase;
+use NeNeRecords\Media\FindMediaUsagesUseCase;
+use NeNeRecords\Media\GdImageProcessor;
 use NeNeRecords\Media\ListMediaHandler;
+use NeNeRecords\Media\ListMediaUsagesHandler;
 use NeNeRecords\Media\ListMediaUseCase;
+use NeNeRecords\Media\LocalStorage;
 use NeNeRecords\Media\Media;
+use NeNeRecords\Media\MediaInUseExceptionHandler;
 use NeNeRecords\Media\MediaNotFoundExceptionHandler;
 use NeNeRecords\Media\MediaRouteRegistrar;
+use NeNeRecords\Media\MediaUsage;
+use NeNeRecords\Media\ServeDerivativeHandler;
 use NeNeRecords\Media\ServeMediaHandler;
+use NeNeRecords\Media\UpdateMediaAltHandler;
+use NeNeRecords\Media\UpdateMediaAltUseCase;
 use NeNeRecords\Media\UploadMediaHandler;
 use NeNeRecords\Media\UploadMediaUseCase;
 use Nyholm\Psr7\Factory\Psr17Factory;
@@ -27,6 +36,7 @@ final class MediaHttpTest extends TestCase
     private Psr17Factory $factory;
     private InMemoryMediaRepository $repository;
     private string $storageRoot;
+    private LocalStorage $storage;
     private RequestHandlerInterface $application;
 
     protected function setUp(): void
@@ -36,6 +46,7 @@ final class MediaHttpTest extends TestCase
         $this->factory = new Psr17Factory();
         $this->storageRoot = sys_get_temp_dir() . '/nene-media-test-' . bin2hex(random_bytes(4));
         mkdir($this->storageRoot, 0755, true);
+        $this->storage = new LocalStorage($this->storageRoot);
 
         $this->repository = new InMemoryMediaRepository([
             new Media(
@@ -63,7 +74,7 @@ final class MediaHttpTest extends TestCase
 
         $registrar = new MediaRouteRegistrar(
             new UploadMediaHandler(
-                new UploadMediaUseCase($this->repository, $this->storageRoot),
+                new UploadMediaUseCase($this->repository, $this->storage),
                 $jsonResponse,
             ),
             new ListMediaHandler(
@@ -71,11 +82,19 @@ final class MediaHttpTest extends TestCase
                 $jsonResponse,
             ),
             new DeleteMediaHandler(
-                new DeleteMediaUseCase($this->repository),
+                new DeleteMediaUseCase($this->repository, $this->storage),
                 $this->factory,
-                $this->storageRoot,
             ),
-            new ServeMediaHandler($this->storageRoot, $this->factory, $this->factory),
+            new ServeMediaHandler($this->storage, $this->factory, $this->factory),
+            new UpdateMediaAltHandler(
+                new UpdateMediaAltUseCase($this->repository),
+                $jsonResponse,
+            ),
+            new ServeDerivativeHandler($this->storage, new GdImageProcessor(), $this->factory, $this->factory),
+            new ListMediaUsagesHandler(
+                new FindMediaUsagesUseCase($this->repository),
+                $jsonResponse,
+            ),
         );
 
         $this->application = (new RuntimeApplicationFactory(
@@ -83,6 +102,7 @@ final class MediaHttpTest extends TestCase
             $this->factory,
             domainExceptionHandlers: [
                 new MediaNotFoundExceptionHandler($problemDetails),
+                new MediaInUseExceptionHandler($problemDetails),
             ],
             routeRegistrars: [$registrar],
         ))->create();
@@ -145,10 +165,13 @@ final class MediaHttpTest extends TestCase
         $problemDetails = new ProblemDetailsResponseFactory($this->factory, $this->factory);
 
         $registrar = new MediaRouteRegistrar(
-            new UploadMediaHandler(new UploadMediaUseCase($emptyRepo, $this->storageRoot), $jsonResponse),
+            new UploadMediaHandler(new UploadMediaUseCase($emptyRepo, $this->storage), $jsonResponse),
             new ListMediaHandler(new ListMediaUseCase($emptyRepo), $jsonResponse),
-            new DeleteMediaHandler(new DeleteMediaUseCase($emptyRepo), $this->factory, $this->storageRoot),
-            new ServeMediaHandler($this->storageRoot, $this->factory, $this->factory),
+            new DeleteMediaHandler(new DeleteMediaUseCase($emptyRepo, $this->storage), $this->factory),
+            new ServeMediaHandler($this->storage, $this->factory, $this->factory),
+            new UpdateMediaAltHandler(new UpdateMediaAltUseCase($emptyRepo), $jsonResponse),
+            new ServeDerivativeHandler($this->storage, new GdImageProcessor(), $this->factory, $this->factory),
+            new ListMediaUsagesHandler(new FindMediaUsagesUseCase($emptyRepo), $jsonResponse),
         );
 
         $app = (new RuntimeApplicationFactory(
@@ -217,6 +240,229 @@ final class MediaHttpTest extends TestCase
         );
 
         self::assertFileDoesNotExist($filePath);
+    }
+
+    // ── Usages (reverse-lookup) ──────────────────────────────────────────────
+
+    public function testGetMediaUsagesReturnsReferencingEntities(): void
+    {
+        $this->repository->setUsages('/media/2026/05/abc123.jpg', [
+            new MediaUsage(
+                entityId: 7,
+                entityTypeSlug: 'post',
+                entitySlug: 'hello-world',
+                status: 'published',
+                fieldKey: 'cover',
+                title: 'Hello World',
+            ),
+        ]);
+
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/api/v1/media/1/usages'),
+        );
+        $payload = $this->decodeJson($response);
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertCount(1, $payload['items']);
+        self::assertSame(7, $payload['items'][0]['entity_id']);
+        self::assertSame('post', $payload['items'][0]['entity_type_slug']);
+        self::assertSame('cover', $payload['items'][0]['field_key']);
+        self::assertSame('Hello World', $payload['items'][0]['title']);
+    }
+
+    public function testGetMediaUsagesReturnsEmptyWhenUnused(): void
+    {
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/api/v1/media/1/usages'),
+        );
+        $payload = $this->decodeJson($response);
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame([], $payload['items']);
+    }
+
+    public function testGetUsagesForMissingMediaReturns404(): void
+    {
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/api/v1/media/999/usages'),
+        );
+
+        self::assertSame(404, $response->getStatusCode());
+    }
+
+    public function testDeleteInUseMediaReturns409WithUsages(): void
+    {
+        $this->repository->setUsages('/media/2026/05/abc123.jpg', [
+            new MediaUsage(
+                entityId: 7,
+                entityTypeSlug: 'post',
+                entitySlug: 'hello-world',
+                status: 'published',
+                fieldKey: 'cover',
+                title: 'Hello World',
+            ),
+        ]);
+
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('DELETE', 'https://example.test/api/v1/media/1'),
+        );
+        $payload = $this->decodeJson($response);
+
+        self::assertSame(409, $response->getStatusCode());
+        self::assertSame('media-in-use', basename($payload['type']));
+        self::assertCount(1, $payload['usages']);
+        self::assertSame(7, $payload['usages'][0]['entity_id']);
+        // The media row must survive a blocked delete.
+        self::assertNotNull($this->repository->findById(1));
+    }
+
+    // ── Update alt text ───────────────────────────────────────────────────────
+
+    public function testUpdateMediaAltSetsAltText(): void
+    {
+        $body = $this->factory->createStream(json_encode(['alt_text' => 'A red car'], JSON_THROW_ON_ERROR));
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('PATCH', 'https://example.test/api/v1/media/1')->withBody($body),
+        );
+        $payload = $this->decodeJson($response);
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('A red car', $payload['alt_text']);
+        self::assertSame('A red car', $this->repository->findById(1)?->altText);
+    }
+
+    public function testUpdateMediaAltClearsAltTextWhenBlank(): void
+    {
+        $this->repository->updateAltText(1, 'existing');
+
+        $body = $this->factory->createStream(json_encode(['alt_text' => '   '], JSON_THROW_ON_ERROR));
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('PATCH', 'https://example.test/api/v1/media/1')->withBody($body),
+        );
+        $payload = $this->decodeJson($response);
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertNull($payload['alt_text']);
+        self::assertNull($this->repository->findById(1)?->altText);
+    }
+
+    public function testUpdateMediaAltOnMissingReturns404(): void
+    {
+        $body = $this->factory->createStream(json_encode(['alt_text' => 'x'], JSON_THROW_ON_ERROR));
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('PATCH', 'https://example.test/api/v1/media/999')->withBody($body),
+        );
+
+        self::assertSame(404, $response->getStatusCode());
+    }
+
+    public function testListItemsExposeDimensionAndAltKeys(): void
+    {
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/api/v1/media'),
+        );
+        $item = $this->decodeJson($response)['items'][0];
+
+        self::assertArrayHasKey('width', $item);
+        self::assertArrayHasKey('height', $item);
+        self::assertArrayHasKey('alt_text', $item);
+    }
+
+    // ── Derivatives ────────────────────────────────────────────────────────────
+
+    public function testDerivativeGeneratesResizedImageAndCachesIt(): void
+    {
+        $this->seedStorageImage('2026/05/pic.png', 800, 400);
+
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/media/sm/2026/05/pic.png'),
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('image/png', $response->getHeaderLine('Content-Type'));
+
+        $info = getimagesizefromstring((string) $response->getBody());
+        self::assertNotFalse($info);
+        self::assertSame(320, $info[0], 'sm preset constrains width to 320');
+        self::assertSame(160, $info[1]);
+
+        self::assertFileExists($this->storageRoot . '/derivatives/sm/png/2026/05/pic.png');
+    }
+
+    public function testDerivativeNegotiatesWebpFromAcceptHeader(): void
+    {
+        $this->seedStorageImage('2026/05/pic.png', 200, 200);
+
+        $response = $this->application->handle(
+            $this->factory
+                ->createServerRequest('GET', 'https://example.test/media/thumb/2026/05/pic.png')
+                ->withHeader('Accept', 'image/avif,image/webp,image/*'),
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+        // libavif is not guaranteed in CI; AVIF is preferred but at least webp/avif, not png.
+        self::assertContains($response->getHeaderLine('Content-Type'), ['image/avif', 'image/webp']);
+    }
+
+    public function testDerivativeWithFormatOverrideReturnsWebp(): void
+    {
+        $this->seedStorageImage('2026/05/pic.png', 200, 200);
+
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/media/thumb/2026/05/pic.png?fm=webp'),
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('image/webp', $response->getHeaderLine('Content-Type'));
+    }
+
+    public function testDerivativeWithUnknownPresetReturns404(): void
+    {
+        $this->seedStorageImage('2026/05/pic.png', 200, 200);
+
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/media/huge/2026/05/pic.png'),
+        );
+
+        self::assertSame(404, $response->getStatusCode());
+    }
+
+    public function testDerivativeForMissingOriginalReturns404(): void
+    {
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/media/sm/2026/05/nope.png'),
+        );
+
+        self::assertSame(404, $response->getStatusCode());
+    }
+
+    public function testDerivativeForUndecodableSourceReturns404(): void
+    {
+        // A file with an image extension but non-image bytes must not 500.
+        $dir = $this->storageRoot . '/2026/05';
+        mkdir($dir, 0755, true);
+        file_put_contents($dir . '/broken.png', 'not really a png');
+
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/media/sm/2026/05/broken.png'),
+        );
+
+        self::assertSame(404, $response->getStatusCode());
+    }
+
+    /**
+     * @param positive-int $width
+     * @param positive-int $height
+     */
+    private function seedStorageImage(string $key, int $width, int $height): void
+    {
+        $image = imagecreatetruecolor($width, $height);
+        self::assertNotFalse($image);
+        imagefilledrectangle($image, 0, 0, $width, $height, (int) imagecolorallocate($image, 10, 120, 200));
+        $dir = $this->storageRoot . '/' . dirname($key);
+        mkdir($dir, 0755, true);
+        imagepng($image, $this->storageRoot . '/' . $key);
+        imagedestroy($image);
     }
 
     /** @return array<string, mixed> */

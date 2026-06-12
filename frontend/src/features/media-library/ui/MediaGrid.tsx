@@ -1,6 +1,6 @@
 import type { Media } from '@/entities/media'
 import { useTranslation } from '@/shared/i18n'
-import { Button, Card, EmptyState, ErrorState, LoadingState } from '@/shared/ui'
+import { Button, Card, EmptyState, ErrorState, LoadingState, ResponsiveImage } from '@/shared/ui'
 import { IconCopy, IconImage } from '@/shared/ui/icons/Icons'
 
 export interface MediaGridProps {
@@ -11,6 +11,7 @@ export interface MediaGridProps {
   copiedId: number | null
   onRetry: () => void
   onCopy: (media: Media) => void
+  onUpdateAlt: (media: Media, altText: string) => void
   onDelete: (media: Media) => void
 }
 
@@ -32,6 +33,7 @@ export function MediaGrid({
   copiedId,
   onRetry,
   onCopy,
+  onUpdateAlt,
   onDelete,
 }: MediaGridProps) {
   const { t } = useTranslation()
@@ -70,11 +72,11 @@ export function MediaGrid({
           {/* Thumbnail */}
           <div className="flex h-32 items-center justify-center bg-surface-overlay">
             {isImageMime(media.mimeType) ? (
-              <img
+              <ResponsiveImage
                 src={media.url}
-                alt={media.originalName}
+                alt={media.altText ?? media.originalName}
+                sizes="(max-width: 640px) 50vw, 20vw"
                 className="h-full w-full object-cover"
-                loading="lazy"
               />
             ) : (
               <IconImage size={32} className="text-text-muted" />
@@ -89,7 +91,22 @@ export function MediaGrid({
             >
               {media.originalName}
             </div>
-            <div className="text-caption text-text-muted">{formatBytes(media.size)}</div>
+            <div className="text-caption text-text-muted">
+              {formatBytes(media.size)}
+              {media.width !== null && media.height !== null
+                ? ` · ${String(media.width)}×${String(media.height)}`
+                : ''}
+            </div>
+            <input
+              type="text"
+              defaultValue={media.altText ?? ''}
+              placeholder={t('admin.media.alt.placeholder')}
+              aria-label={t('admin.media.alt.label')}
+              onBlur={(e) => {
+                onUpdateAlt(media, e.target.value)
+              }}
+              className="mt-1 w-full rounded border border-border bg-surface px-1.5 py-1 text-caption text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none"
+            />
           </div>
 
           {/* Actions overlay */}
