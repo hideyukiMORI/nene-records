@@ -13,3 +13,16 @@ export interface Media {
 export interface MediaList {
   items: Media[]
 }
+
+export interface MediaUsage {
+  entityId: number
+  entityTypeSlug: string
+  entitySlug: string
+  status: string
+  fieldKey: string
+  title: string | null
+}
+
+export interface MediaUsageList {
+  items: MediaUsage[]
+}

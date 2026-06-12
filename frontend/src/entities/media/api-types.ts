@@ -13,3 +13,16 @@ export interface MediaDto {
 export interface MediaListDto {
   items: MediaDto[]
 }
+
+export interface MediaUsageDto {
+  entity_id: number
+  entity_type_slug: string
+  entity_slug: string
+  status: string
+  field_key: string
+  title: string | null
+}
+
+export interface MediaUsageListDto {
+  items: MediaUsageDto[]
+}

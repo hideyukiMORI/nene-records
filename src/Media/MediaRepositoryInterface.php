@@ -15,5 +15,13 @@ interface MediaRepositoryInterface
 
     public function updateAltText(int $id, ?string $altText): void;
 
+    /**
+     * Reverse-lookup: find every entity field whose stored value references the
+     * given media URL (image / file fields and markdown bodies). Org-scoped.
+     *
+     * @return list<MediaUsage>
+     */
+    public function findUsages(string $url): array;
+
     public function delete(int $id): void;
 }

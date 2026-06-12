@@ -467,6 +467,9 @@ export const en = {
   'admin.media.delete.confirmTitle': 'Delete file?',
   'admin.media.delete.confirmDescription': 'Delete "{{name}}"? This cannot be undone.',
   'admin.media.delete.deleting': 'Deleting…',
+  'admin.media.usages.loading': 'Checking where this file is used…',
+  'admin.media.usages.blocked':
+    'In use by {{count}} field(s). Remove the references below before deleting.',
 
   // ── Users ────────────────────────────────────────────────────────────────
   'admin.users.pageTitle': 'Users',

@@ -103,6 +103,18 @@ final readonly class MediaServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(
+                FindMediaUsagesUseCaseInterface::class,
+                static function (ContainerInterface $c): FindMediaUsagesUseCaseInterface {
+                    $repository = $c->get(MediaRepositoryInterface::class);
+
+                    if (!$repository instanceof MediaRepositoryInterface) {
+                        throw new LogicException('Media repository service is invalid.');
+                    }
+
+                    return new FindMediaUsagesUseCase($repository);
+                },
+            )
+            ->set(
                 DeleteMediaUseCaseInterface::class,
                 static function (ContainerInterface $c): DeleteMediaUseCaseInterface {
                     $repository = $c->get(MediaRepositoryInterface::class);
@@ -185,6 +197,23 @@ final readonly class MediaServiceProvider implements ServiceProviderInterface
                     }
 
                     return new UpdateMediaAltHandler($useCase, $response);
+                },
+            )
+            ->set(
+                ListMediaUsagesHandler::class,
+                static function (ContainerInterface $c): ListMediaUsagesHandler {
+                    $useCase = $c->get(FindMediaUsagesUseCaseInterface::class);
+                    $response = $c->get(JsonResponseFactory::class);
+
+                    if (!$useCase instanceof FindMediaUsagesUseCaseInterface) {
+                        throw new LogicException('FindMediaUsages use case service is invalid.');
+                    }
+
+                    if (!$response instanceof JsonResponseFactory) {
+                        throw new LogicException('JSON response factory service is invalid.');
+                    }
+
+                    return new ListMediaUsagesHandler($useCase, $response);
                 },
             )
             ->set(
@@ -273,6 +302,18 @@ final readonly class MediaServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(
+                MediaInUseExceptionHandler::class,
+                static function (ContainerInterface $c): MediaInUseExceptionHandler {
+                    $problemDetails = $c->get(ProblemDetailsResponseFactory::class);
+
+                    if (!$problemDetails instanceof ProblemDetailsResponseFactory) {
+                        throw new LogicException('Problem details response factory service is invalid.');
+                    }
+
+                    return new MediaInUseExceptionHandler($problemDetails);
+                },
+            )
+            ->set(
                 'nene-records.route_registrar.media',
                 static function (ContainerInterface $c): MediaRouteRegistrar {
                     $upload = $c->get(UploadMediaHandler::class);
@@ -281,6 +322,7 @@ final readonly class MediaServiceProvider implements ServiceProviderInterface
                     $serve = $c->get(ServeMediaHandler::class);
                     $updateAlt = $c->get(UpdateMediaAltHandler::class);
                     $serveDerivative = $c->get(ServeDerivativeHandler::class);
+                    $usages = $c->get(ListMediaUsagesHandler::class);
 
                     if (!$upload instanceof UploadMediaHandler) {
                         throw new LogicException('UploadMedia handler service is invalid.');
@@ -306,7 +348,11 @@ final readonly class MediaServiceProvider implements ServiceProviderInterface
                         throw new LogicException('ServeDerivative handler service is invalid.');
                     }
 
-                    return new MediaRouteRegistrar($upload, $list, $delete, $serve, $updateAlt, $serveDerivative);
+                    if (!$usages instanceof ListMediaUsagesHandler) {
+                        throw new LogicException('ListMediaUsages handler service is invalid.');
+                    }
+
+                    return new MediaRouteRegistrar($upload, $list, $delete, $serve, $updateAlt, $serveDerivative, $usages);
                 },
             );
     }

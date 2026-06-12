@@ -469,6 +469,9 @@ export const ja: Partial<MessageCatalog> = {
   'admin.media.delete.confirmTitle': 'ファイルを削除しますか？',
   'admin.media.delete.confirmDescription': '「{{name}}」を削除しますか？この操作は元に戻せません。',
   'admin.media.delete.deleting': '削除中…',
+  'admin.media.usages.loading': 'このファイルの使用箇所を確認しています…',
+  'admin.media.usages.blocked':
+    '{{count}} 件のフィールドで使用中です。削除する前に下記の参照を解除してください。',
 
   // ── Users ────────────────────────────────────────────────────────────────
   'admin.users.pageTitle': 'ユーザー',
