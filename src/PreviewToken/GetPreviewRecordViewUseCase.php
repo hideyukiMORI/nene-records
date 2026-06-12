@@ -81,7 +81,7 @@ final readonly class GetPreviewRecordViewUseCase implements GetPreviewRecordView
             $fieldDefRows,
         )));
 
-        $textFieldRows = (in_array('text', $dataTypes, true) || in_array('markdown', $dataTypes, true) || in_array('html', $dataTypes, true) || in_array('image', $dataTypes, true) || in_array('file', $dataTypes, true))
+        $textFieldRows = (in_array('text', $dataTypes, true) || in_array('markdown', $dataTypes, true) || in_array('html', $dataTypes, true) || in_array('bundle', $dataTypes, true) || in_array('image', $dataTypes, true) || in_array('file', $dataTypes, true))
             ? $this->textFields->findByEntityId($entityId, self::FIELD_VALUE_LIMIT, 0)
             : [];
         $intFieldRows = in_array('int', $dataTypes, true)
@@ -238,7 +238,7 @@ final readonly class GetPreviewRecordViewUseCase implements GetPreviewRecordView
             }
 
             $raw = match ($fieldDef->dataType) {
-                'text', 'markdown', 'html', 'image', 'file' => $this->findTextValue($textFieldRows, $fieldDef->fieldKey),
+                'text', 'markdown', 'html', 'bundle', 'image', 'file' => $this->findTextValue($textFieldRows, $fieldDef->fieldKey),
                 'int' => $this->findIntValue($intFieldRows, $fieldDef->fieldKey),
                 'enum' => $this->findEnumValue($enumFieldRows, $fieldDef->fieldKey),
                 'bool' => $this->findBoolValue($boolFieldRows, $fieldDef->fieldKey),

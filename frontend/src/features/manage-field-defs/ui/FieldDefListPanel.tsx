@@ -8,6 +8,7 @@ const DATA_TYPE_LABEL_KEYS: Record<FieldDataType, MessageKey> = {
   text: 'admin.fieldDefs.dataType.text',
   markdown: 'admin.fieldDefs.dataType.markdown',
   html: 'admin.fieldDefs.dataType.html',
+  bundle: 'admin.fieldDefs.dataType.bundle',
   int: 'admin.fieldDefs.dataType.int',
   enum: 'admin.fieldDefs.dataType.enum',
   bool: 'admin.fieldDefs.dataType.bool',

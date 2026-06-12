@@ -7,8 +7,9 @@
  * - two-col:   header / [main | sidebar] / footer
  * - three-col: header / [main | sidebar | aside] / footer
  * - bare:      no header/footer, no theme — fully custom page
+ * - custom:    full-width host for a sandboxed bundle field + crawlable text
  */
-export type PublicLayoutKey = 'standard' | 'full' | 'two-col' | 'three-col' | 'bare'
+export type PublicLayoutKey = 'standard' | 'full' | 'two-col' | 'three-col' | 'bare' | 'custom'
 
 export const PUBLIC_LAYOUT_KEYS: readonly PublicLayoutKey[] = [
   'standard',
@@ -16,6 +17,7 @@ export const PUBLIC_LAYOUT_KEYS: readonly PublicLayoutKey[] = [
   'two-col',
   'three-col',
   'bare',
+  'custom',
 ]
 
 export const DEFAULT_PUBLIC_LAYOUT: PublicLayoutKey = 'standard'
@@ -34,6 +36,7 @@ const LAYOUT_REGIONS: Record<PublicLayoutKey, readonly ContentRegion[]> = {
   'two-col': ['main', 'sidebar'],
   'three-col': ['main', 'sidebar', 'aside'],
   bare: ['main'],
+  custom: ['main'],
 }
 
 export function layoutRegions(layout: PublicLayoutKey): readonly ContentRegion[] {

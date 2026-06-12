@@ -3854,7 +3854,7 @@ components:
           description: 'Previous URL pattern, automatically saved when permalink_pattern changes. Used to redirect old URLs.'
         default_layout:
           type: string
-          enum: [standard, full, bare]
+          enum: [standard, full, two-col, three-col, bare, custom]
           description: 'Default public-page layout (scaffold preset) for records of this type. Overridable per entity.'
     CreateEntityTypeRequest:
       type: object
@@ -3895,7 +3895,7 @@ components:
           description: 'URL pattern. Must contain {slug} or {id}. Must start with /.'
         default_layout:
           type: string
-          enum: [standard, full, bare]
+          enum: [standard, full, two-col, three-col, bare, custom]
           description: 'Default public-page layout for records of this type. Defaults to standard.'
       additionalProperties: false
     ReorderEntityTypesRequest:
@@ -4062,7 +4062,7 @@ components:
           type:
             - string
             - 'null'
-          enum: [standard, full, bare, null]
+          enum: [standard, full, two-col, three-col, bare, custom, null]
           description: 'Per-entity layout override. Null = inherit the type''s default_layout.'
         status:
           $ref: '#/components/schemas/EntityStatus'
@@ -4120,7 +4120,7 @@ components:
           type:
             - string
             - 'null'
-          enum: [standard, full, bare, null]
+          enum: [standard, full, two-col, three-col, bare, custom, null]
           description: 'Per-entity layout override. Null/omitted = inherit the type''s default_layout.'
       additionalProperties: false
     UpdateEntityRequest:
@@ -4160,7 +4160,7 @@ components:
           type:
             - string
             - 'null'
-          enum: [standard, full, bare, null]
+          enum: [standard, full, two-col, three-col, bare, custom, null]
           description: 'Per-entity layout override. Null = inherit the type''s default_layout.'
       additionalProperties: false
     ScheduleEntityRequest:
@@ -4306,6 +4306,7 @@ components:
             - text
             - markdown
             - html
+            - bundle
             - int
             - enum
             - bool
@@ -4351,6 +4352,7 @@ components:
             - text
             - markdown
             - html
+            - bundle
             - int
             - enum
             - bool

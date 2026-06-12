@@ -27,7 +27,7 @@ export function PublicLayout({ variant, site, children }: PublicLayoutProps) {
   }
 
   const mainClassName =
-    variant === 'full'
+    variant === 'full' || variant === 'custom'
       ? 'w-full flex-1 px-inline-md py-stack-lg'
       : 'mx-auto w-full max-w-3xl flex-1 px-inline-md py-stack-lg'
 

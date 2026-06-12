@@ -13,7 +13,7 @@ use NeNeRecords\FieldDef\FieldTypeMismatchException;
 final readonly class UpdateTextFieldUseCase implements UpdateTextFieldUseCaseInterface
 {
     /** Data types whose values are stored in text_fields. */
-    private const TEXT_BACKED_DATA_TYPES = ['text', 'markdown', 'html', 'image', 'file'];
+    private const TEXT_BACKED_DATA_TYPES = ['text', 'markdown', 'html', 'bundle', 'image', 'file'];
 
     public function __construct(
         private TextFieldRepositoryInterface $textFields,

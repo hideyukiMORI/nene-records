@@ -105,7 +105,7 @@ export function EntityTextFieldsForm({
             )
           }
 
-          if (fieldDef.dataType === 'html') {
+          if (fieldDef.dataType === 'html' || fieldDef.dataType === 'bundle') {
             return (
               <div key={fieldDef.fieldKey} className="flex flex-col gap-stack-xs">
                 <label
@@ -116,7 +116,7 @@ export function EntityTextFieldsForm({
                 </label>
                 <textarea
                   id={fieldId}
-                  rows={10}
+                  rows={fieldDef.dataType === 'bundle' ? 16 : 10}
                   disabled={isSubmitting}
                   value={values[fieldDef.fieldKey] ?? ''}
                   onChange={(event) => {
@@ -128,7 +128,11 @@ export function EntityTextFieldsForm({
                   className="rounded-sm border border-border bg-surface-raised px-inline-sm py-stack-xs font-mono text-caption text-text-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                 />
                 <span className="font-sans text-caption text-text-muted">
-                  {t('admin.fieldDefs.html.hint')}
+                  {t(
+                    fieldDef.dataType === 'bundle'
+                      ? 'admin.fieldDefs.bundle.hint'
+                      : 'admin.fieldDefs.html.hint',
+                  )}
                 </span>
               </div>
             )

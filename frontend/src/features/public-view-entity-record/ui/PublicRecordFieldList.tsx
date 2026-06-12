@@ -1,6 +1,6 @@
 import type { Entity } from '@/entities/entity'
 import { isMarkdownBodyField } from '@/shared/lib/is-markdown-body-field'
-import { SanitizedHtml, Text } from '@/shared/ui'
+import { SandboxedBundle, SanitizedHtml, Text } from '@/shared/ui'
 import { PublicMarkdownContent } from '@/shared/ui/markdown'
 import type { PublicFieldRow } from '../hooks/use-public-view-entity-record-page'
 import { PublicRelationFieldDisplay } from './PublicRelationFieldDisplay'
@@ -42,7 +42,11 @@ export function PublicRecordFieldList({
             <Text as="dt" variant="heading-sm">
               {row.fieldKey}
             </Text>
-            {row.dataType === 'html' ? (
+            {row.dataType === 'bundle' ? (
+              <dd>
+                <SandboxedBundle html={row.displayValue === '—' ? '' : row.displayValue} />
+              </dd>
+            ) : row.dataType === 'html' ? (
               <dd>
                 <SanitizedHtml html={row.displayValue === '—' ? '' : row.displayValue} />
               </dd>

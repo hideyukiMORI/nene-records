@@ -221,7 +221,10 @@ export const en = {
   'admin.fieldDefs.dataType.text': 'Text',
   'admin.fieldDefs.dataType.markdown': 'Markdown',
   'admin.fieldDefs.dataType.html': 'HTML (sanitized)',
+  'admin.fieldDefs.dataType.bundle': 'Bundle (sandboxed HTML/JS/CSS)',
   'admin.fieldDefs.html.hint': 'HTML with CSS is allowed; scripts are removed on display.',
+  'admin.fieldDefs.bundle.hint':
+    'A full HTML document (JS/CSS allowed). Runs isolated in a sandboxed iframe on the public page.',
   'admin.fieldDefs.dataType.int': 'Integer',
   'admin.fieldDefs.dataType.enum': 'Enum',
   'admin.fieldDefs.dataType.bool': 'Boolean',
@@ -312,6 +315,7 @@ export const en = {
   'admin.layout.twoCol': 'Two columns (main / sidebar)',
   'admin.layout.threeCol': 'Three columns (main / sidebar / aside)',
   'admin.layout.bare': 'Bare (no header/footer, custom page)',
+  'admin.layout.custom': 'Custom (sandboxed bundle + crawlable text)',
   'admin.region.label': 'Region',
   'admin.region.main': 'Main',
   'admin.region.sidebar': 'Sidebar',

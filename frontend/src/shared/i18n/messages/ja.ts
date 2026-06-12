@@ -218,7 +218,10 @@ export const ja: Partial<MessageCatalog> = {
   'admin.fieldDefs.dataType.text': 'テキスト',
   'admin.fieldDefs.dataType.markdown': 'Markdown',
   'admin.fieldDefs.dataType.html': 'HTML（サニタイズ）',
+  'admin.fieldDefs.dataType.bundle': 'バンドル（サンドボックスHTML/JS/CSS）',
   'admin.fieldDefs.html.hint': 'CSS込みのHTMLを使えます。表示時にスクリプトは除去されます。',
+  'admin.fieldDefs.bundle.hint':
+    'HTMLドキュメント一式（JS/CSS可）。公開ページではサンドボックスiframe内で隔離実行されます。',
   'admin.fieldDefs.dataType.int': '整数',
   'admin.fieldDefs.dataType.enum': '列挙型',
   'admin.fieldDefs.dataType.bool': 'ブール値',
@@ -310,6 +313,7 @@ export const ja: Partial<MessageCatalog> = {
   'admin.layout.twoCol': '2カラム（メイン / サイドバー）',
   'admin.layout.threeCol': '3カラム（メイン / サイドバー / アサイド）',
   'admin.layout.bare': 'ベア（ヘッダー・フッター無し、独自ページ）',
+  'admin.layout.custom': 'カスタム（サンドボックスバンドル＋クロール用テキスト）',
   'admin.region.label': '領域',
   'admin.region.main': 'メイン',
   'admin.region.sidebar': 'サイドバー',
