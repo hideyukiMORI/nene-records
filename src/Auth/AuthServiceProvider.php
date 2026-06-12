@@ -12,6 +12,7 @@ use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use Psr\Container\ContainerInterface;
+use Psr\Http\Message\ResponseFactoryInterface;
 
 final readonly class AuthServiceProvider implements ServiceProviderInterface
 {
@@ -66,6 +67,18 @@ final readonly class AuthServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(
+                LogoutHandler::class,
+                static function (ContainerInterface $container): LogoutHandler {
+                    $responseFactory = $container->get(ResponseFactoryInterface::class);
+
+                    if (!$responseFactory instanceof ResponseFactoryInterface) {
+                        throw new LogicException('ResponseFactoryInterface service is invalid.');
+                    }
+
+                    return new LogoutHandler($responseFactory);
+                },
+            )
+            ->set(
                 InvalidCredentialsExceptionHandler::class,
                 static function (ContainerInterface $container): InvalidCredentialsExceptionHandler {
                     $problemDetails = $container->get(ProblemDetailsResponseFactory::class);
@@ -81,12 +94,17 @@ final readonly class AuthServiceProvider implements ServiceProviderInterface
                 'nene-records.route_registrar.auth',
                 static function (ContainerInterface $container): AuthRouteRegistrar {
                     $loginHandler = $container->get(LoginHandler::class);
+                    $logoutHandler = $container->get(LogoutHandler::class);
 
                     if (!$loginHandler instanceof LoginHandler) {
                         throw new LogicException('LoginHandler service is invalid.');
                     }
 
-                    return new AuthRouteRegistrar($loginHandler);
+                    if (!$logoutHandler instanceof LogoutHandler) {
+                        throw new LogicException('LogoutHandler service is invalid.');
+                    }
+
+                    return new AuthRouteRegistrar($loginHandler, $logoutHandler);
                 },
             );
     }

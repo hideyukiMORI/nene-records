@@ -53,16 +53,40 @@ final readonly class AdminApiAuthMiddleware implements MiddlewareInterface
         }
 
         $authorization = $request->getHeaderLine('Authorization');
+        $credentialType = 'bearer';
 
-        if ($authorization === '') {
-            return $this->unauthorized($request, 'missing_token', 'No Bearer token was provided.');
+        if ($authorization !== '') {
+            if (!str_starts_with($authorization, 'Bearer ')) {
+                return $this->unauthorized($request, 'invalid_token', 'Authorization header must use the Bearer scheme.');
+            }
+
+            $token = substr($authorization, 7);
+        } else {
+            // Fall back to the HttpOnly session cookie (browser SPA).
+            $cookies = $request->getCookieParams();
+            $cookieToken = isset($cookies[SessionCookie::NAME]) && is_string($cookies[SessionCookie::NAME])
+                ? $cookies[SessionCookie::NAME]
+                : '';
+
+            if ($cookieToken === '') {
+                return $this->unauthorized($request, 'missing_token', 'No session token was provided.');
+            }
+
+            $token = $cookieToken;
+            $credentialType = 'cookie';
+
+            // CSRF: the cookie is sent automatically by the browser, so a
+            // cross-site form could trigger a state-changing request. Require a
+            // custom header that only same-origin JS sets — a cross-site form
+            // post cannot set it without a CORS preflight the API does not allow.
+            $method = strtoupper($request->getMethod());
+            if (
+                in_array($method, ['POST', 'PUT', 'PATCH', 'DELETE'], true)
+                && $request->getHeaderLine('X-Requested-With') === ''
+            ) {
+                return $this->forbiddenCsrf($request);
+            }
         }
-
-        if (!str_starts_with($authorization, 'Bearer ')) {
-            return $this->unauthorized($request, 'invalid_token', 'Authorization header must use the Bearer scheme.');
-        }
-
-        $token = substr($authorization, 7);
 
         try {
             $claims = $this->verifier->verify($token);
@@ -72,8 +96,19 @@ final readonly class AdminApiAuthMiddleware implements MiddlewareInterface
 
         return $handler->handle(
             $request
-                ->withAttribute('nene2.auth.credential_type', 'bearer')
+                ->withAttribute('nene2.auth.credential_type', $credentialType)
                 ->withAttribute('nene2.auth.claims', $claims),
+        );
+    }
+
+    private function forbiddenCsrf(ServerRequestInterface $request): ResponseInterface
+    {
+        return $this->problemDetails->create(
+            $request,
+            'csrf-protection',
+            'Forbidden',
+            403,
+            'Cookie-authenticated requests must include the X-Requested-With header.',
         );
     }
 

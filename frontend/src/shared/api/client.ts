@@ -4,6 +4,10 @@ import { AppError, parseProblemDetails } from '@/shared/api/errors'
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
 
+// Custom header required by the API for cookie-authenticated mutations (CSRF
+// defense): a cross-site form post cannot set it without a CORS preflight.
+const CSRF_HEADER: Readonly<Record<string, string>> = { 'X-Requested-With': 'fetch' }
+
 interface RequestOptions {
   method?: HttpMethod
   body?: unknown
@@ -27,14 +31,11 @@ function handleErrorResponse(response: Response, path: string): void {
 async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const base = env.apiBaseUrl.replace(/\/$/, '')
   const url = `${base}${path}`
-  const headers: Record<string, string> = {}
+  const headers: Record<string, string> = { ...CSRF_HEADER }
   if (options.body !== undefined) {
     headers['Content-Type'] = 'application/json'
   }
-  const token = authStore.getToken()
-  if (token !== null) {
-    headers['Authorization'] = `Bearer ${token}`
-  }
+  // Auth travels in the HttpOnly session cookie (sent via credentials:'include').
 
   const response = await fetch(url, {
     method: options.method ?? 'GET',
@@ -75,15 +76,10 @@ export const apiClient = {
   async upload<T>(path: string, formData: FormData): Promise<T> {
     const base = env.apiBaseUrl.replace(/\/$/, '')
     const url = `${base}${path}`
-    const headers: Record<string, string> = {}
-    const token = authStore.getToken()
-    if (token !== null) {
-      headers['Authorization'] = `Bearer ${token}`
-    }
 
     const response = await fetch(url, {
       method: 'POST',
-      headers,
+      headers: { ...CSRF_HEADER },
       body: formData,
       credentials: 'include',
     })
