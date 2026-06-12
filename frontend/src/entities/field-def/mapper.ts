@@ -27,6 +27,8 @@ export function mapFieldDefDtoToModel(dto: FieldDefDto): FieldDef {
       dto.cardinality !== undefined && isRelationCardinality(dto.cardinality)
         ? dto.cardinality
         : undefined,
+    region: dto.region ?? null,
+    displayOrder: dto.display_order ?? 0,
   }
 }
 
@@ -48,6 +50,13 @@ export function mapCreateInputToDto(input: CreateFieldDefInput): CreateFieldDefD
   if (input.dataType === 'relation') {
     dto.target_entity_type_id = input.targetEntityTypeId
     dto.cardinality = input.cardinality
+  }
+
+  if (input.region !== undefined) {
+    dto.region = input.region
+  }
+  if (input.displayOrder !== undefined) {
+    dto.display_order = input.displayOrder
   }
 
   return dto

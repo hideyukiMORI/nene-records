@@ -48,6 +48,8 @@ final readonly class UpdateFieldDefUseCase implements UpdateFieldDefUseCaseInter
             id: $input->id,
             targetEntityTypeId: $input->targetEntityTypeId,
             cardinality: $input->cardinality,
+            region: $input->region,
+            displayOrder: $input->displayOrder,
         );
         $this->fieldDefs->update($updated);
 
@@ -58,6 +60,8 @@ final readonly class UpdateFieldDefUseCase implements UpdateFieldDefUseCaseInter
             dataType: $input->dataType,
             targetEntityTypeId: $input->targetEntityTypeId,
             cardinality: $input->cardinality,
+            region: $input->region,
+            displayOrder: $input->displayOrder,
         );
     }
 }

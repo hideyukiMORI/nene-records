@@ -1654,6 +1654,13 @@ export interface components {
             field_key: string;
             /** @enum {string} */
             data_type: "text" | "markdown" | "int" | "enum" | "bool" | "datetime" | "image" | "file" | "relation";
+            /**
+             * @description Layout region this field renders into. Null = main.
+             * @enum {string|null}
+             */
+            region?: "main" | "sidebar" | "aside" | null;
+            /** @description Ascending display order within the entity type. */
+            display_order?: number;
             /** Format: int64 */
             target_entity_type_id?: number;
             /** @enum {string} */
@@ -1665,6 +1672,13 @@ export interface components {
             field_key: string;
             /** @enum {string} */
             data_type: "text" | "markdown" | "int" | "enum" | "bool" | "datetime" | "image" | "file" | "relation";
+            /**
+             * @description Layout region this field renders into. Null/omitted = main.
+             * @enum {string|null}
+             */
+            region?: "main" | "sidebar" | "aside" | null;
+            /** @description Ascending display order within the entity type. */
+            display_order?: number;
             /** Format: int64 */
             target_entity_type_id?: number;
             /** @enum {string} */

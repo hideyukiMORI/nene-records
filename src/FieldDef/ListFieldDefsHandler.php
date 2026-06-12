@@ -47,6 +47,8 @@ final readonly class ListFieldDefsHandler
                         dataType: $item->dataType,
                         targetEntityTypeId: $item->targetEntityTypeId,
                         cardinality: $item->cardinality,
+                        region: $item->region,
+                        displayOrder: $item->displayOrder,
                     ),
                     $output->items,
                 ),

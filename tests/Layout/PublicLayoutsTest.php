@@ -44,4 +44,19 @@ final class PublicLayoutsTest extends TestCase
         self::assertSame('full', PublicLayouts::resolve('bogus', 'full'));
         self::assertSame('standard', PublicLayouts::resolve('bogus', 'nope'));
     }
+
+    public function testColumnLayoutsAreValid(): void
+    {
+        self::assertTrue(PublicLayouts::isValid('two-col'));
+        self::assertTrue(PublicLayouts::isValid('three-col'));
+    }
+
+    public function testRegionsPerLayout(): void
+    {
+        self::assertSame(['main'], PublicLayouts::regions('standard'));
+        self::assertSame(['main', 'sidebar'], PublicLayouts::regions('two-col'));
+        self::assertSame(['main', 'sidebar', 'aside'], PublicLayouts::regions('three-col'));
+        // Unknown layout falls back to the default layout's regions.
+        self::assertSame(['main'], PublicLayouts::regions('bogus'));
+    }
 }

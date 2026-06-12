@@ -7,3 +7,4 @@ export type {
   PublicScalarFieldDisplay,
 } from './hooks/use-public-view-entity-record-page'
 export { PublicRecordDetailView } from './ui/PublicRecordDetailView'
+export { PublicRecordRegionGrid } from './ui/PublicRecordRegionGrid'

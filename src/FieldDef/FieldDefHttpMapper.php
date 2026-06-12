@@ -16,12 +16,16 @@ final readonly class FieldDefHttpMapper
         string $dataType,
         ?int $targetEntityTypeId = null,
         ?string $cardinality = null,
+        ?string $region = null,
+        int $displayOrder = 0,
     ): array {
         $payload = [
             'id' => $id,
             'entity_type_id' => $entityTypeId,
             'field_key' => $fieldKey,
             'data_type' => $dataType,
+            'region' => $region,
+            'display_order' => $displayOrder,
         ];
 
         if ($dataType === 'relation') {
@@ -44,6 +48,8 @@ final readonly class FieldDefHttpMapper
             dataType: $fieldDef->dataType,
             targetEntityTypeId: $fieldDef->targetEntityTypeId,
             cardinality: $fieldDef->cardinality,
+            region: $fieldDef->region,
+            displayOrder: $fieldDef->displayOrder,
         );
     }
 }

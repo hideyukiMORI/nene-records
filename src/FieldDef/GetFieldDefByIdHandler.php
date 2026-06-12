@@ -35,6 +35,8 @@ final readonly class GetFieldDefByIdHandler
             dataType: $output->dataType,
             targetEntityTypeId: $output->targetEntityTypeId,
             cardinality: $output->cardinality,
+            region: $output->region,
+            displayOrder: $output->displayOrder,
         ));
     }
 }

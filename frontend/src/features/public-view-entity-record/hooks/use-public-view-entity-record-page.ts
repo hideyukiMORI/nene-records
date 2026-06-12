@@ -13,6 +13,7 @@ import { useEnumFieldList } from '@/entities/enum-field'
 import { useIntFieldList } from '@/entities/int-field'
 import { useTextFieldList } from '@/entities/text-field'
 import { formatFieldDisplayValue } from '@/shared/lib/format-field-display-value'
+import type { ContentRegion } from '@/shared/lib/resolve-layout'
 
 const FIELD_LIST_PARAMS = { limit: 100, offset: 0 } as const
 
@@ -21,11 +22,13 @@ export interface PublicScalarFieldDisplay {
   fieldKey: string
   dataType: Exclude<FieldDataType, 'relation'>
   displayValue: string
+  region: ContentRegion | null
 }
 
 export interface PublicRelationFieldRow {
   kind: 'relation'
   fieldDef: RelationFieldDef
+  region: ContentRegion | null
 }
 
 export type PublicFieldRow = PublicScalarFieldDisplay | PublicRelationFieldRow
@@ -46,7 +49,7 @@ export function usePublicViewEntityRecordPage(entityTypeId: number, entityId: nu
 
     return fieldDefs.flatMap((fieldDef): PublicFieldRow[] => {
       if (isRelationFieldDef(fieldDef)) {
-        return [{ kind: 'relation', fieldDef }]
+        return [{ kind: 'relation', fieldDef, region: fieldDef.region }]
       }
 
       let raw: string | number | boolean | null = null
@@ -85,6 +88,7 @@ export function usePublicViewEntityRecordPage(entityTypeId: number, entityId: nu
           fieldKey: fieldDef.fieldKey,
           dataType: fieldDef.dataType,
           displayValue: formatFieldDisplayValue(fieldDef.dataType, raw),
+          region: fieldDef.region,
         },
       ]
     })

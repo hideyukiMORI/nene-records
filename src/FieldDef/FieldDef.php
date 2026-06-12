@@ -17,6 +17,8 @@ final readonly class FieldDef
         public ?DateTimeImmutable $deletedAt = null,
         public ?int $targetEntityTypeId = null,
         public ?string $cardinality = null,
+        public ?string $region = null,
+        public int $displayOrder = 0,
     ) {
     }
 }

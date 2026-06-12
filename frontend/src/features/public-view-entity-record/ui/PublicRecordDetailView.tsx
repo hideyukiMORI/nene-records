@@ -1,9 +1,7 @@
 import type { Entity } from '@/entities/entity'
-import { isMarkdownBodyField } from '@/shared/lib/is-markdown-body-field'
 import { Button, Stack, Text } from '@/shared/ui'
-import { PublicMarkdownContent } from '@/shared/ui/markdown'
 import type { PublicFieldRow } from '../hooks/use-public-view-entity-record-page'
-import { PublicRelationFieldDisplay } from './PublicRelationFieldDisplay'
+import { PublicRecordFieldList } from './PublicRecordFieldList'
 
 export interface PublicRecordDetailViewProps {
   entity: Entity | null
@@ -51,39 +49,11 @@ export function PublicRecordDetailView({
   }
 
   return (
-    <dl className="flex flex-col gap-stack-md">
-      {fieldRows.map((row) => {
-        if (row.kind === 'relation') {
-          return (
-            <PublicRelationFieldDisplay
-              key={row.fieldDef.fieldKey}
-              entityId={Number(entity.id)}
-              fieldDef={row.fieldDef}
-              entityTypeSlugById={entityTypeSlugById}
-              entityTypePatternById={entityTypePatternById}
-            />
-          )
-        }
-
-        return (
-          <div key={row.fieldKey} className="flex flex-col gap-stack-xs">
-            <Text as="dt" variant="heading-sm">
-              {row.fieldKey}
-            </Text>
-            {isMarkdownBodyField(row.fieldKey) && row.dataType === 'text' ? (
-              <dd>
-                <PublicMarkdownContent
-                  markdown={row.displayValue === '—' ? '' : row.displayValue}
-                />
-              </dd>
-            ) : (
-              <Text as="dd" muted>
-                {row.displayValue}
-              </Text>
-            )}
-          </div>
-        )
-      })}
-    </dl>
+    <PublicRecordFieldList
+      entity={entity}
+      fieldRows={fieldRows}
+      entityTypeSlugById={entityTypeSlugById}
+      entityTypePatternById={entityTypePatternById}
+    />
   )
 }

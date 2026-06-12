@@ -37,6 +37,8 @@ final readonly class CreateFieldDefUseCase implements CreateFieldDefUseCaseInter
             dataType: $input->dataType,
             targetEntityTypeId: $input->targetEntityTypeId,
             cardinality: $input->cardinality,
+            region: $input->region,
+            displayOrder: $input->displayOrder,
         ));
 
         return new CreateFieldDefOutput(
@@ -46,6 +48,8 @@ final readonly class CreateFieldDefUseCase implements CreateFieldDefUseCaseInter
             dataType: $input->dataType,
             targetEntityTypeId: $input->targetEntityTypeId,
             cardinality: $input->cardinality,
+            region: $input->region,
+            displayOrder: $input->displayOrder,
         );
     }
 

@@ -24,7 +24,7 @@ final readonly class PdoFieldDefRepository implements FieldDefRepositoryInterfac
     {
         $row = $this->query->fetchOne(
             <<<'SQL'
-                SELECT id, entity_type_id, field_key, data_type, target_entity_type_id, cardinality, is_deleted, deleted_at
+                SELECT id, entity_type_id, field_key, data_type, region, display_order, target_entity_type_id, cardinality, is_deleted, deleted_at
                 FROM field_defs
                 WHERE id = ? AND organization_id = ? AND is_deleted = 0
                 SQL,
@@ -42,7 +42,7 @@ final readonly class PdoFieldDefRepository implements FieldDefRepositoryInterfac
     {
         $row = $this->query->fetchOne(
             <<<'SQL'
-                SELECT id, entity_type_id, field_key, data_type, target_entity_type_id, cardinality, is_deleted, deleted_at
+                SELECT id, entity_type_id, field_key, data_type, region, display_order, target_entity_type_id, cardinality, is_deleted, deleted_at
                 FROM field_defs
                 WHERE entity_type_id = ? AND field_key = ? AND organization_id = ? AND is_deleted = 0
                 SQL,
@@ -65,7 +65,7 @@ final readonly class PdoFieldDefRepository implements FieldDefRepositoryInterfac
                     SELECT id, entity_type_id, field_key, data_type, target_entity_type_id, cardinality, is_deleted, deleted_at
                     FROM field_defs
                     WHERE is_deleted = 0 AND entity_type_id = ? AND organization_id = ?
-                    ORDER BY id ASC
+                    ORDER BY display_order ASC, id ASC
                     LIMIT ? OFFSET ?
                     SQL,
                 [$entityTypeId, $this->orgId->get(), $limit, $offset],
@@ -76,7 +76,7 @@ final readonly class PdoFieldDefRepository implements FieldDefRepositoryInterfac
                     SELECT id, entity_type_id, field_key, data_type, target_entity_type_id, cardinality, is_deleted, deleted_at
                     FROM field_defs
                     WHERE is_deleted = 0 AND organization_id = ?
-                    ORDER BY id ASC
+                    ORDER BY display_order ASC, id ASC
                     LIMIT ? OFFSET ?
                     SQL,
                 [$this->orgId->get(), $limit, $offset],
@@ -90,14 +90,16 @@ final readonly class PdoFieldDefRepository implements FieldDefRepositoryInterfac
     {
         $this->query->execute(
             <<<'SQL'
-                INSERT INTO field_defs (organization_id, entity_type_id, field_key, data_type, target_entity_type_id, cardinality)
-                VALUES (?, ?, ?, ?, ?, ?)
+                INSERT INTO field_defs (organization_id, entity_type_id, field_key, data_type, region, display_order, target_entity_type_id, cardinality)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 SQL,
             [
                 $this->orgId->get(),
                 $fieldDef->entityTypeId,
                 $fieldDef->fieldKey,
                 $fieldDef->dataType,
+                $fieldDef->region,
+                $fieldDef->displayOrder,
                 $fieldDef->targetEntityTypeId,
                 $fieldDef->cardinality,
             ],
@@ -117,13 +119,15 @@ final readonly class PdoFieldDefRepository implements FieldDefRepositoryInterfac
         $this->query->execute(
             <<<'SQL'
                 UPDATE field_defs
-                SET entity_type_id = ?, field_key = ?, data_type = ?, target_entity_type_id = ?, cardinality = ?
+                SET entity_type_id = ?, field_key = ?, data_type = ?, region = ?, display_order = ?, target_entity_type_id = ?, cardinality = ?
                 WHERE id = ? AND organization_id = ? AND is_deleted = 0
                 SQL,
             [
                 $fieldDef->entityTypeId,
                 $fieldDef->fieldKey,
                 $fieldDef->dataType,
+                $fieldDef->region,
+                $fieldDef->displayOrder,
                 $fieldDef->targetEntityTypeId,
                 $fieldDef->cardinality,
                 $id,
@@ -162,6 +166,10 @@ final readonly class PdoFieldDefRepository implements FieldDefRepositoryInterfac
             cardinality: ($row['cardinality'] ?? null) !== null && $row['cardinality'] !== ''
                 ? (string) $row['cardinality']
                 : null,
+            region: ($row['region'] ?? null) !== null && $row['region'] !== ''
+                ? (string) $row['region']
+                : null,
+            displayOrder: (int) ($row['display_order'] ?? 0),
         );
     }
 }

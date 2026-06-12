@@ -25,6 +25,8 @@ export function useManageFieldDefsPage(entityTypeId: number) {
         entityTypeId,
         fieldKey: values.fieldKey,
         dataType: values.dataType,
+        region: values.region === 'main' ? null : values.region,
+        displayOrder: values.displayOrder,
       })
     },
     [createMutation, entityTypeId],
@@ -50,6 +52,8 @@ export function useManageFieldDefsPage(entityTypeId: number) {
           entityTypeId,
           fieldKey: values.fieldKey,
           dataType: values.dataType,
+          region: values.region === 'main' ? null : values.region,
+          displayOrder: values.displayOrder,
         },
       })
       setEditTarget(null)

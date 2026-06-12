@@ -5,6 +5,7 @@ import { useEntityTypeList } from '@/entities/entity-type'
 import { CommentSection, useCommentSection } from '@/features/comment-section'
 import {
   PublicRecordDetailView,
+  PublicRecordRegionGrid,
   usePublicViewEntityRecordPage,
 } from '@/features/public-view-entity-record'
 import { useTranslation } from '@/shared/i18n'
@@ -70,6 +71,7 @@ function PublicRecordDetailContent({
   const commentSection = useCommentSection(entityId)
 
   const variant = resolveLayout(entity?.layout ?? null, entityTypeDefaultLayout)
+  const isMultiColLayout = variant === 'two-col' || variant === 'three-col'
 
   // Redirect if the current URL doesn't match the canonical URL for this entity.
   // This handles pattern changes (e.g. /{type}/{id} → /{type}/{slug}) transparently.
@@ -97,18 +99,28 @@ function PublicRecordDetailContent({
             {entityTypeName}
           </Text>
         </Stack>
-        <PublicRecordDetailView
-          entity={entity}
-          fieldRows={fieldRows}
-          entityTypeSlugById={entityTypeSlugById}
-          entityTypePatternById={entityTypePatternById}
-          isLoading={isLoading}
-          isError={isError}
-          errorTitle={errorTitle}
-          onRetry={() => {
-            void refetch()
-          }}
-        />
+        {isMultiColLayout && !isLoading && !isError && entity !== null && fieldRows.length > 0 ? (
+          <PublicRecordRegionGrid
+            layout={variant}
+            entity={entity}
+            fieldRows={fieldRows}
+            entityTypeSlugById={entityTypeSlugById}
+            entityTypePatternById={entityTypePatternById}
+          />
+        ) : (
+          <PublicRecordDetailView
+            entity={entity}
+            fieldRows={fieldRows}
+            entityTypeSlugById={entityTypeSlugById}
+            entityTypePatternById={entityTypePatternById}
+            isLoading={isLoading}
+            isError={isError}
+            errorTitle={errorTitle}
+            onRetry={() => {
+              void refetch()
+            }}
+          />
+        )}
         {entity !== null && !isLoading && !isError ? <CommentSection {...commentSection} /> : null}
       </Stack>
     </PublicLayout>

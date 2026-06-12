@@ -3,7 +3,10 @@ import { FIELD_DATA_TYPES, type FieldDataType } from '@/entities/field-def'
 import { useTranslation } from '@/shared/i18n'
 import type { MessageKey } from '@/shared/i18n'
 import { Button, Card, Input, Select, Stack, Text } from '@/shared/ui'
-import { useCreateFieldDefForm } from '../hooks/use-create-field-def-form'
+import {
+  type CreateFieldDefFormValues,
+  useCreateFieldDefForm,
+} from '../hooks/use-create-field-def-form'
 
 const DATA_TYPE_LABEL_KEYS: Record<FieldDataType, MessageKey> = {
   text: 'admin.fieldDefs.dataType.text',
@@ -18,7 +21,7 @@ const DATA_TYPE_LABEL_KEYS: Record<FieldDataType, MessageKey> = {
 export interface FieldDefCreateFormProps {
   isSubmitting: boolean
   serverErrorTitle: string | null
-  onSubmit: (values: { fieldKey: string; dataType: FieldDataType }) => Promise<void>
+  onSubmit: (values: CreateFieldDefFormValues) => Promise<void>
 }
 
 export function FieldDefCreateForm({
@@ -40,7 +43,12 @@ export function FieldDefCreateForm({
       onSubmit={(event) => {
         void handleSubmit(async (values) => {
           await onSubmit(values)
-          reset({ fieldKey: '', dataType: values.dataType })
+          reset({
+            fieldKey: '',
+            dataType: values.dataType,
+            region: values.region,
+            displayOrder: values.displayOrder,
+          })
         })(event)
       }}
     >

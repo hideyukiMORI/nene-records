@@ -4,6 +4,8 @@ CREATE TABLE field_defs (
     entity_type_id INTEGER NOT NULL,
     field_key TEXT NOT NULL,
     data_type TEXT NOT NULL,
+    region TEXT NULL,
+    display_order INTEGER NOT NULL DEFAULT 0,
     target_entity_type_id INTEGER NULL,
     cardinality TEXT NULL,
     is_deleted BOOLEAN NOT NULL DEFAULT 0,

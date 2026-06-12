@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeNeRecords\FieldDef;
 
 use Nene2\Validation\ValidationError;
+use NeNeRecords\Layout\ContentRegions;
 
 final readonly class FieldDefWriteValidator
 {
@@ -70,7 +71,32 @@ final readonly class FieldDefWriteValidator
             );
         }
 
+        $region = trim((string) ($body['region'] ?? ''));
+        if ($region !== '' && !ContentRegions::isValid($region)) {
+            $errors[] = new ValidationError('region', 'Region must be one of: main, sidebar, aside.', 'invalid');
+        }
+
         return $errors;
+    }
+
+    /**
+     * @param array<string, mixed> $body
+     */
+    public static function parseRegion(array $body): ?string
+    {
+        $region = trim((string) ($body['region'] ?? ''));
+
+        return $region === '' ? null : $region;
+    }
+
+    /**
+     * @param array<string, mixed> $body
+     */
+    public static function parseDisplayOrder(array $body): int
+    {
+        $raw = $body['display_order'] ?? 0;
+
+        return is_int($raw) || (is_string($raw) && ctype_digit($raw)) ? (int) $raw : 0;
     }
 
     /**

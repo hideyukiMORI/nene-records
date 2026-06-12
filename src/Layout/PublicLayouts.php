@@ -12,16 +12,32 @@ namespace NeNeRecords\Layout;
  * to a fixed set keeps the contract portable across tenants and rejects
  * arbitrary values at the write boundary.
  *
- * - standard: header / single column (max-w-3xl) / footer — the default.
- * - full:     header / full-width content / footer — landing-page oriented.
- * - bare:     no header/footer, no theme — fully custom page (CSS in content).
+ * - standard:  header / single column (max-w-3xl) / footer — the default.
+ * - full:      header / full-width content / footer — landing-page oriented.
+ * - two-col:   header / [main | sidebar] / footer.
+ * - three-col: header / [main | sidebar | aside] / footer.
+ * - bare:      no header/footer, no theme — fully custom page (CSS in content).
  */
 final class PublicLayouts
 {
     public const DEFAULT = 'standard';
 
     /** @var list<string> */
-    private const LAYOUTS = ['standard', 'full', 'bare'];
+    private const LAYOUTS = ['standard', 'full', 'two-col', 'three-col', 'bare'];
+
+    /**
+     * Regions each layout renders, in display order. Fields assigned to a region
+     * not listed here fall back to `main`.
+     *
+     * @var array<string, list<string>>
+     */
+    private const REGIONS = [
+        'standard' => ['main'],
+        'full' => ['main'],
+        'two-col' => ['main', 'sidebar'],
+        'three-col' => ['main', 'sidebar', 'aside'],
+        'bare' => ['main'],
+    ];
 
     public static function isValid(string $layout): bool
     {
@@ -32,6 +48,17 @@ final class PublicLayouts
     public static function all(): array
     {
         return self::LAYOUTS;
+    }
+
+    /**
+     * Regions rendered by the given layout (falls back to the default layout's
+     * regions for unknown values).
+     *
+     * @return list<string>
+     */
+    public static function regions(string $layout): array
+    {
+        return self::REGIONS[$layout] ?? self::REGIONS[self::DEFAULT];
     }
 
     /**

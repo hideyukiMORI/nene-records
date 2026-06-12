@@ -16,6 +16,8 @@ describe('field-def mapper', () => {
       entityTypeId: 2,
       fieldKey: 'title',
       dataType: 'text',
+      region: null,
+      displayOrder: 0,
     })
   })
 
