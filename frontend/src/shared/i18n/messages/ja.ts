@@ -52,7 +52,10 @@ export const ja: Partial<MessageCatalog> = {
   'admin.widgets.typeLabel': 'ウィジェットタイプ',
   'admin.widgets.type.recent-posts': '最近の投稿',
   'admin.widgets.type.menu': 'メニュー',
+  'admin.widgets.type.toc': '目次',
   'admin.widgets.menuSettings': 'メニューの設定',
+  'admin.widgets.tocSettings':
+    '現在ページの見出しを表示します。設定なし（見出しがあるページで描画）。',
   'widgets.recentPosts.unconfigured': 'コンテンツタイプが未設定です。',
   'widgets.recentPosts.empty': '投稿がまだありません。',
   'widgets.menu.empty': 'メニュー項目がまだありません。',

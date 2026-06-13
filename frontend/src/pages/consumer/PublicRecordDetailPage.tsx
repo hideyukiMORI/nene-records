@@ -8,8 +8,10 @@ import {
   PublicRecordRegionGrid,
   usePublicViewEntityRecordPage,
 } from '@/features/public-view-entity-record'
+import { PageContentContext } from '@/features/render-widgets'
 import { useTranslation } from '@/shared/i18n'
 import { findEntityTypeBySlug } from '@/shared/lib/find-entity-type-by-slug'
+import { isMarkdownBodyField } from '@/shared/lib/is-markdown-body-field'
 import { type PublicLayoutKey, resolveLayout } from '@/shared/lib/resolve-layout'
 import {
   DEFAULT_PERMALINK_PATTERN,
@@ -73,6 +75,23 @@ function PublicRecordDetailContent({
   const variant = resolveLayout(entity?.layout ?? null, entityTypeDefaultLayout)
   const isMultiColLayout = variant === 'two-col' || variant === 'three-col'
 
+  // The page's markdown body feeds region widgets (e.g. the TOC widget) so they
+  // derive from the same content the main column renders.
+  const pageMarkdown = useMemo(
+    () =>
+      fieldRows
+        .filter(
+          (row) =>
+            row.kind === 'scalar' &&
+            row.dataType === 'text' &&
+            isMarkdownBodyField(row.fieldKey) &&
+            row.displayValue !== '—',
+        )
+        .map((row) => (row.kind === 'scalar' ? row.displayValue : ''))
+        .join('\n\n'),
+    [fieldRows],
+  )
+
   // Redirect if the current URL doesn't match the canonical URL for this entity.
   // This handles pattern changes (e.g. /{type}/{id} → /{type}/{slug}) transparently.
   const redirect = useCanonicalRedirect(
@@ -88,41 +107,45 @@ function PublicRecordDetailContent({
 
   return (
     <PublicLayout variant={variant} site={site}>
-      <Stack gap="md">
-        <Stack gap="sm">
-          <Link to={`/${entityTypeSlug}`}>
-            <Button variant="secondary" size="sm">
-              Back to {entityTypeName}
-            </Button>
-          </Link>
-          <Text as="h1" variant="heading-md">
-            {entityTypeName}
-          </Text>
+      <PageContentContext.Provider value={pageMarkdown}>
+        <Stack gap="md">
+          <Stack gap="sm">
+            <Link to={`/${entityTypeSlug}`}>
+              <Button variant="secondary" size="sm">
+                Back to {entityTypeName}
+              </Button>
+            </Link>
+            <Text as="h1" variant="heading-md">
+              {entityTypeName}
+            </Text>
+          </Stack>
+          {isMultiColLayout && !isLoading && !isError && entity !== null && fieldRows.length > 0 ? (
+            <PublicRecordRegionGrid
+              layout={variant}
+              entity={entity}
+              fieldRows={fieldRows}
+              entityTypeSlugById={entityTypeSlugById}
+              entityTypePatternById={entityTypePatternById}
+            />
+          ) : (
+            <PublicRecordDetailView
+              entity={entity}
+              fieldRows={fieldRows}
+              entityTypeSlugById={entityTypeSlugById}
+              entityTypePatternById={entityTypePatternById}
+              isLoading={isLoading}
+              isError={isError}
+              errorTitle={errorTitle}
+              onRetry={() => {
+                void refetch()
+              }}
+            />
+          )}
+          {entity !== null && !isLoading && !isError ? (
+            <CommentSection {...commentSection} />
+          ) : null}
         </Stack>
-        {isMultiColLayout && !isLoading && !isError && entity !== null && fieldRows.length > 0 ? (
-          <PublicRecordRegionGrid
-            layout={variant}
-            entity={entity}
-            fieldRows={fieldRows}
-            entityTypeSlugById={entityTypeSlugById}
-            entityTypePatternById={entityTypePatternById}
-          />
-        ) : (
-          <PublicRecordDetailView
-            entity={entity}
-            fieldRows={fieldRows}
-            entityTypeSlugById={entityTypeSlugById}
-            entityTypePatternById={entityTypePatternById}
-            isLoading={isLoading}
-            isError={isError}
-            errorTitle={errorTitle}
-            onRetry={() => {
-              void refetch()
-            }}
-          />
-        )}
-        {entity !== null && !isLoading && !isError ? <CommentSection {...commentSection} /> : null}
-      </Stack>
+      </PageContentContext.Provider>
     </PublicLayout>
   )
 }

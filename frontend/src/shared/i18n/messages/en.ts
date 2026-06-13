@@ -59,7 +59,10 @@ export const en = {
   'admin.widgets.typeLabel': 'Widget type',
   'admin.widgets.type.recent-posts': 'Recent posts',
   'admin.widgets.type.menu': 'Menu',
+  'admin.widgets.type.toc': 'Table of contents',
   'admin.widgets.menuSettings': 'Menu settings',
+  'admin.widgets.tocSettings':
+    "Shows the current page's headings. No settings — it renders on pages that have headings.",
   'widgets.recentPosts.unconfigured': 'No content type configured.',
   'widgets.recentPosts.empty': 'No posts yet.',
   'widgets.menu.empty': 'No menu items yet.',
