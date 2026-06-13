@@ -32,6 +32,7 @@ export {
 } from './mutations'
 export {
   defaultEntityListParams,
+  useEntitiesByTag,
   useEntity,
   useEntityList,
   useEntityRevisions,

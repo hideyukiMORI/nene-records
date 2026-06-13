@@ -6,13 +6,13 @@ import { getRecordDisplayLabel } from '@/shared/lib/get-record-display-label'
 import { resolvePermalink } from '@/shared/lib/resolve-permalink'
 import { Stack, Text } from '@/shared/ui'
 
-export interface PublicSearchResultGroupProps {
+export interface PublicEntityResultGroupProps {
   entityType: EntityType
   entities: Entity[]
 }
 
-/** One entity type's search hits, with titles resolved from its text fields. */
-export function PublicSearchResultGroup({ entityType, entities }: PublicSearchResultGroupProps) {
+/** One entity type's results, with titles resolved from its text fields. */
+export function PublicEntityResultGroup({ entityType, entities }: PublicEntityResultGroupProps) {
   const entityTypeId = Number(entityType.id)
   const textFieldQuery = useTextFieldList(defaultTextFieldListParamsForEntityType(entityTypeId), {
     enabled: entityTypeId > 0,

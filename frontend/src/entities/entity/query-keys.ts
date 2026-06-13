@@ -23,6 +23,7 @@ export const entityKeys = {
   lists: () => [...entityKeys.all, 'list'] as const,
   list: (params: EntityListParams) => [...entityKeys.lists(), params] as const,
   search: (q: string, limit: number) => [...entityKeys.all, 'search', q, limit] as const,
+  byTag: (tagSlug: string, limit: number) => [...entityKeys.all, 'by-tag', tagSlug, limit] as const,
   details: () => [...entityKeys.all, 'detail'] as const,
   detail: (id: EntityId) => [...entityKeys.details(), id] as const,
   revisions: (id: EntityId) => [...entityKeys.detail(id), 'revisions'] as const,
