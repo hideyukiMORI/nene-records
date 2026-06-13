@@ -58,6 +58,8 @@ export const ja: Partial<MessageCatalog> = {
   'admin.widgets.type.popular-posts': '人気記事',
   'admin.widgets.type.calendar': 'カレンダー',
   'admin.widgets.menuSettings': 'メニューの設定',
+  'admin.widgets.menuLabel': 'メニュー',
+  'admin.widgets.menuPlaceholder': 'メニューを選択…',
   'admin.widgets.tocSettings':
     '現在ページの見出しを表示します。設定なし（見出しがあるページで描画）。',
   'admin.widgets.searchSettings': '検索の設定',

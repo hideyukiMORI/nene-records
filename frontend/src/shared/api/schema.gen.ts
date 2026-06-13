@@ -2186,6 +2186,8 @@ export interface components {
              * @enum {string}
              */
             location: "header" | "footer" | "side";
+            /** @description Named menu the item belongs to. */
+            menu_id?: number | null;
             /** @default 0 */
             display_order: number;
         };
@@ -2197,6 +2199,8 @@ export interface components {
              * @enum {string}
              */
             location: "header" | "footer" | "side";
+            /** @description Named menu the item belongs to. Omit to keep the current menu. */
+            menu_id?: number | null;
             /** @default 0 */
             display_order: number;
         };

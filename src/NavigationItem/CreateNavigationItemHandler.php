@@ -30,6 +30,7 @@ final readonly class CreateNavigationItemHandler
         $displayOrder = isset($body['display_order']) && is_int($body['display_order'])
             ? $body['display_order']
             : 0;
+        $menuId = is_int($body['menu_id'] ?? null) ? $body['menu_id'] : null;
 
         if ($label === '') {
             $errors[] = new ValidationError('label', 'Label is required.', 'required');
@@ -48,6 +49,7 @@ final readonly class CreateNavigationItemHandler
         }
 
         $output = $this->useCase->execute(new CreateNavigationItemInput(
+            menuId: $menuId,
             label: $label,
             url: $url,
             location: $location,

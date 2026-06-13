@@ -7,6 +7,7 @@ export function mapNavigationItemDtoToModel(dto: NavigationItemDto): NavigationI
     label: dto.label,
     url: dto.url,
     location: dto.location,
+    menuId: dto.menu_id,
     displayOrder: dto.display_order,
     createdAt: dto.created_at,
     updatedAt: dto.updated_at,

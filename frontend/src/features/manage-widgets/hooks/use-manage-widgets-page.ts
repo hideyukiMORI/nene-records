@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react'
 import { useEntityTypeList } from '@/entities/entity-type'
-import type { NavLocation } from '@/entities/navigation-item'
+import { useMenuList } from '@/entities/menu'
 import {
   useCreateWidget,
   useDeleteWidget,
@@ -18,7 +18,7 @@ export interface WidgetFormState {
   title: string
   entityTypeSlug: string
   limit: number
-  menuLocation: NavLocation
+  menuId: number | null
   searchPlaceholder: string
 }
 
@@ -28,13 +28,14 @@ const EMPTY_FORM: WidgetFormState = {
   title: '',
   entityTypeSlug: '',
   limit: 5,
-  menuLocation: 'side',
+  menuId: null,
   searchPlaceholder: '',
 }
 
 export function useManageWidgetsPage() {
   const listQuery = useWidgetList()
   const entityTypesQuery = useEntityTypeList()
+  const menusQuery = useMenuList()
   const createMutation = useCreateWidget()
   const updateMutation = useUpdateWidget()
   const deleteMutation = useDeleteWidget()
@@ -71,12 +72,7 @@ export function useManageWidgetsPage() {
           ? widget.settings['entityTypeSlug']
           : '',
       limit: typeof widget.settings['limit'] === 'number' ? widget.settings['limit'] : 5,
-      menuLocation:
-        widget.settings['location'] === 'header' ||
-        widget.settings['location'] === 'footer' ||
-        widget.settings['location'] === 'side'
-          ? widget.settings['location']
-          : 'side',
+      menuId: typeof widget.settings['menuId'] === 'number' ? widget.settings['menuId'] : null,
       searchPlaceholder:
         typeof widget.settings['placeholder'] === 'string' ? widget.settings['placeholder'] : '',
     })
@@ -85,7 +81,7 @@ export function useManageWidgetsPage() {
   const submit = useCallback(async () => {
     const settings =
       form.widgetType === 'menu'
-        ? { location: form.menuLocation }
+        ? { menuId: form.menuId }
         : form.widgetType === 'toc'
           ? {}
           : form.widgetType === 'search'
@@ -126,6 +122,7 @@ export function useManageWidgetsPage() {
     widgets: listQuery.data?.items ?? [],
     isLoading: listQuery.isLoading,
     entityTypes: entityTypesQuery.data?.items ?? [],
+    menus: menusQuery.data?.items ?? [],
     form,
     editId,
     isSubmitting: createMutation.isPending || updateMutation.isPending,

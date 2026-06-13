@@ -1,5 +1,5 @@
 import type { EntityType } from '@/entities/entity-type'
-import { NAV_LOCATIONS, type NavLocation } from '@/entities/navigation-item'
+import type { Menu } from '@/entities/menu'
 import type { Widget, WidgetType } from '@/entities/widget'
 import { useTranslation } from '@/shared/i18n'
 import type { ContentRegion } from '@/shared/lib/resolve-layout'
@@ -20,6 +20,7 @@ const WIDGET_TYPES: readonly WidgetType[] = [
 export interface ManageWidgetsViewProps {
   widgets: Widget[]
   entityTypes: EntityType[]
+  menus: Menu[]
   form: WidgetFormState
   editId: number | null
   isSubmitting: boolean
@@ -34,6 +35,7 @@ export interface ManageWidgetsViewProps {
 export function ManageWidgetsView({
   widgets,
   entityTypes,
+  menus,
   form,
   editId,
   isSubmitting,
@@ -128,16 +130,17 @@ export function ManageWidgetsView({
                 {t('admin.widgets.menuSettings')}
               </Text>
               <Select
-                id="widget-menu-location"
-                label={t('admin.navigation.location')}
-                value={form.menuLocation}
+                id="widget-menu"
+                label={t('admin.widgets.menuLabel')}
+                value={form.menuId === null ? '' : String(form.menuId)}
                 onChange={(e) => {
-                  setField('menuLocation', e.target.value as NavLocation)
+                  setField('menuId', e.target.value === '' ? null : Number(e.target.value))
                 }}
               >
-                {NAV_LOCATIONS.map((location) => (
-                  <option key={location} value={location}>
-                    {t(`admin.navigation.location.${location}`)}
+                <option value="">{t('admin.widgets.menuPlaceholder')}</option>
+                {menus.map((menu) => (
+                  <option key={menu.id} value={String(menu.id)}>
+                    {menu.name}
                   </option>
                 ))}
               </Select>

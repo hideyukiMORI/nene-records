@@ -22,6 +22,7 @@ export function WidgetsPage() {
       <ManageWidgetsView
         widgets={page.widgets}
         entityTypes={page.entityTypes}
+        menus={page.menus}
         form={page.form}
         editId={page.editId}
         isSubmitting={page.isSubmitting}

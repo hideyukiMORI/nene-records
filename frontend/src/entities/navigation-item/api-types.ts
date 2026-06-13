@@ -5,6 +5,7 @@ export interface NavigationItemDto {
   label: string
   url: string
   location: NavLocation
+  menu_id: number | null
   display_order: number
   created_at: string
   updated_at: string
