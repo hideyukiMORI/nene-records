@@ -8,13 +8,14 @@ namespace NeNeRecords\Widget;
  * Whitelist of widget types. Widgets are bounded, typed blocks (not a free-form
  * page builder): each type has a known renderer and settings shape. Phase 1
  * ships `recent-posts`; Phase 2 adds `menu` (renders a navigation location);
- * Phase 3 adds `toc` (table of contents for the current page); more (search,
- * calendar, tag-cloud) follow.
+ * Phase 3 adds `toc` (table of contents for the current page); Phase 4 adds
+ * `search` (a search box linking to the results page); more (calendar,
+ * tag-cloud) follow.
  */
 final class WidgetTypes
 {
     /** @var list<string> */
-    private const TYPES = ['recent-posts', 'menu', 'toc'];
+    private const TYPES = ['recent-posts', 'menu', 'toc', 'search'];
 
     public static function isValid(string $type): bool
     {

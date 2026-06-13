@@ -54,6 +54,35 @@ export function useEntityList(
   })
 }
 
+/**
+ * Site-wide full-text search across published entities of every type. Unlike
+ * useEntityList, it omits entity_type_id so the backend searches all types
+ * (a sent entity_type_id=0 would match nothing). Disabled for an empty query.
+ */
+export function useEntitySearch(
+  q: string,
+  options?: { limit?: number; enabled?: boolean },
+): UseQueryResult<EntityList, AppError> {
+  const limit = options?.limit ?? 30
+  return useQuery({
+    queryKey: entityKeys.search(q, limit),
+    enabled: (options?.enabled ?? true) && q !== '',
+    queryFn: async ({ signal }) => {
+      const search = new URLSearchParams({
+        limit: String(limit),
+        offset: '0',
+        status: 'published',
+        q,
+      })
+      const dto = await apiClient.get<EntityListDto>(
+        `/api/v1/entities?${search.toString()}`,
+        signal,
+      )
+      return mapEntityListDtoToModel(dto)
+    },
+  })
+}
+
 export function useEntity(
   id: EntityId,
   options?: { enabled?: boolean },
