@@ -2029,7 +2029,7 @@ export interface components {
         WidgetResponse: {
             id: number;
             /** @enum {string} */
-            widget_type: "recent-posts" | "menu" | "toc" | "search";
+            widget_type: "recent-posts" | "menu" | "toc" | "search" | "tag-cloud";
             /** @enum {string} */
             region: "main" | "sidebar" | "aside";
             display_order: number;
@@ -2048,7 +2048,7 @@ export interface components {
         };
         CreateWidgetRequest: {
             /** @enum {string} */
-            widget_type: "recent-posts" | "menu" | "toc" | "search";
+            widget_type: "recent-posts" | "menu" | "toc" | "search" | "tag-cloud";
             /** @enum {string} */
             region: "main" | "sidebar" | "aside";
             /** @default 0 */

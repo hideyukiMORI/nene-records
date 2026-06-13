@@ -6,7 +6,7 @@ import type { ContentRegion } from '@/shared/lib/resolve-layout'
 import { Button, Card, Input, Select, Stack, Text } from '@/shared/ui'
 import type { WidgetFormState } from '../hooks/use-manage-widgets-page'
 
-const WIDGET_TYPES: readonly WidgetType[] = ['recent-posts', 'menu', 'toc', 'search']
+const WIDGET_TYPES: readonly WidgetType[] = ['recent-posts', 'menu', 'toc', 'search', 'tag-cloud']
 
 export interface ManageWidgetsViewProps {
   widgets: Widget[]
@@ -136,7 +136,7 @@ export function ManageWidgetsView({
             <Text muted variant="caption">
               {t('admin.widgets.tocSettings')}
             </Text>
-          ) : (
+          ) : form.widgetType === 'search' ? (
             <>
               <Text muted variant="caption">
                 {t('admin.widgets.searchSettings')}
@@ -150,6 +150,10 @@ export function ManageWidgetsView({
                 }}
               />
             </>
+          ) : (
+            <Text muted variant="caption">
+              {t('admin.widgets.tagCloudSettings')}
+            </Text>
           )}
           <div className="flex items-center gap-inline-sm">
             <Button type="submit" disabled={isSubmitting}>

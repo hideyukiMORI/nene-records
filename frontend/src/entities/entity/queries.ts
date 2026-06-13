@@ -83,6 +83,35 @@ export function useEntitySearch(
   })
 }
 
+/**
+ * Published entities of every type carrying a given tag slug. Like useEntitySearch
+ * it omits entity_type_id so the backend matches across all types. Disabled for
+ * an empty slug.
+ */
+export function useEntitiesByTag(
+  tagSlug: string,
+  options?: { limit?: number; enabled?: boolean },
+): UseQueryResult<EntityList, AppError> {
+  const limit = options?.limit ?? 50
+  return useQuery({
+    queryKey: entityKeys.byTag(tagSlug, limit),
+    enabled: (options?.enabled ?? true) && tagSlug !== '',
+    queryFn: async ({ signal }) => {
+      const search = new URLSearchParams({
+        limit: String(limit),
+        offset: '0',
+        status: 'published',
+        tags: tagSlug,
+      })
+      const dto = await apiClient.get<EntityListDto>(
+        `/api/v1/entities?${search.toString()}`,
+        signal,
+      )
+      return mapEntityListDtoToModel(dto)
+    },
+  })
+}
+
 export function useEntity(
   id: EntityId,
   options?: { enabled?: boolean },

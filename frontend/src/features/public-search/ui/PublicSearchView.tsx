@@ -1,13 +1,15 @@
 import { useState } from 'react'
+import {
+  PublicEntityResultGroup,
+  type PublicEntityTypeGroup,
+} from '@/features/public-entity-results'
 import { useTranslation } from '@/shared/i18n'
 import { Button, EmptyState, ErrorState, Input, LoadingState, Stack, Text } from '@/shared/ui'
-import type { PublicSearchTypeGroup } from '../hooks/use-public-search-page'
-import { PublicSearchResultGroup } from './PublicSearchResultGroup'
 
 export interface PublicSearchViewProps {
   query: string
   hasQuery: boolean
-  groups: PublicSearchTypeGroup[]
+  groups: PublicEntityTypeGroup[]
   total: number
   isLoading: boolean
   isError: boolean
@@ -79,7 +81,7 @@ export function PublicSearchView({
             {t('public.search.resultCount', { count: String(total) })}
           </Text>
           {groups.map((group) => (
-            <PublicSearchResultGroup
+            <PublicEntityResultGroup
               key={String(group.entityType.id)}
               entityType={group.entityType}
               entities={group.entities}

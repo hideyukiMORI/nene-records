@@ -6,6 +6,7 @@ import { Stack, Text } from '@/shared/ui'
 import { MenuWidget } from './MenuWidget'
 import { RecentPostsWidget } from './RecentPostsWidget'
 import { SearchWidget } from './SearchWidget'
+import { TagCloudWidget } from './TagCloudWidget'
 import { TocWidget } from './TocWidget'
 
 export interface SiteWidgetsProps {
@@ -18,6 +19,7 @@ const WIDGET_REGISTRY: Record<WidgetType, (widget: Widget) => ReactNode> = {
   menu: (widget) => <MenuWidget widget={widget} />,
   toc: () => <TocWidget />,
   search: (widget) => <SearchWidget widget={widget} />,
+  'tag-cloud': () => <TagCloudWidget />,
 }
 
 /** Renders all site widgets placed into a given region, in order. */
