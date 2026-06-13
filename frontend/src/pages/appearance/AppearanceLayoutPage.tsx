@@ -1,10 +1,18 @@
+import { useState } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
 import { currentUserHasCapability } from '@/entities/auth'
 import { useMenuList } from '@/entities/menu'
 import { ManageMenusView, useManageMenusPage } from '@/features/manage-menus'
-import { ManageWidgetsView, useManageWidgetsPage } from '@/features/manage-widgets'
+import {
+  HelpModal,
+  LayoutTour,
+  ManageWidgetsView,
+  useManageWidgetsPage,
+} from '@/features/manage-widgets'
 import { useTranslation } from '@/shared/i18n'
-import { Stack, Text } from '@/shared/ui'
+import { Button, Stack, Text } from '@/shared/ui'
+
+const TOUR_LS_KEY = 'nene_layout_tour_seen'
 
 type AppearanceTab = 'layout' | 'menus'
 
@@ -22,9 +30,16 @@ export function AppearanceLayoutPage() {
   const { t } = useTranslation()
   const { tab } = useParams()
   const menusQuery = useMenuList()
+  const [help, setHelp] = useState(false)
+  const [tourOn, setTourOn] = useState(() => localStorage.getItem(TOUR_LS_KEY) === null)
 
   if (!currentUserHasCapability('manage_settings')) {
     return <Navigate to="/forbidden" replace />
+  }
+
+  const endTour = () => {
+    setTourOn(false)
+    localStorage.setItem(TOUR_LS_KEY, '1')
   }
 
   const active: AppearanceTab = tab === 'menus' ? 'menus' : 'layout'
@@ -39,17 +54,28 @@ export function AppearanceLayoutPage() {
 
   return (
     <Stack gap="md">
-      <div>
-        <Text as="span" muted variant="caption">
-          {t('admin.appearance.crumb')} ›{' '}
-          {active === 'layout' ? t('admin.appearance.layoutTab') : t('admin.appearance.menusTab')}
-        </Text>
-        <Text as="h1" variant="heading-md">
-          {active === 'layout' ? t('admin.appearance.layoutTab') : t('admin.appearance.menusTab')}
-        </Text>
-        <Text muted>
-          {active === 'layout' ? t('admin.appearance.layoutSub') : t('admin.appearance.menusSub')}
-        </Text>
+      <div className="flex items-start justify-between gap-inline-md">
+        <div>
+          <Text as="span" muted variant="caption">
+            {t('admin.appearance.crumb')} ›{' '}
+            {active === 'layout' ? t('admin.appearance.layoutTab') : t('admin.appearance.menusTab')}
+          </Text>
+          <Text as="h1" variant="heading-md">
+            {active === 'layout' ? t('admin.appearance.layoutTab') : t('admin.appearance.menusTab')}
+          </Text>
+          <Text muted>
+            {active === 'layout' ? t('admin.appearance.layoutSub') : t('admin.appearance.menusSub')}
+          </Text>
+        </div>
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={() => {
+            setHelp(true)
+          }}
+        >
+          {t('admin.layout.helpButton')}
+        </Button>
       </div>
 
       <nav className="flex items-center gap-inline-md border-b border-border">
@@ -65,6 +91,15 @@ export function AppearanceLayoutPage() {
       </nav>
 
       {active === 'layout' ? <LayoutTab /> : <MenusTab />}
+
+      {help ? (
+        <HelpModal
+          onClose={() => {
+            setHelp(false)
+          }}
+        />
+      ) : null}
+      {tourOn ? <LayoutTour onDone={endTour} /> : null}
     </Stack>
   )
 }

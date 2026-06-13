@@ -10,7 +10,9 @@ import {
   type WidgetInput,
   type WidgetType,
 } from '@/entities/widget'
+import { useTranslation } from '@/shared/i18n'
 import type { WidgetRegion } from '@/shared/lib/resolve-layout'
+import { useToast } from '@/shared/ui'
 
 /** Default settings for a freshly added widget of `type`. */
 function defaultSettings(type: WidgetType, menus: Menu[]): Record<string, unknown> {
@@ -51,6 +53,8 @@ export function useManageWidgetsPage() {
   const createMutation = useCreateWidget()
   const updateMutation = useUpdateWidget()
   const deleteMutation = useDeleteWidget()
+  const { showToast } = useToast()
+  const { t } = useTranslation()
 
   const [selectedId, setSelectedId] = useState<number | null>(null)
   const widgets = useMemo(() => listQuery.data?.items ?? [], [listQuery.data?.items])
@@ -60,8 +64,9 @@ export function useManageWidgetsPage() {
     async (id: number) => {
       await deleteMutation.mutateAsync(id)
       setSelectedId((s) => (s === id ? null : s))
+      showToast(t('admin.layout.toast.removed'))
     },
-    [deleteMutation],
+    [deleteMutation, showToast, t],
   )
 
   // Persist a region's desired widget order; only PUT widgets whose region or
@@ -97,8 +102,9 @@ export function useManageWidgetsPage() {
       ordered.splice(at, 0, created)
       await persistOrder(region, ordered)
       setSelectedId(created.id)
+      showToast(t('admin.layout.toast.added'))
     },
-    [createMutation, menus, widgets, persistOrder],
+    [createMutation, menus, widgets, persistOrder, showToast, t],
   )
 
   const moveWidgetAt = useCallback(

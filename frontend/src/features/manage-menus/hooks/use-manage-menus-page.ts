@@ -14,6 +14,8 @@ import {
   type NavigationItem,
 } from '@/entities/navigation-item'
 import { useCreateWidget, useWidgetList } from '@/entities/widget'
+import { useTranslation } from '@/shared/i18n'
+import { useToast } from '@/shared/ui'
 
 /**
  * Menu management (master–detail): named menus on the left, the selected menu's
@@ -33,6 +35,8 @@ export function useManageMenusPage() {
   const updateItem = useUpdateNavigationItem()
   const deleteItem = useDeleteNavigationItem()
   const createWidget = useCreateWidget()
+  const { showToast } = useToast()
+  const { t } = useTranslation()
 
   const [selectedId, setSelectedId] = useState<number | null>(null)
 
@@ -60,8 +64,9 @@ export function useManageMenusPage() {
     async (name: string) => {
       const menu = await createMenu.mutateAsync({ name })
       setSelectedId(menu.id)
+      showToast(t('admin.menus.toast.created'))
     },
-    [createMenu],
+    [createMenu, showToast, t],
   )
 
   const renameMenu = useCallback(
@@ -76,7 +81,8 @@ export function useManageMenusPage() {
     if (activeMenu === null) return
     await deleteMenu.mutateAsync(activeMenu.id)
     setSelectedId(null)
-  }, [activeMenu, deleteMenu])
+    showToast(t('admin.menus.toast.deleted'))
+  }, [activeMenu, deleteMenu, showToast, t])
 
   const addItem = useCallback(
     async (label: string, url: string) => {
