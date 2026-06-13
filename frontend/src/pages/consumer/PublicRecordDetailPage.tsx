@@ -19,6 +19,7 @@ import {
   resolvePermalink,
 } from '@/shared/lib/resolve-permalink'
 import { Button, EmptyState, Stack, Text } from '@/shared/ui'
+import { InlineTableOfContents } from '@/shared/ui/markdown'
 import { useEntityIdBySlug } from './hooks/use-entity-id-by-slug'
 import { PublicLayout } from './PublicLayout'
 import { usePublicSite } from './public-site-context'
@@ -74,6 +75,9 @@ function PublicRecordDetailContent({
 
   const variant = resolveLayout(entity?.layout ?? null, entityTypeDefaultLayout)
   const isMultiColLayout = variant === 'two-col' || variant === 'three-col'
+  // Single-column themed layouts have no sidebar to host the TOC widget, so they
+  // get an auto inline TOC instead. `bare`/`custom` are author-controlled — skip.
+  const isInlineTocLayout = variant === 'standard' || variant === 'full'
 
   // The page's markdown body feeds region widgets (e.g. the TOC widget) so they
   // derive from the same content the main column renders.
@@ -128,18 +132,23 @@ function PublicRecordDetailContent({
               entityTypePatternById={entityTypePatternById}
             />
           ) : (
-            <PublicRecordDetailView
-              entity={entity}
-              fieldRows={fieldRows}
-              entityTypeSlugById={entityTypeSlugById}
-              entityTypePatternById={entityTypePatternById}
-              isLoading={isLoading}
-              isError={isError}
-              errorTitle={errorTitle}
-              onRetry={() => {
-                void refetch()
-              }}
-            />
+            <>
+              {isInlineTocLayout && !isLoading && !isError && entity !== null ? (
+                <InlineTableOfContents markdown={pageMarkdown} />
+              ) : null}
+              <PublicRecordDetailView
+                entity={entity}
+                fieldRows={fieldRows}
+                entityTypeSlugById={entityTypeSlugById}
+                entityTypePatternById={entityTypePatternById}
+                isLoading={isLoading}
+                isError={isError}
+                errorTitle={errorTitle}
+                onRetry={() => {
+                  void refetch()
+                }}
+              />
+            </>
           )}
           {entity !== null && !isLoading && !isError ? (
             <CommentSection {...commentSection} />
