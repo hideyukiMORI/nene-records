@@ -90,6 +90,13 @@ export const en = {
   'admin.layout.inspectorEmpty':
     'Select a placed widget to edit its heading, settings, and region.',
   'admin.layout.dropHere': 'Drag widgets here',
+  'admin.layout.modeDnd': 'Drag & drop',
+  'admin.layout.modePreview': 'Preview',
+  'admin.layout.previewTitle': 'Live preview',
+  'admin.layout.previewHome': 'Home',
+  'admin.layout.previewRecord': 'Record detail',
+  'admin.layout.previewHomeNote': 'The index is always 1 column — sidebar/aside do not appear.',
+  'admin.layout.previewRecordNote': '{{columns}}-column record detail layout.',
   'admin.layout.cond.sidebar': 'Shows on 2/3-column record pages',
   'admin.layout.cond.aside': 'Shows on 3-column record pages',
   'admin.widgets.board.deleteWidget': 'Delete this widget',
