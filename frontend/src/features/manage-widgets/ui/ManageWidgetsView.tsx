@@ -6,7 +6,7 @@ import type { ContentRegion } from '@/shared/lib/resolve-layout'
 import { Button, Card, Input, Select, Stack, Text } from '@/shared/ui'
 import type { WidgetFormState } from '../hooks/use-manage-widgets-page'
 
-const WIDGET_TYPES: readonly WidgetType[] = ['recent-posts', 'menu']
+const WIDGET_TYPES: readonly WidgetType[] = ['recent-posts', 'menu', 'toc']
 
 export interface ManageWidgetsViewProps {
   widgets: Widget[]
@@ -112,7 +112,7 @@ export function ManageWidgetsView({
                 }}
               />
             </>
-          ) : (
+          ) : form.widgetType === 'menu' ? (
             <>
               <Text muted variant="caption">
                 {t('admin.widgets.menuSettings')}
@@ -132,6 +132,10 @@ export function ManageWidgetsView({
                 ))}
               </Select>
             </>
+          ) : (
+            <Text muted variant="caption">
+              {t('admin.widgets.tocSettings')}
+            </Text>
           )}
           <div className="flex items-center gap-inline-sm">
             <Button type="submit" disabled={isSubmitting}>

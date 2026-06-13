@@ -5,6 +5,7 @@ import type { ContentRegion } from '@/shared/lib/resolve-layout'
 import { Stack, Text } from '@/shared/ui'
 import { MenuWidget } from './MenuWidget'
 import { RecentPostsWidget } from './RecentPostsWidget'
+import { TocWidget } from './TocWidget'
 
 export interface SiteWidgetsProps {
   region: ContentRegion
@@ -14,6 +15,7 @@ export interface SiteWidgetsProps {
 const WIDGET_REGISTRY: Record<WidgetType, (widget: Widget) => ReactNode> = {
   'recent-posts': (widget) => <RecentPostsWidget widget={widget} />,
   menu: (widget) => <MenuWidget widget={widget} />,
+  toc: () => <TocWidget />,
 }
 
 /** Renders all site widgets placed into a given region, in order. */
