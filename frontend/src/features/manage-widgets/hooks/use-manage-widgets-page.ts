@@ -54,6 +54,12 @@ export function useManageWidgetsPage() {
     setForm(EMPTY_FORM)
   }, [])
 
+  // Start a fresh widget targeted at a region (used by the layout board).
+  const addToRegion = useCallback((region: ContentRegion) => {
+    setEditId(null)
+    setForm({ ...EMPTY_FORM, region })
+  }, [])
+
   const editWidget = useCallback((widget: Widget) => {
     setEditId(widget.id)
     setForm({
@@ -125,6 +131,7 @@ export function useManageWidgetsPage() {
     isSubmitting: createMutation.isPending || updateMutation.isPending,
     setField,
     resetForm,
+    addToRegion,
     editWidget,
     submit,
     remove,

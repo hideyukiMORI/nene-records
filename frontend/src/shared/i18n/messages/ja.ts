@@ -66,6 +66,13 @@ export const ja: Partial<MessageCatalog> = {
   'admin.widgets.popularPostsSettings': '閲覧の多い公開レコードを表示します（直近30日）。',
   'admin.widgets.calendarSettings':
     '月カレンダーを表示します。投稿のある日はアーカイブへのリンクになります。',
+  'admin.widgets.board.title': 'レイアウト',
+  'admin.widgets.board.layoutNote':
+    'サイドバー・アサイドのウィジェットは、2カラム/3カラムのレイアウトを使うレコードページで表示されます。',
+  'admin.widgets.board.mainContent': 'レコード本文（フィールド）',
+  'admin.widgets.board.mainNote': 'main に置いたウィジェットは公開サイトでは描画されません。',
+  'admin.widgets.board.addHere': '＋ ここに追加',
+  'admin.widgets.board.empty': 'この領域にウィジェットはまだありません。',
   'widgets.recentPosts.unconfigured': 'コンテンツタイプが未設定です。',
   'widgets.recentPosts.empty': '投稿がまだありません。',
   'widgets.menu.empty': 'メニュー項目がまだありません。',

@@ -73,6 +73,13 @@ export const en = {
   'admin.widgets.popularPostsSettings': 'Shows the most-viewed published records (last 30 days).',
   'admin.widgets.calendarSettings':
     'Shows a month calendar; days with posts link to their archive.',
+  'admin.widgets.board.title': 'Layout',
+  'admin.widgets.board.layoutNote':
+    'Sidebar and aside widgets appear on record pages that use a two- or three-column layout.',
+  'admin.widgets.board.mainContent': 'Record content (fields)',
+  'admin.widgets.board.mainNote': 'Widgets placed in main are not rendered on the public site.',
+  'admin.widgets.board.addHere': '+ Add here',
+  'admin.widgets.board.empty': 'No widgets in this region yet.',
   'widgets.recentPosts.unconfigured': 'No content type configured.',
   'widgets.recentPosts.empty': 'No posts yet.',
   'widgets.menu.empty': 'No menu items yet.',
