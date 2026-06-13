@@ -83,6 +83,13 @@ export const ja: Partial<MessageCatalog> = {
   'admin.layout.inspectorEmpty':
     '配置済みのウィジェットを選ぶと、見出し・設定・領域を編集できます。',
   'admin.layout.dropHere': 'ここにドラッグして配置',
+  'admin.layout.modeDnd': 'ドラッグ配置',
+  'admin.layout.modePreview': 'プレビュー',
+  'admin.layout.previewTitle': 'ライブプレビュー',
+  'admin.layout.previewHome': 'トップ',
+  'admin.layout.previewRecord': 'レコード詳細',
+  'admin.layout.previewHomeNote': 'トップは常に1カラム — サイドバー／アサイドは出ません。',
+  'admin.layout.previewRecordNote': '{{columns}}カラムのレコード詳細レイアウト。',
   'admin.layout.cond.sidebar': '2/3カラムのレコードページで表示',
   'admin.layout.cond.aside': '3カラムのレコードページで表示',
   'admin.widgets.board.deleteWidget': 'このウィジェットを削除',
