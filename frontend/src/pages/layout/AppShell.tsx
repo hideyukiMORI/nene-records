@@ -284,17 +284,17 @@ export function AppShell() {
                     <ul className="mt-0.5 space-y-0.5">
                       <li>
                         <NavItem
-                          to="/admin/navigation"
-                          icon={<IconLink size={16} />}
-                          label={t('admin.nav.navigation')}
+                          to="/admin/appearance/layout"
+                          icon={<IconLayout size={16} />}
+                          label={t('admin.nav.layout')}
                           onClick={closeSidebar}
                         />
                       </li>
                       <li>
                         <NavItem
-                          to="/admin/widgets"
+                          to="/admin/appearance/menus"
                           icon={<IconLink size={16} />}
-                          label={t('admin.nav.widgets')}
+                          label={t('admin.nav.menus')}
                           onClick={closeSidebar}
                         />
                       </li>
