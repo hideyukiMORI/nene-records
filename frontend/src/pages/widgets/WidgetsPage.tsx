@@ -27,6 +27,7 @@ export function WidgetsPage() {
         isSubmitting={page.isSubmitting}
         setField={page.setField}
         resetForm={page.resetForm}
+        addToRegion={page.addToRegion}
         editWidget={page.editWidget}
         submit={page.submit}
         remove={page.remove}

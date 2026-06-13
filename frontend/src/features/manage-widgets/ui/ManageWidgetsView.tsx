@@ -5,6 +5,7 @@ import { useTranslation } from '@/shared/i18n'
 import type { ContentRegion } from '@/shared/lib/resolve-layout'
 import { Button, Card, Input, Select, Stack, Text } from '@/shared/ui'
 import type { WidgetFormState } from '../hooks/use-manage-widgets-page'
+import { WidgetRegionBoard } from './WidgetRegionBoard'
 
 const WIDGET_TYPES: readonly WidgetType[] = [
   'recent-posts',
@@ -24,6 +25,7 @@ export interface ManageWidgetsViewProps {
   isSubmitting: boolean
   setField: <K extends keyof WidgetFormState>(key: K, value: WidgetFormState[K]) => void
   resetForm: () => void
+  addToRegion: (region: ContentRegion) => void
   editWidget: (widget: Widget) => void
   submit: () => Promise<void>
   remove: (id: number) => Promise<void>
@@ -37,6 +39,7 @@ export function ManageWidgetsView({
   isSubmitting,
   setField,
   resetForm,
+  addToRegion,
   editWidget,
   submit,
   remove,
@@ -80,7 +83,6 @@ export function ManageWidgetsView({
           >
             <option value="sidebar">{t('admin.region.sidebar')}</option>
             <option value="aside">{t('admin.region.aside')}</option>
-            <option value="main">{t('admin.region.main')}</option>
           </Select>
           <Input
             id="widget-title"
@@ -195,55 +197,17 @@ export function ManageWidgetsView({
         </Stack>
       </Card>
 
-      <Stack gap="sm">
-        <Text as="h2" variant="heading-sm">
-          {t('admin.widgets.listTitle')}
-        </Text>
-        {widgets.length === 0 ? (
-          <Text muted>{t('admin.widgets.empty')}</Text>
-        ) : (
-          <ul className="flex flex-col gap-stack-xs">
-            {widgets.map((widget) => (
-              <Card
-                as="li"
-                key={widget.id}
-                padding="row"
-                className="flex items-center justify-between gap-inline-md"
-              >
-                <Stack gap="xs">
-                  <Text as="span" variant="heading-sm">
-                    {widget.title ?? widget.widgetType}
-                  </Text>
-                  <Text as="span" muted variant="caption">
-                    {t(`admin.region.${widget.region}`)} ·{' '}
-                    {t(`admin.widgets.type.${widget.widgetType}`)}
-                  </Text>
-                </Stack>
-                <div className="flex items-center gap-inline-sm">
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    onClick={() => {
-                      editWidget(widget)
-                    }}
-                  >
-                    {t('common.actions.edit')}
-                  </Button>
-                  <Button
-                    variant="danger"
-                    size="sm"
-                    onClick={() => {
-                      void remove(widget.id)
-                    }}
-                  >
-                    {t('common.actions.delete')}
-                  </Button>
-                </div>
-              </Card>
-            ))}
-          </ul>
-        )}
-      </Stack>
+      <WidgetRegionBoard
+        widgets={widgets}
+        editId={editId}
+        onAddToRegion={(region) => {
+          addToRegion(region)
+        }}
+        onEdit={editWidget}
+        onRemove={(id) => {
+          void remove(id)
+        }}
+      />
     </Stack>
   )
 }
