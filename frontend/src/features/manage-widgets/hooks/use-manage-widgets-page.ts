@@ -88,7 +88,9 @@ export function useManageWidgetsPage() {
               ? {}
               : form.widgetType === 'popular-posts'
                 ? { limit: form.limit }
-                : { entityTypeSlug: form.entityTypeSlug, limit: form.limit }
+                : form.widgetType === 'calendar'
+                  ? {}
+                  : { entityTypeSlug: form.entityTypeSlug, limit: form.limit }
     const input: WidgetInput = {
       widgetType: form.widgetType,
       region: form.region,

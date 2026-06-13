@@ -305,6 +305,20 @@ paths:
             type: string
             minLength: 1
           description: Full-text search across slug and text field values (partial match).
+        - name: published_from
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+          description: Only entities published on or after this date (YYYY-MM-DD).
+        - name: published_to
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+          description: Only entities published on or before this date, inclusive (YYYY-MM-DD).
         - name: sort
           in: query
           required: false
@@ -5302,7 +5316,7 @@ components:
           minimum: 1
         widget_type:
           type: string
-          enum: [recent-posts, menu, toc, search, tag-cloud, popular-posts]
+          enum: [recent-posts, menu, toc, search, tag-cloud, popular-posts, calendar]
         region:
           type: string
           enum: [main, sidebar, aside]
@@ -5342,7 +5356,7 @@ components:
       properties:
         widget_type:
           type: string
-          enum: [recent-posts, menu, toc, search, tag-cloud, popular-posts]
+          enum: [recent-posts, menu, toc, search, tag-cloud, popular-posts, calendar]
         region:
           type: string
           enum: [main, sidebar, aside]

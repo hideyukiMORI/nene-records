@@ -2061,7 +2061,7 @@ export interface components {
         WidgetResponse: {
             id: number;
             /** @enum {string} */
-            widget_type: "recent-posts" | "menu" | "toc" | "search" | "tag-cloud" | "popular-posts";
+            widget_type: "recent-posts" | "menu" | "toc" | "search" | "tag-cloud" | "popular-posts" | "calendar";
             /** @enum {string} */
             region: "main" | "sidebar" | "aside";
             display_order: number;
@@ -2080,7 +2080,7 @@ export interface components {
         };
         CreateWidgetRequest: {
             /** @enum {string} */
-            widget_type: "recent-posts" | "menu" | "toc" | "search" | "tag-cloud" | "popular-posts";
+            widget_type: "recent-posts" | "menu" | "toc" | "search" | "tag-cloud" | "popular-posts" | "calendar";
             /** @enum {string} */
             region: "main" | "sidebar" | "aside";
             /** @default 0 */
@@ -2715,6 +2715,10 @@ export interface operations {
                 "relation.{field_key}"?: components["parameters"]["RelationFilterQuery"];
                 /** @description Full-text search across slug and text field values (partial match). */
                 q?: string;
+                /** @description Only entities published on or after this date (YYYY-MM-DD). */
+                published_from?: string;
+                /** @description Only entities published on or before this date, inclusive (YYYY-MM-DD). */
+                published_to?: string;
                 /** @description Sort key. `title` joins the `title` text field value. */
                 sort?: "id" | "published_at" | "title";
                 /** @description Sort direction. */

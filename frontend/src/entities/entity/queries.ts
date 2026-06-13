@@ -112,6 +112,37 @@ export function useEntitiesByTag(
   })
 }
 
+/**
+ * Published entities of every type published within [from, to] (inclusive,
+ * YYYY-MM-DD). Omits entity_type_id to search across types. Disabled until both
+ * dates are set.
+ */
+export function useEntitiesByDateRange(
+  from: string,
+  to: string,
+  options?: { limit?: number; enabled?: boolean },
+): UseQueryResult<EntityList, AppError> {
+  const limit = options?.limit ?? 100
+  return useQuery({
+    queryKey: entityKeys.byDateRange(from, to, limit),
+    enabled: (options?.enabled ?? true) && from !== '' && to !== '',
+    queryFn: async ({ signal }) => {
+      const search = new URLSearchParams({
+        limit: String(limit),
+        offset: '0',
+        status: 'published',
+        published_from: from,
+        published_to: to,
+      })
+      const dto = await apiClient.get<EntityListDto>(
+        `/api/v1/entities?${search.toString()}`,
+        signal,
+      )
+      return mapEntityListDtoToModel(dto)
+    },
+  })
+}
+
 export function useEntity(
   id: EntityId,
   options?: { enabled?: boolean },

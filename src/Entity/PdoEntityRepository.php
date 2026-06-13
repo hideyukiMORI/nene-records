@@ -193,6 +193,16 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
             $params[] = $targetEntityId;
         }
 
+        if ($criteria->publishedFrom !== null) {
+            $conditions[] = 'e.published_at >= ?';
+            $params[] = $criteria->publishedFrom;
+        }
+
+        if ($criteria->publishedToExclusive !== null) {
+            $conditions[] = 'e.published_at < ?';
+            $params[] = $criteria->publishedToExclusive;
+        }
+
         if ($criteria->q !== null && $criteria->q !== '') {
             $like = '%' . $criteria->q . '%';
             $conditions[] = <<<'SQL'

@@ -36,6 +36,14 @@ final readonly class ListEntitiesHandler
         $rawQ = $request->getQueryParams()['q'] ?? null;
         $q = (is_string($rawQ) && $rawQ !== '') ? $rawQ : null;
 
+        $publishedFrom = $this->parseDate($request->getQueryParams()['published_from'] ?? null);
+        // `published_to` is an inclusive day; store the exclusive next-day bound so
+        // ISO timestamps on the last day still match (`published_at < to+1d`).
+        $publishedTo = $this->parseDate($request->getQueryParams()['published_to'] ?? null);
+        $publishedToExclusive = $publishedTo === null
+            ? null
+            : (new \DateTimeImmutable($publishedTo))->modify('+1 day')->format('Y-m-d');
+
         $rawSort = $request->getQueryParams()['sort'] ?? null;
         $sortKey = is_string($rawSort) ? (EntitySortKey::tryFrom($rawSort) ?? EntitySortKey::Id) : EntitySortKey::Id;
 
@@ -53,6 +61,8 @@ final readonly class ListEntitiesHandler
                 q: $q,
                 sortKey: $sortKey,
                 sortOrder: $sortOrder,
+                publishedFrom: $publishedFrom,
+                publishedToExclusive: $publishedToExclusive,
             ),
         ));
 
@@ -78,5 +88,17 @@ final readonly class ListEntitiesHandler
                 total: $output->total,
             ))->toArray(),
         );
+    }
+
+    /** Returns a valid `Y-m-d` string, or null for anything else. */
+    private function parseDate(mixed $raw): ?string
+    {
+        if (!is_string($raw) || preg_match('/^\d{4}-\d{2}-\d{2}$/', $raw) !== 1) {
+            return null;
+        }
+
+        $date = \DateTimeImmutable::createFromFormat('!Y-m-d', $raw);
+
+        return $date !== false && $date->format('Y-m-d') === $raw ? $raw : null;
     }
 }

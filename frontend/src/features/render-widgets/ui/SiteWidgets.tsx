@@ -3,6 +3,7 @@ import type { Widget, WidgetType } from '@/entities/widget'
 import { usePublicWidgets } from '@/entities/widget'
 import type { ContentRegion } from '@/shared/lib/resolve-layout'
 import { Stack, Text } from '@/shared/ui'
+import { CalendarWidget } from './CalendarWidget'
 import { MenuWidget } from './MenuWidget'
 import { PopularPostsWidget } from './PopularPostsWidget'
 import { RecentPostsWidget } from './RecentPostsWidget'
@@ -22,6 +23,7 @@ const WIDGET_REGISTRY: Record<WidgetType, (widget: Widget) => ReactNode> = {
   search: (widget) => <SearchWidget widget={widget} />,
   'tag-cloud': () => <TagCloudWidget />,
   'popular-posts': (widget) => <PopularPostsWidget widget={widget} />,
+  calendar: () => <CalendarWidget />,
 }
 
 /** Renders all site widgets placed into a given region, in order. */
