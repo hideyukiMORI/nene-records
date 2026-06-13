@@ -2738,8 +2738,16 @@ paths:
       tags:
         - PublicConsumer
       summary: List public navigation items
-      description: Returns all navigation items for the public site header. No authentication required.
+      description: Returns navigation items for the public site, optionally filtered by location. No authentication required.
       operationId: listPublicNavigationItems
+      parameters:
+        - name: location
+          in: query
+          required: false
+          description: Filter by location (header, footer, side). Unknown values are ignored.
+          schema:
+            type: string
+            enum: [header, footer, side]
       responses:
         '200':
           description: Navigation item list.
@@ -5213,7 +5221,7 @@ components:
           minimum: 1
         widget_type:
           type: string
-          enum: [recent-posts]
+          enum: [recent-posts, menu]
         region:
           type: string
           enum: [main, sidebar, aside]
@@ -5253,7 +5261,7 @@ components:
       properties:
         widget_type:
           type: string
-          enum: [recent-posts]
+          enum: [recent-posts, menu]
         region:
           type: string
           enum: [main, sidebar, aside]
@@ -5275,6 +5283,7 @@ components:
         - id
         - label
         - url
+        - location
         - display_order
         - created_at
         - updated_at
@@ -5288,6 +5297,10 @@ components:
         url:
           type: string
           minLength: 1
+        location:
+          type: string
+          enum: [header, footer, side]
+          description: Where the item renders. `side` items are surfaced via a menu widget.
         display_order:
           type: integer
           minimum: 0
@@ -5320,6 +5333,10 @@ components:
         url:
           type: string
           minLength: 1
+        location:
+          type: string
+          enum: [header, footer, side]
+          default: header
         display_order:
           type: integer
           minimum: 0
@@ -5337,6 +5354,10 @@ components:
         url:
           type: string
           minLength: 1
+        location:
+          type: string
+          enum: [header, footer, side]
+          default: header
         display_order:
           type: integer
           minimum: 0

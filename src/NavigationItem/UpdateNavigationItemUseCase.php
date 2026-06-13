@@ -23,6 +23,7 @@ final readonly class UpdateNavigationItemUseCase implements UpdateNavigationItem
             id: $existing->id,
             label: $input->label,
             url: $input->url,
+            location: $input->location,
             displayOrder: $input->displayOrder,
             createdAt: $existing->createdAt,
             updatedAt: '',

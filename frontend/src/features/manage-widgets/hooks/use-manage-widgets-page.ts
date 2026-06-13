@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react'
 import { useEntityTypeList } from '@/entities/entity-type'
+import type { NavLocation } from '@/entities/navigation-item'
 import {
   useCreateWidget,
   useDeleteWidget,
@@ -7,17 +8,27 @@ import {
   useWidgetList,
   type Widget,
   type WidgetInput,
+  type WidgetType,
 } from '@/entities/widget'
 import type { ContentRegion } from '@/shared/lib/resolve-layout'
 
 export interface WidgetFormState {
+  widgetType: WidgetType
   region: ContentRegion
   title: string
   entityTypeSlug: string
   limit: number
+  menuLocation: NavLocation
 }
 
-const EMPTY_FORM: WidgetFormState = { region: 'sidebar', title: '', entityTypeSlug: '', limit: 5 }
+const EMPTY_FORM: WidgetFormState = {
+  widgetType: 'recent-posts',
+  region: 'sidebar',
+  title: '',
+  entityTypeSlug: '',
+  limit: 5,
+  menuLocation: 'side',
+}
 
 export function useManageWidgetsPage() {
   const listQuery = useWidgetList()
@@ -44,6 +55,7 @@ export function useManageWidgetsPage() {
   const editWidget = useCallback((widget: Widget) => {
     setEditId(widget.id)
     setForm({
+      widgetType: widget.widgetType,
       region: widget.region,
       title: widget.title ?? '',
       entityTypeSlug:
@@ -51,16 +63,26 @@ export function useManageWidgetsPage() {
           ? widget.settings['entityTypeSlug']
           : '',
       limit: typeof widget.settings['limit'] === 'number' ? widget.settings['limit'] : 5,
+      menuLocation:
+        widget.settings['location'] === 'header' ||
+        widget.settings['location'] === 'footer' ||
+        widget.settings['location'] === 'side'
+          ? widget.settings['location']
+          : 'side',
     })
   }, [])
 
   const submit = useCallback(async () => {
+    const settings =
+      form.widgetType === 'menu'
+        ? { location: form.menuLocation }
+        : { entityTypeSlug: form.entityTypeSlug, limit: form.limit }
     const input: WidgetInput = {
-      widgetType: 'recent-posts',
+      widgetType: form.widgetType,
       region: form.region,
       displayOrder: 0,
       title: form.title.trim() === '' ? null : form.title.trim(),
-      settings: { entityTypeSlug: form.entityTypeSlug, limit: form.limit },
+      settings,
     }
     if (editId !== null) {
       await updateMutation.mutateAsync({ id: editId, input })

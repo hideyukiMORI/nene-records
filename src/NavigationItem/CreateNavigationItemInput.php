@@ -9,6 +9,7 @@ final readonly class CreateNavigationItemInput
     public function __construct(
         public string $label,
         public string $url,
+        public string $location,
         public int $displayOrder,
     ) {
     }

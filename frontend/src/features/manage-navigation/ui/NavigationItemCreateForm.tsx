@@ -1,7 +1,8 @@
 import { useCallback } from 'react'
 import { useForm } from 'react-hook-form'
+import { NAV_LOCATIONS } from '@/entities/navigation-item'
 import { useTranslation } from '@/shared/i18n'
-import { Button, Card, Input, Stack, Text } from '@/shared/ui'
+import { Button, Card, Input, Select, Stack, Text } from '@/shared/ui'
 import type { NavigationItemFormValues } from '../hooks/use-manage-navigation-page'
 
 export interface NavigationItemCreateFormProps {
@@ -22,7 +23,7 @@ export function NavigationItemCreateForm({
     reset,
     formState: { errors },
   } = useForm<NavigationItemFormValues>({
-    defaultValues: { label: '', url: '', displayOrder: 0 },
+    defaultValues: { label: '', url: '', location: 'header', displayOrder: 0 },
   })
 
   const submit = useCallback(
@@ -62,6 +63,18 @@ export function NavigationItemCreateForm({
           disabled={isSubmitting}
           {...register('url', { required: t('admin.navigation.url') + ' is required.' })}
         />
+        <Select
+          id="nav-create-location"
+          label={t('admin.navigation.location')}
+          disabled={isSubmitting}
+          {...register('location')}
+        >
+          {NAV_LOCATIONS.map((location) => (
+            <option key={location} value={location}>
+              {t(`admin.navigation.location.${location}`)}
+            </option>
+          ))}
+        </Select>
         <Input
           id="nav-create-order"
           label={t('admin.navigation.displayOrder')}

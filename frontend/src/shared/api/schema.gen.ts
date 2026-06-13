@@ -1097,7 +1097,7 @@ export interface paths {
         };
         /**
          * List public navigation items
-         * @description Returns all navigation items for the public site header. No authentication required.
+         * @description Returns navigation items for the public site, optionally filtered by location. No authentication required.
          */
         get: operations["listPublicNavigationItems"];
         put?: never;
@@ -2029,7 +2029,7 @@ export interface components {
         WidgetResponse: {
             id: number;
             /** @enum {string} */
-            widget_type: "recent-posts";
+            widget_type: "recent-posts" | "menu";
             /** @enum {string} */
             region: "main" | "sidebar" | "aside";
             display_order: number;
@@ -2048,7 +2048,7 @@ export interface components {
         };
         CreateWidgetRequest: {
             /** @enum {string} */
-            widget_type: "recent-posts";
+            widget_type: "recent-posts" | "menu";
             /** @enum {string} */
             region: "main" | "sidebar" | "aside";
             /** @default 0 */
@@ -2062,6 +2062,11 @@ export interface components {
             id: number;
             label: string;
             url: string;
+            /**
+             * @description Where the item renders. `side` items are surfaced via a menu widget.
+             * @enum {string}
+             */
+            location: "header" | "footer" | "side";
             display_order: number;
             /** Format: date-time */
             created_at: string;
@@ -2074,12 +2079,22 @@ export interface components {
         CreateNavigationItemRequest: {
             label: string;
             url: string;
+            /**
+             * @default header
+             * @enum {string}
+             */
+            location: "header" | "footer" | "side";
             /** @default 0 */
             display_order: number;
         };
         UpdateNavigationItemRequest: {
             label: string;
             url: string;
+            /**
+             * @default header
+             * @enum {string}
+             */
+            location: "header" | "footer" | "side";
             /** @default 0 */
             display_order: number;
         };
@@ -5051,7 +5066,10 @@ export interface operations {
     };
     listPublicNavigationItems: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Filter by location (header, footer, side). Unknown values are ignored. */
+                location?: "header" | "footer" | "side";
+            };
             header?: never;
             path?: never;
             cookie?: never;

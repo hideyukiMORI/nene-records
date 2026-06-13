@@ -1,9 +1,12 @@
 import type { EntityType } from '@/entities/entity-type'
-import type { Widget } from '@/entities/widget'
+import { NAV_LOCATIONS, type NavLocation } from '@/entities/navigation-item'
+import type { Widget, WidgetType } from '@/entities/widget'
 import { useTranslation } from '@/shared/i18n'
 import type { ContentRegion } from '@/shared/lib/resolve-layout'
 import { Button, Card, Input, Select, Stack, Text } from '@/shared/ui'
 import type { WidgetFormState } from '../hooks/use-manage-widgets-page'
+
+const WIDGET_TYPES: readonly WidgetType[] = ['recent-posts', 'menu']
 
 export interface ManageWidgetsViewProps {
   widgets: Widget[]
@@ -46,6 +49,20 @@ export function ManageWidgetsView({
             {editId !== null ? t('admin.widgets.editTitle') : t('admin.widgets.createTitle')}
           </Text>
           <Select
+            id="widget-type"
+            label={t('admin.widgets.typeLabel')}
+            value={form.widgetType}
+            onChange={(e) => {
+              setField('widgetType', e.target.value as WidgetType)
+            }}
+          >
+            {WIDGET_TYPES.map((type) => (
+              <option key={type} value={type}>
+                {t(`admin.widgets.type.${type}`)}
+              </option>
+            ))}
+          </Select>
+          <Select
             id="widget-region"
             label={t('admin.region.label')}
             value={form.region}
@@ -65,33 +82,57 @@ export function ManageWidgetsView({
               setField('title', e.target.value)
             }}
           />
-          <Text muted variant="caption">
-            {t('admin.widgets.recentPostsSettings')}
-          </Text>
-          <Select
-            id="widget-entity-type"
-            label={t('admin.widgets.entityTypeLabel')}
-            value={form.entityTypeSlug}
-            onChange={(e) => {
-              setField('entityTypeSlug', e.target.value)
-            }}
-          >
-            <option value="">{t('admin.widgets.entityTypePlaceholder')}</option>
-            {entityTypes.map((type) => (
-              <option key={String(type.id)} value={type.slug}>
-                {type.name}
-              </option>
-            ))}
-          </Select>
-          <Input
-            id="widget-limit"
-            type="number"
-            label={t('admin.widgets.limitLabel')}
-            value={String(form.limit)}
-            onChange={(e) => {
-              setField('limit', Number(e.target.value) || 1)
-            }}
-          />
+          {form.widgetType === 'recent-posts' ? (
+            <>
+              <Text muted variant="caption">
+                {t('admin.widgets.recentPostsSettings')}
+              </Text>
+              <Select
+                id="widget-entity-type"
+                label={t('admin.widgets.entityTypeLabel')}
+                value={form.entityTypeSlug}
+                onChange={(e) => {
+                  setField('entityTypeSlug', e.target.value)
+                }}
+              >
+                <option value="">{t('admin.widgets.entityTypePlaceholder')}</option>
+                {entityTypes.map((type) => (
+                  <option key={String(type.id)} value={type.slug}>
+                    {type.name}
+                  </option>
+                ))}
+              </Select>
+              <Input
+                id="widget-limit"
+                type="number"
+                label={t('admin.widgets.limitLabel')}
+                value={String(form.limit)}
+                onChange={(e) => {
+                  setField('limit', Number(e.target.value) || 1)
+                }}
+              />
+            </>
+          ) : (
+            <>
+              <Text muted variant="caption">
+                {t('admin.widgets.menuSettings')}
+              </Text>
+              <Select
+                id="widget-menu-location"
+                label={t('admin.navigation.location')}
+                value={form.menuLocation}
+                onChange={(e) => {
+                  setField('menuLocation', e.target.value as NavLocation)
+                }}
+              >
+                {NAV_LOCATIONS.map((location) => (
+                  <option key={location} value={location}>
+                    {t(`admin.navigation.location.${location}`)}
+                  </option>
+                ))}
+              </Select>
+            </>
+          )}
           <div className="flex items-center gap-inline-sm">
             <Button type="submit" disabled={isSubmitting}>
               {editId !== null ? t('common.actions.save') : t('admin.widgets.add')}
@@ -125,7 +166,8 @@ export function ManageWidgetsView({
                     {widget.title ?? widget.widgetType}
                   </Text>
                   <Text as="span" muted variant="caption">
-                    {t(`admin.region.${widget.region}`)} · {widget.widgetType}
+                    {t(`admin.region.${widget.region}`)} ·{' '}
+                    {t(`admin.widgets.type.${widget.widgetType}`)}
                   </Text>
                 </Stack>
                 <div className="flex items-center gap-inline-sm">

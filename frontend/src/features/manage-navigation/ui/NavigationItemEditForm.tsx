@@ -1,8 +1,8 @@
 import { useCallback } from 'react'
 import { useForm } from 'react-hook-form'
-import type { NavigationItem } from '@/entities/navigation-item'
+import { NAV_LOCATIONS, type NavigationItem } from '@/entities/navigation-item'
 import { useTranslation } from '@/shared/i18n'
-import { Button, Card, Input, Stack, Text } from '@/shared/ui'
+import { Button, Card, Input, Select, Stack, Text } from '@/shared/ui'
 import type { NavigationItemFormValues } from '../hooks/use-manage-navigation-page'
 
 export interface NavigationItemEditFormProps {
@@ -26,7 +26,12 @@ export function NavigationItemEditForm({
     handleSubmit,
     formState: { errors },
   } = useForm<NavigationItemFormValues>({
-    defaultValues: { label: item.label, url: item.url, displayOrder: item.displayOrder },
+    defaultValues: {
+      label: item.label,
+      url: item.url,
+      location: item.location,
+      displayOrder: item.displayOrder,
+    },
   })
 
   const submit = useCallback(
@@ -65,6 +70,18 @@ export function NavigationItemEditForm({
           disabled={isSubmitting}
           {...register('url', { required: t('admin.navigation.url') + ' is required.' })}
         />
+        <Select
+          id={`nav-edit-location-${String(item.id)}`}
+          label={t('admin.navigation.location')}
+          disabled={isSubmitting}
+          {...register('location')}
+        >
+          {NAV_LOCATIONS.map((location) => (
+            <option key={location} value={location}>
+              {t(`admin.navigation.location.${location}`)}
+            </option>
+          ))}
+        </Select>
         <Input
           id={`nav-edit-order-${String(item.id)}`}
           label={t('admin.navigation.displayOrder')}
