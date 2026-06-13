@@ -1,5 +1,7 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
 import { AcceptInvitePage } from '@/pages/accept-invite/AcceptInvitePage'
+import { AppearanceLayoutPage } from '@/pages/appearance/AppearanceLayoutPage'
 import { PublicBrowsePage } from '@/pages/consumer/PublicBrowsePage'
 import { PublicIndexPage } from '@/pages/consumer/PublicIndexPage'
 import { PublicRecordDetailPage } from '@/pages/consumer/PublicRecordDetailPage'
@@ -16,8 +18,6 @@ import { HomePage } from '@/pages/home/HomePage'
 import { AppShell } from '@/pages/layout/AppShell'
 import { LoginPage } from '@/pages/login/LoginPage'
 import { MediaPage } from '@/pages/media/MediaPage'
-import { NavigationPage } from '@/pages/navigation/NavigationPage'
-import { WidgetsPage } from '@/pages/widgets/WidgetsPage'
 import { NotFoundPage } from '@/pages/not-found/NotFoundPage'
 import { ResetPasswordPage } from '@/pages/reset-password/ResetPasswordPage'
 import { SiteSettingsPage } from '@/pages/settings/SiteSettingsPage'
@@ -85,8 +85,11 @@ const router = createBrowserRouter([
       { path: 'entity-types', element: <EntityTypesPage /> },
       { path: 'tags', element: <TagsPage /> },
       { path: 'comments', element: <CommentsPage /> },
-      { path: 'navigation', element: <NavigationPage /> },
-      { path: 'widgets', element: <WidgetsPage /> },
+      // Appearance › Layout builder (tabs: layout / menus). Old routes redirect.
+      { path: 'appearance', element: <Navigate to="/admin/appearance/layout" replace /> },
+      { path: 'appearance/:tab', element: <AppearanceLayoutPage /> },
+      { path: 'navigation', element: <Navigate to="/admin/appearance/menus" replace /> },
+      { path: 'widgets', element: <Navigate to="/admin/appearance/layout" replace /> },
       { path: 'media', element: <MediaPage /> },
       { path: 'webhooks', element: <WebhooksPage /> },
       { path: 'notifications', element: <NotificationChannelsPage /> },
