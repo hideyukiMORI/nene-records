@@ -1,28 +1,28 @@
 import type { Widget } from '@/entities/widget'
 import { useTranslation } from '@/shared/i18n'
+import { bodyColumns, type LayoutConfig } from '@/shared/lib/layout-config'
 import type { WidgetRegion } from '@/shared/lib/resolve-layout'
 import { Button, Card, Stack, Text } from '@/shared/ui'
 
 export interface WidgetRegionBoardProps {
   widgets: Widget[]
   editId: number | null
+  cfg: LayoutConfig
   onAddToRegion: (region: WidgetRegion) => void
   onEdit: (widget: Widget) => void
   onRemove: (id: number) => void
 }
 
-// Mirrors the public column proportion (main 2 / sidebar 1 / aside 1).
-// Kept in a constant so the arbitrary Tailwind value is not a className literal.
-const BOARD_GRID_CLASS = 'grid grid-cols-1 gap-stack-md lg:grid-cols-[2fr_1fr_1fr]'
-
 /**
  * Visual layout board mirroring the public page: a full-width header bar, the
- * main content column with the side columns, and a full-width footer bar. Each
- * region (header/sidebar/aside/footer) accepts widgets; `main` is record content.
+ * record-detail body columns (driven by the layout config), and a full-width
+ * footer bar. Each region (header/sidebar/aside/footer) accepts widgets; `main`
+ * is record content.
  */
 export function WidgetRegionBoard({
   widgets,
   editId,
+  cfg,
   onAddToRegion,
   onEdit,
   onRemove,
@@ -105,6 +105,8 @@ export function WidgetRegionBoard({
     )
   }
 
+  const cols = bodyColumns(cfg)
+
   return (
     <Stack gap="sm">
       <Text as="h2" variant="heading-sm">
@@ -116,20 +118,28 @@ export function WidgetRegionBoard({
 
       {renderRegion('header')}
 
-      <div className={BOARD_GRID_CLASS}>
-        {/* main = record content, not a widget target */}
-        <Card className="flex flex-col gap-stack-sm border-dashed">
-          <Text as="span" variant="heading-sm">
-            {t('admin.region.main')}
-          </Text>
-          <div className="flex min-h-16 items-center justify-center rounded-md bg-surface px-inline-md py-stack-md text-center">
-            <Text muted variant="caption">
-              {t('admin.widgets.board.mainContent')}
-            </Text>
-          </div>
-        </Card>
-        {renderRegion('sidebar')}
-        {renderRegion('aside')}
+      <div
+        className="grid gap-stack-md"
+        style={{
+          gridTemplateColumns: cols.map((c) => (c === 'main' ? '1.6fr' : '1fr')).join(' '),
+        }}
+      >
+        {cols.map((c) =>
+          c === 'main' ? (
+            <Card key="main" className="flex flex-col gap-stack-sm border-dashed">
+              <Text as="span" variant="heading-sm">
+                {t('admin.region.main')}
+              </Text>
+              <div className="flex min-h-16 items-center justify-center rounded-md bg-surface px-inline-md py-stack-md text-center">
+                <Text muted variant="caption">
+                  {t('admin.widgets.board.mainContent')}
+                </Text>
+              </div>
+            </Card>
+          ) : (
+            <div key={c}>{renderRegion(c)}</div>
+          ),
+        )}
       </div>
 
       {renderRegion('footer')}

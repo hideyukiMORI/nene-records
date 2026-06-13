@@ -1,10 +1,18 @@
+import { useState } from 'react'
 import type { EntityType } from '@/entities/entity-type'
 import type { Menu } from '@/entities/menu'
 import type { Widget, WidgetType } from '@/entities/widget'
 import { useTranslation } from '@/shared/i18n'
+import {
+  activeSideRegions,
+  loadLayoutConfig,
+  saveLayoutConfig,
+  type LayoutConfig,
+} from '@/shared/lib/layout-config'
 import { WIDGET_REGIONS, type WidgetRegion } from '@/shared/lib/resolve-layout'
 import { Button, Card, Input, Select, Stack, Text } from '@/shared/ui'
 import type { WidgetFormState } from '../hooks/use-manage-widgets-page'
+import { LayoutConfigBar } from './LayoutConfigBar'
 import { WidgetRegionBoard } from './WidgetRegionBoard'
 
 const WIDGET_TYPES: readonly WidgetType[] = [
@@ -47,9 +55,42 @@ export function ManageWidgetsView({
   remove,
 }: ManageWidgetsViewProps) {
   const { t } = useTranslation()
+  const [cfg, setCfgState] = useState<LayoutConfig>(() => loadLayoutConfig())
+  const setCfg = (next: LayoutConfig) => {
+    setCfgState(next)
+    saveLayoutConfig(next)
+  }
+
+  // Widgets in side regions the current config does not render → hidden publicly.
+  const active = activeSideRegions(cfg)
+  const hiddenRegions = (['sidebar', 'aside'] as const).filter((r) => !active.includes(r))
+  const hiddenCount = widgets.filter((w) =>
+    (hiddenRegions as readonly WidgetRegion[]).includes(w.region),
+  ).length
 
   return (
     <Stack gap="lg">
+      <LayoutConfigBar cfg={cfg} setCfg={setCfg} />
+      {hiddenCount > 0 ? (
+        <Card className="flex flex-wrap items-center gap-inline-md border-warn">
+          <Text as="span" variant="caption">
+            {t('admin.layoutCfg.hiddenWarning', {
+              count: String(hiddenCount),
+              regions: hiddenRegions.map((r) => t(`admin.region.${r}`)).join('・'),
+              columns: String(cfg.columns),
+            })}
+          </Text>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => {
+              setCfg({ ...cfg, columns: 3 })
+            }}
+          >
+            {t('admin.layoutCfg.makeThreeCol')}
+          </Button>
+        </Card>
+      ) : null}
       <Card
         as="form"
         onSubmit={(e) => {
@@ -206,6 +247,7 @@ export function ManageWidgetsView({
       <WidgetRegionBoard
         widgets={widgets}
         editId={editId}
+        cfg={cfg}
         onAddToRegion={(region) => {
           addToRegion(region)
         }}
