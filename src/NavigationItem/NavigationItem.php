@@ -10,6 +10,7 @@ final readonly class NavigationItem
         public ?int $id,
         public string $label,
         public string $url,
+        public string $location,
         public int $displayOrder,
         public string $createdAt,
         public string $updatedAt,

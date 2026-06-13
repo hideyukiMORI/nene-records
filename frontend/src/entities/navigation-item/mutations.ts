@@ -17,6 +17,7 @@ export function useCreateNavigationItem(): UseMutationResult<
       const dto = await apiClient.post<NavigationItemDto>('/api/v1/navigation-items', {
         label: input.label,
         url: input.url,
+        location: input.location,
         display_order: input.displayOrder,
       })
       return mapNavigationItemDtoToModel(dto)
@@ -40,6 +41,7 @@ export function useUpdateNavigationItem(): UseMutationResult<
       const dto = await apiClient.put<NavigationItemDto>(`/api/v1/navigation-items/${String(id)}`, {
         label: input.label,
         url: input.url,
+        location: input.location,
         display_order: input.displayOrder,
       })
       return mapNavigationItemDtoToModel(dto)

@@ -17,6 +17,7 @@ final readonly class CreateNavigationItemUseCase implements CreateNavigationItem
             id: null,
             label: $input->label,
             url: $input->url,
+            location: $input->location,
             displayOrder: $input->displayOrder,
             createdAt: '',
             updatedAt: '',

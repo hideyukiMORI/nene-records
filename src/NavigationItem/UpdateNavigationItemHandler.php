@@ -30,6 +30,7 @@ final readonly class UpdateNavigationItemHandler
 
         $label = trim((string) ($body['label'] ?? ''));
         $url = trim((string) ($body['url'] ?? ''));
+        $location = isset($body['location']) ? trim((string) $body['location']) : NavLocations::DEFAULT;
         $displayOrder = isset($body['display_order']) && is_int($body['display_order'])
             ? $body['display_order']
             : 0;
@@ -42,6 +43,10 @@ final readonly class UpdateNavigationItemHandler
             $errors[] = new ValidationError('url', 'URL is required.', 'required');
         }
 
+        if (!NavLocations::isValid($location)) {
+            $errors[] = new ValidationError('location', 'Location must be one of: header, footer, side.', 'invalid');
+        }
+
         if ($errors !== []) {
             throw new ValidationException($errors);
         }
@@ -50,6 +55,7 @@ final readonly class UpdateNavigationItemHandler
             id: $id,
             label: $label,
             url: $url,
+            location: $location,
             displayOrder: $displayOrder,
         ));
 

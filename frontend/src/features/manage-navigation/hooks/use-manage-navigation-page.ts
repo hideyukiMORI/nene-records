@@ -5,11 +5,13 @@ import {
   useNavigationItemList,
   useUpdateNavigationItem,
   type NavigationItem,
+  type NavLocation,
 } from '@/entities/navigation-item'
 
 export interface NavigationItemFormValues {
   label: string
   url: string
+  location: NavLocation
   displayOrder: number
 }
 
@@ -26,6 +28,7 @@ export function useManageNavigationPage() {
       await createMutation.mutateAsync({
         label: values.label,
         url: values.url,
+        location: values.location,
         displayOrder: values.displayOrder,
       })
     },
@@ -51,6 +54,7 @@ export function useManageNavigationPage() {
         input: {
           label: values.label,
           url: values.url,
+          location: values.location,
           displayOrder: values.displayOrder,
         },
       })

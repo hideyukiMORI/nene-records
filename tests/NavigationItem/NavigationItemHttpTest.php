@@ -87,8 +87,43 @@ final class NavigationItemHttpTest extends TestCase
         self::assertSame(201, $response->getStatusCode());
         self::assertSame('Home', $payload['label']);
         self::assertSame('/', $payload['url']);
+        self::assertSame('header', $payload['location']);
         self::assertSame(0, $payload['display_order']);
         self::assertIsInt($payload['id']);
+    }
+
+    public function testCreateNavigationItemAcceptsFooterLocation(): void
+    {
+        $body = $this->factory->createStream(json_encode([
+            'label' => 'Privacy',
+            'url' => '/privacy',
+            'location' => 'footer',
+        ], JSON_THROW_ON_ERROR));
+
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('POST', 'https://example.test/api/v1/navigation-items')
+                ->withBody($body),
+        );
+        $payload = $this->decodeJson($response);
+
+        self::assertSame(201, $response->getStatusCode());
+        self::assertSame('footer', $payload['location']);
+    }
+
+    public function testCreateNavigationItemWithUnknownLocationReturns422(): void
+    {
+        $body = $this->factory->createStream(json_encode([
+            'label' => 'Bad',
+            'url' => '/bad',
+            'location' => 'nowhere',
+        ], JSON_THROW_ON_ERROR));
+
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('POST', 'https://example.test/api/v1/navigation-items')
+                ->withBody($body),
+        );
+
+        self::assertSame(422, $response->getStatusCode());
     }
 
     public function testCreateNavigationItemWithoutLabelReturns422(): void
@@ -252,6 +287,31 @@ final class NavigationItemHttpTest extends TestCase
         self::assertSame(200, $response->getStatusCode());
         self::assertCount(1, $payload['items']);
         self::assertSame('Public Link', $payload['items'][0]['label']);
+    }
+
+    public function testPublicEndpointFiltersByLocation(): void
+    {
+        foreach ([['Home', '/', 'header'], ['Privacy', '/privacy', 'footer']] as [$label, $url, $location]) {
+            $body = $this->factory->createStream(json_encode([
+                'label' => $label,
+                'url' => $url,
+                'location' => $location,
+            ], JSON_THROW_ON_ERROR));
+            $this->application->handle(
+                $this->factory->createServerRequest('POST', 'https://example.test/api/v1/navigation-items')
+                    ->withBody($body),
+            );
+        }
+
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/api/v1/public/navigation-items?location=footer'),
+        );
+        $payload = $this->decodeJson($response);
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertCount(1, $payload['items']);
+        self::assertSame('Privacy', $payload['items'][0]['label']);
+        self::assertSame('footer', $payload['items'][0]['location']);
     }
 
     /** @return array<string, mixed> */

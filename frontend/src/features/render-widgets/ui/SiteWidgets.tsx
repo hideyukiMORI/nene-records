@@ -3,6 +3,7 @@ import type { Widget, WidgetType } from '@/entities/widget'
 import { usePublicWidgets } from '@/entities/widget'
 import type { ContentRegion } from '@/shared/lib/resolve-layout'
 import { Stack, Text } from '@/shared/ui'
+import { MenuWidget } from './MenuWidget'
 import { RecentPostsWidget } from './RecentPostsWidget'
 
 export interface SiteWidgetsProps {
@@ -12,6 +13,7 @@ export interface SiteWidgetsProps {
 // Registry: widget type → renderer. Add new widget types here.
 const WIDGET_REGISTRY: Record<WidgetType, (widget: Widget) => ReactNode> = {
   'recent-posts': (widget) => <RecentPostsWidget widget={widget} />,
+  menu: (widget) => <MenuWidget widget={widget} />,
 }
 
 /** Renders all site widgets placed into a given region, in order. */

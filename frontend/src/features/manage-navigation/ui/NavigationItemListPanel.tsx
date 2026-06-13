@@ -66,6 +66,7 @@ export function NavigationItemListPanel({
               {item.url}
             </Text>
             <Text as="span" muted variant="caption">
+              {t(`admin.navigation.location.${item.location}`)} ·{' '}
               {t('admin.navigation.displayOrder')}: {item.displayOrder}
             </Text>
           </Stack>

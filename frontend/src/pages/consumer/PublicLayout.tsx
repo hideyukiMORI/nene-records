@@ -31,6 +31,9 @@ export function PublicLayout({ variant, site, children }: PublicLayoutProps) {
       ? 'w-full flex-1 px-inline-md py-stack-lg'
       : 'mx-auto w-full max-w-3xl flex-1 px-inline-md py-stack-lg'
 
+  const headerNav = site.navItems.filter((item) => item.location === 'header')
+  const footerNav = site.navItems.filter((item) => item.location === 'footer')
+
   return (
     <div
       data-theme="consumer"
@@ -51,10 +54,10 @@ export function PublicLayout({ variant, site, children }: PublicLayoutProps) {
               ) : null}
             </Stack>
           </Link>
-          {site.navItems.length > 0 ? (
+          {headerNav.length > 0 ? (
             <nav aria-label="Site navigation">
               <Stack direction="horizontal" gap="sm">
-                {site.navItems.map((item) => (
+                {headerNav.map((item) => (
                   <Link
                     key={item.id}
                     to={item.url}
@@ -69,12 +72,29 @@ export function PublicLayout({ variant, site, children }: PublicLayoutProps) {
         </div>
       </header>
       <main className={mainClassName}>{children}</main>
-      {site.footerMarkdown !== '' ? (
+      {site.footerMarkdown !== '' || footerNav.length > 0 ? (
         <footer className="border-t border-border bg-surface-raised">
-          <div className="mx-auto max-w-3xl px-inline-md py-stack-md">
-            <div className="whitespace-pre-wrap font-sans text-body text-text-muted">
-              {site.footerMarkdown}
-            </div>
+          <div className="mx-auto flex max-w-3xl flex-col gap-stack-sm px-inline-md py-stack-md">
+            {footerNav.length > 0 ? (
+              <nav aria-label="Footer navigation">
+                <Stack direction="horizontal" gap="sm">
+                  {footerNav.map((item) => (
+                    <Link
+                      key={item.id}
+                      to={item.url}
+                      className="font-sans text-body text-text-muted transition-colors duration-fast hover:text-text-primary"
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+                </Stack>
+              </nav>
+            ) : null}
+            {site.footerMarkdown !== '' ? (
+              <div className="whitespace-pre-wrap font-sans text-body text-text-muted">
+                {site.footerMarkdown}
+              </div>
+            ) : null}
           </div>
         </footer>
       ) : null}
