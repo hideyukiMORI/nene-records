@@ -1,6 +1,6 @@
 import type { ContentRegion } from '@/shared/lib/resolve-layout'
 
-export type WidgetType = 'recent-posts' | 'menu' | 'toc'
+export type WidgetType = 'recent-posts' | 'menu' | 'toc' | 'search'
 
 export interface Widget {
   id: number

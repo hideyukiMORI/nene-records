@@ -3,6 +3,7 @@ import { AcceptInvitePage } from '@/pages/accept-invite/AcceptInvitePage'
 import { PublicBrowsePage } from '@/pages/consumer/PublicBrowsePage'
 import { PublicIndexPage } from '@/pages/consumer/PublicIndexPage'
 import { PublicRecordDetailPage } from '@/pages/consumer/PublicRecordDetailPage'
+import { PublicSearchPage } from '@/pages/consumer/PublicSearchPage'
 import { PublicShell } from '@/pages/consumer/PublicShell'
 import { EntityRecordPage } from '@/pages/entity-record/EntityRecordPage'
 import { EntityRecordsPage } from '@/pages/entity-records/EntityRecordsPage'
@@ -118,6 +119,8 @@ const router = createBrowserRouter([
     errorElement: <NotFoundPage />,
     children: [
       { index: true, element: <PublicIndexPage /> },
+      // Static route before `:entityTypeSlug` so /search is not treated as a type.
+      { path: 'search', element: <PublicSearchPage /> },
       { path: ':entityTypeSlug', element: <PublicBrowsePage /> },
       // Wildcard captures any permalink pattern after the entity type slug
       // e.g. /posts/42, /posts/my-article, /posts/2024/01/my-article

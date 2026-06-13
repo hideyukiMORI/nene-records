@@ -30,4 +30,10 @@ export {
   useUnscheduleEntity,
   useUpdateEntity,
 } from './mutations'
-export { defaultEntityListParams, useEntity, useEntityList, useEntityRevisions } from './queries'
+export {
+  defaultEntityListParams,
+  useEntity,
+  useEntityList,
+  useEntityRevisions,
+  useEntitySearch,
+} from './queries'

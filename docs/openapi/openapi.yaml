@@ -5221,7 +5221,7 @@ components:
           minimum: 1
         widget_type:
           type: string
-          enum: [recent-posts, menu, toc]
+          enum: [recent-posts, menu, toc, search]
         region:
           type: string
           enum: [main, sidebar, aside]
@@ -5261,7 +5261,7 @@ components:
       properties:
         widget_type:
           type: string
-          enum: [recent-posts, menu, toc]
+          enum: [recent-posts, menu, toc, search]
         region:
           type: string
           enum: [main, sidebar, aside]

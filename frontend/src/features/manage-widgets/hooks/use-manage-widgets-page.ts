@@ -19,6 +19,7 @@ export interface WidgetFormState {
   entityTypeSlug: string
   limit: number
   menuLocation: NavLocation
+  searchPlaceholder: string
 }
 
 const EMPTY_FORM: WidgetFormState = {
@@ -28,6 +29,7 @@ const EMPTY_FORM: WidgetFormState = {
   entityTypeSlug: '',
   limit: 5,
   menuLocation: 'side',
+  searchPlaceholder: '',
 }
 
 export function useManageWidgetsPage() {
@@ -69,6 +71,8 @@ export function useManageWidgetsPage() {
         widget.settings['location'] === 'side'
           ? widget.settings['location']
           : 'side',
+      searchPlaceholder:
+        typeof widget.settings['placeholder'] === 'string' ? widget.settings['placeholder'] : '',
     })
   }, [])
 
@@ -78,7 +82,9 @@ export function useManageWidgetsPage() {
         ? { location: form.menuLocation }
         : form.widgetType === 'toc'
           ? {}
-          : { entityTypeSlug: form.entityTypeSlug, limit: form.limit }
+          : form.widgetType === 'search'
+            ? { placeholder: form.searchPlaceholder.trim() }
+            : { entityTypeSlug: form.entityTypeSlug, limit: form.limit }
     const input: WidgetInput = {
       widgetType: form.widgetType,
       region: form.region,
