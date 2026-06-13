@@ -1,6 +1,6 @@
 # Current Work
 
-Last updated: 2026-05-27
+Last updated: 2026-06-13
 
 ## 状態サマリー
 
@@ -24,7 +24,93 @@ Last updated: 2026-05-27
 
 **M10 — マルチテナント包括テストスイート + E2E 拡充: 完了（2026-05-27）**
 
-PHPUnit 545 tests / PHPStan level 8 / CS-Fixer / OpenAPI / MCP + Playwright 157 E2E tests — 全グリーン。
+**M11 — 通知・運用機能の拡充: 完了（2026-05-28）**
+
+**M12 — メディアライブラリ強化（ストレージ抽象化・派生画像）: 完了（2026-06-12）**
+
+**M13 — 管理コンソール再設計: 完了（2026-06-12）**
+
+**M14 — 公開レイアウト & Custom Page: 完了（2026-06-12）**
+
+**M15 — ウィジェット（Epic #324・全フェーズ）: 完了（2026-06-13）**
+
+最新の検証基準: PHPUnit 681 tests / PHPStan level 8 / CS-Fixer / OpenAPI / MCP ＋
+`npm run check`（type-check / lint / prettier / test / knip / storybook）全グリーン。
+
+---
+
+## M15 — ウィジェット（Epic #324）: 完了（2026-06-13）
+
+サイドバー/アサイド領域に置ける型付き・固定種類のウィジェット群（Elementor 路線は不採用）。
+
+| Issue | PR | Summary |
+| --- | --- | --- |
+| #325 | #326 | feat: ウィジェット基盤 + 最近の投稿（region 配置・公開描画） |
+| #327 | #328 | feat: メニューの location(header/footer/side) + メニューウィジェット |
+| #331 | #332 | feat: 目次(TOC) — 見出しアンカー + 目次ウィジェット |
+| #333 | #334 | feat: インライン目次（単一カラムの本文先頭に自動配置） |
+| #335 | #336 | feat: サイト内検索（検索ウィジェット + `/search` 結果ページ） |
+| #337 | #338 | feat: タグクラウド + タグアーカイブ `/tag/:slug` |
+| #339 | #340 | feat: 人気記事 + アクセス集計API（`/api/v1/analytics/popular-entities`） |
+| #341 | #342 | feat: カレンダー + 日付アーカイブ `/archive/:y/:m(/:d)` |
+| #329 | #330 | chore(db): NENE2 サンプル `notes` テーブルを削除 |
+
+**提供ウィジェット:** `recent-posts` / `menu` / `toc` / `search` / `tag-cloud` / `popular-posts` / `calendar`
+**公開ページ追加:** `/search`、`/tag/:slug`、`/archive/:year/:month(/:day)`
+**基盤追加:** entities 一覧に公開日レンジ絞り込み（`published_from`/`published_to`）
+
+---
+
+## M14 — 公開レイアウト & Custom Page: 完了（2026-06-12）
+
+| Issue | PR | Summary |
+| --- | --- | --- |
+| #307 | #308 | feat: 公開ページのレイアウト基盤（型付きプリセット選択・Phase 1） |
+| #309 | #310 | feat: 2/3カラム + フィールドの領域配置・並び順（Phase 2A） |
+| #312 | #313 | feat: サニタイズ版 html フィールド型（CSS可/JS不可・Phase 2B） |
+| #316 | #317 | feat: Custom Page 3A — bundle フィールド型（サンドボックス iframe 隔離）+ custom レイアウト |
+| #318 | #319 | feat: Custom Page 3B — iframe 自動高さ(postMessage) + SEOテキスト必須 |
+| #322 | #323 | fix: custom レイアウトの meta 必須を公開時のみに限定・失敗理由表示 |
+| #320 | #321 | feat: フィールド領域(region)・表示順の管理UX仕上げ |
+| #314 | #315 | feat(auth): セッショントークンを httpOnly Cookie へ移行（XSS耐性） |
+
+---
+
+## M13 — 管理コンソール再設計: 完了（2026-06-12）
+
+| Issue | PR | Summary |
+| --- | --- | --- |
+| — | #298 | feat: 管理コンソールを Console 仕様に再設計・エンティティタイプ並び替え |
+| — | #306 | docs(rules): design-export/ をローカル専用・非追跡とするルール追記 |
+
+---
+
+## M12 — メディアライブラリ強化: 完了（2026-06-12）
+
+| Issue | PR | Summary |
+| --- | --- | --- |
+| #299 | #300 | feat(media): ストレージ抽象化 + Local/S3互換ドライバ（Phase A） |
+| #299 | #301 | feat(media): 画像の寸法・alt テキスト・storage_key（Phase B） |
+| #299 | #302 | feat(media): オンデマンド画像派生（プリセット + WebP/AVIF + キャッシュ・Phase C） |
+| #299 | #303 | feat(media): 公開・管理でレスポンシブ画像（srcset・Phase D） |
+| #304 | #305 | feat(media): メディアの使用箇所逆引き + 削除ガード |
+
+---
+
+## M11 — 通知・運用機能の拡充: 完了（2026-05-28）
+
+| Issue | PR | Summary |
+| --- | --- | --- |
+| #263 | #267 | feat: 通知チャンネルモジュール（email/slack/discord/chatwork/webhook） |
+| #273 | #280 | feat: 通知チャンネル管理 GUI |
+| #264 | #292 | feat: コメントスパム対策（honeypot + IP/エンティティ別レート制限） |
+| #285 | #295 | feat: Webhook を DB キュー＋ワーカー方式で非同期化 |
+| #282 | #282 | feat: ユーザープロフィール編集・メールアドレス変更・プロフィール更新 |
+| #283 | #294 | feat: メールアドレス変更の確認トークンフロー |
+| #265 | #291 | feat: エンティティ一覧の検索クエリを URL(?q=) に反映 |
+| #268 | #270 | fix: 組織作成時にデフォルトコンテンツタイプを自動シード |
+| #269 | #269 | test(e2e): 完全シナリオ（ブログ・LP・ペルソナ 50 テスト） |
+| #286 | #296 | test: feature フック単位の Vitest テスト拡充 |
 
 ---
 
@@ -113,13 +199,15 @@ PHPUnit 545 tests / PHPStan level 8 / CS-Fixer / OpenAPI / MCP + Playwright 157 
 
 ## 次フェーズ候補
 
-| Issue | 項目 | 概要 | 難易度 | 優先度 |
-| --- | --- | --- | --- | --- |
-| #263 | コメント通知 | 新規コメント時にメール通知（MailerInterface 活用） | 小 | P1 |
-| #264 | コメントスパム対策 | honeypot / レート制限 | 小〜中 | P1 |
-| #265 | コンテンツ検索 UI | Admin SPA に全文検索フォーム追加 | 小 | P2 |
-| — | AI Consumer Chat | NeNe Records を外部 API として使うチャットシステム（**別リポジトリ**） | 大 | P2 |
-| — | スケジュール公開改善 | `scheduled_at` ジョブ状態 UI・失敗ハンドリング | 小〜中 | P2 |
+| 項目 | 概要 | 難易度 | 優先度 |
+| --- | --- | --- | --- |
+| 人気記事の精度向上 | per-view ロギング（entity_id 明示記録）で管理 GET を除外し正確化 | 中 | P2 |
+| Consumer i18n | 公開 detail / アーカイブ系の多言語化 | 中 | P2 |
+| AI Consumer Chat | NeNe Records を外部 API として使うチャットシステム（**別リポジトリ**） | 大 | P2 |
+| スケジュール公開改善 | `scheduled_at` ジョブ状態 UI・失敗ハンドリング | 小〜中 | P2 |
+| ウィジェット表示順 UI | region 内のウィジェット並び替え（現状 display_order は固定 0） | 小 | P3 |
+
+> 完了済み（旧候補）: コメント通知/スパム対策（#263/#264）、コンテンツ検索（#265 → 公開検索 #335 で実現）。
 
 ---
 

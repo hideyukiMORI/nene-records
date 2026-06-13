@@ -31,7 +31,7 @@ Flexible entity platform — lighter and more typed than WordPress post meta. Ad
 
 ## Current Status
 
-M1 – M9 complete. See `docs/todo/current.md`.
+M1 – M15 complete (widgets epic #324 done). See `docs/todo/current.md`.
 
 ## Verification
 
