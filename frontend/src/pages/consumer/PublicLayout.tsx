@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
+import { SiteWidgets } from '@/features/render-widgets'
 import type { PublicLayoutKey } from '@/shared/lib/resolve-layout'
 import { NeneMark, Stack, Text } from '@/shared/ui'
 import type { PublicSite } from './public-site-context'
@@ -18,7 +19,8 @@ export interface PublicLayoutProps {
  * - bare:     no header/footer, no theme — content is rendered as-is so a record
  *             can ship a fully custom page (CSS in content).
  *
- * Does not: fetch data or resolve which layout to use (the page does that).
+ * Navigation is placement-unified: the header and footer render their region
+ * widgets (e.g. a menu widget), not a per-item location.
  */
 export function PublicLayout({ variant, site, children }: PublicLayoutProps) {
   // Fully custom page: escape the theme and all chrome.
@@ -31,16 +33,13 @@ export function PublicLayout({ variant, site, children }: PublicLayoutProps) {
       ? 'w-full flex-1 px-inline-md py-stack-lg'
       : 'mx-auto w-full max-w-3xl flex-1 px-inline-md py-stack-lg'
 
-  const headerNav = site.navItems.filter((item) => item.location === 'header')
-  const footerNav = site.navItems.filter((item) => item.location === 'footer')
-
   return (
     <div
       data-theme="consumer"
       className="flex min-h-screen flex-col bg-surface font-sans text-text-primary"
     >
       <header className="border-b border-border bg-surface-raised shadow-sm">
-        <div className="mx-auto flex max-w-3xl items-center justify-between px-inline-md py-stack-md">
+        <div className="mx-auto flex max-w-3xl items-center justify-between gap-inline-md px-inline-md py-stack-md">
           <Link to="/" className="flex items-center gap-inline-sm">
             <NeneMark size={22} className="shrink-0 text-accent" />
             <Stack gap="xs">
@@ -54,50 +53,22 @@ export function PublicLayout({ variant, site, children }: PublicLayoutProps) {
               ) : null}
             </Stack>
           </Link>
-          {headerNav.length > 0 ? (
-            <nav aria-label="Site navigation">
-              <Stack direction="horizontal" gap="sm">
-                {headerNav.map((item) => (
-                  <Link
-                    key={item.id}
-                    to={item.url}
-                    className="font-sans text-body text-text-muted transition-colors duration-fast hover:text-text-primary"
-                  >
-                    {item.label}
-                  </Link>
-                ))}
-              </Stack>
-            </nav>
-          ) : null}
+          <nav aria-label="Site navigation">
+            <SiteWidgets region="header" />
+          </nav>
         </div>
       </header>
       <main className={mainClassName}>{children}</main>
-      {site.footerMarkdown !== '' || footerNav.length > 0 ? (
-        <footer className="border-t border-border bg-surface-raised">
-          <div className="mx-auto flex max-w-3xl flex-col gap-stack-sm px-inline-md py-stack-md">
-            {footerNav.length > 0 ? (
-              <nav aria-label="Footer navigation">
-                <Stack direction="horizontal" gap="sm">
-                  {footerNav.map((item) => (
-                    <Link
-                      key={item.id}
-                      to={item.url}
-                      className="font-sans text-body text-text-muted transition-colors duration-fast hover:text-text-primary"
-                    >
-                      {item.label}
-                    </Link>
-                  ))}
-                </Stack>
-              </nav>
-            ) : null}
-            {site.footerMarkdown !== '' ? (
-              <div className="whitespace-pre-wrap font-sans text-body text-text-muted">
-                {site.footerMarkdown}
-              </div>
-            ) : null}
-          </div>
-        </footer>
-      ) : null}
+      <footer className="border-t border-border bg-surface-raised">
+        <div className="mx-auto flex max-w-3xl flex-col gap-stack-sm px-inline-md py-stack-md">
+          <SiteWidgets region="footer" />
+          {site.footerMarkdown !== '' ? (
+            <div className="whitespace-pre-wrap font-sans text-body text-text-muted">
+              {site.footerMarkdown}
+            </div>
+          ) : null}
+        </div>
+      </footer>
     </div>
   )
 }

@@ -5446,7 +5446,7 @@ components:
           enum: [recent-posts, menu, toc, search, tag-cloud, popular-posts, calendar]
         region:
           type: string
-          enum: [main, sidebar, aside]
+          enum: [header, sidebar, aside, footer]
         display_order:
           type: integer
           minimum: 0
@@ -5486,7 +5486,7 @@ components:
           enum: [recent-posts, menu, toc, search, tag-cloud, popular-posts, calendar]
         region:
           type: string
-          enum: [main, sidebar, aside]
+          enum: [header, sidebar, aside, footer]
         display_order:
           type: integer
           minimum: 0

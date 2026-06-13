@@ -7,6 +7,8 @@ import type { Widget } from '@/entities/widget'
 
 export interface MenuWidgetProps {
   widget: Widget
+  /** `horizontal` for header/footer bars; `vertical` for side columns. */
+  orientation?: 'vertical' | 'horizontal'
 }
 
 /**
@@ -14,7 +16,7 @@ export interface MenuWidgetProps {
  * legacy widgets configured with `settings.location` fall back to the menu whose
  * slug matches that location (from the backfill).
  */
-export function MenuWidget({ widget }: MenuWidgetProps) {
+export function MenuWidget({ widget, orientation = 'vertical' }: MenuWidgetProps) {
   const { t } = useTranslation()
   const { data: menusData } = usePublicMenus()
   const { data: navData } = usePublicNavigationItems()
@@ -39,8 +41,13 @@ export function MenuWidget({ widget }: MenuWidgetProps) {
     )
   }
 
+  const listClass =
+    orientation === 'horizontal'
+      ? 'flex flex-row flex-wrap gap-inline-md'
+      : 'flex flex-col gap-stack-xs'
+
   return (
-    <ul className="flex flex-col gap-stack-xs">
+    <ul className={listClass}>
       {items.map((item) => (
         <li key={item.id}>
           <Link to={item.url} className="text-body text-accent underline hover:no-underline">

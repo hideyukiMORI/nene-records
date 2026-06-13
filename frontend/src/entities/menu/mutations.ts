@@ -15,7 +15,6 @@ export function useCreateMenu(): UseMutationResult<Menu, AppError, CreateMenuInp
     mutationFn: async (input) => {
       const dto = await apiClient.post<MenuDto>('/api/v1/menus', {
         name: input.name,
-        location: input.location,
       })
       return mapMenuDtoToModel(dto)
     },
@@ -33,7 +32,6 @@ export function useUpdateMenu(): UseMutationResult<
     mutationFn: async ({ id, input }) => {
       const dto = await apiClient.put<MenuDto>(`/api/v1/menus/${String(id)}`, {
         name: input.name,
-        location: input.location,
       })
       return mapMenuDtoToModel(dto)
     },

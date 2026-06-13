@@ -92,7 +92,8 @@ final class WidgetHttpTest extends TestCase
 
     public function testCreateRejectsUnknownRegion(): void
     {
-        $response = $this->post(['widget_type' => 'recent-posts', 'region' => 'footer']);
+        // `main` is record content, not a widget region.
+        $response = $this->post(['widget_type' => 'recent-posts', 'region' => 'main']);
         self::assertSame(422, $response->getStatusCode());
     }
 
