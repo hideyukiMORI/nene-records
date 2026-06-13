@@ -1108,6 +1108,74 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/menus": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List menus
+         * @description Returns all named menus.
+         */
+        get: operations["listMenus"];
+        put?: never;
+        /**
+         * Create menu
+         * @description Creates a new named menu.
+         */
+        post: operations["createMenu"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/menus/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Update menu
+         * @description Updates an existing menu by ID.
+         */
+        put: operations["updateMenu"];
+        post?: never;
+        /**
+         * Delete menu
+         * @description Permanently deletes a menu by ID.
+         */
+        delete: operations["deleteMenu"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/public/menus": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List public menus
+         * @description Returns all named menus for the public site. No authentication required.
+         */
+        get: operations["listPublicMenus"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/entities/{id}/preview-token": {
         parameters: {
             query?: never;
@@ -2099,6 +2167,8 @@ export interface components {
              * @enum {string}
              */
             location: "header" | "footer" | "side";
+            /** @description Named menu this item belongs to (backfilled from location). */
+            menu_id: number | null;
             display_order: number;
             /** Format: date-time */
             created_at: string;
@@ -2129,6 +2199,33 @@ export interface components {
             location: "header" | "footer" | "side";
             /** @default 0 */
             display_order: number;
+        };
+        MenuResponse: {
+            id: number;
+            name: string;
+            slug: string;
+            /**
+             * @description Where the menu auto-displays. `null` means it only shows via a menu widget.
+             * @enum {string|null}
+             */
+            location: "header" | "footer" | null;
+            /** Format: date-time */
+            created_at: string;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        MenuListResponse: {
+            items: components["schemas"]["MenuResponse"][];
+        };
+        CreateMenuRequest: {
+            name: string;
+            /** @enum {string|null} */
+            location?: "header" | "footer" | null;
+        };
+        UpdateMenuRequest: {
+            name: string;
+            /** @enum {string|null} */
+            location?: "header" | "footer" | null;
         };
         WebhookResponse: {
             /** Format: int64 */
@@ -5122,6 +5219,139 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["NavigationItemListResponse"];
+                };
+            };
+            /** @description Not Modified — ETag matched, use cached response. */
+            304: {
+                headers: {
+                    ETag?: string;
+                    "Cache-Control"?: string;
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    listMenus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Menu list. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MenuListResponse"];
+                };
+            };
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    createMenu: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateMenuRequest"];
+            };
+        };
+        responses: {
+            /** @description Created menu. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MenuResponse"];
+                };
+            };
+            422: components["responses"]["ValidationFailed"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    updateMenu: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Menu ID. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateMenuRequest"];
+            };
+        };
+        responses: {
+            /** @description Updated menu. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MenuResponse"];
+                };
+            };
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["ValidationFailed"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    deleteMenu: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Menu ID. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted successfully. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    listPublicMenus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Menu list. */
+            200: {
+                headers: {
+                    /** @example public, max-age=300, stale-while-revalidate=3600 */
+                    "Cache-Control"?: string;
+                    ETag?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MenuListResponse"];
                 };
             };
             /** @description Not Modified — ETag matched, use cached response. */

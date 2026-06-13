@@ -45,6 +45,7 @@ final class InMemoryNavigationItemRepository implements NavigationItemRepository
             displayOrder: $item->displayOrder,
             createdAt: $now,
             updatedAt: $now,
+            menuId: $item->menuId,
         );
 
         return $id;
@@ -67,6 +68,7 @@ final class InMemoryNavigationItemRepository implements NavigationItemRepository
             displayOrder: $item->displayOrder,
             createdAt: $this->items[$id]->createdAt,
             updatedAt: $now,
+            menuId: $item->menuId,
         );
     }
 

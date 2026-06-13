@@ -27,6 +27,7 @@ final readonly class UpdateNavigationItemUseCase implements UpdateNavigationItem
             displayOrder: $input->displayOrder,
             createdAt: $existing->createdAt,
             updatedAt: '',
+            menuId: $existing->menuId,
         );
 
         $this->repository->update($updated);

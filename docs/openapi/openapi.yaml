@@ -2788,6 +2788,133 @@ paths:
                 type: string
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /api/v1/menus:
+    get:
+      tags:
+        - Menus
+      summary: List menus
+      description: Returns all named menus.
+      operationId: listMenus
+      responses:
+        '200':
+          description: Menu list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MenuListResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Menus
+      summary: Create menu
+      description: Creates a new named menu.
+      operationId: createMenu
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMenuRequest'
+      responses:
+        '201':
+          description: Created menu.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MenuResponse'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/menus/{id}:
+    put:
+      tags:
+        - Menus
+      summary: Update menu
+      description: Updates an existing menu by ID.
+      operationId: updateMenu
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Menu ID.
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMenuRequest'
+      responses:
+        '200':
+          description: Updated menu.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MenuResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Menus
+      summary: Delete menu
+      description: Permanently deletes a menu by ID.
+      operationId: deleteMenu
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Menu ID.
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '204':
+          description: Deleted successfully.
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/public/menus:
+    get:
+      tags:
+        - PublicConsumer
+      summary: List public menus
+      description: Returns all named menus for the public site. No authentication required.
+      operationId: listPublicMenus
+      responses:
+        '200':
+          description: Menu list.
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+              example: public, max-age=300, stale-while-revalidate=3600
+            ETag:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MenuListResponse'
+        '304':
+          description: Not Modified — ETag matched, use cached response.
+          headers:
+            ETag:
+              schema:
+                type: string
+            Cache-Control:
+              schema:
+                type: string
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /api/v1/entities/{id}/preview-token:
     post:
       tags:
@@ -5379,6 +5506,7 @@ components:
         - label
         - url
         - location
+        - menu_id
         - display_order
         - created_at
         - updated_at
@@ -5396,6 +5524,11 @@ components:
           type: string
           enum: [header, footer, side]
           description: Where the item renders. `side` items are surfaced via a menu widget.
+        menu_id:
+          type:
+            - integer
+            - 'null'
+          description: Named menu this item belongs to (backfilled from location).
         display_order:
           type: integer
           minimum: 0
@@ -5457,6 +5590,76 @@ components:
           type: integer
           minimum: 0
           default: 0
+      additionalProperties: false
+    MenuResponse:
+      type: object
+      required:
+        - id
+        - name
+        - slug
+        - location
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: integer
+          minimum: 1
+        name:
+          type: string
+          minLength: 1
+        slug:
+          type: string
+          minLength: 1
+        location:
+          type:
+            - string
+            - 'null'
+          enum: [header, footer, null]
+          description: Where the menu auto-displays. `null` means it only shows via a menu widget.
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      additionalProperties: false
+    MenuListResponse:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/MenuResponse'
+      additionalProperties: false
+    CreateMenuRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          minLength: 1
+        location:
+          type:
+            - string
+            - 'null'
+          enum: [header, footer, null]
+      additionalProperties: false
+    UpdateMenuRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          minLength: 1
+        location:
+          type:
+            - string
+            - 'null'
+          enum: [header, footer, null]
       additionalProperties: false
 
 
