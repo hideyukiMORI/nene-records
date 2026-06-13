@@ -12,6 +12,12 @@ use NeNeRecords\Analytics\AccessLogEntry;
 use NeNeRecords\Analytics\AnalyticsRouteRegistrar;
 use NeNeRecords\Analytics\GetAccessStatsByDateHandler;
 use NeNeRecords\Analytics\GetAccessStatsByDateUseCase;
+use NeNeRecords\Analytics\GetPopularEntitiesHandler;
+use NeNeRecords\Analytics\GetPopularEntitiesUseCase;
+use NeNeRecords\Entity\Entity;
+use NeNeRecords\Entity\EntityStatus;
+use NeNeRecords\Tests\Entity\InMemoryEntityRepository;
+use NeNeRecords\Tests\TextField\InMemoryTextFieldRepository;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
@@ -49,9 +55,20 @@ final class AnalyticsHttpTest extends TestCase
         ));
 
         $jsonResponse = new JsonResponseFactory($this->factory, $this->factory);
+        $entities = new InMemoryEntityRepository([
+            new Entity(id: 7, entityTypeId: 3, slug: 'popular', status: EntityStatus::Published),
+        ]);
         $registrar = new AnalyticsRouteRegistrar(
             new GetAccessStatsByDateHandler(
                 new GetAccessStatsByDateUseCase($this->repository),
+                $jsonResponse,
+            ),
+            new GetPopularEntitiesHandler(
+                new GetPopularEntitiesUseCase(
+                    $this->repository,
+                    $entities,
+                    new InMemoryTextFieldRepository(),
+                ),
                 $jsonResponse,
             ),
         );
@@ -80,6 +97,35 @@ final class AnalyticsHttpTest extends TestCase
         self::assertSame('2026-05-01', $payload['items'][0]['date']);
         self::assertSame(1, $payload['items'][0]['request_count']);
         self::assertSame(10.0, $payload['items'][0]['avg_duration_ms']);
+    }
+
+    public function testGetPopularEntitiesReturnsPublishedRankedByViews(): void
+    {
+        $now = new DateTimeImmutable();
+        for ($i = 0; $i < 4; ++$i) {
+            $this->repository->insert(new AccessLogEntry(
+                requestId: null,
+                method: 'GET',
+                path: '/api/v1/entities/7',
+                statusCode: 200,
+                durationMs: 5.0,
+                accessedAt: $now,
+            ));
+        }
+
+        $response = $this->application->handle(
+            $this->factory->createServerRequest(
+                'GET',
+                'https://example.test/api/v1/analytics/popular-entities?days=30&limit=5',
+            ),
+        );
+        $payload = $this->decodeJson($response);
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertCount(1, $payload['items']);
+        self::assertSame(7, $payload['items'][0]['entity_id']);
+        self::assertSame(3, $payload['items'][0]['entity_type_id']);
+        self::assertSame(4, $payload['items'][0]['view_count']);
     }
 
     public function testMissingFromReturns422(): void

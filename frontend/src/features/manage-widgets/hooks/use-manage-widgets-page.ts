@@ -86,7 +86,9 @@ export function useManageWidgetsPage() {
             ? { placeholder: form.searchPlaceholder.trim() }
             : form.widgetType === 'tag-cloud'
               ? {}
-              : { entityTypeSlug: form.entityTypeSlug, limit: form.limit }
+              : form.widgetType === 'popular-posts'
+                ? { limit: form.limit }
+                : { entityTypeSlug: form.entityTypeSlug, limit: form.limit }
     const input: WidgetInput = {
       widgetType: form.widgetType,
       region: form.region,

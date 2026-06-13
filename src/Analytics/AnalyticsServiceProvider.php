@@ -10,6 +10,8 @@ use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RequestScopedHolder;
+use NeNeRecords\Entity\EntityRepositoryInterface;
+use NeNeRecords\TextField\TextFieldRepositoryInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 
@@ -65,6 +67,45 @@ final readonly class AnalyticsServiceProvider implements ServiceProviderInterfac
                 },
             )
             ->set(
+                GetPopularEntitiesUseCaseInterface::class,
+                static function (ContainerInterface $c): GetPopularEntitiesUseCaseInterface {
+                    $accessLogs = $c->get(AccessLogRepositoryInterface::class);
+                    $entities = $c->get(EntityRepositoryInterface::class);
+                    $textFields = $c->get(TextFieldRepositoryInterface::class);
+
+                    if (!$accessLogs instanceof AccessLogRepositoryInterface) {
+                        throw new LogicException('Access log repository service is invalid.');
+                    }
+
+                    if (!$entities instanceof EntityRepositoryInterface) {
+                        throw new LogicException('Entity repository service is invalid.');
+                    }
+
+                    if (!$textFields instanceof TextFieldRepositoryInterface) {
+                        throw new LogicException('Text field repository service is invalid.');
+                    }
+
+                    return new GetPopularEntitiesUseCase($accessLogs, $entities, $textFields);
+                },
+            )
+            ->set(
+                GetPopularEntitiesHandler::class,
+                static function (ContainerInterface $c): GetPopularEntitiesHandler {
+                    $useCase = $c->get(GetPopularEntitiesUseCaseInterface::class);
+                    $response = $c->get(JsonResponseFactory::class);
+
+                    if (!$useCase instanceof GetPopularEntitiesUseCaseInterface) {
+                        throw new LogicException('GetPopularEntities use case service is invalid.');
+                    }
+
+                    if (!$response instanceof JsonResponseFactory) {
+                        throw new LogicException('JSON response factory service is invalid.');
+                    }
+
+                    return new GetPopularEntitiesHandler($useCase, $response);
+                },
+            )
+            ->set(
                 AccessLogMiddleware::class,
                 static function (ContainerInterface $c): AccessLogMiddleware {
                     $repository = $c->get(AccessLogRepositoryInterface::class);
@@ -85,12 +126,17 @@ final readonly class AnalyticsServiceProvider implements ServiceProviderInterfac
                 'nene-records.route_registrar.analytics',
                 static function (ContainerInterface $c): AnalyticsRouteRegistrar {
                     $handler = $c->get(GetAccessStatsByDateHandler::class);
+                    $popularHandler = $c->get(GetPopularEntitiesHandler::class);
 
                     if (!$handler instanceof GetAccessStatsByDateHandler) {
                         throw new LogicException('GetAccessStatsByDate handler service is invalid.');
                     }
 
-                    return new AnalyticsRouteRegistrar($handler);
+                    if (!$popularHandler instanceof GetPopularEntitiesHandler) {
+                        throw new LogicException('GetPopularEntities handler service is invalid.');
+                    }
+
+                    return new AnalyticsRouteRegistrar($handler, $popularHandler);
                 },
             );
     }

@@ -18,4 +18,12 @@ interface AccessLogRepositoryInterface
     public function countByDate(DateTimeImmutable $date): int;
 
     public function countByYearMonth(int $year, int $month): int;
+
+    /**
+     * View counts per entity, derived from GET hits on `/api/v1/entities/{id}`
+     * since `$sinceDate` (inclusive, Y-m-d), highest first.
+     *
+     * @return array<int, int> entityId => viewCount, ordered by viewCount desc
+     */
+    public function aggregateEntityViews(string $sinceDate): array;
 }

@@ -2928,6 +2928,44 @@ paths:
           $ref: '#/components/responses/ValidationFailed'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /api/v1/analytics/popular-entities:
+    get:
+      tags:
+        - Analytics
+      summary: Popular entities
+      description: >-
+        Returns the most-viewed published entities, derived from GET hits on
+        `/api/v1/entities/{id}` within the last `days` days. Counts are an
+        approximation (they include any GET on the record, not only public views).
+      operationId: getPopularEntities
+      parameters:
+        - name: days
+          in: query
+          required: false
+          description: Look-back window in days (1–366).
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 366
+            default: 30
+        - name: limit
+          in: query
+          required: false
+          description: Maximum number of entities to return (1–50).
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 5
+      responses:
+        '200':
+          description: Popular entities, most-viewed first.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PopularEntitiesResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /api/v1/users:
     get:
       tags:
@@ -4916,6 +4954,49 @@ components:
           type: number
           minimum: 0
       additionalProperties: false
+    PopularEntitiesResponse:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/PopularEntityItem'
+      additionalProperties: false
+    PopularEntityItem:
+      type: object
+      required:
+        - entity_id
+        - entity_type_id
+        - slug
+        - published_at
+        - title
+        - view_count
+      properties:
+        entity_id:
+          type: integer
+          minimum: 1
+        entity_type_id:
+          type: integer
+          minimum: 1
+        slug:
+          type:
+            - string
+            - 'null'
+        published_at:
+          type:
+            - string
+            - 'null'
+          format: date-time
+        title:
+          type:
+            - string
+            - 'null'
+        view_count:
+          type: integer
+          minimum: 0
+      additionalProperties: false
     SettingListResponse:
       type: object
       required:
@@ -5221,7 +5302,7 @@ components:
           minimum: 1
         widget_type:
           type: string
-          enum: [recent-posts, menu, toc, search, tag-cloud]
+          enum: [recent-posts, menu, toc, search, tag-cloud, popular-posts]
         region:
           type: string
           enum: [main, sidebar, aside]
@@ -5261,7 +5342,7 @@ components:
       properties:
         widget_type:
           type: string
-          enum: [recent-posts, menu, toc, search, tag-cloud]
+          enum: [recent-posts, menu, toc, search, tag-cloud, popular-posts]
         region:
           type: string
           enum: [main, sidebar, aside]

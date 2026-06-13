@@ -100,6 +100,11 @@ final class AccessLogMiddlewareTest extends TestCase
                 {
                     return [];
                 }
+
+                public function aggregateEntityViews(string $sinceDate): array
+                {
+                    return [];
+                }
             },
             new NullLogger(),
             excludedPaths: ['/health'],

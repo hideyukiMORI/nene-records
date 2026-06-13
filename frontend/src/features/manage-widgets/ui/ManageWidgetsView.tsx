@@ -6,7 +6,14 @@ import type { ContentRegion } from '@/shared/lib/resolve-layout'
 import { Button, Card, Input, Select, Stack, Text } from '@/shared/ui'
 import type { WidgetFormState } from '../hooks/use-manage-widgets-page'
 
-const WIDGET_TYPES: readonly WidgetType[] = ['recent-posts', 'menu', 'toc', 'search', 'tag-cloud']
+const WIDGET_TYPES: readonly WidgetType[] = [
+  'recent-posts',
+  'menu',
+  'toc',
+  'search',
+  'tag-cloud',
+  'popular-posts',
+]
 
 export interface ManageWidgetsViewProps {
   widgets: Widget[]
@@ -150,10 +157,25 @@ export function ManageWidgetsView({
                 }}
               />
             </>
-          ) : (
+          ) : form.widgetType === 'tag-cloud' ? (
             <Text muted variant="caption">
               {t('admin.widgets.tagCloudSettings')}
             </Text>
+          ) : (
+            <>
+              <Text muted variant="caption">
+                {t('admin.widgets.popularPostsSettings')}
+              </Text>
+              <Input
+                id="widget-popular-limit"
+                type="number"
+                label={t('admin.widgets.limitLabel')}
+                value={String(form.limit)}
+                onChange={(e) => {
+                  setField('limit', Number(e.target.value) || 1)
+                }}
+              />
+            </>
           )}
           <div className="flex items-center gap-inline-sm">
             <Button type="submit" disabled={isSubmitting}>
