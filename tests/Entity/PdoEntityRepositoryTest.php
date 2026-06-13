@@ -200,6 +200,34 @@ final class PdoEntityRepositoryTest extends TestCase
         self::assertSame(1, $repository->countByCriteria(new EntityListCriteria(entityTypeId: $typeB)));
     }
 
+    public function testFindByCriteriaFiltersByPublishedDateRange(): void
+    {
+        $typeId = $this->insertEntityTypeId();
+        $repository = new PdoEntityRepository($this->executor, $this->orgId);
+
+        $may = $repository->save(new Entity(
+            id: null,
+            entityTypeId: $typeId,
+            publishedAt: new \DateTimeImmutable('2026-05-15T09:00:00+00:00'),
+        ));
+        $repository->save(new Entity(
+            id: null,
+            entityTypeId: $typeId,
+            publishedAt: new \DateTimeImmutable('2026-06-20T23:30:00+00:00'),
+        ));
+
+        // June only: exclusive upper bound (2026-07-01) still matches a late-June time.
+        $criteria = new EntityListCriteria(
+            publishedFrom: '2026-06-01',
+            publishedToExclusive: '2026-07-01',
+        );
+        $june = $repository->findByCriteria($criteria, 10, 0);
+
+        self::assertCount(1, $june);
+        self::assertNotSame($may, $june[0]->id);
+        self::assertSame(1, $repository->countByCriteria($criteria));
+    }
+
     public function testFindByCriteriaFiltersByTagSlugsWithOrSemantics(): void
     {
         $typeId = $this->insertEntityTypeId();

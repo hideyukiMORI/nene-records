@@ -13,6 +13,7 @@ const WIDGET_TYPES: readonly WidgetType[] = [
   'search',
   'tag-cloud',
   'popular-posts',
+  'calendar',
 ]
 
 export interface ManageWidgetsViewProps {
@@ -161,7 +162,7 @@ export function ManageWidgetsView({
             <Text muted variant="caption">
               {t('admin.widgets.tagCloudSettings')}
             </Text>
-          ) : (
+          ) : form.widgetType === 'popular-posts' ? (
             <>
               <Text muted variant="caption">
                 {t('admin.widgets.popularPostsSettings')}
@@ -176,6 +177,10 @@ export function ManageWidgetsView({
                 }}
               />
             </>
+          ) : (
+            <Text muted variant="caption">
+              {t('admin.widgets.calendarSettings')}
+            </Text>
           )}
           <div className="flex items-center gap-inline-sm">
             <Button type="submit" disabled={isSubmitting}>
