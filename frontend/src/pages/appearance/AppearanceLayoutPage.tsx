@@ -10,22 +10,7 @@ type AppearanceTab = 'layout' | 'menus'
 
 function LayoutTab() {
   const page = useManageWidgetsPage()
-  return (
-    <ManageWidgetsView
-      widgets={page.widgets}
-      entityTypes={page.entityTypes}
-      menus={page.menus}
-      form={page.form}
-      editId={page.editId}
-      isSubmitting={page.isSubmitting}
-      setField={page.setField}
-      resetForm={page.resetForm}
-      addToRegion={page.addToRegion}
-      editWidget={page.editWidget}
-      submit={page.submit}
-      remove={page.remove}
-    />
-  )
+  return <ManageWidgetsView page={page} />
 }
 
 function MenusTab() {

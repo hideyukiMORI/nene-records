@@ -84,6 +84,15 @@ export const en = {
   'admin.layoutCfg.hiddenWarning':
     '{{count}} widget(s) in {{regions}} are not shown on public pages with the current {{columns}}-column layout.',
   'admin.layoutCfg.makeThreeCol': 'Use 3 columns',
+  'admin.layout.palette': 'Widgets',
+  'admin.layout.paletteHint': 'Drag onto a region, or click to add.',
+  'admin.layout.inspector': 'Inspector',
+  'admin.layout.inspectorEmpty':
+    'Select a placed widget to edit its heading, settings, and region.',
+  'admin.layout.dropHere': 'Drag widgets here',
+  'admin.layout.cond.sidebar': 'Shows on 2/3-column record pages',
+  'admin.layout.cond.aside': 'Shows on 3-column record pages',
+  'admin.widgets.board.deleteWidget': 'Delete this widget',
   'admin.widgets.pageTitle': 'Widgets',
   'admin.widgets.pageDescription': 'Blocks placed into sidebar / aside columns of public pages.',
   'admin.widgets.createTitle': 'Add widget',
