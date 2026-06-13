@@ -59,6 +59,7 @@ export const ja: Partial<MessageCatalog> = {
   'widgets.recentPosts.unconfigured': 'コンテンツタイプが未設定です。',
   'widgets.recentPosts.empty': '投稿がまだありません。',
   'widgets.menu.empty': 'メニュー項目がまだありません。',
+  'public.toc.title': '目次',
   'admin.nav.webhooks': 'Webhook',
   'admin.nav.notifications': '通知',
   'admin.nav.settings': '設定',

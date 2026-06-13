@@ -66,6 +66,7 @@ export const en = {
   'widgets.recentPosts.unconfigured': 'No content type configured.',
   'widgets.recentPosts.empty': 'No posts yet.',
   'widgets.menu.empty': 'No menu items yet.',
+  'public.toc.title': 'Contents',
   'admin.nav.webhooks': 'Webhooks',
   'admin.nav.notifications': 'Notifications',
   'admin.nav.settings': 'Settings',
