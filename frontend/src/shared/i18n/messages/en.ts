@@ -97,6 +97,38 @@ export const en = {
   'admin.layout.previewRecord': 'Record detail',
   'admin.layout.previewHomeNote': 'The index is always 1 column — sidebar/aside do not appear.',
   'admin.layout.previewRecordNote': '{{columns}}-column record detail layout.',
+  'admin.layout.helpButton': '? Help',
+  'admin.layout.toast.added': 'Widget added.',
+  'admin.layout.toast.removed': 'Widget removed.',
+  'admin.layout.help.title': 'How menus and widgets relate',
+  'admin.layout.help.body':
+    'Regions are the "where" on a public page; widgets are the blocks placed there. A menu (named link collection) is not shown on its own — place a Menu widget into a region to display it.',
+  'admin.layout.help.gotIt': 'Got it',
+  'admin.layout.diagram.menu': 'Menu',
+  'admin.layout.diagram.menuDesc': 'A named link collection. Has no location of its own.',
+  'admin.layout.diagram.widget': 'Menu widget',
+  'admin.layout.diagram.widgetDesc': 'Place a Menu widget and choose which menu to show.',
+  'admin.layout.diagram.region': 'Region',
+  'admin.layout.diagram.regionDesc':
+    'Drop it into header / sidebar / footer → it appears publicly.',
+  'admin.layout.tour.stepLabel': 'Step {{n}} / {{total}}',
+  'admin.layout.tour.back': 'Back',
+  'admin.layout.tour.next': 'Next',
+  'admin.layout.tour.start': 'Get started',
+  'admin.layout.tour.s1Title': 'Appearance › Layout',
+  'admin.layout.tour.s1Body':
+    'Decide what goes into each region of your public pages — header, sidebar, aside, footer.',
+  'admin.layout.tour.s2Title': 'Place widgets',
+  'admin.layout.tour.s2Body':
+    'Drag a block from the palette onto a region, or click it to add. Select a placed widget to edit it.',
+  'admin.layout.tour.s3Title': 'Mind the display conditions',
+  'admin.layout.tour.s3Body':
+    'Header and footer show on every page. Sidebar/aside only show on 2/3-column record pages.',
+  'admin.layout.tour.s4Title': 'Menus are two steps',
+  'admin.layout.tour.s4Body':
+    'Build a named menu on the Menus tab, then place it here as a Menu widget.',
+  'admin.menus.toast.created': 'Menu created.',
+  'admin.menus.toast.deleted': 'Menu deleted.',
   'admin.layout.cond.sidebar': 'Shows on 2/3-column record pages',
   'admin.layout.cond.aside': 'Shows on 3-column record pages',
   'admin.widgets.board.deleteWidget': 'Delete this widget',
