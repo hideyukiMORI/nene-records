@@ -65,6 +65,8 @@ export const en = {
   'admin.widgets.type.popular-posts': 'Popular posts',
   'admin.widgets.type.calendar': 'Calendar',
   'admin.widgets.menuSettings': 'Menu settings',
+  'admin.widgets.menuLabel': 'Menu',
+  'admin.widgets.menuPlaceholder': 'Select a menu…',
   'admin.widgets.tocSettings':
     "Shows the current page's headings. No settings — it renders on pages that have headings.",
   'admin.widgets.searchSettings': 'Search settings',

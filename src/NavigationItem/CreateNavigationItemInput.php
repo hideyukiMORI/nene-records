@@ -11,6 +11,7 @@ final readonly class CreateNavigationItemInput
         public string $url,
         public string $location,
         public int $displayOrder,
+        public ?int $menuId = null,
     ) {
     }
 }

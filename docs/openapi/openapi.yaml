@@ -5565,6 +5565,11 @@ components:
           type: string
           enum: [header, footer, side]
           default: header
+        menu_id:
+          type:
+            - integer
+            - 'null'
+          description: Named menu the item belongs to.
         display_order:
           type: integer
           minimum: 0
@@ -5586,6 +5591,11 @@ components:
           type: string
           enum: [header, footer, side]
           default: header
+        menu_id:
+          type:
+            - integer
+            - 'null'
+          description: Named menu the item belongs to. Omit to keep the current menu.
         display_order:
           type: integer
           minimum: 0

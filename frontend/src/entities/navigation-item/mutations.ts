@@ -18,6 +18,7 @@ export function useCreateNavigationItem(): UseMutationResult<
         label: input.label,
         url: input.url,
         location: input.location,
+        ...(input.menuId !== undefined ? { menu_id: input.menuId } : {}),
         display_order: input.displayOrder,
       })
       return mapNavigationItemDtoToModel(dto)
@@ -42,6 +43,7 @@ export function useUpdateNavigationItem(): UseMutationResult<
         label: input.label,
         url: input.url,
         location: input.location,
+        ...(input.menuId !== undefined ? { menu_id: input.menuId } : {}),
         display_order: input.displayOrder,
       })
       return mapNavigationItemDtoToModel(dto)

@@ -21,6 +21,7 @@ final readonly class CreateNavigationItemUseCase implements CreateNavigationItem
             displayOrder: $input->displayOrder,
             createdAt: '',
             updatedAt: '',
+            menuId: $input->menuId,
         );
 
         $id = $this->repository->save($item);

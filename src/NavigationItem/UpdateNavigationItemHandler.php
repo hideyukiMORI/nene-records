@@ -34,6 +34,8 @@ final readonly class UpdateNavigationItemHandler
         $displayOrder = isset($body['display_order']) && is_int($body['display_order'])
             ? $body['display_order']
             : 0;
+        $menuIdProvided = array_key_exists('menu_id', $body);
+        $menuId = is_int($body['menu_id'] ?? null) ? $body['menu_id'] : null;
 
         if ($label === '') {
             $errors[] = new ValidationError('label', 'Label is required.', 'required');
@@ -57,6 +59,8 @@ final readonly class UpdateNavigationItemHandler
             url: $url,
             location: $location,
             displayOrder: $displayOrder,
+            menuId: $menuId,
+            menuIdProvided: $menuIdProvided,
         ));
 
         return $this->response->create(NavigationItemHttpMapper::toArray($output->item));
