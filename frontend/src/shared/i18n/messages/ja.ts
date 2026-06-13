@@ -77,6 +77,15 @@ export const ja: Partial<MessageCatalog> = {
   'admin.layoutCfg.hiddenWarning':
     '{{regions}} にある {{count}} 件のウィジェットは、現在の {{columns}}カラム構成では公開ページに表示されません。',
   'admin.layoutCfg.makeThreeCol': '3カラムにする',
+  'admin.layout.palette': 'ウィジェット',
+  'admin.layout.paletteHint': '領域へドラッグ、またはクリックで追加。',
+  'admin.layout.inspector': 'インスペクタ',
+  'admin.layout.inspectorEmpty':
+    '配置済みのウィジェットを選ぶと、見出し・設定・領域を編集できます。',
+  'admin.layout.dropHere': 'ここにドラッグして配置',
+  'admin.layout.cond.sidebar': '2/3カラムのレコードページで表示',
+  'admin.layout.cond.aside': '3カラムのレコードページで表示',
+  'admin.widgets.board.deleteWidget': 'このウィジェットを削除',
   'admin.widgets.pageTitle': 'ウィジェット',
   'admin.widgets.pageDescription': '公開ページのサイドバー / アサイド カラムに配置するブロック。',
   'admin.widgets.createTitle': 'ウィジェットを追加',
