@@ -10,11 +10,11 @@ import {
   type WidgetInput,
   type WidgetType,
 } from '@/entities/widget'
-import type { ContentRegion } from '@/shared/lib/resolve-layout'
+import type { WidgetRegion } from '@/shared/lib/resolve-layout'
 
 export interface WidgetFormState {
   widgetType: WidgetType
-  region: ContentRegion
+  region: WidgetRegion
   title: string
   entityTypeSlug: string
   limit: number
@@ -56,7 +56,7 @@ export function useManageWidgetsPage() {
   }, [])
 
   // Start a fresh widget targeted at a region (used by the layout board).
-  const addToRegion = useCallback((region: ContentRegion) => {
+  const addToRegion = useCallback((region: WidgetRegion) => {
     setEditId(null)
     setForm({ ...EMPTY_FORM, region })
   }, [])

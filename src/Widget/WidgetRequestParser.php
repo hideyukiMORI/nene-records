@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace NeNeRecords\Widget;
 
 use Nene2\Validation\ValidationError;
-use NeNeRecords\Layout\ContentRegions;
 
 /**
  * Parses + validates a widget create/update request body.
@@ -43,8 +42,8 @@ final readonly class WidgetRequestParser
         $region = trim((string) ($body['region'] ?? ''));
         if ($region === '') {
             $errors[] = new ValidationError('region', 'Region is required.', 'required');
-        } elseif (!ContentRegions::isValid($region)) {
-            $errors[] = new ValidationError('region', 'Region must be one of: main, sidebar, aside.', 'invalid');
+        } elseif (!WidgetRegions::isValid($region)) {
+            $errors[] = new ValidationError('region', 'Region must be one of: header, sidebar, aside, footer.', 'invalid');
         }
 
         $displayOrder = isset($body['display_order']) && is_int($body['display_order']) ? $body['display_order'] : 0;

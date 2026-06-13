@@ -1,4 +1,4 @@
-import type { ContentRegion } from '@/shared/lib/resolve-layout'
+import type { WidgetRegion } from '@/shared/lib/resolve-layout'
 
 export type WidgetType =
   | 'recent-posts'
@@ -12,7 +12,7 @@ export type WidgetType =
 export interface Widget {
   id: number
   widgetType: WidgetType
-  region: ContentRegion
+  region: WidgetRegion
   displayOrder: number
   title: string | null
   settings: Record<string, unknown>
@@ -26,7 +26,7 @@ export interface WidgetList {
 
 export interface WidgetInput {
   widgetType: WidgetType
-  region: ContentRegion
+  region: WidgetRegion
   displayOrder: number
   title: string | null
   settings: Record<string, unknown>

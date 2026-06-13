@@ -2,7 +2,7 @@ import type { EntityType } from '@/entities/entity-type'
 import type { Menu } from '@/entities/menu'
 import type { Widget, WidgetType } from '@/entities/widget'
 import { useTranslation } from '@/shared/i18n'
-import type { ContentRegion } from '@/shared/lib/resolve-layout'
+import { WIDGET_REGIONS, type WidgetRegion } from '@/shared/lib/resolve-layout'
 import { Button, Card, Input, Select, Stack, Text } from '@/shared/ui'
 import type { WidgetFormState } from '../hooks/use-manage-widgets-page'
 import { WidgetRegionBoard } from './WidgetRegionBoard'
@@ -26,7 +26,7 @@ export interface ManageWidgetsViewProps {
   isSubmitting: boolean
   setField: <K extends keyof WidgetFormState>(key: K, value: WidgetFormState[K]) => void
   resetForm: () => void
-  addToRegion: (region: ContentRegion) => void
+  addToRegion: (region: WidgetRegion) => void
   editWidget: (widget: Widget) => void
   submit: () => Promise<void>
   remove: (id: number) => Promise<void>
@@ -80,11 +80,14 @@ export function ManageWidgetsView({
             label={t('admin.region.label')}
             value={form.region}
             onChange={(e) => {
-              setField('region', e.target.value as ContentRegion)
+              setField('region', e.target.value as WidgetRegion)
             }}
           >
-            <option value="sidebar">{t('admin.region.sidebar')}</option>
-            <option value="aside">{t('admin.region.aside')}</option>
+            {WIDGET_REGIONS.map((region) => (
+              <option key={region} value={region}>
+                {t(`admin.region.${region}`)}
+              </option>
+            ))}
           </Select>
           <Input
             id="widget-title"

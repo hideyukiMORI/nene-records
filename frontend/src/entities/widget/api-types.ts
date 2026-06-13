@@ -1,10 +1,10 @@
-import type { ContentRegion } from '@/shared/lib/resolve-layout'
+import type { WidgetRegion } from '@/shared/lib/resolve-layout'
 import type { WidgetType } from './model'
 
 export interface WidgetDto {
   id: number
   widget_type: WidgetType
-  region: ContentRegion
+  region: WidgetRegion
   display_order: number
   title: string | null
   settings: Record<string, unknown>
@@ -18,7 +18,7 @@ export interface WidgetListDto {
 
 export interface WidgetRequestDto {
   widget_type: WidgetType
-  region: ContentRegion
+  region: WidgetRegion
   display_order: number
   title: string | null
   settings: Record<string, unknown>

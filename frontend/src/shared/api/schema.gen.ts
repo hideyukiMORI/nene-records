@@ -2131,7 +2131,7 @@ export interface components {
             /** @enum {string} */
             widget_type: "recent-posts" | "menu" | "toc" | "search" | "tag-cloud" | "popular-posts" | "calendar";
             /** @enum {string} */
-            region: "main" | "sidebar" | "aside";
+            region: "header" | "sidebar" | "aside" | "footer";
             display_order: number;
             title: string | null;
             /** @description Widget-type-specific configuration. */
@@ -2150,7 +2150,7 @@ export interface components {
             /** @enum {string} */
             widget_type: "recent-posts" | "menu" | "toc" | "search" | "tag-cloud" | "popular-posts" | "calendar";
             /** @enum {string} */
-            region: "main" | "sidebar" | "aside";
+            region: "header" | "sidebar" | "aside" | "footer";
             /** @default 0 */
             display_order: number;
             title?: string | null;

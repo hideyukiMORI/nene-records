@@ -29,6 +29,15 @@ export const CONTENT_REGIONS: readonly ContentRegion[] = ['main', 'sidebar', 'as
 
 export const DEFAULT_REGION: ContentRegion = 'main'
 
+/**
+ * Regions a widget can be placed into (mirrors WidgetRegions.php). Unlike field
+ * regions, widgets place into the site chrome (header/footer) and side columns;
+ * `main` is record content, not a widget target.
+ */
+export type WidgetRegion = 'header' | 'sidebar' | 'aside' | 'footer'
+
+export const WIDGET_REGIONS: readonly WidgetRegion[] = ['header', 'sidebar', 'aside', 'footer']
+
 /** Regions each layout renders, in order (mirrors PublicLayouts::regions). */
 const LAYOUT_REGIONS: Record<PublicLayoutKey, readonly ContentRegion[]> = {
   standard: ['main'],
