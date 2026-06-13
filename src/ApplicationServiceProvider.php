@@ -64,6 +64,9 @@ use NeNeRecords\Media\MediaNotFoundExceptionHandler;
 use NeNeRecords\Media\MediaRouteRegistrar;
 use NeNeRecords\Media\MediaServiceProvider;
 use NeNeRecords\Media\MediaTooLargeExceptionHandler;
+use NeNeRecords\Menu\MenuNotFoundExceptionHandler;
+use NeNeRecords\Menu\MenuRouteRegistrar;
+use NeNeRecords\Menu\MenuServiceProvider;
 use NeNeRecords\NavigationItem\NavigationItemNotFoundExceptionHandler;
 use NeNeRecords\NavigationItem\NavigationItemRouteRegistrar;
 use NeNeRecords\NavigationItem\NavigationItemServiceProvider;
@@ -154,6 +157,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
             ->addProvider(new PublicRecordServiceProvider())
             ->addProvider(new SettingServiceProvider())
             ->addProvider(new NavigationItemServiceProvider())
+            ->addProvider(new MenuServiceProvider())
             ->addProvider(new WidgetServiceProvider())
             ->addProvider(new WebhookServiceProvider())
             ->addProvider(new PreviewTokenServiceProvider())
@@ -188,6 +192,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $publicRecord = $container->get('nene-records.route_registrar.public_record');
                     $setting = $container->get('nene-records.route_registrar.setting');
                     $navigationItem = $container->get('nene-records.route_registrar.navigation_item');
+                    $menu = $container->get('nene-records.route_registrar.menu');
                     $widget = $container->get('nene-records.route_registrar.widget');
                     $webhook = $container->get('nene-records.route_registrar.webhook');
                     $previewToken = $container->get('nene-records.route_registrar.preview_token');
@@ -220,6 +225,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         || !$publicRecord instanceof PublicRecordRouteRegistrar
                         || !$setting instanceof SettingRouteRegistrar
                         || !$navigationItem instanceof NavigationItemRouteRegistrar
+                        || !$menu instanceof MenuRouteRegistrar
                         || !$widget instanceof WidgetRouteRegistrar
                         || !$webhook instanceof WebhookRouteRegistrar
                         || !$previewToken instanceof PreviewTokenRouteRegistrar
@@ -256,6 +262,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $publicRecord,
                         $setting,
                         $navigationItem,
+                        $menu,
                         $widget,
                         $webhook,
                         $previewToken,
@@ -305,6 +312,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $mediaNotFound = $container->get(MediaNotFoundExceptionHandler::class);
                     $mediaInUse = $container->get(MediaInUseExceptionHandler::class);
                     $navigationItemNotFound = $container->get(NavigationItemNotFoundExceptionHandler::class);
+                    $menuNotFound = $container->get(MenuNotFoundExceptionHandler::class);
                     $widgetNotFound = $container->get(WidgetNotFoundExceptionHandler::class);
                     $webhookNotFound = $container->get(WebhookNotFoundExceptionHandler::class);
                     $previewTokenNotFound = $container->get(PreviewTokenNotFoundExceptionHandler::class);
@@ -353,6 +361,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $mediaNotFound,
                         $mediaInUse,
                         $navigationItemNotFound,
+                        $menuNotFound,
                         $widgetNotFound,
                         $webhookNotFound,
                         $previewTokenNotFound,
@@ -406,6 +415,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $mediaNotFound,
                         $mediaInUse,
                         $navigationItemNotFound,
+                        $menuNotFound,
                         $widgetNotFound,
                         $webhookNotFound,
                         $previewTokenNotFound,

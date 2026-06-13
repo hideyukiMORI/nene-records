@@ -14,6 +14,9 @@ final readonly class NavigationItem
         public int $displayOrder,
         public string $createdAt,
         public string $updatedAt,
+        // Named menu this item belongs to (backfilled from location; the source
+        // of truth once the UI migrates off `location`).
+        public ?int $menuId = null,
     ) {
     }
 }

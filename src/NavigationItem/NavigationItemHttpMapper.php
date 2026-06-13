@@ -14,6 +14,7 @@ final readonly class NavigationItemHttpMapper
             'label' => $item->label,
             'url' => $item->url,
             'location' => $item->location,
+            'menu_id' => $item->menuId,
             'display_order' => $item->displayOrder,
             'created_at' => $item->createdAt,
             'updated_at' => $item->updatedAt,
