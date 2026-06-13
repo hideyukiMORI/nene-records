@@ -10,12 +10,13 @@ namespace NeNeRecords\Widget;
  * ships `recent-posts`; Phase 2 adds `menu` (renders a navigation location);
  * Phase 3 adds `toc` (table of contents for the current page); Phase 4 adds
  * `search` (a search box linking to the results page); Phase 5 adds `tag-cloud`
- * (tags linking to tag archives); more (calendar, popular-posts) follow.
+ * (tags linking to tag archives) and `popular-posts` (most-viewed records);
+ * more (calendar) follow.
  */
 final class WidgetTypes
 {
     /** @var list<string> */
-    private const TYPES = ['recent-posts', 'menu', 'toc', 'search', 'tag-cloud'];
+    private const TYPES = ['recent-posts', 'menu', 'toc', 'search', 'tag-cloud', 'popular-posts'];
 
     public static function isValid(string $type): bool
     {

@@ -60,6 +60,37 @@ final readonly class PdoAccessLogRepository implements AccessLogRepositoryInterf
         return (int) ($row['cnt'] ?? 0);
     }
 
+    public function aggregateEntityViews(string $sinceDate): array
+    {
+        $rows = $this->query->fetchAll(
+            <<<'SQL'
+            SELECT path, COUNT(*) AS cnt
+            FROM access_logs
+            WHERE organization_id = ?
+              AND method = 'GET'
+              AND status_code < 400
+              AND access_date >= ?
+              AND path LIKE '/api/v1/entities/%'
+            GROUP BY path
+            SQL,
+            [$this->orgId->get(), $sinceDate],
+        );
+
+        $counts = [];
+        foreach ($rows as $row) {
+            // Only bare record-detail paths (/api/v1/entities/42), not nested
+            // ones such as /api/v1/entities/42/revisions.
+            if (preg_match('#^/api/v1/entities/(\d+)$#', (string) $row['path'], $matches) === 1) {
+                $id = (int) $matches[1];
+                $counts[$id] = ($counts[$id] ?? 0) + (int) $row['cnt'];
+            }
+        }
+
+        arsort($counts);
+
+        return $counts;
+    }
+
     public function aggregateByDate(DateTimeImmutable $from, DateTimeImmutable $to): array
     {
         $rows = $this->query->fetchAll(

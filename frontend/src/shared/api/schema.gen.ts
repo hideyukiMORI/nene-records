@@ -1192,6 +1192,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/analytics/popular-entities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Popular entities
+         * @description Returns the most-viewed published entities, derived from GET hits on `/api/v1/entities/{id}` within the last `days` days. Counts are an approximation (they include any GET on the record, not only public views).
+         */
+        get: operations["getPopularEntities"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/users": {
         parameters: {
             query?: never;
@@ -1925,6 +1945,18 @@ export interface components {
             request_count: number;
             avg_duration_ms: number;
         };
+        PopularEntitiesResponse: {
+            items: components["schemas"]["PopularEntityItem"][];
+        };
+        PopularEntityItem: {
+            entity_id: number;
+            entity_type_id: number;
+            slug: string | null;
+            /** Format: date-time */
+            published_at: string | null;
+            title: string | null;
+            view_count: number;
+        };
         SettingListResponse: {
             items: components["schemas"]["SettingAdminItemResponse"][];
         };
@@ -2029,7 +2061,7 @@ export interface components {
         WidgetResponse: {
             id: number;
             /** @enum {string} */
-            widget_type: "recent-posts" | "menu" | "toc" | "search" | "tag-cloud";
+            widget_type: "recent-posts" | "menu" | "toc" | "search" | "tag-cloud" | "popular-posts";
             /** @enum {string} */
             region: "main" | "sidebar" | "aside";
             display_order: number;
@@ -2048,7 +2080,7 @@ export interface components {
         };
         CreateWidgetRequest: {
             /** @enum {string} */
-            widget_type: "recent-posts" | "menu" | "toc" | "search" | "tag-cloud";
+            widget_type: "recent-posts" | "menu" | "toc" | "search" | "tag-cloud" | "popular-posts";
             /** @enum {string} */
             region: "main" | "sidebar" | "aside";
             /** @default 0 */
@@ -5217,6 +5249,32 @@ export interface operations {
                 };
             };
             422: components["responses"]["ValidationFailed"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    getPopularEntities: {
+        parameters: {
+            query?: {
+                /** @description Look-back window in days (1–366). */
+                days?: number;
+                /** @description Maximum number of entities to return (1–50). */
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Popular entities, most-viewed first. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PopularEntitiesResponse"];
+                };
+            };
             500: components["responses"]["InternalServerError"];
         };
     };
