@@ -10,7 +10,6 @@ final readonly class UpdateNavigationItemInput
         public int $id,
         public string $label,
         public string $url,
-        public string $location,
         public int $displayOrder,
         // menu_id is only changed when the client sends it; otherwise preserved.
         public ?int $menuId = null,

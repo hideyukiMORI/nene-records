@@ -1,6 +1,6 @@
 # Current Work
 
-Last updated: 2026-06-13
+Last updated: 2026-06-14
 
 ## 状態サマリー
 
@@ -34,8 +34,27 @@ Last updated: 2026-06-13
 
 **M15 — ウィジェット（Epic #324・全フェーズ）: 完了（2026-06-13）**
 
-最新の検証基準: PHPUnit 681 tests / PHPStan level 8 / CS-Fixer / OpenAPI / MCP ＋
+最新の検証基準: PHPUnit 691 tests / PHPStan level 8 / CS-Fixer / OpenAPI / MCP ＋
 `npm run check`（type-check / lint / prettier / test / knip / storybook）全グリーン。
+
+---
+
+## 進行中エピック
+
+### #347 名前付きメニュー移行（location → menus）
+
+| Phase | PR | Summary |
+| --- | --- | --- |
+| PR1 | #348 | feat: 名前付きメニューのバックエンド基盤（`menus` + `navigation_items.menu_id` + 移行） |
+| PR2a | #349 | feat: メニューウィジェットを名前付きメニュー選択へ |
+| PR3 | — | chore: `navigation_items.location` / `NavLocations` を撤去（#352 スライス5 と同一） |
+
+PR3 で旧 `location` バケツモデルを完全撤去。項目は `menu_id` で名前付きメニューに所属、
+ヘッダー/フッターは region ウィジェット（#350）で描画。`menus.location`（テーマ表示場所）は存置。
+
+### #352 外観 › レイアウトビルダー
+
+スライス1〜4（#353〜#358）実装済み。スライス5（後片付け）は #347 PR3 に統合。
 
 ---
 

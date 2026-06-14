@@ -23,14 +23,12 @@ final class CreateNavigationItemUseCaseTest extends TestCase
         $output = $useCase->execute(new CreateNavigationItemInput(
             label: 'Home',
             url: 'https://example.com',
-            location: 'header',
             displayOrder: 1,
         ));
 
         self::assertSame(1, $output->item->id);
         self::assertSame('Home', $output->item->label);
         self::assertSame('https://example.com', $output->item->url);
-        self::assertSame('header', $output->item->location);
         self::assertSame(1, $output->item->displayOrder);
     }
 
@@ -42,13 +40,11 @@ final class CreateNavigationItemUseCaseTest extends TestCase
         $first = $useCase->execute(new CreateNavigationItemInput(
             label: 'Home',
             url: 'https://example.com',
-            location: 'header',
             displayOrder: 1,
         ));
         $second = $useCase->execute(new CreateNavigationItemInput(
             label: 'About',
             url: 'https://example.com/about',
-            location: 'header',
             displayOrder: 2,
         ));
 
@@ -64,7 +60,6 @@ final class CreateNavigationItemUseCaseTest extends TestCase
         $output = $useCase->execute(new CreateNavigationItemInput(
             label: 'Home',
             url: 'https://example.com',
-            location: 'header',
             displayOrder: 1,
         ));
 
@@ -82,7 +77,6 @@ final class UpdateNavigationItemUseCaseTest extends TestCase
         $useCase->execute(new CreateNavigationItemInput(
             label: 'Home',
             url: 'https://example.com',
-            location: 'header',
             displayOrder: 1,
         ));
 
@@ -91,14 +85,12 @@ final class UpdateNavigationItemUseCaseTest extends TestCase
             id: 1,
             label: 'Updated Home',
             url: 'https://example.com/new',
-            location: 'footer',
             displayOrder: 10,
         ));
 
         self::assertSame(1, $output->item->id);
         self::assertSame('Updated Home', $output->item->label);
         self::assertSame('https://example.com/new', $output->item->url);
-        self::assertSame('footer', $output->item->location);
         self::assertSame(10, $output->item->displayOrder);
     }
 
@@ -113,7 +105,6 @@ final class UpdateNavigationItemUseCaseTest extends TestCase
             id: 99,
             label: 'Ghost',
             url: 'https://ghost.example.com',
-            location: 'header',
             displayOrder: 1,
         ));
     }
@@ -128,7 +119,6 @@ final class DeleteNavigationItemUseCaseTest extends TestCase
         $createUseCase->execute(new CreateNavigationItemInput(
             label: 'Home',
             url: 'https://example.com',
-            location: 'header',
             displayOrder: 1,
         ));
 

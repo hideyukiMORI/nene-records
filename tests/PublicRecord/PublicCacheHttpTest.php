@@ -70,7 +70,7 @@ final class PublicCacheHttpTest extends TestCase
         $publicSettings = new ListPublicSettingsUseCase($settingRepo);
 
         $navRepo = new InMemoryNavigationItemRepository();
-        $navRepo->save(new NavigationItem(id: null, label: 'Home', url: '/', location: 'header', displayOrder: 0, createdAt: '2026-01-01T00:00:00Z', updatedAt: '2026-01-01T00:00:00Z'));
+        $navRepo->save(new NavigationItem(id: null, label: 'Home', url: '/', displayOrder: 0, createdAt: '2026-01-01T00:00:00Z', updatedAt: '2026-01-01T00:00:00Z'));
         $navUseCase = new ListNavigationItemsUseCase($navRepo);
 
         $useCase = new GetPublicRecordViewUseCase(

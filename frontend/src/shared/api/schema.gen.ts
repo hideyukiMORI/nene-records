@@ -1097,7 +1097,7 @@ export interface paths {
         };
         /**
          * List public navigation items
-         * @description Returns navigation items for the public site, optionally filtered by location. No authentication required.
+         * @description Returns navigation items for the public site. No authentication required.
          */
         get: operations["listPublicNavigationItems"];
         put?: never;
@@ -2162,12 +2162,7 @@ export interface components {
             id: number;
             label: string;
             url: string;
-            /**
-             * @description Where the item renders. `side` items are surfaced via a menu widget.
-             * @enum {string}
-             */
-            location: "header" | "footer" | "side";
-            /** @description Named menu this item belongs to (backfilled from location). */
+            /** @description Named menu this item belongs to. */
             menu_id: number | null;
             display_order: number;
             /** Format: date-time */
@@ -2181,11 +2176,6 @@ export interface components {
         CreateNavigationItemRequest: {
             label: string;
             url: string;
-            /**
-             * @default header
-             * @enum {string}
-             */
-            location: "header" | "footer" | "side";
             /** @description Named menu the item belongs to. */
             menu_id?: number | null;
             /** @default 0 */
@@ -2194,11 +2184,6 @@ export interface components {
         UpdateNavigationItemRequest: {
             label: string;
             url: string;
-            /**
-             * @default header
-             * @enum {string}
-             */
-            location: "header" | "footer" | "side";
             /** @description Named menu the item belongs to. Omit to keep the current menu. */
             menu_id?: number | null;
             /** @default 0 */
@@ -5203,10 +5188,7 @@ export interface operations {
     };
     listPublicNavigationItems: {
         parameters: {
-            query?: {
-                /** @description Filter by location (header, footer, side). Unknown values are ignored. */
-                location?: "header" | "footer" | "side";
-            };
+            query?: never;
             header?: never;
             path?: never;
             cookie?: never;

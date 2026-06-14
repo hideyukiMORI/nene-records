@@ -22,7 +22,7 @@ final readonly class PdoNavigationItemRepository implements NavigationItemReposi
     public function findAll(): array
     {
         $rows = $this->query->fetchAll(
-            'SELECT id, menu_id, label, url, location, display_order, created_at, updated_at
+            'SELECT id, menu_id, label, url, display_order, created_at, updated_at
              FROM navigation_items
              WHERE organization_id = ?
              ORDER BY display_order ASC, id ASC',
@@ -35,7 +35,7 @@ final readonly class PdoNavigationItemRepository implements NavigationItemReposi
     public function findById(int $id): ?NavigationItem
     {
         $row = $this->query->fetchOne(
-            'SELECT id, menu_id, label, url, location, display_order, created_at, updated_at
+            'SELECT id, menu_id, label, url, display_order, created_at, updated_at
              FROM navigation_items
              WHERE id = ? AND organization_id = ?',
             [$id, $this->orgId->get()],
@@ -49,9 +49,9 @@ final readonly class PdoNavigationItemRepository implements NavigationItemReposi
         $now = date('Y-m-d H:i:s');
 
         $this->query->execute(
-            'INSERT INTO navigation_items (organization_id, menu_id, label, url, location, display_order, created_at, updated_at)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-            [$this->orgId->get(), $item->menuId, $item->label, $item->url, $item->location, $item->displayOrder, $now, $now],
+            'INSERT INTO navigation_items (organization_id, menu_id, label, url, display_order, created_at, updated_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?)',
+            [$this->orgId->get(), $item->menuId, $item->label, $item->url, $item->displayOrder, $now, $now],
         );
 
         return $this->query->lastInsertId();
@@ -63,9 +63,9 @@ final readonly class PdoNavigationItemRepository implements NavigationItemReposi
 
         $this->query->execute(
             'UPDATE navigation_items
-             SET menu_id = ?, label = ?, url = ?, location = ?, display_order = ?, updated_at = ?
+             SET menu_id = ?, label = ?, url = ?, display_order = ?, updated_at = ?
              WHERE id = ? AND organization_id = ?',
-            [$item->menuId, $item->label, $item->url, $item->location, $item->displayOrder, $now, $item->id, $this->orgId->get()],
+            [$item->menuId, $item->label, $item->url, $item->displayOrder, $now, $item->id, $this->orgId->get()],
         );
     }
 
@@ -81,7 +81,6 @@ final readonly class PdoNavigationItemRepository implements NavigationItemReposi
             id: (int) $row['id'],
             label: (string) $row['label'],
             url: (string) $row['url'],
-            location: (string) $row['location'],
             displayOrder: (int) $row['display_order'],
             createdAt: (string) $row['created_at'],
             updatedAt: (string) $row['updated_at'],

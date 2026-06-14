@@ -76,7 +76,6 @@ final class PdoNavigationItemRepositoryTest extends TestCase
             id: null,
             label: 'Home',
             url: '/',
-            location: 'header',
             displayOrder: 0,
             createdAt: '',
             updatedAt: '',
@@ -90,7 +89,6 @@ final class PdoNavigationItemRepositoryTest extends TestCase
         self::assertSame($id, $found->id);
         self::assertSame('Home', $found->label);
         self::assertSame('/', $found->url);
-        self::assertSame('header', $found->location);
         self::assertSame(0, $found->displayOrder);
     }
 
@@ -103,7 +101,7 @@ final class PdoNavigationItemRepositoryTest extends TestCase
             ['Home', '/', 0],
             ['Contact', '/contact', 1],
         ] as [$label, $url, $order]) {
-            $repository->save(new NavigationItem(null, $label, $url, 'header', $order, '', ''));
+            $repository->save(new NavigationItem(null, $label, $url, $order, '', ''));
         }
 
         $items = $repository->findAll();
@@ -114,7 +112,7 @@ final class PdoNavigationItemRepositoryTest extends TestCase
     public function testUpdateChangesFields(): void
     {
         $repository = new PdoNavigationItemRepository($this->executor, $this->orgId);
-        $id = $repository->save(new NavigationItem(null, 'Home', '/', 'header', 0, '', ''));
+        $id = $repository->save(new NavigationItem(null, 'Home', '/', 0, '', ''));
 
         $found = $repository->findById($id);
         self::assertNotNull($found);
@@ -123,7 +121,6 @@ final class PdoNavigationItemRepositoryTest extends TestCase
             id: $id,
             label: 'Home Updated',
             url: '/home',
-            location: 'footer',
             displayOrder: 5,
             createdAt: $found->createdAt,
             updatedAt: '',
@@ -133,14 +130,13 @@ final class PdoNavigationItemRepositoryTest extends TestCase
         self::assertNotNull($updated);
         self::assertSame('Home Updated', $updated->label);
         self::assertSame('/home', $updated->url);
-        self::assertSame('footer', $updated->location);
         self::assertSame(5, $updated->displayOrder);
     }
 
     public function testDeleteRemovesItem(): void
     {
         $repository = new PdoNavigationItemRepository($this->executor, $this->orgId);
-        $id = $repository->save(new NavigationItem(null, 'To Delete', '/delete', 'header', 0, '', ''));
+        $id = $repository->save(new NavigationItem(null, 'To Delete', '/delete', 0, '', ''));
 
         $repository->delete($id);
 

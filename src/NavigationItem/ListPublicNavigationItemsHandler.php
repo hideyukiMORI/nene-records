@@ -25,22 +25,10 @@ final readonly class ListPublicNavigationItemsHandler
     {
         $output = $this->useCase->execute();
 
-        $items = $output->items;
-
-        // Optional ?location=header|footer|side narrows the menu for a region.
-        $queryParams = $request->getQueryParams();
-        $location = isset($queryParams['location']) ? trim((string) $queryParams['location']) : '';
-        if ($location !== '' && NavLocations::isValid($location)) {
-            $items = array_values(array_filter(
-                $items,
-                static fn (NavigationItem $item) => $item->location === $location,
-            ));
-        }
-
         $data = [
             'items' => array_map(
                 static fn (NavigationItem $item) => NavigationItemHttpMapper::toArray($item),
-                $items,
+                $output->items,
             ),
         ];
 
