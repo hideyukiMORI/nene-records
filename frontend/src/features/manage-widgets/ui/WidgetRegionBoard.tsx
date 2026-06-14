@@ -2,7 +2,6 @@ import { useState, type DragEvent, type ReactNode } from 'react'
 import type { Menu } from '@/entities/menu'
 import type { Widget } from '@/entities/widget'
 import { useTranslation } from '@/shared/i18n'
-import { bodyColumns, type LayoutConfig } from '@/shared/lib/layout-config'
 import type { WidgetRegion } from '@/shared/lib/resolve-layout'
 import { Button, Card, Stack, Text } from '@/shared/ui'
 import { WIDGET_CATALOG_BY_TYPE } from '../widget-catalog'
@@ -18,7 +17,6 @@ export interface WidgetRegionBoardProps {
   widgets: Widget[]
   menus: Menu[]
   selectedId: number | null
-  cfg: LayoutConfig
   dnd: boolean
   onAddToRegion: (region: WidgetRegion) => void
   onSelect: (id: number) => void
@@ -37,7 +35,6 @@ export function WidgetRegionBoard({
   widgets,
   menus,
   selectedId,
-  cfg,
   dnd,
   onAddToRegion,
   onSelect,
@@ -198,7 +195,9 @@ export function WidgetRegionBoard({
     )
   }
 
-  const cols = bodyColumns(cfg)
+  // The editing board always shows every region; whether a region is rendered
+  // on the public site is decided per-page by the layout config.
+  const cols: readonly (WidgetRegion | 'main')[] = ['main', 'sidebar', 'aside']
 
   return (
     <Stack gap="sm">

@@ -9,6 +9,8 @@ import {
 } from '@/entities/auth'
 import { getLocalizedEntityTypeName, usePinnedEntityTypes } from '@/entities/entity-type'
 import { LOCALES, SUPPORTED_LOCALE_IDS, useTranslation } from '@/shared/i18n'
+import { useChromeRail } from '@/shared/lib/chrome-rail'
+import { useMediaQuery } from '@/shared/lib/use-media-query'
 import { NeneMark, ToastProvider } from '@/shared/ui'
 import {
   IconBuilding,
@@ -38,17 +40,22 @@ interface NavItemProps {
   icon: React.ReactNode
   label: string
   onClick?: () => void
+  /** Icon-only rail mode (preview): hide the label and centre the icon. */
+  rail?: boolean
 }
 
-function NavItem({ to, end, icon, label, onClick }: NavItemProps) {
+function NavItem({ to, end, icon, label, onClick, rail = false }: NavItemProps) {
   return (
     <NavLink
       to={to}
       end={end}
       onClick={onClick}
+      title={rail ? label : undefined}
+      aria-label={rail ? label : undefined}
       className={({ isActive }) =>
         [
-          'flex items-center gap-2.5 rounded-md px-2.5 py-1.5 font-chrome text-sm font-medium transition-colors duration-fast',
+          'flex items-center rounded-md py-1.5 font-chrome text-sm font-medium transition-colors duration-fast',
+          rail ? 'justify-center px-0' : 'gap-2.5 px-2.5',
           isActive
             ? 'bg-sidebar-active-tint text-sidebar-active-text'
             : 'text-sidebar-text hover:bg-sidebar-hover-bg hover:text-sidebar-active-text',
@@ -60,7 +67,7 @@ function NavItem({ to, end, icon, label, onClick }: NavItemProps) {
           <span className={['shrink-0', isActive ? 'text-accent' : 'opacity-70'].join(' ')}>
             {icon}
           </span>
-          <span>{label}</span>
+          {rail ? null : <span>{label}</span>}
         </>
       )}
     </NavLink>
@@ -121,6 +128,12 @@ export function AppShell() {
   const pinnedEntityTypesQuery = usePinnedEntityTypes()
   const pinnedEntityTypes = pinnedEntityTypesQuery.data ?? []
 
+  // Preview mode collapses the desktop sidebar to an icon rail. Gated to desktop
+  // (≥lg) so it never fights the mobile drawer, which is unaffected.
+  const railSignal = useChromeRail()
+  const isDesktop = useMediaQuery('(min-width: 1024px)')
+  const rail = railSignal && isDesktop
+
   const closeSidebar = () => {
     setSidebarOpen(false)
   }
@@ -162,21 +175,31 @@ export function AppShell() {
         <aside
           className={[
             'fixed inset-y-0 left-0 z-30 flex w-64 flex-col border-r border-sidebar-border bg-sidebar-bg',
-            'transition-transform duration-200',
-            'lg:w-60 lg:translate-x-0',
+            'transition-all duration-200',
+            'lg:translate-x-0',
+            rail ? 'lg:w-16' : 'lg:w-60',
             sidebarOpen ? 'translate-x-0' : '-translate-x-full',
           ].join(' ')}
           aria-label="Sidebar"
         >
           {/* Brand */}
-          <div className="flex h-14 shrink-0 items-center gap-2 border-b border-sidebar-border px-4">
+          <div
+            className={[
+              'flex h-14 shrink-0 items-center border-b border-sidebar-border',
+              rail ? 'justify-center px-0' : 'gap-2 px-4',
+            ].join(' ')}
+          >
             <NeneMark size={22} className="shrink-0 text-accent" />
-            <span className="flex-1 font-chrome text-sm font-bold tracking-tight text-sidebar-active-text">
-              NeNe Records
-            </span>
-            <span className="rounded-sm bg-accent px-1.5 py-0.5 font-chrome text-tiny font-bold uppercase tracking-wider text-text-inverse">
-              Admin
-            </span>
+            {rail ? null : (
+              <>
+                <span className="flex-1 font-chrome text-sm font-bold tracking-tight text-sidebar-active-text">
+                  NeNe Records
+                </span>
+                <span className="rounded-sm bg-accent px-1.5 py-0.5 font-chrome text-tiny font-bold uppercase tracking-wider text-text-inverse">
+                  Admin
+                </span>
+              </>
+            )}
             {/* Close button — mobile only */}
             <button
               type="button"
@@ -189,7 +212,10 @@ export function AppShell() {
           </div>
 
           {/* Nav links */}
-          <nav className="flex-1 overflow-y-auto px-3 py-4" aria-label="Main">
+          <nav
+            className={['flex-1 overflow-y-auto py-4', rail ? 'px-2' : 'px-3'].join(' ')}
+            aria-label="Main"
+          >
             {/* ── Primary nav ── */}
             <ul className="space-y-0.5">
               <li>
@@ -199,6 +225,7 @@ export function AppShell() {
                   icon={<IconHome size={16} />}
                   label={t('admin.nav.home')}
                   onClick={closeSidebar}
+                  rail={rail}
                 />
               </li>
               {/* ── Pinned content types (dynamic) ── */}
@@ -209,6 +236,7 @@ export function AppShell() {
                     icon={<IconFileText size={16} />}
                     label={getLocalizedEntityTypeName(entityType, locale)}
                     onClick={closeSidebar}
+                    rail={rail}
                   />
                 </li>
               ))}
@@ -222,6 +250,7 @@ export function AppShell() {
                     icon={<IconTag size={16} />}
                     label={t('admin.nav.tags')}
                     onClick={closeSidebar}
+                    rail={rail}
                   />
                 </li>
               ) : null}
@@ -232,6 +261,7 @@ export function AppShell() {
                     icon={<IconUsers size={16} />}
                     label={t('admin.nav.users')}
                     onClick={closeSidebar}
+                    rail={rail}
                   />
                 </li>
               ) : null}
@@ -242,6 +272,7 @@ export function AppShell() {
                     icon={<IconBuilding size={16} />}
                     label="Superadmin"
                     onClick={closeSidebar}
+                    rail={rail}
                   />
                 </li>
               ) : null}
@@ -252,6 +283,7 @@ export function AppShell() {
                     icon={<IconSettings size={16} />}
                     label={t('admin.nav.settings')}
                     onClick={closeSidebar}
+                    rail={rail}
                   />
                 </li>
               ) : null}
@@ -262,25 +294,27 @@ export function AppShell() {
               <>
                 <div className="my-4 border-t border-sidebar-border" />
                 <div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setAppearanceOpen((o) => !o)
-                    }}
-                    className="flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 font-chrome text-tiny font-bold uppercase tracking-widest text-sidebar-text-muted transition-colors hover:bg-sidebar-hover-bg hover:text-sidebar-active-text"
-                    aria-expanded={appearanceOpen}
-                  >
-                    <IconLayout size={12} className="shrink-0" />
-                    <span className="flex-1 text-left">{t('admin.nav.appearance')}</span>
-                    <IconChevronRight
-                      size={12}
-                      className={[
-                        'shrink-0 transition-transform duration-150',
-                        appearanceOpen ? 'rotate-90' : '',
-                      ].join(' ')}
-                    />
-                  </button>
-                  {appearanceOpen ? (
+                  {rail ? null : (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAppearanceOpen((o) => !o)
+                      }}
+                      className="flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 font-chrome text-tiny font-bold uppercase tracking-widest text-sidebar-text-muted transition-colors hover:bg-sidebar-hover-bg hover:text-sidebar-active-text"
+                      aria-expanded={appearanceOpen}
+                    >
+                      <IconLayout size={12} className="shrink-0" />
+                      <span className="flex-1 text-left">{t('admin.nav.appearance')}</span>
+                      <IconChevronRight
+                        size={12}
+                        className={[
+                          'shrink-0 transition-transform duration-150',
+                          appearanceOpen ? 'rotate-90' : '',
+                        ].join(' ')}
+                      />
+                    </button>
+                  )}
+                  {appearanceOpen || rail ? (
                     <ul className="mt-0.5 space-y-0.5">
                       <li>
                         <NavItem
@@ -288,6 +322,7 @@ export function AppShell() {
                           icon={<IconLayout size={16} />}
                           label={t('admin.nav.layout')}
                           onClick={closeSidebar}
+                          rail={rail}
                         />
                       </li>
                       <li>
@@ -296,6 +331,7 @@ export function AppShell() {
                           icon={<IconLink size={16} />}
                           label={t('admin.nav.menus')}
                           onClick={closeSidebar}
+                          rail={rail}
                         />
                       </li>
                       <li>
@@ -304,6 +340,7 @@ export function AppShell() {
                           icon={<IconImage size={16} />}
                           label={t('admin.nav.media')}
                           onClick={closeSidebar}
+                          rail={rail}
                         />
                       </li>
                       <li>
@@ -312,6 +349,7 @@ export function AppShell() {
                           icon={<IconMessageCircle size={16} />}
                           label={t('admin.nav.comments')}
                           onClick={closeSidebar}
+                          rail={rail}
                         />
                       </li>
                     </ul>
@@ -325,24 +363,26 @@ export function AppShell() {
               <>
                 <div className="my-4 border-t border-sidebar-border" />
                 <div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setAdvancedOpen((o) => !o)
-                    }}
-                    className="flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 font-chrome text-tiny font-bold uppercase tracking-widest text-sidebar-text-muted transition-colors hover:bg-sidebar-hover-bg hover:text-sidebar-active-text"
-                    aria-expanded={advancedOpen}
-                  >
-                    <span className="flex-1 text-left">{t('admin.nav.advanced')}</span>
-                    <IconChevronRight
-                      size={12}
-                      className={[
-                        'shrink-0 transition-transform duration-150',
-                        advancedOpen ? 'rotate-90' : '',
-                      ].join(' ')}
-                    />
-                  </button>
-                  {advancedOpen ? (
+                  {rail ? null : (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAdvancedOpen((o) => !o)
+                      }}
+                      className="flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 font-chrome text-tiny font-bold uppercase tracking-widest text-sidebar-text-muted transition-colors hover:bg-sidebar-hover-bg hover:text-sidebar-active-text"
+                      aria-expanded={advancedOpen}
+                    >
+                      <span className="flex-1 text-left">{t('admin.nav.advanced')}</span>
+                      <IconChevronRight
+                        size={12}
+                        className={[
+                          'shrink-0 transition-transform duration-150',
+                          advancedOpen ? 'rotate-90' : '',
+                        ].join(' ')}
+                      />
+                    </button>
+                  )}
+                  {advancedOpen || rail ? (
                     <ul className="mt-0.5 space-y-0.5">
                       <li>
                         <NavItem
@@ -350,6 +390,7 @@ export function AppShell() {
                           icon={<IconLayers size={16} />}
                           label={t('admin.nav.entityTypes')}
                           onClick={closeSidebar}
+                          rail={rail}
                         />
                       </li>
                       <li>
@@ -358,6 +399,7 @@ export function AppShell() {
                           icon={<IconWebhook size={16} />}
                           label={t('admin.nav.webhooks')}
                           onClick={closeSidebar}
+                          rail={rail}
                         />
                       </li>
                       <li>
@@ -366,6 +408,7 @@ export function AppShell() {
                           icon={<IconBell size={16} />}
                           label={t('admin.nav.notifications')}
                           onClick={closeSidebar}
+                          rail={rail}
                         />
                       </li>
                     </ul>
@@ -376,58 +419,87 @@ export function AppShell() {
           </nav>
 
           {/* Bottom: public-site link + language + user row (redesign §06) */}
-          <div className="flex shrink-0 flex-col gap-3 border-t border-sidebar-border p-3">
+          <div
+            className={[
+              'flex shrink-0 flex-col gap-3 border-t border-sidebar-border',
+              rail ? 'p-2' : 'p-3',
+            ].join(' ')}
+          >
             <NavItem
               to="/"
               icon={<IconGlobe size={16} />}
               label={t('admin.nav.publicSite')}
               onClick={closeSidebar}
+              rail={rail}
             />
 
-            {/* Language selector */}
-            <select
-              aria-label="Language"
-              value={locale}
-              onChange={(e) => {
-                setLocale(e.target.value as typeof locale)
-              }}
-              className="min-w-0 rounded-sm border border-sidebar-border bg-sidebar-hover-bg px-2 py-1.5 text-xs text-sidebar-text focus:outline-none focus:ring-1 focus:ring-accent"
-            >
-              {SUPPORTED_LOCALE_IDS.map((id) => (
-                <option key={id} value={id}>
-                  {LOCALES[id].label}
-                </option>
-              ))}
-            </select>
-
-            {/* User row */}
-            {session && (
-              <div className="pf-userrow">
-                <span className="rd-avatar" aria-hidden="true">
-                  {userInitials(session.email)}
-                </span>
-                <div className="pf-userrow__id">
-                  <div className="pf-userrow__n">{userDisplayName(session.email)}</div>
-                  <div className="pf-userrow__e" title={session.email}>
-                    {session.email}
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  aria-label={t('admin.nav.logout')}
-                  title={t('admin.nav.logout')}
-                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-sm border border-sidebar-border bg-sidebar-hover-bg text-sidebar-text transition-colors hover:border-danger hover:text-danger"
-                >
-                  <IconLogOut size={15} />
-                </button>
-              </div>
+            {/* Language selector — hidden in the icon rail */}
+            {rail ? null : (
+              <select
+                aria-label="Language"
+                value={locale}
+                onChange={(e) => {
+                  setLocale(e.target.value as typeof locale)
+                }}
+                className="min-w-0 rounded-sm border border-sidebar-border bg-sidebar-hover-bg px-2 py-1.5 text-xs text-sidebar-text focus:outline-none focus:ring-1 focus:ring-accent"
+              >
+                {SUPPORTED_LOCALE_IDS.map((id) => (
+                  <option key={id} value={id}>
+                    {LOCALES[id].label}
+                  </option>
+                ))}
+              </select>
             )}
+
+            {/* User row — avatar + logout only when railed */}
+            {session &&
+              (rail ? (
+                <div className="flex flex-col items-center gap-2">
+                  <span className="rd-avatar" aria-hidden="true">
+                    {userInitials(session.email)}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    aria-label={t('admin.nav.logout')}
+                    title={t('admin.nav.logout')}
+                    className="flex h-7 w-7 shrink-0 items-center justify-center rounded-sm border border-sidebar-border bg-sidebar-hover-bg text-sidebar-text transition-colors hover:border-danger hover:text-danger"
+                  >
+                    <IconLogOut size={15} />
+                  </button>
+                </div>
+              ) : (
+                <div className="pf-userrow">
+                  <span className="rd-avatar" aria-hidden="true">
+                    {userInitials(session.email)}
+                  </span>
+                  <div className="pf-userrow__id">
+                    <div className="pf-userrow__n">{userDisplayName(session.email)}</div>
+                    <div className="pf-userrow__e" title={session.email}>
+                      {session.email}
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    aria-label={t('admin.nav.logout')}
+                    title={t('admin.nav.logout')}
+                    className="flex h-7 w-7 shrink-0 items-center justify-center rounded-sm border border-sidebar-border bg-sidebar-hover-bg text-sidebar-text transition-colors hover:border-danger hover:text-danger"
+                  >
+                    <IconLogOut size={15} />
+                  </button>
+                </div>
+              ))}
           </div>
         </aside>
 
         {/* ── Main content ────────────────────────────────────────────────── */}
-        <main className="min-w-0 flex-1 pb-8 pt-14 lg:ml-60 lg:pt-0">
+        <main
+          className={[
+            'min-w-0 flex-1 pb-8 pt-14 transition-all duration-200 lg:pt-0',
+            rail ? 'lg:ml-16' : 'lg:ml-60',
+          ].join(' ')}
+        >
           {/* Quiet topbar — search + notifications (desktop only) */}
           <div className="hidden items-center gap-3 border-b border-border bg-surface px-6 py-2.5 lg:flex">
             <label className="flex max-w-md flex-1 items-center gap-2 rounded-sm border border-border bg-surface-raised px-3 py-1.5 text-text-muted">
