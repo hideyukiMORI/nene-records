@@ -92,8 +92,6 @@ export function useManageMenusPage() {
       await createItem.mutateAsync({
         label,
         url: url.trim() === '' ? '/' : url,
-        // location is vestigial under the menu model; backend defaults it.
-        location: 'header',
         menuId: activeMenu.id,
         displayOrder: nextOrder,
       })
@@ -108,7 +106,6 @@ export function useManageMenusPage() {
         input: {
           label,
           url,
-          location: item.location,
           menuId: item.menuId,
           displayOrder: item.displayOrder,
         },
@@ -137,7 +134,6 @@ export function useManageMenusPage() {
           input: {
             label: a.label,
             url: a.url,
-            location: a.location,
             menuId: a.menuId,
             displayOrder: b.displayOrder,
           },
@@ -147,7 +143,6 @@ export function useManageMenusPage() {
           input: {
             label: b.label,
             url: b.url,
-            location: b.location,
             menuId: b.menuId,
             displayOrder: a.displayOrder,
           },

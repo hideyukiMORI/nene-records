@@ -2752,16 +2752,8 @@ paths:
       tags:
         - PublicConsumer
       summary: List public navigation items
-      description: Returns navigation items for the public site, optionally filtered by location. No authentication required.
+      description: Returns navigation items for the public site. No authentication required.
       operationId: listPublicNavigationItems
-      parameters:
-        - name: location
-          in: query
-          required: false
-          description: Filter by location (header, footer, side). Unknown values are ignored.
-          schema:
-            type: string
-            enum: [header, footer, side]
       responses:
         '200':
           description: Navigation item list.
@@ -5505,7 +5497,6 @@ components:
         - id
         - label
         - url
-        - location
         - menu_id
         - display_order
         - created_at
@@ -5520,15 +5511,11 @@ components:
         url:
           type: string
           minLength: 1
-        location:
-          type: string
-          enum: [header, footer, side]
-          description: Where the item renders. `side` items are surfaced via a menu widget.
         menu_id:
           type:
             - integer
             - 'null'
-          description: Named menu this item belongs to (backfilled from location).
+          description: Named menu this item belongs to.
         display_order:
           type: integer
           minimum: 0
@@ -5561,10 +5548,6 @@ components:
         url:
           type: string
           minLength: 1
-        location:
-          type: string
-          enum: [header, footer, side]
-          default: header
         menu_id:
           type:
             - integer
@@ -5587,10 +5570,6 @@ components:
         url:
           type: string
           minLength: 1
-        location:
-          type: string
-          enum: [header, footer, side]
-          default: header
         menu_id:
           type:
             - integer
