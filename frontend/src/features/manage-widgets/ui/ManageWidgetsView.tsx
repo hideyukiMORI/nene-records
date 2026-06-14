@@ -1,16 +1,19 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from '@/shared/i18n'
+import { setChromeRail } from '@/shared/lib/chrome-rail'
 import {
-  activeSideRegions,
+  allActiveSideRegions,
   loadLayoutConfig,
   saveLayoutConfig,
   type LayoutConfig,
+  type LayoutPageKey,
+  type PageLayout,
 } from '@/shared/lib/layout-config'
 import type { WidgetRegion } from '@/shared/lib/resolve-layout'
 import { Button, Card, Stack, Text } from '@/shared/ui'
 import type { useManageWidgetsPage } from '../hooks/use-manage-widgets-page'
 import { LayoutConfigBar } from './LayoutConfigBar'
-import { LayoutPreview, type PreviewPage } from './LayoutPreview'
+import { LayoutPreview } from './LayoutPreview'
 import { WidgetInspector } from './WidgetInspector'
 import { WidgetPalette } from './WidgetPalette'
 import { WidgetRegionBoard } from './WidgetRegionBoard'
@@ -22,6 +25,7 @@ const PREVIEW_CLASS = 'grid grid-cols-1 gap-stack-lg lg:grid-cols-[1fr_1.3fr] lg
 
 type LayoutMode = 'dnd' | 'preview'
 const MODE_LS_KEY = 'nene_layout_mode'
+const PAGE_LS_KEY = 'nene_layout_page'
 
 export interface ManageWidgetsViewProps {
   page: ReturnType<typeof useManageWidgetsPage>
@@ -42,7 +46,31 @@ export function ManageWidgetsView({ page }: ManageWidgetsViewProps) {
     setMode(next)
     localStorage.setItem(MODE_LS_KEY, next)
   }
-  const [previewPage, setPreviewPage] = useState<PreviewPage>('record')
+
+  // The selected page drives *both* which page's columns the config bar edits
+  // and which page the live preview renders.
+  const [layoutPage, setLayoutPageState] = useState<LayoutPageKey>(() =>
+    localStorage.getItem(PAGE_LS_KEY) === 'home' ? 'home' : 'record',
+  )
+  const setLayoutPage = (next: LayoutPageKey) => {
+    setLayoutPageState(next)
+    localStorage.setItem(PAGE_LS_KEY, next)
+  }
+
+  const pageCfg: PageLayout = cfg[layoutPage]
+  const setPageCfg = (next: PageLayout) => {
+    setCfg({ ...cfg, [layoutPage]: next })
+  }
+  const pageLabel =
+    layoutPage === 'home' ? t('admin.layout.previewHome') : t('admin.layout.previewRecord')
+
+  // Preview mode collapses the app sidebar into an icon rail (desktop only).
+  useEffect(() => {
+    setChromeRail(mode === 'preview')
+    return () => {
+      setChromeRail(false)
+    }
+  }, [mode])
 
   const segBtn = (on: boolean): string =>
     [
@@ -50,11 +78,19 @@ export function ManageWidgetsView({ page }: ManageWidgetsViewProps) {
       on ? 'bg-accent text-text-inverse' : 'bg-surface-raised hover:bg-surface-overlay',
     ].join(' ')
 
-  const active = activeSideRegions(cfg)
-  const hiddenRegions = (['sidebar', 'aside'] as const).filter((r) => !active.includes(r))
+  // Widgets in a side region that *no* page's config renders are hidden in public.
+  const activeUnion = allActiveSideRegions(cfg)
+  const hiddenRegions = (['sidebar', 'aside'] as const).filter((r) => !activeUnion.includes(r))
   const hiddenCount = page.widgets.filter((w) =>
     (hiddenRegions as readonly WidgetRegion[]).includes(w.region),
   ).length
+
+  const mainLabel =
+    pageCfg.columns >= 3 && pageCfg.mainPos === 'center'
+      ? t('admin.layoutCfg.posCenter')
+      : pageCfg.mainPos === 'right'
+        ? t('admin.layoutCfg.posRight')
+        : t('admin.layoutCfg.posLeft')
 
   const selected = page.widgets.find((w) => w.id === page.selectedId) ?? null
 
@@ -83,24 +119,28 @@ export function ManageWidgetsView({ page }: ManageWidgetsViewProps) {
         </span>
       </div>
 
-      <LayoutConfigBar cfg={cfg} setCfg={setCfg} />
+      <LayoutConfigBar
+        cfg={pageCfg}
+        setCfg={setPageCfg}
+        page={layoutPage}
+        setPage={setLayoutPage}
+      />
       {hiddenCount > 0 ? (
         <Card className="flex flex-wrap items-center gap-inline-md border-warn">
           <Text as="span" variant="caption">
             {t('admin.layoutCfg.hiddenWarning', {
               count: String(hiddenCount),
               regions: hiddenRegions.map((r) => t(`admin.region.${r}`)).join('・'),
-              columns: String(cfg.columns),
             })}
           </Text>
           <Button
             variant="secondary"
             size="sm"
             onClick={() => {
-              setCfg({ ...cfg, columns: 3 })
+              setPageCfg({ ...pageCfg, columns: 3 })
             }}
           >
-            {t('admin.layoutCfg.makeThreeCol')}
+            {t('admin.layoutCfg.makeThreeCol', { page: pageLabel })}
           </Button>
         </Card>
       ) : null}
@@ -117,7 +157,6 @@ export function ManageWidgetsView({ page }: ManageWidgetsViewProps) {
             widgets={page.widgets}
             menus={page.menus}
             selectedId={page.selectedId}
-            cfg={cfg}
             dnd
             onAddToRegion={(region) => {
               void page.addWidgetAt('menu', region, null)
@@ -159,7 +198,6 @@ export function ManageWidgetsView({ page }: ManageWidgetsViewProps) {
             widgets={page.widgets}
             menus={page.menus}
             selectedId={page.selectedId}
-            cfg={cfg}
             dnd={false}
             onAddToRegion={(region) => {
               void page.addWidgetAt('menu', region, null)
@@ -178,18 +216,18 @@ export function ManageWidgetsView({ page }: ManageWidgetsViewProps) {
               <span className="inline-flex overflow-hidden rounded-md border border-border">
                 <button
                   type="button"
-                  className={segBtn(previewPage === 'home')}
+                  className={segBtn(layoutPage === 'home')}
                   onClick={() => {
-                    setPreviewPage('home')
+                    setLayoutPage('home')
                   }}
                 >
                   {t('admin.layout.previewHome')}
                 </button>
                 <button
                   type="button"
-                  className={segBtn(previewPage === 'record')}
+                  className={segBtn(layoutPage === 'record')}
                   onClick={() => {
-                    setPreviewPage('record')
+                    setLayoutPage('record')
                   }}
                 >
                   {t('admin.layout.previewRecord')}
@@ -199,14 +237,18 @@ export function ManageWidgetsView({ page }: ManageWidgetsViewProps) {
             <LayoutPreview
               widgets={page.widgets}
               menus={page.menus}
-              cfg={cfg}
-              page={previewPage}
+              cfg={pageCfg}
+              page={layoutPage}
               selectedId={page.selectedId}
             />
             <Text as="span" muted variant="caption">
-              {previewPage === 'home'
-                ? t('admin.layout.previewHomeNote')
-                : t('admin.layout.previewRecordNote', { columns: String(cfg.columns) })}
+              {pageCfg.columns === 1
+                ? t('admin.layout.previewNoteOneCol', { page: pageLabel })
+                : t('admin.layout.previewNoteMultiCol', {
+                    page: pageLabel,
+                    columns: String(pageCfg.columns),
+                    main: mainLabel,
+                  })}
             </Text>
           </Stack>
         </div>

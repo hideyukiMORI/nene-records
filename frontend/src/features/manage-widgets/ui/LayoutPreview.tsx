@@ -2,16 +2,15 @@ import type { ReactNode } from 'react'
 import type { Menu } from '@/entities/menu'
 import type { Widget } from '@/entities/widget'
 import { useTranslation } from '@/shared/i18n'
-import { bodyColumns, type LayoutConfig } from '@/shared/lib/layout-config'
+import { bodyColumns, type LayoutPageKey, type PageLayout } from '@/shared/lib/layout-config'
 import type { WidgetRegion } from '@/shared/lib/resolve-layout'
-
-export type PreviewPage = 'home' | 'record'
 
 export interface LayoutPreviewProps {
   widgets: Widget[]
   menus: Menu[]
-  cfg: LayoutConfig
-  page: PreviewPage
+  /** The selected page's own column config. */
+  cfg: PageLayout
+  page: LayoutPageKey
   selectedId: number | null
 }
 
@@ -110,7 +109,7 @@ export function LayoutPreview({ widgets, menus, cfg, page, selectedId }: LayoutP
       .filter((w) => w.region === r)
       .sort((a, b) => a.displayOrder - b.displayOrder || a.id - b.id)
 
-  const cols: readonly (WidgetRegion | 'main')[] = page === 'record' ? bodyColumns(cfg) : ['main']
+  const cols: readonly (WidgetRegion | 'main')[] = bodyColumns(cfg)
 
   const renderWidget = (w: Widget, horizontal: boolean) => (
     <div key={w.id} className={`rounded-sm p-1 ${w.id === selectedId ? 'ring-2 ring-accent' : ''}`}>

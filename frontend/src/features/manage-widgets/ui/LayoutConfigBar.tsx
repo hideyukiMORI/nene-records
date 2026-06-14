@@ -1,10 +1,12 @@
 import { useTranslation } from '@/shared/i18n'
-import type { LayoutConfig } from '@/shared/lib/layout-config'
+import type { LayoutPageKey, PageLayout } from '@/shared/lib/layout-config'
 import { Card, Text } from '@/shared/ui'
 
 export interface LayoutConfigBarProps {
-  cfg: LayoutConfig
-  setCfg: (cfg: LayoutConfig) => void
+  cfg: PageLayout
+  setCfg: (cfg: PageLayout) => void
+  page: LayoutPageKey
+  setPage: (page: LayoutPageKey) => void
 }
 
 const segBtn = (active: boolean, disabled: boolean): string =>
@@ -16,19 +18,43 @@ const segBtn = (active: boolean, disabled: boolean): string =>
       : 'bg-surface-raised text-text-primary hover:bg-surface-overlay',
   ].join(' ')
 
-/** Record-detail layout structure: columns, main position, side swap. */
-export function LayoutConfigBar({ cfg, setCfg }: LayoutConfigBarProps) {
+/** Per-page layout structure: page selector, columns, main position, side swap. */
+export function LayoutConfigBar({ cfg, setCfg, page, setPage }: LayoutConfigBarProps) {
   const { t } = useTranslation()
-  const set = (patch: Partial<LayoutConfig>) => {
+  const set = (patch: Partial<PageLayout>) => {
     setCfg({ ...cfg, ...patch })
   }
   const displayMain = cfg.columns < 3 && cfg.mainPos === 'center' ? 'left' : cfg.mainPos
+  const pageLabel =
+    page === 'home' ? t('admin.layout.previewHome') : t('admin.layout.previewRecord')
 
   return (
     <Card className="flex flex-wrap items-center gap-inline-lg">
       <Text as="span" variant="heading-sm">
         {t('admin.layoutCfg.title')}
       </Text>
+
+      <span className="flex items-center gap-inline-sm">
+        <Text as="span" muted variant="caption">
+          {t('admin.layoutCfg.page')}
+        </Text>
+        <span className="inline-flex overflow-hidden rounded-md border border-border">
+          {(['home', 'record'] as const).map((p) => (
+            <button
+              key={p}
+              type="button"
+              className={segBtn(page === p, false)}
+              onClick={() => {
+                setPage(p)
+              }}
+            >
+              {p === 'home' ? t('admin.layout.previewHome') : t('admin.layout.previewRecord')}
+            </button>
+          ))}
+        </span>
+      </span>
+
+      <span aria-hidden className="h-5 w-px self-center bg-border" />
 
       <span className="flex items-center gap-inline-sm">
         <Text as="span" muted variant="caption">
@@ -103,7 +129,7 @@ export function LayoutConfigBar({ cfg, setCfg }: LayoutConfigBarProps) {
 
       <span className="ml-auto">
         <Text as="span" muted variant="caption">
-          {t('admin.layoutCfg.hint')}
+          {t('admin.layoutCfg.hint', { page: pageLabel })}
         </Text>
       </span>
     </Card>
