@@ -1,31 +1,22 @@
-import { PublicEntityTypeListView, usePublicBrowseIndexPage } from '@/features/public-browse-index'
-import { Stack, Text } from '@/shared/ui'
-import { PublicLayout } from './PublicLayout'
+import { PublicHomeView } from '@/features/public-home'
 import { usePublicSite } from './public-site-context'
 
+/**
+ * Public home (`/`) — the magazine-style site face: hero, latest cross-type
+ * feed, and entity-type entrances. It renders its own self-contained shell
+ * (header / footer / theme toggle) rather than the generic PublicLayout, so the
+ * homepage chrome and the light/dark theme controller stay scoped to the top
+ * page. Site-wide data comes from PublicShell's outlet context.
+ */
 export function PublicIndexPage() {
   const site = usePublicSite()
-  const { items, isLoading, isError, errorTitle, refetch } = usePublicBrowseIndexPage()
 
   return (
-    <PublicLayout variant="standard" site={site}>
-      <Stack gap="md">
-        <Stack gap="sm">
-          <Text as="h1" variant="heading-md">
-            Browse
-          </Text>
-          <Text muted>Public records grouped by entity type.</Text>
-        </Stack>
-        <PublicEntityTypeListView
-          items={items}
-          isLoading={isLoading}
-          isError={isError}
-          errorTitle={errorTitle}
-          onRetry={() => {
-            void refetch()
-          }}
-        />
-      </Stack>
-    </PublicLayout>
+    <PublicHomeView
+      siteName={site.siteName}
+      tagline={site.tagline}
+      metaDescription={site.metaDescription}
+      footerMarkdown={site.footerMarkdown}
+    />
   )
 }

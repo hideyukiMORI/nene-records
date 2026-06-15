@@ -38,4 +38,5 @@ export {
   useEntityList,
   useEntityRevisions,
   useEntitySearch,
+  usePublicLatestEntities,
 } from './queries'

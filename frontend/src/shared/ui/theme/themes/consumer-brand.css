@@ -1,14 +1,135 @@
+/* ============================================================================
+   NeNe Records — Public site brand tokens (light + dark)
+   ----------------------------------------------------------------------------
+   Color is OKLCH + color-mix, scoped under [data-theme]:
+     • [data-theme="consumer"]      → light (warm terracotta paper)
+     • [data-theme="consumer-dark"] → dark  (warm near-black paper)
+
+   These override the global @theme `--color-*` tokens within scope, so the
+   existing Tailwind utilities (bg-surface, text-text-primary, border-border …)
+   and the public home stylesheet pick up the right palette per theme.
+
+   Token names mirror the ClaudeDesign handoff §3 contract
+   (design-export/public-home-handoff). Names already shared with the product
+   keep their exact spelling so they fold straight into the @theme system.
+   ========================================================================== */
+
+/* ── LIGHT — warm terracotta paper ───────────────────────────────────────── */
 [data-theme='consumer'] {
+  /* surface */
   --color-surface: oklch(97.5% 0.012 75);
   --color-surface-raised: oklch(99.5% 0.008 75);
   --color-surface-overlay: oklch(94% 0.02 75);
+  --color-surface-sunken: oklch(95.5% 0.016 70);
+
+  /* text */
   --color-text-primary: oklch(24% 0.03 55);
   --color-text-muted: oklch(48% 0.03 55);
-  --color-text-inverse: oklch(99% 0 0);
+  --color-text-inverse: oklch(99% 0.005 75);
+
+  /* line */
   --color-border: oklch(86% 0.02 75);
+  --color-border-strong: oklch(78% 0.025 70);
+  --color-focus-ring: oklch(68% 0.12 45);
+
+  /* brand — terracotta */
   --color-accent: oklch(58% 0.14 45);
   --color-accent-hover: oklch(52% 0.14 45);
+  --color-accent-weak: color-mix(in oklch, var(--color-accent) 12%, var(--color-surface-raised));
+  --color-on-accent: oklch(99% 0.005 75);
+
+  /* brand mark — NENE2 violet (logo only, distinct from the UI accent) */
+  --color-brand-violet: oklch(56% 0.24 300);
+
+  /* status */
   --color-danger: oklch(52% 0.2 25);
   --color-danger-hover: oklch(46% 0.2 25);
-  --color-focus-ring: oklch(68% 0.12 45);
+  --color-ok: oklch(55% 0.13 150);
+  --color-warn: oklch(70% 0.15 75);
+  --color-info: oklch(55% 0.13 250);
+
+  /* shadow — warm-tinted, soft in light */
+  --shadow-sm: 0 1px 2px oklch(40% 0.04 60 / 0.08);
+  --shadow-md: 0 6px 22px oklch(40% 0.04 60 / 0.1);
+  --shadow-lg: 0 22px 50px oklch(38% 0.05 55 / 0.16);
+
+  color-scheme: light;
+}
+
+/* ── DARK — warm near-black paper ────────────────────────────────────────────
+   Hue kept in the 50–75 warm family (never cold neutral) so the brand warmth
+   survives. Accent is the SAME terracotta hue with lightness lifted only
+   (L58 → L70) for AA contrast on dark; text-on-accent flips to warm-dark. */
+[data-theme='consumer-dark'] {
+  /* surface */
+  --color-surface: oklch(18% 0.012 55);
+  --color-surface-raised: oklch(22% 0.014 55);
+  --color-surface-overlay: oklch(27% 0.016 50);
+  --color-surface-sunken: oklch(15% 0.011 55);
+
+  /* text */
+  --color-text-primary: oklch(94% 0.012 75);
+  --color-text-muted: oklch(68% 0.022 60);
+  --color-text-inverse: oklch(20% 0.02 50);
+
+  /* line */
+  --color-border: oklch(32% 0.016 55);
+  --color-border-strong: oklch(42% 0.02 55);
+  --color-focus-ring: oklch(74% 0.13 45);
+
+  /* brand — lifted terracotta, dark text rides on top */
+  --color-accent: oklch(70% 0.15 45);
+  --color-accent-hover: oklch(77% 0.15 45);
+  --color-accent-weak: color-mix(in oklch, var(--color-accent) 16%, var(--color-surface-raised));
+  --color-on-accent: oklch(20% 0.04 45);
+
+  --color-brand-violet: oklch(72% 0.18 300);
+
+  /* status — lifted for dark legibility */
+  --color-danger: oklch(66% 0.18 25);
+  --color-danger-hover: oklch(72% 0.18 25);
+  --color-ok: oklch(72% 0.14 150);
+  --color-warn: oklch(80% 0.14 80);
+  --color-info: oklch(74% 0.12 250);
+
+  /* shadow — deeper, near-black */
+  --shadow-sm: 0 1px 2px oklch(0% 0 0 / 0.4);
+  --shadow-md: 0 8px 26px oklch(0% 0 0 / 0.5);
+  --shadow-lg: 0 24px 56px oklch(0% 0 0 / 0.62);
+
+  color-scheme: dark;
+}
+
+/* ── No-JS OS-dark fallback ──────────────────────────────────────────────────
+   Before the light/dark/auto controller boots (or with JS off), an OS-dark
+   visitor still gets the dark palette as long as the page hasn't been pinned to
+   an explicit theme. The controller sets data-theme-mode; until then
+   [data-theme="consumer"] + OS dark resolves to the dark token set. */
+@media (prefers-color-scheme: dark) {
+  [data-theme='consumer']:not([data-theme-mode]) {
+    --color-surface: oklch(18% 0.012 55);
+    --color-surface-raised: oklch(22% 0.014 55);
+    --color-surface-overlay: oklch(27% 0.016 50);
+    --color-surface-sunken: oklch(15% 0.011 55);
+    --color-text-primary: oklch(94% 0.012 75);
+    --color-text-muted: oklch(68% 0.022 60);
+    --color-text-inverse: oklch(20% 0.02 50);
+    --color-border: oklch(32% 0.016 55);
+    --color-border-strong: oklch(42% 0.02 55);
+    --color-focus-ring: oklch(74% 0.13 45);
+    --color-accent: oklch(70% 0.15 45);
+    --color-accent-hover: oklch(77% 0.15 45);
+    --color-accent-weak: color-mix(in oklch, var(--color-accent) 16%, var(--color-surface-raised));
+    --color-on-accent: oklch(20% 0.04 45);
+    --color-brand-violet: oklch(72% 0.18 300);
+    --color-danger: oklch(66% 0.18 25);
+    --color-danger-hover: oklch(72% 0.18 25);
+    --color-ok: oklch(72% 0.14 150);
+    --color-warn: oklch(80% 0.14 80);
+    --color-info: oklch(74% 0.12 250);
+    --shadow-sm: 0 1px 2px oklch(0% 0 0 / 0.4);
+    --shadow-md: 0 8px 26px oklch(0% 0 0 / 0.5);
+    --shadow-lg: 0 24px 56px oklch(0% 0 0 / 0.62);
+    color-scheme: dark;
+  }
 }

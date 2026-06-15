@@ -22,6 +22,7 @@ export const entityKeys = {
   all: ['entities'] as const,
   lists: () => [...entityKeys.all, 'list'] as const,
   list: (params: EntityListParams) => [...entityKeys.lists(), params] as const,
+  latest: (limit: number) => [...entityKeys.all, 'latest', limit] as const,
   search: (q: string, limit: number) => [...entityKeys.all, 'search', q, limit] as const,
   byTag: (tagSlug: string, limit: number) => [...entityKeys.all, 'by-tag', tagSlug, limit] as const,
   byDateRange: (from: string, to: string, limit: number) =>
