@@ -13,10 +13,15 @@ function readJson(fromFrontend: string): Record<string, unknown> {
 
 const schema = readJson('../docs/theming/public-theme.schema.json')
 const exampleManifest = readJson('../docs/theming/examples/consumer.manifest.json')
+const auroraManifest = readJson('../docs/theming/themes/aurora/manifest.json')
 
 describe('validateManifest', () => {
   it('accepts the built-in consumer example manifest', () => {
     expect(validateManifest(exampleManifest, schema)).toEqual([])
+  })
+
+  it('accepts the Aurora theme manifest', () => {
+    expect(validateManifest(auroraManifest, schema)).toEqual([])
   })
 
   it('rejects a manifest missing a required token (no color-accent in dark)', () => {

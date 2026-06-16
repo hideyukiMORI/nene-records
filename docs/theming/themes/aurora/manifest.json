@@ -1,0 +1,97 @@
+{
+  "$schema": "../../public-theme.schema.json",
+  "id": "aurora",
+  "name": "Aurora",
+  "version": "1.0.0",
+  "author": "NeNe Records",
+  "description": "Cool, quiet tech theme — teal/cyan accent on cool paper. Authored from examples/aurora.theme.md; the counterpoint to consumer (Terracotta).",
+  "supportsModes": ["light", "dark"],
+  "fonts": [
+    {
+      "family": "Saira Semi Condensed",
+      "role": "display",
+      "source": "fontsource",
+      "weights": [400, 500, 600]
+    },
+    {
+      "family": "Inter",
+      "role": "body",
+      "source": "fontsource",
+      "weights": [400, 500, 600]
+    },
+    {
+      "family": "JetBrains Mono",
+      "role": "mono",
+      "source": "fontsource",
+      "weights": [400]
+    }
+  ],
+  "tokens": {
+    "light": {
+      "color-surface": "oklch(98% 0.006 230)",
+      "color-surface-raised": "oklch(99.5% 0.004 230)",
+      "color-surface-overlay": "oklch(94.5% 0.012 230)",
+      "color-surface-sunken": "oklch(96% 0.01 235)",
+      "color-text-primary": "oklch(24% 0.03 250)",
+      "color-text-muted": "oklch(48% 0.03 245)",
+      "color-text-inverse": "oklch(99% 0.004 230)",
+      "color-border": "oklch(88% 0.012 230)",
+      "color-border-strong": "oklch(80% 0.018 235)",
+      "color-focus-ring": "oklch(68% 0.13 215)",
+      "color-accent": "oklch(62% 0.13 200)",
+      "color-accent-hover": "oklch(56% 0.13 200)",
+      "color-accent-weak": "color-mix(in oklch, var(--color-accent) 12%, var(--color-surface-raised))",
+      "color-on-accent": "oklch(99% 0.004 230)",
+      "color-brand-violet": "oklch(56% 0.24 300)",
+      "color-danger": "oklch(52% 0.2 25)",
+      "color-danger-hover": "oklch(46% 0.2 25)",
+      "color-ok": "oklch(55% 0.13 150)",
+      "color-warn": "oklch(70% 0.15 75)",
+      "color-info": "oklch(55% 0.13 250)",
+      "shadow-sm": "0 1px 2px oklch(40% 0.04 250 / 0.08)",
+      "shadow-md": "0 6px 22px oklch(40% 0.04 250 / 0.1)",
+      "shadow-lg": "0 22px 50px oklch(38% 0.05 250 / 0.16)",
+      "color-scheme": "light"
+    },
+    "dark": {
+      "color-surface": "oklch(17% 0.02 250)",
+      "color-surface-raised": "oklch(21% 0.022 250)",
+      "color-surface-overlay": "oklch(26% 0.024 248)",
+      "color-surface-sunken": "oklch(14% 0.018 250)",
+      "color-text-primary": "oklch(94% 0.012 230)",
+      "color-text-muted": "oklch(68% 0.02 235)",
+      "color-text-inverse": "oklch(20% 0.02 250)",
+      "color-border": "oklch(32% 0.022 250)",
+      "color-border-strong": "oklch(42% 0.026 250)",
+      "color-focus-ring": "oklch(74% 0.13 210)",
+      "color-accent": "oklch(72% 0.13 200)",
+      "color-accent-hover": "oklch(79% 0.13 200)",
+      "color-accent-weak": "color-mix(in oklch, var(--color-accent) 16%, var(--color-surface-raised))",
+      "color-on-accent": "oklch(20% 0.04 250)",
+      "color-brand-violet": "oklch(72% 0.18 300)",
+      "color-danger": "oklch(66% 0.18 25)",
+      "color-danger-hover": "oklch(72% 0.18 25)",
+      "color-ok": "oklch(72% 0.14 150)",
+      "color-warn": "oklch(80% 0.14 80)",
+      "color-info": "oklch(74% 0.12 250)",
+      "shadow-sm": "0 1px 2px oklch(0% 0 0 / 0.4)",
+      "shadow-md": "0 8px 26px oklch(0% 0 0 / 0.5)",
+      "shadow-lg": "0 24px 56px oklch(0% 0 0 / 0.62)",
+      "color-scheme": "dark"
+    }
+  },
+  "knobs": {
+    "accent": { "light": "oklch(62% 0.13 200)", "dark": "oklch(72% 0.13 200)" },
+    "surface": {
+      "light": "oklch(98% 0.006 230)",
+      "dark": "oklch(17% 0.02 250)"
+    },
+    "fontDisplay": "Saira Semi Condensed",
+    "fontBody": "Inter",
+    "fontMono": "JetBrains Mono",
+    "baseFontSize": "1.0625rem",
+    "typeScale": 1.18,
+    "density": "comfortable",
+    "radius": "round"
+  }
+}
