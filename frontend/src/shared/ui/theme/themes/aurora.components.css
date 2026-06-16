@@ -1,0 +1,118 @@
+/* ============================================================================
+   NeNe Records — Aurora theme — component overlay (L2)
+   ----------------------------------------------------------------------------
+   Demonstrates how a theme can change the *whole impression* with CSS only —
+   no DOM/markup changes. Aurora's tokens stay cool/teal; this overlay turns the
+   soft magazine into a sharp, editorial/tech layout: square corners, hairline
+   borders, framed media, tracked mono labels, ruled sections.
+
+   Scoped via `.nene-public[data-theme^='aurora']` so it covers both
+   `aurora` (light) and `aurora-dark` and never leaks to other themes.
+   Only restyles existing public-site.css classes — validator-safe.
+   ========================================================================== */
+
+/* Square everything off — the single biggest "different theme" signal. */
+.nene-public[data-theme^='aurora'] {
+  --radius-sm: 2px;
+  --radius-md: 2px;
+  --radius-lg: 3px;
+}
+
+/* Eyebrows & type badges → tracked uppercase mono chips. */
+.nene-public[data-theme^='aurora'] .eyebrow,
+.nene-public[data-theme^='aurora'] .hero__kicker {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.7rem;
+}
+.nene-public[data-theme^='aurora'] .tbadge {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 0;
+  background: transparent;
+}
+
+/* Hero → close it with a heavy baseline rule; frame the art hard. */
+.nene-public[data-theme^='aurora'] .hero {
+  border-bottom: 2px solid var(--color-text-primary);
+}
+.nene-public[data-theme^='aurora'] .hero__art-frame {
+  border: 1px solid var(--color-border-strong);
+  box-shadow: 8px 8px 0 var(--color-accent-weak);
+}
+.nene-public[data-theme^='aurora'] .hero__stat {
+  font-family: var(--font-mono);
+}
+
+/* Section heads → a strong top rule + tracked title. */
+.nene-public[data-theme^='aurora'] .section__head {
+  border-top: 2px solid var(--color-text-primary);
+  padding-top: var(--space-md);
+}
+.nene-public[data-theme^='aurora'] .section__title {
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.nene-public[data-theme^='aurora'] .section__link {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+}
+
+/* Feed cards → flat panels become hard-bordered tiles with framed media. */
+.nene-public[data-theme^='aurora'] .card {
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-surface-raised);
+  padding: var(--space-md);
+  gap: var(--space-xs);
+  transition:
+    border-color var(--dur-fast) var(--ease),
+    transform var(--dur-fast) var(--ease);
+}
+.nene-public[data-theme^='aurora'] .card:hover {
+  border-color: var(--color-accent);
+  transform: translateY(-3px);
+}
+.nene-public[data-theme^='aurora'] .card__media,
+.nene-public[data-theme^='aurora'] .featured__media {
+  border: 1px solid var(--color-border-strong);
+  filter: saturate(0.7) contrast(1.05);
+}
+.nene-public[data-theme^='aurora'] .card__title,
+.nene-public[data-theme^='aurora'] .featured__title {
+  letter-spacing: -0.01em;
+}
+
+/* Featured → bracket it with rules so it reads as the lead slot. */
+.nene-public[data-theme^='aurora'] .featured {
+  border: 1px solid var(--color-border-strong);
+  border-top: 3px solid var(--color-accent);
+  box-shadow: none;
+}
+
+/* Type nav → square tiles with an accent edge that fills on hover. */
+.nene-public[data-theme^='aurora'] .typecard {
+  border: 1px solid var(--color-border-strong);
+  border-left: 3px solid var(--color-border-strong);
+  border-radius: 0;
+  transition:
+    border-color var(--dur-fast) var(--ease),
+    transform var(--dur-fast) var(--ease);
+}
+.nene-public[data-theme^='aurora'] .typecard:hover {
+  border-left-color: var(--color-accent);
+  transform: translateX(3px);
+}
+.nene-public[data-theme^='aurora'] .typecard__slug {
+  font-family: var(--font-mono);
+}
+
+/* Meta everywhere → mono for the technical register. */
+.nene-public[data-theme^='aurora'] .meta {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+}
