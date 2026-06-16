@@ -280,7 +280,12 @@ function PublicRecordDetailContent({
   // the TOC widget) still read this page's markdown.
   return (
     <PageContentContext.Provider value={pageMarkdown}>
-      <PublicSiteShell site={site} activeTypeSlug={entityTypeSlug} withSidebar={isMultiColLayout}>
+      <PublicSiteShell
+        site={site}
+        activeTypeSlug={entityTypeSlug}
+        withSidebar={isMultiColLayout}
+        withAside={variant === 'three-col'}
+      >
         <article className="article">
           <Link className="backlink" to={`/${entityTypeSlug}`}>
             <IconArrowLeft size={16} /> Back to {entityTypeName}

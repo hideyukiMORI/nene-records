@@ -492,6 +492,9 @@
 .nene-public .layout.is-2col {
   grid-template-columns: minmax(0, 1fr) 320px;
 }
+.nene-public .layout.is-3col {
+  grid-template-columns: minmax(0, 1fr) 280px 280px;
+}
 .nene-public .layout__main {
   container-type: inline-size;
 }
@@ -1565,14 +1568,17 @@
 
 /* ── Responsive ──────────────────────────────────────────────────────────── */
 @media (max-width: 1080px) {
-  .nene-public .layout.is-2col {
+  .nene-public .layout.is-2col,
+  .nene-public .layout.is-3col {
     grid-template-columns: 1fr;
   }
-  .nene-public .layout.is-2col .aside {
+  .nene-public .layout.is-2col .aside,
+  .nene-public .layout.is-3col .aside {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   }
-  .nene-public .layout.is-2col .cardgrid {
+  .nene-public .layout.is-2col .cardgrid,
+  .nene-public .layout.is-3col .cardgrid {
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   }
 }

@@ -25,6 +25,12 @@ export interface PublicSiteShellProps {
    * the full reading width.
    */
   withSidebar?: boolean
+  /**
+   * Whether the shell renders the `aside` region widgets as a third column.
+   * Only the `three-col` record layout opts in; an empty `aside` region stays
+   * collapsed so the layout falls back to two (or one) columns.
+   */
+  withAside?: boolean
   children: ReactNode
 }
 
@@ -93,16 +99,21 @@ export function PublicSiteShell({
   isHome = false,
   hero,
   withSidebar = true,
+  withAside = false,
   children,
 }: PublicSiteShellProps) {
   const { mode, resolvedTheme, setMode } = useConsumerTheme()
   const [drawerOpen, setDrawerOpen] = useState(false)
 
-  // Render the `sidebar` region as a second column when widgets are placed there
-  // (and the page opts in). Empty region → stay single-column.
+  // Render `sidebar` / `aside` regions as side columns when widgets are placed
+  // there (and the page opts in). Empty regions collapse, so the grid steps down
+  // from three → two → single column as content allows.
   const widgetQuery = usePublicWidgets()
-  const hasSidebar =
-    withSidebar && (widgetQuery.data?.items ?? []).some((widget) => widget.region === 'sidebar')
+  const widgets = widgetQuery.data?.items ?? []
+  const hasSidebar = withSidebar && widgets.some((widget) => widget.region === 'sidebar')
+  const hasAside = withAside && widgets.some((widget) => widget.region === 'aside')
+  const sideColumns = (hasSidebar ? 1 : 0) + (hasAside ? 1 : 0)
+  const layoutModifier = sideColumns === 2 ? 'is-3col' : sideColumns === 1 ? 'is-2col' : ''
 
   const entityTypeQuery = useEntityTypeList({ limit: 100, offset: 0 })
   const types = useMemo(
@@ -164,11 +175,16 @@ export function PublicSiteShell({
       <main>
         {hero}
         <div className="wrap">
-          <div className={`layout ${hasSidebar ? 'is-2col' : ''}`}>
+          <div className={`layout ${layoutModifier}`}>
             <div className="layout__main">{children}</div>
             {hasSidebar ? (
               <aside className="aside" aria-label="Site widgets">
                 <SiteWidgets region="sidebar" />
+              </aside>
+            ) : null}
+            {hasAside ? (
+              <aside className="aside" aria-label="Secondary widgets">
+                <SiteWidgets region="aside" />
               </aside>
             ) : null}
           </div>
