@@ -29,7 +29,7 @@ function findManifests(dir: string): string[] {
     const full = join(dir, entry.name)
     if (entry.isDirectory()) {
       out.push(...findManifests(full))
-    } else if (entry.name.endsWith('.manifest.json')) {
+    } else if (entry.name === 'manifest.json' || entry.name.endsWith('.manifest.json')) {
       out.push(full)
     }
   }

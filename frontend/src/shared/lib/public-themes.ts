@@ -29,6 +29,15 @@ export const PUBLIC_THEMES: readonly PublicThemeMeta[] = [
       accent: 'oklch(58% 0.14 45)',
     },
   },
+  {
+    id: 'aurora',
+    name: 'Aurora',
+    preview: {
+      surface: 'oklch(98% 0.006 230)',
+      raised: 'oklch(99.5% 0.004 230)',
+      accent: 'oklch(62% 0.13 200)',
+    },
+  },
 ]
 
 export const DEFAULT_PUBLIC_THEME_ID = 'consumer'

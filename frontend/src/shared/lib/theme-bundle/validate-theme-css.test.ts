@@ -8,10 +8,18 @@ const consumerCss = readFileSync(
   resolve(process.cwd(), 'src/shared/ui/theme/themes/consumer-brand.css'),
   'utf8',
 )
+const auroraCss = readFileSync(
+  resolve(process.cwd(), 'src/shared/ui/theme/themes/aurora.css'),
+  'utf8',
+)
 
 describe('validateThemeCss', () => {
   it('accepts the built-in consumer-brand.css (scoped, no external refs)', () => {
     expect(validateThemeCss(consumerCss, { themeId: 'consumer' })).toEqual([])
+  })
+
+  it('accepts the built-in aurora.css (scoped, no external refs)', () => {
+    expect(validateThemeCss(auroraCss, { themeId: 'aurora' })).toEqual([])
   })
 
   it('accepts theme-scoped and .nene-public selectors', () => {
