@@ -1,0 +1,157 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nene-records.dev/schemas/public-theme.schema.json",
+  "title": "Public Theme Manifest",
+  "description": "Manifest for a NeNe Records public-site theme. See public-theme-contract.md (#368 / epic #367). Scope is the public site only (.nene-public / [data-theme='consumer*']).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "name", "version", "supportsModes", "tokens"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "id": {
+      "type": "string",
+      "description": "Theme id. Used as [data-theme='<id>'] (light) and [data-theme='<id>-dark'] (dark).",
+      "pattern": "^[a-z][a-z0-9-]{1,40}$"
+    },
+    "name": { "type": "string", "minLength": 1, "maxLength": 80 },
+    "version": {
+      "type": "string",
+      "description": "Semantic version.",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "author": { "type": "string", "maxLength": 120 },
+    "description": { "type": "string", "maxLength": 500 },
+    "supportsModes": {
+      "type": "array",
+      "description": "Themes MUST support both light and dark.",
+      "items": { "enum": ["light", "dark"] },
+      "minItems": 2,
+      "uniqueItems": true,
+      "contains": { "const": "light" },
+      "allOf": [{ "contains": { "const": "dark" } }]
+    },
+    "fonts": {
+      "type": "array",
+      "description": "Fonts the theme uses. Self-hosted or from the allowlist; no external @import.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["family", "role", "source"],
+        "properties": {
+          "family": { "type": "string", "minLength": 1 },
+          "role": { "enum": ["display", "body", "chrome", "mono"] },
+          "source": { "enum": ["fontsource", "selfhost", "system"] },
+          "weights": {
+            "type": "array",
+            "items": { "type": "integer", "minimum": 100, "maximum": 900 },
+            "uniqueItems": true
+          }
+        }
+      }
+    },
+    "tokens": {
+      "type": "object",
+      "description": "CSS custom property values per mode (without the leading --). Keys must be contract tokens; values are CSS values (oklch / color-mix / clamp / length …).",
+      "additionalProperties": false,
+      "required": ["light", "dark"],
+      "properties": {
+        "light": { "$ref": "#/$defs/tokenSet" },
+        "dark": { "$ref": "#/$defs/tokenSet" }
+      }
+    },
+    "knobs": {
+      "type": "object",
+      "description": "Optional default values for the customizer knobs (admin-editable). Omitted knobs fall back to derivations from the token set.",
+      "additionalProperties": false,
+      "properties": {
+        "accent": { "$ref": "#/$defs/colorPerMode" },
+        "surface": { "$ref": "#/$defs/colorPerMode" },
+        "textPrimary": { "$ref": "#/$defs/colorPerMode" },
+        "fontDisplay": { "type": "string" },
+        "fontBody": { "type": "string" },
+        "fontMono": { "type": "string" },
+        "baseFontSize": { "type": "string", "pattern": "^[0-9.]+(rem|px)$" },
+        "typeScale": { "type": "number", "minimum": 1.0, "maximum": 1.6 },
+        "density": { "enum": ["compact", "cozy", "comfortable"] },
+        "radius": { "enum": ["sharp", "soft", "round"] }
+      }
+    },
+    "assets": {
+      "type": "object",
+      "description": "Asset slots. Values are bundle-relative paths (no external URLs). Per-mode slots may use {light,dark}.",
+      "additionalProperties": false,
+      "properties": {
+        "preview": { "$ref": "#/$defs/assetPerMode" },
+        "hero": { "$ref": "#/$defs/assetPerMode" },
+        "background": { "$ref": "#/$defs/assetPerMode" },
+        "logo": { "$ref": "#/$defs/assetPerMode" },
+        "decoration": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/assetRef" }
+        },
+        "icons": { "$ref": "#/$defs/assetRef" }
+      }
+    }
+  },
+  "$defs": {
+    "tokenSet": {
+      "type": "object",
+      "description": "Map of contract token name (no leading --) to CSS value. Required tokens enforced here; extra contract tokens allowed.",
+      "required": [
+        "color-surface",
+        "color-surface-raised",
+        "color-surface-overlay",
+        "color-surface-sunken",
+        "color-text-primary",
+        "color-text-muted",
+        "color-text-inverse",
+        "color-border",
+        "color-border-strong",
+        "color-focus-ring",
+        "color-accent",
+        "color-accent-hover",
+        "color-accent-weak",
+        "color-on-accent",
+        "color-brand-violet",
+        "color-danger",
+        "color-danger-hover",
+        "color-ok",
+        "color-warn",
+        "color-info",
+        "shadow-sm",
+        "shadow-md",
+        "shadow-lg",
+        "color-scheme"
+      ],
+      "propertyNames": { "pattern": "^[a-z][a-z0-9-]*$" },
+      "additionalProperties": { "type": "string", "minLength": 1 }
+    },
+    "colorPerMode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["light", "dark"],
+      "properties": {
+        "light": { "type": "string", "minLength": 1 },
+        "dark": { "type": "string", "minLength": 1 }
+      }
+    },
+    "assetRef": {
+      "type": "string",
+      "description": "Bundle-relative path. External URLs (http/https/protocol-relative) and data: are rejected here; data URIs belong in CSS, not the manifest.",
+      "pattern": "^(?!https?:)(?!//)(?!data:)[A-Za-z0-9._/-]+\\.(png|jpg|jpeg|webp|avif|svg)$"
+    },
+    "assetPerMode": {
+      "oneOf": [
+        { "$ref": "#/$defs/assetRef" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "light": { "$ref": "#/$defs/assetRef" },
+            "dark": { "$ref": "#/$defs/assetRef" }
+          }
+        }
+      ]
+    }
+  }
+}
