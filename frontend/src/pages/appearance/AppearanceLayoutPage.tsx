@@ -2,7 +2,12 @@ import { useState } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
 import { currentUserHasCapability } from '@/entities/auth'
 import { useMenuList } from '@/entities/menu'
-import { PublicThemeView, usePublicThemePage } from '@/features/manage-appearance'
+import {
+  PublicThemeView,
+  ThemeCustomizeView,
+  usePublicThemePage,
+  useThemeCustomizePage,
+} from '@/features/manage-appearance'
 import { ManageMenusView, useManageMenusPage } from '@/features/manage-menus'
 import {
   HelpModal,
@@ -28,8 +33,20 @@ function MenusTab() {
 }
 
 function ThemeTab() {
+  const { t } = useTranslation()
   const page = usePublicThemePage()
-  return <PublicThemeView {...page} />
+  const customize = useThemeCustomizePage()
+  return (
+    <Stack gap="lg">
+      <PublicThemeView {...page} />
+      <Stack gap="sm">
+        <Text as="h2" variant="heading-sm">
+          {t('admin.themeCustomize.title')}
+        </Text>
+        <ThemeCustomizeView {...customize} />
+      </Stack>
+    </Stack>
+  )
 }
 
 export function AppearanceLayoutPage() {

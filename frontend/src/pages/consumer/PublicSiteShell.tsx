@@ -139,7 +139,12 @@ export function PublicSiteShell({
   const footerTypeLinks = types.slice(0, 4)
 
   return (
-    <div className="nene-public" data-theme={resolvedTheme} data-theme-mode={mode}>
+    <div
+      className="nene-public"
+      data-theme={resolvedTheme}
+      data-theme-mode={mode}
+      style={site.themeOverrideStyle}
+    >
       <header className="hd">
         <div className="wrap hd__in">
           <Brand siteName={site.siteName} tagline={site.tagline} />

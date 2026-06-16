@@ -19,6 +19,8 @@ export interface PublicSite {
   navItems: PublicSiteNavItem[]
   /** Admin-selected public-site theme id (`active_theme` setting). */
   activeTheme: string
+  /** Customizer overrides for the active theme, as CSS custom properties. */
+  themeOverrideStyle: Record<string, string>
 }
 
 export function usePublicSite(): PublicSite {
