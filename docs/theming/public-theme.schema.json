@@ -76,6 +76,19 @@
         "radius": { "enum": ["sharp", "soft", "round"] }
       }
     },
+    "flags": {
+      "type": "object",
+      "description": "Structural style flags (enumerated). Applied as data-* attributes on .nene-public; implemented once in base CSS (no DOM change). See theme-flags.md.",
+      "additionalProperties": false,
+      "properties": {
+        "feedLayout": { "enum": ["grid", "list", "magazine"] },
+        "cardStyle": { "enum": ["flat", "bordered", "shadowed", "framed"] },
+        "media": { "enum": ["plain", "duotone", "grayscale", "framed"] },
+        "hero": { "enum": ["standard", "fullbleed", "minimal"] },
+        "sectionRule": { "enum": ["none", "hairline", "heavy"] },
+        "eyebrow": { "enum": ["plain", "caps", "barred"] }
+      }
+    },
     "assets": {
       "type": "object",
       "description": "Asset slots. Values are bundle-relative paths (no external URLs). Per-mode slots may use {light,dark}.",
