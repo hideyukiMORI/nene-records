@@ -9,6 +9,7 @@ const TEST_SITE: PublicSite = {
   navItems: [],
   activeTheme: 'consumer',
   themeOverrideCss: '',
+  themeFlagAttrs: {},
 }
 
 /**

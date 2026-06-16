@@ -71,6 +71,8 @@ export const en = {
   'admin.themeCustomize.fontSize': 'Font size',
   'admin.themeCustomize.typeScale': 'Type scale',
   'admin.themeCustomize.density': 'Density',
+  'admin.themeCustomize.feedLayout': 'Feed layout',
+  'admin.themeCustomize.cardStyle': 'Card style',
   'admin.themeCustomize.save': 'Save',
   'admin.themeCustomize.saving': 'Saving…',
   'admin.themeCustomize.reset': 'Reset',

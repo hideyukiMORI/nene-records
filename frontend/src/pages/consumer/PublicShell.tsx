@@ -10,6 +10,7 @@ import {
   storeActiveTheme,
 } from '@/shared/lib/public-themes'
 import {
+  flagAttrsForTheme,
   overrideCssForTheme,
   readStoredThemeOverridesRaw,
   storeThemeOverridesRaw,
@@ -73,6 +74,7 @@ export function PublicShell() {
     navItems,
     activeTheme,
     themeOverrideCss: overrideCssForTheme(overridesRaw, activeTheme),
+    themeFlagAttrs: flagAttrsForTheme(overridesRaw, activeTheme),
   }
 
   useSiteDocumentMeta(site.siteName, site.metaDescription)

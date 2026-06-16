@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { useTranslation } from '@/shared/i18n'
 import {
   DENSITY_OPTIONS,
+  FLAG_DEFS,
   FONT_OPTIONS,
   FONT_SIZE_OPTIONS,
   GUTTER_OPTIONS,
@@ -226,6 +227,26 @@ export function ThemeCustomizeView({
               placeholder={themePlaceholder}
               onChange={(v) => {
                 setKnob('density', v)
+              }}
+            />
+          </Field>
+          <Field label={t('admin.themeCustomize.feedLayout')}>
+            <Select
+              value={draft.flags?.feedLayout}
+              options={FLAG_DEFS.feedLayout.options}
+              placeholder={themePlaceholder}
+              onChange={(v) => {
+                setKnob('flags', { ...draft.flags, feedLayout: v })
+              }}
+            />
+          </Field>
+          <Field label={t('admin.themeCustomize.cardStyle')}>
+            <Select
+              value={draft.flags?.cardStyle}
+              options={FLAG_DEFS.cardStyle.options}
+              placeholder={themePlaceholder}
+              onChange={(v) => {
+                setKnob('flags', { ...draft.flags, cardStyle: v })
               }}
             />
           </Field>

@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import {
   buildOverrideCss,
+  flagAttrsForTheme,
   overrideCssForTheme,
+  resolveFlagAttrs,
   resolveModeColors,
   resolveOverrideStyle,
 } from './theme-customization'
@@ -98,5 +100,27 @@ describe('buildOverrideCss / overrideCssForTheme', () => {
     expect(overrideCssForTheme(raw, 'aurora')).toContain('--radius-md')
     expect(overrideCssForTheme(raw, 'consumer')).toBe('')
     expect(overrideCssForTheme('not json', 'aurora')).toBe('')
+  })
+})
+
+describe('resolveFlagAttrs / flagAttrsForTheme', () => {
+  it('maps valid flags to data-* attributes; overrides win over defaults', () => {
+    const attrs = resolveFlagAttrs(
+      { feedLayout: 'grid' },
+      { feedLayout: 'list', cardStyle: 'bordered' },
+    )
+    expect(attrs).toEqual({ 'data-feed': 'list', 'data-cards': 'bordered' })
+  })
+
+  it('drops unknown flags / invalid values', () => {
+    expect(resolveFlagAttrs(undefined, { feedLayout: 'spaceship', cardStyle: 'flat' })).toEqual({
+      'data-cards': 'flat',
+    })
+  })
+
+  it('reads flags from stored overrides JSON for the theme', () => {
+    const raw = JSON.stringify({ reading: { flags: { feedLayout: 'list' } } })
+    expect(flagAttrsForTheme(raw, 'reading')).toEqual({ 'data-feed': 'list' })
+    expect(flagAttrsForTheme(raw, 'aurora')).toEqual({})
   })
 })
