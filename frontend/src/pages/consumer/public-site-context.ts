@@ -21,6 +21,8 @@ export interface PublicSite {
   activeTheme: string
   /** Customizer overrides for the active theme, as a scoped CSS stylesheet. */
   themeOverrideCss: string
+  /** Structural style-flag `data-*` attributes for the active theme. */
+  themeFlagAttrs: Record<string, string>
 }
 
 export function usePublicSite(): PublicSite {

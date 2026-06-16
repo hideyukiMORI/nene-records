@@ -34,6 +34,8 @@ export interface ThemeOverrides {
   surface?: ColorPair
   /** Body text ink colour, per mode (hex). Derives `--color-text-muted`. */
   text?: ColorPair
+  /** Structural style flags (applied as data-* attributes; see theme-flags.md). */
+  flags?: ThemeFlags
 }
 
 /** A colour value per light/dark mode (hex). */
@@ -41,6 +43,71 @@ export interface ColorPair {
   light?: string
   dark?: string
 }
+
+/** Structural style flags — enumerated; implemented once in base CSS. */
+export interface ThemeFlags {
+  feedLayout?: string
+  cardStyle?: string
+  media?: string
+  hero?: string
+  sectionRule?: string
+  eyebrow?: string
+}
+
+/** flag key → { data attribute, allowed values }. Mirrors theme-flags.md §2. */
+export const FLAG_DEFS: Record<keyof ThemeFlags, { attr: string; options: readonly KnobOption[] }> =
+  {
+    feedLayout: {
+      attr: 'data-feed',
+      options: [
+        { value: 'grid', label: 'Grid' },
+        { value: 'list', label: 'List' },
+        { value: 'magazine', label: 'Magazine' },
+      ],
+    },
+    cardStyle: {
+      attr: 'data-cards',
+      options: [
+        { value: 'flat', label: 'Flat' },
+        { value: 'bordered', label: 'Bordered' },
+        { value: 'shadowed', label: 'Shadowed' },
+        { value: 'framed', label: 'Framed' },
+      ],
+    },
+    media: {
+      attr: 'data-media',
+      options: [
+        { value: 'plain', label: 'Plain' },
+        { value: 'duotone', label: 'Duotone' },
+        { value: 'grayscale', label: 'Grayscale' },
+        { value: 'framed', label: 'Framed' },
+      ],
+    },
+    hero: {
+      attr: 'data-hero',
+      options: [
+        { value: 'standard', label: 'Standard' },
+        { value: 'fullbleed', label: 'Full bleed' },
+        { value: 'minimal', label: 'Minimal' },
+      ],
+    },
+    sectionRule: {
+      attr: 'data-rule',
+      options: [
+        { value: 'none', label: 'None' },
+        { value: 'hairline', label: 'Hairline' },
+        { value: 'heavy', label: 'Heavy' },
+      ],
+    },
+    eyebrow: {
+      attr: 'data-eyebrow',
+      options: [
+        { value: 'plain', label: 'Plain' },
+        { value: 'caps', label: 'Caps' },
+        { value: 'barred', label: 'Barred' },
+      ],
+    },
+  }
 
 export interface KnobOption {
   value: string
@@ -293,6 +360,38 @@ export function buildOverrideCss(overrides: ThemeOverrides, themeId: string): st
 export function overrideCssForTheme(raw: string | undefined, themeId: string): string {
   const forTheme = parseThemeOverrides(raw)[themeId]
   return forTheme ? buildOverrideCss(forTheme, themeId) : ''
+}
+
+/**
+ * Resolve style flags into `data-*` attributes for the `.nene-public` root.
+ * Only known flags with allowed enum values are emitted; base CSS implements
+ * the actual look (no DOM change). `themeDefaults` are the theme's built-in
+ * flags; `overrides` (admin) win.
+ */
+export function resolveFlagAttrs(
+  themeDefaults: ThemeFlags | undefined,
+  overrides: ThemeFlags | undefined,
+): Record<string, string> {
+  const merged: ThemeFlags = { ...themeDefaults, ...overrides }
+  const attrs: Record<string, string> = {}
+  for (const key of Object.keys(FLAG_DEFS) as Array<keyof ThemeFlags>) {
+    const def = FLAG_DEFS[key]
+    const value = merged[key]
+    if (typeof value === 'string' && def.options.some((option) => option.value === value)) {
+      attrs[def.attr] = value
+    }
+  }
+  return attrs
+}
+
+/** Resolve flag data-* attributes for a theme from stored overrides JSON. */
+export function flagAttrsForTheme(
+  raw: string | undefined,
+  themeId: string,
+  themeDefaults?: ThemeFlags,
+): Record<string, string> {
+  const forTheme = parseThemeOverrides(raw)[themeId]
+  return resolveFlagAttrs(themeDefaults, forTheme?.flags)
 }
 
 // Cache the raw overrides JSON so the first paint can apply them synchronously

@@ -64,6 +64,8 @@ export const ja: Partial<MessageCatalog> = {
   'admin.themeCustomize.fontSize': '文字サイズ',
   'admin.themeCustomize.typeScale': '見出しスケール',
   'admin.themeCustomize.density': '密度',
+  'admin.themeCustomize.feedLayout': 'フィード版面',
+  'admin.themeCustomize.cardStyle': 'カード意匠',
   'admin.themeCustomize.save': '保存',
   'admin.themeCustomize.saving': '保存中…',
   'admin.themeCustomize.reset': 'リセット',

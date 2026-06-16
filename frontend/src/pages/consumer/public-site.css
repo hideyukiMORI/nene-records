@@ -1646,3 +1646,63 @@
     animation: none !important;
   }
 }
+
+/* ── Style flags (preset engine) ──────────────────────────────────────────
+   Structural variations selected by theme/customizer flags and applied as
+   data-* attributes on .nene-public (see docs/theming/theme-flags.md).
+   Implemented once here; themes/JSON just opt in. No DOM changes. */
+
+/* feedLayout=list — the latest feed becomes full-width rows (grid areas keep
+   the flat card markup: media | meta/title/excerpt). */
+.nene-public[data-feed='list'] .cardgrid {
+  grid-template-columns: 1fr;
+  gap: var(--space-md);
+}
+.nene-public[data-feed='list'] .card {
+  display: grid;
+  grid-template-columns: minmax(150px, 230px) 1fr;
+  grid-template-areas: 'media meta' 'media title' 'media excerpt';
+  align-items: start;
+  gap: var(--space-2xs) var(--space-lg);
+}
+.nene-public[data-feed='list'] .card > a:first-child {
+  grid-area: media;
+}
+.nene-public[data-feed='list'] .card__metarow {
+  grid-area: meta;
+}
+.nene-public[data-feed='list'] .card__title {
+  grid-area: title;
+}
+.nene-public[data-feed='list'] .card__excerpt {
+  grid-area: excerpt;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+}
+@media (max-width: 560px) {
+  .nene-public[data-feed='list'] .card {
+    grid-template-columns: 1fr;
+    grid-template-areas: 'media' 'meta' 'title' 'excerpt';
+  }
+}
+
+/* cardStyle — card surface treatment. flat = default (no rule). */
+.nene-public[data-cards='bordered'] .card {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-raised);
+  padding: var(--space-md);
+}
+.nene-public[data-cards='shadowed'] .card {
+  border-radius: var(--radius-md);
+  background: var(--color-surface-raised);
+  padding: var(--space-md);
+  box-shadow: var(--shadow-md);
+}
+.nene-public[data-cards='framed'] .card {
+  border: 1px solid var(--color-border-strong);
+  border-top: 3px solid var(--color-accent);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-raised);
+  padding: var(--space-md);
+}

@@ -139,7 +139,12 @@ export function PublicSiteShell({
   const footerTypeLinks = types.slice(0, 4)
 
   return (
-    <div className="nene-public" data-theme={resolvedTheme} data-theme-mode={mode}>
+    <div
+      className="nene-public"
+      data-theme={resolvedTheme}
+      data-theme-mode={mode}
+      {...site.themeFlagAttrs}
+    >
       {site.themeOverrideCss !== '' ? <style>{site.themeOverrideCss}</style> : null}
       <header className="hd">
         <div className="wrap hd__in">
