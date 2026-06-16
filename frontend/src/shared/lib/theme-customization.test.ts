@@ -28,6 +28,23 @@ describe('resolveOverrideStyle', () => {
     expect(style).toEqual({})
   })
 
+  it('derives the text scale from fontSize × typeScale', () => {
+    const style = resolveOverrideStyle({ fontSize: 'large', typeScale: 'dramatic' })
+    expect(style['--text-body']).toBe('1.1875rem')
+    // h3 = base * scale^1 > body
+    expect(parseFloat(style['--text-h3'])).toBeGreaterThan(parseFloat(style['--text-body']))
+    // overline = base * scale^-2 < body
+    expect(parseFloat(style['--text-overline'])).toBeLessThan(parseFloat(style['--text-body']))
+    // clamp-based hero tokens are NOT overridden
+    expect(style['--text-display']).toBeUndefined()
+  })
+
+  it('scales the space ramp from density', () => {
+    const style = resolveOverrideStyle({ density: 'compact' })
+    expect(style['--space-md']).toBe('0.85rem')
+    expect(style['--space-2xl']).toBe('3.4rem')
+  })
+
   it('emits only the provided knobs', () => {
     expect(resolveOverrideStyle({ accent: '#abc' })).toEqual({
       '--color-accent': '#abc',

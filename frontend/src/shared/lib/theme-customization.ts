@@ -7,9 +7,9 @@
  * override the active theme's tokens). Values are constrained/sanitised here —
  * we only ever emit known CSS variables with validated values, never raw input.
  *
- * Slice 1 knobs: accent (色) / body font (フォント) / content width (幅) /
- * gutter (余白) / radius (角丸). Derived tokens that reference these (e.g.
- * `--color-accent-weak`) auto-follow.
+ * Knobs: accent (色) / body font (フォント) / content width (幅) / gutter (余白)
+ * / radius (角丸) / font size × type scale (→ `--text-*`) / density (→ `--space-*`).
+ * Derived tokens that reference these (e.g. `--color-accent-weak`) auto-follow.
  */
 
 /** Per-theme override values as stored (one entry per theme id). */
@@ -24,6 +24,12 @@ export interface ThemeOverrides {
   gutter?: string
   /** Corner radius preset key (see RADIUS_OPTIONS). */
   radius?: string
+  /** Base body font-size preset (see FONT_SIZE_OPTIONS). Recomputes `--text-*`. */
+  fontSize?: string
+  /** Type scale preset (see TYPE_SCALE_OPTIONS). Recomputes `--text-*`. */
+  typeScale?: string
+  /** Spacing density preset (see DENSITY_OPTIONS). Scales `--space-*`. */
+  density?: string
 }
 
 export interface KnobOption {
@@ -81,6 +87,51 @@ const RADIUS_VALUES: Record<string, { sm: string; md: string; lg: string }> = {
   round: { sm: '10px', md: '18px', lg: '28px' },
 }
 
+export const FONT_SIZE_OPTIONS: readonly KnobOption[] = [
+  { value: 'small', label: 'Small' },
+  { value: 'default', label: 'Default' },
+  { value: 'large', label: 'Large' },
+]
+const FONT_SIZE_VALUES: Record<string, number> = { small: 1.0, default: 1.0625, large: 1.1875 }
+
+export const TYPE_SCALE_OPTIONS: readonly KnobOption[] = [
+  { value: 'compact', label: 'Compact' },
+  { value: 'default', label: 'Default' },
+  { value: 'dramatic', label: 'Dramatic' },
+]
+const TYPE_SCALE_VALUES: Record<string, number> = { compact: 1.12, default: 1.18, dramatic: 1.28 }
+
+export const DENSITY_OPTIONS: readonly KnobOption[] = [
+  { value: 'compact', label: 'Compact' },
+  { value: 'cozy', label: 'Cozy' },
+  { value: 'comfortable', label: 'Comfortable' },
+]
+const DENSITY_FACTORS: Record<string, number> = { compact: 0.85, cozy: 0.92, comfortable: 1.0 }
+
+// Default space scale (rem) — scaled by the density factor.
+const SPACE_SCALE: ReadonlyArray<readonly [string, number]> = [
+  ['2xs', 0.25],
+  ['xs', 0.5],
+  ['sm', 0.75],
+  ['md', 1],
+  ['lg', 1.5],
+  ['xl', 2.5],
+  ['2xl', 4],
+]
+// `--text-*` step exponents relative to body (fixed-rem tokens only; the
+// clamp-based h2/h1/display stay the theme's so the hero keeps its fluidity).
+const TEXT_STEPS: ReadonlyArray<readonly [string, number]> = [
+  ['overline', -2],
+  ['meta', -1.4],
+  ['body-sm', -0.8],
+  ['body', 0],
+  ['h3', 1],
+]
+
+function rem(value: number): string {
+  return `${String(Math.round(value * 10000) / 10000)}rem`
+}
+
 const HEX_COLOR = /^#[0-9a-fA-F]{3,8}$/
 
 /** Whitelisted value option keys, so JSON from the API can't smuggle anything. */
@@ -116,6 +167,29 @@ export function resolveOverrideStyle(overrides: ThemeOverrides): Record<string, 
     style['--radius-lg'] = radius.lg
   }
 
+  // Type scale: recompute the fixed-rem text tokens from base × scale.
+  const hasFontSize = isOption(FONT_SIZE_OPTIONS, overrides.fontSize)
+  const hasTypeScale = isOption(TYPE_SCALE_OPTIONS, overrides.typeScale)
+  if (hasFontSize || hasTypeScale) {
+    const base = hasFontSize
+      ? FONT_SIZE_VALUES[overrides.fontSize as string]
+      : FONT_SIZE_VALUES.default
+    const scale = hasTypeScale
+      ? TYPE_SCALE_VALUES[overrides.typeScale as string]
+      : TYPE_SCALE_VALUES.default
+    for (const [name, step] of TEXT_STEPS) {
+      style[`--text-${name}`] = rem(base * scale ** step)
+    }
+  }
+
+  // Density: scale the whole space ramp.
+  if (isOption(DENSITY_OPTIONS, overrides.density)) {
+    const factor = DENSITY_FACTORS[overrides.density]
+    for (const [name, value] of SPACE_SCALE) {
+      style[`--space-${name}`] = rem(value * factor)
+    }
+  }
+
   return style
 }
 
@@ -143,4 +217,22 @@ export function overrideStyleForTheme(
   const byTheme = parseThemeOverrides(raw)
   const forTheme = byTheme[themeId]
   return forTheme ? resolveOverrideStyle(forTheme) : {}
+}
+
+// Cache the raw overrides JSON so the first paint can apply them synchronously
+// (same FOUC-avoidance as the active theme id).
+const OVERRIDES_STORAGE_KEY = 'nene_public_theme_overrides'
+
+export function readStoredThemeOverridesRaw(): string {
+  if (typeof window === 'undefined') {
+    return '{}'
+  }
+  return window.localStorage.getItem(OVERRIDES_STORAGE_KEY) ?? '{}'
+}
+
+export function storeThemeOverridesRaw(raw: string | undefined): void {
+  if (typeof window === 'undefined') {
+    return
+  }
+  window.localStorage.setItem(OVERRIDES_STORAGE_KEY, raw ?? '{}')
 }
