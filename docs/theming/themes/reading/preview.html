@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Reading theme — preview</title>
+
+<!-- Preview-only font loading. In the real app these are self-hosted via
+     @fontsource (public-fonts.ts); the bundle CSS carries no external url(). -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Saira+Semi+Condensed:wght@400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono&display=swap" rel="stylesheet" />
+
+<!-- The consuming component stylesheet (unchanged). Colors come from the theme. -->
+<link rel="stylesheet" href="../uploads/nene-theme-handoff/reference/public-site.css" />
+<!-- The Reading theme bundle -->
+<link rel="stylesheet" href="tokens.css" />
+<link rel="stylesheet" href="components.css" />
+
+<style>
+  /* Preview chrome only — not part of the theme bundle. */
+  html, body { margin: 0; background: var(--color-surface); }
+  .nene-public { --font-chrome: 'Saira Semi Condensed', system-ui, sans-serif; }
+</style>
+</head>
+<body>
+<div class="nene-public" id="site" data-theme="reading" data-theme-mode="light">
+
+  <!-- ── Header ─────────────────────────────────────────────────────────── -->
+  <header class="hd">
+    <div class="wrap hd__in">
+      <a class="brand" href="#">
+        <span class="brand__mark">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M5 19V5l14 14V5" />
+          </svg>
+        </span>
+        <span class="brand__text">
+          <span class="brand__name">NeNe Records</span>
+          <span class="brand__tag">読み物アーカイブ</span>
+        </span>
+      </a>
+      <nav class="hd__nav">
+        <a class="navlink" aria-current="page" href="#">ホーム</a>
+        <a class="navlink" href="#">エッセイ</a>
+        <a class="navlink" href="#">レビュー</a>
+        <a class="navlink" href="#">アーカイブ</a>
+        <div class="themesw" role="group" aria-label="テーマ">
+          <button class="themesw__btn" data-set="light" aria-pressed="true" title="Light">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19"/></svg>
+          </button>
+          <button class="themesw__btn" data-set="dark" aria-pressed="false" title="Dark">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
+          </button>
+        </div>
+        <a class="btn btn--primary" href="#">購読する</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+
+    <!-- ── Hero (typography-led) ────────────────────────────────────────── -->
+    <section class="hero">
+      <div class="hero__grid">
+        <div>
+          <p class="eyebrow hero__kicker">Essay · 読書のための設計</p>
+          <h1 class="hero__title">静かな紙の上で、<em>長い文章</em>を気持ちよく読む。</h1>
+          <p class="hero__lead">Reading テーマは色で主張しません。暖かいクリームの紙、大きめの serif 本文、広い計測幅とゆったりした行間で、読むことそのものに集中できる設計です。</p>
+          <div class="hero__cta">
+            <a class="btn btn--primary" href="#">最新号を読む</a>
+            <a class="btn btn--ghost" href="#">テーマについて</a>
+          </div>
+          <div class="hero__meta">
+            <div class="hero__stat"><b>76ch</b><span>本文計測幅</span></div>
+            <div class="hero__stat"><b>1.72</b><span>行間（leading）</span></div>
+            <div class="hero__stat"><b>Serif</b><span>Source Serif 4</span></div>
+          </div>
+        </div>
+        <div class="hero__art">
+          <div class="hero__art-frame">
+            <div class="eyecatch" data-label="hero illustration" style="width:100%"></div>
+            <span class="hero__art-tag"><b>◆</b> typography-first</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Long-form article (the showcase) ─────────────────────────────── -->
+    <div class="layout is-2col">
+      <article class="article layout__main">
+        <div class="article__metarow">
+          <span class="tbadge">essay</span>
+          <span class="meta">2026年6月16日</span>
+          <span class="dot"></span>
+          <span class="meta">読了 8分</span>
+        </div>
+        <h2 class="article__title">余白と行間が、読み手の呼吸を決める</h2>
+        <div class="article__byline">
+          <span class="article__avatar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-4 5-6 8-6s6.5 2 8 6"/></svg>
+          </span>
+          <span>編集部</span>
+          <span class="dot"></span>
+          <span>Typography Notes</span>
+        </div>
+
+        <div class="article__hero eyecatch" data-label="article cover"></div>
+
+        <div class="prose">
+          <p>本文を serif にするだけでは、読み物にはなりません。一行の長さ、行と行のあいだ、段落の間隔——そうした目に見えにくい余白の設計こそが、読み手の呼吸を決めます。Reading テーマは、その三つを同時に整えることを起点にしています。</p>
+          <p>一行は約 76 文字分まで広げ、行間は 1.72 までゆるめました。やや大きめの本文（1.125rem）と組み合わせると、視線が次の行頭へ戻るときの迷いが減り、長い文章でも疲れにくくなります。色は意図的に抑え、リンクと強調にだけ静かなブラウンのインクを差します。</p>
+          <blockquote>読みやすさは装飾ではなく、構造である。文字の大きさより、文字と文字のあいだに宿る。</blockquote>
+          <h2>見出しは引き締めて、雑誌の手触りを残す</h2>
+          <p>本文が serif でゆったりしているぶん、見出しには Saira Semi Condensed を使って密度とリズムを与えます。柔らかい本文と引き締まった見出しの対比が、ページ全体に編集された印象をつくります。</p>
+          <ul>
+            <li>本文 — Source Serif 4（セルフホスト同梱）</li>
+            <li>見出し — Saira Semi Condensed</li>
+            <li>コード／メタ — JetBrains Mono</li>
+          </ul>
+          <h3>ダークでも紙の温度を保つ</h3>
+          <p>暗いモードでは、冷たい黒ではなくセピア寄りの近黒を地にしています。アクセントは同じブラウンの色相のまま明度だけを持ち上げ、リンクは <a href="#">この通り</a> 読みやすさを保ちます。<code>--measure</code> や <code>--leading-body</code> はモードに依らず一定です。</p>
+        </div>
+
+        <div class="article__tags">
+          <span class="eyebrow">Tags</span>
+          <a class="tag" href="#">typography</a>
+          <a class="tag" href="#">reading</a>
+          <a class="tag" href="#">serif</a>
+        </div>
+      </article>
+
+      <!-- ── Sidebar ───────────────────────────────────────────────────── -->
+      <aside class="aside">
+        <div class="search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          <input type="search" placeholder="記事を検索…" />
+        </div>
+        <div class="widget">
+          <h3 class="widget__title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
+            よく読まれている
+          </h3>
+          <ul class="poplist">
+            <li><span class="poplist__rank">1</span><div><a class="poplist__t" href="#">行間設計の基礎</a><div class="poplist__m">エッセイ · 6分</div></div></li>
+            <li><span class="poplist__rank">2</span><div><a class="poplist__t" href="#">本文 serif の選び方</a><div class="poplist__m">レビュー · 9分</div></div></li>
+            <li><span class="poplist__rank">3</span><div><a class="poplist__t" href="#">計測幅と読書速度</a><div class="poplist__m">ノート · 4分</div></div></li>
+          </ul>
+        </div>
+        <div class="widget">
+          <h3 class="widget__title">タグ</h3>
+          <div class="tags">
+            <a class="tag" href="#">essay <b>24</b></a>
+            <a class="tag" href="#">review <b>18</b></a>
+            <a class="tag" href="#">type <b>11</b></a>
+            <a class="tag" href="#">archive <b>7</b></a>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- ── Related card grid ────────────────────────────────────────────── -->
+    <section class="section">
+      <div class="section__head">
+        <div>
+          <p class="eyebrow">More to read</p>
+          <h2 class="section__title">関連する読み物</h2>
+        </div>
+        <a class="section__link" href="#">すべて見る
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+      </div>
+      <div class="cardgrid">
+        <a class="card" href="#">
+          <div class="card__media eyecatch" data-label="cover"></div>
+          <div class="card__metarow"><span class="tbadge">review</span><span class="meta">5分</span></div>
+          <h3 class="card__title">紙の白さは、ほんの少し暖かいほうがいい</h3>
+          <p class="card__excerpt">純白よりわずかにクリームへ寄せると、長時間の読書で目に優しくなります。</p>
+        </a>
+        <a class="card" href="#">
+          <div class="card__media eyecatch" data-label="cover"></div>
+          <div class="card__metarow"><span class="tbadge">essay</span><span class="meta">7分</span></div>
+          <h3 class="card__title">アクセント色を「面」で使わない理由</h3>
+          <p class="card__excerpt">読み物では色は脇役。リンクと強調にだけ静かに効かせます。</p>
+        </a>
+        <a class="card" href="#">
+          <div class="card__media eyecatch" data-label="cover"></div>
+          <div class="card__metarow"><span class="tbadge">note</span><span class="meta">3分</span></div>
+          <h3 class="card__title">ダークモードの黒を、冷やしすぎない</h3>
+          <p class="card__excerpt">セピア寄りの近黒は、紙の温度を夜にも持ち越します。</p>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <!-- ── Footer ───────────────────────────────────────────────────────── -->
+  <footer class="ft">
+    <div class="wrap">
+      <div class="ft__bar">
+        <small>© 2026 NeNe Records — <span class="mono">theme: reading</span></small>
+        <small class="mono">light / dark · serif body · 76ch</small>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<script>
+  // Preview-only theme toggle. The real site flips data-theme via its own
+  // controller; here we swap between the light and dark token sets.
+  const site = document.getElementById('site');
+  document.querySelectorAll('.themesw__btn').forEach((b) => {
+    b.addEventListener('click', () => {
+      const mode = b.dataset.set;
+      site.dataset.theme = mode === 'dark' ? 'reading-dark' : 'reading';
+      site.dataset.themeMode = mode;
+      document.querySelectorAll('.themesw__btn').forEach((x) =>
+        x.setAttribute('aria-pressed', String(x === b))
+      );
+    });
+  });
+</script>
+</body>
+</html>

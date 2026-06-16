@@ -1,0 +1,98 @@
+/* ============================================================================
+   NeNe Records — Public site theme: Reading (light + dark)
+   ----------------------------------------------------------------------------
+   A reading-first theme. Where consumer/aurora/ink differ by hue & shape,
+   Reading differs by *reading experience*: warm cream paper, a quiet low-chroma
+   ink accent used only for links/emphasis (never as a fill field), serif body,
+   larger type, a wider measure and looser leading (see components.css).
+   Authored from uploads/brief-reading.theme.md per the token contract;
+   scoped under [data-theme='reading'] / [data-theme='reading-dark'].
+   ========================================================================== */
+
+/* ── LIGHT — warm cream paper ────────────────────────────────────────────── */
+[data-theme='reading'] {
+  /* surface */
+  --color-surface: oklch(97% 0.02 85);
+  --color-surface-raised: oklch(99% 0.014 85);
+  --color-surface-overlay: oklch(93.5% 0.03 82);
+  --color-surface-sunken: oklch(95% 0.026 80);
+
+  /* text — warm near-black, well above AA */
+  --color-text-primary: oklch(23% 0.028 62);
+  --color-text-muted: oklch(47% 0.032 60);
+  --color-text-inverse: oklch(99% 0.008 85);
+
+  /* line */
+  --color-border: oklch(87% 0.024 82);
+  --color-border-strong: oklch(79% 0.028 78);
+  --color-focus-ring: oklch(58% 0.09 60);
+
+  /* accent — quiet brown ink (links/emphasis only) */
+  --color-accent: oklch(46% 0.07 58);
+  --color-accent-hover: oklch(40% 0.07 58);
+  --color-accent-weak: color-mix(in oklch, var(--color-accent) 12%, var(--color-surface-raised));
+  --color-on-accent: oklch(99% 0.008 85);
+
+  /* brand mark — NENE2 violet (logo only, distinct from the UI accent) */
+  --color-brand-violet: oklch(56% 0.24 300);
+
+  /* status */
+  --color-danger: oklch(52% 0.2 25);
+  --color-danger-hover: oklch(46% 0.2 25);
+  --color-ok: oklch(55% 0.13 150);
+  --color-warn: oklch(70% 0.15 75);
+  --color-info: oklch(55% 0.13 250);
+
+  /* shadow — warm-tinted, soft in light */
+  --shadow-sm: 0 1px 2px oklch(40% 0.04 70 / 0.08);
+  --shadow-md: 0 6px 22px oklch(40% 0.04 70 / 0.1);
+  --shadow-lg: 0 22px 50px oklch(38% 0.05 65 / 0.16);
+  --shadow-focus: 0 0 0 3px color-mix(in oklch, var(--color-focus-ring) 30%, transparent);
+
+  color-scheme: light;
+}
+
+/* ── DARK — warm sepia near-black paper ──────────────────────────────────────
+   Hue kept in the warm 65–85 family so the cream/sepia warmth survives. Accent
+   is the same quiet brown with lightness lifted (L46 → L72) for AA on dark;
+   text-on-accent flips to warm-dark. */
+[data-theme='reading-dark'] {
+  /* surface */
+  --color-surface: oklch(18% 0.012 70);
+  --color-surface-raised: oklch(22% 0.014 70);
+  --color-surface-overlay: oklch(27% 0.016 68);
+  --color-surface-sunken: oklch(15% 0.011 70);
+
+  /* text — cream, well above AA */
+  --color-text-primary: oklch(93% 0.016 85);
+  --color-text-muted: oklch(67% 0.024 75);
+  --color-text-inverse: oklch(20% 0.02 65);
+
+  /* line */
+  --color-border: oklch(32% 0.016 70);
+  --color-border-strong: oklch(42% 0.02 70);
+  --color-focus-ring: oklch(70% 0.08 65);
+
+  /* accent — lifted quiet brown, dark text rides on top */
+  --color-accent: oklch(72% 0.075 68);
+  --color-accent-hover: oklch(79% 0.075 68);
+  --color-accent-weak: color-mix(in oklch, var(--color-accent) 16%, var(--color-surface-raised));
+  --color-on-accent: oklch(20% 0.03 65);
+
+  --color-brand-violet: oklch(72% 0.18 300);
+
+  /* status — lifted for dark legibility */
+  --color-danger: oklch(66% 0.18 25);
+  --color-danger-hover: oklch(72% 0.18 25);
+  --color-ok: oklch(72% 0.14 150);
+  --color-warn: oklch(80% 0.14 80);
+  --color-info: oklch(74% 0.12 250);
+
+  /* shadow — deep, near-black */
+  --shadow-sm: 0 1px 2px oklch(0% 0 0 / 0.4);
+  --shadow-md: 0 8px 26px oklch(0% 0 0 / 0.5);
+  --shadow-lg: 0 24px 56px oklch(0% 0 0 / 0.62);
+  --shadow-focus: 0 0 0 3px color-mix(in oklch, var(--color-focus-ring) 32%, transparent);
+
+  color-scheme: dark;
+}
