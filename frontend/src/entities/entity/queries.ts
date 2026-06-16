@@ -55,6 +55,36 @@ export function useEntityList(
 }
 
 /**
+ * Latest published entities across every type, newest first. Omits
+ * entity_type_id so the backend spans all types (like useEntitySearch) and
+ * sorts by published_at desc. Powers the public home "Latest records" feed.
+ */
+export function usePublicLatestEntities(options?: {
+  limit?: number
+  enabled?: boolean
+}): UseQueryResult<EntityList, AppError> {
+  const limit = options?.limit ?? 13
+  return useQuery({
+    queryKey: entityKeys.latest(limit),
+    enabled: options?.enabled ?? true,
+    queryFn: async ({ signal }) => {
+      const search = new URLSearchParams({
+        limit: String(limit),
+        offset: '0',
+        status: 'published',
+        sort: 'published_at',
+        order: 'desc',
+      })
+      const dto = await apiClient.get<EntityListDto>(
+        `/api/v1/entities?${search.toString()}`,
+        signal,
+      )
+      return mapEntityListDtoToModel(dto)
+    },
+  })
+}
+
+/**
  * Site-wide full-text search across published entities of every type. Unlike
  * useEntityList, it omits entity_type_id so the backend searches all types
  * (a sent entity_type_id=0 would match nothing). Disabled for an empty query.

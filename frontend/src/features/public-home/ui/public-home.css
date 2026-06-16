@@ -1,0 +1,859 @@
+/* ============================================================================
+   NeNe Records — Public home styles (ported from the ClaudeDesign prototype)
+   ----------------------------------------------------------------------------
+   Everything is scoped under `.nene-home` so these short class names never leak
+   into the rest of the app. Colors come from the inherited [data-theme]
+   (consumer / consumer-dark, see consumer-brand.css); the type/space scale is
+   defined here on the root. Font families reuse the global @theme tokens.
+
+   Note: the app ships @fontsource weights up to 600, so display headings use
+   --weight-bold = 600 (the prototype's 700 would render faux-bold here).
+   ============================================================================ */
+
+.nene-home {
+  /* type scale — public reads larger than the 14px admin */
+  --text-overline: 0.75rem;
+  --text-meta: 0.8125rem;
+  --text-body: 1.0625rem;
+  --text-body-sm: 0.9375rem;
+  --text-h3: 1.25rem;
+  --text-h2: clamp(1.5rem, 1.1rem + 1.6vw, 2.125rem);
+  --text-h1: clamp(1.6rem, 1.2rem + 1.6vw, 2.35rem);
+  --text-display: clamp(2.5rem, 1.6rem + 4.4vw, 4.85rem);
+
+  --leading-tight: 1.07;
+  --leading-heading: 1.16;
+  --leading-body: 1.68;
+
+  --weight-normal: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 600;
+
+  --tracking-display: -0.015em;
+  --tracking-overline: 0.14em;
+
+  /* space */
+  --space-2xs: 0.25rem;
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2.5rem;
+  --space-2xl: 4rem;
+  --space-section: clamp(3.5rem, 2rem + 6vw, 7rem);
+  --gutter: clamp(1.25rem, 0.5rem + 3vw, 2.5rem);
+  --measure: 72ch;
+  --content-w: 1180px;
+
+  /* radius (public-specific, softer than admin) */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-full: 9999px;
+
+  /* motion */
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-fast: 120ms;
+  --dur-normal: 220ms;
+
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
+  color: var(--color-text-primary);
+  background: var(--color-surface);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  transition:
+    background var(--dur-normal) var(--ease),
+    color var(--dur-normal) var(--ease);
+}
+
+.nene-home a {
+  color: inherit;
+  text-decoration: none;
+}
+.nene-home button {
+  font-family: inherit;
+  cursor: pointer;
+}
+.nene-home img {
+  display: block;
+  max-width: 100%;
+}
+.nene-home :focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+.nene-home .wrap {
+  width: 100%;
+  max-width: var(--content-w);
+  margin: 0 auto;
+  padding-inline: var(--gutter);
+}
+
+.nene-home .eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--text-overline);
+  letter-spacing: var(--tracking-overline);
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  margin: 0;
+}
+.nene-home .eyebrow::before {
+  content: '';
+  width: 22px;
+  height: 2px;
+  background: var(--color-accent);
+  display: inline-block;
+}
+
+/* ── Header ──────────────────────────────────────────────────────────────── */
+.nene-home .hd {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: color-mix(in oklch, var(--color-surface) 86%, transparent);
+  backdrop-filter: saturate(1.4) blur(12px);
+  border-bottom: 1px solid var(--color-border);
+}
+.nene-home .hd__in {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-lg);
+  height: 72px;
+}
+.nene-home .brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+.nene-home .brand__mark {
+  width: 34px;
+  height: 34px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-sm);
+  background: color-mix(in oklch, var(--color-brand-violet) 14%, var(--color-surface-raised));
+}
+.nene-home .brand__mark svg {
+  width: 22px;
+  height: 22px;
+  color: var(--color-brand-violet);
+}
+.nene-home .brand__text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.05;
+}
+.nene-home .brand__name {
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+  font-size: 1.25rem;
+  letter-spacing: -0.01em;
+}
+.nene-home .brand__tag {
+  font-size: var(--text-meta);
+  color: var(--color-text-muted);
+}
+
+.nene-home .hd__nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  margin-left: auto;
+}
+.nene-home .navlink {
+  font-size: var(--text-body-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-muted);
+  padding: 6px 2px;
+  position: relative;
+  transition: color var(--dur-fast) var(--ease);
+}
+.nene-home .navlink:hover,
+.nene-home .navlink[aria-current='page'] {
+  color: var(--color-text-primary);
+}
+.nene-home .navlink[aria-current='page']::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 2px;
+  background: var(--color-accent);
+}
+
+/* theme toggle (segmented light/dark/auto) */
+.nene-home .themesw {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  background: var(--color-surface-raised);
+}
+.nene-home .themesw__btn {
+  width: 30px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  border-radius: var(--radius-full);
+  color: var(--color-text-muted);
+  transition: all var(--dur-fast) var(--ease);
+}
+.nene-home .themesw__btn svg {
+  width: 16px;
+  height: 16px;
+}
+.nene-home .themesw__btn:hover {
+  color: var(--color-text-primary);
+}
+.nene-home .themesw__btn[aria-pressed='true'] {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+.nene-home .iconbtn {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  flex: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  background: var(--color-surface-raised);
+  color: var(--color-text-primary);
+  transition: all var(--dur-fast) var(--ease);
+}
+.nene-home .iconbtn:hover {
+  border-color: var(--color-border-strong);
+}
+.nene-home .iconbtn svg {
+  width: 18px;
+  height: 18px;
+}
+.nene-home .hd__menu {
+  display: none;
+}
+
+/* ── Buttons ─────────────────────────────────────────────────────────────── */
+.nene-home .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  font-size: var(--text-body-sm);
+  font-weight: var(--weight-semibold);
+  padding: 12px 22px;
+  border-radius: var(--radius-full);
+  border: 1px solid transparent;
+  transition: all var(--dur-fast) var(--ease);
+  white-space: nowrap;
+}
+.nene-home .btn svg {
+  width: 17px;
+  height: 17px;
+}
+.nene-home .btn--primary {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+.nene-home .btn--primary:hover {
+  background: var(--color-accent-hover);
+  transform: translateY(-1px);
+}
+.nene-home .btn--ghost {
+  background: transparent;
+  color: var(--color-text-primary);
+  border-color: var(--color-border-strong);
+}
+.nene-home .btn--ghost:hover {
+  background: var(--color-surface-overlay);
+}
+
+/* type badge */
+.nene-home .tbadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: var(--text-overline);
+  letter-spacing: 0.03em;
+  text-transform: lowercase;
+  color: var(--color-accent);
+  background: var(--color-accent-weak);
+  border: 1px solid color-mix(in oklch, var(--color-accent) 22%, transparent);
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+}
+.nene-home .tbadge::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* ── Eyecatch placeholder ────────────────────────────────────────────────── */
+.nene-home .eyecatch {
+  position: relative;
+  width: 100%;
+  aspect-ratio: var(--ar, 16 / 9);
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: repeating-linear-gradient(
+    135deg,
+    color-mix(in oklch, var(--color-accent) 13%, var(--color-surface-overlay)) 0 12px,
+    color-mix(in oklch, var(--color-accent) 5%, var(--color-surface-overlay)) 12px 24px
+  );
+  border: 1px solid var(--color-border);
+  display: grid;
+  place-items: center;
+}
+.nene-home .eyecatch::after {
+  content: attr(data-label);
+  font-family: var(--font-mono);
+  font-size: var(--text-meta);
+  color: color-mix(in oklch, var(--color-text-muted) 90%, var(--color-accent));
+  background: color-mix(in oklch, var(--color-surface-raised) 78%, transparent);
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  letter-spacing: 0.02em;
+}
+
+/* ── Hero ────────────────────────────────────────────────────────────────── */
+.nene-home .hero {
+  padding-top: clamp(2.5rem, 1rem + 5vw, 5rem);
+}
+.nene-home .hero__grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: clamp(1.5rem, 4vw, 4rem);
+  align-items: center;
+}
+.nene-home .hero__kicker {
+  margin-bottom: var(--space-lg);
+}
+.nene-home .hero__title {
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+  font-size: var(--text-display);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-display);
+  margin: 0 0 var(--space-lg);
+  text-wrap: balance;
+}
+.nene-home .hero__title em {
+  font-style: normal;
+  color: var(--color-accent);
+}
+.nene-home .hero__lead {
+  font-size: clamp(1.0625rem, 1rem + 0.4vw, 1.3125rem);
+  color: var(--color-text-muted);
+  max-width: 46ch;
+  margin: 0 0 var(--space-xl);
+  line-height: 1.55;
+}
+.nene-home .hero__cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+.nene-home .hero__art {
+  position: relative;
+}
+.nene-home .hero__art-frame {
+  position: relative;
+  border-radius: var(--radius-lg);
+  padding: clamp(1.5rem, 3vw, 2.75rem);
+  background: radial-gradient(
+    120% 120% at 70% 10%,
+    color-mix(in oklch, var(--color-brand-violet) 22%, var(--color-surface-raised)),
+    var(--color-surface-raised)
+  );
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-lg);
+  display: grid;
+  place-items: center;
+}
+.nene-home .hero__art-frame img {
+  width: min(78%, 280px);
+  filter: drop-shadow(0 18px 30px oklch(40% 0.12 300 / 0.28));
+}
+.nene-home .hero__art-tag {
+  position: absolute;
+  left: clamp(1rem, 3vw, 2rem);
+  bottom: clamp(1rem, 3vw, 2rem);
+  font-family: var(--font-mono);
+  font-size: var(--text-meta);
+  color: var(--color-text-primary);
+  background: color-mix(in oklch, var(--color-surface-raised) 90%, transparent);
+  border: 1px solid var(--color-border);
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.nene-home .hero__art-tag b {
+  color: var(--color-brand-violet);
+  font-weight: var(--weight-semibold);
+}
+.nene-home .hero__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xl);
+  margin-top: var(--space-2xl);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--color-border);
+}
+.nene-home .hero__stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.nene-home .hero__stat b {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: var(--weight-bold);
+  letter-spacing: -0.01em;
+}
+.nene-home .hero__stat span {
+  font-size: var(--text-meta);
+  color: var(--color-text-muted);
+}
+
+/* ── Section scaffolding ─────────────────────────────────────────────────── */
+.nene-home .section {
+  margin-top: var(--space-section);
+}
+.nene-home .section__head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-xl);
+  padding-bottom: var(--space-md);
+  border-bottom: 2px solid var(--color-text-primary);
+}
+.nene-home .section__title {
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+  font-size: var(--text-h2);
+  line-height: var(--leading-heading);
+  letter-spacing: -0.01em;
+  margin: var(--space-xs) 0 0;
+}
+.nene-home .section__link {
+  font-size: var(--text-body-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--color-accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex: none;
+}
+.nene-home .section__link:hover {
+  gap: 9px;
+}
+.nene-home .section__link svg {
+  width: 15px;
+  height: 15px;
+}
+
+/* ── Layout ──────────────────────────────────────────────────────────────── */
+.nene-home .layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(2rem, 4vw, 4rem);
+  align-items: start;
+}
+.nene-home .layout__main {
+  container-type: inline-size;
+}
+
+/* ── Latest feed ─────────────────────────────────────────────────────────── */
+.nene-home .featured {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: clamp(1.5rem, 3vw, 2.75rem);
+  align-items: center;
+  padding: clamp(1.25rem, 2vw, 1.75rem);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-raised);
+  box-shadow: var(--shadow-md);
+}
+.nene-home .featured__media {
+  --ar: 4 / 3;
+}
+.nene-home .featured__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+.nene-home .featured__metarow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+.nene-home .featured__title {
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+  font-size: var(--text-h1);
+  line-height: var(--leading-heading);
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+.nene-home .featured__title a:hover {
+  color: var(--color-accent);
+}
+.nene-home .featured__excerpt {
+  color: var(--color-text-muted);
+  font-size: 1.0625rem;
+  margin: 0;
+  max-width: 52ch;
+}
+.nene-home .featured__foot {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-top: var(--space-xs);
+}
+@container (max-width: 560px) {
+  .nene-home .featured {
+    grid-template-columns: 1fr;
+  }
+  .nene-home .featured__media {
+    --ar: 16 / 9;
+  }
+}
+.nene-home .dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--color-text-muted);
+  flex: none;
+}
+.nene-home .meta {
+  font-size: var(--text-meta);
+  color: var(--color-text-muted);
+}
+
+.nene-home .cardgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(258px, 1fr));
+  gap: clamp(1.25rem, 2.5vw, 2rem);
+  margin-top: var(--space-xl);
+}
+.nene-home .card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+.nene-home .card__media {
+  --ar: 16 / 10;
+  transition: transform var(--dur-normal) var(--ease);
+}
+.nene-home .card:hover .card__media {
+  transform: translateY(-3px);
+}
+.nene-home .card__metarow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-top: 2px;
+}
+.nene-home .card__title {
+  font-family: var(--font-display);
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-h3);
+  line-height: 1.2;
+  letter-spacing: -0.005em;
+  margin: 0;
+}
+.nene-home .card:hover .card__title {
+  color: var(--color-accent);
+}
+.nene-home .card__excerpt {
+  font-size: var(--text-body-sm);
+  color: var(--color-text-muted);
+  margin: 0;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ── Entity-type nav ─────────────────────────────────────────────────────── */
+.nene-home .types {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-md);
+}
+.nene-home .typecard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-raised);
+  transition: all var(--dur-fast) var(--ease);
+}
+.nene-home .typecard:hover {
+  border-color: var(--color-accent);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+.nene-home .typecard__main {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.nene-home .typecard__name {
+  font-family: var(--font-display);
+  font-weight: var(--weight-semibold);
+  font-size: 1.375rem;
+  letter-spacing: -0.01em;
+}
+.nene-home .typecard__slug {
+  font-family: var(--font-mono);
+  font-size: var(--text-meta);
+  color: var(--color-text-muted);
+}
+.nene-home .typecard__arrow {
+  color: var(--color-text-muted);
+  transition: all var(--dur-fast) var(--ease);
+}
+.nene-home .typecard:hover .typecard__arrow {
+  color: var(--color-accent);
+  transform: translateX(3px);
+}
+.nene-home .typecard__arrow svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* ── Empty state ─────────────────────────────────────────────────────────── */
+.nene-home .empty {
+  border: 1.5px dashed var(--color-border-strong);
+  border-radius: var(--radius-lg);
+  padding: clamp(2.5rem, 5vw, 4.5rem) var(--gutter);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  background: var(--color-surface-raised);
+}
+.nene-home .empty__icon {
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-md);
+  background: var(--color-accent-weak);
+  color: var(--color-accent);
+}
+.nene-home .empty__icon svg {
+  width: 26px;
+  height: 26px;
+}
+.nene-home .empty__title {
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+  font-size: 1.5rem;
+  line-height: 1.15;
+  margin: 0;
+}
+.nene-home .empty__text {
+  color: var(--color-text-muted);
+  margin: 0;
+  max-width: 42ch;
+}
+
+/* ── Footer ──────────────────────────────────────────────────────────────── */
+.nene-home .ft {
+  margin-top: var(--space-section);
+  border-top: 1px solid var(--color-border);
+  background: var(--color-surface-sunken);
+}
+.nene-home .ft__grid {
+  display: grid;
+  grid-template-columns: 1.4fr repeat(3, 1fr);
+  gap: var(--space-xl);
+  padding-block: var(--space-2xl);
+}
+.nene-home .ft__brand {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  max-width: 34ch;
+}
+.nene-home .ft__free {
+  font-size: var(--text-body-sm);
+  color: var(--color-text-muted);
+  line-height: 1.6;
+  white-space: pre-line;
+}
+.nene-home .ft__col h4 {
+  font-family: var(--font-mono);
+  font-size: var(--text-overline);
+  letter-spacing: var(--tracking-overline);
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin: 0 0 var(--space-md);
+}
+.nene-home .ft__col ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+.nene-home .ft__col a {
+  font-size: var(--text-body-sm);
+  color: var(--color-text-primary);
+}
+.nene-home .ft__col a:hover {
+  color: var(--color-accent);
+}
+.nene-home .ft__bar {
+  border-top: 1px solid var(--color-border);
+  padding-block: var(--space-lg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+.nene-home .ft__bar small {
+  font-size: var(--text-meta);
+  color: var(--color-text-muted);
+}
+.nene-home .ft__bar .mono {
+  font-family: var(--font-mono);
+}
+
+/* ── Mobile drawer ───────────────────────────────────────────────────────── */
+.nene-home .drawer {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  display: none;
+}
+.nene-home .drawer.is-open {
+  display: block;
+}
+.nene-home .drawer__scrim {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  border: 0;
+  padding: 0;
+  background: oklch(0% 0 0 / 0.45);
+  cursor: pointer;
+}
+.nene-home .drawer__panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(82vw, 320px);
+  background: var(--color-surface-raised);
+  border-left: 1px solid var(--color-border);
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  box-shadow: var(--shadow-lg);
+}
+.nene-home .drawer__panel .navlink {
+  font-size: 1.125rem;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+.nene-home .drawer__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 860px) {
+  .nene-home .hero__grid {
+    grid-template-columns: 1fr;
+  }
+  .nene-home .hero__art {
+    order: -1;
+    max-width: 460px;
+  }
+  .nene-home .featured {
+    grid-template-columns: 1fr;
+  }
+  .nene-home .featured__media {
+    --ar: 16 / 9;
+  }
+  .nene-home .ft__grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (max-width: 680px) {
+  .nene-home .hd__nav .navlink,
+  .nene-home .hd__nav .btn--primary {
+    display: none;
+  }
+  .nene-home .hd__menu {
+    display: grid;
+  }
+  .nene-home .hero__meta {
+    gap: var(--space-lg);
+  }
+  .nene-home .section__head {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+  .nene-home .ft__grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-lg);
+  }
+}
+@media (max-width: 480px) {
+  .nene-home .hd__in {
+    height: 62px;
+  }
+  .nene-home .brand__tag {
+    display: none;
+  }
+  .nene-home .brand__name {
+    white-space: nowrap;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .nene-home * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
