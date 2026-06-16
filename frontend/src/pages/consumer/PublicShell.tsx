@@ -4,7 +4,11 @@ import './public-fonts'
 import { Outlet } from 'react-router-dom'
 import { usePublicNavigationItems } from '@/entities/navigation-item'
 import { publicSettingsToMap, usePublicSettings } from '@/entities/setting'
-import { resolvePublicThemeId } from '@/shared/lib/public-themes'
+import {
+  readStoredActiveTheme,
+  resolvePublicThemeId,
+  storeActiveTheme,
+} from '@/shared/lib/public-themes'
 import type { PublicSite } from './public-site-context'
 
 function useSiteDocumentMeta(siteName: string, metaDescription: string): void {
@@ -39,13 +43,27 @@ export function PublicShell() {
     [publicSettingsQuery.data?.items],
   )
 
+  // Apply the last-known theme synchronously on first paint, then reconcile with
+  // the fetched setting — avoids a default→saved theme flash (FOUC) while the
+  // public settings request is in flight. Derived (no state): use the stored
+  // theme until settings settle, then the resolved value (which we persist for
+  // the next first paint).
+  const settingsSettled = publicSettingsQuery.data !== undefined
+  const resolvedTheme = resolvePublicThemeId(settings.active_theme)
+  const activeTheme = settingsSettled ? resolvedTheme : readStoredActiveTheme()
+  useEffect(() => {
+    if (settingsSettled) {
+      storeActiveTheme(resolvedTheme)
+    }
+  }, [settingsSettled, resolvedTheme])
+
   const site: PublicSite = {
     siteName: settings.site_name ?? 'NeNe Records',
     tagline: settings.tagline ?? '',
     metaDescription: settings.default_meta_description ?? '',
     footerMarkdown: settings.footer_markdown ?? '',
     navItems,
-    activeTheme: resolvePublicThemeId(settings.active_theme),
+    activeTheme,
   }
 
   useSiteDocumentMeta(site.siteName, site.metaDescription)
