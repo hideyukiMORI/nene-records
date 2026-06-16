@@ -2,9 +2,9 @@
   "$schema": "../../public-theme.schema.json",
   "id": "aurora",
   "name": "Aurora",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "author": "NeNe Records",
-  "description": "Cool, quiet tech theme — teal/cyan accent on cool paper. Authored from examples/aurora.theme.md; the counterpoint to consumer (Terracotta).",
+  "description": "Cool, structural tech theme — teal/cyan accent on cool paper. Redesign of Aurora 1.x: same hue family, but components.css turns the soft magazine into a ruled, indexed, blueprint-tech layout — hard hairlines, framed/duotone media, squared chrome, mono technical register. The deliberate counterpoint to consumer (warm soft) and reading (serif).",
   "supportsModes": ["light", "dark"],
   "fonts": [
     {
@@ -23,7 +23,7 @@
       "family": "JetBrains Mono",
       "role": "mono",
       "source": "fontsource",
-      "weights": [400]
+      "weights": [400, 500]
     }
   ],
   "tokens": {
@@ -35,8 +35,8 @@
       "color-text-primary": "oklch(24% 0.03 250)",
       "color-text-muted": "oklch(48% 0.03 245)",
       "color-text-inverse": "oklch(99% 0.004 230)",
-      "color-border": "oklch(88% 0.012 230)",
-      "color-border-strong": "oklch(80% 0.018 235)",
+      "color-border": "oklch(85% 0.014 232)",
+      "color-border-strong": "oklch(74% 0.022 238)",
       "color-focus-ring": "oklch(68% 0.13 215)",
       "color-accent": "oklch(62% 0.13 200)",
       "color-accent-hover": "oklch(56% 0.13 200)",
@@ -48,9 +48,10 @@
       "color-ok": "oklch(55% 0.13 150)",
       "color-warn": "oklch(70% 0.15 75)",
       "color-info": "oklch(55% 0.13 250)",
-      "shadow-sm": "0 1px 2px oklch(40% 0.04 250 / 0.08)",
-      "shadow-md": "0 6px 22px oklch(40% 0.04 250 / 0.1)",
-      "shadow-lg": "0 22px 50px oklch(38% 0.05 250 / 0.16)",
+      "shadow-sm": "0 1px 0 oklch(40% 0.04 250 / 0.1)",
+      "shadow-md": "0 2px 0 oklch(40% 0.04 250 / 0.08), 0 10px 24px oklch(40% 0.04 250 / 0.07)",
+      "shadow-lg": "0 14px 36px oklch(38% 0.05 250 / 0.12)",
+      "shadow-focus": "0 0 0 3px color-mix(in oklch, var(--color-focus-ring) 30%, transparent)",
       "color-scheme": "light"
     },
     "dark": {
@@ -61,8 +62,8 @@
       "color-text-primary": "oklch(94% 0.012 230)",
       "color-text-muted": "oklch(68% 0.02 235)",
       "color-text-inverse": "oklch(20% 0.02 250)",
-      "color-border": "oklch(32% 0.022 250)",
-      "color-border-strong": "oklch(42% 0.026 250)",
+      "color-border": "oklch(35% 0.024 250)",
+      "color-border-strong": "oklch(48% 0.028 250)",
       "color-focus-ring": "oklch(74% 0.13 210)",
       "color-accent": "oklch(72% 0.13 200)",
       "color-accent-hover": "oklch(79% 0.13 200)",
@@ -74,9 +75,10 @@
       "color-ok": "oklch(72% 0.14 150)",
       "color-warn": "oklch(80% 0.14 80)",
       "color-info": "oklch(74% 0.12 250)",
-      "shadow-sm": "0 1px 2px oklch(0% 0 0 / 0.4)",
-      "shadow-md": "0 8px 26px oklch(0% 0 0 / 0.5)",
-      "shadow-lg": "0 24px 56px oklch(0% 0 0 / 0.62)",
+      "shadow-sm": "0 1px 0 oklch(0% 0 0 / 0.45)",
+      "shadow-md": "0 2px 0 oklch(0% 0 0 / 0.4), 0 12px 28px oklch(0% 0 0 / 0.45)",
+      "shadow-lg": "0 18px 44px oklch(0% 0 0 / 0.58)",
+      "shadow-focus": "0 0 0 3px color-mix(in oklch, var(--color-focus-ring) 32%, transparent)",
       "color-scheme": "dark"
     }
   },
@@ -92,6 +94,6 @@
     "baseFontSize": "1.0625rem",
     "typeScale": 1.18,
     "density": "comfortable",
-    "radius": "round"
+    "radius": "sharp"
   }
 }
