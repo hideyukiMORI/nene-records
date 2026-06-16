@@ -30,6 +30,16 @@ export interface ThemeOverrides {
   typeScale?: string
   /** Spacing density preset (see DENSITY_OPTIONS). Scales `--space-*`. */
   density?: string
+  /** Paper / surface colour, per mode (hex). Derives the surface family. */
+  surface?: ColorPair
+  /** Body text ink colour, per mode (hex). Derives `--color-text-muted`. */
+  text?: ColorPair
+}
+
+/** A colour value per light/dark mode (hex). */
+export interface ColorPair {
+  light?: string
+  dark?: string
 }
 
 export interface KnobOption {
@@ -209,14 +219,80 @@ export function parseThemeOverrides(raw: string | undefined): Record<string, The
   }
 }
 
-/** Resolved inline style for one theme's overrides (empty object if none). */
-export function overrideStyleForTheme(
-  raw: string | undefined,
-  themeId: string,
-): Record<string, string> {
-  const byTheme = parseThemeOverrides(raw)
-  const forTheme = byTheme[themeId]
-  return forTheme ? resolveOverrideStyle(forTheme) : {}
+type Mode = 'light' | 'dark'
+
+/**
+ * Per-mode colour overrides (surface family + text). These MUST be mode-scoped
+ * because a light surface would break dark mode and vice-versa. The surface
+ * family and muted text are derived from the chosen colours via `color-mix`.
+ */
+export function resolveModeColors(overrides: ThemeOverrides, mode: Mode): Record<string, string> {
+  const style: Record<string, string> = {}
+
+  const surface = overrides.surface?.[mode]
+  if (typeof surface === 'string' && HEX_COLOR.test(surface)) {
+    style['--color-surface'] = surface
+    style['--color-surface-raised'] =
+      mode === 'light'
+        ? `color-mix(in oklch, ${surface}, white 55%)`
+        : `color-mix(in oklch, ${surface}, white 6%)`
+    style['--color-surface-overlay'] =
+      mode === 'light'
+        ? `color-mix(in oklch, ${surface}, black 6%)`
+        : `color-mix(in oklch, ${surface}, white 12%)`
+    style['--color-surface-sunken'] =
+      mode === 'light'
+        ? `color-mix(in oklch, ${surface}, black 3%)`
+        : `color-mix(in oklch, ${surface}, black 30%)`
+    style['--color-border'] =
+      mode === 'light'
+        ? `color-mix(in oklch, ${surface}, black 16%)`
+        : `color-mix(in oklch, ${surface}, white 14%)`
+    style['--color-border-strong'] =
+      mode === 'light'
+        ? `color-mix(in oklch, ${surface}, black 26%)`
+        : `color-mix(in oklch, ${surface}, white 24%)`
+  }
+
+  const text = overrides.text?.[mode]
+  if (typeof text === 'string' && HEX_COLOR.test(text)) {
+    style['--color-text-primary'] = text
+    style['--color-text-muted'] = `color-mix(in oklch, ${text}, transparent 32%)`
+  }
+
+  return style
+}
+
+function cssVarsBlock(selector: string, vars: Record<string, string>): string {
+  const entries = Object.entries(vars)
+  if (entries.length === 0) {
+    return ''
+  }
+  const body = entries.map(([key, value]) => `  ${key}: ${value};`).join('\n')
+  return `${selector} {\n${body}\n}\n`
+}
+
+/**
+ * Build the full override stylesheet for one theme: mode-agnostic vars on both
+ * `[data-theme='<id>']` and `-dark`, plus per-mode colours on each. Returns ''
+ * when there are no overrides. Values are validated upstream, so the emitted
+ * CSS only ever contains known variables and safe values.
+ */
+export function buildOverrideCss(overrides: ThemeOverrides, themeId: string): string {
+  const light = `.nene-public[data-theme='${themeId}']`
+  const dark = `.nene-public[data-theme='${themeId}-dark']`
+
+  const agnostic = resolveOverrideStyle(overrides)
+  let css = cssVarsBlock(`${light},\n${dark}`, agnostic)
+  css += cssVarsBlock(light, resolveModeColors(overrides, 'light'))
+  css += cssVarsBlock(dark, resolveModeColors(overrides, 'dark'))
+  return css
+}
+
+/** Build the override stylesheet for the requested theme from stored JSON. */
+export function overrideCssForTheme(raw: string | undefined, themeId: string): string {
+  const forTheme = parseThemeOverrides(raw)[themeId]
+  return forTheme ? buildOverrideCss(forTheme, themeId) : ''
 }
 
 // Cache the raw overrides JSON so the first paint can apply them synchronously

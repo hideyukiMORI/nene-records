@@ -8,7 +8,7 @@ const TEST_SITE: PublicSite = {
   footerMarkdown: '',
   navItems: [],
   activeTheme: 'consumer',
-  themeOverrideStyle: {},
+  themeOverrideCss: '',
 }
 
 /**

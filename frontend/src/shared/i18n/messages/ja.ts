@@ -55,6 +55,8 @@ export const ja: Partial<MessageCatalog> = {
   'admin.themeCustomize.intro': '「{theme}」テーマを微調整します。未設定＝テーマ既定。',
   'admin.themeCustomize.themeDefault': 'テーマ既定',
   'admin.themeCustomize.accent': 'アクセント色',
+  'admin.themeCustomize.surface': '背景（light / dark）',
+  'admin.themeCustomize.text': '文字（light / dark）',
   'admin.themeCustomize.font': '本文フォント',
   'admin.themeCustomize.width': 'コンテンツ幅',
   'admin.themeCustomize.gutter': '左右余白',
