@@ -12,10 +12,6 @@ const auroraCss = readFileSync(
   resolve(process.cwd(), 'src/shared/ui/theme/themes/aurora.css'),
   'utf8',
 )
-const auroraComponentsCss = readFileSync(
-  resolve(process.cwd(), 'src/shared/ui/theme/themes/aurora.components.css'),
-  'utf8',
-)
 const readingCss = readFileSync(
   resolve(process.cwd(), 'src/shared/ui/theme/themes/reading.css'),
   'utf8',
@@ -30,9 +26,8 @@ describe('validateThemeCss', () => {
     expect(validateThemeCss(consumerCss, { themeId: 'consumer' })).toEqual([])
   })
 
-  it('accepts the built-in aurora theme css (tokens + component overlay, scoped)', () => {
+  it('accepts the built-in aurora.css (scoped, no external refs)', () => {
     expect(validateThemeCss(auroraCss, { themeId: 'aurora' })).toEqual([])
-    expect(validateThemeCss(auroraComponentsCss, { themeId: 'aurora' })).toEqual([])
   })
 
   it('accepts the built-in reading theme css (tokens + components, scoped)', () => {
