@@ -12,6 +12,14 @@ const auroraCss = readFileSync(
   resolve(process.cwd(), 'src/shared/ui/theme/themes/aurora.css'),
   'utf8',
 )
+const readingCss = readFileSync(
+  resolve(process.cwd(), 'src/shared/ui/theme/themes/reading.css'),
+  'utf8',
+)
+const readingComponentsCss = readFileSync(
+  resolve(process.cwd(), 'src/shared/ui/theme/themes/reading.components.css'),
+  'utf8',
+)
 
 describe('validateThemeCss', () => {
   it('accepts the built-in consumer-brand.css (scoped, no external refs)', () => {
@@ -20,6 +28,11 @@ describe('validateThemeCss', () => {
 
   it('accepts the built-in aurora.css (scoped, no external refs)', () => {
     expect(validateThemeCss(auroraCss, { themeId: 'aurora' })).toEqual([])
+  })
+
+  it('accepts the built-in reading theme css (tokens + components, scoped)', () => {
+    expect(validateThemeCss(readingCss, { themeId: 'reading' })).toEqual([])
+    expect(validateThemeCss(readingComponentsCss, { themeId: 'reading' })).toEqual([])
   })
 
   it('accepts theme-scoped and .nene-public selectors', () => {

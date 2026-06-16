@@ -38,6 +38,15 @@ export const PUBLIC_THEMES: readonly PublicThemeMeta[] = [
       accent: 'oklch(62% 0.13 200)',
     },
   },
+  {
+    id: 'reading',
+    name: 'Reading',
+    preview: {
+      surface: 'oklch(97% 0.02 85)',
+      raised: 'oklch(99% 0.014 85)',
+      accent: 'oklch(46% 0.07 58)',
+    },
+  },
 ]
 
 export const DEFAULT_PUBLIC_THEME_ID = 'consumer'

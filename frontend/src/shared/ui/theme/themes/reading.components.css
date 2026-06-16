@@ -1,0 +1,62 @@
+/* ============================================================================
+   NeNe Records — Public site theme: Reading — type overlay
+   ----------------------------------------------------------------------------
+   Reading's differentiator is the *reading experience*, not hue. These rules
+   re-express the typography knobs (baseFontSize 1.125rem, typeScale 1.2,
+   serif body, wide measure, loose leading) as token overrides, scoped to the
+   theme so they only apply when [data-theme='reading'|'reading-dark'] is set.
+
+   No new DOM structure — only overrides of contract tokens consumed by the
+   existing public-site.css. Selector carries `.nene-public` so it outranks the
+   base `.nene-public` type scale and stays inside the validator's scope rule.
+   `--font-sans` points at the self-hosted Source Serif 4 (@fontsource).
+   ========================================================================== */
+
+.nene-public[data-theme='reading'],
+.nene-public[data-theme='reading-dark'] {
+  /* fonts — serif body, condensed display, mono code */
+  --font-sans: 'Source Serif 4', 'Noto Serif JP', Georgia, 'Times New Roman', serif;
+  --font-display: 'Saira Semi Condensed', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+
+  /* type scale — recomputed from baseFontSize 1.125rem × typeScale 1.2 */
+  --text-overline: 0.78rem;
+  --text-meta: 0.84rem;
+  --text-body-sm: 0.98rem;
+  --text-body: 1.125rem;
+  --text-h3: 1.4rem;
+  --text-h2: clamp(1.6rem, 1.15rem + 1.7vw, 2.35rem);
+  --text-h1: clamp(1.8rem, 1.3rem + 1.9vw, 2.7rem);
+  --text-display: clamp(2.8rem, 1.7rem + 4.8vw, 5.4rem);
+
+  /* reading rhythm — looser body leading, wider measure */
+  --leading-body: 1.72;
+  --measure: 76ch;
+}
+
+/* Serif body wants slightly tighter tracking on the big display so the
+   condensed heading still reads as a unit against the larger serif body. */
+.nene-public[data-theme='reading'] .hero__title,
+.nene-public[data-theme='reading-dark'] .hero__title {
+  letter-spacing: -0.02em;
+}
+
+/* Long-form prose is the headline use case: give it generous measure + leading
+   and treat blockquotes as an italic serif aside rather than a display pull. */
+.nene-public[data-theme='reading'] .prose,
+.nene-public[data-theme='reading-dark'] .prose,
+.nene-public[data-theme='reading'] .markdown-body,
+.nene-public[data-theme='reading-dark'] .markdown-body {
+  font-size: 1.1875rem;
+  line-height: var(--leading-body);
+}
+.nene-public[data-theme='reading'] .prose blockquote,
+.nene-public[data-theme='reading-dark'] .prose blockquote,
+.nene-public[data-theme='reading'] .markdown-body blockquote,
+.nene-public[data-theme='reading-dark'] .markdown-body blockquote {
+  font-family: var(--font-sans);
+  font-style: italic;
+  font-weight: var(--weight-normal);
+  font-size: 1.3125rem;
+  color: var(--color-text-muted);
+}
