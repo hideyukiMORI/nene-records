@@ -7,6 +7,7 @@ const TEST_SITE: PublicSite = {
   metaDescription: '',
   footerMarkdown: '',
   navItems: [],
+  activeTheme: 'consumer',
 }
 
 /**

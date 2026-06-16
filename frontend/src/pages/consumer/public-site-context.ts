@@ -17,6 +17,8 @@ export interface PublicSite {
   metaDescription: string
   footerMarkdown: string
   navItems: PublicSiteNavItem[]
+  /** Admin-selected public-site theme id (`active_theme` setting). */
+  activeTheme: string
 }
 
 export function usePublicSite(): PublicSite {

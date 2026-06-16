@@ -102,7 +102,7 @@ export function PublicSiteShell({
   withAside = false,
   children,
 }: PublicSiteShellProps) {
-  const { mode, resolvedTheme, setMode } = useConsumerTheme()
+  const { mode, resolvedTheme, setMode } = useConsumerTheme(site.activeTheme)
   const [drawerOpen, setDrawerOpen] = useState(false)
 
   // Render `sidebar` / `aside` regions as side columns when widgets are placed

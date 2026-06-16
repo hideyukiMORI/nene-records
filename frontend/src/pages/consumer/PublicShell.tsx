@@ -4,6 +4,7 @@ import { Outlet } from 'react-router-dom'
 import { usePublicNavigationItems } from '@/entities/navigation-item'
 import { publicSettingsToMap, usePublicSettings } from '@/entities/setting'
 import type { PublicSite } from './public-site-context'
+import { resolvePublicThemeId } from './public-themes'
 
 function useSiteDocumentMeta(siteName: string, metaDescription: string): void {
   useEffect(() => {
@@ -43,6 +44,7 @@ export function PublicShell() {
     metaDescription: settings.default_meta_description ?? '',
     footerMarkdown: settings.footer_markdown ?? '',
     navItems,
+    activeTheme: resolvePublicThemeId(settings.active_theme),
   }
 
   useSiteDocumentMeta(site.siteName, site.metaDescription)
