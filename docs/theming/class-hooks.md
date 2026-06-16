@@ -72,4 +72,5 @@
 - **タイポの表情**: 見出しの `text-transform` / `letter-spacing`、`.eyebrow` `.meta` を `--font-mono` 等へ。
 - **リズム**: `--space-*` 上書きで密度を変える。`.section__head` に罫線。
 - **グリッド**: `.cardgrid` / `.types` の `grid-template-columns` を変えて版面の密度・列数を変える（DOM はそのまま）。
+- **幅でメリハリ（重要）**: `--content-w`（`.wrap` のページ全体幅）/ `--measure`（本文幅）/ `--gutter`（左右余白）/ `.layout.is-2col` のサイド列幅をテーマごとに変える。全テーマ同じ幅だと印象が似るので、狭め＋広い余白＝親密、広め＝情報密度、で空気感を変える。
 - 禁止: 外部 `url()` / `@import` / 任意 JS / 新規 DOM 前提のスタイル。
