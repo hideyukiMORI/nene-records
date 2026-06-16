@@ -110,4 +110,9 @@ authoring.md ──(ClaudeDesign / 作者)──▶ theme bundle ──(validate
 
 ## 7. 例
 
-実例のオーサリング MD: [`examples/aurora.theme.md`](./examples/aurora.theme.md)。
+実例のオーサリング MD（記入済みブリーフ）:
+
+- [`examples/aurora.theme.md`](./examples/aurora.theme.md) … 寒色・round・comfortable。
+- [`examples/ink.theme.md`](./examples/ink.theme.md) … 無彩色・sharp・compact（別の display フォント）。
+
+`consumer`（暖色・soft）も含め、`mood` / `radius` / `density` / フォント選択の振れ幅の参考に。
