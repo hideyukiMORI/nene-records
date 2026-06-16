@@ -1,0 +1,111 @@
+{
+  "$schema": "../public-theme.schema.json",
+  "id": "consumer",
+  "name": "Terracotta",
+  "version": "1.0.0",
+  "author": "NeNe Records",
+  "description": "Built-in reference theme — warm terracotta paper (light) / warm near-black paper (dark). Mirrors consumer-brand.css.",
+  "supportsModes": ["light", "dark"],
+  "fonts": [
+    {
+      "family": "Saira Semi Condensed",
+      "role": "display",
+      "source": "fontsource",
+      "weights": [400, 500, 600]
+    },
+    {
+      "family": "Inter",
+      "role": "body",
+      "source": "fontsource",
+      "weights": [400, 500, 600]
+    },
+    {
+      "family": "Space Grotesk",
+      "role": "chrome",
+      "source": "fontsource",
+      "weights": [500, 600]
+    },
+    {
+      "family": "JetBrains Mono",
+      "role": "mono",
+      "source": "fontsource",
+      "weights": [400]
+    }
+  ],
+  "tokens": {
+    "light": {
+      "color-surface": "oklch(97.5% 0.012 75)",
+      "color-surface-raised": "oklch(99.5% 0.008 75)",
+      "color-surface-overlay": "oklch(94% 0.02 75)",
+      "color-surface-sunken": "oklch(95.5% 0.016 70)",
+      "color-text-primary": "oklch(24% 0.03 55)",
+      "color-text-muted": "oklch(48% 0.03 55)",
+      "color-text-inverse": "oklch(99% 0.005 75)",
+      "color-border": "oklch(86% 0.02 75)",
+      "color-border-strong": "oklch(78% 0.025 70)",
+      "color-focus-ring": "oklch(68% 0.12 45)",
+      "color-accent": "oklch(58% 0.14 45)",
+      "color-accent-hover": "oklch(52% 0.14 45)",
+      "color-accent-weak": "color-mix(in oklch, var(--color-accent) 12%, var(--color-surface-raised))",
+      "color-on-accent": "oklch(99% 0.005 75)",
+      "color-brand-violet": "oklch(56% 0.24 300)",
+      "color-danger": "oklch(52% 0.2 25)",
+      "color-danger-hover": "oklch(46% 0.2 25)",
+      "color-ok": "oklch(55% 0.13 150)",
+      "color-warn": "oklch(70% 0.15 75)",
+      "color-info": "oklch(55% 0.13 250)",
+      "shadow-sm": "0 1px 2px oklch(40% 0.04 60 / 0.08)",
+      "shadow-md": "0 6px 22px oklch(40% 0.04 60 / 0.1)",
+      "shadow-lg": "0 22px 50px oklch(38% 0.05 55 / 0.16)",
+      "color-scheme": "light"
+    },
+    "dark": {
+      "color-surface": "oklch(18% 0.012 55)",
+      "color-surface-raised": "oklch(22% 0.014 55)",
+      "color-surface-overlay": "oklch(27% 0.016 50)",
+      "color-surface-sunken": "oklch(15% 0.011 55)",
+      "color-text-primary": "oklch(94% 0.012 75)",
+      "color-text-muted": "oklch(68% 0.022 60)",
+      "color-text-inverse": "oklch(20% 0.02 50)",
+      "color-border": "oklch(32% 0.016 55)",
+      "color-border-strong": "oklch(42% 0.02 55)",
+      "color-focus-ring": "oklch(74% 0.13 45)",
+      "color-accent": "oklch(70% 0.15 45)",
+      "color-accent-hover": "oklch(77% 0.15 45)",
+      "color-accent-weak": "color-mix(in oklch, var(--color-accent) 16%, var(--color-surface-raised))",
+      "color-on-accent": "oklch(20% 0.04 45)",
+      "color-brand-violet": "oklch(72% 0.18 300)",
+      "color-danger": "oklch(66% 0.18 25)",
+      "color-danger-hover": "oklch(72% 0.18 25)",
+      "color-ok": "oklch(72% 0.14 150)",
+      "color-warn": "oklch(80% 0.14 80)",
+      "color-info": "oklch(74% 0.12 250)",
+      "shadow-sm": "0 1px 2px oklch(0% 0 0 / 0.4)",
+      "shadow-md": "0 8px 26px oklch(0% 0 0 / 0.5)",
+      "shadow-lg": "0 24px 56px oklch(0% 0 0 / 0.62)",
+      "color-scheme": "dark"
+    }
+  },
+  "knobs": {
+    "accent": { "light": "oklch(58% 0.14 45)", "dark": "oklch(70% 0.15 45)" },
+    "surface": {
+      "light": "oklch(97.5% 0.012 75)",
+      "dark": "oklch(18% 0.012 55)"
+    },
+    "fontDisplay": "Saira Semi Condensed",
+    "fontBody": "Inter",
+    "fontMono": "JetBrains Mono",
+    "baseFontSize": "1.0625rem",
+    "typeScale": 1.18,
+    "density": "comfortable",
+    "radius": "soft"
+  },
+  "assets": {
+    "preview": {
+      "light": "screenshots/light.png",
+      "dark": "screenshots/dark.png"
+    },
+    "hero": "assets/hero.png",
+    "logo": "assets/nene-mark.svg"
+  }
+}
