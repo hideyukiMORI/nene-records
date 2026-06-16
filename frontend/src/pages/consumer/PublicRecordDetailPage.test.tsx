@@ -88,9 +88,8 @@ describe('PublicRecordDetailPage', () => {
 
     renderDetailPage()
 
-    expect(await screen.findByRole('heading', { name: 'Article' })).toBeInTheDocument()
-    expect(await screen.findByText('title')).toBeInTheDocument()
-    expect(screen.getByText('My article')).toBeInTheDocument()
+    // The record title is lifted into the masthead h1 (and dropped from the body).
+    expect(await screen.findByRole('heading', { level: 1, name: 'My article' })).toBeInTheDocument()
     expect(screen.getByText('views')).toBeInTheDocument()
     expect(screen.getByText('42')).toBeInTheDocument()
     expect(screen.getByText('published')).toBeInTheDocument()

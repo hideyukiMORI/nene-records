@@ -1,9 +1,9 @@
+import { Link } from 'react-router-dom'
 import {
   PublicEntityResultGroup,
   type PublicEntityTypeGroup,
 } from '@/features/public-entity-results'
-import { useTranslation } from '@/shared/i18n'
-import { EmptyState, ErrorState, LoadingState, Stack, Text } from '@/shared/ui'
+import { IconArrowLeft, IconInbox } from '@/shared/ui/icons/magazine-icons'
 
 export interface PublicDateArchiveViewProps {
   title: string
@@ -26,37 +26,54 @@ export function PublicDateArchiveView({
   errorTitle,
   onRetry,
 }: PublicDateArchiveViewProps) {
-  const { t } = useTranslation()
-
   return (
-    <Stack gap="lg">
-      <Text as="h1" variant="heading-md">
-        {title}
-      </Text>
+    <div className="pagehead">
+      <Link className="backlink" to="/">
+        <IconArrowLeft size={16} /> All records
+      </Link>
+      <h1 className="pagehead__title">{title}</h1>
+      {valid && !isLoading && !isError && total > 0 ? (
+        <p className="pagehead__sub">
+          {total} record{total === 1 ? '' : 's'} published in this period.
+        </p>
+      ) : null}
 
       {!valid ? (
-        <EmptyState
-          title={t('public.dateArchive.invalid.title')}
-          description={t('public.dateArchive.invalid.description')}
-        />
+        <div className="empty" style={{ marginTop: '2rem' }}>
+          <span className="empty__icon">
+            <IconInbox size={26} />
+          </span>
+          <h3 className="empty__title">Invalid date</h3>
+          <p className="empty__text">This archive URL is not a valid date.</p>
+          <Link className="btn btn--ghost" to="/">
+            Back to latest
+          </Link>
+        </div>
       ) : isLoading ? (
-        <LoadingState>{t('public.dateArchive.loading')}</LoadingState>
+        <p className="searchhint">Loading…</p>
       ) : isError ? (
-        <ErrorState
-          message={errorTitle ?? t('common.error.unknown')}
-          onRetry={onRetry}
-          retryLabel={t('common.actions.retry')}
-        />
+        <div className="empty" style={{ marginTop: '2rem' }}>
+          <h3 className="empty__title">Could not load this archive</h3>
+          <p className="empty__text">{errorTitle ?? 'Unknown error'}</p>
+          <button type="button" className="btn btn--ghost" onClick={onRetry}>
+            Retry
+          </button>
+        </div>
       ) : total === 0 ? (
-        <EmptyState
-          title={t('public.dateArchive.empty.title')}
-          description={t('public.dateArchive.empty.description')}
-        />
+        <div className="empty" style={{ marginTop: '2rem' }}>
+          <span className="empty__icon">
+            <IconInbox size={26} />
+          </span>
+          <h3 className="empty__title">No records in this period</h3>
+          <p className="empty__text">
+            Nothing was published then. Pick another date, or browse the latest.
+          </p>
+          <Link className="btn btn--ghost" to="/">
+            Back to latest
+          </Link>
+        </div>
       ) : (
-        <Stack gap="lg">
-          <Text muted variant="caption">
-            {t('public.dateArchive.resultCount', { count: String(total) })}
-          </Text>
+        <div style={{ marginTop: 'var(--space-xl)' }}>
           {groups.map((group) => (
             <PublicEntityResultGroup
               key={String(group.entityType.id)}
@@ -64,8 +81,8 @@ export function PublicDateArchiveView({
               entities={group.entities}
             />
           ))}
-        </Stack>
+        </div>
       )}
-    </Stack>
+    </div>
   )
 }

@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom'
 import { PublicTagArchiveView, usePublicTagArchivePage } from '@/features/public-tag-archive'
-import { PublicLayout } from './PublicLayout'
+import { PublicSiteShell } from './PublicSiteShell'
 import { usePublicSite } from './public-site-context'
 
 export function PublicTagArchivePage() {
@@ -11,7 +11,7 @@ export function PublicTagArchivePage() {
     usePublicTagArchivePage(tagSlug)
 
   return (
-    <PublicLayout variant="standard" site={site}>
+    <PublicSiteShell site={site}>
       <PublicTagArchiveView
         tagName={tagName}
         groups={groups}
@@ -23,6 +23,6 @@ export function PublicTagArchivePage() {
           void refetch()
         }}
       />
-    </PublicLayout>
+    </PublicSiteShell>
   )
 }

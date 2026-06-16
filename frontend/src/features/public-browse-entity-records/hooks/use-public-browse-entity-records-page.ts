@@ -12,6 +12,26 @@ export interface PublicRecordListItem {
   label: string
   /** Resolved public URL for this record based on the entity type's permalink pattern */
   publicUrl: string
+  /** Human-readable published date (empty when unavailable). */
+  publishedLabel: string
+}
+
+/** A browsable entity type, for the type-switch chips. */
+export interface PublicBrowseType {
+  slug: string
+  name: string
+  href: string
+}
+
+function formatPublishedDate(iso: string | null): string {
+  if (iso === null || iso === '') {
+    return ''
+  }
+  const date = new Date(iso)
+  if (Number.isNaN(date.getTime())) {
+    return ''
+  }
+  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
 }
 
 export function usePublicBrowseEntityRecordsPage(entityTypeSlug: string, offset: number) {
@@ -52,6 +72,7 @@ export function usePublicBrowseEntityRecordsPage(entityTypeSlug: string, offset:
           entityId: id,
           publishedAt: entity.publishedAt ?? null,
         }),
+        publishedLabel: formatPublishedDate(entity.publishedAt ?? null),
       }
     })
   }, [
@@ -60,6 +81,16 @@ export function usePublicBrowseEntityRecordsPage(entityTypeSlug: string, offset:
     entityType?.permalinkPattern,
     entityTypeSlug,
   ])
+
+  const entityTypes = useMemo(
+    (): PublicBrowseType[] =>
+      (entityTypeQuery.data?.items ?? []).map((type) => ({
+        slug: type.slug,
+        name: type.name,
+        href: `/${type.slug}`,
+      })),
+    [entityTypeQuery.data?.items],
+  )
 
   const isLoading =
     entityTypeQuery.isLoading ||
@@ -79,6 +110,7 @@ export function usePublicBrowseEntityRecordsPage(entityTypeSlug: string, offset:
 
   return {
     entityType,
+    entityTypes,
     entityTypeSlug,
     items,
     total,
