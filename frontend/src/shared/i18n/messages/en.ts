@@ -53,6 +53,11 @@ export const en = {
     'Place blocks (widgets) into the regions of public pages — header / sidebar / aside / footer.',
   'admin.appearance.menusSub':
     'Build named link collections. To show one, place a Menu widget into a region on the Layout tab.',
+  'admin.appearance.themeTab': 'Theme',
+  'admin.appearance.themeSub':
+    'Choose the look of the public site. The visitor light/dark toggle still applies within the selected theme.',
+  'admin.publicTheme.intro': 'Pick the theme applied to every public page.',
+  'admin.publicTheme.saving': 'Saving…',
   'admin.menus.listTitle': 'Menus',
   'admin.menus.new': '+ New',
   'admin.menus.newMenuName': 'New menu',

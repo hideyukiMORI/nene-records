@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { DEFAULT_PUBLIC_THEME_ID } from './public-themes'
+import { DEFAULT_PUBLIC_THEME_ID } from '@/shared/lib/public-themes'
 
 /**
  * Public-site color theme controller (light / dark / auto).

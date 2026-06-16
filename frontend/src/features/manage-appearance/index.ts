@@ -1,4 +1,7 @@
 export { AppearanceView } from './ui/AppearanceView'
+export { PublicThemeView } from './ui/PublicThemeView'
 export { PermalinkSettingsView } from './ui/PermalinkSettingsView'
 export { usePermalinkSettingsPage } from './hooks/usePermalinkSettingsPage'
 export type { PermalinkSettingsPageState } from './hooks/usePermalinkSettingsPage'
+export { usePublicThemePage } from './hooks/usePublicThemePage'
+export type { PublicThemePageState } from './hooks/usePublicThemePage'
