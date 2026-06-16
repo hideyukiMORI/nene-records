@@ -97,11 +97,26 @@
 | --------------------------- | ----------------------------------------- | --------------------------- |
 | `--space-2xs … --space-2xl` | 0.25 / 0.5 / 0.75 / 1 / 1.5 / 2.5 / 4 rem | Derived（density ノブから） |
 | `--space-section`           | `clamp(3.5rem, 2rem + 6vw, 7rem)`         | Derived                     |
-| `--gutter`                  | `clamp(1.25rem, 0.5rem + 3vw, 2.5rem)`    | Fixed                       |
+| `--gutter`                  | `clamp(1.25rem, 0.5rem + 3vw, 2.5rem)`    | **Knob（左右余白）**        |
 | `--measure`                 | `72ch`                                    | Knob（本文計測幅）          |
-| `--content-w`               | `1180px`                                  | Fixed                       |
+| `--content-w`               | `1180px`                                  | **Knob（ページ全体幅）**    |
 
 `density`（compact / cozy / comfortable）ノブが `--space-*` 全体を一括スケール。
+
+### 幅でメリハリを出す（テーマ間の差別化レバー）
+
+`--content-w`（`.wrap` の `max-width`＝ページ全体幅）/ `--measure`（本文計測幅）/ `--gutter`（左右余白）/ `.layout.is-2col` のサイド列幅は、**テーマごとに変えてよい**。全テーマが同じ幅だと印象が似るため、版面の広い・狭い・余白の多寡で空気感を変える（例: 読み物系は狭め＋広い余白で親密に、構造系は広めで情報密度高く）。`components.css` でスコープ内上書きする:
+
+```css
+.nene-public[data-theme^="myid"] {
+  --content-w: 1040px;
+  --measure: 66ch;
+  --gutter: clamp(1.5rem, 1rem + 4vw, 3.5rem);
+}
+.nene-public[data-theme^="myid"] .layout.is-2col {
+  grid-template-columns: minmax(0, 1fr) 280px;
+}
+```
 
 ## 6. 角丸 / モーショントークン
 
