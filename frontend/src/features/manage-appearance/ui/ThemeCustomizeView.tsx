@@ -1,9 +1,12 @@
 import type { ReactNode } from 'react'
 import { useTranslation } from '@/shared/i18n'
 import {
+  DENSITY_OPTIONS,
   FONT_OPTIONS,
+  FONT_SIZE_OPTIONS,
   GUTTER_OPTIONS,
   RADIUS_OPTIONS,
+  TYPE_SCALE_OPTIONS,
   WIDTH_OPTIONS,
   type KnobOption,
 } from '@/shared/lib/theme-customization'
@@ -124,6 +127,36 @@ export function ThemeCustomizeView({
               placeholder={themePlaceholder}
               onChange={(v) => {
                 setKnob('radius', v)
+              }}
+            />
+          </Field>
+          <Field label={t('admin.themeCustomize.fontSize')}>
+            <Select
+              value={draft.fontSize}
+              options={FONT_SIZE_OPTIONS}
+              placeholder={themePlaceholder}
+              onChange={(v) => {
+                setKnob('fontSize', v)
+              }}
+            />
+          </Field>
+          <Field label={t('admin.themeCustomize.typeScale')}>
+            <Select
+              value={draft.typeScale}
+              options={TYPE_SCALE_OPTIONS}
+              placeholder={themePlaceholder}
+              onChange={(v) => {
+                setKnob('typeScale', v)
+              }}
+            />
+          </Field>
+          <Field label={t('admin.themeCustomize.density')}>
+            <Select
+              value={draft.density}
+              options={DENSITY_OPTIONS}
+              placeholder={themePlaceholder}
+              onChange={(v) => {
+                setKnob('density', v)
               }}
             />
           </Field>

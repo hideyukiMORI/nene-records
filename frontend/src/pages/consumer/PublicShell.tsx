@@ -9,7 +9,11 @@ import {
   resolvePublicThemeId,
   storeActiveTheme,
 } from '@/shared/lib/public-themes'
-import { overrideStyleForTheme } from '@/shared/lib/theme-customization'
+import {
+  overrideStyleForTheme,
+  readStoredThemeOverridesRaw,
+  storeThemeOverridesRaw,
+} from '@/shared/lib/theme-customization'
 import type { PublicSite } from './public-site-context'
 
 function useSiteDocumentMeta(siteName: string, metaDescription: string): void {
@@ -52,11 +56,14 @@ export function PublicShell() {
   const settingsSettled = publicSettingsQuery.data !== undefined
   const resolvedTheme = resolvePublicThemeId(settings.active_theme)
   const activeTheme = settingsSettled ? resolvedTheme : readStoredActiveTheme()
+  // Customizer overrides: stored raw applied on first paint, fetched value after.
+  const overridesRaw = settingsSettled ? settings.theme_overrides : readStoredThemeOverridesRaw()
   useEffect(() => {
     if (settingsSettled) {
       storeActiveTheme(resolvedTheme)
+      storeThemeOverridesRaw(settings.theme_overrides)
     }
-  }, [settingsSettled, resolvedTheme])
+  }, [settingsSettled, resolvedTheme, settings.theme_overrides])
 
   const site: PublicSite = {
     siteName: settings.site_name ?? 'NeNe Records',
@@ -65,7 +72,7 @@ export function PublicShell() {
     footerMarkdown: settings.footer_markdown ?? '',
     navItems,
     activeTheme,
-    themeOverrideStyle: overrideStyleForTheme(settings.theme_overrides, activeTheme),
+    themeOverrideStyle: overrideStyleForTheme(overridesRaw, activeTheme),
   }
 
   useSiteDocumentMeta(site.siteName, site.metaDescription)
