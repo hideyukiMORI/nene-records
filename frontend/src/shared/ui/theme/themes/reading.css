@@ -1,12 +1,16 @@
 /* ============================================================================
-   NeNe Records — Public site theme: Reading (light + dark)
+   NeNe Records — Public site theme: Reading — REDESIGN (light + dark)
    ----------------------------------------------------------------------------
-   A reading-first theme. Where consumer/aurora/ink differ by hue & shape,
-   Reading differs by *reading experience*: warm cream paper, a quiet low-chroma
-   ink accent used only for links/emphasis (never as a fill field), serif body,
-   larger type, a wider measure and looser leading (see components.css).
-   Authored from uploads/brief-reading.theme.md per the token contract;
-   scoped under [data-theme='reading'] / [data-theme='reading-dark'].
+   The intimate "single book" theme. Hue family kept from Reading 1.x (warm
+   cream paper, a quiet low-chroma brown ink used only for links/emphasis) so it
+   still reads as "Reading" — the redesign happens in components.css (L2): a
+   deliberately NARROW measure & content width, serif-led headings, a literary
+   drop cap, hairline rules and small-caps labels. Tokens here only refine the
+   foundation: borders eased to the faintest hairline (delicate, not structural)
+   and shadows kept soft. The deliberate opposite of Aurora (wide / ruled / mono)
+   and a quieter cousin of consumer (warm soft magazine). Both modes AA.
+   Authored from brief-reading-redesign.theme.md per the token contract; scoped
+   under [data-theme='reading'] / [data-theme='reading-dark'].
    ========================================================================== */
 
 /* ── LIGHT — warm cream paper ────────────────────────────────────────────── */
@@ -15,16 +19,16 @@
   --color-surface: oklch(97% 0.02 85);
   --color-surface-raised: oklch(99% 0.014 85);
   --color-surface-overlay: oklch(93.5% 0.03 82);
-  --color-surface-sunken: oklch(95% 0.026 80);
+  --color-surface-sunken: oklch(95.5% 0.024 80);
 
   /* text — warm near-black, well above AA */
   --color-text-primary: oklch(23% 0.028 62);
   --color-text-muted: oklch(47% 0.032 60);
   --color-text-inverse: oklch(99% 0.008 85);
 
-  /* line */
-  --color-border: oklch(87% 0.024 82);
-  --color-border-strong: oklch(79% 0.028 78);
+  /* line — eased to a faint hairline (delicate, not structural) */
+  --color-border: oklch(89.5% 0.02 84);
+  --color-border-strong: oklch(81% 0.026 78);
   --color-focus-ring: oklch(58% 0.09 60);
 
   /* accent — quiet brown ink (links/emphasis only) */
@@ -44,9 +48,9 @@
   --color-info: oklch(55% 0.13 250);
 
   /* shadow — warm-tinted, soft in light */
-  --shadow-sm: 0 1px 2px oklch(40% 0.04 70 / 0.08);
-  --shadow-md: 0 6px 22px oklch(40% 0.04 70 / 0.1);
-  --shadow-lg: 0 22px 50px oklch(38% 0.05 65 / 0.16);
+  --shadow-sm: 0 1px 2px oklch(40% 0.04 70 / 0.07);
+  --shadow-md: 0 6px 22px oklch(40% 0.04 70 / 0.09);
+  --shadow-lg: 0 22px 50px oklch(38% 0.05 65 / 0.14);
   --shadow-focus: 0 0 0 3px color-mix(in oklch, var(--color-focus-ring) 30%, transparent);
 
   color-scheme: light;
@@ -68,9 +72,9 @@
   --color-text-muted: oklch(67% 0.024 75);
   --color-text-inverse: oklch(20% 0.02 65);
 
-  /* line */
-  --color-border: oklch(32% 0.016 70);
-  --color-border-strong: oklch(42% 0.02 70);
+  /* line — faint warm hairline */
+  --color-border: oklch(30% 0.014 70);
+  --color-border-strong: oklch(40% 0.018 70);
   --color-focus-ring: oklch(70% 0.08 65);
 
   /* accent — lifted quiet brown, dark text rides on top */

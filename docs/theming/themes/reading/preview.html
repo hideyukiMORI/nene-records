@@ -3,17 +3,17 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Reading theme — preview</title>
+<title>Reading theme (redesign) — preview</title>
 
 <!-- Preview-only font loading. In the real app these are self-hosted via
      @fontsource (public-fonts.ts); the bundle CSS carries no external url(). -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Saira+Semi+Condensed:wght@400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Saira+Semi+Condensed:wght@400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400;1,8..60,600&family=JetBrains+Mono&display=swap" rel="stylesheet" />
 
-<!-- The consuming component stylesheet (unchanged). Colors come from the theme. -->
+<!-- The consuming component stylesheet (unchanged). Type/shape come from the theme. -->
 <link rel="stylesheet" href="../uploads/nene-theme-handoff/reference/public-site.css" />
-<!-- The Reading theme bundle -->
+<!-- The Reading redesign bundle -->
 <link rel="stylesheet" href="tokens.css" />
 <link rel="stylesheet" href="components.css" />
 
@@ -65,22 +65,22 @@
       <div class="hero__grid">
         <div>
           <p class="eyebrow hero__kicker">Essay · 読書のための設計</p>
-          <h1 class="hero__title">静かな紙の上で、<em>長い文章</em>を気持ちよく読む。</h1>
-          <p class="hero__lead">Reading テーマは色で主張しません。暖かいクリームの紙、大きめの serif 本文、広い計測幅とゆったりした行間で、読むことそのものに集中できる設計です。</p>
+          <h1 class="hero__title">狭い版面で、<em>一冊の本</em>を読むように。</h1>
+          <p class="hero__lead">Reading は、広さで主張しません。中央に細く組まれた紙面と広い余白、serif の見出しと本文、ゆったりした行間で、文章を読むことそのものに沈み込めるように設計しています。</p>
           <div class="hero__cta">
             <a class="btn btn--primary" href="#">最新号を読む</a>
             <a class="btn btn--ghost" href="#">テーマについて</a>
           </div>
           <div class="hero__meta">
-            <div class="hero__stat"><b>76ch</b><span>本文計測幅</span></div>
-            <div class="hero__stat"><b>1.72</b><span>行間（leading）</span></div>
-            <div class="hero__stat"><b>Serif</b><span>Source Serif 4</span></div>
+            <div class="hero__stat"><b>1008px</b><span>版面の幅</span></div>
+            <div class="hero__stat"><b>66ch</b><span>本文の計測幅</span></div>
+            <div class="hero__stat"><b>1.74</b><span>行間 leading</span></div>
           </div>
         </div>
         <div class="hero__art">
           <div class="hero__art-frame">
-            <div class="eyecatch" data-label="hero illustration" style="width:100%"></div>
-            <span class="hero__art-tag"><b>◆</b> typography-first</span>
+            <div class="eyecatch" data-label="装幀イメージ" style="width:100%"></div>
+            <span class="hero__art-tag">◆ printed page</span>
           </div>
         </div>
       </div>
@@ -91,11 +91,11 @@
       <article class="article layout__main">
         <div class="article__metarow">
           <span class="tbadge">essay</span>
-          <span class="meta">2026年6月16日</span>
+          <span class="meta">2026年6月17日</span>
           <span class="dot"></span>
           <span class="meta">読了 8分</span>
         </div>
-        <h2 class="article__title">余白と行間が、読み手の呼吸を決める</h2>
+        <h2 class="article__title">狭さがつくる、親密な読書体験</h2>
         <div class="article__byline">
           <span class="article__avatar">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-4 5-6 8-6s6.5 2 8 6"/></svg>
@@ -108,18 +108,18 @@
         <div class="article__hero eyecatch" data-label="article cover"></div>
 
         <div class="prose">
-          <p>本文を serif にするだけでは、読み物にはなりません。一行の長さ、行と行のあいだ、段落の間隔——そうした目に見えにくい余白の設計こそが、読み手の呼吸を決めます。Reading テーマは、その三つを同時に整えることを起点にしています。</p>
-          <p>一行は約 76 文字分まで広げ、行間は 1.72 までゆるめました。やや大きめの本文（1.125rem）と組み合わせると、視線が次の行頭へ戻るときの迷いが減り、長い文章でも疲れにくくなります。色は意図的に抑え、リンクと強調にだけ静かなブラウンのインクを差します。</p>
-          <blockquote>読みやすさは装飾ではなく、構造である。文字の大きさより、文字と文字のあいだに宿る。</blockquote>
-          <h2>見出しは引き締めて、雑誌の手触りを残す</h2>
-          <p>本文が serif でゆったりしているぶん、見出しには Saira Semi Condensed を使って密度とリズムを与えます。柔らかい本文と引き締まった見出しの対比が、ページ全体に編集された印象をつくります。</p>
+          <p>本を読むという行為は、本来とても親密なものです。手のひらに収まる紙面、視線が迷わずに次の行へ落ちていく一定の幅、そして指で送るページの余白——Reading テーマは、画面の上にその親密さを取り戻すことを起点にしています。広く敷き詰めるのではなく、あえて狭く組む。空気のような余白を版面の左右に残すことで、読み手と文章のあいだの距離を縮めます。</p>
+          <p>版面の幅は 1008px まで絞り、本文の一行は約 66 文字に整えました。行間は 1.74 までゆるめ、本文には serif の Source Serif 4 を据えています。見出しまで同じ serif で揃えることで、ページ全体がひとつの声で語りかけるような、出版物の落ち着きが生まれます。</p>
+          <blockquote>読みやすさは、足し算ではなく引き算でつくられる。装飾を削り、余白を残し、文字だけを残す。</blockquote>
+          <h2>罫線は、髪の毛のように繊細に</h2>
+          <p>区切りは、囲うのではなく、一本の細い罫で示します。カードもサイドバーも枠で閉じず、余白とヘアラインだけで領域を分ける。過度な装飾やモノスペースの表記は使わず、ラベルには控えめな小さなキャップスだけを添えます。静けさそのものが、このテーマの意匠です。</p>
           <ul>
-            <li>本文 — Source Serif 4（セルフホスト同梱）</li>
-            <li>見出し — Saira Semi Condensed</li>
-            <li>コード／メタ — JetBrains Mono</li>
+            <li>本文・見出し — Source Serif 4（セルフホスト同梱）</li>
+            <li>ラベル — Saira Semi Condensed の小さなキャップス</li>
+            <li>コード — JetBrains Mono</li>
           </ul>
-          <h3>ダークでも紙の温度を保つ</h3>
-          <p>暗いモードでは、冷たい黒ではなくセピア寄りの近黒を地にしています。アクセントは同じブラウンの色相のまま明度だけを持ち上げ、リンクは <a href="#">この通り</a> 読みやすさを保ちます。<code>--measure</code> や <code>--leading-body</code> はモードに依らず一定です。</p>
+          <h3>ダークでも、紙の温度を保つ</h3>
+          <p>暗いモードでは、冷たい黒ではなくセピア寄りの近黒を地にしています。アクセントは同じブラウンの色相のまま明度だけを持ち上げ、リンクは <a href="#">この通り</a> 静かに効きます。<code>--measure</code> や <code>--leading-body</code>、そして版面の幅は、モードに依らず一定に保たれます。</p>
         </div>
 
         <div class="article__tags">
@@ -197,8 +197,8 @@
   <footer class="ft">
     <div class="wrap">
       <div class="ft__bar">
-        <small>© 2026 NeNe Records — <span class="mono">theme: reading</span></small>
-        <small class="mono">light / dark · serif body · 76ch</small>
+        <small>© 2026 NeNe Records — <span class="mono">theme: reading · v2</span></small>
+        <small class="mono">light / dark · serif · 1008px / 66ch</small>
       </div>
     </div>
   </footer>
