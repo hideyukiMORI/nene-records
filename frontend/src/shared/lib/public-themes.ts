@@ -4,20 +4,32 @@
  * A theme is a set of design-token values scoped under `[data-theme='<id>']`
  * (light) and `[data-theme='<id>-dark']` (dark). The active theme is chosen by
  * the site admin via the `active_theme` public setting; the visitor light/dark
- * toggle (see use-consumer-theme.ts) picks the mode within the active theme.
+ * toggle (see pages/consumer/use-consumer-theme.ts) picks the mode within it.
  *
- * For now `consumer` is the sole built-in (consumer-brand.css). Additional
- * themes register here as their token CSS lands, per the contract in
- * docs/theming/public-theme-contract.md.
+ * Shared so both the public site (resolution) and the admin theme picker
+ * (manage-appearance) read the same list. Additional themes register here as
+ * their token CSS lands, per docs/theming/public-theme-contract.md.
  */
 export interface PublicThemeMeta {
   /** Theme id — used as the `[data-theme]` base value. */
   id: string
   /** Human label for the admin theme picker. */
   name: string
+  /** Mini-swatch colours for the picker (light-mode tokens). */
+  preview: { surface: string; raised: string; accent: string }
 }
 
-export const PUBLIC_THEMES: readonly PublicThemeMeta[] = [{ id: 'consumer', name: 'Terracotta' }]
+export const PUBLIC_THEMES: readonly PublicThemeMeta[] = [
+  {
+    id: 'consumer',
+    name: 'Terracotta',
+    preview: {
+      surface: 'oklch(97.5% 0.012 75)',
+      raised: 'oklch(99.5% 0.008 75)',
+      accent: 'oklch(58% 0.14 45)',
+    },
+  },
+]
 
 export const DEFAULT_PUBLIC_THEME_ID = 'consumer'
 

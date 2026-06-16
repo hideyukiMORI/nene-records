@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
 import { currentUserHasCapability } from '@/entities/auth'
 import { useMenuList } from '@/entities/menu'
+import { PublicThemeView, usePublicThemePage } from '@/features/manage-appearance'
 import { ManageMenusView, useManageMenusPage } from '@/features/manage-menus'
 import {
   HelpModal,
@@ -14,7 +15,7 @@ import { Button, Stack, Text } from '@/shared/ui'
 
 const TOUR_LS_KEY = 'nene_layout_tour_seen'
 
-type AppearanceTab = 'layout' | 'menus'
+type AppearanceTab = 'layout' | 'menus' | 'theme'
 
 function LayoutTab() {
   const page = useManageWidgetsPage()
@@ -24,6 +25,11 @@ function LayoutTab() {
 function MenusTab() {
   const page = useManageMenusPage()
   return <ManageMenusView page={page} />
+}
+
+function ThemeTab() {
+  const page = usePublicThemePage()
+  return <PublicThemeView {...page} />
 }
 
 export function AppearanceLayoutPage() {
@@ -42,7 +48,18 @@ export function AppearanceLayoutPage() {
     localStorage.setItem(TOUR_LS_KEY, '1')
   }
 
-  const active: AppearanceTab = tab === 'menus' ? 'menus' : 'layout'
+  const active: AppearanceTab = tab === 'menus' ? 'menus' : tab === 'theme' ? 'theme' : 'layout'
+
+  const tabTitle: Record<AppearanceTab, string> = {
+    layout: t('admin.appearance.layoutTab'),
+    menus: t('admin.appearance.menusTab'),
+    theme: t('admin.appearance.themeTab'),
+  }
+  const tabSub: Record<AppearanceTab, string> = {
+    layout: t('admin.appearance.layoutSub'),
+    menus: t('admin.appearance.menusSub'),
+    theme: t('admin.appearance.themeSub'),
+  }
 
   const tabClass = (isActive: boolean): string =>
     [
@@ -57,15 +74,12 @@ export function AppearanceLayoutPage() {
       <div className="flex items-start justify-between gap-inline-md">
         <div>
           <Text as="span" muted variant="caption">
-            {t('admin.appearance.crumb')} ›{' '}
-            {active === 'layout' ? t('admin.appearance.layoutTab') : t('admin.appearance.menusTab')}
+            {t('admin.appearance.crumb')} › {tabTitle[active]}
           </Text>
           <Text as="h1" variant="heading-md">
-            {active === 'layout' ? t('admin.appearance.layoutTab') : t('admin.appearance.menusTab')}
+            {tabTitle[active]}
           </Text>
-          <Text muted>
-            {active === 'layout' ? t('admin.appearance.layoutSub') : t('admin.appearance.menusSub')}
-          </Text>
+          <Text muted>{tabSub[active]}</Text>
         </div>
         <Button
           variant="secondary"
@@ -88,9 +102,12 @@ export function AppearanceLayoutPage() {
             {menusQuery.data?.items.length ?? 0}
           </span>
         </Link>
+        <Link to="/admin/appearance/theme" className={tabClass(active === 'theme')}>
+          {t('admin.appearance.themeTab')}
+        </Link>
       </nav>
 
-      {active === 'layout' ? <LayoutTab /> : <MenusTab />}
+      {active === 'layout' ? <LayoutTab /> : active === 'menus' ? <MenusTab /> : <ThemeTab />}
 
       {help ? (
         <HelpModal

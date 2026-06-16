@@ -46,6 +46,11 @@ export const ja: Partial<MessageCatalog> = {
     '公開ページの各領域（ヘッダー / サイドバー / アサイド / フッター）に置くブロック（ウィジェット）を配置します。',
   'admin.appearance.menusSub':
     '名前付きのリンク集をつくります。表示するには、レイアウトタブで「メニュー」ウィジェットを領域に置きます。',
+  'admin.appearance.themeTab': 'テーマ',
+  'admin.appearance.themeSub':
+    '公開サイトの見た目を選びます。選択したテーマの中で、訪問者の light/dark 切替は引き続き有効です。',
+  'admin.publicTheme.intro': 'すべての公開ページに適用するテーマを選びます。',
+  'admin.publicTheme.saving': '保存中…',
   'admin.menus.listTitle': 'メニュー一覧',
   'admin.menus.new': '＋ 新規',
   'admin.menus.newMenuName': '新しいメニュー',

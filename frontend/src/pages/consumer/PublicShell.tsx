@@ -3,8 +3,8 @@ import './consumer-theme.css'
 import { Outlet } from 'react-router-dom'
 import { usePublicNavigationItems } from '@/entities/navigation-item'
 import { publicSettingsToMap, usePublicSettings } from '@/entities/setting'
+import { resolvePublicThemeId } from '@/shared/lib/public-themes'
 import type { PublicSite } from './public-site-context'
-import { resolvePublicThemeId } from './public-themes'
 
 function useSiteDocumentMeta(siteName: string, metaDescription: string): void {
   useEffect(() => {
