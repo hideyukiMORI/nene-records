@@ -10,7 +10,7 @@ import {
   storeActiveTheme,
 } from '@/shared/lib/public-themes'
 import {
-  overrideStyleForTheme,
+  overrideCssForTheme,
   readStoredThemeOverridesRaw,
   storeThemeOverridesRaw,
 } from '@/shared/lib/theme-customization'
@@ -72,7 +72,7 @@ export function PublicShell() {
     footerMarkdown: settings.footer_markdown ?? '',
     navItems,
     activeTheme,
-    themeOverrideStyle: overrideStyleForTheme(overridesRaw, activeTheme),
+    themeOverrideCss: overrideCssForTheme(overridesRaw, activeTheme),
   }
 
   useSiteDocumentMeta(site.siteName, site.metaDescription)

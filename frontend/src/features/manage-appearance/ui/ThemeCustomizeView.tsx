@@ -22,6 +22,31 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
   )
 }
 
+function ColorInput({
+  value,
+  onChange,
+  ariaLabel,
+  disabled,
+}: {
+  value: string | undefined
+  onChange: (value: string) => void
+  ariaLabel: string
+  disabled: boolean
+}) {
+  return (
+    <input
+      type="color"
+      className="h-8 w-14 cursor-pointer rounded-sm border border-border bg-surface"
+      value={value ?? '#888888'}
+      disabled={disabled}
+      onChange={(event) => {
+        onChange(event.target.value)
+      }}
+      aria-label={ariaLabel}
+    />
+  )
+}
+
 function Select({
   value,
   options,
@@ -79,17 +104,61 @@ export function ThemeCustomizeView({
 
         <Stack gap="sm">
           <Field label={t('admin.themeCustomize.accent')}>
-            <input
-              type="color"
-              className="h-8 w-14 cursor-pointer rounded-sm border border-border bg-surface"
-              value={draft.accent ?? '#000000'}
+            <ColorInput
+              value={draft.accent}
               disabled={disabled}
-              onChange={(event) => {
-                setKnob('accent', event.target.value)
+              ariaLabel={t('admin.themeCustomize.accent')}
+              onChange={(v) => {
+                setKnob('accent', v)
               }}
-              aria-label={t('admin.themeCustomize.accent')}
             />
           </Field>
+          <div className="flex items-center justify-between gap-inline-md">
+            <span className="font-chrome text-caption font-semibold text-text-primary">
+              {t('admin.themeCustomize.surface')}
+            </span>
+            <span className="flex items-center gap-inline-sm">
+              <ColorInput
+                value={draft.surface?.light}
+                disabled={disabled}
+                ariaLabel={`${t('admin.themeCustomize.surface')} (light)`}
+                onChange={(v) => {
+                  setKnob('surface', { ...draft.surface, light: v })
+                }}
+              />
+              <ColorInput
+                value={draft.surface?.dark}
+                disabled={disabled}
+                ariaLabel={`${t('admin.themeCustomize.surface')} (dark)`}
+                onChange={(v) => {
+                  setKnob('surface', { ...draft.surface, dark: v })
+                }}
+              />
+            </span>
+          </div>
+          <div className="flex items-center justify-between gap-inline-md">
+            <span className="font-chrome text-caption font-semibold text-text-primary">
+              {t('admin.themeCustomize.text')}
+            </span>
+            <span className="flex items-center gap-inline-sm">
+              <ColorInput
+                value={draft.text?.light}
+                disabled={disabled}
+                ariaLabel={`${t('admin.themeCustomize.text')} (light)`}
+                onChange={(v) => {
+                  setKnob('text', { ...draft.text, light: v })
+                }}
+              />
+              <ColorInput
+                value={draft.text?.dark}
+                disabled={disabled}
+                ariaLabel={`${t('admin.themeCustomize.text')} (dark)`}
+                onChange={(v) => {
+                  setKnob('text', { ...draft.text, dark: v })
+                }}
+              />
+            </span>
+          </div>
           <Field label={t('admin.themeCustomize.font')}>
             <Select
               value={draft.fontBody}

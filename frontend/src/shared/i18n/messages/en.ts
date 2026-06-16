@@ -62,6 +62,8 @@ export const en = {
   'admin.themeCustomize.intro': 'Tweak the “{theme}” theme. Empty = theme default.',
   'admin.themeCustomize.themeDefault': 'Theme default',
   'admin.themeCustomize.accent': 'Accent color',
+  'admin.themeCustomize.surface': 'Surface (light / dark)',
+  'admin.themeCustomize.text': 'Text (light / dark)',
   'admin.themeCustomize.font': 'Body font',
   'admin.themeCustomize.width': 'Content width',
   'admin.themeCustomize.gutter': 'Side margin',

@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { overrideStyleForTheme, resolveOverrideStyle } from './theme-customization'
+import {
+  buildOverrideCss,
+  overrideCssForTheme,
+  resolveModeColors,
+  resolveOverrideStyle,
+} from './theme-customization'
 
 describe('resolveOverrideStyle', () => {
   it('emits known CSS variables for valid knob values', () => {
@@ -53,17 +58,45 @@ describe('resolveOverrideStyle', () => {
   })
 })
 
-describe('overrideStyleForTheme', () => {
-  const raw = JSON.stringify({ aurora: { contentWidth: 'wide' }, reading: { radius: 'round' } })
+describe('resolveModeColors', () => {
+  it('derives the surface family + muted text per mode (validated hex only)', () => {
+    const light = resolveModeColors(
+      { surface: { light: '#ffffff', dark: '#101010' }, text: { light: '#222222' } },
+      'light',
+    )
+    expect(light['--color-surface']).toBe('#ffffff')
+    expect(light['--color-surface-raised']).toContain('color-mix')
+    expect(light['--color-text-primary']).toBe('#222222')
+    expect(light['--color-text-muted']).toContain('transparent')
 
-  it('returns the resolved style for the requested theme only', () => {
-    expect(overrideStyleForTheme(raw, 'aurora')).toEqual({ '--content-w': '1320px' })
-    expect(overrideStyleForTheme(raw, 'reading')['--radius-md']).toBe('18px')
+    const dark = resolveModeColors({ surface: { light: '#fff', dark: '#101010' } }, 'dark')
+    expect(dark['--color-surface']).toBe('#101010')
+    // no text override for dark → not emitted
+    expect(dark['--color-text-primary']).toBeUndefined()
   })
 
-  it('returns empty for unknown theme or invalid JSON', () => {
-    expect(overrideStyleForTheme(raw, 'consumer')).toEqual({})
-    expect(overrideStyleForTheme('not json', 'aurora')).toEqual({})
-    expect(overrideStyleForTheme(undefined, 'aurora')).toEqual({})
+  it('ignores invalid hex', () => {
+    expect(resolveModeColors({ surface: { light: 'rgb(0,0,0)' } }, 'light')).toEqual({})
+  })
+})
+
+describe('buildOverrideCss / overrideCssForTheme', () => {
+  it('scopes mode-agnostic vars to both modes and colours per mode', () => {
+    const css = buildOverrideCss(
+      { contentWidth: 'wide', surface: { light: '#ffffff', dark: '#101010' } },
+      'aurora',
+    )
+    expect(css).toContain(".nene-public[data-theme='aurora']")
+    expect(css).toContain(".nene-public[data-theme='aurora-dark']")
+    expect(css).toContain('--content-w: 1320px;')
+    expect(css).toContain('--color-surface: #ffffff;')
+    expect(css).toContain('--color-surface: #101010;')
+  })
+
+  it('returns the css for the requested theme only, empty otherwise', () => {
+    const raw = JSON.stringify({ aurora: { radius: 'round' } })
+    expect(overrideCssForTheme(raw, 'aurora')).toContain('--radius-md')
+    expect(overrideCssForTheme(raw, 'consumer')).toBe('')
+    expect(overrideCssForTheme('not json', 'aurora')).toBe('')
   })
 })
