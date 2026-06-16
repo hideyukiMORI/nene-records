@@ -13,7 +13,7 @@
    ========================================================================== */
 
 /* ── LIGHT — cool near-white paper ───────────────────────────────────────── */
-[data-theme='aurora'] {
+[data-theme="aurora"] {
   /* surface */
   --color-surface: oklch(98% 0.006 230);
   --color-surface-raised: oklch(99.5% 0.004 230);
@@ -33,7 +33,11 @@
   /* brand — teal */
   --color-accent: oklch(62% 0.13 200);
   --color-accent-hover: oklch(56% 0.13 200);
-  --color-accent-weak: color-mix(in oklch, var(--color-accent) 12%, var(--color-surface-raised));
+  --color-accent-weak: color-mix(
+    in oklch,
+    var(--color-accent) 12%,
+    var(--color-surface-raised)
+  );
   --color-on-accent: oklch(99% 0.004 230);
 
   /* brand mark — NENE2 violet (logo only) */
@@ -48,15 +52,17 @@
 
   /* shadow — cool-tinted, crisp & shallow (structure = rules, not blur) */
   --shadow-sm: 0 1px 0 oklch(40% 0.04 250 / 0.1);
-  --shadow-md: 0 2px 0 oklch(40% 0.04 250 / 0.08), 0 10px 24px oklch(40% 0.04 250 / 0.07);
+  --shadow-md:
+    0 2px 0 oklch(40% 0.04 250 / 0.08), 0 10px 24px oklch(40% 0.04 250 / 0.07);
   --shadow-lg: 0 14px 36px oklch(38% 0.05 250 / 0.12);
-  --shadow-focus: 0 0 0 3px color-mix(in oklch, var(--color-focus-ring) 30%, transparent);
+  --shadow-focus: 0 0 0 3px
+    color-mix(in oklch, var(--color-focus-ring) 30%, transparent);
 
   color-scheme: light;
 }
 
 /* ── DARK — deep blue-black paper ────────────────────────────────────────── */
-[data-theme='aurora-dark'] {
+[data-theme="aurora-dark"] {
   /* surface */
   --color-surface: oklch(17% 0.02 250);
   --color-surface-raised: oklch(21% 0.022 250);
@@ -76,7 +82,11 @@
   /* brand — lifted teal, dark text rides on top */
   --color-accent: oklch(72% 0.13 200);
   --color-accent-hover: oklch(79% 0.13 200);
-  --color-accent-weak: color-mix(in oklch, var(--color-accent) 16%, var(--color-surface-raised));
+  --color-accent-weak: color-mix(
+    in oklch,
+    var(--color-accent) 16%,
+    var(--color-surface-raised)
+  );
   --color-on-accent: oklch(20% 0.04 250);
 
   --color-brand-violet: oklch(72% 0.18 300);
@@ -92,7 +102,8 @@
   --shadow-sm: 0 1px 0 oklch(0% 0 0 / 0.45);
   --shadow-md: 0 2px 0 oklch(0% 0 0 / 0.4), 0 12px 28px oklch(0% 0 0 / 0.45);
   --shadow-lg: 0 18px 44px oklch(0% 0 0 / 0.58);
-  --shadow-focus: 0 0 0 3px color-mix(in oklch, var(--color-focus-ring) 32%, transparent);
+  --shadow-focus: 0 0 0 3px
+    color-mix(in oklch, var(--color-focus-ring) 32%, transparent);
 
   color-scheme: dark;
 }
