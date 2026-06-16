@@ -8,7 +8,7 @@ export interface PublicSiteNavItem {
 
 /**
  * Site-wide data resolved once by PublicShell and consumed by each page's
- * PublicLayout. Kept in a small module so PublicShell and PublicLayout can share
+ * PublicSiteShell. Kept in a small module so the shell and the pages can share
  * the type without a circular import.
  */
 export interface PublicSite {

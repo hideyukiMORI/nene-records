@@ -1,10 +1,11 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import {
   PublicEntityResultGroup,
   type PublicEntityTypeGroup,
 } from '@/features/public-entity-results'
-import { useTranslation } from '@/shared/i18n'
-import { Button, EmptyState, ErrorState, Input, LoadingState, Stack, Text } from '@/shared/ui'
+import { IconArrowLeft, IconInbox } from '@/shared/ui/icons/magazine-icons'
+import { IconSearch } from '@/shared/ui/icons/Icons'
 
 export interface PublicSearchViewProps {
   query: string
@@ -29,66 +30,80 @@ export function PublicSearchView({
   onSearch,
   onRetry,
 }: PublicSearchViewProps) {
-  const { t } = useTranslation()
   const [input, setInput] = useState(query)
 
   return (
-    <Stack gap="lg">
-      <Text as="h1" variant="heading-md">
-        {t('public.search.title')}
-      </Text>
+    <div className="pagehead">
+      <Link className="backlink" to="/">
+        <IconArrowLeft size={16} /> All records
+      </Link>
+      <h1 className="pagehead__title">Search</h1>
+      <p className="pagehead__sub">Find published records by title, excerpt, or tag.</p>
 
       <form
-        className="flex items-end gap-inline-sm"
+        className="searchbar"
+        role="search"
         onSubmit={(event) => {
           event.preventDefault()
           onSearch(input.trim())
         }}
       >
-        <div className="flex-1">
-          <Input
-            id="public-search-input"
-            label={t('public.search.label')}
-            placeholder={t('public.search.placeholder')}
-            value={input}
-            autoComplete="off"
-            onChange={(event) => {
-              setInput(event.target.value)
-            }}
-          />
-        </div>
-        <Button type="submit">{t('public.search.submit')}</Button>
+        <IconSearch size={20} />
+        <input
+          // eslint-disable-next-line jsx-a11y/no-autofocus
+          autoFocus
+          type="search"
+          value={input}
+          autoComplete="off"
+          placeholder="Search records…"
+          aria-label="Search records"
+          onChange={(event) => {
+            setInput(event.target.value)
+          }}
+        />
       </form>
 
       {!hasQuery ? (
-        <Text muted>{t('public.search.prompt')}</Text>
+        <p className="searchhint">Type a keyword and press Enter to search published records.</p>
       ) : isLoading ? (
-        <LoadingState>{t('public.search.loading')}</LoadingState>
+        <p className="searchhint">Searching…</p>
       ) : isError ? (
-        <ErrorState
-          message={errorTitle ?? t('common.error.unknown')}
-          onRetry={onRetry}
-          retryLabel={t('common.actions.retry')}
-        />
+        <div className="empty" style={{ marginTop: '2rem' }}>
+          <h3 className="empty__title">Could not search</h3>
+          <p className="empty__text">{errorTitle ?? 'Unknown error'}</p>
+          <button type="button" className="btn btn--ghost" onClick={onRetry}>
+            Retry
+          </button>
+        </div>
       ) : total === 0 ? (
-        <EmptyState
-          title={t('public.search.empty.title')}
-          description={t('public.search.empty.description', { query })}
-        />
+        <div className="empty" style={{ marginTop: '2rem' }}>
+          <span className="empty__icon">
+            <IconInbox size={26} />
+          </span>
+          <h3 className="empty__title">No results for “{query}”</h3>
+          <p className="empty__text">
+            No published records match that search. Try another word, or browse by type.
+          </p>
+          <Link className="btn btn--ghost" to="/">
+            Back to latest
+          </Link>
+        </div>
       ) : (
-        <Stack gap="lg">
-          <Text muted variant="caption">
-            {t('public.search.resultCount', { count: String(total) })}
-          </Text>
-          {groups.map((group) => (
-            <PublicEntityResultGroup
-              key={String(group.entityType.id)}
-              entityType={group.entityType}
-              entities={group.entities}
-            />
-          ))}
-        </Stack>
+        <>
+          <p className="searchhint">
+            {total} result{total === 1 ? '' : 's'} for “{query}”
+          </p>
+          <div style={{ marginTop: 'var(--space-lg)' }}>
+            {groups.map((group) => (
+              <PublicEntityResultGroup
+                key={String(group.entityType.id)}
+                entityType={group.entityType}
+                entities={group.entities}
+              />
+            ))}
+          </div>
+        </>
       )}
-    </Stack>
+    </div>
   )
 }

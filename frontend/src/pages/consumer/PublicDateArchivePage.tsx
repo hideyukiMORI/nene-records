@@ -1,7 +1,7 @@
 import { useParams } from 'react-router-dom'
 import { PublicDateArchiveView, usePublicDateArchivePage } from '@/features/public-date-archive'
 import { useTranslation } from '@/shared/i18n'
-import { PublicLayout } from './PublicLayout'
+import { PublicSiteShell } from './PublicSiteShell'
 import { usePublicSite } from './public-site-context'
 
 export function PublicDateArchivePage() {
@@ -29,7 +29,7 @@ export function PublicDateArchivePage() {
     : t('public.dateArchive.monthTitle', { year: String(year), month: String(month) })
 
   return (
-    <PublicLayout variant="standard" site={site}>
+    <PublicSiteShell site={site}>
       <PublicDateArchiveView
         title={title}
         valid={archive.valid}
@@ -42,6 +42,6 @@ export function PublicDateArchivePage() {
           void archive.refetch()
         }}
       />
-    </PublicLayout>
+    </PublicSiteShell>
   )
 }

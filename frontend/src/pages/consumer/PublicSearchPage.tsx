@@ -1,6 +1,6 @@
 import { useSearchParams } from 'react-router-dom'
 import { PublicSearchView, usePublicSearchPage } from '@/features/public-search'
-import { PublicLayout } from './PublicLayout'
+import { PublicSiteShell } from './PublicSiteShell'
 import { usePublicSite } from './public-site-context'
 
 export function PublicSearchPage() {
@@ -12,7 +12,7 @@ export function PublicSearchPage() {
     usePublicSearchPage(q)
 
   return (
-    <PublicLayout variant="standard" site={site}>
+    <PublicSiteShell site={site}>
       <PublicSearchView
         query={query}
         hasQuery={hasQuery}
@@ -28,6 +28,6 @@ export function PublicSearchPage() {
           void refetch()
         }}
       />
-    </PublicLayout>
+    </PublicSiteShell>
   )
 }

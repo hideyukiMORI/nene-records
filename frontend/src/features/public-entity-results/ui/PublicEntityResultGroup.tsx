@@ -4,7 +4,6 @@ import type { EntityType } from '@/entities/entity-type'
 import { defaultTextFieldListParamsForEntityType, useTextFieldList } from '@/entities/text-field'
 import { getRecordDisplayLabel } from '@/shared/lib/get-record-display-label'
 import { resolvePermalink } from '@/shared/lib/resolve-permalink'
-import { Stack, Text } from '@/shared/ui'
 
 export interface PublicEntityResultGroupProps {
   entityType: EntityType
@@ -20,11 +19,9 @@ export function PublicEntityResultGroup({ entityType, entities }: PublicEntityRe
   const textFields = textFieldQuery.data?.items ?? []
 
   return (
-    <Stack gap="sm">
-      <Text as="h2" variant="heading-sm">
-        {entityType.name}
-      </Text>
-      <ul className="flex flex-col gap-stack-xs">
+    <section className="resultgroup">
+      <h2 className="resultgroup__title">{entityType.name}</h2>
+      <div className="rowlist">
         {entities.map((entity) => {
           const id = Number(entity.id)
           const url = resolvePermalink(entityType.permalinkPattern, {
@@ -34,14 +31,23 @@ export function PublicEntityResultGroup({ entityType, entities }: PublicEntityRe
             publishedAt: entity.publishedAt ?? null,
           })
           return (
-            <li key={id}>
-              <Link to={url} className="text-body text-accent underline hover:no-underline">
-                {getRecordDisplayLabel(id, textFields, `Record #${String(id)}`)}
-              </Link>
-            </li>
+            <article key={id} className="row row--compact">
+              <div className="row__body">
+                <div className="row__metarow">
+                  <Link className="tbadge" to={`/${entityType.slug}`}>
+                    {entityType.name.toLowerCase()}
+                  </Link>
+                </div>
+                <h3 className="row__title">
+                  <Link to={url}>
+                    {getRecordDisplayLabel(id, textFields, `Record #${String(id)}`)}
+                  </Link>
+                </h3>
+              </div>
+            </article>
           )
         })}
-      </ul>
-    </Stack>
+      </div>
+    </section>
   )
 }

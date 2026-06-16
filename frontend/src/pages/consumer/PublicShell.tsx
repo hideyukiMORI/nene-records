@@ -48,7 +48,7 @@ export function PublicShell() {
   useSiteDocumentMeta(site.siteName, site.metaDescription)
 
   // PublicShell only resolves site-wide data and the document meta. The visual
-  // scaffold (header / footer / theme) is rendered per page by PublicLayout, so
-  // a record can pick its own layout — including `bare`, which has no chrome.
+  // scaffold (header / footer / drawer / theme) is the magazine PublicSiteShell,
+  // rendered per page so a record can still opt into a chrome-less `bare` layout.
   return <Outlet context={site} />
 }

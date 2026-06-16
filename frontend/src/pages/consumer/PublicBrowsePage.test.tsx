@@ -87,7 +87,7 @@ describe('PublicBrowsePage', () => {
     renderBrowsePage('/missing-type')
 
     expect(await screen.findByText('Entity type not found')).toBeInTheDocument()
-    expect(screen.getByText('No public content for "missing-type".')).toBeInTheDocument()
+    expect(screen.getByText('No public content for “missing-type”.')).toBeInTheDocument()
   })
 
   it('navigates to record detail from the list', async () => {
@@ -116,7 +116,7 @@ describe('PublicBrowsePage', () => {
     await user.click(await screen.findByRole('link', { name: 'Hello world' }))
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: 'Back to Article' })).toBeInTheDocument()
+      expect(screen.getByRole('link', { name: 'Back to Article' })).toBeInTheDocument()
     })
   })
 
@@ -147,7 +147,7 @@ describe('PublicBrowsePage', () => {
     expect(screen.getByRole('link', { name: 'Post 1' })).toBeInTheDocument()
     expect(screen.queryByRole('link', { name: 'Post 21' })).not.toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', { name: 'Next' }))
+    await user.click(screen.getByRole('button', { name: 'Next page' }))
 
     await waitFor(() => {
       expect(screen.getByText('21 records · showing 21–21')).toBeInTheDocument()
