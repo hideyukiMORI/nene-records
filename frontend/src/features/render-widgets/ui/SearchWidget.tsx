@@ -2,13 +2,18 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { Widget } from '@/entities/widget'
 import { useTranslation } from '@/shared/i18n'
-import { Button, Input } from '@/shared/ui'
+import { IconSearch } from '@/shared/ui/icons/Icons'
 
 export interface SearchWidgetProps {
   widget: Widget
 }
 
-/** Search box that navigates to the results page (/search?q=…) on submit. */
+/**
+ * Search box that navigates to the results page (/search?q=…) on submit.
+ * Renders the magazine "pill" form from the public-home handoff: an inline
+ * search icon + borderless input, submitted on Enter (no separate button), so
+ * it fits the narrow sidebar column without overflowing.
+ */
 export function SearchWidget({ widget }: SearchWidgetProps) {
   const { t } = useTranslation()
   const navigate = useNavigate()
@@ -21,7 +26,7 @@ export function SearchWidget({ widget }: SearchWidgetProps) {
 
   return (
     <form
-      className="flex items-end gap-inline-sm"
+      className="search"
       role="search"
       onSubmit={(event) => {
         event.preventDefault()
@@ -31,19 +36,18 @@ export function SearchWidget({ widget }: SearchWidgetProps) {
         }
       }}
     >
-      <div className="flex-1">
-        <Input
-          id={`search-widget-${String(widget.id)}`}
-          label={t('public.search.label')}
-          placeholder={placeholder}
-          value={input}
-          autoComplete="off"
-          onChange={(event) => {
-            setInput(event.target.value)
-          }}
-        />
-      </div>
-      <Button type="submit">{t('public.search.submit')}</Button>
+      <IconSearch size={16} />
+      <input
+        id={`search-widget-${String(widget.id)}`}
+        type="search"
+        aria-label={t('public.search.label')}
+        placeholder={placeholder}
+        value={input}
+        autoComplete="off"
+        onChange={(event) => {
+          setInput(event.target.value)
+        }}
+      />
     </form>
   )
 }

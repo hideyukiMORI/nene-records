@@ -37,6 +37,20 @@ export function PublicRecordFieldList({
           )
         }
 
+        // Markdown content (a `markdown` field, or a legacy text `body`) renders
+        // as the article's prose reading column — no field-key label, so it reads
+        // like a magazine article rather than a labelled definition row.
+        if (
+          row.dataType === 'markdown' ||
+          (row.dataType === 'text' && isMarkdownBodyField(row.fieldKey))
+        ) {
+          return (
+            <div key={row.fieldKey} className="prose">
+              <PublicMarkdownContent markdown={row.displayValue === '—' ? '' : row.displayValue} />
+            </div>
+          )
+        }
+
         return (
           <div key={row.fieldKey} className="flex flex-col gap-stack-xs">
             <Text as="dt" variant="heading-sm">
@@ -49,12 +63,6 @@ export function PublicRecordFieldList({
             ) : row.dataType === 'html' ? (
               <dd>
                 <SanitizedHtml html={row.displayValue === '—' ? '' : row.displayValue} />
-              </dd>
-            ) : isMarkdownBodyField(row.fieldKey) && row.dataType === 'text' ? (
-              <dd>
-                <PublicMarkdownContent
-                  markdown={row.displayValue === '—' ? '' : row.displayValue}
-                />
               </dd>
             ) : (
               <Text as="dd" muted>

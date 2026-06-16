@@ -691,6 +691,64 @@
   flex-direction: column;
   gap: var(--space-xl);
 }
+/* Region widgets (SiteWidgets) render each widget as a <section>; card them so
+   they read as the magazine sidebar instead of raw admin blocks. */
+.nene-public .aside > div {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+.nene-public .aside section {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-raised);
+  padding: var(--space-lg);
+}
+.nene-public .aside section > * {
+  min-width: 0;
+}
+.nene-public .aside section h2 {
+  font-family: var(--font-display);
+  font-weight: var(--weight-semibold);
+  font-size: 1.0625rem;
+  letter-spacing: -0.005em;
+  margin: 0 0 var(--space-md);
+}
+/* Search widget — magazine pill (handoff `.search`): inline icon + borderless
+   input, submitted on Enter. Shrinks within the 320px sidebar column. */
+.nene-public .search {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  min-width: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  padding: 9px 14px;
+}
+.nene-public .search:focus-within {
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow-focus);
+}
+.nene-public .search svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  color: var(--color-text-muted);
+}
+.nene-public .search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: var(--text-body-sm);
+  color: var(--color-text-primary);
+  outline: none;
+}
+.nene-public .search input::placeholder {
+  color: var(--color-text-muted);
+}
 .nene-public .widget {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);

@@ -6,7 +6,6 @@ import { CommentSection, useCommentSection } from '@/features/comment-section'
 import { usePublicBrowseEntityRecordsPage } from '@/features/public-browse-entity-records'
 import {
   PublicRecordDetailView,
-  PublicRecordRegionGrid,
   type PublicFieldRow,
   usePublicViewEntityRecordPage,
 } from '@/features/public-view-entity-record'
@@ -70,7 +69,7 @@ function RecordShellMessage({
   icon?: boolean
 }) {
   return (
-    <PublicSiteShell site={site} activeTypeSlug={entityTypeSlug}>
+    <PublicSiteShell site={site} activeTypeSlug={entityTypeSlug} withSidebar={false}>
       <div className="pagehead">
         <Link className="backlink" to="/">
           <IconArrowLeft size={16} /> Home
@@ -214,8 +213,8 @@ function PublicRecordDetailContent({
         .filter(
           (row) =>
             row.kind === 'scalar' &&
-            row.dataType === 'text' &&
-            isMarkdownBodyField(row.fieldKey) &&
+            (row.dataType === 'markdown' ||
+              (row.dataType === 'text' && isMarkdownBodyField(row.fieldKey))) &&
             row.displayValue !== '—',
         )
         .map((row) => (row.kind === 'scalar' ? row.displayValue : ''))
@@ -273,9 +272,15 @@ function PublicRecordDetailContent({
     )
   }
 
+  // Multi-column layouts surface the global widget sidebar as the second column
+  // of the shell's top-level `.layout` grid — a sibling of the article, not a
+  // region nested inside it. `align-items: start` then aligns the sidebar's top
+  // with the article header (no head-height gap). The body stays a single prose
+  // reading column. The provider wraps the whole shell so sidebar widgets (e.g.
+  // the TOC widget) still read this page's markdown.
   return (
-    <PublicSiteShell site={site} activeTypeSlug={entityTypeSlug}>
-      <PageContentContext.Provider value={pageMarkdown}>
+    <PageContentContext.Provider value={pageMarkdown}>
+      <PublicSiteShell site={site} activeTypeSlug={entityTypeSlug} withSidebar={isMultiColLayout}>
         <article className="article">
           <Link className="backlink" to={`/${entityTypeSlug}`}>
             <IconArrowLeft size={16} /> Back to {entityTypeName}
@@ -297,33 +302,21 @@ function PublicRecordDetailContent({
             ) : null}
           </header>
 
-          {isMultiColLayout && !isLoading && !isError && entity !== null && fieldRows.length > 0 ? (
-            <PublicRecordRegionGrid
-              layout={variant}
-              entity={entity}
-              fieldRows={fieldRows}
-              entityTypeSlugById={entityTypeSlugById}
-              entityTypePatternById={entityTypePatternById}
-            />
-          ) : (
-            <>
-              {isInlineTocLayout && !isLoading && !isError && entity !== null ? (
-                <InlineTableOfContents markdown={pageMarkdown} />
-              ) : null}
-              <PublicRecordDetailView
-                entity={entity}
-                fieldRows={bodyRows}
-                entityTypeSlugById={entityTypeSlugById}
-                entityTypePatternById={entityTypePatternById}
-                isLoading={isLoading}
-                isError={isError}
-                errorTitle={errorTitle}
-                onRetry={() => {
-                  void refetch()
-                }}
-              />
-            </>
-          )}
+          {isInlineTocLayout && !isLoading && !isError && entity !== null ? (
+            <InlineTableOfContents markdown={pageMarkdown} />
+          ) : null}
+          <PublicRecordDetailView
+            entity={entity}
+            fieldRows={bodyRows}
+            entityTypeSlugById={entityTypeSlugById}
+            entityTypePatternById={entityTypePatternById}
+            isLoading={isLoading}
+            isError={isError}
+            errorTitle={errorTitle}
+            onRetry={() => {
+              void refetch()
+            }}
+          />
 
           {entity !== null && !isLoading && !isError ? (
             <>
@@ -338,8 +331,8 @@ function PublicRecordDetailContent({
             </>
           ) : null}
         </article>
-      </PageContentContext.Provider>
-    </PublicSiteShell>
+      </PublicSiteShell>
+    </PageContentContext.Provider>
   )
 }
 

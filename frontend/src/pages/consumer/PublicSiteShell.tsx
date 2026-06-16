@@ -1,6 +1,8 @@
 import { type ReactNode, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useEntityTypeList } from '@/entities/entity-type'
+import { usePublicWidgets } from '@/entities/widget'
+import { SiteWidgets } from '@/features/render-widgets'
 import { NeneMark } from '@/shared/ui'
 import { IconMenu, IconMoon, IconSearch, IconSun, IconX } from '@/shared/ui/icons/Icons'
 import { IconAuto } from '@/shared/ui/icons/magazine-icons'
@@ -16,8 +18,13 @@ export interface PublicSiteShellProps {
   isHome?: boolean
   /** Full-bleed content rendered before the layout wrap (home hero). */
   hero?: ReactNode
-  /** Optional sidebar — when present the layout switches to two columns. */
-  sidebar?: ReactNode
+  /**
+   * Whether the shell renders the `sidebar` region widgets as a second column.
+   * Defaults to true for listing/home pages. Record detail opts in only for
+   * multi-column layouts; single-column records pass false so the article spans
+   * the full reading width.
+   */
+  withSidebar?: boolean
   children: ReactNode
 }
 
@@ -85,11 +92,17 @@ export function PublicSiteShell({
   activeTypeSlug = null,
   isHome = false,
   hero,
-  sidebar,
+  withSidebar = true,
   children,
 }: PublicSiteShellProps) {
   const { mode, resolvedTheme, setMode } = useConsumerTheme()
   const [drawerOpen, setDrawerOpen] = useState(false)
+
+  // Render the `sidebar` region as a second column when widgets are placed there
+  // (and the page opts in). Empty region → stay single-column.
+  const widgetQuery = usePublicWidgets()
+  const hasSidebar =
+    withSidebar && (widgetQuery.data?.items ?? []).some((widget) => widget.region === 'sidebar')
 
   const entityTypeQuery = useEntityTypeList({ limit: 100, offset: 0 })
   const types = useMemo(
@@ -151,9 +164,13 @@ export function PublicSiteShell({
       <main>
         {hero}
         <div className="wrap">
-          <div className={`layout ${sidebar !== undefined ? 'is-2col' : ''}`}>
+          <div className={`layout ${hasSidebar ? 'is-2col' : ''}`}>
             <div className="layout__main">{children}</div>
-            {sidebar !== undefined ? sidebar : null}
+            {hasSidebar ? (
+              <aside className="aside" aria-label="Site widgets">
+                <SiteWidgets region="sidebar" />
+              </aside>
+            ) : null}
           </div>
         </div>
       </main>
