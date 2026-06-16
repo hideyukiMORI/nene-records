@@ -9,6 +9,7 @@ import {
   resolvePublicThemeId,
   storeActiveTheme,
 } from '@/shared/lib/public-themes'
+import { overrideStyleForTheme } from '@/shared/lib/theme-customization'
 import type { PublicSite } from './public-site-context'
 
 function useSiteDocumentMeta(siteName: string, metaDescription: string): void {
@@ -64,6 +65,7 @@ export function PublicShell() {
     footerMarkdown: settings.footer_markdown ?? '',
     navItems,
     activeTheme,
+    themeOverrideStyle: overrideStyleForTheme(settings.theme_overrides, activeTheme),
   }
 
   useSiteDocumentMeta(site.siteName, site.metaDescription)
