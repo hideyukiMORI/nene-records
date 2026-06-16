@@ -1,5 +1,6 @@
 import { useEffect, useMemo } from 'react'
 import './consumer-theme.css'
+import './public-fonts'
 import { Outlet } from 'react-router-dom'
 import { usePublicNavigationItems } from '@/entities/navigation-item'
 import { publicSettingsToMap, usePublicSettings } from '@/entities/setting'
