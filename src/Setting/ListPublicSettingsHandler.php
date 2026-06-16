@@ -12,7 +12,11 @@ use Psr\Http\Message\ServerRequestInterface;
 
 final readonly class ListPublicSettingsHandler
 {
-    private const CACHE_CONTROL = 'public, max-age=300, stale-while-revalidate=3600';
+    // Settings drive the public site's identity and active theme, so an admin
+    // change must reflect promptly. `max-age=0, must-revalidate` keeps the
+    // response cacheable but forces an ETag revalidation on every request — a
+    // cheap 304 when unchanged, immediate pickup when it changes.
+    private const CACHE_CONTROL = 'public, max-age=0, must-revalidate';
 
     public function __construct(
         private ListPublicSettingsUseCaseInterface $useCase,

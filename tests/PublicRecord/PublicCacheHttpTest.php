@@ -183,8 +183,11 @@ final class PublicCacheHttpTest extends TestCase
         );
 
         self::assertSame(200, $response->getStatusCode());
+        // Settings revalidate on every request (ETag/304) so admin changes —
+        // e.g. the active theme — reflect promptly instead of being cached 5 min.
         self::assertStringContainsString('public', $response->getHeaderLine('Cache-Control'));
-        self::assertStringContainsString('max-age=300', $response->getHeaderLine('Cache-Control'));
+        self::assertStringContainsString('max-age=0', $response->getHeaderLine('Cache-Control'));
+        self::assertStringContainsString('must-revalidate', $response->getHeaderLine('Cache-Control'));
         self::assertNotEmpty($response->getHeaderLine('ETag'));
     }
 

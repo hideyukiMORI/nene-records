@@ -57,3 +57,22 @@ export function resolvePublicThemeId(value: string | null | undefined): string {
     ? (value as string)
     : DEFAULT_PUBLIC_THEME_ID
 }
+
+// The last theme the site resolved to, cached so the first paint can apply it
+// synchronously while the public settings request is still in flight — avoids a
+// default→saved theme flash (FOUC) for returning visitors.
+const ACTIVE_THEME_STORAGE_KEY = 'nene_public_active_theme'
+
+export function readStoredActiveTheme(): string {
+  if (typeof window === 'undefined') {
+    return DEFAULT_PUBLIC_THEME_ID
+  }
+  return resolvePublicThemeId(window.localStorage.getItem(ACTIVE_THEME_STORAGE_KEY))
+}
+
+export function storeActiveTheme(themeId: string): void {
+  if (typeof window === 'undefined') {
+    return
+  }
+  window.localStorage.setItem(ACTIVE_THEME_STORAGE_KEY, resolvePublicThemeId(themeId))
+}
