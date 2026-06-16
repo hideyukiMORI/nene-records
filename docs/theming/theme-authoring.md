@@ -72,10 +72,20 @@ authoring.md ──(ClaudeDesign / 作者)──▶ theme bundle ──(validate
 <theme-id>/
 ├─ manifest.json     # public-theme.schema.json 準拠（id/name/supportsModes/fonts/tokens/assets…）
 ├─ tokens.css        # [data-theme='<id>'] と [data-theme='<id>-dark'] の 2 ブロック
-├─ components.css    # 任意・既存クラスへの上乗せのみ（新規 DOM 構造なし）
+├─ components.css    # ★印象を作り込む主役（既存クラスへの上乗せのみ・新規 DOM なし）
 ├─ assets/           # hero / logo / decoration …（外部 url 不可・同梱 or data URI）
 └─ screenshots/      # preview（light/dark/mobile）
 ```
+
+### ★ components.css で「印象をガラッと変える」（重要）
+
+トークンだけでは**再配色**にしかならない。WordPress テーマのように**印象を一変**させるには、`components.css` で既存クラスを**大胆に**作り込むこと（DOM は変えない）。
+
+- 狙えるクラスの全カタログ: [`class-hooks.md`](./class-hooks.md)。
+- 効くポイント: 角/罫線/影（`--radius-*` 上書き）、`.card` `.featured` `.hero` の意匠、`.card__media` 等の枠・`filter`（duotone/グレースケール）、見出しの `text-transform`/`letter-spacing`、`.eyebrow` `.meta` のフォント、`.cardgrid`/`.types` の `grid-template-columns`（列数・密度）、`.section__head` の罫線、`.prose` の本文体裁。
+- セレクタは必ず `.nene-public[data-theme='<id>'|'<id>-dark']`（または `.nene-public[data-theme^='<id>']` で light/dark 一括）でスコープ。
+- 禁止: 外部 `url()` / `@import` / 任意 JS / 新規 DOM 前提のスタイル。
+- 目安: tokens.css は配色・トークン、**components.css は版面の個性**（カード/ヒーロー/セクション/タイポの作り込み）。「色が違うだけ」で終わらせない。
 
 ## 4. 変換規則（MD → トークン）
 
