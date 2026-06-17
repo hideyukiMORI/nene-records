@@ -1,0 +1,217 @@
+/* ============================================================================
+   NeNe Records — Coastal theme — component overlay (L2) ★STAR
+   System: "Mediterranean / coastal / airy humanist"
+   Azure + sand + white, breezy whitespace, soft rounded shadowed cards.
+   FONT OVERRIDE: --font-display -> Nunito. Scoped [data-theme^='coastal'].
+   ========================================================================== */
+.nene-public[data-theme^='coastal'] {
+  --font-display: 'Nunito', system-ui, sans-serif;
+  --font-chrome: 'Nunito', system-ui, sans-serif;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --content-w: 1300px;
+  --measure: 70ch;
+  --space-xl: 2.75rem;
+  --space-2xl: 4.5rem;
+  --space-section: clamp(4rem, 2.5rem + 6vw, 7.5rem);
+  --gutter: clamp(1.5rem, 0.75rem + 3.5vw, 3rem);
+  --tracking-display: -0.01em;
+}
+.nene-public[data-theme^='coastal'] .hero__title,
+.nene-public[data-theme^='coastal'] .section__title,
+.nene-public[data-theme^='coastal'] .featured__title,
+.nene-public[data-theme^='coastal'] .card__title,
+.nene-public[data-theme^='coastal'] .pagehead__title,
+.nene-public[data-theme^='coastal'] .typecard__name,
+.nene-public[data-theme^='coastal'] .row__title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.nene-public[data-theme^='coastal'] .hd {
+  border-bottom: 1px solid var(--color-border);
+  background: color-mix(in oklch, var(--color-surface) 80%, transparent);
+}
+.nene-public[data-theme^='coastal'] .brand__mark {
+  border-radius: 12px;
+  background: var(--color-accent-weak);
+}
+.nene-public[data-theme^='coastal'] .brand__name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  white-space: nowrap;
+}
+.nene-public[data-theme^='coastal'] .navlink {
+  font-weight: 600;
+}
+.nene-public[data-theme^='coastal'] .navlink[aria-current='page']::after {
+  height: 3px;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+}
+.nene-public[data-theme^='coastal'] .btn {
+  border-radius: var(--radius-full);
+  font-weight: 700;
+}
+.nene-public[data-theme^='coastal'] .btn--primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+.nene-public[data-theme^='coastal'] .eyebrow {
+  text-transform: none;
+  font-family: var(--font-chrome);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  font-size: var(--text-body-sm);
+  color: var(--color-accent);
+}
+.nene-public[data-theme^='coastal'] .eyebrow::before {
+  width: 12px;
+  height: 12px;
+  border-radius: var(--radius-full);
+  background: var(--color-brand-violet);
+}
+.nene-public[data-theme^='coastal'] .tbadge {
+  border-radius: var(--radius-full);
+  background: var(--color-accent-weak);
+  color: var(--color-accent);
+  border-color: transparent;
+  text-transform: none;
+}
+.nene-public[data-theme^='coastal'] .hero__title {
+  font-size: clamp(2.6rem, 1.7rem + 4vw, 4.6rem);
+}
+.nene-public[data-theme^='coastal'] .hero__title em {
+  color: var(--color-accent);
+  font-style: normal;
+}
+.nene-public[data-theme^='coastal'] .hero__art-frame {
+  border-radius: var(--radius-lg);
+  border: 0;
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in oklch, var(--color-accent) 26%, var(--color-surface-raised)),
+      var(--color-surface-raised) 70%
+    ),
+    radial-gradient(
+      70% 60% at 80% 90%,
+      color-mix(in oklch, var(--color-brand-violet) 28%, transparent),
+      transparent 60%
+    );
+  box-shadow: var(--shadow-lg);
+}
+.nene-public[data-theme^='coastal'] .hero__art-tag {
+  border-radius: var(--radius-full);
+}
+.nene-public[data-theme^='coastal'] .hero__art-tag b {
+  color: var(--color-accent);
+}
+.nene-public[data-theme^='coastal'] .hero__stat b {
+  font-family: var(--font-display);
+  font-weight: 700;
+}
+.nene-public[data-theme^='coastal'] .section__head {
+  border-bottom: 1px solid var(--color-border);
+}
+.nene-public[data-theme^='coastal'] .section__title {
+  font-size: clamp(1.7rem, 1.2rem + 1.8vw, 2.5rem);
+}
+.nene-public[data-theme^='coastal'] .section__link {
+  border-radius: var(--radius-full);
+  background: var(--color-accent-weak);
+  color: var(--color-accent);
+  padding: 7px 15px;
+}
+.nene-public[data-theme^='coastal'] .card {
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-raised);
+  padding: var(--space-sm) var(--space-sm) var(--space-md);
+  box-shadow: var(--shadow-sm);
+  transition:
+    transform var(--dur-normal) var(--ease),
+    box-shadow var(--dur-normal) var(--ease);
+}
+.nene-public[data-theme^='coastal'] .card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-md);
+}
+.nene-public[data-theme^='coastal'] .card__media,
+.nene-public[data-theme^='coastal'] .featured__media,
+.nene-public[data-theme^='coastal'] .row__media {
+  border-radius: var(--radius-md);
+  border: 0;
+}
+.nene-public[data-theme^='coastal'] .card:hover .card__title {
+  color: var(--color-accent);
+}
+.nene-public[data-theme^='coastal'] .featured {
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: radial-gradient(
+    120% 140% at 100% 0%,
+    color-mix(in oklch, var(--color-accent) 12%, var(--color-surface-raised)),
+    var(--color-surface-raised)
+  );
+  box-shadow: var(--shadow-md);
+}
+.nene-public[data-theme^='coastal'] .typecard {
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-raised);
+  box-shadow: var(--shadow-sm);
+}
+.nene-public[data-theme^='coastal'] .typecard:hover {
+  transform: translateY(-4px);
+  background: var(--color-accent-weak);
+  box-shadow: var(--shadow-md);
+}
+.nene-public[data-theme^='coastal'] .widget,
+.nene-public[data-theme^='coastal'] .aside section {
+  border: 0;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+.nene-public[data-theme^='coastal'] .search,
+.nene-public[data-theme^='coastal'] .searchbar,
+.nene-public[data-theme^='coastal'] .input {
+  border-radius: var(--radius-full);
+}
+.nene-public[data-theme^='coastal'] .textarea {
+  border-radius: var(--radius-lg);
+}
+.nene-public[data-theme^='coastal'] .poplist__rank {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--color-accent);
+}
+.nene-public[data-theme^='coastal'] .tag {
+  border-radius: var(--radius-full);
+}
+.nene-public[data-theme^='coastal'] .tag:hover {
+  background: var(--color-accent-weak);
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+.nene-public[data-theme^='coastal'] .chip,
+.nene-public[data-theme^='coastal'] .viewtoggle,
+.nene-public[data-theme^='coastal'] .pager button,
+.nene-public[data-theme^='coastal'] .pager span {
+  border-radius: var(--radius-full);
+}
+.nene-public[data-theme^='coastal'] .ft {
+  border-top: 1px solid var(--color-border);
+}
+.nene-public[data-theme^='coastal'] .eyecatch {
+  border-radius: var(--radius-md);
+  border-color: var(--color-border);
+  background: repeating-linear-gradient(
+    125deg,
+    color-mix(in oklch, var(--color-accent) 16%, var(--color-surface-overlay)) 0 16px,
+    color-mix(in oklch, var(--color-brand-violet) 12%, var(--color-surface-overlay)) 16px 32px
+  );
+}
+.nene-public[data-theme^='coastal'] .eyecatch::after {
+  border-radius: var(--radius-full);
+}

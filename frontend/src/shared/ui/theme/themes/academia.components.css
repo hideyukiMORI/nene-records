@@ -1,0 +1,251 @@
+/* ============================================================================
+   NeNe Records — Dark Academia theme — component overlay (L2) ★STAR
+   System: "scholarly / classical serif"
+   Burgundy + forest on parchment/ink, Source Serif, ornamental double rules.
+   FONT OVERRIDE: --font-display & --font-sans -> Source Serif 4.
+   Scoped .nene-public[data-theme^='academia'].
+   ========================================================================== */
+.nene-public[data-theme^='academia'] {
+  --font-display: 'Source Serif 4', Georgia, serif;
+  --font-sans: 'Source Serif 4', Georgia, serif;
+  --font-chrome: 'Source Serif 4', Georgia, serif;
+  --radius-sm: 3px;
+  --radius-md: 4px;
+  --radius-lg: 5px;
+  --content-w: 1180px;
+  --measure: 68ch;
+  --leading-body: 1.7;
+  --tracking-display: 0em;
+}
+.nene-public[data-theme^='academia'] .hero__title,
+.nene-public[data-theme^='academia'] .section__title,
+.nene-public[data-theme^='academia'] .featured__title,
+.nene-public[data-theme^='academia'] .card__title,
+.nene-public[data-theme^='academia'] .pagehead__title,
+.nene-public[data-theme^='academia'] .typecard__name,
+.nene-public[data-theme^='academia'] .row__title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.005em;
+}
+.nene-public[data-theme^='academia'] .hd {
+  border-bottom: 3px double var(--color-accent);
+}
+.nene-public[data-theme^='academia'] .brand__mark {
+  border-radius: 3px;
+  border: 1px solid var(--color-accent);
+  background: var(--color-accent-weak);
+  color: var(--color-accent);
+}
+.nene-public[data-theme^='academia'] .brand__mark svg {
+  color: var(--color-accent);
+}
+.nene-public[data-theme^='academia'] .brand__name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  white-space: nowrap;
+}
+.nene-public[data-theme^='academia'] .navlink {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.7rem;
+  font-family: var(--font-chrome);
+}
+.nene-public[data-theme^='academia'] .navlink[aria-current='page']::after {
+  height: 2px;
+  background: var(--color-accent);
+}
+.nene-public[data-theme^='academia'] .btn {
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.76rem;
+  font-family: var(--font-chrome);
+}
+.nene-public[data-theme^='academia'] .eyebrow {
+  font-family: var(--font-chrome);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.68rem;
+  color: var(--color-accent);
+}
+.nene-public[data-theme^='academia'] .eyebrow::before {
+  width: 16px;
+  height: 2px;
+  background: var(--color-accent);
+}
+.nene-public[data-theme^='academia'] .tbadge {
+  border-radius: var(--radius-sm);
+  font-family: var(--font-chrome);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: transparent;
+  border: 1px solid var(--color-accent);
+  color: var(--color-accent);
+}
+.nene-public[data-theme^='academia'] .tbadge::before {
+  background: var(--color-brand-violet);
+}
+.nene-public[data-theme^='academia'] .hero__title {
+  font-size: clamp(2.5rem, 1.7rem + 3.6vw, 4.4rem);
+  line-height: 1.08;
+}
+.nene-public[data-theme^='academia'] .hero__title em {
+  font-style: italic;
+  color: var(--color-accent);
+}
+.nene-public[data-theme^='academia'] .hero__lead {
+  font-style: italic;
+  max-width: 54ch;
+}
+.nene-public[data-theme^='academia'] .hero__meta {
+  border-top: 3px double var(--color-accent);
+}
+.nene-public[data-theme^='academia'] .hero__stat b {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--color-accent);
+}
+.nene-public[data-theme^='academia'] .section__head {
+  border-bottom: 3px double var(--color-accent);
+}
+.nene-public[data-theme^='academia'] .section__title {
+  font-size: clamp(1.7rem, 1.2rem + 1.8vw, 2.6rem);
+}
+.nene-public[data-theme^='academia'] .section__link {
+  color: var(--color-accent);
+  font-family: var(--font-chrome);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.72rem;
+}
+.nene-public[data-theme^='academia'] .card {
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-raised);
+  padding: var(--space-md);
+}
+.nene-public[data-theme^='academia'] .card:hover {
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow-sm);
+}
+.nene-public[data-theme^='academia'] .card__media,
+.nene-public[data-theme^='academia'] .featured__media,
+.nene-public[data-theme^='academia'] .article__hero,
+.nene-public[data-theme^='academia'] .row__media {
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-accent-weak);
+  filter: grayscale(0.85) sepia(0.2) contrast(1.05);
+  isolation: isolate;
+  transition: filter var(--dur-normal) var(--ease);
+}
+.nene-public[data-theme^='academia'] .card__media::before,
+.nene-public[data-theme^='academia'] .featured__media::before,
+.nene-public[data-theme^='academia'] .article__hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    140deg,
+    color-mix(in oklch, var(--color-accent) 40%, transparent),
+    color-mix(in oklch, var(--color-brand-violet) 26%, transparent)
+  );
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+.nene-public[data-theme^='academia'] .eyecatch::after {
+  position: relative;
+  z-index: 2;
+}
+.nene-public[data-theme^='academia'] .card:hover .card__media {
+  filter: grayscale(0.3) sepia(0.05);
+}
+.nene-public[data-theme^='academia'] .card:hover .card__title {
+  color: var(--color-accent);
+}
+.nene-public[data-theme^='academia'] .featured {
+  border: 1px solid var(--color-accent);
+  border-top: 4px double var(--color-accent);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-raised);
+  box-shadow: none;
+}
+.nene-public[data-theme^='academia'] .featured__excerpt {
+  font-style: italic;
+}
+.nene-public[data-theme^='academia'] .typecard {
+  border: 1px solid var(--color-border-strong);
+  border-left: 3px solid var(--color-accent);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-raised);
+}
+.nene-public[data-theme^='academia'] .typecard:hover {
+  border-left-color: var(--color-brand-violet);
+  background: var(--color-accent-weak);
+  transform: none;
+  box-shadow: var(--shadow-sm);
+}
+.nene-public[data-theme^='academia'] .widget,
+.nene-public[data-theme^='academia'] .aside section {
+  border: 1px solid var(--color-border-strong);
+  border-top: 3px double var(--color-accent);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-raised);
+}
+.nene-public[data-theme^='academia'] .widget__title,
+.nene-public[data-theme^='academia'] .aside section h2 {
+  font-family: var(--font-display);
+}
+.nene-public[data-theme^='academia'] .search,
+.nene-public[data-theme^='academia'] .searchbar,
+.nene-public[data-theme^='academia'] .input,
+.nene-public[data-theme^='academia'] .textarea {
+  border-radius: var(--radius-sm);
+  border-color: var(--color-border-strong);
+}
+.nene-public[data-theme^='academia'] .poplist__rank {
+  font-family: var(--font-display);
+  font-style: italic;
+  color: var(--color-accent);
+}
+.nene-public[data-theme^='academia'] .tag {
+  border-radius: var(--radius-sm);
+  font-family: var(--font-chrome);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.72rem;
+}
+.nene-public[data-theme^='academia'] .chip,
+.nene-public[data-theme^='academia'] .viewtoggle,
+.nene-public[data-theme^='academia'] .pager button,
+.nene-public[data-theme^='academia'] .pager span {
+  border-radius: var(--radius-sm);
+}
+.nene-public[data-theme^='academia'] .prose > p:first-of-type::first-letter,
+.nene-public[data-theme^='academia'] .markdown-body > p:first-of-type::first-letter {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 3.2em;
+  line-height: 0.82;
+  float: left;
+  margin: 0.06em 0.1em 0 0;
+  color: var(--color-accent);
+}
+.nene-public[data-theme^='academia'] .ft {
+  border-top: 3px double var(--color-accent);
+}
+.nene-public[data-theme^='academia'] .eyecatch {
+  border-radius: var(--radius-sm);
+  border-color: var(--color-accent-weak);
+  background: repeating-linear-gradient(
+    135deg,
+    color-mix(in oklch, var(--color-accent) 12%, var(--color-surface-overlay)) 0 13px,
+    var(--color-surface-overlay) 13px 26px
+  );
+}
+.nene-public[data-theme^='academia'] .eyecatch::after {
+  font-family: var(--font-chrome);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
