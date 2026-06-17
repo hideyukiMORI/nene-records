@@ -12,7 +12,10 @@ use Psr\Http\Message\ServerRequestInterface;
 
 final readonly class ListPublicMenusHandler
 {
-    private const CACHE_CONTROL = 'public, max-age=300, stale-while-revalidate=3600';
+    // Admin menu edits must reflect promptly on the public site, so revalidate
+    // every request (cheap 304 via ETag when unchanged) instead of serving a
+    // stale 5-minute cache. Mirrors ListPublicSettingsHandler.
+    private const CACHE_CONTROL = 'public, max-age=0, must-revalidate';
 
     public function __construct(
         private ListMenusUseCaseInterface $useCase,
