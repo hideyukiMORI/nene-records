@@ -92,7 +92,7 @@ export function usePublicHomePage(): PublicHomeViewModel {
       return {
         id,
         title,
-        excerpt: entity.metaDescription?.trim() ?? '',
+        excerpt: entity.excerpt?.trim() ?? '',
         publishedLabel: formatPublishedDate(entity.publishedAt),
         typeSlug,
         typeName: type?.name ?? typeSlug,

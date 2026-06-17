@@ -1,7 +1,7 @@
 /**
- * Shared helpers for the post-list widgets (recent / popular) optional
- * date + excerpt lines. Kept tiny and locale-aware so both widgets render
- * the same way.
+ * Shared helper for the post-list widgets (recent / popular): a locale-aware
+ * published-date line. The excerpt itself is computed server-side now
+ * (`?include=excerpt`), so widgets only format the date here.
  */
 
 /** Format an ISO timestamp for the locale; '' when missing / unparseable. */
@@ -14,13 +14,4 @@ export function formatPostDate(iso: string | null, locale: string): string {
     return ''
   }
   return date.toLocaleDateString(locale, { year: 'numeric', month: 'short', day: 'numeric' })
-}
-
-/** Trim an excerpt to at most `length` chars, adding an ellipsis when cut. */
-export function truncateExcerpt(text: string, length: number): string {
-  const trimmed = text.trim()
-  if (length <= 0 || trimmed.length <= length) {
-    return trimmed
-  }
-  return `${trimmed.slice(0, length).trimEnd()}…`
 }

@@ -16,6 +16,8 @@ export interface EntityListParams {
   q?: string
   sortKey?: EntitySortKey
   sortOrder?: EntitySortOrder
+  /** `'excerpt'` to request the server-computed teaser on each item. */
+  include?: string
 }
 
 export const entityKeys = {

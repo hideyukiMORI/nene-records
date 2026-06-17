@@ -170,7 +170,6 @@ export const ja: Partial<MessageCatalog> = {
   'admin.widgets.limitLabel': '表示件数',
   'admin.widgets.showDateLabel': '投稿日を表示',
   'admin.widgets.showExcerptLabel': '抜粋を表示',
-  'admin.widgets.excerptLengthLabel': '抜粋の文字数',
   'admin.widgets.add': '追加',
   'admin.widgets.typeLabel': 'ウィジェットタイプ',
   'admin.widgets.type.recent-posts': '最近の投稿',
@@ -577,6 +576,8 @@ export const ja: Partial<MessageCatalog> = {
   'admin.entitySeo.metaTitle.placeholder': '検索エンジン向けのページタイトルを上書き…',
   'admin.entitySeo.metaDescription': 'メタディスクリプション',
   'admin.entitySeo.metaDescription.placeholder': '検索エンジン向けのメタ説明を上書き…',
+  'admin.entitySeo.metaDescription.help':
+    '検索結果に出る短い説明です。フィードや投稿一覧ウィジェットの抜粋にも使われます（空欄なら本文の先頭が代わりに使われます）。',
   'admin.entitySeo.save': 'SEO を保存',
   'admin.entitySeo.saving': '保存中…',
   'admin.entitySeo.saveSuccess': 'SEO 設定を保存しました。',

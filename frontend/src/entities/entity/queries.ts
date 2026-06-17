@@ -45,6 +45,9 @@ export function useEntityList(
           search.set(`relation.${fieldKey}`, String(targetEntityId))
         }
       }
+      if (params.include !== undefined && params.include !== '') {
+        search.set('include', params.include)
+      }
       const dto = await apiClient.get<EntityListDto>(
         `/api/v1/entities?${search.toString()}`,
         signal,
@@ -74,6 +77,7 @@ export function usePublicLatestEntities(options?: {
         status: 'published',
         sort: 'published_at',
         order: 'desc',
+        include: 'excerpt',
       })
       const dto = await apiClient.get<EntityListDto>(
         `/api/v1/entities?${search.toString()}`,

@@ -13,6 +13,7 @@ use NeNeRecords\Entity\DeleteEntityHandler;
 use NeNeRecords\Entity\DeleteEntityUseCase;
 use NeNeRecords\Entity\EntityNotFoundExceptionHandler;
 use NeNeRecords\Entity\EntityRouteRegistrar;
+use NeNeRecords\Entity\ExcerptResolver;
 use NeNeRecords\Entity\ExportEntitiesHandler;
 use NeNeRecords\Entity\GetEntityByIdHandler;
 use NeNeRecords\Entity\GetEntityByIdUseCase;
@@ -36,6 +37,7 @@ use NeNeRecords\FieldDef\FieldTypeMismatchExceptionHandler;
 use NeNeRecords\Tests\Entity\InMemoryEntityRepository;
 use NeNeRecords\Tests\EntityType\InMemoryEntityTypeRepository;
 use NeNeRecords\Tests\FieldDef\InMemoryFieldDefRepository;
+use NeNeRecords\Tests\Setting\InMemorySettingRepository;
 use NeNeRecords\TextField\CreateTextFieldHandler;
 use NeNeRecords\TextField\CreateTextFieldUseCase;
 use NeNeRecords\TextField\DeleteTextFieldHandler;
@@ -80,7 +82,7 @@ final class TextFieldHttpTest extends TestCase
             new CreateEntityHandler(new CreateEntityUseCase($this->entities, $this->entityTypes), $jsonResponse),
             new UpdateEntityHandler(new UpdateEntityUseCase($this->entities, $this->entityTypes), $jsonResponse),
             new DeleteEntityHandler(new DeleteEntityUseCase($this->entities), $this->factory),
-            new ListEntitiesHandler(new ListEntitiesUseCase($this->entities), $jsonResponse),
+            new ListEntitiesHandler(new ListEntitiesUseCase($this->entities), $jsonResponse, new ExcerptResolver(new InMemoryTextFieldRepository(), new InMemorySettingRepository())),
             new ListEntityRevisionsHandler(new ListEntityRevisionsUseCase($this->entities), $jsonResponse),
             new ExportEntitiesHandler($this->entities, $this->textFields, $this->factory),
             new ScheduleEntityHandler(new ScheduleEntityUseCase($this->entities), $jsonResponse),

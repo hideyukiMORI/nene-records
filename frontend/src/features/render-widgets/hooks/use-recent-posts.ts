@@ -26,8 +26,8 @@ export function useRecentPosts(entityTypeSlug: string, limit: number) {
   const entityTypeId = entityType !== undefined ? Number(entityType.id) : 0
 
   const listParams = useMemo(
-    () =>
-      defaultEntityListParams(
+    () => ({
+      ...defaultEntityListParams(
         entityTypeId,
         [],
         {},
@@ -37,6 +37,8 @@ export function useRecentPosts(entityTypeSlug: string, limit: number) {
         'published_at',
         'desc',
       ),
+      include: 'excerpt',
+    }),
     [entityTypeId],
   )
   const entityListQuery = useEntityList(listParams, { enabled: entityTypeId > 0 })
@@ -61,7 +63,7 @@ export function useRecentPosts(entityTypeSlug: string, limit: number) {
           publishedAt: entity.publishedAt ?? null,
         }),
         publishedAt: entity.publishedAt ?? null,
-        excerpt: entity.metaDescription?.trim() ?? '',
+        excerpt: entity.excerpt ?? '',
       }
     })
   }, [

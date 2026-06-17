@@ -4377,6 +4377,12 @@ components:
           type:
             - string
             - 'null'
+        excerpt:
+          type: string
+          description: >-
+            Server-computed plain-text teaser. Present only when the list is
+            requested with `?include=excerpt` (used by the public feed and
+            post-list widgets). Source/length follow the excerpt_* settings.
         created_at:
           type:
             - string
