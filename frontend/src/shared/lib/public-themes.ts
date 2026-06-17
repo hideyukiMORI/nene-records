@@ -78,6 +78,21 @@ export const PUBLIC_THEMES: readonly PublicThemeMeta[] = [
       accent: 'oklch(46% 0.07 58)',
     },
   },
+  {
+    id: 'noir',
+    name: 'Noir',
+    description:
+      'Dark-first, high-contrast editorial — inky near-black paper, an electric acid-lime accent and oversized display type. The bold counterpoint to the lighter three.',
+    author: 'NeNe Records',
+    version: '1.0.0',
+    createdAt: '2026-06-17',
+    thumbnail: '/theme-thumbnails/noir.webp',
+    preview: {
+      surface: 'oklch(15% 0.012 280)',
+      raised: 'oklch(19% 0.014 280)',
+      accent: 'oklch(86% 0.21 128)',
+    },
+  },
 ]
 
 export const DEFAULT_PUBLIC_THEME_ID = 'consumer'
