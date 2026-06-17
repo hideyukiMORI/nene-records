@@ -1,30 +1,16 @@
 {
-  "$schema": "../../public-theme.schema.json",
+  "$schema": "../public-theme.schema.json",
   "id": "aurora",
   "name": "Aurora",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "author": "NeNe Records",
-  "description": "Cool, structural tech theme — teal/cyan accent on cool paper. Redesign of Aurora 1.x: same hue family, but components.css turns the soft magazine into a ruled, indexed, blueprint-tech layout — hard hairlines, framed/duotone media, squared chrome, mono technical register. The deliberate counterpoint to consumer (warm soft) and reading (serif).",
+  "description": "Cool structural tech — teal/cyan on cool paper. Redesign v3 pushes the differentiation: a wider ~1320px canvas, denser indexed grids, harder hairlines and an all-mono technical register. components.css is the star — ruled mastheads, leading-zero section & card indices, a blueprint hero frame, teal-duotone framed media that snaps to colour on hover, and squared mono chrome. The deliberate counterpoint to Terracotta (warm photo) and Reading (serif). Light + dark, both AA.",
   "supportsModes": ["light", "dark"],
   "fonts": [
-    {
-      "family": "Saira Semi Condensed",
-      "role": "display",
-      "source": "fontsource",
-      "weights": [400, 500, 600]
-    },
-    {
-      "family": "Inter",
-      "role": "body",
-      "source": "fontsource",
-      "weights": [400, 500, 600]
-    },
-    {
-      "family": "JetBrains Mono",
-      "role": "mono",
-      "source": "fontsource",
-      "weights": [400, 500]
-    }
+    { "family": "Saira Semi Condensed", "role": "display", "source": "fontsource", "weights": [400, 500, 600] },
+    { "family": "JetBrains Mono", "role": "chrome", "source": "fontsource", "weights": [400, 500] },
+    { "family": "Inter", "role": "body", "source": "fontsource", "weights": [400, 500, 600] },
+    { "family": "JetBrains Mono", "role": "mono", "source": "fontsource", "weights": [400, 500] }
   ],
   "tokens": {
     "light": {
@@ -36,7 +22,7 @@
       "color-text-muted": "oklch(48% 0.03 245)",
       "color-text-inverse": "oklch(99% 0.004 230)",
       "color-border": "oklch(85% 0.014 232)",
-      "color-border-strong": "oklch(74% 0.022 238)",
+      "color-border-strong": "oklch(72% 0.024 238)",
       "color-focus-ring": "oklch(68% 0.13 215)",
       "color-accent": "oklch(62% 0.13 200)",
       "color-accent-hover": "oklch(56% 0.13 200)",
@@ -63,7 +49,7 @@
       "color-text-muted": "oklch(68% 0.02 235)",
       "color-text-inverse": "oklch(20% 0.02 250)",
       "color-border": "oklch(35% 0.024 250)",
-      "color-border-strong": "oklch(48% 0.028 250)",
+      "color-border-strong": "oklch(50% 0.03 250)",
       "color-focus-ring": "oklch(74% 0.13 210)",
       "color-accent": "oklch(72% 0.13 200)",
       "color-accent-hover": "oklch(79% 0.13 200)",
@@ -82,12 +68,18 @@
       "color-scheme": "dark"
     }
   },
+  "flags": {
+    "feedLayout": "magazine",
+    "cardStyle": "framed",
+    "media": "duotone",
+    "hero": "standard",
+    "sectionRule": "heavy",
+    "eyebrow": "caps"
+  },
   "knobs": {
     "accent": { "light": "oklch(62% 0.13 200)", "dark": "oklch(72% 0.13 200)" },
-    "surface": {
-      "light": "oklch(98% 0.006 230)",
-      "dark": "oklch(17% 0.02 250)"
-    },
+    "surface": { "light": "oklch(98% 0.006 230)", "dark": "oklch(17% 0.02 250)" },
+    "textPrimary": { "light": "oklch(24% 0.03 250)", "dark": "oklch(94% 0.012 230)" },
     "fontDisplay": "Saira Semi Condensed",
     "fontBody": "Inter",
     "fontMono": "JetBrains Mono",

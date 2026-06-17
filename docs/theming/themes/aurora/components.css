@@ -1,111 +1,124 @@
 /* ============================================================================
-   NeNe Records — Aurora theme — component overlay (L2)  ·  REDESIGN
+   NeNe Records — Aurora theme — component overlay (L2) · REDESIGN v3 ★STAR
    ----------------------------------------------------------------------------
-   The star of the redesign. Aurora's tokens stay cool/teal; everything that
-   makes it read as a DIFFERENT theme lives here — no DOM/markup changes, only
-   restyling existing public-site.css classes (validator-safe).
+   Builds on the v2 "blueprint tech" and pushes the differentiation hard: a
+   WIDER canvas, DENSER indexed grids, HARDER rules and an all-mono technical
+   register. No DOM/markup changes — only restyling existing classes.
 
-   System: "structural / blueprint tech".
+   System: "engineering blueprint / dense index"
+     · WIDE    — ~1320px canvas; the page reads as a broad technical sheet.
      · SHAPE   — everything squared off (radius 0, incl. pills). Hard hairlines.
-     · RULE     — strong top rules close sections; the page reads as a ruled grid.
-     · INDEX    — sections & feed cards carry mono leading-zero indices (counters,
-                  existing DOM only) for an engineered, catalogued feel.
-     · MEDIA    — framed + de-saturated (duotone-ish) by default; snaps to full
-                  colour on hover. A blueprint grid fills the hero art frame.
-     · REGISTER — eyebrows / meta / slugs / stats / footer set in tracked mono.
-     · CHROME   — squared nav/buttons/toggles; uppercase tracked labels.
+     · RULE     — heavy top rules close sections; the page is a ruled grid.
+     · INDEX    — sections & feed cards carry mono leading-zero indices.
+     · DENSE    — tighter cardgrid / types columns; a packed catalogue.
+     · MEDIA    — framed + teal duotone by default; snaps to colour on hover.
+     · REGISTER — chrome/labels/meta all set in tracked mono (font override).
 
-   Scoped via `.nene-public[data-theme^='aurora']` so it covers both
-   `aurora` (light) and `aurora-dark` and never leaks to other themes.
+   FONT OVERRIDE (authoring §4): display stays Saira (base default); --font-chrome
+   is overridden from Space Grotesk to JetBrains Mono for the technical register.
+   Scoped via `.nene-public[data-theme^='aurora']` (light + dark).
    ========================================================================== */
 
-/* ── 1 · SHAPE — square everything; the single biggest "different theme" tell. */
-.nene-public[data-theme^="aurora"] {
+/* ── 1 · FOUNDATIONS — wide, square, mono chrome ──────────────────────────── */
+.nene-public[data-theme^='aurora'] {
+  --font-display: 'Saira Semi Condensed', system-ui, sans-serif;
+  --font-chrome: 'JetBrains Mono', ui-monospace, monospace; /* OVERRIDE: tech register */
+
   --radius-sm: 0px;
   --radius-md: 0px;
   --radius-lg: 0px;
-  --radius-full: 0px; /* squares the pills too: toggle, chips, tags, pager, search */
-  --leading-body: 1.62;
+  --radius-full: 0px;
+
+  --leading-body: 1.6;
   --tracking-display: -0.02em;
-  counter-reset: nene-sec; /* section index, consumed in §6 */
+
+  /* WIDE technical sheet (Terracotta std 1180, Reading narrow 1008) */
+  --content-w: 1320px;
+  --measure: 76ch;
+
+  counter-reset: nene-sec;
+}
+.nene-public[data-theme^='aurora'] .layout.is-2col {
+  grid-template-columns: minmax(0, 1fr) 300px;
 }
 
-/* ── 2 · CHROME — header reads as a ruled instrument panel. */
-.nene-public[data-theme^="aurora"] .hd {
+/* ── 2 · CHROME — header as a ruled instrument panel ──────────────────────── */
+.nene-public[data-theme^='aurora'] .hd {
   border-bottom: 2px solid var(--color-text-primary);
   backdrop-filter: saturate(1.2) blur(10px);
 }
-.nene-public[data-theme^="aurora"] .brand__mark {
+.nene-public[data-theme^='aurora'] .brand__mark {
   border: 1px solid var(--color-border-strong);
   background: var(--color-surface-raised);
 }
-.nene-public[data-theme^="aurora"] .brand__name {
+.nene-public[data-theme^='aurora'] .brand__name {
   letter-spacing: -0.01em;
+  white-space: nowrap;
 }
-.nene-public[data-theme^="aurora"] .brand__tag {
+.nene-public[data-theme^='aurora'] .brand__tag {
   font-family: var(--font-mono);
   text-transform: uppercase;
   letter-spacing: 0.16em;
-  font-size: 0.66rem;
+  font-size: 0.64rem;
 }
-.nene-public[data-theme^="aurora"] .navlink {
+.nene-public[data-theme^='aurora'] .navlink {
+  font-family: var(--font-mono);
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   font-weight: var(--weight-semibold);
 }
-/* current-page marker → a hard full-width underline rule, not a tab pip. */
-.nene-public[data-theme^="aurora"] .navlink[aria-current="page"]::after {
+.nene-public[data-theme^='aurora'] .navlink[aria-current='page']::after {
   height: 2px;
   bottom: -4px;
   background: var(--color-text-primary);
 }
-.nene-public[data-theme^="aurora"] .themesw,
-.nene-public[data-theme^="aurora"] .iconbtn {
+.nene-public[data-theme^='aurora'] .themesw,
+.nene-public[data-theme^='aurora'] .iconbtn {
   border-color: var(--color-border-strong);
 }
 
-/* ── 3 · BUTTONS — squared, tracked, instrument-label uppercase. */
-.nene-public[data-theme^="aurora"] .btn {
+/* ── 3 · BUTTONS — squared, tracked mono, hard offset shadow ──────────────── */
+.nene-public[data-theme^='aurora'] .btn {
   font-family: var(--font-chrome);
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   padding: 13px 24px;
   border-radius: 0;
 }
-.nene-public[data-theme^="aurora"] .btn--primary {
+.nene-public[data-theme^='aurora'] .btn--primary {
   box-shadow: 4px 4px 0 var(--color-accent-weak);
 }
-.nene-public[data-theme^="aurora"] .btn--primary:hover {
+.nene-public[data-theme^='aurora'] .btn--primary:hover {
   transform: translate(-1px, -1px);
   box-shadow: 6px 6px 0 var(--color-accent-weak);
 }
-.nene-public[data-theme^="aurora"] .btn--ghost {
+.nene-public[data-theme^='aurora'] .btn--ghost {
   border-color: var(--color-text-primary);
 }
 
-/* ── 4 · REGISTER — eyebrows / kickers / meta set in tracked mono. */
-.nene-public[data-theme^="aurora"] .eyebrow,
-.nene-public[data-theme^="aurora"] .hero__kicker {
+/* ── 4 · REGISTER — eyebrows / kickers / meta in tracked mono ─────────────── */
+.nene-public[data-theme^='aurora'] .eyebrow,
+.nene-public[data-theme^='aurora'] .hero__kicker {
   font-family: var(--font-mono);
   text-transform: uppercase;
   letter-spacing: 0.2em;
   font-size: 0.68rem;
   gap: 10px;
+  color: var(--color-accent);
 }
-/* eyebrow tick → a hard square notch instead of a soft 2px bar. */
-.nene-public[data-theme^="aurora"] .eyebrow::before {
+.nene-public[data-theme^='aurora'] .eyebrow::before {
   width: 7px;
   height: 7px;
   background: var(--color-accent);
 }
-.nene-public[data-theme^="aurora"] .meta {
+.nene-public[data-theme^='aurora'] .meta {
   font-family: var(--font-mono);
-  font-size: 0.76rem;
+  font-size: 0.74rem;
   letter-spacing: 0.01em;
 }
-.nene-public[data-theme^="aurora"] .tbadge {
+.nene-public[data-theme^='aurora'] .tbadge {
   font-family: var(--font-mono);
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -114,98 +127,95 @@
   background: transparent;
   padding: 3px 9px;
 }
-.nene-public[data-theme^="aurora"] .tbadge::before {
-  border-radius: 0; /* square the status dot */
+.nene-public[data-theme^='aurora'] .tbadge::before {
+  border-radius: 0;
   width: 5px;
   height: 5px;
 }
 
-/* ── 5 · HERO — blueprint art frame, heavy baseline rule, mono stats. */
-.nene-public[data-theme^="aurora"] .hero {
+/* ── 5 · HERO — blueprint art frame, heavy baseline rule, mono stats ──────── */
+.nene-public[data-theme^='aurora'] .hero {
   border-bottom: 2px solid var(--color-text-primary);
   padding-bottom: var(--space-xl);
 }
-.nene-public[data-theme^="aurora"] .hero__title {
+.nene-public[data-theme^='aurora'] .hero__title {
   letter-spacing: -0.025em;
 }
-.nene-public[data-theme^="aurora"] .hero__art-frame {
+.nene-public[data-theme^='aurora'] .hero__art-frame {
   border: 1px solid var(--color-border-strong);
   border-radius: 0;
   box-shadow: 14px 14px 0 var(--color-accent-weak);
-  /* blueprint measuring grid (no url(); pure gradients) */
   background:
-    repeating-linear-gradient(
-      to right,
-      transparent 0 23px,
-      color-mix(in oklch, var(--color-accent) 14%, transparent) 23px 24px
-    ),
-    repeating-linear-gradient(
-      to bottom,
-      transparent 0 23px,
-      color-mix(in oklch, var(--color-accent) 14%, transparent) 23px 24px
-    ),
+    repeating-linear-gradient(to right, transparent 0 23px,
+      color-mix(in oklch, var(--color-accent) 14%, transparent) 23px 24px),
+    repeating-linear-gradient(to bottom, transparent 0 23px,
+      color-mix(in oklch, var(--color-accent) 14%, transparent) 23px 24px),
     var(--color-surface-raised);
 }
-.nene-public[data-theme^="aurora"] .hero__art-tag {
+.nene-public[data-theme^='aurora'] .hero__art-tag {
   font-family: var(--font-mono);
   border: 1px solid var(--color-border-strong);
   border-radius: 0;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  font-size: 0.68rem;
+  font-size: 0.66rem;
 }
-.nene-public[data-theme^="aurora"] .hero__meta {
+.nene-public[data-theme^='aurora'] .hero__meta {
   border-top: 2px solid var(--color-text-primary);
 }
-.nene-public[data-theme^="aurora"] .hero__stat b {
+.nene-public[data-theme^='aurora'] .hero__stat b {
   font-family: var(--font-mono);
   font-weight: 500;
   letter-spacing: -0.02em;
 }
-.nene-public[data-theme^="aurora"] .hero__stat span {
+.nene-public[data-theme^='aurora'] .hero__stat span {
   font-family: var(--font-mono);
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  font-size: 0.66rem;
+  font-size: 0.64rem;
 }
 
-/* ── 6 · SECTIONS — strong top rule + tracked uppercase title + mono index. */
-.nene-public[data-theme^="aurora"] .section {
+/* ── 6 · SECTIONS — heavy top rule + tracked title + mono index ───────────── */
+.nene-public[data-theme^='aurora'] .section {
   counter-increment: nene-sec;
 }
-.nene-public[data-theme^="aurora"] .section__head {
-  border-top: 3px solid var(--color-text-primary);
+.nene-public[data-theme^='aurora'] .section__head {
+  border-top: 4px solid var(--color-text-primary);
   border-bottom: 0;
   padding-top: var(--space-md);
   align-items: flex-start;
 }
-.nene-public[data-theme^="aurora"] .section__title {
+.nene-public[data-theme^='aurora'] .section__title {
   text-transform: uppercase;
   letter-spacing: 0.01em;
 }
-/* leading-zero section index, set in accent mono before the title. */
-.nene-public[data-theme^="aurora"] .section__title::before {
+.nene-public[data-theme^='aurora'] .section__title::before {
   content: counter(nene-sec, decimal-leading-zero);
   font-family: var(--font-mono);
   font-weight: 500;
-  font-size: 0.62em;
+  font-size: 0.6em;
   letter-spacing: 0.04em;
   color: var(--color-accent);
   vertical-align: 0.42em;
   margin-right: 0.7em;
 }
-.nene-public[data-theme^="aurora"] .section__link {
+.nene-public[data-theme^='aurora'] .section__link {
   font-family: var(--font-mono);
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  font-size: 0.72rem;
+  font-size: 0.7rem;
 }
 
-/* ── 7 · FEED CARDS — flat → hard-bordered, indexed tiles; duotone media. */
-.nene-public[data-theme^="aurora"] .cardgrid {
+/* ── 7 · FEED — DENSE indexed tiles; teal duotone media ───────────────────── */
+.nene-public[data-theme^='aurora'] .cardgrid {
   counter-reset: nene-card;
+  grid-template-columns: repeat(auto-fill, minmax(214px, 1fr));
+  gap: clamp(1rem, 1.6vw, 1.5rem);
 }
-.nene-public[data-theme^="aurora"] .card {
+.nene-public[data-theme^='aurora'] .layout.is-2col .cardgrid {
+  grid-template-columns: repeat(auto-fill, minmax(196px, 1fr));
+}
+.nene-public[data-theme^='aurora'] .card {
   position: relative;
   counter-increment: nene-card;
   border: 1px solid var(--color-border-strong);
@@ -217,20 +227,19 @@
     transform var(--dur-fast) var(--ease),
     box-shadow var(--dur-fast) var(--ease);
 }
-.nene-public[data-theme^="aurora"] .card:hover {
+.nene-public[data-theme^='aurora'] .card:hover {
   border-color: var(--color-accent);
   transform: translateY(-3px);
   box-shadow: 6px 6px 0 var(--color-accent-weak);
 }
-/* leading-zero catalogue index, top-right corner. */
-.nene-public[data-theme^="aurora"] .card::after {
+.nene-public[data-theme^='aurora'] .card::after {
   content: counter(nene-card, decimal-leading-zero);
   position: absolute;
   top: calc(var(--space-md) + 7px);
   right: calc(var(--space-md) + 7px);
   z-index: 1;
   font-family: var(--font-mono);
-  font-size: 0.68rem;
+  font-size: 0.66rem;
   letter-spacing: 0.06em;
   color: var(--color-text-primary);
   background: color-mix(in oklch, var(--color-surface-raised) 88%, transparent);
@@ -238,38 +247,56 @@
   padding: 1px 6px;
   pointer-events: none;
 }
-.nene-public[data-theme^="aurora"] .card__media,
-.nene-public[data-theme^="aurora"] .featured__media,
-.nene-public[data-theme^="aurora"] .article__hero,
-.nene-public[data-theme^="aurora"] .row__media {
+.nene-public[data-theme^='aurora'] .card__media,
+.nene-public[data-theme^='aurora'] .featured__media,
+.nene-public[data-theme^='aurora'] .article__hero,
+.nene-public[data-theme^='aurora'] .row__media {
   border: 1px solid var(--color-border-strong);
   border-radius: 0;
-  filter: grayscale(0.9) contrast(1.04);
-  transition:
-    filter var(--dur-normal) var(--ease),
-    transform var(--dur-normal) var(--ease);
+  filter: grayscale(0.92) contrast(1.05);
+  isolation: isolate;
+  transition: filter var(--dur-normal) var(--ease);
 }
-.nene-public[data-theme^="aurora"] .card:hover .card__media,
-.nene-public[data-theme^="aurora"] .featured:hover .featured__media,
-.nene-public[data-theme^="aurora"] .row:hover .row__media {
+/* teal duotone tint over the desaturated media */
+.nene-public[data-theme^='aurora'] .card__media::before,
+.nene-public[data-theme^='aurora'] .featured__media::before,
+.nene-public[data-theme^='aurora'] .article__hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(140deg,
+    color-mix(in oklch, var(--color-accent) 52%, transparent),
+    color-mix(in oklch, var(--color-accent) 20%, transparent));
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+.nene-public[data-theme^='aurora'] .eyecatch::after { position: relative; z-index: 2; }
+.nene-public[data-theme^='aurora'] .card:hover .card__media,
+.nene-public[data-theme^='aurora'] .featured:hover .featured__media,
+.nene-public[data-theme^='aurora'] .row:hover .row__media {
   filter: grayscale(0) contrast(1);
 }
-.nene-public[data-theme^="aurora"] .card__title,
-.nene-public[data-theme^="aurora"] .featured__title,
-.nene-public[data-theme^="aurora"] .row__title {
+.nene-public[data-theme^='aurora'] .card__title,
+.nene-public[data-theme^='aurora'] .featured__title,
+.nene-public[data-theme^='aurora'] .row__title {
   letter-spacing: -0.015em;
 }
 
-/* ── 8 · FEATURED — bracket the lead slot with rules + an accent top edge. */
-.nene-public[data-theme^="aurora"] .featured {
+/* ── 8 · FEATURED — bracketed lead with an accent top edge ────────────────── */
+.nene-public[data-theme^='aurora'] .featured {
   border: 1px solid var(--color-border-strong);
   border-top: 3px solid var(--color-accent);
   border-radius: 0;
   box-shadow: none;
 }
 
-/* ── 9 · TYPE NAV — square tiles, left accent rule that fills + slides on hover. */
-.nene-public[data-theme^="aurora"] .typecard {
+/* ── 9 · TYPE NAV — DENSE square tiles, left accent rule slides on hover ──── */
+.nene-public[data-theme^='aurora'] .types {
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: clamp(0.75rem, 1.4vw, 1.25rem);
+}
+.nene-public[data-theme^='aurora'] .typecard {
   border: 1px solid var(--color-border-strong);
   border-left: 3px solid var(--color-border-strong);
   border-radius: 0;
@@ -278,45 +305,44 @@
     background var(--dur-fast) var(--ease),
     transform var(--dur-fast) var(--ease);
 }
-.nene-public[data-theme^="aurora"] .typecard:hover {
-  border-color: var(--color-border-strong);
+.nene-public[data-theme^='aurora'] .typecard:hover {
   border-left-color: var(--color-accent);
   background: var(--color-accent-weak);
   transform: translateX(4px);
   box-shadow: none;
 }
-.nene-public[data-theme^="aurora"] .typecard__name {
+.nene-public[data-theme^='aurora'] .typecard__name {
   letter-spacing: -0.015em;
 }
-.nene-public[data-theme^="aurora"] .typecard__slug,
-.nene-public[data-theme^="aurora"] .typecard__count {
+.nene-public[data-theme^='aurora'] .typecard__slug,
+.nene-public[data-theme^='aurora'] .typecard__count {
   font-family: var(--font-mono);
   font-size: 0.74rem;
 }
 
-/* ── 10 · SIDEBAR / WIDGETS — ruled, squared, disciplined headings. */
-.nene-public[data-theme^="aurora"] .widget,
-.nene-public[data-theme^="aurora"] .aside section,
-.nene-public[data-theme^="aurora"] .search,
-.nene-public[data-theme^="aurora"] .searchbar,
-.nene-public[data-theme^="aurora"] .input,
-.nene-public[data-theme^="aurora"] .textarea {
+/* ── 10 · SIDEBAR / WIDGETS — ruled, squared, disciplined ─────────────────── */
+.nene-public[data-theme^='aurora'] .widget,
+.nene-public[data-theme^='aurora'] .aside section,
+.nene-public[data-theme^='aurora'] .search,
+.nene-public[data-theme^='aurora'] .searchbar,
+.nene-public[data-theme^='aurora'] .input,
+.nene-public[data-theme^='aurora'] .textarea {
   border-color: var(--color-border-strong);
   border-radius: 0;
 }
-.nene-public[data-theme^="aurora"] .widget__title,
-.nene-public[data-theme^="aurora"] .aside section h2 {
+.nene-public[data-theme^='aurora'] .widget__title,
+.nene-public[data-theme^='aurora'] .aside section h2 {
   text-transform: uppercase;
   letter-spacing: 0.06em;
   font-size: 0.92rem;
   padding-bottom: var(--space-sm);
   border-bottom: 1px solid var(--color-border-strong);
 }
-.nene-public[data-theme^="aurora"] .poplist__rank {
+.nene-public[data-theme^='aurora'] .poplist__rank {
   font-family: var(--font-mono);
   font-weight: 500;
 }
-.nene-public[data-theme^="aurora"] .tag {
+.nene-public[data-theme^='aurora'] .tag {
   font-family: var(--font-mono);
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -325,92 +351,80 @@
   border-radius: 0;
 }
 
-/* ── 11 · LIST / ARCHIVE / FILTER chrome — square + mono numerals. */
-.nene-public[data-theme^="aurora"] .pagehead__row {
+/* ── 11 · LIST / ARCHIVE / FILTER — square + mono numerals ────────────────── */
+.nene-public[data-theme^='aurora'] .pagehead__row {
   border-bottom: 0;
-  border-top: 3px solid var(--color-text-primary);
+  border-top: 4px solid var(--color-text-primary);
   padding-top: var(--space-md);
 }
-.nene-public[data-theme^="aurora"] .pagehead__title {
+.nene-public[data-theme^='aurora'] .pagehead__title {
   text-transform: uppercase;
   letter-spacing: 0.005em;
 }
-.nene-public[data-theme^="aurora"] .chip,
-.nene-public[data-theme^="aurora"] .viewtoggle,
-.nene-public[data-theme^="aurora"] .pager button,
-.nene-public[data-theme^="aurora"] .pager span {
+.nene-public[data-theme^='aurora'] .chip,
+.nene-public[data-theme^='aurora'] .viewtoggle,
+.nene-public[data-theme^='aurora'] .pager button,
+.nene-public[data-theme^='aurora'] .pager span {
   border-radius: 0;
   border-color: var(--color-border-strong);
-}
-.nene-public[data-theme^="aurora"] .chip,
-.nene-public[data-theme^="aurora"] .pager button,
-.nene-public[data-theme^="aurora"] .pager span {
   font-family: var(--font-mono);
 }
-.nene-public[data-theme^="aurora"] .resultgroup__title {
+.nene-public[data-theme^='aurora'] .resultgroup__title {
   text-transform: uppercase;
   letter-spacing: 0.02em;
   border-bottom-color: var(--color-border-strong);
 }
 
-/* ── 12 · PROSE — technical body: ruled subheads, framed code. */
-.nene-public[data-theme^="aurora"] .prose h2,
-.nene-public[data-theme^="aurora"] .markdown-body h2 {
+/* ── 12 · PROSE — technical body: ruled subheads, framed code ─────────────── */
+.nene-public[data-theme^='aurora'] .prose h2,
+.nene-public[data-theme^='aurora'] .markdown-body h2 {
   padding-top: var(--space-md);
   border-top: 1px solid var(--color-border-strong);
 }
-.nene-public[data-theme^="aurora"] .prose blockquote,
-.nene-public[data-theme^="aurora"] .markdown-body blockquote {
+.nene-public[data-theme^='aurora'] .prose blockquote,
+.nene-public[data-theme^='aurora'] .markdown-body blockquote {
   border-left-width: 3px;
   background: var(--color-accent-weak);
   padding: var(--space-md) var(--space-lg);
 }
-.nene-public[data-theme^="aurora"] .prose code,
-.nene-public[data-theme^="aurora"] .markdown-body code {
+.nene-public[data-theme^='aurora'] .prose code,
+.nene-public[data-theme^='aurora'] .markdown-body code {
   border: 1px solid var(--color-border-strong);
   border-radius: 0;
   background: var(--color-surface-overlay);
 }
-.nene-public[data-theme^="aurora"] .article__tags {
-  border-top-color: var(--color-border-strong);
-}
+.nene-public[data-theme^='aurora'] .article__tags { border-top-color: var(--color-border-strong); }
 
-/* ── 13 · EMPTY STATE — hard dashed frame, squared icon chip. */
-.nene-public[data-theme^="aurora"] .empty {
+/* ── 13 · EMPTY STATE — hard dashed frame, squared icon chip ──────────────── */
+.nene-public[data-theme^='aurora'] .empty {
   border-style: dashed;
   border-width: 2px;
   border-radius: 0;
 }
-.nene-public[data-theme^="aurora"] .empty__icon {
-  border-radius: 0;
-}
+.nene-public[data-theme^='aurora'] .empty__icon { border-radius: 0; }
 
-/* ── 14 · FOOTER — closed with a heavy rule; technical column heads. */
-.nene-public[data-theme^="aurora"] .ft {
+/* ── 14 · FOOTER — closed with a heavy rule; technical column heads ───────── */
+.nene-public[data-theme^='aurora'] .ft {
   border-top: 2px solid var(--color-text-primary);
 }
-.nene-public[data-theme^="aurora"] .ft__col h4 {
-  letter-spacing: 0.16em;
-}
-.nene-public[data-theme^="aurora"] .ft__bar small,
-.nene-public[data-theme^="aurora"] .ft__bar .mono {
+.nene-public[data-theme^='aurora'] .ft__col h4 { letter-spacing: 0.16em; }
+.nene-public[data-theme^='aurora'] .ft__bar small,
+.nene-public[data-theme^='aurora'] .ft__bar .mono {
   font-family: var(--font-mono);
   font-size: 0.74rem;
 }
 
-/* ── 15 · EYECATCH placeholder — tighter technical hatch + hard frame. */
-.nene-public[data-theme^="aurora"] .eyecatch {
+/* ── 15 · EYECATCH placeholder — tighter technical hatch + hard frame ─────── */
+.nene-public[data-theme^='aurora'] .eyecatch {
   border-color: var(--color-border-strong);
   border-radius: 0;
   background: repeating-linear-gradient(
     90deg,
-    color-mix(in oklch, var(--color-accent) 13%, var(--color-surface-overlay)) 0
-      9px,
-    color-mix(in oklch, var(--color-accent) 4%, var(--color-surface-overlay))
-      9px 18px
+    color-mix(in oklch, var(--color-accent) 13%, var(--color-surface-overlay)) 0 9px,
+    color-mix(in oklch, var(--color-accent) 4%, var(--color-surface-overlay)) 9px 18px
   );
 }
-.nene-public[data-theme^="aurora"] .eyecatch::after {
+.nene-public[data-theme^='aurora'] .eyecatch::after {
   border-radius: 0;
   text-transform: uppercase;
   letter-spacing: 0.08em;

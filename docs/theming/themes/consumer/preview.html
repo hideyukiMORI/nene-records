@@ -3,17 +3,17 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>NeNe Records — Aurora theme preview</title>
+<title>NeNe Records — Terracotta (consumer) theme preview</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Saira+Semi+Condensed:wght@400;500;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 
 <!-- 1) base/engine (unmodified) -->
 <link rel="stylesheet" href="../uploads/nene-theme-handoff/reference/public-site-2211f73b.css" />
-<!-- 2) Aurora tokens (light + dark) -->
+<!-- 2) Terracotta tokens (light + dark) -->
 <link rel="stylesheet" href="./tokens.css" />
-<!-- 3) Aurora components.css (the star) -->
+<!-- 3) Terracotta components.css (the star) -->
 <link rel="stylesheet" href="./components.css" />
 
 <style>
@@ -21,8 +21,8 @@
   html, body { margin: 0; background: var(--color-surface); }
   .nene-public {
     --font-sans: 'Inter', 'Noto Sans JP', system-ui, sans-serif;
-    --font-display: 'Saira Semi Condensed', system-ui, sans-serif;
-    --font-chrome: 'JetBrains Mono', ui-monospace, monospace;
+    --font-display: 'Bricolage Grotesque', system-ui, sans-serif;
+    --font-chrome: 'Bricolage Grotesque', system-ui, sans-serif;
     --font-mono: 'JetBrains Mono', ui-monospace, monospace;
   }
 </style>
@@ -30,9 +30,9 @@
 <body>
 <!-- Noir is dark-first → preview opens in dark. Flags (#390) applied as data-*. -->
 <div class="nene-public" id="site"
-     data-theme="aurora" data-theme-mode="light"
-     data-feed="magazine" data-cards="framed" data-media="duotone"
-     data-hero="standard" data-rule="heavy" data-eyebrow="caps">
+     data-theme="consumer" data-theme-mode="light"
+     data-feed="magazine" data-cards="shadowed" data-media="plain"
+     data-hero="standard" data-rule="hairline" data-eyebrow="plain">
 
   <!-- ── Header ─────────────────────────────────────────────────────────── -->
   <header class="hd">
@@ -72,9 +72,9 @@
     <section class="hero">
       <div class="hero__grid">
         <div>
-          <p class="eyebrow hero__kicker">Ref · Aurora</p>
-          <h1 class="hero__title">設計図のような版面を、<em>CSS だけ</em>で。</h1>
-          <p class="hero__lead">寒色の構造テック。ティール/シアンの差し色、ハードなヘアライン、採番された密グリッド、mono の技術的レジスター。幅広で情報密度の高い索引的版面。base の public-site.css に tokens.css と components.css を当てた結果です。DOM は変えません。</p>
+          <p class="eyebrow hero__kicker">Issue · Terracotta</p>
+          <h1 class="hero__title">写真が主役の、<em>暖かい</em>マガジン。</h1>
+          <p class="hero__lead">テラコッタ/クレイの暖色、写真を大きく豊かに、柔らかい角と親しみのある編集レイアウト。base の public-site.css に tokens.css と components.css を当てた結果です。DOM は変えません。</p>
           <div class="hero__cta">
             <a class="btn btn--primary" href="#">最新リリース</a>
             <a class="btn btn--ghost" href="#">テーマについて</a>
@@ -118,8 +118,8 @@
                 <span class="dot"></span>
                 <span class="meta">12 tracks</span>
               </div>
-              <h3 class="featured__title"><a href="#">リファレンス：今季リリースの索引</a></h3>
-              <p class="featured__excerpt">フィーチャーは索引のリード。media=duotone はこの .featured__media にティール着色で効きます。</p>
+              <h3 class="featured__title"><a href="#">今月の表紙：陽だまりのセッション</a></h3>
+              <p class="featured__excerpt">フィーチャーは表紙写真のリードに。media=plain で写真は鮮やかなまま主役。</p>
               <div class="featured__foot">
                 <span class="meta">REF&nbsp;/&nbsp;0042</span>
               </div>
@@ -130,25 +130,25 @@
             <a class="card" href="#">
               <div class="card__media eyecatch" data-label="cover"></div>
               <div class="card__metarow"><span class="tbadge">single</span><span class="meta">4:21</span></div>
-              <h3 class="card__title">Index 01</h3>
-              <p class="card__excerpt">cardStyle=framed＋密グリッド。カード右上は mono のリーディングゼロ採番（counter）。</p>
+              <h3 class="card__title">Sunset Drive</h3>
+              <p class="card__excerpt">cardStyle=shadowed の柔らかい影と大きめ写真。Bricolage の親しみある見出し。</p>
             </a>
             <a class="card" href="#">
               <div class="card__media eyecatch" data-label="cover"></div>
               <div class="card__metarow"><span class="tbadge">ep</span><span class="meta">5 tracks</span></div>
-              <h3 class="card__title">Index 02</h3>
-              <p class="card__excerpt">幅広 ~1320px・ハード罫・mono レジスターで索引的に。</p>
+              <h3 class="card__title">Golden Hour</h3>
+              <p class="card__excerpt">写真主役・暖色クレイ・柔らかい角のマガジン版面。</p>
             </a>
             <a class="card" href="#">
               <div class="card__media eyecatch" data-label="cover"></div>
               <div class="card__metarow"><span class="tbadge">album</span><span class="meta">9 tracks</span></div>
-              <h3 class="card__title">Index 03</h3>
-              <p class="card__excerpt">ホバーでフルカラーへスナップ。</p>
+              <h3 class="card__title">Warm Static</h3>
+              <p class="card__excerpt">ホバーでふわっと浮きます。</p>
             </a>
             <a class="card" href="#">
               <div class="card__media eyecatch" data-label="cover"></div>
               <div class="card__metarow"><span class="tbadge">single</span><span class="meta">3:08</span></div>
-              <h3 class="card__title">Index 04</h3>
+              <h3 class="card__title">Clay Sessions</h3>
               <p class="card__excerpt">サンプル抜粋テキスト。</p>
             </a>
           </div>
@@ -167,9 +167,9 @@
             Most played
           </h3>
           <ul class="poplist">
-            <li><span class="poplist__rank">1</span><div><a class="poplist__t" href="#">Index 01</a><div class="poplist__m">single · 4:21</div></div></li>
-            <li><span class="poplist__rank">2</span><div><a class="poplist__t" href="#">Index 02</a><div class="poplist__m">ep · 5 tracks</div></div></li>
-            <li><span class="poplist__rank">3</span><div><a class="poplist__t" href="#">Index 04</a><div class="poplist__m">single · 3:08</div></div></li>
+            <li><span class="poplist__rank">1</span><div><a class="poplist__t" href="#">Sunset Drive</a><div class="poplist__m">single · 4:21</div></div></li>
+            <li><span class="poplist__rank">2</span><div><a class="poplist__t" href="#">Golden Hour</a><div class="poplist__m">ep · 5 tracks</div></div></li>
+            <li><span class="poplist__rank">3</span><div><a class="poplist__t" href="#">Clay Sessions</a><div class="poplist__m">single · 3:08</div></div></li>
           </ul>
         </div>
         <div class="widget">
@@ -232,7 +232,7 @@
   <footer class="ft">
     <div class="wrap">
       <div class="ft__bar">
-        <small>© 2026 NeNe Records — <span class="mono">theme: aurora</span></small>
+        <small>© 2026 NeNe Records — <span class="mono">theme: consumer (Terracotta)</span></small>
         <small class="mono">light / dark · AA · no JS</small>
       </div>
     </div>
@@ -240,8 +240,8 @@
 </div>
 
 <script>
-  // Preview-only toggle (light is the default for Aurora).
-  const THEME_ID = 'aurora';
+  // Preview-only toggle (light is the default for Terracotta).
+  const THEME_ID = 'consumer';
   const site = document.getElementById('site');
   document.querySelectorAll('.themesw__btn').forEach((b) => {
     b.addEventListener('click', () => {

@@ -40,10 +40,11 @@ export const PUBLIC_THEMES: readonly PublicThemeMeta[] = [
     id: 'consumer',
     name: 'Terracotta',
     description:
-      'Warm, soft editorial magazine — terracotta accent on warm paper. The standard baseline: rounded chrome and gentle shadows.',
+      'Warm photo-magazine — terracotta/clay warmth on warm paper, photo-forward media, soft round corners and a friendly editorial voice.',
     author: 'NeNe Records',
-    version: '1.0.0',
+    version: '2.0.0',
     createdAt: '2026-05-24',
+    thumbnail: '/theme-thumbnails/consumer.webp',
     preview: {
       surface: 'oklch(97.5% 0.012 75)',
       raised: 'oklch(99.5% 0.008 75)',
@@ -54,10 +55,11 @@ export const PUBLIC_THEMES: readonly PublicThemeMeta[] = [
     id: 'aurora',
     name: 'Aurora',
     description:
-      'Cool, structural tech — teal on cool paper. A ruled, indexed blueprint layout with hard hairlines and a mono register.',
+      'Cool, structural tech — teal on cool paper. A wide, ruled, indexed blueprint layout with hard hairlines and a mono register.',
     author: 'NeNe Records',
-    version: '2.0.0',
+    version: '3.0.0',
     createdAt: '2026-06-16',
+    thumbnail: '/theme-thumbnails/aurora.webp',
     preview: {
       surface: 'oklch(98% 0.006 230)',
       raised: 'oklch(99.5% 0.004 230)',
@@ -68,10 +70,11 @@ export const PUBLIC_THEMES: readonly PublicThemeMeta[] = [
     id: 'reading',
     name: 'Reading',
     description:
-      'Intimate single-book reading — serif headings, a narrow measure with wide margins, hairline rules and a literary drop cap.',
+      'An intimate single book — warm cream paper, quiet brown ink, a narrow serif-led measure with wide margins and hairline rules.',
     author: 'NeNe Records',
-    version: '2.0.0',
+    version: '3.0.0',
     createdAt: '2026-06-16',
+    thumbnail: '/theme-thumbnails/reading.webp',
     preview: {
       surface: 'oklch(97% 0.02 85)',
       raised: 'oklch(99% 0.014 85)',

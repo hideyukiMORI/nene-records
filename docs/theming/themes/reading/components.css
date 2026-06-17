@@ -1,454 +1,390 @@
 /* ============================================================================
-   NeNe Records — Reading theme — component overlay (L2)  ·  REDESIGN
+   NeNe Records — Reading theme — component overlay (L2) · REDESIGN v3 ★STAR
    ----------------------------------------------------------------------------
-   The star of the redesign, and the deliberate OPPOSITE of Aurora. Where Aurora
-   is wide / structural / ruled / mono, Reading is NARROW / intimate / paper —
-   "a single book, read quietly". No DOM changes; only restyling existing
-   public-site.css classes (validator-safe).
+   The intimate single book. Builds on the v2 reading overlay and pushes the
+   differentiation: a deliberately NARROW canvas & measure, a serif body, a
+   literary drop cap, hairline rules and small-caps labels. No DOM/markup
+   changes — only restyling existing classes.
 
-   System: "the printed page".
-     · WIDTH    — a narrow content column + wide margins is the headline move:
-                  --content-w 1180 → 1008, wider --gutter, --measure 66ch,
-                  a slimmer sidebar. Air, not density, carries the design.
-     · SERIF    — headings re-set in the body serif (Source Serif 4); the page
-                  reads as one typographic voice instead of sans heads + serif body.
-     · DROP CAP — the article opens with a literary raised/dropped initial.
-     · HAIRLINE — every divider is the faintest single rule; nothing is boxed.
-     · LABELS   — eyebrows / meta / section links set in small tracked CAPS
-                  (Saira), never mono — the quiet counter to Aurora's mono.
+   System: "single book / quiet serif"
+     · NARROW  — ~1008px canvas, narrow measure, wide gutters: an intimate page.
+     · SERIF    — Source Serif 4 for BOTH body and headings; a literary voice.
+     · DROP CAP — prose opens on a large serif drop cap.
+     · HAIRLINE — the faintest rules; structure is whitespace, not borders.
+     · SMALL CAPS — Saira small-caps labels for eyebrows / kickers.
+     · QUIET     — flat cards, minimal hairline media, generous breathing.
 
-   Scoped via `.nene-public[data-theme^='reading']` so it covers both
-   `reading` (light) and `reading-dark` and never leaks to other themes.
+   FONT OVERRIDE (authoring §4): base defaults are display=Saira / body=Inter.
+   Reading overrides --font-display AND --font-sans to Source Serif 4, and keeps
+   Saira on --font-chrome for the small-caps labels.
+   Scoped via `.nene-public[data-theme^='reading']` (light + dark).
    ========================================================================== */
 
-/* ── 1 · THE PAGE — narrow column, wide margins, serif voice, soft paper. */
-.nene-public[data-theme^="reading"] {
-  /* fonts — serif body AND serif heads; Saira reserved for small caps labels */
-  --font-sans:
-    "Source Serif 4", "Noto Serif JP", Georgia, "Times New Roman", serif;
-  --font-display:
-    "Source Serif 4", "Noto Serif JP", Georgia, "Times New Roman", serif;
-  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
-  --font-label: "Saira Semi Condensed", system-ui, -apple-system, sans-serif;
+/* ── 1 · FOUNDATIONS — narrow, serif, generous reading rhythm ─────────────── */
+.nene-public[data-theme^='reading'] {
+  /* FONT OVERRIDE — serif body + headings; Saira kept for small-caps labels */
+  --font-display: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --font-sans: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --font-chrome: 'Saira Semi Condensed', system-ui, sans-serif;
 
-  /* type scale — baseFontSize 1.125rem × typeScale 1.2, display lifted for serif heads */
-  --text-overline: 0.78rem;
-  --text-meta: 0.84rem;
-  --text-body-sm: 0.98rem;
+  /* reading-sized body (baseFontSize 1.125) */
   --text-body: 1.125rem;
-  --text-h3: 1.4rem;
-  --text-h2: clamp(1.6rem, 1.15rem + 1.7vw, 2.4rem);
-  --text-h1: clamp(1.85rem, 1.3rem + 2vw, 2.85rem);
-  --text-display: clamp(2.9rem, 1.7rem + 5vw, 5.6rem);
+  --text-body-sm: 1rem;
+  --leading-body: 1.78;
+  --leading-heading: 1.18;
+  --tracking-display: 0em;
 
-  /* reading rhythm — loose body leading */
-  --leading-body: 1.74;
-  --leading-heading: 1.2;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
 
-  /* ★ WIDTH — the headline of the redesign: narrow page, wide margins */
+  /* NARROW intimate canvas (Terracotta 1180, Aurora 1320) + wide gutters */
   --content-w: 1008px;
-  --gutter: clamp(1.5rem, 0.75rem + 4.5vw, 3.75rem);
-  --measure: 66ch;
+  --measure: 58ch;
+  --gutter: clamp(1.5rem, 0.75rem + 4vw, 3.5rem);
 
-  /* radius — paper-restrained (gently rounded, never bubbly) */
-  --radius-sm: 3px;
-  --radius-md: 6px;
-  --radius-lg: 10px;
+  --space-section: clamp(4rem, 2.5rem + 6vw, 7.5rem);
 }
-
-/* Narrower sidebar so the body column stays the protagonist. */
-.nene-public[data-theme^="reading"] .layout.is-2col {
-  grid-template-columns: minmax(0, 1fr) 232px;
-  gap: clamp(2.5rem, 1.5rem + 4vw, 5rem);
-}
-.nene-public[data-theme^="reading"] .layout.is-3col {
-  grid-template-columns: minmax(0, 1fr) 220px 220px;
+.nene-public[data-theme^='reading'] .layout.is-2col {
+  grid-template-columns: minmax(0, 1fr) 248px;
+  gap: clamp(2.5rem, 4vw, 5rem);
 }
 
-/* ── 2 · LABELS — small tracked CAPS in Saira (never mono). */
-.nene-public[data-theme^="reading"] .eyebrow,
-.nene-public[data-theme^="reading"] .hero__kicker {
-  font-family: var(--font-label);
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.22em;
-  font-size: 0.72rem;
-  color: var(--color-text-muted);
-}
-/* eyebrow tick → a slim rule, in step with the hairline language. */
-.nene-public[data-theme^="reading"] .eyebrow::before {
-  width: 18px;
-  height: 1px;
-  background: var(--color-border-strong);
-}
-.nene-public[data-theme^="reading"] .meta {
-  font-family: var(--font-label);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  font-size: 0.74rem;
-  white-space: nowrap;
-}
-.nene-public[data-theme^="reading"] .section__link {
-  font-family: var(--font-label);
-  text-transform: uppercase;
-  letter-spacing: 0.16em;
-  font-size: 0.74rem;
-  font-weight: 500;
-  color: var(--color-text-muted);
-}
-.nene-public[data-theme^="reading"] .section__link:hover {
-  color: var(--color-accent);
-}
-/* type badge → a quiet italic serif tag, not a chip. */
-.nene-public[data-theme^="reading"] .tbadge {
-  font-family: var(--font-display);
-  font-style: italic;
-  font-weight: var(--weight-normal);
-  text-transform: none;
-  letter-spacing: 0;
-  font-size: 0.92rem;
-  color: var(--color-text-muted);
-  background: transparent;
-  border: 0;
-  padding: 0;
-}
-.nene-public[data-theme^="reading"] .tbadge::before {
-  display: none;
-}
-
-/* ── 3 · CHROME — a quiet masthead, hairline ruled. */
-.nene-public[data-theme^="reading"] .hd {
+/* ── 2 · CHROME — quiet serif masthead ────────────────────────────────────── */
+.nene-public[data-theme^='reading'] .hd {
   border-bottom: 1px solid var(--color-border);
+  background: color-mix(in oklch, var(--color-surface) 88%, transparent);
 }
-.nene-public[data-theme^="reading"] .brand__name {
+.nene-public[data-theme^='reading'] .brand__mark {
+  border-radius: 10px;
+  background: var(--color-accent-weak);
+}
+.nene-public[data-theme^='reading'] .brand__name {
+  font-family: var(--font-display);
   font-weight: var(--weight-semibold);
   letter-spacing: 0;
   white-space: nowrap;
 }
-.nene-public[data-theme^="reading"] .brand__tag {
-  font-family: var(--font-display);
-  font-style: italic;
-  color: var(--color-text-muted);
+.nene-public[data-theme^='reading'] .navlink {
+  font-family: var(--font-chrome);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.74rem;
 }
-.nene-public[data-theme^="reading"] .navlink {
-  font-family: var(--font-label);
+.nene-public[data-theme^='reading'] .navlink[aria-current='page']::after {
+  height: 1px;
+  bottom: -2px;
+  background: var(--color-accent);
+}
+
+/* ── 3 · BUTTONS — soft, quiet ────────────────────────────────────────────── */
+.nene-public[data-theme^='reading'] .btn {
+  font-family: var(--font-chrome);
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  font-size: 0.8rem;
-  font-weight: 500;
-  white-space: nowrap;
-}
-/* buttons → calm pills; the primary is the brown ink, the ghost a hairline. */
-.nene-public[data-theme^="reading"] .btn {
-  font-family: var(--font-label);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
   font-size: 0.78rem;
+  border-radius: var(--radius-full);
+  padding: 12px 24px;
 }
-.nene-public[data-theme^="reading"] .btn--ghost {
+.nene-public[data-theme^='reading'] .btn--primary {
+  box-shadow: none;
+}
+.nene-public[data-theme^='reading'] .btn--ghost {
   border-color: var(--color-border-strong);
 }
+.nene-public[data-theme^='reading'] .btn--ghost:hover {
+  background: var(--color-accent-weak);
+}
 
-/* ── 4 · HERO — a large serif title closed by a single hairline. */
-.nene-public[data-theme^="reading"] .hero {
-  border-bottom: 1px solid var(--color-border);
-  padding-bottom: var(--space-2xl);
-}
-.nene-public[data-theme^="reading"] .hero__title {
-  font-weight: var(--weight-semibold);
-  letter-spacing: -0.015em;
-  line-height: 1.08;
-}
-.nene-public[data-theme^="reading"] .hero__title em {
-  font-style: italic;
-  color: var(--color-accent);
-}
-.nene-public[data-theme^="reading"] .hero__lead {
-  font-size: clamp(1.15rem, 1.05rem + 0.5vw, 1.4rem);
-  line-height: 1.6;
-  max-width: 52ch;
-}
-/* art frame → a quiet paper plate: soft border, faint shadow, no gradient field. */
-.nene-public[data-theme^="reading"] .hero__art-frame {
-  background: var(--color-surface-raised);
-  border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-sm);
-}
-.nene-public[data-theme^="reading"] .hero__art-tag {
-  font-family: var(--font-label);
+/* ── 4 · LABELS — Saira small-caps eyebrows; serif meta ───────────────────── */
+.nene-public[data-theme^='reading'] .eyebrow,
+.nene-public[data-theme^='reading'] .hero__kicker {
+  font-family: var(--font-chrome);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.2em;
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+}
+.nene-public[data-theme^='reading'] .eyebrow::before {
+  width: 18px;
+  height: 1px;
+  background: var(--color-accent);
+}
+.nene-public[data-theme^='reading'] .meta {
+  font-family: var(--font-chrome);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
   font-size: 0.72rem;
 }
-.nene-public[data-theme^="reading"] .hero__meta {
-  border-top: 1px solid var(--color-border);
-}
-.nene-public[data-theme^="reading"] .hero__stat b {
-  font-weight: var(--weight-semibold);
-  letter-spacing: -0.01em;
-}
-.nene-public[data-theme^="reading"] .hero__stat span {
-  font-family: var(--font-label);
+.nene-public[data-theme^='reading'] .tbadge {
+  font-family: var(--font-chrome);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  border-radius: var(--radius-full);
+  border-color: color-mix(in oklch, var(--color-accent) 24%, transparent);
+  background: transparent;
 }
 
-/* ── 5 · SECTIONS — publication rule: a single hairline, serif title. */
-.nene-public[data-theme^="reading"] .section__head,
-.nene-public[data-theme^="reading"] .pagehead__row {
-  border-bottom: 1px solid var(--color-border-strong);
-  padding-bottom: var(--space-sm);
-  align-items: baseline;
-}
-.nene-public[data-theme^="reading"] .section__title,
-.nene-public[data-theme^="reading"] .pagehead__title,
-.nene-public[data-theme^="reading"] .resultgroup__title {
+/* ── 5 · HERO — typographic, quiet, literary (hero=minimal) ───────────────── */
+.nene-public[data-theme^='reading'] .hero__title {
   font-weight: var(--weight-semibold);
-  letter-spacing: -0.01em;
-}
-
-/* ── 6 · ARTICLE & PROSE — the showcase: the page as a printed essay. */
-.nene-public[data-theme^="reading"] .article__title {
-  font-weight: var(--weight-semibold);
-  letter-spacing: -0.015em;
+  font-size: clamp(2.4rem, 1.6rem + 3.4vw, 4rem);
   line-height: 1.12;
+  max-width: 20ch;
 }
-.nene-public[data-theme^="reading"] .article__byline {
-  font-family: var(--font-label);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-}
-.nene-public[data-theme^="reading"] .article__hero {
-  --ar: 16 / 9;
-  border-radius: var(--radius-lg);
-}
-
-.nene-public[data-theme^="reading"] .prose,
-.nene-public[data-theme^="reading"] .markdown-body {
-  font-size: 1.1875rem;
-  line-height: var(--leading-body);
-  hanging-punctuation: first last;
-}
-/* Lead paragraph sits a touch larger; the very first line is small-cap'd. */
-.nene-public[data-theme^="reading"] .prose > p:first-of-type,
-.nene-public[data-theme^="reading"] .markdown-body > p:first-of-type {
-  font-size: 1.26rem;
-  line-height: 1.62;
-}
-/* ★ DROP CAP — the literary opening initial. */
-.nene-public[data-theme^="reading"] .prose > p:first-of-type::first-letter,
-.nene-public[data-theme^="reading"]
-  .markdown-body
-  > p:first-of-type::first-letter {
-  font-family: var(--font-display);
-  font-weight: var(--weight-semibold);
-  font-size: 3.1em;
-  line-height: 0.82;
-  float: left;
-  margin: 0.06em 0.1em 0 0;
+.nene-public[data-theme^='reading'] .hero__title em {
+  font-style: italic;
   color: var(--color-accent);
 }
-/* Serif subheads, set off by air and a faint rule. */
-.nene-public[data-theme^="reading"] .prose h2,
-.nene-public[data-theme^="reading"] .markdown-body h2 {
-  font-size: 1.65rem;
-  font-weight: var(--weight-semibold);
-  letter-spacing: -0.01em;
-  margin-top: var(--space-2xl);
-  padding-bottom: var(--space-xs);
-  border-bottom: 1px solid var(--color-border);
-}
-.nene-public[data-theme^="reading"] .prose h3,
-.nene-public[data-theme^="reading"] .markdown-body h3 {
-  font-style: italic;
-  font-weight: var(--weight-normal);
-  font-size: 1.3rem;
-  color: var(--color-text-primary);
-}
-/* A quiet, well-bred pull quote — italic serif, indented, hairline left rule.
-   (No accent fill: that register belongs to Aurora.) */
-.nene-public[data-theme^="reading"] .prose blockquote,
-.nene-public[data-theme^="reading"] .markdown-body blockquote {
+.nene-public[data-theme^='reading'] .hero__lead {
   font-family: var(--font-display);
+  font-size: clamp(1.125rem, 1rem + 0.5vw, 1.375rem);
   font-style: italic;
-  font-weight: var(--weight-normal);
-  font-size: 1.4rem;
-  line-height: 1.45;
-  color: var(--color-text-primary);
-  margin: var(--space-xl) 0;
-  padding: 0 0 0 var(--space-xl);
-  border-left: 1px solid var(--color-border-strong);
-  max-width: 56ch;
+  max-width: 52ch;
 }
-.nene-public[data-theme^="reading"] .prose a,
-.nene-public[data-theme^="reading"] .markdown-body a {
-  text-decoration-thickness: 1px;
-  text-underline-offset: 4px;
-}
-.nene-public[data-theme^="reading"] .prose code,
-.nene-public[data-theme^="reading"] .markdown-body code {
-  font-size: 0.86em;
-}
-.nene-public[data-theme^="reading"] .article__tags {
+.nene-public[data-theme^='reading'] .hero__meta {
   border-top: 1px solid var(--color-border);
 }
-
-/* ── 7 · FEED — no boxes: hairline-ruled tiles separated by air. */
-.nene-public[data-theme^="reading"] .cardgrid {
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: clamp(1.75rem, 1rem + 2.5vw, 3rem) clamp(2rem, 1rem + 3vw, 3.5rem);
-}
-.nene-public[data-theme^="reading"] .layout.is-2col .cardgrid {
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-}
-.nene-public[data-theme^="reading"] .card {
-  border-top: 1px solid var(--color-border-strong);
-  padding-top: var(--space-md);
-  gap: var(--space-sm);
-}
-.nene-public[data-theme^="reading"] .card__media {
-  border-radius: var(--radius-md);
-}
-.nene-public[data-theme^="reading"] .card__title,
-.nene-public[data-theme^="reading"] .row__title {
+.nene-public[data-theme^='reading'] .hero__stat b {
+  font-family: var(--font-display);
   font-weight: var(--weight-semibold);
-  letter-spacing: -0.01em;
+}
+.nene-public[data-theme^='reading'] .hero__stat span {
+  font-family: var(--font-chrome);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.66rem;
+}
+
+/* ── 6 · SECTIONS — hairline rule, quiet serif title ──────────────────────── */
+.nene-public[data-theme^='reading'] .section__head {
+  border-bottom: 1px solid var(--color-border);
+  align-items: flex-end;
+}
+.nene-public[data-theme^='reading'] .section__title {
+  font-weight: var(--weight-semibold);
+  font-size: clamp(1.6rem, 1.2rem + 1.4vw, 2.25rem);
+}
+.nene-public[data-theme^='reading'] .section__link {
+  font-family: var(--font-chrome);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.74rem;
+}
+
+/* ── 7 · FEED — quiet flat rows; minimal hairline media ───────────────────── */
+/* Reading is intimate & narrow. feedLayout=list should be a single calm column,
+   but the base `.layout.is-2col .cardgrid` out-specifies `[data-feed=list]`, so
+   the feed stayed a cramped 2-up grid (titles wrapped to ribbons). Force one
+   column and give the text room — a quiet table-of-contents list. */
+.nene-public[data-theme^='reading'][data-feed='list'] .cardgrid,
+.nene-public[data-theme^='reading'][data-feed='list'] .layout.is-2col .cardgrid {
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+.nene-public[data-theme^='reading'][data-feed='list'] .card {
+  grid-template-columns: minmax(150px, 200px) 1fr;
+  gap: var(--space-2xs) var(--space-lg);
+  padding: var(--space-lg) 0;
+  border-top: 1px solid var(--color-border);
+}
+.nene-public[data-theme^='reading'][data-feed='list'] .cardgrid .card:first-child {
+  border-top: 0;
+  padding-top: var(--space-xs);
+}
+.nene-public[data-theme^='reading'][data-feed='list'] .card__excerpt {
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+}
+.nene-public[data-theme^='reading'] .card {
+  gap: var(--space-xs);
+}
+.nene-public[data-theme^='reading'] .card__media,
+.nene-public[data-theme^='reading'] .featured__media,
+.nene-public[data-theme^='reading'] .article__hero,
+.nene-public[data-theme^='reading'] .row__media {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  filter: saturate(0.85);
+}
+.nene-public[data-theme^='reading'] .card__title,
+.nene-public[data-theme^='reading'] .row__title {
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0;
   line-height: 1.22;
 }
-.nene-public[data-theme^="reading"] .card__excerpt {
-  font-size: 1rem;
+.nene-public[data-theme^='reading'] .card:hover .card__title {
+  color: var(--color-accent);
+}
+.nene-public[data-theme^='reading'] .card__excerpt {
+  font-family: var(--font-display);
 }
 
-/* Featured → the lead essay slot: bracketed by hairlines, never boxed. */
-.nene-public[data-theme^="reading"] .featured {
+/* ── 8 · FEATURED — a quiet opening essay, not a poster ───────────────────── */
+.nene-public[data-theme^='reading'] .featured {
   border: 0;
   border-top: 1px solid var(--color-border-strong);
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border-strong);
   border-radius: 0;
   background: transparent;
   box-shadow: none;
-  padding: var(--space-xl) 0;
+  padding-block: var(--space-lg);
 }
-.nene-public[data-theme^="reading"] .featured__title {
+.nene-public[data-theme^='reading'] .featured__title {
   font-weight: var(--weight-semibold);
-  letter-spacing: -0.015em;
-  line-height: 1.12;
+  font-size: clamp(1.7rem, 1.2rem + 1.8vw, 2.5rem);
 }
-.nene-public[data-theme^="reading"] .featured__excerpt {
+.nene-public[data-theme^='reading'] .featured__excerpt {
+  font-family: var(--font-display);
+  font-style: italic;
   font-size: 1.0625rem;
 }
+.nene-public[data-theme^='reading'] .featured__title a:hover {
+  color: var(--color-accent);
+}
 
-/* ── 8 · TYPE NAV — a quiet ruled index, not boxed cards. */
-.nene-public[data-theme^="reading"] .typecard {
+/* ── 9 · TYPE NAV — quiet ruled list, not cards ───────────────────────────── */
+.nene-public[data-theme^='reading'] .typecard {
   border: 0;
   border-bottom: 1px solid var(--color-border);
   border-radius: 0;
   background: transparent;
-  padding: var(--space-md) var(--space-xs);
-  transition: color var(--dur-fast) var(--ease);
+  padding-inline: 0;
 }
-.nene-public[data-theme^="reading"] .typecard:hover {
-  border-color: var(--color-border);
+.nene-public[data-theme^='reading'] .typecard:hover {
+  border-bottom-color: var(--color-accent);
   background: transparent;
   transform: none;
   box-shadow: none;
 }
-.nene-public[data-theme^="reading"] .typecard:hover .typecard__name {
-  color: var(--color-accent);
-}
-.nene-public[data-theme^="reading"] .typecard__name {
+.nene-public[data-theme^='reading'] .typecard__name {
   font-weight: var(--weight-semibold);
-  letter-spacing: -0.01em;
 }
-.nene-public[data-theme^="reading"] .typecard__slug {
-  font-family: var(--font-display);
-  font-style: italic;
+.nene-public[data-theme^='reading'] .typecard__slug,
+.nene-public[data-theme^='reading'] .typecard__count {
+  font-family: var(--font-chrome);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.72rem;
 }
 
-/* ── 9 · SIDEBAR — margin notes: no cards, hairline-topped, small-caps heads. */
-.nene-public[data-theme^="reading"] .widget,
-.nene-public[data-theme^="reading"] .aside section {
+/* ── 10 · SIDEBAR / WIDGETS — quiet, borderless, ruled headings ───────────── */
+.nene-public[data-theme^='reading'] .widget,
+.nene-public[data-theme^='reading'] .aside section {
   border: 0;
   border-top: 1px solid var(--color-border-strong);
   border-radius: 0;
   background: transparent;
   padding: var(--space-md) 0 0;
+  box-shadow: none;
 }
-.nene-public[data-theme^="reading"] .widget__title,
-.nene-public[data-theme^="reading"] .aside section h2 {
-  font-family: var(--font-label);
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  font-size: 0.8rem;
-  color: var(--color-text-muted);
+.nene-public[data-theme^='reading'] .widget__title,
+.nene-public[data-theme^='reading'] .aside section h2 {
+  font-family: var(--font-display);
+  font-weight: var(--weight-semibold);
 }
-.nene-public[data-theme^="reading"] .poplist__rank {
+.nene-public[data-theme^='reading'] .search,
+.nene-public[data-theme^='reading'] .searchbar,
+.nene-public[data-theme^='reading'] .input,
+.nene-public[data-theme^='reading'] .textarea {
+  border-radius: var(--radius-full);
+  border-color: var(--color-border-strong);
+}
+.nene-public[data-theme^='reading'] .textarea {
+  border-radius: var(--radius-md);
+}
+.nene-public[data-theme^='reading'] .poplist__rank {
   font-family: var(--font-display);
   font-style: italic;
-  font-weight: var(--weight-normal);
   color: var(--color-accent);
 }
-.nene-public[data-theme^="reading"] .poplist__t {
-  font-size: 1rem;
-}
-.nene-public[data-theme^="reading"] .search,
-.nene-public[data-theme^="reading"] .searchbar {
+.nene-public[data-theme^='reading'] .tag {
+  font-family: var(--font-chrome);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.72rem;
   border-radius: var(--radius-full);
 }
-.nene-public[data-theme^="reading"] .tag {
-  font-family: var(--font-label);
+
+/* ── 11 · LIST / ARCHIVE / FILTER — quiet hairline rows ───────────────────── */
+.nene-public[data-theme^='reading'] .pagehead__row {
+  border-bottom: 1px solid var(--color-border);
+}
+.nene-public[data-theme^='reading'] .chip,
+.nene-public[data-theme^='reading'] .viewtoggle,
+.nene-public[data-theme^='reading'] .pager button,
+.nene-public[data-theme^='reading'] .pager span {
+  border-radius: var(--radius-full);
+}
+.nene-public[data-theme^='reading'] .chip {
+  font-family: var(--font-chrome);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-size: 0.72rem;
+  letter-spacing: 0.05em;
 }
 
-/* ── 10 · LIST / ARCHIVE — editorial rows, serif titles. */
-.nene-public[data-theme^="reading"] .row {
-  border-top: 1px solid var(--color-border);
+/* ── 12 · PROSE — the heart: literary drop cap, serif body ────────────────── */
+.nene-public[data-theme^='reading'] .prose,
+.nene-public[data-theme^='reading'] .markdown-body {
+  font-size: 1.1875rem;
+  line-height: 1.8;
 }
-.nene-public[data-theme^="reading"] .row__excerpt {
-  font-size: 1.0625rem;
+.nene-public[data-theme^='reading'] .prose > p:first-of-type::first-letter,
+.nene-public[data-theme^='reading'] .markdown-body > p:first-of-type::first-letter {
+  font-family: var(--font-display);
+  font-weight: var(--weight-semibold);
+  font-size: 3.6em;
+  line-height: 0.8;
+  float: left;
+  margin: 0.06em 0.1em 0 0;
+  color: var(--color-accent);
 }
-.nene-public[data-theme^="reading"] .chip {
-  font-family: var(--font-label);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-size: 0.78rem;
+.nene-public[data-theme^='reading'] .prose blockquote,
+.nene-public[data-theme^='reading'] .markdown-body blockquote {
+  border-left: 2px solid var(--color-accent);
+  font-style: italic;
 }
-.nene-public[data-theme^="reading"] .resultgroup__title {
-  border-bottom-color: var(--color-border-strong);
-}
-
-/* ── 11 · FOOTER — a quiet colophon closed by one rule. */
-.nene-public[data-theme^="reading"] .ft {
-  border-top: 1px solid var(--color-border-strong);
-}
-.nene-public[data-theme^="reading"] .ft__col h4 {
-  font-family: var(--font-label);
-  letter-spacing: 0.16em;
-}
-.nene-public[data-theme^="reading"] .ft__bar small,
-.nene-public[data-theme^="reading"] .ft__bar .mono {
-  font-family: var(--font-label);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-size: 0.74rem;
+.nene-public[data-theme^='reading'] .prose h2,
+.nene-public[data-theme^='reading'] .markdown-body h2,
+.nene-public[data-theme^='reading'] .prose h3,
+.nene-public[data-theme^='reading'] .markdown-body h3 {
+  font-weight: var(--weight-semibold);
 }
 
-/* ── 12 · EYECATCH placeholder — soft paper plate, gentle hatch. */
-.nene-public[data-theme^="reading"] .eyecatch {
+/* ── 13 · EMPTY STATE — quiet hairline frame ──────────────────────────────── */
+.nene-public[data-theme^='reading'] .empty {
+  border-style: solid;
+  border-width: 1px;
+  border-radius: var(--radius-lg);
+}
+.nene-public[data-theme^='reading'] .empty__icon {
+  border-radius: var(--radius-md);
+}
+
+/* ── 14 · EYECATCH placeholder — soft, low-chroma hatch ───────────────────── */
+.nene-public[data-theme^='reading'] .eyecatch {
+  border-radius: var(--radius-sm);
   border-color: var(--color-border);
   background: repeating-linear-gradient(
-    135deg,
-    color-mix(in oklch, var(--color-accent) 7%, var(--color-surface-overlay)) 0
-      14px,
-    color-mix(in oklch, var(--color-accent) 2%, var(--color-surface-overlay))
-      14px 28px
+    110deg,
+    color-mix(in oklch, var(--color-accent) 11%, var(--color-surface-overlay)) 0 13px,
+    color-mix(in oklch, var(--color-accent) 4%, var(--color-surface-overlay)) 13px 26px
   );
 }
-.nene-public[data-theme^="reading"] .eyecatch::after {
-  font-family: var(--font-label);
+.nene-public[data-theme^='reading'] .eyecatch::after {
+  font-family: var(--font-chrome);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
+  border-radius: var(--radius-full);
+}
+
+/* ── 15 · FOOTER — quiet close ────────────────────────────────────────────── */
+.nene-public[data-theme^='reading'] .ft {
+  border-top: 1px solid var(--color-border);
+  background: transparent;
+}
+.nene-public[data-theme^='reading'] .ft__bar small,
+.nene-public[data-theme^='reading'] .ft__bar .mono {
+  font-family: var(--font-chrome);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
