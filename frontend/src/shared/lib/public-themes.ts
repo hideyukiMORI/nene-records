@@ -15,14 +15,35 @@ export interface PublicThemeMeta {
   id: string
   /** Human label for the admin theme picker. */
   name: string
-  /** Mini-swatch colours for the picker (light-mode tokens). */
+  /** One-line description shown on the picker card (mirrors the bundle manifest). */
+  description: string
+  /** Theme author / vendor. */
+  author: string
+  /** Semantic version — mirrors the bundle manifest `version`. */
+  version: string
+  /** ISO date (YYYY-MM-DD) the theme was first added. Shown on the card. */
+  createdAt: string
+  /** Mini-swatch colours for the picker (light-mode tokens). Fallback when no thumbnail. */
   preview: { surface: string; raised: string; accent: string }
+  /**
+   * Optional preview image for the picker card (WordPress-style screenshot).
+   * App-absolute path; when absent the colour swatch is shown instead. Built-in
+   * themes drop a file at `public/theme-thumbnails/<id>.webp` (served at
+   * `/theme-thumbnails/<id>.webp`); delivered bundles map their
+   * `assets.preview` here at import time. See public/theme-thumbnails/README.md.
+   */
+  thumbnail?: string
 }
 
 export const PUBLIC_THEMES: readonly PublicThemeMeta[] = [
   {
     id: 'consumer',
     name: 'Terracotta',
+    description:
+      'Warm, soft editorial magazine — terracotta accent on warm paper. The standard baseline: rounded chrome and gentle shadows.',
+    author: 'NeNe Records',
+    version: '1.0.0',
+    createdAt: '2026-05-24',
     preview: {
       surface: 'oklch(97.5% 0.012 75)',
       raised: 'oklch(99.5% 0.008 75)',
@@ -32,6 +53,11 @@ export const PUBLIC_THEMES: readonly PublicThemeMeta[] = [
   {
     id: 'aurora',
     name: 'Aurora',
+    description:
+      'Cool, structural tech — teal on cool paper. A ruled, indexed blueprint layout with hard hairlines and a mono register.',
+    author: 'NeNe Records',
+    version: '2.0.0',
+    createdAt: '2026-06-16',
     preview: {
       surface: 'oklch(98% 0.006 230)',
       raised: 'oklch(99.5% 0.004 230)',
@@ -41,6 +67,11 @@ export const PUBLIC_THEMES: readonly PublicThemeMeta[] = [
   {
     id: 'reading',
     name: 'Reading',
+    description:
+      'Intimate single-book reading — serif headings, a narrow measure with wide margins, hairline rules and a literary drop cap.',
+    author: 'NeNe Records',
+    version: '2.0.0',
+    createdAt: '2026-06-16',
     preview: {
       surface: 'oklch(97% 0.02 85)',
       raised: 'oklch(99% 0.014 85)',
