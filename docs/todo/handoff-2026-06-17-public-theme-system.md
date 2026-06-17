@@ -55,8 +55,8 @@
 テーマ定義を「**列挙パラメータ＋スタイルフラグの JSON**」に寄せ、**汎用エンジン（base CSS）が1回だけ実装**。語彙外は bespoke `components.css`（Pro escape hatch）。
 
 - **スタイルフラグ**: `feedLayout` / `cardStyle` / `media` / `hero` / `sectionRule` / `eyebrow`。`.nene-public` の `data-*` で適用（DOM 不変）。語彙・実装方針は `theme-flags.md`、enum は `public-theme.schema.json` と `FLAG_DEFS`（theme-customization.ts）。
-- **実装済み**: `feedLayout=list`（フィードを横長リスト化）＋ `cardStyle`（bordered/shadowed/framed）。
-- **未実装**: `media` / `hero` / `sectionRule` / `eyebrow` の base CSS、カスタマイザ simple/pro 分割、validator の flags enum 検証、ClaudeCode による JSON テーマ量産。
+- **実装済み**: 全6フラグの base CSS（`feedLayout=list` ＋ `cardStyle` ＋ `media`/`hero`/`sectionRule`/`eyebrow`）＋カスタマイザに全フラグのプルダウン＋validator の flags enum 検証（schema 駆動）＋カスタマイザ simple/pro 分割（基本は常時表示・詳細は `<details>` 折りたたみ）。
+- **未実装**: ClaudeCode による JSON テーマ量産。
 
 ---
 
@@ -71,7 +71,7 @@
 
 ## 5. 残タスク / 次の一手
 
-- **#390 続き（推奨）**: フラグ拡充（media/hero/sectionRule/eyebrow）→ simple/pro 分割 → validator flags enum → ClaudeCode で JSON テーマ量産。
+- **#390 続き（推奨）**: ClaudeCode で JSON テーマ量産。フラグ拡充（media/hero/sectionRule/eyebrow base CSS）・カスタマイザ全フラグ UI・validator flags enum・simple/pro 分割は実装済み。
 - **#372 残り**: 画像ノブ（logo/hero、メディアライブラリ #299 連携）、ライブプレビュー（iframe）。
 - **#371**: モーション/インタラクション能力レイヤ（hero バリアント / scroll-reveal / View Transitions）。
 - **バリデータ強化**: コントラスト AA 自動判定、SVG 深サニタイズ。
