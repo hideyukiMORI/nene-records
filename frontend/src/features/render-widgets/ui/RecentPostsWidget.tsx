@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import type { Widget } from '@/entities/widget'
 import { useTranslation } from '@/shared/i18n'
+import { formatPostDate, truncateExcerpt } from '@/shared/lib/widget-post-meta'
 import { Text } from '@/shared/ui'
 import { useRecentPosts } from '../hooks/use-recent-posts'
 
@@ -10,11 +11,16 @@ export interface RecentPostsWidgetProps {
 
 /** Lists recent published records of a configured entity type as links. */
 export function RecentPostsWidget({ widget }: RecentPostsWidgetProps) {
-  const { t } = useTranslation()
+  const { t, locale } = useTranslation()
   const entityTypeSlug =
     typeof widget.settings['entityTypeSlug'] === 'string' ? widget.settings['entityTypeSlug'] : ''
   const rawLimit = widget.settings['limit']
   const limit = typeof rawLimit === 'number' && rawLimit > 0 ? rawLimit : 5
+  const showDate = widget.settings['showDate'] === true
+  const showExcerpt = widget.settings['showExcerpt'] === true
+  const rawExcerptLength = widget.settings['excerptLength']
+  const excerptLength =
+    typeof rawExcerptLength === 'number' && rawExcerptLength > 0 ? rawExcerptLength : 80
 
   const { items } = useRecentPosts(entityTypeSlug, limit)
 
@@ -35,14 +41,31 @@ export function RecentPostsWidget({ widget }: RecentPostsWidgetProps) {
   }
 
   return (
-    <ul className="flex flex-col gap-stack-xs">
-      {items.map((item) => (
-        <li key={item.id}>
-          <Link to={item.publicUrl} className="text-body text-accent underline hover:no-underline">
-            {item.label}
-          </Link>
-        </li>
-      ))}
+    <ul className="flex flex-col gap-stack-sm">
+      {items.map((item) => {
+        const date = showDate ? formatPostDate(item.publishedAt, locale) : ''
+        const excerpt = showExcerpt ? truncateExcerpt(item.excerpt, excerptLength) : ''
+        return (
+          <li key={item.id} className="flex flex-col gap-stack-xs">
+            <Link
+              to={item.publicUrl}
+              className="text-body text-accent underline hover:no-underline"
+            >
+              {item.label}
+            </Link>
+            {date !== '' ? (
+              <Text as="span" muted variant="caption">
+                {date}
+              </Text>
+            ) : null}
+            {excerpt !== '' ? (
+              <Text as="span" muted variant="caption">
+                {excerpt}
+              </Text>
+            ) : null}
+          </li>
+        )
+      })}
     </ul>
   )
 }
