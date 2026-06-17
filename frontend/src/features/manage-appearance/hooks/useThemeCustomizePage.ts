@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { useUpdateSetting, useSettingList } from '@/entities/setting'
+import { useTranslation } from '@/shared/i18n'
 import { resolvePublicThemeId } from '@/shared/lib/public-themes'
 import { parseThemeOverrides, type ThemeOverrides } from '@/shared/lib/theme-customization'
+import { useToast } from '@/shared/ui'
 
 const ACTIVE_THEME_KEY = 'active_theme'
 const OVERRIDES_KEY = 'theme_overrides'
@@ -34,6 +36,8 @@ function clean(overrides: ThemeOverrides): ThemeOverrides {
 export function useThemeCustomizePage(): ThemeCustomizePageState {
   const settingsQuery = useSettingList()
   const updateSetting = useUpdateSetting()
+  const { showToast } = useToast()
+  const { t } = useTranslation()
 
   const items = settingsQuery.data?.items
   const themeId = resolvePublicThemeId(
@@ -71,7 +75,17 @@ export function useThemeCustomizePage(): ThemeCustomizePageState {
     if (Object.keys(cleaned).length > 0) {
       next[themeId] = cleaned
     }
-    updateSetting.mutate({ settingKey: OVERRIDES_KEY, input: { value: JSON.stringify(next) } })
+    updateSetting.mutate(
+      { settingKey: OVERRIDES_KEY, input: { value: JSON.stringify(next) } },
+      {
+        onSuccess: () => {
+          showToast(t('admin.themeCustomize.saved'), 'success')
+        },
+        onError: () => {
+          showToast(t('admin.themeCustomize.saveError'), 'error')
+        },
+      },
+    )
   }
 
   return {

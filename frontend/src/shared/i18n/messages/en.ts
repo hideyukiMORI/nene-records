@@ -80,6 +80,8 @@ export const en = {
   'admin.themeCustomize.eyebrow': 'Eyebrow',
   'admin.themeCustomize.basic': 'Basics',
   'admin.themeCustomize.advanced': 'Advanced',
+  'admin.themeCustomize.saved': 'Customization saved',
+  'admin.themeCustomize.saveError': 'Could not save customization',
   'admin.themeCustomize.save': 'Save',
   'admin.themeCustomize.saving': 'Saving…',
   'admin.themeCustomize.reset': 'Reset',
