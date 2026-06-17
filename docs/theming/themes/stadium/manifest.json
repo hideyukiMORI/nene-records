@@ -1,0 +1,124 @@
+{
+  "$schema": "../public-theme.schema.json",
+  "id": "stadium",
+  "name": "Stadium",
+  "version": "1.0.0",
+  "author": "NeNe Records",
+  "description": "Athletic / stadium — bold condensed italic display (Saira Condensed) like jersey type, electric blue with a hot-orange counter, hard angular energy and big numerals. components.css is the star: oversized italic condensed headings, jersey-number indices, angled accents, duotone action media. Light + dark, both AA.",
+  "supportsModes": [
+    "light",
+    "dark"
+  ],
+  "fonts": [
+    {
+      "family": "Saira Condensed",
+      "role": "display",
+      "source": "fontsource",
+      "weights": [
+        600,
+        700,
+        800
+      ]
+    },
+    {
+      "family": "Inter",
+      "role": "body",
+      "source": "fontsource",
+      "weights": [
+        400,
+        500,
+        600
+      ]
+    },
+    {
+      "family": "JetBrains Mono",
+      "role": "mono",
+      "source": "fontsource",
+      "weights": [
+        400,
+        500
+      ]
+    }
+  ],
+  "tokens": {
+    "light": {
+      "color-surface": "oklch(97% 0.006 250)",
+      "color-surface-raised": "oklch(99% 0.006 250)",
+      "color-surface-overlay": "oklch(93.5% 0.008 250)",
+      "color-surface-sunken": "oklch(95.2% 0.006 250)",
+      "color-text-primary": "oklch(20% 0.02 255)",
+      "color-text-muted": "oklch(44% 0.018 255)",
+      "color-text-inverse": "oklch(99% 0.006 250)",
+      "color-border": "oklch(85% 0.01 250)",
+      "color-border-strong": "oklch(74% 0.014 250)",
+      "color-focus-ring": "oklch(55% 0.2 255)",
+      "color-accent": "oklch(55% 0.2 255)",
+      "color-accent-hover": "oklch(49% 0.2 255)",
+      "color-accent-weak": "color-mix(in oklch, var(--color-accent) 12%, var(--color-surface-raised))",
+      "color-on-accent": "oklch(99% 0.01 250)",
+      "color-brand-violet": "oklch(64% 0.2 35)",
+      "color-danger": "oklch(52% 0.2 25)",
+      "color-danger-hover": "oklch(46% 0.2 25)",
+      "color-ok": "oklch(55% 0.13 150)",
+      "color-warn": "oklch(70% 0.15 75)",
+      "color-info": "oklch(55% 0.13 250)",
+      "shadow-sm": "0 1px 2px oklch(40% 0.04 255 / 0.08)",
+      "shadow-md": "0 6px 20px oklch(40% 0.04 255 / 0.1), 0 2px 6px oklch(40% 0.04 255 / 0.08)",
+      "shadow-lg": "0 24px 54px oklch(38% 0.05 255 / 0.16)",
+      "shadow-focus": "0 0 0 3px color-mix(in oklch, var(--color-focus-ring) 30%, transparent)",
+      "color-scheme": "light"
+    },
+    "dark": {
+      "color-surface": "oklch(18% 0.02 255)",
+      "color-surface-raised": "oklch(22% 0.02 255)",
+      "color-surface-overlay": "oklch(27% 0.026 255)",
+      "color-surface-sunken": "oklch(14.5% 0.02 255)",
+      "color-text-primary": "oklch(95% 0.01 250)",
+      "color-text-muted": "oklch(70% 0.009 250)",
+      "color-text-inverse": "oklch(20% 0.02 255)",
+      "color-border": "oklch(33% 0.024 255)",
+      "color-border-strong": "oklch(46% 0.028 255)",
+      "color-focus-ring": "oklch(72% 0.18 255)",
+      "color-accent": "oklch(70% 0.18 255)",
+      "color-accent-hover": "oklch(77% 0.18 255)",
+      "color-accent-weak": "color-mix(in oklch, var(--color-accent) 16%, var(--color-surface-raised))",
+      "color-on-accent": "oklch(17% 0.04 255)",
+      "color-brand-violet": "oklch(72% 0.19 35)",
+      "color-danger": "oklch(66% 0.18 25)",
+      "color-danger-hover": "oklch(72% 0.18 25)",
+      "color-ok": "oklch(72% 0.14 150)",
+      "color-warn": "oklch(80% 0.14 80)",
+      "color-info": "oklch(74% 0.12 250)",
+      "shadow-sm": "0 1px 2px oklch(0% 0 0 / 0.4)",
+      "shadow-md": "0 10px 28px oklch(0% 0 0 / 0.5), 0 2px 6px oklch(0% 0 0 / 0.4)",
+      "shadow-lg": "0 28px 60px oklch(0% 0 0 / 0.62)",
+      "shadow-focus": "0 0 0 3px color-mix(in oklch, var(--color-focus-ring) 30%, transparent)",
+      "color-scheme": "dark"
+    }
+  },
+  "flags": {
+    "feedLayout": "magazine",
+    "cardStyle": "shadowed",
+    "media": "duotone",
+    "hero": "standard",
+    "sectionRule": "heavy",
+    "eyebrow": "caps"
+  },
+  "knobs": {
+    "accent": {
+      "light": "oklch(55% 0.2 255)",
+      "dark": "oklch(70% 0.18 255)"
+    },
+    "surface": {
+      "light": "oklch(97% 0.006 250)",
+      "dark": "oklch(18% 0.02 255)"
+    },
+    "fontDisplay": "Saira Condensed",
+    "fontBody": "Inter",
+    "fontMono": "JetBrains Mono",
+    "baseFontSize": "1.0625rem",
+    "typeScale": 1.3,
+    "density": "comfortable",
+    "radius": "sharp"
+  }
+}

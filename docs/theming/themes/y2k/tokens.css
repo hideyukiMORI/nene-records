@@ -1,0 +1,61 @@
+/* NeNe Records — theme: Y2K Aqua (id=y2k) — tokens (light + dark)
+   Frutiger Aero / aqua — glossy sky-blue gradients, bubbly chrome, soft bevels and an optimistic early-2000s sheen. components.css is the star: glossy gradient buttons and cards, rounded chrome, a sky hero and a clean rounded sans. Distinct from Nebula’s matte frosted glass. Light + dark, both AA.
+   Knob -> Derived per contract §3. Scoped [data-theme='y2k'] / 'y2k-dark'. Both AA. */
+
+/* LIGHT */
+[data-theme='y2k'] {
+  --color-surface: oklch(98% 0.012 230);
+  --color-surface-raised: oklch(99.5% 0.012 230);
+  --color-surface-overlay: oklch(94.5% 0.016 230);
+  --color-surface-sunken: oklch(96.2% 0.012 230);
+  --color-text-primary: oklch(26% 0.03 240);
+  --color-text-muted: oklch(50% 0.027 240);
+  --color-text-inverse: oklch(99% 0.01 230);
+  --color-border: oklch(86% 0.016 230);
+  --color-border-strong: oklch(75% 0.02 230);
+  --color-focus-ring: oklch(58% 0.15 235);
+  --color-accent: oklch(58% 0.15 235);
+  --color-accent-hover: oklch(52% 0.15 235);
+  --color-accent-weak: color-mix(in oklch, var(--color-accent) 12%, var(--color-surface-raised));
+  --color-on-accent: oklch(99% 0.01 230);
+  --color-brand-violet: oklch(72% 0.13 160);
+  --color-danger: oklch(52% 0.2 25);
+  --color-danger-hover: oklch(46% 0.2 25);
+  --color-ok: oklch(55% 0.13 150);
+  --color-warn: oklch(70% 0.15 75);
+  --color-info: oklch(55% 0.13 250);
+  --shadow-sm: 0 1px 2px oklch(40% 0.04 235 / 0.08);
+  --shadow-md: 0 6px 20px oklch(40% 0.04 235 / 0.1), 0 2px 6px oklch(40% 0.04 235 / 0.08);
+  --shadow-lg: 0 24px 54px oklch(38% 0.05 235 / 0.16);
+  --shadow-focus: 0 0 0 3px color-mix(in oklch, var(--color-focus-ring) 30%, transparent);
+  color-scheme: light;
+}
+
+/* DARK */
+[data-theme='y2k-dark'] {
+  --color-surface: oklch(22% 0.04 250);
+  --color-surface-raised: oklch(26% 0.04 250);
+  --color-surface-overlay: oklch(31% 0.052 250);
+  --color-surface-sunken: oklch(18.5% 0.04 250);
+  --color-text-primary: oklch(94% 0.012 225);
+  --color-text-muted: oklch(69% 0.011 225);
+  --color-text-inverse: oklch(20% 0.04 250);
+  --color-border: oklch(37% 0.044 250);
+  --color-border-strong: oklch(50% 0.048 250);
+  --color-focus-ring: oklch(74% 0.13 230);
+  --color-accent: oklch(72% 0.13 230);
+  --color-accent-hover: oklch(79% 0.13 230);
+  --color-accent-weak: color-mix(in oklch, var(--color-accent) 16%, var(--color-surface-raised));
+  --color-on-accent: oklch(18% 0.04 235);
+  --color-brand-violet: oklch(80% 0.12 160);
+  --color-danger: oklch(66% 0.18 25);
+  --color-danger-hover: oklch(72% 0.18 25);
+  --color-ok: oklch(72% 0.14 150);
+  --color-warn: oklch(80% 0.14 80);
+  --color-info: oklch(74% 0.12 250);
+  --shadow-sm: 0 1px 2px oklch(0% 0 0 / 0.4);
+  --shadow-md: 0 10px 28px oklch(0% 0 0 / 0.5), 0 2px 6px oklch(0% 0 0 / 0.4);
+  --shadow-lg: 0 28px 60px oklch(0% 0 0 / 0.62);
+  --shadow-focus: 0 0 0 3px color-mix(in oklch, var(--color-focus-ring) 30%, transparent);
+  color-scheme: dark;
+}

@@ -1,0 +1,41 @@
+/* Brutalist — raw web brutalism. FONT OVERRIDE: Space Mono display. ★STAR */
+.nene-public[data-theme^='brutalist']{--font-display:'Space Mono',ui-monospace,monospace;--font-chrome:'Space Mono',ui-monospace,monospace;--radius-sm:0px;--radius-md:0px;--radius-lg:0px;--radius-full:0px;--content-w:1280px;--tracking-display:-0.01em;}
+.nene-public[data-theme^='brutalist'] .hero__title,.nene-public[data-theme^='brutalist'] .section__title,.nene-public[data-theme^='brutalist'] .featured__title,.nene-public[data-theme^='brutalist'] .card__title,.nene-public[data-theme^='brutalist'] .pagehead__title,.nene-public[data-theme^='brutalist'] .typecard__name,.nene-public[data-theme^='brutalist'] .row__title{font-family:var(--font-display);font-weight:700;text-transform:uppercase;letter-spacing:-0.01em;}
+.nene-public[data-theme^='brutalist'] .hd{border-bottom:3px solid var(--color-text-primary);}
+.nene-public[data-theme^='brutalist'] .brand__mark{border-radius:0;border:2px solid var(--color-text-primary);background:var(--color-accent);color:var(--color-on-accent);}
+.nene-public[data-theme^='brutalist'] .brand__mark svg{color:var(--color-on-accent);}
+.nene-public[data-theme^='brutalist'] .brand__name{text-transform:uppercase;white-space:nowrap;}
+.nene-public[data-theme^='brutalist'] .navlink{text-transform:uppercase;letter-spacing:0.04em;font-size:0.74rem;font-weight:700;text-decoration:underline;text-underline-offset:3px;}
+.nene-public[data-theme^='brutalist'] .navlink[aria-current='page']::after{display:none;}
+.nene-public[data-theme^='brutalist'] .btn{border-radius:0;border:2px solid var(--color-text-primary);text-transform:uppercase;font-weight:700;box-shadow:4px 4px 0 var(--color-text-primary);}
+.nene-public[data-theme^='brutalist'] .btn--primary:hover{transform:translate(-1px,-1px);box-shadow:6px 6px 0 var(--color-text-primary);}
+.nene-public[data-theme^='brutalist'] .btn--ghost{background:var(--color-surface);}
+.nene-public[data-theme^='brutalist'] .eyebrow{font-family:var(--font-chrome);text-transform:uppercase;letter-spacing:0.1em;font-size:0.7rem;color:var(--color-text-primary);}
+.nene-public[data-theme^='brutalist'] .eyebrow::before{width:14px;height:14px;background:var(--color-accent);}
+.nene-public[data-theme^='brutalist'] .tbadge{border-radius:0;border:2px solid var(--color-text-primary);background:var(--color-accent-weak);color:var(--color-text-primary);text-transform:uppercase;font-family:var(--font-chrome);}
+.nene-public[data-theme^='brutalist'] .tbadge::before{border-radius:0;background:var(--color-accent);}
+.nene-public[data-theme^='brutalist'] .hero{border-bottom:4px solid var(--color-text-primary);padding-bottom:var(--space-xl);}
+.nene-public[data-theme^='brutalist'] .hero__title{font-size:clamp(2.6rem,1.7rem+4.4vw,5rem);line-height:1.0;}
+.nene-public[data-theme^='brutalist'] .hero__title em{color:var(--color-accent);font-style:normal;text-decoration:underline;text-decoration-thickness:6px;text-underline-offset:8px;}
+.nene-public[data-theme^='brutalist'] .hero__lead{max-width:60ch;border-left:4px solid var(--color-accent);padding-left:var(--space-md);}
+.nene-public[data-theme^='brutalist'] .hero__stat b{font-family:var(--font-display);}
+.nene-public[data-theme^='brutalist'] .section__head{border-bottom:4px solid var(--color-text-primary);}
+.nene-public[data-theme^='brutalist'] .section__title{text-transform:uppercase;}
+.nene-public[data-theme^='brutalist'] .section__link{font-family:var(--font-chrome);text-transform:uppercase;text-decoration:underline;text-underline-offset:3px;}
+.nene-public[data-theme^='brutalist'] .cardgrid{gap:0;}
+.nene-public[data-theme^='brutalist'] .card{border:2px solid var(--color-text-primary);padding:var(--space-md);margin:-1px;gap:var(--space-xs);box-shadow:none;transition:box-shadow var(--dur-fast) var(--ease),transform var(--dur-fast) var(--ease);}
+.nene-public[data-theme^='brutalist'] .card:hover{box-shadow:6px 6px 0 var(--color-accent);transform:translate(-2px,-2px);}
+.nene-public[data-theme^='brutalist'] .card__media,.nene-public[data-theme^='brutalist'] .featured__media,.nene-public[data-theme^='brutalist'] .row__media{border-radius:0;border:2px solid var(--color-text-primary);filter:grayscale(1) contrast(1.1);transition:filter var(--dur-normal) var(--ease);}
+.nene-public[data-theme^='brutalist'] .card:hover .card__media{filter:none;}
+.nene-public[data-theme^='brutalist'] .featured{border:3px solid var(--color-text-primary);border-radius:0;background:var(--color-surface-raised);box-shadow:8px 8px 0 var(--color-accent);}
+.nene-public[data-theme^='brutalist'] .typecard{border:2px solid var(--color-text-primary);border-radius:0;background:var(--color-surface-raised);margin:-1px;}
+.nene-public[data-theme^='brutalist'] .typecard:hover{background:var(--color-accent-weak);transform:none;box-shadow:none;}
+.nene-public[data-theme^='brutalist'] .typecard__slug,.nene-public[data-theme^='brutalist'] .typecard__count{font-family:var(--font-chrome);}
+.nene-public[data-theme^='brutalist'] .widget,.nene-public[data-theme^='brutalist'] .aside section,.nene-public[data-theme^='brutalist'] .search,.nene-public[data-theme^='brutalist'] .searchbar,.nene-public[data-theme^='brutalist'] .input,.nene-public[data-theme^='brutalist'] .textarea{border:2px solid var(--color-text-primary);border-radius:0;}
+.nene-public[data-theme^='brutalist'] .widget__title,.nene-public[data-theme^='brutalist'] .aside section h2{text-transform:uppercase;}
+.nene-public[data-theme^='brutalist'] .poplist__rank{font-family:var(--font-display);color:var(--color-accent);}
+.nene-public[data-theme^='brutalist'] .tag{border-radius:0;border:2px solid var(--color-text-primary);text-transform:uppercase;font-family:var(--font-chrome);font-size:0.72rem;}
+.nene-public[data-theme^='brutalist'] .chip,.nene-public[data-theme^='brutalist'] .viewtoggle,.nene-public[data-theme^='brutalist'] .pager button,.nene-public[data-theme^='brutalist'] .pager span{border-radius:0;border:2px solid var(--color-text-primary);}
+.nene-public[data-theme^='brutalist'] .ft{border-top:4px solid var(--color-text-primary);}
+.nene-public[data-theme^='brutalist'] .eyecatch{border-radius:0;border:2px solid var(--color-text-primary);background:repeating-linear-gradient(45deg,color-mix(in oklch,var(--color-text-primary) 10%,var(--color-surface-overlay)) 0 8px,var(--color-surface-overlay) 8px 16px);}
+.nene-public[data-theme^='brutalist'] .eyecatch::after{border-radius:0;border:1px solid var(--color-text-primary);font-family:var(--font-chrome);text-transform:uppercase;}

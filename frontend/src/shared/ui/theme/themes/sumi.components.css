@@ -1,0 +1,206 @@
+/* Sumi-e — washi + sumi ink + vermilion seal. FONT OVERRIDE: Shippori Mincho. ★STAR */
+.nene-public[data-theme^='sumi'] {
+  --font-display: 'Shippori Mincho', serif;
+  --font-sans: 'Shippori Mincho', serif;
+  --font-chrome: 'Shippori Mincho', serif;
+  --radius-sm: 2px;
+  --radius-md: 3px;
+  --radius-lg: 4px;
+  --content-w: 1120px;
+  --measure: 64ch;
+  --leading-body: 1.9;
+  --gutter: clamp(1.5rem, 1rem+3.5vw, 3.25rem);
+  --space-section: clamp(4.5rem, 3rem+7vw, 8rem);
+  --tracking-display: 0.02em;
+}
+.nene-public[data-theme^='sumi'] .hero__title,
+.nene-public[data-theme^='sumi'] .section__title,
+.nene-public[data-theme^='sumi'] .featured__title,
+.nene-public[data-theme^='sumi'] .card__title,
+.nene-public[data-theme^='sumi'] .pagehead__title,
+.nene-public[data-theme^='sumi'] .typecard__name,
+.nene-public[data-theme^='sumi'] .row__title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.nene-public[data-theme^='sumi'] .hd {
+  border-bottom: 1px solid var(--color-border);
+}
+.nene-public[data-theme^='sumi'] .brand__mark {
+  border-radius: 2px;
+  background: var(--color-accent);
+  color: oklch(99% 0.01 85);
+}
+.nene-public[data-theme^='sumi'] .brand__mark svg {
+  color: oklch(99% 0.01 85);
+}
+.nene-public[data-theme^='sumi'] .brand__name {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+.nene-public[data-theme^='sumi'] .navlink {
+  font-family: var(--font-display);
+  letter-spacing: 0.1em;
+  font-size: 0.86rem;
+}
+.nene-public[data-theme^='sumi'] .navlink[aria-current='page']::after {
+  height: 1px;
+  background: var(--color-accent);
+}
+.nene-public[data-theme^='sumi'] .btn {
+  font-family: var(--font-display);
+  border-radius: 2px;
+  letter-spacing: 0.06em;
+}
+.nene-public[data-theme^='sumi'] .eyebrow {
+  font-family: var(--font-display);
+  text-transform: none;
+  letter-spacing: 0.24em;
+  font-size: 0.74rem;
+  color: var(--color-accent);
+}
+.nene-public[data-theme^='sumi'] .eyebrow::before {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  background: var(--color-accent);
+}
+.nene-public[data-theme^='sumi'] .tbadge {
+  border-radius: 2px;
+  font-family: var(--font-display);
+  background: transparent;
+  border: 1px solid var(--color-accent);
+  color: var(--color-accent);
+  text-transform: none;
+}
+.nene-public[data-theme^='sumi'] .tbadge::before {
+  border-radius: 1px;
+  background: var(--color-accent);
+}
+.nene-public[data-theme^='sumi'] .hero__title {
+  font-weight: 600;
+  font-size: clamp(2.4rem, 1.6rem+3.4vw, 4.2rem);
+  line-height: 1.2;
+  max-width: 18ch;
+}
+.nene-public[data-theme^='sumi'] .hero__title em {
+  font-style: normal;
+  color: var(--color-accent);
+}
+.nene-public[data-theme^='sumi'] .hero__lead {
+  max-width: 52ch;
+}
+.nene-public[data-theme^='sumi'] .hero__meta {
+  border-top: 1px solid var(--color-border);
+}
+.nene-public[data-theme^='sumi'] .hero__stat b {
+  font-family: var(--font-display);
+}
+.nene-public[data-theme^='sumi'] .section__head {
+  border-bottom: 1px solid var(--color-border-strong);
+}
+.nene-public[data-theme^='sumi'] .section__title {
+  font-weight: 600;
+}
+.nene-public[data-theme^='sumi'] .section__link {
+  font-family: var(--font-display);
+  color: var(--color-accent);
+  letter-spacing: 0.06em;
+}
+.nene-public[data-theme^='sumi'] .card__media,
+.nene-public[data-theme^='sumi'] .featured__media,
+.nene-public[data-theme^='sumi'] .row__media {
+  border-radius: 2px;
+  border: 1px solid var(--color-border);
+  filter: grayscale(1) contrast(1.08);
+  transition: filter var(--dur-normal) var(--ease);
+}
+.nene-public[data-theme^='sumi'] .card:hover .card__media {
+  filter: grayscale(0.6);
+}
+.nene-public[data-theme^='sumi'] .card:hover .card__title {
+  color: var(--color-accent);
+}
+.nene-public[data-theme^='sumi'] .featured {
+  border: 0;
+  border-top: 1px solid var(--color-border-strong);
+  border-bottom: 1px solid var(--color-border-strong);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  padding-block: var(--space-lg);
+}
+.nene-public[data-theme^='sumi'] .typecard {
+  border: 0;
+  border-bottom: 1px solid var(--color-border);
+  border-radius: 0;
+  background: transparent;
+  padding-inline: 0;
+}
+.nene-public[data-theme^='sumi'] .typecard:hover {
+  background: transparent;
+  border-bottom-color: var(--color-accent);
+  transform: none;
+  box-shadow: none;
+}
+.nene-public[data-theme^='sumi'] .widget,
+.nene-public[data-theme^='sumi'] .aside section {
+  border: 0;
+  border-top: 1px solid var(--color-border-strong);
+  border-radius: 0;
+  background: transparent;
+  padding: var(--space-md) 0 0;
+  box-shadow: none;
+}
+.nene-public[data-theme^='sumi'] .widget__title,
+.nene-public[data-theme^='sumi'] .aside section h2 {
+  font-family: var(--font-display);
+}
+.nene-public[data-theme^='sumi'] .search,
+.nene-public[data-theme^='sumi'] .searchbar,
+.nene-public[data-theme^='sumi'] .input,
+.nene-public[data-theme^='sumi'] .textarea {
+  border-radius: 2px;
+}
+.nene-public[data-theme^='sumi'] .poplist__rank {
+  font-family: var(--font-display);
+  color: var(--color-accent);
+}
+.nene-public[data-theme^='sumi'] .tag {
+  border-radius: 2px;
+  font-family: var(--font-display);
+}
+.nene-public[data-theme^='sumi'] .chip,
+.nene-public[data-theme^='sumi'] .viewtoggle,
+.nene-public[data-theme^='sumi'] .pager button,
+.nene-public[data-theme^='sumi'] .pager span {
+  border-radius: 2px;
+}
+.nene-public[data-theme^='sumi'] .prose > p:first-of-type::first-letter,
+.nene-public[data-theme^='sumi'] .markdown-body > p:first-of-type::first-letter {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 3em;
+  line-height: 0.85;
+  float: left;
+  margin: 0.06em 0.12em 0 0;
+  color: var(--color-accent);
+}
+.nene-public[data-theme^='sumi'] .ft {
+  border-top: 1px solid var(--color-border);
+}
+.nene-public[data-theme^='sumi'] .eyecatch {
+  border-radius: 2px;
+  border-color: var(--color-border);
+  background: repeating-linear-gradient(
+    115deg,
+    color-mix(in oklch, var(--color-text-primary) 8%, var(--color-surface-overlay)) 0 16px,
+    var(--color-surface-overlay) 16px 32px
+  );
+}
+.nene-public[data-theme^='sumi'] .eyecatch::after {
+  font-family: var(--font-display);
+}

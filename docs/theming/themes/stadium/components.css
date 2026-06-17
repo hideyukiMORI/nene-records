@@ -1,0 +1,42 @@
+/* Stadium — athletic condensed italic, jersey numerals. FONT OVERRIDE: Saira Condensed. ★STAR */
+.nene-public[data-theme^='stadium']{--font-display:'Saira Condensed',system-ui,sans-serif;--font-chrome:'Saira Condensed',system-ui,sans-serif;--radius-sm:2px;--radius-md:3px;--radius-lg:4px;--content-w:1280px;--tracking-display:-0.01em;counter-reset:st-sec;}
+.nene-public[data-theme^='stadium'] .hero__title,.nene-public[data-theme^='stadium'] .section__title,.nene-public[data-theme^='stadium'] .featured__title,.nene-public[data-theme^='stadium'] .card__title,.nene-public[data-theme^='stadium'] .pagehead__title,.nene-public[data-theme^='stadium'] .typecard__name,.nene-public[data-theme^='stadium'] .row__title{font-family:var(--font-display);font-weight:800;font-style:italic;text-transform:uppercase;letter-spacing:-0.01em;}
+.nene-public[data-theme^='stadium'] .hd{border-bottom:3px solid var(--color-accent);}
+.nene-public[data-theme^='stadium'] .brand__mark{border-radius:2px;background:var(--color-accent);color:var(--color-on-accent);transform:skewX(-8deg);}
+.nene-public[data-theme^='stadium'] .brand__mark svg{color:var(--color-on-accent);transform:skewX(8deg);}
+.nene-public[data-theme^='stadium'] .brand__name{font-family:var(--font-display);font-style:italic;font-weight:800;text-transform:uppercase;letter-spacing:0.01em;white-space:nowrap;}
+.nene-public[data-theme^='stadium'] .navlink{font-family:var(--font-chrome);text-transform:uppercase;letter-spacing:0.06em;font-weight:600;font-size:0.8rem;}
+.nene-public[data-theme^='stadium'] .navlink[aria-current='page']::after{height:3px;background:var(--color-accent);}
+.nene-public[data-theme^='stadium'] .btn{font-family:var(--font-chrome);font-style:italic;text-transform:uppercase;letter-spacing:0.04em;font-weight:700;border-radius:2px;}
+.nene-public[data-theme^='stadium'] .eyebrow{font-family:var(--font-chrome);text-transform:uppercase;letter-spacing:0.16em;font-size:0.72rem;color:var(--color-accent);font-weight:600;}
+.nene-public[data-theme^='stadium'] .eyebrow::before{width:18px;height:4px;background:var(--color-accent);transform:skewX(-20deg);}
+.nene-public[data-theme^='stadium'] .tbadge{font-family:var(--font-chrome);text-transform:uppercase;letter-spacing:0.06em;border-radius:2px;background:var(--color-accent);color:var(--color-on-accent);border:0;}
+.nene-public[data-theme^='stadium'] .tbadge::before{background:currentColor;}
+.nene-public[data-theme^='stadium'] .hero__title{font-size:clamp(3rem,2rem+5vw,6.4rem);line-height:0.94;}
+.nene-public[data-theme^='stadium'] .hero__title em{color:var(--color-accent);font-style:italic;}
+.nene-public[data-theme^='stadium'] .hero__art-frame{border:2px solid var(--color-border-strong);border-radius:2px;box-shadow:0 0 0 4px color-mix(in oklch,var(--color-accent) 22%,transparent);background:var(--color-surface-overlay);}
+.nene-public[data-theme^='stadium'] .hero__art-tag b{color:var(--color-accent);}
+.nene-public[data-theme^='stadium'] .hero__stat b{font-family:var(--font-display);font-style:italic;font-weight:800;}
+.nene-public[data-theme^='stadium'] .section{counter-increment:st-sec;}
+.nene-public[data-theme^='stadium'] .section__head{border-bottom:4px solid var(--color-accent);}
+.nene-public[data-theme^='stadium'] .section__title::before{content:counter(st-sec,decimal-leading-zero);font-family:var(--font-display);font-style:italic;font-weight:800;font-size:1.1em;color:var(--color-accent);margin-right:0.4em;-webkit-text-stroke:0;}
+.nene-public[data-theme^='stadium'] .section__link{font-family:var(--font-chrome);text-transform:uppercase;letter-spacing:0.06em;color:var(--color-accent);}
+.nene-public[data-theme^='stadium'] .card{border:1px solid var(--color-border-strong);border-left:5px solid var(--color-accent);border-radius:2px;background:var(--color-surface-raised);padding:var(--space-md);box-shadow:var(--shadow-sm);transition:transform var(--dur-fast) var(--ease),box-shadow var(--dur-fast) var(--ease);}
+.nene-public[data-theme^='stadium'] .card:hover{transform:translateY(-3px);box-shadow:var(--shadow-md);border-left-color:var(--color-brand-violet);}
+.nene-public[data-theme^='stadium'] .card__media,.nene-public[data-theme^='stadium'] .featured__media,.nene-public[data-theme^='stadium'] .article__hero,.nene-public[data-theme^='stadium'] .row__media{border-radius:2px;border:1px solid var(--color-border-strong);filter:grayscale(0.7) contrast(1.08);isolation:isolate;transition:filter var(--dur-normal) var(--ease);}
+.nene-public[data-theme^='stadium'] .card__media::before,.nene-public[data-theme^='stadium'] .featured__media::before,.nene-public[data-theme^='stadium'] .article__hero::before{content:'';position:absolute;inset:0;z-index:1;background:linear-gradient(120deg,color-mix(in oklch,var(--color-accent) 46%,transparent),color-mix(in oklch,var(--color-brand-violet) 28%,transparent));mix-blend-mode:screen;pointer-events:none;}
+.nene-public[data-theme^='stadium'] .eyecatch::after{position:relative;z-index:2;}
+.nene-public[data-theme^='stadium'] .card:hover .card__media{filter:grayscale(0);}
+.nene-public[data-theme^='stadium'] .featured{border:1px solid var(--color-border-strong);border-top:5px solid var(--color-accent);border-radius:2px;background:var(--color-surface-raised);box-shadow:var(--shadow-md);}
+.nene-public[data-theme^='stadium'] .typecard{border:1px solid var(--color-border-strong);border-left:5px solid var(--color-accent);border-radius:2px;background:var(--color-surface-raised);}
+.nene-public[data-theme^='stadium'] .typecard:hover{background:var(--color-accent-weak);transform:translateX(3px);box-shadow:var(--shadow-sm);}
+.nene-public[data-theme^='stadium'] .typecard__count{font-family:var(--font-display);font-style:italic;font-weight:800;color:var(--color-accent);font-size:1.4rem;}
+.nene-public[data-theme^='stadium'] .widget,.nene-public[data-theme^='stadium'] .aside section{border:1px solid var(--color-border-strong);border-top:3px solid var(--color-accent);border-radius:2px;background:var(--color-surface-raised);}
+.nene-public[data-theme^='stadium'] .widget__title,.nene-public[data-theme^='stadium'] .aside section h2{font-family:var(--font-display);font-style:italic;text-transform:uppercase;}
+.nene-public[data-theme^='stadium'] .search,.nene-public[data-theme^='stadium'] .searchbar,.nene-public[data-theme^='stadium'] .input,.nene-public[data-theme^='stadium'] .textarea{border-radius:2px;border-color:var(--color-border-strong);}
+.nene-public[data-theme^='stadium'] .poplist__rank{font-family:var(--font-display);font-style:italic;font-weight:800;color:var(--color-accent);}
+.nene-public[data-theme^='stadium'] .tag{border-radius:2px;font-family:var(--font-chrome);text-transform:uppercase;letter-spacing:0.04em;font-size:0.74rem;}
+.nene-public[data-theme^='stadium'] .chip,.nene-public[data-theme^='stadium'] .viewtoggle,.nene-public[data-theme^='stadium'] .pager button,.nene-public[data-theme^='stadium'] .pager span{border-radius:2px;}
+.nene-public[data-theme^='stadium'] .ft{border-top:3px solid var(--color-accent);}
+.nene-public[data-theme^='stadium'] .eyecatch{border-radius:2px;border-color:var(--color-border-strong);background:repeating-linear-gradient(-20deg,color-mix(in oklch,var(--color-accent) 16%,var(--color-surface-overlay)) 0 12px,var(--color-surface-overlay) 12px 24px);}
+.nene-public[data-theme^='stadium'] .eyecatch::after{font-family:var(--font-chrome);text-transform:uppercase;}

@@ -1,0 +1,237 @@
+/* Gothic — blackletter + oxblood, ecclesiastical. FONT OVERRIDE: UnifrakturCook display, EB Garamond body. ★STAR */
+.nene-public[data-theme^='gothic'] {
+  --font-display: 'UnifrakturCook', 'UnifrakturMaguntia', serif;
+  --font-sans: 'EB Garamond', Georgia, serif;
+  --font-chrome: 'EB Garamond', Georgia, serif;
+  --radius-sm: 2px;
+  --radius-md: 3px;
+  --radius-lg: 4px;
+  --content-w: 1140px;
+  --measure: 64ch;
+  --leading-body: 1.72;
+  --tracking-display: 0.01em;
+}
+.nene-public[data-theme^='gothic'] .hero__title,
+.nene-public[data-theme^='gothic'] .section__title,
+.nene-public[data-theme^='gothic'] .featured__title,
+.nene-public[data-theme^='gothic'] .pagehead__title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+.nene-public[data-theme^='gothic'] .card__title,
+.nene-public[data-theme^='gothic'] .typecard__name,
+.nene-public[data-theme^='gothic'] .row__title,
+.nene-public[data-theme^='gothic'] .widget__title,
+.nene-public[data-theme^='gothic'] .aside section h2 {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  letter-spacing: 0;
+}
+.nene-public[data-theme^='gothic'] .hd {
+  border-bottom: 3px double var(--color-accent);
+}
+.nene-public[data-theme^='gothic'] .brand__mark {
+  border: 1px solid var(--color-accent);
+  background: var(--color-accent-weak);
+  color: var(--color-accent);
+}
+.nene-public[data-theme^='gothic'] .brand__mark svg {
+  color: var(--color-accent);
+}
+.nene-public[data-theme^='gothic'] .brand__name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+.nene-public[data-theme^='gothic'] .navlink {
+  font-family: var(--font-chrome);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.74rem;
+}
+.nene-public[data-theme^='gothic'] .navlink[aria-current='page']::after {
+  height: 2px;
+  background: var(--color-accent);
+}
+.nene-public[data-theme^='gothic'] .btn {
+  font-family: var(--font-chrome);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border-radius: 2px;
+  font-size: 0.82rem;
+}
+.nene-public[data-theme^='gothic'] .eyebrow {
+  font-family: var(--font-chrome);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 0.7rem;
+  color: var(--color-accent);
+}
+.nene-public[data-theme^='gothic'] .eyebrow::before {
+  width: 16px;
+  height: 2px;
+  background: var(--color-accent);
+}
+.nene-public[data-theme^='gothic'] .tbadge {
+  font-family: var(--font-chrome);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border-radius: 2px;
+  background: transparent;
+  border: 1px solid var(--color-accent);
+  color: var(--color-accent);
+}
+.nene-public[data-theme^='gothic'] .tbadge::before {
+  background: var(--color-accent);
+}
+.nene-public[data-theme^='gothic'] .hero__title {
+  font-size: clamp(3rem, 2rem+4.6vw, 5.6rem);
+  line-height: 1;
+}
+.nene-public[data-theme^='gothic'] .hero__title em {
+  color: var(--color-accent);
+  font-style: normal;
+}
+.nene-public[data-theme^='gothic'] .hero__lead {
+  max-width: 54ch;
+  font-style: italic;
+}
+.nene-public[data-theme^='gothic'] .hero__meta {
+  border-top: 3px double var(--color-accent);
+}
+.nene-public[data-theme^='gothic'] .hero__stat b {
+  font-family: var(--font-display);
+  color: var(--color-accent);
+}
+.nene-public[data-theme^='gothic'] .section__head {
+  border-bottom: 3px double var(--color-accent);
+}
+.nene-public[data-theme^='gothic'] .section__title {
+  font-size: clamp(1.9rem, 1.3rem+2vw, 3rem);
+}
+.nene-public[data-theme^='gothic'] .section__link {
+  font-family: var(--font-chrome);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-accent);
+  font-size: 0.74rem;
+}
+.nene-public[data-theme^='gothic'] .card {
+  border: 1px solid var(--color-border-strong);
+  border-radius: 2px;
+  background: var(--color-surface-raised);
+  padding: var(--space-md);
+}
+.nene-public[data-theme^='gothic'] .card:hover {
+  border-color: var(--color-accent);
+}
+.nene-public[data-theme^='gothic'] .card__media,
+.nene-public[data-theme^='gothic'] .featured__media,
+.nene-public[data-theme^='gothic'] .article__hero,
+.nene-public[data-theme^='gothic'] .row__media {
+  border-radius: 2px;
+  border: 1px solid var(--color-accent-weak);
+  filter: grayscale(0.8) contrast(1.06);
+  isolation: isolate;
+  transition: filter var(--dur-normal) var(--ease);
+}
+.nene-public[data-theme^='gothic'] .card__media::before,
+.nene-public[data-theme^='gothic'] .featured__media::before,
+.nene-public[data-theme^='gothic'] .article__hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    140deg,
+    color-mix(in oklch, var(--color-accent) 42%, transparent),
+    color-mix(in oklch, var(--color-brand-violet) 30%, transparent)
+  );
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+.nene-public[data-theme^='gothic'] .eyecatch::after {
+  position: relative;
+  z-index: 2;
+}
+.nene-public[data-theme^='gothic'] .card:hover .card__title {
+  color: var(--color-accent);
+}
+.nene-public[data-theme^='gothic'] .featured {
+  border: 1px solid var(--color-accent);
+  border-top: 4px double var(--color-accent);
+  border-radius: 2px;
+  background: var(--color-surface-raised);
+  box-shadow: none;
+}
+.nene-public[data-theme^='gothic'] .typecard {
+  border: 1px solid var(--color-border-strong);
+  border-left: 3px solid var(--color-accent);
+  border-radius: 2px;
+  background: var(--color-surface-raised);
+}
+.nene-public[data-theme^='gothic'] .typecard:hover {
+  background: var(--color-accent-weak);
+  border-left-color: var(--color-brand-violet);
+  transform: none;
+  box-shadow: none;
+}
+.nene-public[data-theme^='gothic'] .widget,
+.nene-public[data-theme^='gothic'] .aside section {
+  border: 1px solid var(--color-border-strong);
+  border-top: 3px double var(--color-accent);
+  border-radius: 2px;
+  background: var(--color-surface-raised);
+}
+.nene-public[data-theme^='gothic'] .search,
+.nene-public[data-theme^='gothic'] .searchbar,
+.nene-public[data-theme^='gothic'] .input,
+.nene-public[data-theme^='gothic'] .textarea {
+  border-radius: 2px;
+  border-color: var(--color-border-strong);
+}
+.nene-public[data-theme^='gothic'] .poplist__rank {
+  font-family: var(--font-display);
+  color: var(--color-accent);
+}
+.nene-public[data-theme^='gothic'] .tag {
+  border-radius: 2px;
+  font-family: var(--font-chrome);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.72rem;
+}
+.nene-public[data-theme^='gothic'] .chip,
+.nene-public[data-theme^='gothic'] .viewtoggle,
+.nene-public[data-theme^='gothic'] .pager button,
+.nene-public[data-theme^='gothic'] .pager span {
+  border-radius: 2px;
+}
+.nene-public[data-theme^='gothic'] .prose > p:first-of-type::first-letter,
+.nene-public[data-theme^='gothic'] .markdown-body > p:first-of-type::first-letter {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 3.4em;
+  line-height: 0.78;
+  float: left;
+  margin: 0.04em 0.12em 0 0;
+  color: var(--color-accent);
+}
+.nene-public[data-theme^='gothic'] .ft {
+  border-top: 3px double var(--color-accent);
+}
+.nene-public[data-theme^='gothic'] .eyecatch {
+  border-radius: 2px;
+  border-color: var(--color-accent-weak);
+  background: repeating-linear-gradient(
+    135deg,
+    color-mix(in oklch, var(--color-accent) 12%, var(--color-surface-overlay)) 0 12px,
+    var(--color-surface-overlay) 12px 24px
+  );
+}
+.nene-public[data-theme^='gothic'] .eyecatch::after {
+  font-family: var(--font-chrome);
+  text-transform: uppercase;
+}

@@ -291,6 +291,156 @@ export const PUBLIC_THEMES: readonly PublicThemeMeta[] = [
       accent: 'oklch(58% 0.2 295)',
     },
   },
+  {
+    id: 'brutalist',
+    name: 'Brutalist',
+    description:
+      'Raw web brutalism — stark off-white and black, exposed system-mono, hard borders and an unapologetic grid.',
+    author: 'NeNe Records',
+    version: '1.0.0',
+    createdAt: '2026-06-17',
+    thumbnail: '/theme-thumbnails/brutalist.webp',
+    preview: {
+      surface: 'oklch(97.5% 0.003 264)',
+      raised: 'oklch(99.5% 0.003 264)',
+      accent: 'oklch(50% 0.22 264)',
+    },
+  },
+  {
+    id: 'comic',
+    name: 'Comic Pop',
+    description:
+      'Comic-book pop — halftone Ben-Day dots, bold black ink outlines and a punchy display voice.',
+    author: 'NeNe Records',
+    version: '1.0.0',
+    createdAt: '2026-06-17',
+    thumbnail: '/theme-thumbnails/comic.webp',
+    preview: {
+      surface: 'oklch(98% 0.01 95)',
+      raised: 'oklch(99.5% 0.01 95)',
+      accent: 'oklch(58% 0.2 25)',
+    },
+  },
+  {
+    id: 'deco',
+    name: 'Art Deco',
+    description:
+      'Art Deco — emerald and black with gold geometric ornament, symmetric chrome and an elegant register.',
+    author: 'NeNe Records',
+    version: '1.0.0',
+    createdAt: '2026-06-17',
+    thumbnail: '/theme-thumbnails/deco.webp',
+    preview: {
+      surface: 'oklch(95% 0.012 85)',
+      raised: 'oklch(97% 0.012 85)',
+      accent: 'oklch(76% 0.13 85)',
+    },
+  },
+  {
+    id: 'gothic',
+    name: 'Gothic',
+    description:
+      'Gothic / blackletter — cathedral charcoal and aged stone with an oxblood accent and ornate serif heads.',
+    author: 'NeNe Records',
+    version: '1.0.0',
+    createdAt: '2026-06-17',
+    thumbnail: '/theme-thumbnails/gothic.webp',
+    preview: {
+      surface: 'oklch(93% 0.01 320)',
+      raised: 'oklch(95% 0.01 320)',
+      accent: 'oklch(45% 0.15 25)',
+    },
+  },
+  {
+    id: 'kraft',
+    name: 'Kraft',
+    description:
+      'Recycled kraft paper — a tactile cardboard-tan ground, a hand-stamped accent and condensed industrial type.',
+    author: 'NeNe Records',
+    version: '1.0.0',
+    createdAt: '2026-06-17',
+    thumbnail: '/theme-thumbnails/kraft.webp',
+    preview: {
+      surface: 'oklch(90% 0.035 80)',
+      raised: 'oklch(92% 0.035 80)',
+      accent: 'oklch(48% 0.16 30)',
+    },
+  },
+  {
+    id: 'riso',
+    name: 'Risograph',
+    description:
+      'Risograph zine — fluorescent pink/blue duotone, grainy ink and a playful offset-print misregistration.',
+    author: 'NeNe Records',
+    version: '1.0.0',
+    createdAt: '2026-06-17',
+    thumbnail: '/theme-thumbnails/riso.webp',
+    preview: {
+      surface: 'oklch(97% 0.01 30)',
+      raised: 'oklch(99% 0.01 30)',
+      accent: 'oklch(62% 0.24 5)',
+    },
+  },
+  {
+    id: 'stadium',
+    name: 'Stadium',
+    description:
+      'Athletic / stadium — bold condensed italic display, jersey numbers and a high-energy sports register.',
+    author: 'NeNe Records',
+    version: '1.0.0',
+    createdAt: '2026-06-17',
+    thumbnail: '/theme-thumbnails/stadium.webp',
+    preview: {
+      surface: 'oklch(97% 0.006 250)',
+      raised: 'oklch(99% 0.006 250)',
+      accent: 'oklch(55% 0.2 255)',
+    },
+  },
+  {
+    id: 'sumi',
+    name: 'Sumi-e',
+    description:
+      'Japanese ink wash — warm washi paper, sumi-black ink, a single vermilion seal and a quiet mincho voice.',
+    author: 'NeNe Records',
+    version: '1.0.0',
+    createdAt: '2026-06-17',
+    thumbnail: '/theme-thumbnails/sumi.webp',
+    preview: {
+      surface: 'oklch(95% 0.014 85)',
+      raised: 'oklch(97% 0.014 85)',
+      accent: 'oklch(55% 0.18 30)',
+    },
+  },
+  {
+    id: 'western',
+    name: 'Western',
+    description:
+      'Old-West wood type — aged poster paper, barn-red and saddle-sepia, slab/tuscan display and a wanted-poster feel.',
+    author: 'NeNe Records',
+    version: '1.0.0',
+    createdAt: '2026-06-17',
+    thumbnail: '/theme-thumbnails/western.webp',
+    preview: {
+      surface: 'oklch(93% 0.025 80)',
+      raised: 'oklch(95% 0.025 80)',
+      accent: 'oklch(48% 0.16 28)',
+    },
+  },
+  {
+    id: 'y2k',
+    name: 'Y2K Aqua',
+    description:
+      'Frutiger Aero / aqua — glossy sky-blue gradients, bubbly chrome, soft rounded type and a nostalgic 2000s shine.',
+    author: 'NeNe Records',
+    version: '1.0.0',
+    createdAt: '2026-06-17',
+    thumbnail: '/theme-thumbnails/y2k.webp',
+    preview: {
+      surface: 'oklch(98% 0.012 230)',
+      raised: 'oklch(99.5% 0.012 230)',
+      accent: 'oklch(58% 0.15 235)',
+    },
+  },
 ]
 
 export const DEFAULT_PUBLIC_THEME_ID = 'consumer'
