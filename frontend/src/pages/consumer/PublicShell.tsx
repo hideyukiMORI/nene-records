@@ -71,6 +71,8 @@ export function PublicShell() {
     tagline: settings.tagline ?? '',
     metaDescription: settings.default_meta_description ?? '',
     footerMarkdown: settings.footer_markdown ?? '',
+    logo: settings.logo_media_id ?? '',
+    copyrightText: settings.copyright_text ?? '',
     navItems,
     activeTheme,
     themeOverrideCss: overrideCssForTheme(overridesRaw, activeTheme),

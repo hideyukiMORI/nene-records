@@ -589,6 +589,7 @@ export const en = {
   'admin.settings.error': 'Could not load site settings.',
   'admin.settings.save': 'Save',
   'admin.settings.saving': 'Saving…',
+  'admin.settings.media.none': 'No image',
   'admin.settings.visibility.public': 'Public',
   'admin.settings.visibility.adminOnly': 'Admin only',
   'admin.settings.history.show': 'Show history',

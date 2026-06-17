@@ -67,11 +67,15 @@ function ThemeSwitch({ mode, onMode }: { mode: ThemeMode; onMode: (mode: ThemeMo
   )
 }
 
-function Brand({ siteName, tagline }: { siteName: string; tagline?: string }) {
+function Brand({ siteName, tagline, logo }: { siteName: string; tagline?: string; logo?: string }) {
   return (
     <Link className="brand" to="/">
       <span className="brand__mark">
-        <NeneMark size={22} />
+        {logo !== undefined && logo !== '' ? (
+          <img className="brand__logo" src={logo} alt={siteName} />
+        ) : (
+          <NeneMark size={22} />
+        )}
       </span>
       <span className="brand__text">
         <span className="brand__name">{siteName}</span>
@@ -81,6 +85,15 @@ function Brand({ siteName, tagline }: { siteName: string; tagline?: string }) {
       </span>
     </Link>
   )
+}
+
+/** Footer copyright: substitute `{year}`/`{site}` tokens, fall back to a default. */
+function renderCopyright(template: string, siteName: string): string {
+  const year = String(new Date().getFullYear())
+  if (template.trim() === '') {
+    return `© ${year} ${siteName}`
+  }
+  return template.replaceAll('{year}', year).replaceAll('{site}', siteName)
 }
 
 /**
@@ -148,7 +161,7 @@ export function PublicSiteShell({
       {site.themeOverrideCss !== '' ? <style>{site.themeOverrideCss}</style> : null}
       <header className="hd">
         <div className="wrap hd__in">
-          <Brand siteName={site.siteName} tagline={site.tagline} />
+          <Brand siteName={site.siteName} tagline={site.tagline} logo={site.logo} />
           <nav className="hd__nav" aria-label="Primary">
             {navLinks.map((link) => (
               <Link
@@ -200,7 +213,7 @@ export function PublicSiteShell({
       <footer className="ft">
         <div className="wrap ft__grid">
           <div className="ft__brand">
-            <Brand siteName={site.siteName} />
+            <Brand siteName={site.siteName} logo={site.logo} />
             {site.footerMarkdown !== '' ? <p className="ft__free">{site.footerMarkdown}</p> : null}
           </div>
           <div className="ft__col">
@@ -228,9 +241,7 @@ export function PublicSiteShell({
           </div>
         </div>
         <div className="wrap ft__bar">
-          <small>
-            © {new Date().getFullYear()} {site.siteName}
-          </small>
+          <small>{renderCopyright(site.copyrightText, site.siteName)}</small>
           <small className="mono">Powered by NENE2 · {'>>'}</small>
         </div>
       </footer>

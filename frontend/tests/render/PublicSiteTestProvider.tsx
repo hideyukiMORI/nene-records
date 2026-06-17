@@ -6,6 +6,8 @@ const TEST_SITE: PublicSite = {
   tagline: '',
   metaDescription: '',
   footerMarkdown: '',
+  logo: '',
+  copyrightText: '',
   navItems: [],
   activeTheme: 'consumer',
   themeOverrideCss: '',

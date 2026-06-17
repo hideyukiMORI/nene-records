@@ -31,6 +31,7 @@ use NeNeRecords\Tests\EntityType\InMemoryEntityTypeRepository;
 use NeNeRecords\Tests\EnumField\InMemoryEnumFieldRepository;
 use NeNeRecords\Tests\FieldDef\InMemoryFieldDefRepository;
 use NeNeRecords\Tests\IntField\InMemoryIntFieldRepository;
+use NeNeRecords\Tests\Media\InMemoryMediaRepository;
 use NeNeRecords\Tests\NavigationItem\InMemoryNavigationItemRepository;
 use NeNeRecords\Tests\Setting\InMemorySettingRepository;
 use NeNeRecords\Tests\TextField\InMemoryTextFieldRepository;
@@ -67,7 +68,7 @@ final class PublicCacheHttpTest extends TestCase
         ], $entities);
 
         $settingRepo = new InMemorySettingRepository();
-        $publicSettings = new ListPublicSettingsUseCase($settingRepo);
+        $publicSettings = new ListPublicSettingsUseCase($settingRepo, new InMemoryMediaRepository());
 
         $navRepo = new InMemoryNavigationItemRepository();
         $navRepo->save(new NavigationItem(id: null, label: 'Home', url: '/', displayOrder: 0, createdAt: '2026-01-01T00:00:00Z', updatedAt: '2026-01-01T00:00:00Z'));

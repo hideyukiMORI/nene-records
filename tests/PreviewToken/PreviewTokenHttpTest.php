@@ -31,6 +31,7 @@ use NeNeRecords\Tests\EntityType\InMemoryEntityTypeRepository;
 use NeNeRecords\Tests\EnumField\InMemoryEnumFieldRepository;
 use NeNeRecords\Tests\FieldDef\InMemoryFieldDefRepository;
 use NeNeRecords\Tests\IntField\InMemoryIntFieldRepository;
+use NeNeRecords\Tests\Media\InMemoryMediaRepository;
 use NeNeRecords\Tests\Setting\InMemorySettingRepository;
 use NeNeRecords\Tests\TextField\InMemoryTextFieldRepository;
 use NeNeRecords\TextField\TextField;
@@ -67,7 +68,7 @@ final class PreviewTokenHttpTest extends TestCase
             new TextField(entityId: 10, fieldKey: 'title', value: 'Draft Article', id: 1),
         ], $this->entities);
 
-        $publicSettings = new ListPublicSettingsUseCase(new InMemorySettingRepository());
+        $publicSettings = new ListPublicSettingsUseCase(new InMemorySettingRepository(), new InMemoryMediaRepository());
 
         $jsonResponse = new JsonResponseFactory($this->factory, $this->factory);
         $problemDetails = new ProblemDetailsResponseFactory($this->factory, $this->factory);

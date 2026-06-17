@@ -590,6 +590,7 @@ export const ja: Partial<MessageCatalog> = {
   'admin.settings.error': 'サイト設定を読み込めませんでした。',
   'admin.settings.save': '保存',
   'admin.settings.saving': '保存中…',
+  'admin.settings.media.none': '画像なし',
   'admin.settings.visibility.public': '公開',
   'admin.settings.visibility.adminOnly': '管理者のみ',
   'admin.settings.history.show': '履歴を表示',
