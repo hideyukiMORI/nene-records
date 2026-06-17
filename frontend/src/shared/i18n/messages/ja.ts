@@ -70,6 +70,8 @@ export const ja: Partial<MessageCatalog> = {
   'admin.themeCustomize.hero': 'ヒーロー',
   'admin.themeCustomize.sectionRule': '見出し罫',
   'admin.themeCustomize.eyebrow': 'アイブロウ',
+  'admin.themeCustomize.basic': '基本',
+  'admin.themeCustomize.advanced': '詳細設定',
   'admin.themeCustomize.save': '保存',
   'admin.themeCustomize.saving': '保存中…',
   'admin.themeCustomize.reset': 'リセット',

@@ -103,6 +103,7 @@ export function ThemeCustomizeView({
           {t('admin.themeCustomize.intro', { theme: themeId })}
         </Text>
 
+        {/* Basics — the essentials a non-engineer reaches for first. */}
         <Stack gap="sm">
           <Field label={t('admin.themeCustomize.accent')}>
             <ColorInput
@@ -180,46 +181,6 @@ export function ThemeCustomizeView({
               }}
             />
           </Field>
-          <Field label={t('admin.themeCustomize.gutter')}>
-            <Select
-              value={draft.gutter}
-              options={GUTTER_OPTIONS}
-              placeholder={themePlaceholder}
-              onChange={(v) => {
-                setKnob('gutter', v)
-              }}
-            />
-          </Field>
-          <Field label={t('admin.themeCustomize.radius')}>
-            <Select
-              value={draft.radius}
-              options={RADIUS_OPTIONS}
-              placeholder={themePlaceholder}
-              onChange={(v) => {
-                setKnob('radius', v)
-              }}
-            />
-          </Field>
-          <Field label={t('admin.themeCustomize.fontSize')}>
-            <Select
-              value={draft.fontSize}
-              options={FONT_SIZE_OPTIONS}
-              placeholder={themePlaceholder}
-              onChange={(v) => {
-                setKnob('fontSize', v)
-              }}
-            />
-          </Field>
-          <Field label={t('admin.themeCustomize.typeScale')}>
-            <Select
-              value={draft.typeScale}
-              options={TYPE_SCALE_OPTIONS}
-              placeholder={themePlaceholder}
-              onChange={(v) => {
-                setKnob('typeScale', v)
-              }}
-            />
-          </Field>
           <Field label={t('admin.themeCustomize.density')}>
             <Select
               value={draft.density}
@@ -250,47 +211,96 @@ export function ThemeCustomizeView({
               }}
             />
           </Field>
-          <Field label={t('admin.themeCustomize.media')}>
-            <Select
-              value={draft.flags?.media}
-              options={FLAG_DEFS.media.options}
-              placeholder={themePlaceholder}
-              onChange={(v) => {
-                setKnob('flags', { ...draft.flags, media: v })
-              }}
-            />
-          </Field>
-          <Field label={t('admin.themeCustomize.hero')}>
-            <Select
-              value={draft.flags?.hero}
-              options={FLAG_DEFS.hero.options}
-              placeholder={themePlaceholder}
-              onChange={(v) => {
-                setKnob('flags', { ...draft.flags, hero: v })
-              }}
-            />
-          </Field>
-          <Field label={t('admin.themeCustomize.sectionRule')}>
-            <Select
-              value={draft.flags?.sectionRule}
-              options={FLAG_DEFS.sectionRule.options}
-              placeholder={themePlaceholder}
-              onChange={(v) => {
-                setKnob('flags', { ...draft.flags, sectionRule: v })
-              }}
-            />
-          </Field>
-          <Field label={t('admin.themeCustomize.eyebrow')}>
-            <Select
-              value={draft.flags?.eyebrow}
-              options={FLAG_DEFS.eyebrow.options}
-              placeholder={themePlaceholder}
-              onChange={(v) => {
-                setKnob('flags', { ...draft.flags, eyebrow: v })
-              }}
-            />
-          </Field>
         </Stack>
+
+        {/* Advanced — finer tuning + structural flags, folded away by default. */}
+        <details className="border-t border-border pt-stack-sm">
+          <summary className="cursor-pointer font-chrome text-caption font-semibold text-text-primary">
+            {t('admin.themeCustomize.advanced')}
+          </summary>
+          <Stack gap="sm" className="mt-stack-sm">
+            <Field label={t('admin.themeCustomize.gutter')}>
+              <Select
+                value={draft.gutter}
+                options={GUTTER_OPTIONS}
+                placeholder={themePlaceholder}
+                onChange={(v) => {
+                  setKnob('gutter', v)
+                }}
+              />
+            </Field>
+            <Field label={t('admin.themeCustomize.radius')}>
+              <Select
+                value={draft.radius}
+                options={RADIUS_OPTIONS}
+                placeholder={themePlaceholder}
+                onChange={(v) => {
+                  setKnob('radius', v)
+                }}
+              />
+            </Field>
+            <Field label={t('admin.themeCustomize.fontSize')}>
+              <Select
+                value={draft.fontSize}
+                options={FONT_SIZE_OPTIONS}
+                placeholder={themePlaceholder}
+                onChange={(v) => {
+                  setKnob('fontSize', v)
+                }}
+              />
+            </Field>
+            <Field label={t('admin.themeCustomize.typeScale')}>
+              <Select
+                value={draft.typeScale}
+                options={TYPE_SCALE_OPTIONS}
+                placeholder={themePlaceholder}
+                onChange={(v) => {
+                  setKnob('typeScale', v)
+                }}
+              />
+            </Field>
+            <Field label={t('admin.themeCustomize.media')}>
+              <Select
+                value={draft.flags?.media}
+                options={FLAG_DEFS.media.options}
+                placeholder={themePlaceholder}
+                onChange={(v) => {
+                  setKnob('flags', { ...draft.flags, media: v })
+                }}
+              />
+            </Field>
+            <Field label={t('admin.themeCustomize.hero')}>
+              <Select
+                value={draft.flags?.hero}
+                options={FLAG_DEFS.hero.options}
+                placeholder={themePlaceholder}
+                onChange={(v) => {
+                  setKnob('flags', { ...draft.flags, hero: v })
+                }}
+              />
+            </Field>
+            <Field label={t('admin.themeCustomize.sectionRule')}>
+              <Select
+                value={draft.flags?.sectionRule}
+                options={FLAG_DEFS.sectionRule.options}
+                placeholder={themePlaceholder}
+                onChange={(v) => {
+                  setKnob('flags', { ...draft.flags, sectionRule: v })
+                }}
+              />
+            </Field>
+            <Field label={t('admin.themeCustomize.eyebrow')}>
+              <Select
+                value={draft.flags?.eyebrow}
+                options={FLAG_DEFS.eyebrow.options}
+                placeholder={themePlaceholder}
+                onChange={(v) => {
+                  setKnob('flags', { ...draft.flags, eyebrow: v })
+                }}
+              />
+            </Field>
+          </Stack>
+        </details>
 
         <div className="flex items-center gap-inline-sm">
           <Button onClick={save} disabled={disabled || !isDirty}>

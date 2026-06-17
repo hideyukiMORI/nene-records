@@ -77,6 +77,8 @@ export const en = {
   'admin.themeCustomize.hero': 'Hero',
   'admin.themeCustomize.sectionRule': 'Section rule',
   'admin.themeCustomize.eyebrow': 'Eyebrow',
+  'admin.themeCustomize.basic': 'Basics',
+  'admin.themeCustomize.advanced': 'Advanced',
   'admin.themeCustomize.save': 'Save',
   'admin.themeCustomize.saving': 'Saving…',
   'admin.themeCustomize.reset': 'Reset',

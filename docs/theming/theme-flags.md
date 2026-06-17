@@ -83,8 +83,9 @@ manifest に任意の `flags` を追加（[`public-theme.schema.json`](./public-
 
 ## 4. simple / pro モード（カスタマイザ）
 
-- **simple**: 列挙ノブ（色/幅/余白/サイズ/角丸＝S/M/L 等）＋ **flags のプルダウン**（grid/list 等）。非エンジニア向け。
-- **pro**: 生トークンの細指定・bespoke `components.css` の利用。普段は折りたたみ/別タブに隠す。
+- **simple（基本・常時表示）**: 非エンジニアが最初に触る要素 — アクセント/背景/文字色・本文フォント・幅・密度・`feedLayout`/`cardStyle`。
+- **pro（詳細・`<details>` 折りたたみ／既定で閉）**: 微調整 — 左右余白・角丸・文字サイズ・見出しスケール・`media`/`hero`/`sectionRule`/`eyebrow`。将来は生トークン細指定・bespoke `components.css` の導線もここに。
+- 実装: `ThemeCustomizeView`。基本 `Stack` の下に `<details>` で詳細グループ。
 
 ## 5. バリデーション
 
@@ -110,5 +111,5 @@ manifest に任意の `flags` を追加（[`public-theme.schema.json`](./public-
 4. flags UI ＋ validator enum：
    - ✅ カスタマイザに全6フラグのプルダウン（`ThemeCustomizeView`）。
    - ✅ validator の flags enum 検証（`public-theme.schema.json` の `flags` enum ＋ `additionalProperties:false`、Ajv 駆動）。
-   - ⬜ simple/pro モード分割（UI の折りたたみ）。
+   - ✅ simple/pro 分割：基本ノブ（色/フォント/幅/密度/feedLayout/cardStyle）は常時表示、詳細（余白/角丸/文字サイズ/見出しスケール/media/hero/sectionRule/eyebrow）は `<details>` で折りたたみ（既定で閉）。
 5. ⬜ ClaudeCode で JSON テーマ量産。
