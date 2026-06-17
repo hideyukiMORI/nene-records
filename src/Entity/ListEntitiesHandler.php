@@ -80,6 +80,8 @@ final readonly class ListEntitiesHandler
                         'deleted_at' => $item->deletedAtIso,
                         'created_at' => $item->createdAtIso,
                         'updated_at' => $item->updatedAtIso,
+                        'meta_title' => $item->metaTitle,
+                        'meta_description' => $item->metaDescription,
                     ],
                     $output->items,
                 ),

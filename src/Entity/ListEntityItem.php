@@ -17,6 +17,8 @@ final readonly class ListEntityItem
         public ?string $scheduledAtIso = null,
         public ?string $createdAtIso = null,
         public ?string $updatedAtIso = null,
+        public ?string $metaTitle = null,
+        public ?string $metaDescription = null,
     ) {
     }
 }
