@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import type { Widget } from '@/entities/widget'
 import { useTranslation } from '@/shared/i18n'
-import { formatPostDate, truncateExcerpt } from '@/shared/lib/widget-post-meta'
+import { formatPostDate } from '@/shared/lib/widget-post-meta'
 import { Text } from '@/shared/ui'
 import { useRecentPosts } from '../hooks/use-recent-posts'
 
@@ -18,9 +18,6 @@ export function RecentPostsWidget({ widget }: RecentPostsWidgetProps) {
   const limit = typeof rawLimit === 'number' && rawLimit > 0 ? rawLimit : 5
   const showDate = widget.settings['showDate'] === true
   const showExcerpt = widget.settings['showExcerpt'] === true
-  const rawExcerptLength = widget.settings['excerptLength']
-  const excerptLength =
-    typeof rawExcerptLength === 'number' && rawExcerptLength > 0 ? rawExcerptLength : 80
 
   const { items } = useRecentPosts(entityTypeSlug, limit)
 
@@ -44,7 +41,7 @@ export function RecentPostsWidget({ widget }: RecentPostsWidgetProps) {
     <ul className="flex flex-col gap-stack-sm">
       {items.map((item) => {
         const date = showDate ? formatPostDate(item.publishedAt, locale) : ''
-        const excerpt = showExcerpt ? truncateExcerpt(item.excerpt, excerptLength) : ''
+        const excerpt = showExcerpt ? item.excerpt : ''
         return (
           <li key={item.id} className="flex flex-col gap-stack-xs">
             <Link

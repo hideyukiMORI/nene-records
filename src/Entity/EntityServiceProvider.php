@@ -12,6 +12,7 @@ use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RequestScopedHolder;
 use NeNeRecords\EntityType\EntityTypeRepositoryInterface;
+use NeNeRecords\Setting\SettingRepositoryInterface;
 use NeNeRecords\TextField\TextFieldRepositoryInterface;
 use NeNeRecords\Webhook\WebhookDispatcherInterface;
 use Psr\Container\ContainerInterface;
@@ -167,7 +168,22 @@ final readonly class EntityServiceProvider implements ServiceProviderInterface
                         throw new LogicException('JSON response factory service is invalid.');
                     }
 
-                    return new ListEntitiesHandler($useCase, $response);
+                    $textFields = $c->get(TextFieldRepositoryInterface::class);
+                    $settings = $c->get(SettingRepositoryInterface::class);
+
+                    if (!$textFields instanceof TextFieldRepositoryInterface) {
+                        throw new LogicException('Text field repository service is invalid.');
+                    }
+
+                    if (!$settings instanceof SettingRepositoryInterface) {
+                        throw new LogicException('Setting repository service is invalid.');
+                    }
+
+                    return new ListEntitiesHandler(
+                        $useCase,
+                        $response,
+                        new ExcerptResolver($textFields, $settings),
+                    );
                 },
             )
             ->set(

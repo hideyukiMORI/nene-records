@@ -14,6 +14,8 @@ export interface EntityDto {
   deleted_at: string | null
   meta_title: string | null
   meta_description: string | null
+  /** Server-computed teaser; present only when listed with `?include=excerpt`. */
+  excerpt?: string | null
   created_at: string | null
   updated_at: string | null
 }

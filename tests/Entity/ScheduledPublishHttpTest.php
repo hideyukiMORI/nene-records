@@ -16,6 +16,7 @@ use NeNeRecords\Entity\Entity;
 use NeNeRecords\Entity\EntityNotFoundExceptionHandler;
 use NeNeRecords\Entity\EntityRouteRegistrar;
 use NeNeRecords\Entity\EntityStatus;
+use NeNeRecords\Entity\ExcerptResolver;
 use NeNeRecords\Entity\ExportEntitiesHandler;
 use NeNeRecords\Entity\GetEntityByIdHandler;
 use NeNeRecords\Entity\GetEntityByIdUseCase;
@@ -34,6 +35,7 @@ use NeNeRecords\Entity\UpdateEntityUseCase;
 use NeNeRecords\EntityType\EntityType;
 use NeNeRecords\EntityType\EntityTypeNotFoundExceptionHandler;
 use NeNeRecords\Tests\EntityType\InMemoryEntityTypeRepository;
+use NeNeRecords\Tests\Setting\InMemorySettingRepository;
 use NeNeRecords\Tests\TextField\InMemoryTextFieldRepository;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use PHPUnit\Framework\TestCase;
@@ -62,7 +64,7 @@ final class ScheduledPublishHttpTest extends TestCase
             new CreateEntityHandler(new CreateEntityUseCase($this->entities, $this->entityTypes), $jsonResponse),
             new UpdateEntityHandler(new UpdateEntityUseCase($this->entities, $this->entityTypes), $jsonResponse),
             new DeleteEntityHandler(new DeleteEntityUseCase($this->entities), $this->factory),
-            new ListEntitiesHandler(new ListEntitiesUseCase($this->entities), $jsonResponse),
+            new ListEntitiesHandler(new ListEntitiesUseCase($this->entities), $jsonResponse, new ExcerptResolver(new InMemoryTextFieldRepository(), new InMemorySettingRepository())),
             new ListEntityRevisionsHandler(new ListEntityRevisionsUseCase($this->entities), $jsonResponse),
             new ExportEntitiesHandler($this->entities, new InMemoryTextFieldRepository(), $this->factory),
             new ScheduleEntityHandler(new ScheduleEntityUseCase($this->entities), $jsonResponse),

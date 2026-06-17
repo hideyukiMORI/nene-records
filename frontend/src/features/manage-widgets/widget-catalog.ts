@@ -38,12 +38,6 @@ export const WIDGET_CATALOG: readonly WidgetCatalogEntry[] = [
       { key: 'limit', labelKey: 'admin.widgets.limitLabel', editor: 'int', def: 5 },
       { key: 'showDate', labelKey: 'admin.widgets.showDateLabel', editor: 'bool' },
       { key: 'showExcerpt', labelKey: 'admin.widgets.showExcerptLabel', editor: 'bool' },
-      {
-        key: 'excerptLength',
-        labelKey: 'admin.widgets.excerptLengthLabel',
-        editor: 'int',
-        def: 80,
-      },
     ],
   },
   {

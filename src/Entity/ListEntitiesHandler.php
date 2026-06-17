@@ -16,6 +16,7 @@ final readonly class ListEntitiesHandler
     public function __construct(
         private ListEntitiesUseCaseInterface $useCase,
         private JsonResponseFactory $response,
+        private ExcerptResolver $excerpts,
     ) {
     }
 
@@ -66,23 +67,36 @@ final readonly class ListEntitiesHandler
             ),
         ));
 
+        // `?include=excerpt` adds a server-computed teaser (used by the public
+        // feed and post-list widgets). Off by default so the admin list stays lean.
+        $include = $request->getQueryParams()['include'] ?? '';
+        $wantExcerpt = is_string($include) && in_array('excerpt', explode(',', $include), true);
+        $excerptByEntity = $wantExcerpt ? $this->excerpts->resolve($output->items) : [];
+
         return $this->response->create(
             (new PaginationResponse(
                 items: array_map(
-                    static fn (ListEntityItem $item) => [
-                        'id' => $item->id,
-                        'entity_type_id' => $item->entityTypeId,
-                        'slug' => $item->slug,
-                        'status' => $item->status,
-                        'published_at' => $item->publishedAtIso,
-                        'scheduled_at' => $item->scheduledAtIso,
-                        'is_deleted' => $item->isDeleted,
-                        'deleted_at' => $item->deletedAtIso,
-                        'created_at' => $item->createdAtIso,
-                        'updated_at' => $item->updatedAtIso,
-                        'meta_title' => $item->metaTitle,
-                        'meta_description' => $item->metaDescription,
-                    ],
+                    function (ListEntityItem $item) use ($wantExcerpt, $excerptByEntity) {
+                        $row = [
+                            'id' => $item->id,
+                            'entity_type_id' => $item->entityTypeId,
+                            'slug' => $item->slug,
+                            'status' => $item->status,
+                            'published_at' => $item->publishedAtIso,
+                            'scheduled_at' => $item->scheduledAtIso,
+                            'is_deleted' => $item->isDeleted,
+                            'deleted_at' => $item->deletedAtIso,
+                            'created_at' => $item->createdAtIso,
+                            'updated_at' => $item->updatedAtIso,
+                            'meta_title' => $item->metaTitle,
+                            'meta_description' => $item->metaDescription,
+                        ];
+                        if ($wantExcerpt) {
+                            $row['excerpt'] = $excerptByEntity[$item->id] ?? '';
+                        }
+
+                        return $row;
+                    },
                     $output->items,
                 ),
                 limit: $output->limit,

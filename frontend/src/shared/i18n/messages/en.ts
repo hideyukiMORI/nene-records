@@ -178,7 +178,6 @@ export const en = {
   'admin.widgets.limitLabel': 'Number of posts',
   'admin.widgets.showDateLabel': 'Show published date',
   'admin.widgets.showExcerptLabel': 'Show excerpt',
-  'admin.widgets.excerptLengthLabel': 'Excerpt length',
   'admin.widgets.add': 'Add',
   'admin.widgets.typeLabel': 'Widget type',
   'admin.widgets.type.recent-posts': 'Recent posts',
@@ -576,6 +575,8 @@ export const en = {
   'admin.entitySeo.metaTitle.placeholder': 'Override page title for search engines…',
   'admin.entitySeo.metaDescription': 'Meta description',
   'admin.entitySeo.metaDescription.placeholder': 'Override meta description for search engines…',
+  'admin.entitySeo.metaDescription.help':
+    'A short summary for search results. It can also appear as the excerpt in the feed and post-list widgets — if left blank, the start of the body is used instead.',
   'admin.entitySeo.save': 'Save SEO',
   'admin.entitySeo.saving': 'Saving…',
   'admin.entitySeo.saveSuccess': 'SEO settings saved.',

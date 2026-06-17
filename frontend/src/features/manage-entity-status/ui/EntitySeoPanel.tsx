@@ -44,16 +44,21 @@ export function EntitySeoPanel({
           />
         </Stack>
 
-        <Textarea
-          id="entity-meta-description"
-          label={t('admin.entitySeo.metaDescription')}
-          value={metaDescription}
-          onChange={(e) => {
-            onMetaDescriptionChange(e.target.value)
-          }}
-          placeholder={t('admin.entitySeo.metaDescription.placeholder')}
-          rows={3}
-        />
+        <Stack gap="xs">
+          <Textarea
+            id="entity-meta-description"
+            label={t('admin.entitySeo.metaDescription')}
+            value={metaDescription}
+            onChange={(e) => {
+              onMetaDescriptionChange(e.target.value)
+            }}
+            placeholder={t('admin.entitySeo.metaDescription.placeholder')}
+            rows={3}
+          />
+          <Text as="p" muted variant="caption">
+            {t('admin.entitySeo.metaDescription.help')}
+          </Text>
+        </Stack>
 
         <div className="flex items-center gap-inline-sm">
           <Button variant="secondary" size="sm" disabled={isPending} onClick={onSave}>
