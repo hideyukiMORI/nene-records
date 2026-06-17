@@ -1,4 +1,5 @@
 import { PublicHomeBody, PublicHomeHero, usePublicHomePage } from '@/features/public-home'
+import { activeSideRegions } from '@/shared/lib/layout-config'
 import { PublicSiteShell } from './PublicSiteShell'
 import { usePublicSite } from './public-site-context'
 
@@ -24,10 +25,16 @@ export function PublicIndexPage() {
 
   const browseHref = types[0]?.href ?? '/search'
 
+  // Top-page columns come from the admin layout config (layout_config.home):
+  // a side region renders when the config enables it AND it has widgets.
+  const homeSides = activeSideRegions(site.homeLayout)
+
   return (
     <PublicSiteShell
       site={site}
       isHome
+      withSidebar={homeSides.includes('sidebar')}
+      withAside={homeSides.includes('aside')}
       hero={
         <PublicHomeHero
           siteName={site.siteName}

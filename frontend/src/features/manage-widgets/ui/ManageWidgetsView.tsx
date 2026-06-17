@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
+import { useUpdateSetting, useSettingList } from '@/entities/setting'
 import { useTranslation } from '@/shared/i18n'
 import { setChromeRail } from '@/shared/lib/chrome-rail'
 import {
   allActiveSideRegions,
-  loadLayoutConfig,
-  saveLayoutConfig,
+  parseLayoutConfig,
   type LayoutConfig,
   type LayoutPageKey,
   type PageLayout,
@@ -33,10 +33,24 @@ export interface ManageWidgetsViewProps {
 
 export function ManageWidgetsView({ page }: ManageWidgetsViewProps) {
   const { t } = useTranslation()
-  const [cfg, setCfgState] = useState<LayoutConfig>(() => loadLayoutConfig())
+
+  // Layout config is a public setting (`layout_config`) so the top page's
+  // columns apply to the public site — not just this admin browser. Edits
+  // persist immediately; the draft re-syncs when the stored value loads/changes.
+  const settingsQuery = useSettingList()
+  const updateSetting = useUpdateSetting()
+  const storedLayout = settingsQuery.data?.items.find(
+    (item) => item.settingKey === 'layout_config',
+  )?.value
+  const [cfg, setCfgState] = useState<LayoutConfig>(() => parseLayoutConfig(storedLayout))
+  const [syncedLayout, setSyncedLayout] = useState(storedLayout)
+  if (storedLayout !== syncedLayout) {
+    setSyncedLayout(storedLayout)
+    setCfgState(parseLayoutConfig(storedLayout))
+  }
   const setCfg = (next: LayoutConfig) => {
     setCfgState(next)
-    saveLayoutConfig(next)
+    updateSetting.mutate({ settingKey: 'layout_config', input: { value: JSON.stringify(next) } })
   }
 
   const [mode, setMode] = useState<LayoutMode>(() =>

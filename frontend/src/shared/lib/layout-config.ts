@@ -102,11 +102,21 @@ export function migrateLayoutConfig(raw: unknown): LayoutConfig {
   return { home: { ...DEFAULT_PAGE_LAYOUT.home }, record: { ...DEFAULT_PAGE_LAYOUT.record } }
 }
 
+/** Coerce a stored JSON string (e.g. the `layout_config` setting) into a config. */
+export function parseLayoutConfig(raw: string | null | undefined): LayoutConfig {
+  if (raw === null || raw === undefined || raw === '') {
+    return migrateLayoutConfig(null)
+  }
+  try {
+    return migrateLayoutConfig(JSON.parse(raw))
+  } catch {
+    return migrateLayoutConfig(null)
+  }
+}
+
 export function loadLayoutConfig(): LayoutConfig {
   try {
-    const raw = localStorage.getItem(LS_KEY)
-    if (raw === null) return migrateLayoutConfig(null)
-    return migrateLayoutConfig(JSON.parse(raw))
+    return parseLayoutConfig(localStorage.getItem(LS_KEY))
   } catch {
     return migrateLayoutConfig(null)
   }
