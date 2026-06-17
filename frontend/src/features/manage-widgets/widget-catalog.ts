@@ -1,7 +1,7 @@
 import type { WidgetType } from '@/entities/widget'
 import type { MessageKey } from '@/shared/i18n'
 
-export type SettingEditor = 'menu' | 'enum' | 'int' | 'text'
+export type SettingEditor = 'menu' | 'enum' | 'int' | 'text' | 'bool'
 
 export interface SettingDescriptor {
   key: string
@@ -36,6 +36,14 @@ export const WIDGET_CATALOG: readonly WidgetCatalogEntry[] = [
     settings: [
       { key: 'entityTypeSlug', labelKey: 'admin.widgets.entityTypeLabel', editor: 'enum' },
       { key: 'limit', labelKey: 'admin.widgets.limitLabel', editor: 'int', def: 5 },
+      { key: 'showDate', labelKey: 'admin.widgets.showDateLabel', editor: 'bool' },
+      { key: 'showExcerpt', labelKey: 'admin.widgets.showExcerptLabel', editor: 'bool' },
+      {
+        key: 'excerptLength',
+        labelKey: 'admin.widgets.excerptLengthLabel',
+        editor: 'int',
+        def: 80,
+      },
     ],
   },
   {
@@ -56,7 +64,10 @@ export const WIDGET_CATALOG: readonly WidgetCatalogEntry[] = [
     type: 'popular-posts',
     labelKey: 'admin.widgets.type.popular-posts',
     descKey: 'admin.widgets.popularPostsSettings',
-    settings: [{ key: 'limit', labelKey: 'admin.widgets.limitLabel', editor: 'int', def: 5 }],
+    settings: [
+      { key: 'limit', labelKey: 'admin.widgets.limitLabel', editor: 'int', def: 5 },
+      { key: 'showDate', labelKey: 'admin.widgets.showDateLabel', editor: 'bool' },
+    ],
   },
   {
     type: 'calendar',

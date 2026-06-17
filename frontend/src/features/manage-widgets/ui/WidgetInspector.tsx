@@ -84,6 +84,23 @@ export function WidgetInspector({
         </Select>
       )
     }
+    if (s.editor === 'bool') {
+      return (
+        <label key={s.key} htmlFor={`insp-${s.key}`} className="flex items-center gap-inline-sm">
+          <input
+            id={`insp-${s.key}`}
+            type="checkbox"
+            checked={value === true}
+            onChange={(e) => {
+              onSettings(widget.id, { [s.key]: e.target.checked })
+            }}
+          />
+          <Text as="span" variant="body">
+            {t(s.labelKey)}
+          </Text>
+        </label>
+      )
+    }
     if (s.editor === 'int') {
       return (
         <Input

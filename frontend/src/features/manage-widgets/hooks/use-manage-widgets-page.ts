@@ -20,9 +20,15 @@ function defaultSettings(type: WidgetType, menus: Menu[]): Record<string, unknow
     case 'menu':
       return { menuId: menus[0]?.id ?? null }
     case 'recent-posts':
-      return { entityTypeSlug: '', limit: 5 }
+      return {
+        entityTypeSlug: '',
+        limit: 5,
+        showDate: false,
+        showExcerpt: false,
+        excerptLength: 80,
+      }
     case 'popular-posts':
-      return { limit: 5 }
+      return { limit: 5, showDate: false }
     case 'search':
       return { placeholder: '' }
     default:

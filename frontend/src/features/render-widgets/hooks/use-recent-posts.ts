@@ -10,6 +10,10 @@ export interface RecentPostItem {
   id: number
   label: string
   publicUrl: string
+  /** ISO published timestamp (for the optional date line). */
+  publishedAt: string | null
+  /** SEO meta description — reused as the optional excerpt (same as the feed). */
+  excerpt: string
 }
 
 /** Recent published records of a type, newest first, resolved to label + URL. */
@@ -56,6 +60,8 @@ export function useRecentPosts(entityTypeSlug: string, limit: number) {
           entityId: id,
           publishedAt: entity.publishedAt ?? null,
         }),
+        publishedAt: entity.publishedAt ?? null,
+        excerpt: entity.metaDescription?.trim() ?? '',
       }
     })
   }, [

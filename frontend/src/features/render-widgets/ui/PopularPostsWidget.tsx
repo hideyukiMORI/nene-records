@@ -5,6 +5,7 @@ import { usePopularEntities } from '@/entities/popular-entity'
 import type { Widget } from '@/entities/widget'
 import { useTranslation } from '@/shared/i18n'
 import { resolvePermalink } from '@/shared/lib/resolve-permalink'
+import { formatPostDate } from '@/shared/lib/widget-post-meta'
 import { Text } from '@/shared/ui'
 
 export interface PopularPostsWidgetProps {
@@ -13,9 +14,10 @@ export interface PopularPostsWidgetProps {
 
 /** Lists the most-viewed published records as links. Nothing when there are none. */
 export function PopularPostsWidget({ widget }: PopularPostsWidgetProps) {
-  const { t } = useTranslation()
+  const { t, locale } = useTranslation()
   const rawLimit = widget.settings['limit']
   const limit = typeof rawLimit === 'number' && rawLimit > 0 ? rawLimit : 5
+  const showDate = widget.settings['showDate'] === true
 
   const { data } = usePopularEntities({ limit })
   const entityTypeQuery = useEntityTypeList({ limit: 100, offset: 0 })
@@ -45,11 +47,17 @@ export function PopularPostsWidget({ widget }: PopularPostsWidgetProps) {
           entityId: item.entityId,
           publishedAt: item.publishedAt,
         })
+        const date = showDate ? formatPostDate(item.publishedAt, locale) : ''
         return (
-          <li key={item.entityId}>
+          <li key={item.entityId} className="flex flex-col gap-stack-xs">
             <Link to={url} className="text-body text-accent underline hover:no-underline">
               {item.title ?? `Record #${String(item.entityId)}`}
             </Link>
+            {date !== '' ? (
+              <Text as="span" muted variant="caption">
+                {date}
+              </Text>
+            ) : null}
           </li>
         )
       })}
