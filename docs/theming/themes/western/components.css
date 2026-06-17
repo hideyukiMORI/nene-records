@@ -1,0 +1,43 @@
+/* Western — wood-type slab, saloon bill. FONT OVERRIDE: Rye display. ★STAR */
+.nene-public[data-theme^='western']{--font-display:'Rye',Georgia,serif;--font-chrome:'Rye',Georgia,serif;--radius-sm:0px;--radius-md:0px;--radius-lg:0px;--radius-full:0px;--content-w:1200px;--tracking-display:0em;}
+.nene-public[data-theme^='western'] .hero__title,.nene-public[data-theme^='western'] .section__title,.nene-public[data-theme^='western'] .featured__title,.nene-public[data-theme^='western'] .card__title,.nene-public[data-theme^='western'] .pagehead__title,.nene-public[data-theme^='western'] .typecard__name,.nene-public[data-theme^='western'] .row__title{font-family:var(--font-display);font-weight:400;letter-spacing:0;}
+.nene-public[data-theme^='western'] .hd{border-bottom:4px double var(--color-text-primary);}
+.nene-public[data-theme^='western'] .brand__mark{border:2px solid var(--color-text-primary);background:var(--color-accent);color:var(--color-on-accent);}
+.nene-public[data-theme^='western'] .brand__mark svg{color:var(--color-on-accent);}
+.nene-public[data-theme^='western'] .brand__name{font-family:var(--font-display);white-space:nowrap;}
+.nene-public[data-theme^='western'] .navlink{font-family:var(--font-chrome);text-transform:uppercase;letter-spacing:0.06em;font-size:0.74rem;}
+.nene-public[data-theme^='western'] .navlink[aria-current='page']::after{height:3px;background:var(--color-accent);}
+.nene-public[data-theme^='western'] .btn{font-family:var(--font-chrome);border-radius:0;letter-spacing:0.02em;border:2px solid var(--color-text-primary);}
+.nene-public[data-theme^='western'] .eyebrow{font-family:var(--font-chrome);text-transform:uppercase;letter-spacing:0.12em;font-size:0.7rem;color:var(--color-accent);}
+.nene-public[data-theme^='western'] .eyebrow::before{width:16px;height:3px;background:var(--color-accent);}
+.nene-public[data-theme^='western'] .tbadge{font-family:var(--font-chrome);border-radius:0;text-transform:uppercase;letter-spacing:0.06em;background:transparent;border:2px solid var(--color-text-primary);color:var(--color-text-primary);}
+.nene-public[data-theme^='western'] .tbadge::before{border-radius:0;background:var(--color-accent);}
+.nene-public[data-theme^='western'] .hero{border-bottom:4px double var(--color-text-primary);padding-bottom:var(--space-xl);}
+.nene-public[data-theme^='western'] .hero__title{font-size:clamp(2.6rem,1.7rem+4.4vw,5rem);line-height:1.04;}
+.nene-public[data-theme^='western'] .hero__title em{color:var(--color-accent);font-style:normal;}
+.nene-public[data-theme^='western'] .hero__art-frame{border:3px double var(--color-text-primary);border-radius:0;background:var(--color-surface-overlay);box-shadow:6px 6px 0 var(--color-text-primary);}
+.nene-public[data-theme^='western'] .hero__art-tag{font-family:var(--font-chrome);text-transform:uppercase;border:2px solid var(--color-text-primary);border-radius:0;}
+.nene-public[data-theme^='western'] .hero__art-tag b{color:var(--color-accent);}
+.nene-public[data-theme^='western'] .hero__stat b{font-family:var(--font-display);}
+.nene-public[data-theme^='western'] .section__head{border-bottom:4px double var(--color-text-primary);}
+.nene-public[data-theme^='western'] .section__title{font-size:clamp(1.8rem,1.2rem+2vw,2.8rem);}
+.nene-public[data-theme^='western'] .section__link{font-family:var(--font-chrome);text-transform:uppercase;letter-spacing:0.06em;color:var(--color-accent);}
+.nene-public[data-theme^='western'] .card{border:2px solid var(--color-text-primary);border-top:5px solid var(--color-accent);border-radius:0;background:var(--color-surface-raised);padding:var(--space-md);box-shadow:4px 4px 0 var(--color-text-primary);}
+.nene-public[data-theme^='western'] .card:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--color-text-primary);}
+.nene-public[data-theme^='western'] .card__media,.nene-public[data-theme^='western'] .featured__media,.nene-public[data-theme^='western'] .article__hero,.nene-public[data-theme^='western'] .row__media{border-radius:0;border:2px solid var(--color-text-primary);filter:sepia(0.5) contrast(1.05);isolation:isolate;transition:filter var(--dur-normal) var(--ease);}
+.nene-public[data-theme^='western'] .card__media::before,.nene-public[data-theme^='western'] .featured__media::before,.nene-public[data-theme^='western'] .article__hero::before{content:'';position:absolute;inset:0;z-index:1;background:linear-gradient(140deg,color-mix(in oklch,var(--color-accent) 34%,transparent),color-mix(in oklch,var(--color-brand-violet) 30%,transparent));mix-blend-mode:multiply;pointer-events:none;}
+.nene-public[data-theme^='western'] .eyecatch::after{position:relative;z-index:2;}
+.nene-public[data-theme^='western'] .card:hover .card__media{filter:sepia(0.2);}
+.nene-public[data-theme^='western'] .featured{border:3px double var(--color-text-primary);border-radius:0;background:var(--color-surface-raised);box-shadow:6px 6px 0 var(--color-accent);}
+.nene-public[data-theme^='western'] .typecard{border:2px solid var(--color-text-primary);border-radius:0;background:var(--color-surface-raised);box-shadow:3px 3px 0 var(--color-text-primary);}
+.nene-public[data-theme^='western'] .typecard:hover{transform:translate(-2px,-2px);background:var(--color-accent-weak);box-shadow:5px 5px 0 var(--color-text-primary);}
+.nene-public[data-theme^='western'] .typecard__slug,.nene-public[data-theme^='western'] .typecard__count{font-family:var(--font-chrome);text-transform:uppercase;letter-spacing:0.04em;font-size:0.74rem;}
+.nene-public[data-theme^='western'] .widget,.nene-public[data-theme^='western'] .aside section{border:2px solid var(--color-text-primary);border-radius:0;background:var(--color-surface-raised);}
+.nene-public[data-theme^='western'] .widget__title,.nene-public[data-theme^='western'] .aside section h2{font-family:var(--font-display);}
+.nene-public[data-theme^='western'] .search,.nene-public[data-theme^='western'] .searchbar,.nene-public[data-theme^='western'] .input,.nene-public[data-theme^='western'] .textarea{border-radius:0;border-color:var(--color-text-primary);border-width:2px;}
+.nene-public[data-theme^='western'] .poplist__rank{font-family:var(--font-display);color:var(--color-accent);}
+.nene-public[data-theme^='western'] .tag{border-radius:0;font-family:var(--font-chrome);text-transform:uppercase;letter-spacing:0.04em;font-size:0.72rem;border-width:2px;border-color:var(--color-text-primary);}
+.nene-public[data-theme^='western'] .chip,.nene-public[data-theme^='western'] .viewtoggle,.nene-public[data-theme^='western'] .pager button,.nene-public[data-theme^='western'] .pager span{border-radius:0;border-color:var(--color-text-primary);}
+.nene-public[data-theme^='western'] .ft{border-top:4px double var(--color-text-primary);}
+.nene-public[data-theme^='western'] .eyecatch{border-radius:0;border:2px solid var(--color-text-primary);background:repeating-linear-gradient(90deg,color-mix(in oklch,var(--color-accent) 14%,var(--color-surface-overlay)) 0 10px,var(--color-surface-overlay) 10px 20px);}
+.nene-public[data-theme^='western'] .eyecatch::after{border-radius:0;font-family:var(--font-chrome);text-transform:uppercase;}

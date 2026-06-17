@@ -1,0 +1,122 @@
+{
+  "$schema": "../public-theme.schema.json",
+  "id": "deco",
+  "name": "Art Deco",
+  "version": "1.0.0",
+  "author": "NeNe Records",
+  "description": "Art Deco — emerald and black with gold geometric ornament, symmetric chevron rules and an elegant geometric display (Poiret One). Roaring-20s glamour, distinct from Luxe’s Didone fashion. components.css is the star: chevron section rules, gold hairline frames, geometric caps display and a dark emerald stage. Light + dark, both AA.",
+  "supportsModes": [
+    "light",
+    "dark"
+  ],
+  "fonts": [
+    {
+      "family": "Poiret One",
+      "role": "display",
+      "source": "fontsource",
+      "weights": [
+        400
+      ]
+    },
+    {
+      "family": "Inter",
+      "role": "body",
+      "source": "fontsource",
+      "weights": [
+        400,
+        500,
+        600
+      ]
+    },
+    {
+      "family": "JetBrains Mono",
+      "role": "mono",
+      "source": "fontsource",
+      "weights": [
+        400,
+        500
+      ]
+    }
+  ],
+  "tokens": {
+    "light": {
+      "color-surface": "oklch(95% 0.012 85)",
+      "color-surface-raised": "oklch(97% 0.012 85)",
+      "color-surface-overlay": "oklch(91.5% 0.016 85)",
+      "color-surface-sunken": "oklch(93.2% 0.012 85)",
+      "color-text-primary": "oklch(23% 0.02 160)",
+      "color-text-muted": "oklch(47% 0.018 160)",
+      "color-text-inverse": "oklch(99% 0.01 85)",
+      "color-border": "oklch(83% 0.016 85)",
+      "color-border-strong": "oklch(72% 0.02 85)",
+      "color-focus-ring": "oklch(76% 0.13 85)",
+      "color-accent": "oklch(76% 0.13 85)",
+      "color-accent-hover": "oklch(70% 0.13 85)",
+      "color-accent-weak": "color-mix(in oklch, var(--color-accent) 12%, var(--color-surface-raised))",
+      "color-on-accent": "oklch(18% 0.03 160)",
+      "color-brand-violet": "oklch(46% 0.09 165)",
+      "color-danger": "oklch(52% 0.2 25)",
+      "color-danger-hover": "oklch(46% 0.2 25)",
+      "color-ok": "oklch(55% 0.13 150)",
+      "color-warn": "oklch(70% 0.15 75)",
+      "color-info": "oklch(55% 0.13 250)",
+      "shadow-sm": "0 1px 2px oklch(40% 0.04 165 / 0.08)",
+      "shadow-md": "0 6px 20px oklch(40% 0.04 165 / 0.1), 0 2px 6px oklch(40% 0.04 165 / 0.08)",
+      "shadow-lg": "0 24px 54px oklch(38% 0.05 165 / 0.16)",
+      "shadow-focus": "0 0 0 3px color-mix(in oklch, var(--color-focus-ring) 30%, transparent)",
+      "color-scheme": "light"
+    },
+    "dark": {
+      "color-surface": "oklch(18% 0.03 165)",
+      "color-surface-raised": "oklch(22% 0.03 165)",
+      "color-surface-overlay": "oklch(27% 0.039 165)",
+      "color-surface-sunken": "oklch(14.5% 0.03 165)",
+      "color-text-primary": "oklch(93% 0.02 85)",
+      "color-text-muted": "oklch(68% 0.018 85)",
+      "color-text-inverse": "oklch(20% 0.03 165)",
+      "color-border": "oklch(33% 0.034 165)",
+      "color-border-strong": "oklch(46% 0.038 165)",
+      "color-focus-ring": "oklch(82% 0.12 85)",
+      "color-accent": "oklch(80% 0.12 85)",
+      "color-accent-hover": "oklch(87% 0.12 85)",
+      "color-accent-weak": "color-mix(in oklch, var(--color-accent) 16%, var(--color-surface-raised))",
+      "color-on-accent": "oklch(15% 0.03 165)",
+      "color-brand-violet": "oklch(62% 0.1 165)",
+      "color-danger": "oklch(66% 0.18 25)",
+      "color-danger-hover": "oklch(72% 0.18 25)",
+      "color-ok": "oklch(72% 0.14 150)",
+      "color-warn": "oklch(80% 0.14 80)",
+      "color-info": "oklch(74% 0.12 250)",
+      "shadow-sm": "0 1px 2px oklch(0% 0 0 / 0.4)",
+      "shadow-md": "0 10px 28px oklch(0% 0 0 / 0.5), 0 2px 6px oklch(0% 0 0 / 0.4)",
+      "shadow-lg": "0 28px 60px oklch(0% 0 0 / 0.62)",
+      "shadow-focus": "0 0 0 3px color-mix(in oklch, var(--color-focus-ring) 30%, transparent)",
+      "color-scheme": "dark"
+    }
+  },
+  "flags": {
+    "feedLayout": "magazine",
+    "cardStyle": "framed",
+    "media": "duotone",
+    "hero": "standard",
+    "sectionRule": "heavy",
+    "eyebrow": "caps"
+  },
+  "knobs": {
+    "accent": {
+      "light": "oklch(76% 0.13 85)",
+      "dark": "oklch(80% 0.12 85)"
+    },
+    "surface": {
+      "light": "oklch(95% 0.012 85)",
+      "dark": "oklch(18% 0.03 165)"
+    },
+    "fontDisplay": "Poiret One",
+    "fontBody": "Inter",
+    "fontMono": "JetBrains Mono",
+    "baseFontSize": "1.0625rem",
+    "typeScale": 1.28,
+    "density": "comfortable",
+    "radius": "sharp"
+  }
+}

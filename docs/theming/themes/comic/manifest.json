@@ -1,0 +1,122 @@
+{
+  "$schema": "../public-theme.schema.json",
+  "id": "comic",
+  "name": "Comic Pop",
+  "version": "1.0.0",
+  "author": "NeNe Records",
+  "description": "Comic-book pop — halftone Ben-Day dots, bold black ink outlines, classic red and a blue-and-yellow supporting cast, and a punchy display (Bangers). Loud and graphic. components.css is the star: halftone backgrounds, thick black outlines with hard shadows, framed plain media and barred action labels. Light + dark, both AA.",
+  "supportsModes": [
+    "light",
+    "dark"
+  ],
+  "fonts": [
+    {
+      "family": "Bangers",
+      "role": "display",
+      "source": "fontsource",
+      "weights": [
+        400
+      ]
+    },
+    {
+      "family": "Inter",
+      "role": "body",
+      "source": "fontsource",
+      "weights": [
+        400,
+        500,
+        600
+      ]
+    },
+    {
+      "family": "JetBrains Mono",
+      "role": "mono",
+      "source": "fontsource",
+      "weights": [
+        400,
+        500
+      ]
+    }
+  ],
+  "tokens": {
+    "light": {
+      "color-surface": "oklch(98% 0.01 95)",
+      "color-surface-raised": "oklch(99.5% 0.01 95)",
+      "color-surface-overlay": "oklch(94.5% 0.013 95)",
+      "color-surface-sunken": "oklch(96.2% 0.01 95)",
+      "color-text-primary": "oklch(18% 0.01 260)",
+      "color-text-muted": "oklch(42% 0.009 260)",
+      "color-text-inverse": "oklch(99% 0.01 95)",
+      "color-border": "oklch(86% 0.014 95)",
+      "color-border-strong": "oklch(75% 0.018 95)",
+      "color-focus-ring": "oklch(58% 0.2 25)",
+      "color-accent": "oklch(58% 0.2 25)",
+      "color-accent-hover": "oklch(52% 0.2 25)",
+      "color-accent-weak": "color-mix(in oklch, var(--color-accent) 12%, var(--color-surface-raised))",
+      "color-on-accent": "oklch(99% 0.01 95)",
+      "color-brand-violet": "oklch(58% 0.2 250)",
+      "color-danger": "oklch(52% 0.2 25)",
+      "color-danger-hover": "oklch(46% 0.2 25)",
+      "color-ok": "oklch(55% 0.13 150)",
+      "color-warn": "oklch(70% 0.15 75)",
+      "color-info": "oklch(55% 0.13 250)",
+      "shadow-sm": "0 1px 2px oklch(40% 0.04 95 / 0.08)",
+      "shadow-md": "0 6px 20px oklch(40% 0.04 95 / 0.1), 0 2px 6px oklch(40% 0.04 95 / 0.08)",
+      "shadow-lg": "0 24px 54px oklch(38% 0.05 95 / 0.16)",
+      "shadow-focus": "0 0 0 3px color-mix(in oklch, var(--color-focus-ring) 30%, transparent)",
+      "color-scheme": "light"
+    },
+    "dark": {
+      "color-surface": "oklch(18% 0.02 260)",
+      "color-surface-raised": "oklch(22% 0.02 260)",
+      "color-surface-overlay": "oklch(27% 0.026 260)",
+      "color-surface-sunken": "oklch(14.5% 0.02 260)",
+      "color-text-primary": "oklch(96% 0.005 95)",
+      "color-text-muted": "oklch(71% 0.005 95)",
+      "color-text-inverse": "oklch(20% 0.02 260)",
+      "color-border": "oklch(33% 0.024 260)",
+      "color-border-strong": "oklch(46% 0.028 260)",
+      "color-focus-ring": "oklch(64% 0.2 25)",
+      "color-accent": "oklch(62% 0.2 25)",
+      "color-accent-hover": "oklch(69% 0.2 25)",
+      "color-accent-weak": "color-mix(in oklch, var(--color-accent) 16%, var(--color-surface-raised))",
+      "color-on-accent": "oklch(15% 0.02 25)",
+      "color-brand-violet": "oklch(70% 0.16 250)",
+      "color-danger": "oklch(66% 0.18 25)",
+      "color-danger-hover": "oklch(72% 0.18 25)",
+      "color-ok": "oklch(72% 0.14 150)",
+      "color-warn": "oklch(80% 0.14 80)",
+      "color-info": "oklch(74% 0.12 250)",
+      "shadow-sm": "0 1px 2px oklch(0% 0 0 / 0.4)",
+      "shadow-md": "0 10px 28px oklch(0% 0 0 / 0.5), 0 2px 6px oklch(0% 0 0 / 0.4)",
+      "shadow-lg": "0 28px 60px oklch(0% 0 0 / 0.62)",
+      "shadow-focus": "0 0 0 3px color-mix(in oklch, var(--color-focus-ring) 30%, transparent)",
+      "color-scheme": "dark"
+    }
+  },
+  "flags": {
+    "feedLayout": "grid",
+    "cardStyle": "framed",
+    "media": "plain",
+    "hero": "standard",
+    "sectionRule": "heavy",
+    "eyebrow": "barred"
+  },
+  "knobs": {
+    "accent": {
+      "light": "oklch(58% 0.2 25)",
+      "dark": "oklch(62% 0.2 25)"
+    },
+    "surface": {
+      "light": "oklch(98% 0.01 95)",
+      "dark": "oklch(18% 0.02 260)"
+    },
+    "fontDisplay": "Bangers",
+    "fontBody": "Inter",
+    "fontMono": "JetBrains Mono",
+    "baseFontSize": "1.0625rem",
+    "typeScale": 1.24,
+    "density": "comfortable",
+    "radius": "round"
+  }
+}

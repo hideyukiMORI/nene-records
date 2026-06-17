@@ -1,0 +1,61 @@
+/* NeNe Records — theme: Brutalist (id=brutalist) — tokens (light + dark)
+   Raw web brutalism — stark off-white and black, an exposed system-mono + grotesque mix, thick hard borders, underlined links and no rounding, with one electric cobalt. Anti-decorative and structural. components.css is the star: heavy black frames, hard offset blocks, oversized underlines and a raw utilitarian grid. Light + dark, both AA.
+   Knob -> Derived per contract §3. Scoped [data-theme='brutalist'] / 'brutalist-dark'. Both AA. */
+
+/* LIGHT */
+[data-theme='brutalist'] {
+  --color-surface: oklch(97.5% 0.003 264);
+  --color-surface-raised: oklch(99.5% 0.003 264);
+  --color-surface-overlay: oklch(94% 0.004 264);
+  --color-surface-sunken: oklch(95.7% 0.003 264);
+  --color-text-primary: oklch(14% 0.01 264);
+  --color-text-muted: oklch(40% 0.009 264);
+  --color-text-inverse: oklch(99% 0.003 264);
+  --color-border: oklch(85.5% 0.007 264);
+  --color-border-strong: oklch(74.5% 0.011 264);
+  --color-focus-ring: oklch(50% 0.22 264);
+  --color-accent: oklch(50% 0.22 264);
+  --color-accent-hover: oklch(44% 0.22 264);
+  --color-accent-weak: color-mix(in oklch, var(--color-accent) 12%, var(--color-surface-raised));
+  --color-on-accent: oklch(99% 0 0);
+  --color-brand-violet: oklch(56% 0.24 300);
+  --color-danger: oklch(52% 0.2 25);
+  --color-danger-hover: oklch(46% 0.2 25);
+  --color-ok: oklch(55% 0.13 150);
+  --color-warn: oklch(70% 0.15 75);
+  --color-info: oklch(55% 0.13 250);
+  --shadow-sm: 0 1px 2px oklch(40% 0.04 264 / 0.08);
+  --shadow-md: 0 6px 20px oklch(40% 0.04 264 / 0.1), 0 2px 6px oklch(40% 0.04 264 / 0.08);
+  --shadow-lg: 0 24px 54px oklch(38% 0.05 264 / 0.16);
+  --shadow-focus: 0 0 0 3px color-mix(in oklch, var(--color-focus-ring) 30%, transparent);
+  color-scheme: light;
+}
+
+/* DARK */
+[data-theme='brutalist-dark'] {
+  --color-surface: oklch(16% 0.006 264);
+  --color-surface-raised: oklch(20% 0.006 264);
+  --color-surface-overlay: oklch(25% 0.008 264);
+  --color-surface-sunken: oklch(12.5% 0.006 264);
+  --color-text-primary: oklch(95% 0.005 264);
+  --color-text-muted: oklch(70% 0.005 264);
+  --color-text-inverse: oklch(20% 0.006 264);
+  --color-border: oklch(31% 0.01 264);
+  --color-border-strong: oklch(44% 0.014 264);
+  --color-focus-ring: oklch(64% 0.2 264);
+  --color-accent: oklch(62% 0.2 264);
+  --color-accent-hover: oklch(69% 0.2 264);
+  --color-accent-weak: color-mix(in oklch, var(--color-accent) 16%, var(--color-surface-raised));
+  --color-on-accent: oklch(13% 0.02 264);
+  --color-brand-violet: oklch(72% 0.18 300);
+  --color-danger: oklch(66% 0.18 25);
+  --color-danger-hover: oklch(72% 0.18 25);
+  --color-ok: oklch(72% 0.14 150);
+  --color-warn: oklch(80% 0.14 80);
+  --color-info: oklch(74% 0.12 250);
+  --shadow-sm: 0 1px 2px oklch(0% 0 0 / 0.4);
+  --shadow-md: 0 10px 28px oklch(0% 0 0 / 0.5), 0 2px 6px oklch(0% 0 0 / 0.4);
+  --shadow-lg: 0 28px 60px oklch(0% 0 0 / 0.62);
+  --shadow-focus: 0 0 0 3px color-mix(in oklch, var(--color-focus-ring) 30%, transparent);
+  color-scheme: dark;
+}

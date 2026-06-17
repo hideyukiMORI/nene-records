@@ -1,0 +1,44 @@
+/* Art Deco — emerald + gold geometric. FONT OVERRIDE: Poiret One display. ★STAR */
+.nene-public[data-theme^='deco']{--font-display:'Poiret One',system-ui,sans-serif;--font-chrome:'Poiret One',system-ui,sans-serif;--radius-sm:0px;--radius-md:0px;--radius-lg:0px;--radius-full:0px;--content-w:1240px;--tracking-display:0.02em;}
+.nene-public[data-theme^='deco'] .hero__title,.nene-public[data-theme^='deco'] .section__title,.nene-public[data-theme^='deco'] .featured__title,.nene-public[data-theme^='deco'] .card__title,.nene-public[data-theme^='deco'] .pagehead__title,.nene-public[data-theme^='deco'] .typecard__name,.nene-public[data-theme^='deco'] .row__title{font-family:var(--font-display);font-weight:400;text-transform:uppercase;letter-spacing:0.06em;}
+.nene-public[data-theme^='deco'] .hd{border-bottom:1px solid var(--color-accent);}
+.nene-public[data-theme^='deco'] .brand__mark{border:1px solid var(--color-accent);background:transparent;color:var(--color-accent);}
+.nene-public[data-theme^='deco'] .brand__mark svg{color:var(--color-accent);}
+.nene-public[data-theme^='deco'] .brand__name{font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.1em;white-space:nowrap;}
+.nene-public[data-theme^='deco'] .navlink{font-family:var(--font-chrome);text-transform:uppercase;letter-spacing:0.16em;font-size:0.72rem;}
+.nene-public[data-theme^='deco'] .navlink[aria-current='page']::after{height:1px;background:var(--color-accent);}
+.nene-public[data-theme^='deco'] .btn{border-radius:0;font-family:var(--font-chrome);text-transform:uppercase;letter-spacing:0.14em;font-size:0.74rem;}
+.nene-public[data-theme^='deco'] .btn--ghost{border-color:var(--color-accent);}
+.nene-public[data-theme^='deco'] .eyebrow{font-family:var(--font-chrome);text-transform:uppercase;letter-spacing:0.26em;font-size:0.66rem;color:var(--color-accent);}
+.nene-public[data-theme^='deco'] .eyebrow::before{width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:9px solid var(--color-accent);background:none;}
+.nene-public[data-theme^='deco'] .tbadge{border-radius:0;font-family:var(--font-chrome);text-transform:uppercase;letter-spacing:0.12em;background:transparent;border:1px solid var(--color-accent);color:var(--color-accent);}
+.nene-public[data-theme^='deco'] .tbadge::before{display:none;}
+.nene-public[data-theme^='deco'] .hero__title{font-size:clamp(2.8rem,1.8rem+4.6vw,5.4rem);line-height:1.04;}
+.nene-public[data-theme^='deco'] .hero__title em{color:var(--color-accent);font-style:normal;}
+.nene-public[data-theme^='deco'] .hero__art-frame{border:1px solid var(--color-accent);border-radius:0;background:var(--color-surface-overlay);box-shadow:0 0 0 6px color-mix(in oklch,var(--color-accent) 18%,transparent),0 0 0 7px var(--color-accent);}
+.nene-public[data-theme^='deco'] .hero__art-tag{font-family:var(--font-chrome);text-transform:uppercase;letter-spacing:0.08em;border:1px solid var(--color-accent);border-radius:0;}
+.nene-public[data-theme^='deco'] .hero__art-tag b{color:var(--color-accent);}
+.nene-public[data-theme^='deco'] .hero__stat b{font-family:var(--font-display);color:var(--color-accent);}
+.nene-public[data-theme^='deco'] .section__head{border-bottom:0;padding-bottom:var(--space-md);background-image:linear-gradient(90deg,var(--color-accent),var(--color-accent));background-size:100% 3px;background-position:bottom;background-repeat:no-repeat;}
+.nene-public[data-theme^='deco'] .section__head::after{content:'';position:absolute;}
+.nene-public[data-theme^='deco'] .section__title{text-transform:uppercase;letter-spacing:0.06em;}
+.nene-public[data-theme^='deco'] .section__link{font-family:var(--font-chrome);text-transform:uppercase;letter-spacing:0.1em;font-size:0.7rem;color:var(--color-accent);}
+.nene-public[data-theme^='deco'] .card{border:1px solid var(--color-border-strong);border-top:2px solid var(--color-accent);border-radius:0;background:var(--color-surface-raised);padding:var(--space-md);}
+.nene-public[data-theme^='deco'] .card:hover{border-color:var(--color-accent);}
+.nene-public[data-theme^='deco'] .card__media,.nene-public[data-theme^='deco'] .featured__media,.nene-public[data-theme^='deco'] .article__hero,.nene-public[data-theme^='deco'] .row__media{border-radius:0;border:1px solid var(--color-accent);filter:grayscale(0.7) contrast(1.05);isolation:isolate;transition:filter var(--dur-normal) var(--ease);}
+.nene-public[data-theme^='deco'] .card__media::before,.nene-public[data-theme^='deco'] .featured__media::before,.nene-public[data-theme^='deco'] .article__hero::before{content:'';position:absolute;inset:0;z-index:1;background:linear-gradient(140deg,color-mix(in oklch,var(--color-accent) 38%,transparent),color-mix(in oklch,var(--color-brand-violet) 30%,transparent));mix-blend-mode:screen;pointer-events:none;}
+.nene-public[data-theme^='deco'] .eyecatch::after{position:relative;z-index:2;}
+.nene-public[data-theme^='deco'] .card:hover .card__media{filter:grayscale(0.2);}
+.nene-public[data-theme^='deco'] .card:hover .card__title{color:var(--color-accent);}
+.nene-public[data-theme^='deco'] .featured{border:1px solid var(--color-accent);border-radius:0;background:var(--color-surface-raised);box-shadow:0 0 0 4px color-mix(in oklch,var(--color-accent) 14%,transparent);}
+.nene-public[data-theme^='deco'] .typecard{border:1px solid var(--color-border-strong);border-radius:0;background:var(--color-surface-raised);}
+.nene-public[data-theme^='deco'] .typecard:hover{border-color:var(--color-accent);background:var(--color-accent-weak);transform:none;box-shadow:none;}
+.nene-public[data-theme^='deco'] .typecard__slug,.nene-public[data-theme^='deco'] .typecard__count{font-family:var(--font-chrome);text-transform:uppercase;letter-spacing:0.08em;font-size:0.72rem;}
+.nene-public[data-theme^='deco'] .widget,.nene-public[data-theme^='deco'] .aside section,.nene-public[data-theme^='deco'] .search,.nene-public[data-theme^='deco'] .searchbar,.nene-public[data-theme^='deco'] .input,.nene-public[data-theme^='deco'] .textarea{border-radius:0;border-color:var(--color-accent);}
+.nene-public[data-theme^='deco'] .widget__title,.nene-public[data-theme^='deco'] .aside section h2{font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.06em;}
+.nene-public[data-theme^='deco'] .poplist__rank{font-family:var(--font-display);color:var(--color-accent);}
+.nene-public[data-theme^='deco'] .tag{border-radius:0;font-family:var(--font-chrome);text-transform:uppercase;letter-spacing:0.08em;font-size:0.7rem;border-color:var(--color-accent);}
+.nene-public[data-theme^='deco'] .chip,.nene-public[data-theme^='deco'] .viewtoggle,.nene-public[data-theme^='deco'] .pager button,.nene-public[data-theme^='deco'] .pager span{border-radius:0;border-color:var(--color-accent);}
+.nene-public[data-theme^='deco'] .ft{border-top:1px solid var(--color-accent);}
+.nene-public[data-theme^='deco'] .eyecatch{border-radius:0;border-color:var(--color-accent);background:repeating-linear-gradient(135deg,color-mix(in oklch,var(--color-accent) 14%,var(--color-surface-overlay)) 0 10px,var(--color-surface-overlay) 10px 20px);}
+.nene-public[data-theme^='deco'] .eyecatch::after{font-family:var(--font-chrome);text-transform:uppercase;letter-spacing:0.08em;}

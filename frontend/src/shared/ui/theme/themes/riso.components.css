@@ -1,0 +1,229 @@
+/* Risograph — fluoro pink + blue duotone, grain, offset. ★STAR */
+.nene-public[data-theme^='riso'] {
+  --font-display: 'Space Grotesk', system-ui, sans-serif;
+  --font-chrome: 'Space Grotesk', system-ui, sans-serif;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --content-w: 1200px;
+  --tracking-display: -0.02em;
+}
+.nene-public[data-theme^='riso'] .hero__title,
+.nene-public[data-theme^='riso'] .section__title,
+.nene-public[data-theme^='riso'] .featured__title,
+.nene-public[data-theme^='riso'] .card__title,
+.nene-public[data-theme^='riso'] .pagehead__title,
+.nene-public[data-theme^='riso'] .typecard__name,
+.nene-public[data-theme^='riso'] .row__title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.nene-public[data-theme^='riso'] .hd {
+  border-bottom: 2px solid var(--color-accent);
+}
+.nene-public[data-theme^='riso'] .brand__mark {
+  border-radius: 6px;
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  box-shadow: 3px 3px 0 var(--color-brand-violet);
+}
+.nene-public[data-theme^='riso'] .brand__mark svg {
+  color: var(--color-on-accent);
+}
+.nene-public[data-theme^='riso'] .brand__name {
+  white-space: nowrap;
+}
+.nene-public[data-theme^='riso'] .navlink {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+.nene-public[data-theme^='riso'] .navlink[aria-current='page']::after {
+  height: 3px;
+  background: var(--color-accent);
+}
+.nene-public[data-theme^='riso'] .btn {
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.nene-public[data-theme^='riso'] .btn--primary {
+  box-shadow: 3px 3px 0 var(--color-brand-violet);
+}
+.nene-public[data-theme^='riso'] .btn--primary:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 5px 5px 0 var(--color-brand-violet);
+}
+.nene-public[data-theme^='riso'] .eyebrow {
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  font-size: 0.7rem;
+  color: var(--color-accent);
+}
+.nene-public[data-theme^='riso'] .eyebrow::before {
+  width: 22px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--color-brand-violet);
+}
+.nene-public[data-theme^='riso'] .tbadge {
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  border: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.nene-public[data-theme^='riso'] .tbadge::before {
+  background: currentColor;
+}
+.nene-public[data-theme^='riso'] .hero {
+  position: relative;
+}
+.nene-public[data-theme^='riso'] .hero::after {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  left: 50%;
+  width: 100vw;
+  transform: translateX(-50%);
+  z-index: -1;
+  opacity: 0.5;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+}
+.nene-public[data-theme^='riso'] .hero__title {
+  font-size: clamp(2.7rem, 1.8rem+4.4vw, 5rem);
+}
+.nene-public[data-theme^='riso'] .hero__title em {
+  color: var(--color-accent);
+  font-style: normal;
+}
+.nene-public[data-theme^='riso'] .hero__art-frame {
+  border-radius: var(--radius-md);
+  border: 2px solid var(--color-accent);
+  box-shadow: 8px 8px 0 var(--color-brand-violet);
+  background: var(--color-surface-overlay);
+}
+.nene-public[data-theme^='riso'] .hero__art-tag b {
+  color: var(--color-accent);
+}
+.nene-public[data-theme^='riso'] .hero__stat b {
+  font-family: var(--font-display);
+}
+.nene-public[data-theme^='riso'] .section__head {
+  border-bottom: 3px solid var(--color-accent);
+}
+.nene-public[data-theme^='riso'] .card {
+  border: 2px solid var(--color-text-primary);
+  border-top: 6px solid var(--color-accent);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-raised);
+  padding: var(--space-md);
+  box-shadow: 5px 5px 0 var(--color-brand-violet);
+  transition:
+    transform var(--dur-fast) var(--ease),
+    box-shadow var(--dur-fast) var(--ease);
+}
+.nene-public[data-theme^='riso'] .card:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 8px 8px 0 var(--color-brand-violet);
+}
+.nene-public[data-theme^='riso'] .card__media,
+.nene-public[data-theme^='riso'] .featured__media,
+.nene-public[data-theme^='riso'] .article__hero,
+.nene-public[data-theme^='riso'] .row__media {
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--color-text-primary);
+  filter: grayscale(1) contrast(1.1);
+  isolation: isolate;
+}
+.nene-public[data-theme^='riso'] .card__media::before,
+.nene-public[data-theme^='riso'] .featured__media::before,
+.nene-public[data-theme^='riso'] .article__hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    140deg,
+    color-mix(in oklch, var(--color-accent) 65%, transparent),
+    color-mix(in oklch, var(--color-brand-violet) 55%, transparent)
+  );
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+.nene-public[data-theme^='riso'] .eyecatch::after {
+  position: relative;
+  z-index: 2;
+}
+.nene-public[data-theme^='riso'] .featured {
+  border: 2px solid var(--color-text-primary);
+  border-top: 6px solid var(--color-accent);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-raised);
+  box-shadow: 8px 8px 0 var(--color-brand-violet);
+}
+.nene-public[data-theme^='riso'] .typecard {
+  border: 2px solid var(--color-text-primary);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-raised);
+  box-shadow: 4px 4px 0 var(--color-brand-violet);
+}
+.nene-public[data-theme^='riso'] .typecard:hover {
+  transform: translate(-2px, -2px);
+  background: var(--color-accent-weak);
+  box-shadow: 6px 6px 0 var(--color-brand-violet);
+}
+.nene-public[data-theme^='riso'] .widget,
+.nene-public[data-theme^='riso'] .aside section {
+  border: 2px solid var(--color-text-primary);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-raised);
+}
+.nene-public[data-theme^='riso'] .search,
+.nene-public[data-theme^='riso'] .searchbar,
+.nene-public[data-theme^='riso'] .input,
+.nene-public[data-theme^='riso'] .textarea {
+  border-radius: var(--radius-sm);
+  border-color: var(--color-text-primary);
+  border-width: 2px;
+}
+.nene-public[data-theme^='riso'] .poplist__rank {
+  font-family: var(--font-display);
+  color: var(--color-accent);
+}
+.nene-public[data-theme^='riso'] .tag {
+  border-radius: var(--radius-full);
+  border: 2px solid var(--color-text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.72rem;
+}
+.nene-public[data-theme^='riso'] .chip,
+.nene-public[data-theme^='riso'] .viewtoggle,
+.nene-public[data-theme^='riso'] .pager button,
+.nene-public[data-theme^='riso'] .pager span {
+  border-radius: var(--radius-full);
+  border-color: var(--color-text-primary);
+}
+.nene-public[data-theme^='riso'] .ft {
+  border-top: 3px solid var(--color-accent);
+}
+.nene-public[data-theme^='riso'] .eyecatch {
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--color-text-primary);
+  background: repeating-linear-gradient(
+    45deg,
+    color-mix(in oklch, var(--color-accent) 20%, var(--color-surface-overlay)) 0 6px,
+    color-mix(in oklch, var(--color-brand-violet) 16%, var(--color-surface-overlay)) 6px 12px
+  );
+}
+.nene-public[data-theme^='riso'] .eyecatch::after {
+  border-radius: var(--radius-full);
+}
