@@ -8,6 +8,7 @@ const TEST_SITE: PublicSite = {
   footerMarkdown: '',
   logo: '',
   copyrightText: '',
+  homeLayout: { columns: 2, mainPos: 'left', swap: false },
   navItems: [],
   activeTheme: 'consumer',
   themeOverrideCss: '',

@@ -1,4 +1,5 @@
 import { useOutletContext } from 'react-router-dom'
+import type { PageLayout } from '@/shared/lib/layout-config'
 
 export interface PublicSiteNavItem {
   id: number
@@ -20,6 +21,8 @@ export interface PublicSite {
   logo: string
   /** Footer copyright text; `{year}`/`{site}` tokens substituted at render. */
   copyrightText: string
+  /** Top-page column layout (`layout_config.home`) — drives sidebar/aside on home. */
+  homeLayout: PageLayout
   navItems: PublicSiteNavItem[]
   /** Admin-selected public-site theme id (`active_theme` setting). */
   activeTheme: string

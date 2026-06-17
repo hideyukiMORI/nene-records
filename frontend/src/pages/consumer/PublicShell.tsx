@@ -4,6 +4,7 @@ import './public-fonts'
 import { Outlet } from 'react-router-dom'
 import { usePublicNavigationItems } from '@/entities/navigation-item'
 import { publicSettingsToMap, usePublicSettings } from '@/entities/setting'
+import { parseLayoutConfig } from '@/shared/lib/layout-config'
 import {
   readStoredActiveTheme,
   resolvePublicThemeId,
@@ -73,6 +74,7 @@ export function PublicShell() {
     footerMarkdown: settings.footer_markdown ?? '',
     logo: settings.logo_media_id ?? '',
     copyrightText: settings.copyright_text ?? '',
+    homeLayout: parseLayoutConfig(settings.layout_config).home,
     navItems,
     activeTheme,
     themeOverrideCss: overrideCssForTheme(overridesRaw, activeTheme),
