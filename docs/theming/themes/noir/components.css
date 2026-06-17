@@ -22,6 +22,8 @@
 
 /* ── 1 · FOUNDATIONS — sharp edges, dramatic type scale, bold display ─────── */
 .nene-public[data-theme^='noir'] {
+  /* display = Space Grotesk (oversized); body stays Inter (default --font-sans) */
+  --font-display: 'Space Grotesk', 'Noto Sans JP', ui-sans-serif, system-ui, sans-serif;
   /* radius → sharp; squares the pills too (toggle, chips, tags, pager, search) */
   --radius-sm: 0px;
   --radius-md: 0px;
@@ -105,12 +107,14 @@
   border-radius: 0;
 }
 .nene-public[data-theme^='noir'] .btn--primary {
-  box-shadow: 0 0 0 1px color-mix(in oklch, var(--color-accent) 50%, transparent),
+  box-shadow:
+    0 0 0 1px color-mix(in oklch, var(--color-accent) 50%, transparent),
     0 0 22px color-mix(in oklch, var(--color-accent) 30%, transparent);
 }
 .nene-public[data-theme^='noir'] .btn--primary:hover {
   transform: translateY(-1px);
-  box-shadow: 0 0 0 1px var(--color-accent),
+  box-shadow:
+    0 0 0 1px var(--color-accent),
     0 0 30px color-mix(in oklch, var(--color-accent) 50%, transparent);
 }
 .nene-public[data-theme^='noir'] .btn--ghost {
@@ -173,10 +177,16 @@
   transform: translateX(-50%);
   z-index: -1;
   background:
-    radial-gradient(80% 120% at 88% -10%,
-      color-mix(in oklch, var(--color-accent) 22%, transparent), transparent 60%),
-    radial-gradient(70% 100% at 0% 110%,
-      color-mix(in oklch, var(--color-brand-violet) 16%, transparent), transparent 55%),
+    radial-gradient(
+      80% 120% at 88% -10%,
+      color-mix(in oklch, var(--color-accent) 22%, transparent),
+      transparent 60%
+    ),
+    radial-gradient(
+      70% 100% at 0% 110%,
+      color-mix(in oklch, var(--color-brand-violet) 16%, transparent),
+      transparent 55%
+    ),
     var(--color-surface-sunken);
 }
 /* grain overlay — inline SVG noise (no external url) */
@@ -209,11 +219,13 @@
 .nene-public[data-theme^='noir'] .hero__art-frame {
   border: 1px solid var(--color-border-strong);
   border-radius: 0;
-  background:
-    radial-gradient(120% 120% at 70% 10%,
-      color-mix(in oklch, var(--color-accent) 14%, var(--color-surface-overlay)),
-      var(--color-surface-overlay));
-  box-shadow: 0 0 0 1px color-mix(in oklch, var(--color-accent) 14%, transparent),
+  background: radial-gradient(
+    120% 120% at 70% 10%,
+    color-mix(in oklch, var(--color-accent) 14%, var(--color-surface-overlay)),
+    var(--color-surface-overlay)
+  );
+  box-shadow:
+    0 0 0 1px color-mix(in oklch, var(--color-accent) 14%, transparent),
     var(--shadow-lg);
 }
 .nene-public[data-theme^='noir'] .hero__art-tag {
@@ -295,7 +307,8 @@
 }
 .nene-public[data-theme^='noir'] .card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 0 0 1px color-mix(in oklch, var(--color-accent) 40%, transparent),
+  box-shadow:
+    0 0 0 1px color-mix(in oklch, var(--color-accent) 40%, transparent),
     0 14px 30px oklch(0% 0 0 / 0.4);
 }
 .nene-public[data-theme^='noir'] .card::after {
@@ -330,7 +343,9 @@
   border-radius: 0;
   filter: grayscale(1) contrast(1.08);
   isolation: isolate;
-  transition: filter var(--dur-normal) var(--ease), transform var(--dur-normal) var(--ease);
+  transition:
+    filter var(--dur-normal) var(--ease),
+    transform var(--dur-normal) var(--ease);
 }
 .nene-public[data-theme^='noir'] .card__media::before,
 .nene-public[data-theme^='noir'] .featured__media::before,
@@ -340,9 +355,11 @@
   position: absolute;
   inset: 0;
   z-index: 1;
-  background: linear-gradient(140deg,
+  background: linear-gradient(
+    140deg,
     color-mix(in oklch, var(--color-accent) 62%, transparent),
-    color-mix(in oklch, var(--color-brand-violet) 30%, transparent));
+    color-mix(in oklch, var(--color-brand-violet) 30%, transparent)
+  );
   mix-blend-mode: screen;
   pointer-events: none;
 }
@@ -362,7 +379,8 @@
   border-top: 3px solid var(--color-accent);
   border-radius: 0;
   background: var(--color-surface-raised);
-  box-shadow: 0 0 0 1px color-mix(in oklch, var(--color-accent) 16%, transparent),
+  box-shadow:
+    0 0 0 1px color-mix(in oklch, var(--color-accent) 16%, transparent),
     var(--shadow-md);
 }
 .nene-public[data-theme^='noir'] .featured__title a:hover {
