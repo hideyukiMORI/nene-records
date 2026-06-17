@@ -1,0 +1,71 @@
+/* ============================================================================
+   NeNe Records — Nebula theme — component overlay (L2) ★STAR
+   System: "gradient glassmorphism / modern SaaS"
+   Violet→blue→pink gradients, frosted glass (translucent + backdrop-filter),
+   clean Space Grotesk. FONT OVERRIDE: --font-display -> Space Grotesk.
+   Scoped .nene-public[data-theme^='nebula'].
+   ========================================================================== */
+.nene-public[data-theme^='nebula'] {
+  --font-display: 'Space Grotesk', system-ui, sans-serif;
+  --font-chrome: 'Space Grotesk', system-ui, sans-serif;
+  --radius-sm: 12px; --radius-md: 18px; --radius-lg: 26px;
+  --content-w: 1200px; --tracking-display: -0.02em;
+  /* soft gradient backdrop so the frosted glass reads */
+  background:
+    radial-gradient(55% 45% at 10% -5%, color-mix(in oklch, var(--color-accent) 20%, transparent), transparent 60%),
+    radial-gradient(55% 45% at 95% 8%, color-mix(in oklch, var(--color-brand-violet) 20%, transparent), transparent 60%),
+    radial-gradient(60% 50% at 70% 100%, color-mix(in oklch, var(--color-accent) 12%, transparent), transparent 65%),
+    var(--color-surface);
+  background-attachment: fixed;
+}
+.nene-public[data-theme^='nebula'] .hero__title,
+.nene-public[data-theme^='nebula'] .section__title,
+.nene-public[data-theme^='nebula'] .featured__title,
+.nene-public[data-theme^='nebula'] .card__title,
+.nene-public[data-theme^='nebula'] .pagehead__title,
+.nene-public[data-theme^='nebula'] .typecard__name,
+.nene-public[data-theme^='nebula'] .row__title { font-family: var(--font-display); font-weight: 600; letter-spacing: -0.02em; }
+.nene-public[data-theme^='nebula'] .hd { border-bottom: 1px solid color-mix(in oklch, var(--color-accent) 20%, transparent); background: color-mix(in oklch, var(--color-surface) 60%, transparent); backdrop-filter: blur(16px) saturate(1.3); }
+.nene-public[data-theme^='nebula'] .brand__mark { border-radius: 12px; background: linear-gradient(135deg, var(--color-accent), var(--color-brand-violet)); color: oklch(99% 0.01 300); }
+.nene-public[data-theme^='nebula'] .brand__mark svg { color: oklch(99% 0.01 300); }
+.nene-public[data-theme^='nebula'] .brand__name { white-space: nowrap; }
+.nene-public[data-theme^='nebula'] .navlink { font-weight: 500; }
+.nene-public[data-theme^='nebula'] .navlink[aria-current='page']::after { height: 3px; border-radius: var(--radius-full); background: linear-gradient(90deg, var(--color-accent), var(--color-brand-violet)); }
+.nene-public[data-theme^='nebula'] .btn { border-radius: var(--radius-full); font-weight: 600; }
+.nene-public[data-theme^='nebula'] .btn--primary { background: linear-gradient(120deg, var(--color-accent), var(--color-brand-violet)); border: 0; box-shadow: 0 8px 24px color-mix(in oklch, var(--color-accent) 35%, transparent); }
+.nene-public[data-theme^='nebula'] .btn--primary:hover { transform: translateY(-2px); box-shadow: 0 12px 32px color-mix(in oklch, var(--color-accent) 45%, transparent); }
+.nene-public[data-theme^='nebula'] .eyebrow { text-transform: none; font-family: var(--font-chrome); font-weight: 600; letter-spacing: 0.04em; font-size: var(--text-body-sm); color: var(--color-accent); }
+.nene-public[data-theme^='nebula'] .eyebrow::before { width: 14px; height: 6px; border-radius: var(--radius-full); background: linear-gradient(90deg, var(--color-accent), var(--color-brand-violet)); }
+.nene-public[data-theme^='nebula'] .tbadge { border-radius: var(--radius-full); background: color-mix(in oklch, var(--color-accent) 14%, transparent); color: var(--color-accent); border-color: color-mix(in oklch, var(--color-accent) 30%, transparent); }
+.nene-public[data-theme^='nebula'] .hero__title { font-size: clamp(2.7rem, 1.7rem + 4.4vw, 5rem); }
+.nene-public[data-theme^='nebula'] .hero__title em { font-style: normal; background: linear-gradient(110deg, var(--color-accent), var(--color-brand-violet)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.nene-public[data-theme^='nebula'] .hero::before { background:
+  radial-gradient(70% 90% at 15% 0%, color-mix(in oklch, var(--color-accent) 34%, transparent), transparent 60%),
+  radial-gradient(70% 90% at 90% 30%, color-mix(in oklch, var(--color-brand-violet) 34%, transparent), transparent 60%),
+  var(--color-surface-sunken); }
+.nene-public[data-theme^='nebula'] .hero__art-frame { border-radius: var(--radius-lg); border: 1px solid color-mix(in oklch, var(--color-accent) 26%, transparent); background: color-mix(in oklch, var(--color-surface-raised) 55%, transparent); backdrop-filter: blur(16px) saturate(1.3); box-shadow: 0 20px 50px color-mix(in oklch, var(--color-accent) 22%, transparent); }
+.nene-public[data-theme^='nebula'] .hero__art-tag { border-radius: var(--radius-full); background: color-mix(in oklch, var(--color-surface-raised) 60%, transparent); backdrop-filter: blur(8px); }
+.nene-public[data-theme^='nebula'] .hero__art-tag b { color: var(--color-accent); }
+.nene-public[data-theme^='nebula'] .hero__stat b { font-family: var(--font-display); font-weight: 700; }
+.nene-public[data-theme^='nebula'] .section__head { border-bottom: 0; padding-bottom: var(--space-xs); }
+.nene-public[data-theme^='nebula'] .section__title { font-size: clamp(1.8rem, 1.2rem + 1.8vw, 2.6rem); }
+.nene-public[data-theme^='nebula'] .section__link { border-radius: var(--radius-full); color: var(--color-accent); background: color-mix(in oklch, var(--color-accent) 12%, transparent); padding: 7px 15px; }
+.nene-public[data-theme^='nebula'] .card { border-radius: var(--radius-lg); background: color-mix(in oklch, var(--color-surface-raised) 55%, transparent); backdrop-filter: blur(14px) saturate(1.2); border: 1px solid color-mix(in oklch, var(--color-accent) 18%, transparent); padding: var(--space-sm) var(--space-sm) var(--space-md); box-shadow: 0 10px 30px color-mix(in oklch, var(--color-accent) 12%, transparent); transition: transform var(--dur-normal) var(--ease), box-shadow var(--dur-normal) var(--ease); }
+.nene-public[data-theme^='nebula'] .card:hover { transform: translateY(-5px); box-shadow: 0 18px 40px color-mix(in oklch, var(--color-accent) 24%, transparent); }
+.nene-public[data-theme^='nebula'] .card__media,
+.nene-public[data-theme^='nebula'] .featured__media,
+.nene-public[data-theme^='nebula'] .row__media { border-radius: var(--radius-md); border: 0; }
+.nene-public[data-theme^='nebula'] .card:hover .card__title { color: var(--color-accent); }
+.nene-public[data-theme^='nebula'] .featured { border: 1px solid color-mix(in oklch, var(--color-accent) 20%, transparent); border-radius: var(--radius-lg); background: color-mix(in oklch, var(--color-surface-raised) 55%, transparent); backdrop-filter: blur(16px) saturate(1.2); box-shadow: 0 16px 40px color-mix(in oklch, var(--color-accent) 16%, transparent); }
+.nene-public[data-theme^='nebula'] .typecard { border: 1px solid color-mix(in oklch, var(--color-accent) 18%, transparent); border-radius: var(--radius-lg); background: color-mix(in oklch, var(--color-surface-raised) 55%, transparent); backdrop-filter: blur(12px); }
+.nene-public[data-theme^='nebula'] .typecard:hover { transform: translateY(-4px); border-color: color-mix(in oklch, var(--color-accent) 40%, transparent); box-shadow: 0 14px 34px color-mix(in oklch, var(--color-accent) 20%, transparent); }
+.nene-public[data-theme^='nebula'] .widget, .nene-public[data-theme^='nebula'] .aside section { border: 1px solid color-mix(in oklch, var(--color-accent) 16%, transparent); border-radius: var(--radius-lg); background: color-mix(in oklch, var(--color-surface-raised) 55%, transparent); backdrop-filter: blur(12px); box-shadow: 0 8px 24px color-mix(in oklch, var(--color-accent) 10%, transparent); }
+.nene-public[data-theme^='nebula'] .search, .nene-public[data-theme^='nebula'] .searchbar, .nene-public[data-theme^='nebula'] .input { border-radius: var(--radius-full); }
+.nene-public[data-theme^='nebula'] .textarea { border-radius: var(--radius-lg); }
+.nene-public[data-theme^='nebula'] .poplist__rank { font-family: var(--font-display); font-weight: 700; background: linear-gradient(120deg, var(--color-accent), var(--color-brand-violet)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.nene-public[data-theme^='nebula'] .tag { border-radius: var(--radius-full); }
+.nene-public[data-theme^='nebula'] .tag:hover { border-color: var(--color-accent); color: var(--color-accent); }
+.nene-public[data-theme^='nebula'] .chip, .nene-public[data-theme^='nebula'] .viewtoggle, .nene-public[data-theme^='nebula'] .pager button, .nene-public[data-theme^='nebula'] .pager span { border-radius: var(--radius-full); }
+.nene-public[data-theme^='nebula'] .ft { border-top: 1px solid color-mix(in oklch, var(--color-accent) 16%, transparent); background: transparent; }
+.nene-public[data-theme^='nebula'] .eyecatch { border-radius: var(--radius-md); border-color: color-mix(in oklch, var(--color-accent) 18%, transparent); background: linear-gradient(135deg, color-mix(in oklch, var(--color-accent) 22%, var(--color-surface-overlay)), color-mix(in oklch, var(--color-brand-violet) 22%, var(--color-surface-overlay))); }
+.nene-public[data-theme^='nebula'] .eyecatch::after { border-radius: var(--radius-full); background: color-mix(in oklch, var(--color-surface-raised) 70%, transparent); backdrop-filter: blur(6px); }

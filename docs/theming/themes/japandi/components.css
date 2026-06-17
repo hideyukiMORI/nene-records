@@ -1,0 +1,70 @@
+/* ============================================================================
+   NeNe Records — Japandi theme — component overlay (L2) ★STAR
+   System: "zen minimal / Japanese x Scandinavian"
+   Warm stone paper, muted indigo accent, maximal whitespace, thin Nunito Sans,
+   hairlines only. FONT OVERRIDE: --font-display -> Nunito Sans.
+   Scoped .nene-public[data-theme^='japandi'].
+   ========================================================================== */
+.nene-public[data-theme^='japandi'] {
+  --font-display: 'Nunito Sans', system-ui, sans-serif;
+  --font-chrome: 'Nunito Sans', system-ui, sans-serif;
+  --radius-sm: 4px; --radius-md: 6px; --radius-lg: 8px;
+  /* maximal whitespace */
+  --space-lg: 2rem; --space-xl: 3.5rem; --space-2xl: 6rem;
+  --space-section: clamp(5rem, 3rem + 8vw, 9rem);
+  --gutter: clamp(1.75rem, 1rem + 4vw, 4rem);
+  --content-w: 1080px; --measure: 74ch;
+  --leading-body: 1.85; --tracking-display: 0.005em; --leading-heading: 1.3;
+}
+.nene-public[data-theme^='japandi'] .layout.is-2col { grid-template-columns: minmax(0,1fr) 260px; gap: clamp(2.5rem, 5vw, 5.5rem); }
+.nene-public[data-theme^='japandi'] .hero__title,
+.nene-public[data-theme^='japandi'] .section__title,
+.nene-public[data-theme^='japandi'] .featured__title,
+.nene-public[data-theme^='japandi'] .card__title,
+.nene-public[data-theme^='japandi'] .pagehead__title,
+.nene-public[data-theme^='japandi'] .typecard__name,
+.nene-public[data-theme^='japandi'] .row__title {
+  font-family: var(--font-display); font-weight: 600; letter-spacing: -0.005em;
+}
+.nene-public[data-theme^='japandi'] .hd { border-bottom: 1px solid var(--color-border); background: color-mix(in oklch, var(--color-surface) 88%, transparent); }
+.nene-public[data-theme^='japandi'] .brand__mark { background: var(--color-accent-weak); border-radius: 4px; }
+.nene-public[data-theme^='japandi'] .brand__name { font-weight: 600; letter-spacing: 0.01em; white-space: nowrap; }
+.nene-public[data-theme^='japandi'] .navlink { font-size: var(--text-body-sm); font-weight: 500; letter-spacing: 0.02em; }
+.nene-public[data-theme^='japandi'] .navlink[aria-current='page']::after { height: 1px; background: var(--color-accent); }
+.nene-public[data-theme^='japandi'] .btn { border-radius: var(--radius-sm); font-weight: 600; letter-spacing: 0.02em; box-shadow: none; }
+.nene-public[data-theme^='japandi'] .btn--primary:hover { transform: none; }
+.nene-public[data-theme^='japandi'] .eyebrow { text-transform: none; font-family: var(--font-chrome); font-weight: 600; letter-spacing: 0.08em; font-size: 0.74rem; color: var(--color-text-muted); }
+.nene-public[data-theme^='japandi'] .eyebrow::before { width: 14px; height: 1px; background: var(--color-accent); }
+.nene-public[data-theme^='japandi'] .tbadge { border-radius: var(--radius-full); background: transparent; border-color: var(--color-border-strong); color: var(--color-text-muted); text-transform: none; }
+.nene-public[data-theme^='japandi'] .tbadge::before { background: var(--color-accent); }
+.nene-public[data-theme^='japandi'] .hero__title { font-weight: 600; font-size: clamp(2.2rem, 1.5rem + 3vw, 3.6rem); line-height: 1.2; max-width: 20ch; }
+.nene-public[data-theme^='japandi'] .hero__title em { font-style: normal; color: var(--color-accent); }
+.nene-public[data-theme^='japandi'] .hero__lead { max-width: 56ch; color: var(--color-text-muted); }
+.nene-public[data-theme^='japandi'] .hero__meta { border-top: 1px solid var(--color-border); }
+.nene-public[data-theme^='japandi'] .hero__stat b { font-family: var(--font-display); font-weight: 600; }
+.nene-public[data-theme^='japandi'] .section__head { border-bottom: 1px solid var(--color-border); }
+.nene-public[data-theme^='japandi'] .section__title { font-weight: 600; font-size: clamp(1.5rem, 1.1rem + 1.4vw, 2.1rem); }
+.nene-public[data-theme^='japandi'] .section__link { color: var(--color-text-muted); font-weight: 600; }
+.nene-public[data-theme^='japandi'] .section__link:hover { color: var(--color-accent); }
+/* japandi uses list feed — single calm column with room (base 2col rule out-specifies [data-feed]) */
+.nene-public[data-theme^='japandi'][data-feed='list'] .cardgrid,
+.nene-public[data-theme^='japandi'][data-feed='list'] .layout.is-2col .cardgrid { grid-template-columns: 1fr; gap: 0; }
+.nene-public[data-theme^='japandi'][data-feed='list'] .card { grid-template-columns: minmax(140px,180px) 1fr; gap: var(--space-2xs) var(--space-xl); padding: var(--space-xl) 0; border-top: 1px solid var(--color-border); }
+.nene-public[data-theme^='japandi'][data-feed='list'] .cardgrid .card:first-child { border-top: 0; padding-top: var(--space-sm); }
+.nene-public[data-theme^='japandi'][data-feed='list'] .card__excerpt { -webkit-line-clamp: 3; line-clamp: 3; }
+.nene-public[data-theme^='japandi'] .card__media,
+.nene-public[data-theme^='japandi'] .featured__media,
+.nene-public[data-theme^='japandi'] .row__media { border-radius: var(--radius-sm); border: 1px solid var(--color-border); filter: saturate(0.8); }
+.nene-public[data-theme^='japandi'] .card:hover .card__title { color: var(--color-accent); }
+.nene-public[data-theme^='japandi'] .featured { border: 0; border-top: 1px solid var(--color-border-strong); border-bottom: 1px solid var(--color-border-strong); border-radius: 0; background: transparent; box-shadow: none; padding-block: var(--space-xl); }
+.nene-public[data-theme^='japandi'] .featured__title { font-weight: 600; }
+.nene-public[data-theme^='japandi'] .typecard { border: 0; border-bottom: 1px solid var(--color-border); border-radius: 0; background: transparent; padding-inline: 0; }
+.nene-public[data-theme^='japandi'] .typecard:hover { background: transparent; border-bottom-color: var(--color-accent); transform: none; box-shadow: none; }
+.nene-public[data-theme^='japandi'] .widget, .nene-public[data-theme^='japandi'] .aside section { border: 0; border-top: 1px solid var(--color-border-strong); border-radius: 0; background: transparent; padding: var(--space-md) 0 0; box-shadow: none; }
+.nene-public[data-theme^='japandi'] .search, .nene-public[data-theme^='japandi'] .searchbar, .nene-public[data-theme^='japandi'] .input, .nene-public[data-theme^='japandi'] .textarea { border-radius: var(--radius-sm); }
+.nene-public[data-theme^='japandi'] .poplist__rank { font-family: var(--font-display); color: var(--color-accent); font-weight: 600; }
+.nene-public[data-theme^='japandi'] .tag { border-radius: var(--radius-full); font-weight: 500; }
+.nene-public[data-theme^='japandi'] .chip, .nene-public[data-theme^='japandi'] .viewtoggle, .nene-public[data-theme^='japandi'] .pager button, .nene-public[data-theme^='japandi'] .pager span { border-radius: var(--radius-sm); }
+.nene-public[data-theme^='japandi'] .ft { border-top: 1px solid var(--color-border); }
+.nene-public[data-theme^='japandi'] .eyecatch { border-radius: var(--radius-sm); border-color: var(--color-border); background: repeating-linear-gradient(115deg, color-mix(in oklch, var(--color-accent) 8%, var(--color-surface-overlay)) 0 16px, var(--color-surface-overlay) 16px 32px); }
+.nene-public[data-theme^='japandi'] .eyecatch::after { border-radius: var(--radius-full); }

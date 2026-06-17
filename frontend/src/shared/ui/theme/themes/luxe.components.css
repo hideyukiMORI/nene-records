@@ -1,0 +1,262 @@
+/* ============================================================================
+   NeNe Records — Editorial Luxe theme — component overlay (L2) ★STAR
+   System: "fashion-magazine Didone / theatrical whitespace"
+   High-contrast Playfair Display, gold accent, extreme whitespace, gold
+   hairlines. FONT OVERRIDE: --font-display -> Playfair Display.
+   Scoped .nene-public[data-theme^='luxe'].
+   ========================================================================== */
+.nene-public[data-theme^='luxe'] {
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-chrome: 'Inter', system-ui, sans-serif;
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-full: 0px;
+  --content-w: 1240px;
+  --measure: 64ch;
+  --gutter: clamp(1.5rem, 0.5rem + 4vw, 3.5rem);
+  --space-section: clamp(5rem, 3rem + 7vw, 9rem);
+  --tracking-display: -0.01em;
+  --leading-tight: 1.02;
+}
+.nene-public[data-theme^='luxe'] .hero__title,
+.nene-public[data-theme^='luxe'] .section__title,
+.nene-public[data-theme^='luxe'] .featured__title,
+.nene-public[data-theme^='luxe'] .card__title,
+.nene-public[data-theme^='luxe'] .pagehead__title,
+.nene-public[data-theme^='luxe'] .typecard__name,
+.nene-public[data-theme^='luxe'] .row__title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.005em;
+}
+.nene-public[data-theme^='luxe'] .hd {
+  border-bottom: 1px solid var(--color-accent-weak);
+}
+.nene-public[data-theme^='luxe'] .brand__mark {
+  border-radius: 0;
+  border: 1px solid var(--color-accent);
+  background: transparent;
+  color: var(--color-accent);
+}
+.nene-public[data-theme^='luxe'] .brand__mark svg {
+  color: var(--color-accent);
+}
+.nene-public[data-theme^='luxe'] .brand__name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+.nene-public[data-theme^='luxe'] .navlink {
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.68rem;
+  font-family: var(--font-chrome);
+}
+.nene-public[data-theme^='luxe'] .navlink[aria-current='page']::after {
+  height: 1px;
+  background: var(--color-accent);
+}
+.nene-public[data-theme^='luxe'] .btn {
+  border-radius: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.72rem;
+  font-family: var(--font-chrome);
+  padding: 14px 30px;
+}
+.nene-public[data-theme^='luxe'] .btn--ghost {
+  border-color: var(--color-accent);
+  color: var(--color-text-primary);
+}
+.nene-public[data-theme^='luxe'] .eyebrow {
+  font-family: var(--font-chrome);
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  font-size: 0.66rem;
+  color: var(--color-accent);
+}
+.nene-public[data-theme^='luxe'] .eyebrow::before {
+  width: 28px;
+  height: 1px;
+  background: var(--color-accent);
+}
+.nene-public[data-theme^='luxe'] .tbadge {
+  border-radius: 0;
+  font-family: var(--font-chrome);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  background: transparent;
+  border: 1px solid var(--color-accent);
+  color: var(--color-accent);
+}
+.nene-public[data-theme^='luxe'] .tbadge::before {
+  display: none;
+}
+.nene-public[data-theme^='luxe'] .hero__title {
+  font-weight: 900;
+  font-size: clamp(3rem, 1.8rem + 5.5vw, 6.5rem);
+  line-height: 1;
+}
+.nene-public[data-theme^='luxe'] .hero__title em {
+  font-style: italic;
+  color: var(--color-accent);
+}
+.nene-public[data-theme^='luxe'] .hero__lead {
+  font-style: italic;
+  font-family: var(--font-display);
+  max-width: 48ch;
+}
+.nene-public[data-theme^='luxe'] .hero__meta {
+  border-top: 1px solid var(--color-accent-weak);
+}
+.nene-public[data-theme^='luxe'] .hero__stat b {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--color-accent);
+}
+.nene-public[data-theme^='luxe'] .section__head {
+  border-bottom: 1px solid var(--color-accent);
+}
+.nene-public[data-theme^='luxe'] .section__title {
+  font-size: clamp(1.9rem, 1.3rem + 2vw, 3rem);
+}
+.nene-public[data-theme^='luxe'] .section__link {
+  color: var(--color-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.7rem;
+  font-family: var(--font-chrome);
+}
+.nene-public[data-theme^='luxe'] .card {
+  gap: var(--space-sm);
+}
+.nene-public[data-theme^='luxe'] .card__media,
+.nene-public[data-theme^='luxe'] .featured__media,
+.nene-public[data-theme^='luxe'] .article__hero,
+.nene-public[data-theme^='luxe'] .row__media {
+  border-radius: 0;
+  border: 1px solid var(--color-accent-weak);
+  filter: grayscale(1) contrast(1.06);
+  isolation: isolate;
+  transition: filter var(--dur-normal) var(--ease);
+}
+.nene-public[data-theme^='luxe'] .card__media::before,
+.nene-public[data-theme^='luxe'] .featured__media::before,
+.nene-public[data-theme^='luxe'] .article__hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    140deg,
+    color-mix(in oklch, var(--color-accent) 45%, transparent),
+    transparent 70%
+  );
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+.nene-public[data-theme^='luxe'] .eyecatch::after {
+  position: relative;
+  z-index: 2;
+}
+.nene-public[data-theme^='luxe'] .card:hover .card__media {
+  filter: grayscale(0.4) contrast(1);
+}
+.nene-public[data-theme^='luxe'] .card__title {
+  font-size: 1.3rem;
+}
+.nene-public[data-theme^='luxe'] .card:hover .card__title {
+  color: var(--color-accent);
+}
+.nene-public[data-theme^='luxe'] .featured {
+  border: 0;
+  border-top: 1px solid var(--color-accent);
+  border-bottom: 1px solid var(--color-accent);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  padding-block: var(--space-xl);
+}
+.nene-public[data-theme^='luxe'] .featured__title {
+  font-weight: 900;
+  font-size: clamp(2rem, 1.3rem + 2.6vw, 3.4rem);
+}
+.nene-public[data-theme^='luxe'] .featured__excerpt {
+  font-style: italic;
+}
+.nene-public[data-theme^='luxe'] .typecard {
+  border: 0;
+  border-bottom: 1px solid var(--color-accent-weak);
+  border-radius: 0;
+  background: transparent;
+}
+.nene-public[data-theme^='luxe'] .typecard:hover {
+  background: transparent;
+  border-bottom-color: var(--color-accent);
+  transform: none;
+  box-shadow: none;
+}
+.nene-public[data-theme^='luxe'] .typecard__slug,
+.nene-public[data-theme^='luxe'] .typecard__count {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.72rem;
+}
+.nene-public[data-theme^='luxe'] .widget,
+.nene-public[data-theme^='luxe'] .aside section {
+  border: 0;
+  border-top: 1px solid var(--color-accent);
+  border-radius: 0;
+  background: transparent;
+  padding: var(--space-md) 0 0;
+  box-shadow: none;
+}
+.nene-public[data-theme^='luxe'] .widget__title,
+.nene-public[data-theme^='luxe'] .aside section h2 {
+  font-family: var(--font-display);
+}
+.nene-public[data-theme^='luxe'] .search,
+.nene-public[data-theme^='luxe'] .searchbar,
+.nene-public[data-theme^='luxe'] .input,
+.nene-public[data-theme^='luxe'] .textarea {
+  border-radius: 0;
+  border-color: var(--color-accent-weak);
+}
+.nene-public[data-theme^='luxe'] .poplist__rank {
+  font-family: var(--font-display);
+  color: var(--color-accent);
+  font-style: italic;
+}
+.nene-public[data-theme^='luxe'] .tag {
+  border-radius: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.68rem;
+  font-family: var(--font-chrome);
+}
+.nene-public[data-theme^='luxe'] .chip,
+.nene-public[data-theme^='luxe'] .viewtoggle,
+.nene-public[data-theme^='luxe'] .pager button,
+.nene-public[data-theme^='luxe'] .pager span {
+  border-radius: 0;
+}
+.nene-public[data-theme^='luxe'] .ft {
+  border-top: 1px solid var(--color-accent);
+}
+.nene-public[data-theme^='luxe'] .eyecatch {
+  border-radius: 0;
+  border-color: var(--color-accent-weak);
+  background: repeating-linear-gradient(
+    135deg,
+    color-mix(in oklch, var(--color-accent) 14%, var(--color-surface-overlay)) 0 14px,
+    var(--color-surface-overlay) 14px 28px
+  );
+}
+.nene-public[data-theme^='luxe'] .eyecatch::after {
+  border-radius: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-family: var(--font-chrome);
+}

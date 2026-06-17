@@ -36,11 +36,17 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@fontsource/archivo": "^5.2.8",
     "@fontsource/bricolage-grotesque": "^5.2.10",
+    "@fontsource/fredoka": "^5.2.10",
     "@fontsource/inter": "^5.2.8",
     "@fontsource/jetbrains-mono": "^5.2.8",
     "@fontsource/noto-sans-jp": "^5.2.9",
     "@fontsource/noto-sans-sc": "^5.2.9",
+    "@fontsource/nunito": "^5.2.7",
+    "@fontsource/nunito-sans": "^5.2.7",
+    "@fontsource/orbitron": "^5.2.8",
+    "@fontsource/playfair-display": "^5.2.8",
     "@fontsource/saira-semi-condensed": "^5.2.7",
     "@fontsource/source-serif-4": "^5.2.9",
     "@fontsource/space-grotesk": "^5.2.10",

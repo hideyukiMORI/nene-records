@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NeNe Records — funk theme preview</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+
+<!-- 1) base/engine (unmodified) -->
+<link rel="stylesheet" href="../uploads/nene-theme-handoff/reference/public-site-2211f73b.css" />
+<!-- 2) funk tokens (light + dark) -->
+<link rel="stylesheet" href="./tokens.css" />
+<!-- 3) funk components.css (the star) -->
+<link rel="stylesheet" href="./components.css" />
+
+<style>
+  /* Preview chrome only — not part of the theme bundle. */
+  html, body { margin: 0; background: var(--color-surface); }
+  .nene-public {
+    --font-sans: 'Inter', system-ui, sans-serif;
+    --font-display: 'Fredoka', 'Bricolage Grotesque', system-ui, sans-serif;
+    --font-chrome: 'Fredoka', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  }
+</style>
+</head>
+<body>
+<!-- Noir is dark-first → preview opens in dark. Flags (#390) applied as data-*. -->
+<div class="nene-public" id="site"
+     data-theme="funk" data-theme-mode="light"
+     data-feed="magazine" data-cards="shadowed" data-media="duotone" data-hero="standard" data-rule="heavy" data-eyebrow="barred">
+
+  <!-- ── Header ─────────────────────────────────────────────────────────── -->
+  <header class="hd">
+    <div class="wrap hd__in">
+      <a class="brand" href="#">
+        <span class="brand__mark">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M5 19V5l14 14V5" />
+          </svg>
+        </span>
+        <span class="brand__text">
+          <span class="brand__name">NeNe Records</span>
+          <span class="brand__tag">Sound · Index</span>
+        </span>
+      </a>
+      <nav class="hd__nav">
+        <a class="navlink" aria-current="page" href="#">Home</a>
+        <a class="navlink" href="#">Releases</a>
+        <a class="navlink" href="#">Artists</a>
+        <a class="navlink" href="#">Archive</a>
+        <div class="themesw" role="group" aria-label="テーマ">
+          <button class="themesw__btn" data-set="light" aria-pressed="true" title="Light">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19"/></svg>
+          </button>
+          <button class="themesw__btn" data-set="dark" aria-pressed="false" title="Dark">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
+          </button>
+        </div>
+        <a class="btn btn--primary" href="#">Subscribe</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+
+    <!-- ── Hero ─────────────────────────────────────────────────────────── -->
+    <section class="hero">
+      <div class="hero__grid">
+        <div>
+          <p class="eyebrow hero__kicker">Groove · Funk</p>
+          <h1 class="hero__title">70sの、<em>グルーヴ</em>。</h1>
+          <p class="hero__lead">マスタード/ラスト/アボカドの暖色、丸く太い表示書体。グルーヴィでレトロ、楽しいが落ち着いた暖かさ。 base の public-site.css に tokens.css と components.css を当てた結果です。DOM は変えません。</p>
+          <div class="hero__cta">
+            <a class="btn btn--primary" href="#">最新リリース</a>
+            <a class="btn btn--ghost" href="#">テーマについて</a>
+          </div>
+          <div class="hero__meta">
+            <div class="hero__stat"><b>light/dark</b><span>両対応必須</span></div>
+            <div class="hero__stat"><b>AA</b><span>コントラスト</span></div>
+            <div class="hero__stat"><b>no JS</b><span>宣言的のみ</span></div>
+          </div>
+        </div>
+        <div class="hero__art">
+          <div class="hero__art-frame">
+            <div class="eyecatch" data-label="cover art" style="width:100%"></div>
+            <span class="hero__art-tag"><b>◆</b> hero art</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Latest feed + sidebar ────────────────────────────────────────── -->
+    <div class="layout is-2col">
+      <div class="layout__main">
+
+        <section class="section" style="margin-top:0">
+          <div class="section__head">
+            <div>
+              <p class="eyebrow">Latest · Feed</p>
+              <h2 class="section__title">新着リリース</h2>
+            </div>
+            <a class="section__link" href="#">View all
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </a>
+          </div>
+
+          <article class="featured">
+            <div class="featured__media eyecatch" data-label="featured"></div>
+            <div class="featured__body">
+              <div class="featured__metarow">
+                <span class="tbadge">album</span>
+                <span class="meta">2026.06.16</span>
+                <span class="dot"></span>
+                <span class="meta">12 tracks</span>
+              </div>
+              <h3 class="featured__title"><a href="#">特集：陽だまりのファンク</a></h3>
+              <p class="featured__excerpt">フィーチャー枠の抜粋。テーマの版面づくりは components.css が主役です。</p>
+              <div class="featured__foot">
+                <span class="meta">REF&nbsp;/&nbsp;0042</span>
+              </div>
+            </div>
+          </article>
+
+          <div class="cardgrid">
+            <a class="card" href="#">
+              <div class="card__media eyecatch" data-label="cover"></div>
+              <div class="card__metarow"><span class="tbadge">single</span><span class="meta">4:21</span></div>
+              <h3 class="card__title">Sunflower</h3>
+              <p class="card__excerpt">丸く太いレトロ表示書体。</p>
+            </a>
+            <a class="card" href="#">
+              <div class="card__media eyecatch" data-label="cover"></div>
+              <div class="card__metarow"><span class="tbadge">ep</span><span class="meta">5 tracks</span></div>
+              <h3 class="card__title">Groovy</h3>
+              <p class="card__excerpt">マスタード×アボカドの暖色。</p>
+            </a>
+            <a class="card" href="#">
+              <div class="card__media eyecatch" data-label="cover"></div>
+              <div class="card__metarow"><span class="tbadge">album</span><span class="meta">9 tracks</span></div>
+              <h3 class="card__title">Velvet</h3>
+              <p class="card__excerpt">大きな角丸のカード。</p>
+            </a>
+            <a class="card" href="#">
+              <div class="card__media eyecatch" data-label="cover"></div>
+              <div class="card__metarow"><span class="tbadge">single</span><span class="meta">3:08</span></div>
+              <h3 class="card__title">Mellow</h3>
+              <p class="card__excerpt">duotone のレトロ写真。</p>
+            </a>
+          </div>
+        </section>
+      </div>
+
+      <!-- ── Sidebar ───────────────────────────────────────────────────── -->
+      <aside class="aside">
+        <div class="search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          <input type="search" placeholder="作品を検索…" />
+        </div>
+        <div class="widget">
+          <h3 class="widget__title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
+            Most played
+          </h3>
+          <ul class="poplist">
+            <li><span class="poplist__rank">1</span><div><a class="poplist__t" href="#">Sunflower</a><div class="poplist__m">single · 4:21</div></div></li>
+            <li><span class="poplist__rank">2</span><div><a class="poplist__t" href="#">Groovy</a><div class="poplist__m">ep · 5 tracks</div></div></li>
+            <li><span class="poplist__rank">3</span><div><a class="poplist__t" href="#">Mellow</a><div class="poplist__m">single · 3:08</div></div></li>
+          </ul>
+        </div>
+        <div class="widget">
+          <h3 class="widget__title">Tags</h3>
+          <div class="tags">
+            <a class="tag" href="#">ambient <b>24</b></a>
+            <a class="tag" href="#">techno <b>18</b></a>
+            <a class="tag" href="#">cinematic <b>11</b></a>
+            <a class="tag" href="#">field <b>7</b></a>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- ── Browse by type ───────────────────────────────────────────────── -->
+    <section class="section">
+      <div class="section__head">
+        <div>
+          <p class="eyebrow">Browse · Catalogue</p>
+          <h2 class="section__title">タイプで探す</h2>
+        </div>
+        <a class="section__link" href="#">All types
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+      </div>
+      <div class="types">
+        <a class="typecard" href="#">
+          <div class="typecard__main">
+            <span class="typecard__name">Releases</span>
+            <span class="typecard__slug">music/release</span>
+          </div>
+          <span class="typecard__count">128</span>
+        </a>
+        <a class="typecard" href="#">
+          <div class="typecard__main">
+            <span class="typecard__name">Artists</span>
+            <span class="typecard__slug">people/artist</span>
+          </div>
+          <span class="typecard__count">42</span>
+        </a>
+        <a class="typecard" href="#">
+          <div class="typecard__main">
+            <span class="typecard__name">Sessions</span>
+            <span class="typecard__slug">archive/session</span>
+          </div>
+          <span class="typecard__count">76</span>
+        </a>
+        <a class="typecard" href="#">
+          <div class="typecard__main">
+            <span class="typecard__name">Notes</span>
+            <span class="typecard__slug">editorial/note</span>
+          </div>
+          <span class="typecard__count">19</span>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <!-- ── Footer ───────────────────────────────────────────────────────── -->
+  <footer class="ft">
+    <div class="wrap">
+      <div class="ft__bar">
+        <small>© 2026 NeNe Records — <span class="mono">theme: funk</span></small>
+        <small class="mono">light / dark · AA · no JS</small>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<script>
+  // Preview-only toggle (dark is the default for Noir).
+  const THEME_ID = 'funk';
+  const site = document.getElementById('site');
+  document.querySelectorAll('.themesw__btn').forEach((b) => {
+    b.addEventListener('click', () => {
+      const mode = b.dataset.set;
+      site.dataset.theme = mode === 'dark' ? THEME_ID + '-dark' : THEME_ID;
+      site.dataset.themeMode = mode;
+      document.querySelectorAll('.themesw__btn').forEach((x) =>
+        x.setAttribute('aria-pressed', String(x === b))
+      );
+    });
+  });
+</script>
+</body>
+</html>

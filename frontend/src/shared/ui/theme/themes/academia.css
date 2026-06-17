@@ -1,0 +1,61 @@
+/* NeNe Records — Public site theme: Dark Academia (id=academia) — tokens (light + dark)
+   Dark academia — burgundy and forest on parchment, classical serif (Source Serif 4) and ornamental rules; scholarly, weighty, nostalgic. components.css is the star: classical serif headings, ruled section heads with double-rule decoration, bordered duotone plates and small-caps labels. Dark-led; both modes AA.
+   Knob -> Derived per contract §3. Scoped [data-theme='academia'] / 'academia-dark'. Both AA. */
+
+/* LIGHT */
+[data-theme='academia'] {
+  --color-surface: oklch(94% 0.02 85);
+  --color-surface-raised: oklch(96% 0.02 85);
+  --color-surface-overlay: oklch(90.5% 0.026 85);
+  --color-surface-sunken: oklch(92.2% 0.02 85);
+  --color-text-primary: oklch(24% 0.025 40);
+  --color-text-muted: oklch(48% 0.023 40);
+  --color-text-inverse: oklch(99% 0.01 85);
+  --color-border: oklch(82% 0.024 85);
+  --color-border-strong: oklch(71% 0.028 85);
+  --color-focus-ring: oklch(46% 0.13 25);
+  --color-accent: oklch(46% 0.13 25);
+  --color-accent-hover: oklch(40% 0.13 25);
+  --color-accent-weak: color-mix(in oklch, var(--color-accent) 12%, var(--color-surface-raised));
+  --color-on-accent: oklch(98% 0.01 85);
+  --color-brand-violet: oklch(42% 0.08 150);
+  --color-danger: oklch(52% 0.2 25);
+  --color-danger-hover: oklch(46% 0.2 25);
+  --color-ok: oklch(55% 0.13 150);
+  --color-warn: oklch(70% 0.15 75);
+  --color-info: oklch(55% 0.13 250);
+  --shadow-sm: 0 1px 2px oklch(40% 0.04 40 / 0.08);
+  --shadow-md: 0 6px 20px oklch(40% 0.04 40 / 0.1), 0 2px 6px oklch(40% 0.04 40 / 0.08);
+  --shadow-lg: 0 24px 54px oklch(38% 0.05 40 / 0.16);
+  --shadow-focus: 0 0 0 3px color-mix(in oklch, var(--color-focus-ring) 30%, transparent);
+  color-scheme: light;
+}
+
+/* DARK */
+[data-theme='academia-dark'] {
+  --color-surface: oklch(20% 0.02 40);
+  --color-surface-raised: oklch(24% 0.02 40);
+  --color-surface-overlay: oklch(29% 0.026 40);
+  --color-surface-sunken: oklch(16.5% 0.02 40);
+  --color-text-primary: oklch(92% 0.02 85);
+  --color-text-muted: oklch(67% 0.018 85);
+  --color-text-inverse: oklch(20% 0.02 40);
+  --color-border: oklch(35% 0.024 40);
+  --color-border-strong: oklch(48% 0.028 40);
+  --color-focus-ring: oklch(60% 0.16 25);
+  --color-accent: oklch(58% 0.16 25);
+  --color-accent-hover: oklch(65% 0.16 25);
+  --color-accent-weak: color-mix(in oklch, var(--color-accent) 16%, var(--color-surface-raised));
+  --color-on-accent: oklch(98% 0.01 85);
+  --color-brand-violet: oklch(70% 0.1 150);
+  --color-danger: oklch(66% 0.18 25);
+  --color-danger-hover: oklch(72% 0.18 25);
+  --color-ok: oklch(72% 0.14 150);
+  --color-warn: oklch(80% 0.14 80);
+  --color-info: oklch(74% 0.12 250);
+  --shadow-sm: 0 1px 2px oklch(0% 0 0 / 0.4);
+  --shadow-md: 0 10px 28px oklch(0% 0 0 / 0.5), 0 2px 6px oklch(0% 0 0 / 0.4);
+  --shadow-lg: 0 28px 60px oklch(0% 0 0 / 0.62);
+  --shadow-focus: 0 0 0 3px color-mix(in oklch, var(--color-focus-ring) 30%, transparent);
+  color-scheme: dark;
+}

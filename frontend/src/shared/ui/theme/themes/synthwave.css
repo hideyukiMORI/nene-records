@@ -1,0 +1,61 @@
+/* NeNe Records — Public site theme: Synthwave (id=synthwave) — tokens (light + dark)
+   Retro-future neon — 80s. A deep indigo/violet ground with magenta and cyan neon glow, a grid horizon and luminous chrome. Decorative and nostalgic. components.css is the star: glowing neon headlines, grid-horizon hero, shadowed glow cards, duotone media and barred neon eyebrows. Dark-led; both modes AA.
+   Knob -> Derived per contract §3. Scoped [data-theme='synthwave'] / 'synthwave-dark'. Both AA. */
+
+/* LIGHT */
+[data-theme='synthwave'] {
+  --color-surface: oklch(96% 0.02 300);
+  --color-surface-raised: oklch(98% 0.02 300);
+  --color-surface-overlay: oklch(92.5% 0.026 300);
+  --color-surface-sunken: oklch(94.2% 0.02 300);
+  --color-text-primary: oklch(26% 0.05 295);
+  --color-text-muted: oklch(50% 0.045 295);
+  --color-text-inverse: oklch(99% 0.01 300);
+  --color-border: oklch(84% 0.024 300);
+  --color-border-strong: oklch(73% 0.028 300);
+  --color-focus-ring: oklch(58% 0.22 350);
+  --color-accent: oklch(58% 0.22 350);
+  --color-accent-hover: oklch(52% 0.22 350);
+  --color-accent-weak: color-mix(in oklch, var(--color-accent) 12%, var(--color-surface-raised));
+  --color-on-accent: oklch(99% 0.01 350);
+  --color-brand-violet: oklch(62% 0.13 215);
+  --color-danger: oklch(52% 0.2 25);
+  --color-danger-hover: oklch(46% 0.2 25);
+  --color-ok: oklch(55% 0.13 150);
+  --color-warn: oklch(70% 0.15 75);
+  --color-info: oklch(55% 0.13 250);
+  --shadow-sm: 0 1px 2px oklch(40% 0.04 300 / 0.08);
+  --shadow-md: 0 6px 20px oklch(40% 0.04 300 / 0.1), 0 2px 6px oklch(40% 0.04 300 / 0.08);
+  --shadow-lg: 0 24px 54px oklch(38% 0.05 300 / 0.16);
+  --shadow-focus: 0 0 0 3px color-mix(in oklch, var(--color-focus-ring) 30%, transparent);
+  color-scheme: light;
+}
+
+/* DARK */
+[data-theme='synthwave-dark'] {
+  --color-surface: oklch(18% 0.06 280);
+  --color-surface-raised: oklch(22% 0.06 280);
+  --color-surface-overlay: oklch(27% 0.078 280);
+  --color-surface-sunken: oklch(14.5% 0.06 280);
+  --color-text-primary: oklch(95% 0.02 300);
+  --color-text-muted: oklch(70% 0.018 300);
+  --color-text-inverse: oklch(20% 0.06 280);
+  --color-border: oklch(33% 0.064 280);
+  --color-border-strong: oklch(46% 0.068 280);
+  --color-focus-ring: oklch(72% 0.26 350);
+  --color-accent: oklch(70% 0.26 350);
+  --color-accent-hover: oklch(77% 0.26 350);
+  --color-accent-weak: color-mix(in oklch, var(--color-accent) 16%, var(--color-surface-raised));
+  --color-on-accent: oklch(18% 0.04 350);
+  --color-brand-violet: oklch(80% 0.14 200);
+  --color-danger: oklch(66% 0.18 25);
+  --color-danger-hover: oklch(72% 0.18 25);
+  --color-ok: oklch(72% 0.14 150);
+  --color-warn: oklch(80% 0.14 80);
+  --color-info: oklch(74% 0.12 250);
+  --shadow-sm: 0 1px 2px oklch(0% 0 0 / 0.4);
+  --shadow-md: 0 10px 28px oklch(0% 0 0 / 0.5), 0 2px 6px oklch(0% 0 0 / 0.4);
+  --shadow-lg: 0 28px 60px oklch(0% 0 0 / 0.62);
+  --shadow-focus: 0 0 0 3px color-mix(in oklch, var(--color-focus-ring) 30%, transparent);
+  color-scheme: dark;
+}

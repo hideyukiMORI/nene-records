@@ -141,6 +141,156 @@ export const PUBLIC_THEMES: readonly PublicThemeMeta[] = [
       accent: 'oklch(50% 0.18 25)',
     },
   },
+  {
+    id: 'swiss',
+    name: 'Swiss',
+    description:
+      'Swiss / International modernism — achromatic paper, a single signal red, oversized grotesk and a strict baseline grid.',
+    author: 'NeNe Records',
+    version: '1.0.0',
+    createdAt: '2026-06-17',
+    thumbnail: '/theme-thumbnails/swiss.webp',
+    preview: {
+      surface: 'oklch(99% 0 0)',
+      raised: 'oklch(99.5% 0 0)',
+      accent: 'oklch(56% 0.2 27)',
+    },
+  },
+  {
+    id: 'luxe',
+    name: 'Editorial Luxe',
+    description:
+      'High-fashion editorial — black and gold, a high-contrast Didone serif and dramatic, theatrical whitespace.',
+    author: 'NeNe Records',
+    version: '1.0.0',
+    createdAt: '2026-06-17',
+    thumbnail: '/theme-thumbnails/luxe.webp',
+    preview: {
+      surface: 'oklch(97% 0.006 80)',
+      raised: 'oklch(99% 0.006 80)',
+      accent: 'oklch(66% 0.13 85)',
+    },
+  },
+  {
+    id: 'synthwave',
+    name: 'Synthwave',
+    description:
+      'Retro-future neon — an indigo night, magenta/cyan glow and an 80s grid horizon. Nostalgic and decorative.',
+    author: 'NeNe Records',
+    version: '1.0.0',
+    createdAt: '2026-06-17',
+    thumbnail: '/theme-thumbnails/synthwave.webp',
+    preview: {
+      surface: 'oklch(96% 0.02 300)',
+      raised: 'oklch(98% 0.02 300)',
+      accent: 'oklch(58% 0.22 350)',
+    },
+  },
+  {
+    id: 'japandi',
+    name: 'Japandi',
+    description:
+      'Zen minimalism — warm stone/beige, the widest breathing space, thin humanist type and pared-back chrome.',
+    author: 'NeNe Records',
+    version: '1.0.0',
+    createdAt: '2026-06-17',
+    thumbnail: '/theme-thumbnails/japandi.webp',
+    preview: {
+      surface: 'oklch(95% 0.008 80)',
+      raised: 'oklch(97% 0.008 80)',
+      accent: 'oklch(50% 0.04 250)',
+    },
+  },
+  {
+    id: 'funk',
+    name: 'Funk',
+    description:
+      'Retro 70s funk — mustard, rust and avocado, big rounded display type and a groovy, warm rhythm.',
+    author: 'NeNe Records',
+    version: '1.0.0',
+    createdAt: '2026-06-17',
+    thumbnail: '/theme-thumbnails/funk.webp',
+    preview: {
+      surface: 'oklch(95% 0.03 85)',
+      raised: 'oklch(97% 0.03 85)',
+      accent: 'oklch(62% 0.15 55)',
+    },
+  },
+  {
+    id: 'academia',
+    name: 'Dark Academia',
+    description:
+      'Dark academia — burgundy and forest on parchment, a classic serif voice and ornate scholarly rules.',
+    author: 'NeNe Records',
+    version: '1.0.0',
+    createdAt: '2026-06-17',
+    thumbnail: '/theme-thumbnails/academia.webp',
+    preview: {
+      surface: 'oklch(94% 0.02 85)',
+      raised: 'oklch(96% 0.02 85)',
+      accent: 'oklch(46% 0.13 25)',
+    },
+  },
+  {
+    id: 'terminal',
+    name: 'Terminal',
+    description:
+      'Hacker terminal — phosphor green on near-black, an all-mono register and a faint CRT scanline.',
+    author: 'NeNe Records',
+    version: '1.0.0',
+    createdAt: '2026-06-17',
+    thumbnail: '/theme-thumbnails/terminal.webp',
+    preview: {
+      surface: 'oklch(96% 0.006 150)',
+      raised: 'oklch(98% 0.006 150)',
+      accent: 'oklch(52% 0.15 150)',
+    },
+  },
+  {
+    id: 'memphis',
+    name: 'Memphis',
+    description:
+      'Memphis 80s pop — saturated primaries with black, geometric confetti and a bold graphic register.',
+    author: 'NeNe Records',
+    version: '1.0.0',
+    createdAt: '2026-06-17',
+    thumbnail: '/theme-thumbnails/memphis.webp',
+    preview: {
+      surface: 'oklch(99% 0 0)',
+      raised: 'oklch(99.5% 0 0)',
+      accent: 'oklch(58% 0.21 25)',
+    },
+  },
+  {
+    id: 'coastal',
+    name: 'Coastal',
+    description:
+      'Mediterranean coastal — azure, sand and white, airy whitespace and a relaxed humanist voice.',
+    author: 'NeNe Records',
+    version: '1.0.0',
+    createdAt: '2026-06-17',
+    thumbnail: '/theme-thumbnails/coastal.webp',
+    preview: {
+      surface: 'oklch(98% 0.008 220)',
+      raised: 'oklch(99.5% 0.008 220)',
+      accent: 'oklch(56% 0.13 235)',
+    },
+  },
+  {
+    id: 'nebula',
+    name: 'Nebula',
+    description:
+      'Gradient glassmorphism — soft violet/blue/pink gradients, frosted glass and a clean, futuristic SaaS feel.',
+    author: 'NeNe Records',
+    version: '1.0.0',
+    createdAt: '2026-06-17',
+    thumbnail: '/theme-thumbnails/nebula.webp',
+    preview: {
+      surface: 'oklch(98% 0.012 300)',
+      raised: 'oklch(99.5% 0.012 300)',
+      accent: 'oklch(58% 0.2 295)',
+    },
+  },
 ]
 
 export const DEFAULT_PUBLIC_THEME_ID = 'consumer'

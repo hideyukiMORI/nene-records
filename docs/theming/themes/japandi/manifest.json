@@ -1,0 +1,124 @@
+{
+  "$schema": "../public-theme.schema.json",
+  "id": "japandi",
+  "name": "Japandi",
+  "version": "1.0.0",
+  "author": "NeNe Records",
+  "description": "Zen minimalism — Japanese x Scandinavian. Warm stone/beige paper, a muted earthy indigo accent, maximal whitespace and a thin humanist sans (Nunito Sans). Quiet and restrained, everything pared back. components.css is the star: airy rhythm, hairline rules, plain media and understated labels. Narrower canvas, wide measure. Light + dark, both AA.",
+  "supportsModes": [
+    "light",
+    "dark"
+  ],
+  "fonts": [
+    {
+      "family": "Nunito Sans",
+      "role": "display",
+      "source": "fontsource",
+      "weights": [
+        300,
+        400,
+        600
+      ]
+    },
+    {
+      "family": "Inter",
+      "role": "body",
+      "source": "fontsource",
+      "weights": [
+        400,
+        500,
+        600
+      ]
+    },
+    {
+      "family": "JetBrains Mono",
+      "role": "mono",
+      "source": "fontsource",
+      "weights": [
+        400,
+        500
+      ]
+    }
+  ],
+  "tokens": {
+    "light": {
+      "color-surface": "oklch(95% 0.008 80)",
+      "color-surface-raised": "oklch(97% 0.008 80)",
+      "color-surface-overlay": "oklch(91.5% 0.01 80)",
+      "color-surface-sunken": "oklch(93.2% 0.008 80)",
+      "color-text-primary": "oklch(28% 0.01 70)",
+      "color-text-muted": "oklch(52% 0.009 70)",
+      "color-text-inverse": "oklch(99% 0.008 80)",
+      "color-border": "oklch(83% 0.012 80)",
+      "color-border-strong": "oklch(72% 0.016 80)",
+      "color-focus-ring": "oklch(50% 0.1 250)",
+      "color-accent": "oklch(50% 0.04 250)",
+      "color-accent-hover": "oklch(44% 0.04 250)",
+      "color-accent-weak": "color-mix(in oklch, var(--color-accent) 12%, var(--color-surface-raised))",
+      "color-on-accent": "oklch(99% 0.005 250)",
+      "color-brand-violet": "oklch(52% 0.1 300)",
+      "color-danger": "oklch(52% 0.2 25)",
+      "color-danger-hover": "oklch(46% 0.2 25)",
+      "color-ok": "oklch(55% 0.13 150)",
+      "color-warn": "oklch(70% 0.15 75)",
+      "color-info": "oklch(55% 0.13 250)",
+      "shadow-sm": "0 1px 2px oklch(40% 0.04 70 / 0.08)",
+      "shadow-md": "0 6px 20px oklch(40% 0.04 70 / 0.1), 0 2px 6px oklch(40% 0.04 70 / 0.08)",
+      "shadow-lg": "0 24px 54px oklch(38% 0.05 70 / 0.16)",
+      "shadow-focus": "0 0 0 3px color-mix(in oklch, var(--color-focus-ring) 30%, transparent)",
+      "color-scheme": "light"
+    },
+    "dark": {
+      "color-surface": "oklch(22% 0.006 70)",
+      "color-surface-raised": "oklch(26% 0.006 70)",
+      "color-surface-overlay": "oklch(31% 0.008 70)",
+      "color-surface-sunken": "oklch(18.5% 0.006 70)",
+      "color-text-primary": "oklch(92% 0.008 80)",
+      "color-text-muted": "oklch(67% 0.007 80)",
+      "color-text-inverse": "oklch(20% 0.006 70)",
+      "color-border": "oklch(37% 0.01 70)",
+      "color-border-strong": "oklch(50% 0.014 70)",
+      "color-focus-ring": "oklch(70% 0.1 250)",
+      "color-accent": "oklch(68% 0.05 250)",
+      "color-accent-hover": "oklch(75% 0.05 250)",
+      "color-accent-weak": "color-mix(in oklch, var(--color-accent) 16%, var(--color-surface-raised))",
+      "color-on-accent": "oklch(20% 0.02 250)",
+      "color-brand-violet": "oklch(70% 0.1 300)",
+      "color-danger": "oklch(66% 0.18 25)",
+      "color-danger-hover": "oklch(72% 0.18 25)",
+      "color-ok": "oklch(72% 0.14 150)",
+      "color-warn": "oklch(80% 0.14 80)",
+      "color-info": "oklch(74% 0.12 250)",
+      "shadow-sm": "0 1px 2px oklch(0% 0 0 / 0.4)",
+      "shadow-md": "0 10px 28px oklch(0% 0 0 / 0.5), 0 2px 6px oklch(0% 0 0 / 0.4)",
+      "shadow-lg": "0 28px 60px oklch(0% 0 0 / 0.62)",
+      "shadow-focus": "0 0 0 3px color-mix(in oklch, var(--color-focus-ring) 30%, transparent)",
+      "color-scheme": "dark"
+    }
+  },
+  "flags": {
+    "feedLayout": "list",
+    "cardStyle": "flat",
+    "media": "plain",
+    "hero": "minimal",
+    "sectionRule": "hairline",
+    "eyebrow": "plain"
+  },
+  "knobs": {
+    "accent": {
+      "light": "oklch(50% 0.04 250)",
+      "dark": "oklch(68% 0.05 250)"
+    },
+    "surface": {
+      "light": "oklch(95% 0.008 80)",
+      "dark": "oklch(22% 0.006 70)"
+    },
+    "fontDisplay": "Nunito Sans",
+    "fontBody": "Inter",
+    "fontMono": "JetBrains Mono",
+    "baseFontSize": "1.0625rem",
+    "typeScale": 1.16,
+    "density": "comfortable",
+    "radius": "soft"
+  }
+}
