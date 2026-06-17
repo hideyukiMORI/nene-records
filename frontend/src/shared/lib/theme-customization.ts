@@ -47,6 +47,7 @@ export interface ColorPair {
 /** Structural style flags — enumerated; implemented once in base CSS. */
 export interface ThemeFlags {
   feedLayout?: string
+  feedColumns?: string
   cardStyle?: string
   media?: string
   hero?: string
@@ -63,6 +64,15 @@ export const FLAG_DEFS: Record<keyof ThemeFlags, { attr: string; options: readon
         { value: 'grid', label: 'Grid' },
         { value: 'list', label: 'List' },
         { value: 'magazine', label: 'Magazine' },
+      ],
+    },
+    feedColumns: {
+      attr: 'data-feed-cols',
+      options: [
+        { value: 'auto', label: 'Auto' },
+        { value: '2', label: '2' },
+        { value: '3', label: '3' },
+        { value: '4', label: '4' },
       ],
     },
     cardStyle: {

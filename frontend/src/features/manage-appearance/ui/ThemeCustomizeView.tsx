@@ -201,6 +201,16 @@ export function ThemeCustomizeView({
               }}
             />
           </Field>
+          <Field label={t('admin.themeCustomize.feedColumns')}>
+            <Select
+              value={draft.flags?.feedColumns}
+              options={FLAG_DEFS.feedColumns.options}
+              placeholder={themePlaceholder}
+              onChange={(v) => {
+                setKnob('flags', { ...draft.flags, feedColumns: v })
+              }}
+            />
+          </Field>
           <Field label={t('admin.themeCustomize.cardStyle')}>
             <Select
               value={draft.flags?.cardStyle}

@@ -1659,6 +1659,33 @@
    data-* attributes on .nene-public (see docs/theming/theme-flags.md).
    Implemented once here; themes/JSON just opt in. No DOM changes. */
 
+/* feedColumns — fix the grid feed to N columns (auto = default auto-fill).
+   Guarded so it never fights feedLayout=list (which is a 1-column row mode).
+   .layout__main is a size container, so columns collapse as the column narrows
+   — fixed counts never crush the cards. */
+.nene-public[data-feed-cols='2']:not([data-feed='list']) .cardgrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.nene-public[data-feed-cols='3']:not([data-feed='list']) .cardgrid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.nene-public[data-feed-cols='4']:not([data-feed='list']) .cardgrid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+@container (max-width: 760px) {
+  .nene-public[data-feed-cols='3']:not([data-feed='list']) .cardgrid,
+  .nene-public[data-feed-cols='4']:not([data-feed='list']) .cardgrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@container (max-width: 460px) {
+  .nene-public[data-feed-cols='2']:not([data-feed='list']) .cardgrid,
+  .nene-public[data-feed-cols='3']:not([data-feed='list']) .cardgrid,
+  .nene-public[data-feed-cols='4']:not([data-feed='list']) .cardgrid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* feedLayout=list — the latest feed becomes full-width rows (grid areas keep
    the flat card markup: media | meta/title/excerpt). */
 .nene-public[data-feed='list'] .cardgrid {
