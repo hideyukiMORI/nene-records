@@ -1659,10 +1659,13 @@
    data-* attributes on .nene-public (see docs/theming/theme-flags.md).
    Implemented once here; themes/JSON just opt in. No DOM changes. */
 
-/* feedColumns — fix the grid feed to N columns (auto = default auto-fill).
-   Guarded so it never fights feedLayout=list (which is a 1-column row mode).
-   .layout__main is a size container, so columns collapse as the column narrows
-   — fixed counts never crush the cards. */
+/* feedColumns — fix the grid feed to an exact column count (auto = default
+   auto-fill). Guarded so it never fights feedLayout=list (a 1-column row mode).
+   The chosen count is respected on desktop/tablet; .layout__main is a size
+   container, so we only fold multi-column feeds down to one on phone widths. */
+.nene-public[data-feed-cols='1']:not([data-feed='list']) .cardgrid {
+  grid-template-columns: 1fr;
+}
 .nene-public[data-feed-cols='2']:not([data-feed='list']) .cardgrid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
@@ -1672,13 +1675,14 @@
 .nene-public[data-feed-cols='4']:not([data-feed='list']) .cardgrid {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
-@container (max-width: 760px) {
-  .nene-public[data-feed-cols='3']:not([data-feed='list']) .cardgrid,
+/* 4 columns get crowded first — step to 2 on a narrow-ish column. */
+@container (max-width: 620px) {
   .nene-public[data-feed-cols='4']:not([data-feed='list']) .cardgrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
-@container (max-width: 460px) {
+/* phone width: any fixed multi-column feed folds to a single column. */
+@container (max-width: 430px) {
   .nene-public[data-feed-cols='2']:not([data-feed='list']) .cardgrid,
   .nene-public[data-feed-cols='3']:not([data-feed='list']) .cardgrid,
   .nene-public[data-feed-cols='4']:not([data-feed='list']) .cardgrid {
