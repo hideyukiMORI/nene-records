@@ -1,0 +1,99 @@
+/* ============================================================================
+   NeNe Records — Public site theme: Noir (light + dark)
+   ----------------------------------------------------------------------------
+   The 4th axis: DARK-FIRST, high-contrast, large-display editorial. Inky,
+   slightly-cool near-black paper carrying an electric acid-lime accent and big
+   geometric Space Grotesk display type. Dark is the lead mode; light is the
+   inverted bright sister (both AA).
+
+   Tokens here = palette + foundations only (Knob → Derived per the contract).
+   The bold "Noir" personality (oversized display, neon glow, hard editorial
+   rules, framed/duotone media) lives in components.css (L2).
+   Scoped to [data-theme='noir'] (light) / [data-theme='noir-dark'] (dark).
+   ========================================================================== */
+
+/* ── DARK — the lead mode: inky, slightly-cool near-black paper ───────────── */
+[data-theme='noir-dark'] {
+  /* surface — near-black, a touch cool (hue 280) */
+  --color-surface: oklch(15% 0.012 280);
+  --color-surface-raised: oklch(19% 0.014 280);
+  --color-surface-overlay: oklch(24% 0.016 280);
+  --color-surface-sunken: oklch(10.5% 0.01 280);
+
+  /* text — super high contrast, chroma ~0 */
+  --color-text-primary: oklch(96% 0.004 280);
+  --color-text-muted: oklch(70% 0.012 280);
+  --color-text-inverse: oklch(15% 0.012 280);
+
+  /* line — cool hairlines, visible on the dark band */
+  --color-border: oklch(30% 0.014 280);
+  --color-border-strong: oklch(46% 0.02 280);
+  --color-focus-ring: oklch(86% 0.21 128);
+
+  /* brand — electric acid lime (most alive on the inky ground) */
+  --color-accent: oklch(86% 0.21 128);
+  --color-accent-hover: oklch(92% 0.18 128);
+  --color-accent-weak: color-mix(in oklch, var(--color-accent) 16%, var(--color-surface-raised));
+  --color-on-accent: oklch(18% 0.03 128);
+
+  /* brand mark — NENE violet (logo only) */
+  --color-brand-violet: oklch(72% 0.18 300);
+
+  /* status — lifted for dark legibility */
+  --color-danger: oklch(66% 0.18 25);
+  --color-danger-hover: oklch(72% 0.18 25);
+  --color-ok: oklch(72% 0.14 150);
+  --color-warn: oklch(80% 0.14 80);
+  --color-info: oklch(74% 0.12 250);
+
+  /* shadow — deep & near-black; structure is carried by neon glow in L2 */
+  --shadow-sm: 0 1px 0 oklch(0% 0 0 / 0.5);
+  --shadow-md: 0 2px 0 oklch(0% 0 0 / 0.45), 0 14px 30px oklch(0% 0 0 / 0.5);
+  --shadow-lg: 0 24px 60px oklch(0% 0 0 / 0.62);
+  --shadow-focus: 0 0 0 3px color-mix(in oklch, var(--color-focus-ring) 36%, transparent);
+
+  color-scheme: dark;
+}
+
+/* ── LIGHT — the inverted bright sister: cool near-white paper ────────────── */
+[data-theme='noir'] {
+  /* surface — bright cool grey */
+  --color-surface: oklch(97% 0.004 280);
+  --color-surface-raised: oklch(99.5% 0.003 280);
+  --color-surface-overlay: oklch(93% 0.008 280);
+  --color-surface-sunken: oklch(93.5% 0.006 280);
+
+  /* text — near-black, chroma ~0 */
+  --color-text-primary: oklch(20% 0.01 280);
+  --color-text-muted: oklch(46% 0.014 280);
+  --color-text-inverse: oklch(99% 0.003 280);
+
+  /* line */
+  --color-border: oklch(86% 0.008 280);
+  --color-border-strong: oklch(72% 0.014 280);
+  --color-focus-ring: oklch(58% 0.15 128);
+
+  /* brand — deepened acid lime so it stays legible on white (AA on accent) */
+  --color-accent: oklch(54% 0.15 128);
+  --color-accent-hover: oklch(48% 0.15 128);
+  --color-accent-weak: color-mix(in oklch, var(--color-accent) 12%, var(--color-surface-raised));
+  /* lime is luminous — dark text wins AA on the accent in BOTH modes */
+  --color-on-accent: oklch(17% 0.03 128);
+
+  --color-brand-violet: oklch(52% 0.22 300);
+
+  /* status */
+  --color-danger: oklch(52% 0.2 25);
+  --color-danger-hover: oklch(46% 0.2 25);
+  --color-ok: oklch(52% 0.13 150);
+  --color-warn: oklch(68% 0.15 75);
+  --color-info: oklch(52% 0.13 250);
+
+  /* shadow — soft & cool */
+  --shadow-sm: 0 1px 2px oklch(30% 0.02 280 / 0.08);
+  --shadow-md: 0 2px 4px oklch(30% 0.02 280 / 0.08), 0 12px 28px oklch(30% 0.02 280 / 0.08);
+  --shadow-lg: 0 20px 48px oklch(30% 0.03 280 / 0.14);
+  --shadow-focus: 0 0 0 3px color-mix(in oklch, var(--color-focus-ring) 30%, transparent);
+
+  color-scheme: light;
+}

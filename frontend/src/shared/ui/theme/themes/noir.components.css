@@ -1,0 +1,538 @@
+/* ============================================================================
+   NeNe Records — Noir theme — component overlay (L2)  ·  THE STAR
+   ----------------------------------------------------------------------------
+   Tokens make Noir dark; THIS file makes it Noir. No DOM/markup changes — only
+   restyling existing public-site.css classes (validator-safe).
+
+   System: "midnight broadcast / neon editorial"
+     · SHAPE   — everything squared off (radius 0, incl. pills). Hard edges
+                 for editorial tension.
+     · DISPLAY — oversized Space Grotesk 700, dramatic 1.3 scale, tight
+                 tracking. The hero & section titles dominate the page.
+     · GLOW    — a restrained electric acid-lime glow on the live moments
+                 (hero <em>, primary buttons, accent rules, framed card edge,
+                 eyecatch). Used sparingly so it stays a tell, not a toy.
+     · RULE    — heavy accent rules close section heads; the page reads ruled.
+     · MEDIA   — neon duotone by default (desaturate → lift darks to lime).
+     · REGISTER— eyebrows / meta / slugs / stats / footer in tracked mono caps.
+     · GRAIN   — a faint grain + corner glow dresses the full-bleed hero band.
+
+   Scoped via `.nene-public[data-theme^='noir']` (covers noir + noir-dark).
+   ========================================================================== */
+
+/* ── 1 · FOUNDATIONS — sharp edges, dramatic type scale, bold display ─────── */
+.nene-public[data-theme^='noir'] {
+  /* radius → sharp; squares the pills too (toggle, chips, tags, pager, search) */
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-full: 0px;
+
+  /* density → comfortable: let the dark ground breathe */
+  --space-lg: 1.75rem;
+  --space-xl: 3rem;
+  --space-2xl: 4.75rem;
+
+  /* dramatic type scale (baseFontSize 1.0625rem × ~1.3) */
+  --text-display: clamp(3.25rem, 1.8rem + 7vw, 7.25rem);
+  --text-h1: clamp(2.1rem, 1.4rem + 2.6vw, 3.6rem);
+  --text-h2: clamp(1.8rem, 1.2rem + 2.2vw, 2.9rem);
+  --text-h3: 1.5rem;
+  --text-body: 1.0625rem;
+  --text-body-sm: 0.9375rem;
+  --text-meta: 0.8125rem;
+  --text-overline: 0.74rem;
+
+  --weight-bold: 700; /* preview & @fontsource ship 700 for Space Grotesk here */
+  --tracking-display: -0.03em;
+  --leading-tight: 1.02;
+  --leading-body: 1.66;
+
+  /* width — wide, confident editorial canvas */
+  --content-w: 1240px;
+  --measure: 68ch;
+}
+.nene-public[data-theme^='noir'] .layout.is-2col {
+  grid-template-columns: minmax(0, 1fr) 300px;
+}
+
+/* ── 2 · CHROME — header as a black broadcast bar with a hairline base ────── */
+.nene-public[data-theme^='noir'] .hd {
+  border-bottom: 1px solid var(--color-border-strong);
+  background: color-mix(in oklch, var(--color-surface) 80%, transparent);
+  backdrop-filter: saturate(1.3) blur(14px);
+}
+.nene-public[data-theme^='noir'] .brand__mark {
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-surface);
+}
+.nene-public[data-theme^='noir'] .brand__name {
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+.nene-public[data-theme^='noir'] .brand__tag {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.62rem;
+}
+.nene-public[data-theme^='noir'] .navlink {
+  text-transform: uppercase;
+  letter-spacing: 0.13em;
+  font-size: 0.72rem;
+  font-weight: var(--weight-semibold);
+}
+.nene-public[data-theme^='noir'] .navlink[aria-current='page']::after {
+  height: 2px;
+  bottom: -3px;
+  background: var(--color-accent);
+  box-shadow: 0 0 10px color-mix(in oklch, var(--color-accent) 70%, transparent);
+}
+.nene-public[data-theme^='noir'] .themesw,
+.nene-public[data-theme^='noir'] .iconbtn {
+  border-color: var(--color-border-strong);
+}
+
+/* ── 3 · BUTTONS — hard rectangles; primary carries the neon glow ─────────── */
+.nene-public[data-theme^='noir'] .btn {
+  font-family: var(--font-chrome);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.78rem;
+  font-weight: var(--weight-semibold);
+  padding: 14px 26px;
+  border-radius: 0;
+}
+.nene-public[data-theme^='noir'] .btn--primary {
+  box-shadow:
+    0 0 0 1px color-mix(in oklch, var(--color-accent) 50%, transparent),
+    0 0 22px color-mix(in oklch, var(--color-accent) 30%, transparent);
+}
+.nene-public[data-theme^='noir'] .btn--primary:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 0 0 1px var(--color-accent),
+    0 0 30px color-mix(in oklch, var(--color-accent) 50%, transparent);
+}
+.nene-public[data-theme^='noir'] .btn--ghost {
+  border-color: var(--color-border-strong);
+}
+.nene-public[data-theme^='noir'] .btn--ghost:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  background: transparent;
+}
+
+/* ── 4 · REGISTER — eyebrows / kickers / meta in tracked mono caps ────────── */
+.nene-public[data-theme^='noir'] .eyebrow,
+.nene-public[data-theme^='noir'] .hero__kicker {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  font-size: 0.68rem;
+  gap: 10px;
+  color: var(--color-accent);
+}
+.nene-public[data-theme^='noir'] .eyebrow::before {
+  width: 16px;
+  height: 2px;
+  background: var(--color-accent);
+  box-shadow: 0 0 8px color-mix(in oklch, var(--color-accent) 60%, transparent);
+}
+.nene-public[data-theme^='noir'] .meta {
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  letter-spacing: 0.02em;
+}
+.nene-public[data-theme^='noir'] .tbadge {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border: 1px solid color-mix(in oklch, var(--color-accent) 40%, transparent);
+  border-radius: 0;
+  background: var(--color-accent-weak);
+  padding: 3px 9px;
+}
+.nene-public[data-theme^='noir'] .tbadge::before {
+  border-radius: 0;
+  width: 5px;
+  height: 5px;
+}
+
+/* ── 5 · HERO — full-bleed dark band, grain + corner glow, giant display ──── */
+.nene-public[data-theme^='noir'] .hero {
+  position: relative;
+  padding-block: clamp(3.5rem, 2rem + 7vw, 7rem);
+}
+/* full-bleed sunken band behind the hero, with a faint grain + lime corner glow */
+.nene-public[data-theme^='noir'] .hero::before {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  left: 50%;
+  width: 100vw;
+  transform: translateX(-50%);
+  z-index: -1;
+  background:
+    radial-gradient(
+      80% 120% at 88% -10%,
+      color-mix(in oklch, var(--color-accent) 22%, transparent),
+      transparent 60%
+    ),
+    radial-gradient(
+      70% 100% at 0% 110%,
+      color-mix(in oklch, var(--color-brand-violet) 16%, transparent),
+      transparent 55%
+    ),
+    var(--color-surface-sunken);
+}
+/* grain overlay — inline SVG noise (no external url) */
+.nene-public[data-theme^='noir'] .hero::after {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  left: 50%;
+  width: 100vw;
+  transform: translateX(-50%);
+  z-index: -1;
+  opacity: 0.5;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+}
+.nene-public[data-theme^='noir'] .hero__title {
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 0.98;
+  text-wrap: balance;
+}
+.nene-public[data-theme^='noir'] .hero__title em {
+  color: var(--color-accent);
+  text-shadow: 0 0 26px color-mix(in oklch, var(--color-accent) 45%, transparent);
+}
+.nene-public[data-theme^='noir'] .hero__lead {
+  max-width: 50ch;
+}
+.nene-public[data-theme^='noir'] .hero__art-frame {
+  border: 1px solid var(--color-border-strong);
+  border-radius: 0;
+  background: radial-gradient(
+    120% 120% at 70% 10%,
+    color-mix(in oklch, var(--color-accent) 14%, var(--color-surface-overlay)),
+    var(--color-surface-overlay)
+  );
+  box-shadow:
+    0 0 0 1px color-mix(in oklch, var(--color-accent) 14%, transparent),
+    var(--shadow-lg);
+}
+.nene-public[data-theme^='noir'] .hero__art-tag {
+  font-family: var(--font-mono);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.66rem;
+}
+.nene-public[data-theme^='noir'] .hero__art-tag b {
+  color: var(--color-accent);
+}
+.nene-public[data-theme^='noir'] .hero__meta {
+  border-top: 1px solid var(--color-border-strong);
+}
+.nene-public[data-theme^='noir'] .hero__stat b {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.nene-public[data-theme^='noir'] .hero__stat span {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.64rem;
+}
+
+/* ── 6 · SECTIONS — heavy accent rule + big uppercase title + glowing index ── */
+.nene-public[data-theme^='noir'] {
+  counter-reset: noir-sec;
+}
+.nene-public[data-theme^='noir'] .section {
+  counter-increment: noir-sec;
+}
+.nene-public[data-theme^='noir'] .section__head {
+  border-bottom: 4px solid var(--color-accent);
+  box-shadow: 0 4px 0 -3px color-mix(in oklch, var(--color-accent) 45%, transparent);
+  align-items: flex-end;
+}
+.nene-public[data-theme^='noir'] .section__title {
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  font-weight: 700;
+}
+.nene-public[data-theme^='noir'] .section__title::before {
+  content: counter(noir-sec, decimal-leading-zero);
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 0.5em;
+  letter-spacing: 0.04em;
+  color: var(--color-accent);
+  vertical-align: 0.55em;
+  margin-right: 0.7em;
+}
+.nene-public[data-theme^='noir'] .section__link {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.72rem;
+}
+
+/* ── 7 · FEED CARDS — framed tiles with a neon top edge; duotone media ────── */
+.nene-public[data-theme^='noir'] .cardgrid {
+  counter-reset: noir-card;
+}
+.nene-public[data-theme^='noir'] .card {
+  position: relative;
+  counter-increment: noir-card;
+  border: 1px solid var(--color-border-strong);
+  border-top: 3px solid var(--color-accent);
+  background: var(--color-surface-raised);
+  padding: var(--space-md);
+  gap: var(--space-xs);
+  transition:
+    border-color var(--dur-fast) var(--ease),
+    transform var(--dur-fast) var(--ease),
+    box-shadow var(--dur-fast) var(--ease);
+}
+.nene-public[data-theme^='noir'] .card:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 0 0 1px color-mix(in oklch, var(--color-accent) 40%, transparent),
+    0 14px 30px oklch(0% 0 0 / 0.4);
+}
+.nene-public[data-theme^='noir'] .card::after {
+  content: counter(noir-card, decimal-leading-zero);
+  position: absolute;
+  top: calc(var(--space-md) + 6px);
+  right: calc(var(--space-md) + 6px);
+  z-index: 2;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.06em;
+  color: var(--color-accent);
+  background: color-mix(in oklch, var(--color-surface) 82%, transparent);
+  border: 1px solid color-mix(in oklch, var(--color-accent) 36%, transparent);
+  padding: 1px 6px;
+  pointer-events: none;
+}
+.nene-public[data-theme^='noir'] .card__title,
+.nene-public[data-theme^='noir'] .featured__title,
+.nene-public[data-theme^='noir'] .row__title {
+  letter-spacing: -0.015em;
+  font-weight: 700;
+}
+
+/* media — neon duotone (desaturate → lift darks to lime), framed; full colour
+   on hover. Mirrors the data-media="duotone" engine but baked in for Noir. */
+.nene-public[data-theme^='noir'] .card__media,
+.nene-public[data-theme^='noir'] .featured__media,
+.nene-public[data-theme^='noir'] .article__hero,
+.nene-public[data-theme^='noir'] .row__media {
+  border: 1px solid var(--color-border-strong);
+  border-radius: 0;
+  filter: grayscale(1) contrast(1.08);
+  isolation: isolate;
+  transition:
+    filter var(--dur-normal) var(--ease),
+    transform var(--dur-normal) var(--ease);
+}
+.nene-public[data-theme^='noir'] .card__media::before,
+.nene-public[data-theme^='noir'] .featured__media::before,
+.nene-public[data-theme^='noir'] .article__hero::before,
+.nene-public[data-theme^='noir'] .row__media::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    140deg,
+    color-mix(in oklch, var(--color-accent) 62%, transparent),
+    color-mix(in oklch, var(--color-brand-violet) 30%, transparent)
+  );
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+.nene-public[data-theme^='noir'] .card:hover .card__media,
+.nene-public[data-theme^='noir'] .featured:hover .featured__media,
+.nene-public[data-theme^='noir'] .row:hover .row__media {
+  filter: grayscale(0) contrast(1);
+}
+.nene-public[data-theme^='noir'] .eyecatch::after {
+  position: relative;
+  z-index: 2;
+}
+
+/* ── 8 · FEATURED — the lead slot: bracketed by a glowing accent top edge ──── */
+.nene-public[data-theme^='noir'] .featured {
+  border: 1px solid var(--color-border-strong);
+  border-top: 3px solid var(--color-accent);
+  border-radius: 0;
+  background: var(--color-surface-raised);
+  box-shadow:
+    0 0 0 1px color-mix(in oklch, var(--color-accent) 16%, transparent),
+    var(--shadow-md);
+}
+.nene-public[data-theme^='noir'] .featured__title a:hover {
+  color: var(--color-accent);
+  text-shadow: 0 0 22px color-mix(in oklch, var(--color-accent) 40%, transparent);
+}
+
+/* ── 9 · TYPE NAV — square tiles with a left accent rule that fills on hover ── */
+.nene-public[data-theme^='noir'] .typecard {
+  border: 1px solid var(--color-border-strong);
+  border-left: 3px solid var(--color-border-strong);
+  border-radius: 0;
+  background: var(--color-surface-raised);
+  transition:
+    border-color var(--dur-fast) var(--ease),
+    background var(--dur-fast) var(--ease),
+    transform var(--dur-fast) var(--ease);
+}
+.nene-public[data-theme^='noir'] .typecard:hover {
+  border-left-color: var(--color-accent);
+  background: var(--color-accent-weak);
+  transform: translateX(4px);
+  box-shadow: none;
+}
+.nene-public[data-theme^='noir'] .typecard__name {
+  letter-spacing: -0.015em;
+  font-weight: 700;
+}
+.nene-public[data-theme^='noir'] .typecard__slug,
+.nene-public[data-theme^='noir'] .typecard__count {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+}
+
+/* ── 10 · SIDEBAR / WIDGETS — ruled, squared, disciplined headings ────────── */
+.nene-public[data-theme^='noir'] .widget,
+.nene-public[data-theme^='noir'] .aside section,
+.nene-public[data-theme^='noir'] .search,
+.nene-public[data-theme^='noir'] .searchbar,
+.nene-public[data-theme^='noir'] .input,
+.nene-public[data-theme^='noir'] .textarea {
+  border-color: var(--color-border-strong);
+  border-radius: 0;
+}
+.nene-public[data-theme^='noir'] .widget__title,
+.nene-public[data-theme^='noir'] .aside section h2 {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.95rem;
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--color-border-strong);
+}
+.nene-public[data-theme^='noir'] .poplist__rank {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--color-accent);
+}
+.nene-public[data-theme^='noir'] .tag {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.72rem;
+  border-color: var(--color-border-strong);
+  border-radius: 0;
+}
+.nene-public[data-theme^='noir'] .tag:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+/* ── 11 · LIST / ARCHIVE / FILTER chrome — square + mono numerals ─────────── */
+.nene-public[data-theme^='noir'] .pagehead__row {
+  border-bottom: 4px solid var(--color-accent);
+}
+.nene-public[data-theme^='noir'] .pagehead__title {
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  font-weight: 700;
+}
+.nene-public[data-theme^='noir'] .chip,
+.nene-public[data-theme^='noir'] .viewtoggle,
+.nene-public[data-theme^='noir'] .pager button,
+.nene-public[data-theme^='noir'] .pager span {
+  border-radius: 0;
+  border-color: var(--color-border-strong);
+}
+.nene-public[data-theme^='noir'] .chip,
+.nene-public[data-theme^='noir'] .pager button,
+.nene-public[data-theme^='noir'] .pager span {
+  font-family: var(--font-mono);
+}
+.nene-public[data-theme^='noir'] .resultgroup__title {
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  border-bottom-color: var(--color-border-strong);
+}
+
+/* ── 12 · PROSE — editorial body: ruled subheads, glowing rules, framed code ── */
+.nene-public[data-theme^='noir'] .prose h2,
+.nene-public[data-theme^='noir'] .markdown-body h2 {
+  text-transform: uppercase;
+  letter-spacing: -0.005em;
+  padding-top: var(--space-md);
+  border-top: 2px solid var(--color-accent);
+}
+.nene-public[data-theme^='noir'] .prose blockquote,
+.nene-public[data-theme^='noir'] .markdown-body blockquote {
+  border-left-width: 3px;
+  border-left-color: var(--color-accent);
+  background: var(--color-accent-weak);
+  padding: var(--space-md) var(--space-lg);
+}
+.nene-public[data-theme^='noir'] .prose code,
+.nene-public[data-theme^='noir'] .markdown-body code {
+  border: 1px solid var(--color-border-strong);
+  border-radius: 0;
+  background: var(--color-surface-overlay);
+}
+
+/* ── 13 · EMPTY STATE — hard dashed frame, squared icon chip ──────────────── */
+.nene-public[data-theme^='noir'] .empty {
+  border-style: dashed;
+  border-width: 2px;
+  border-radius: 0;
+}
+.nene-public[data-theme^='noir'] .empty__icon {
+  border-radius: 0;
+}
+
+/* ── 14 · FOOTER — closed with a heavy rule; technical column heads ───────── */
+.nene-public[data-theme^='noir'] .ft {
+  border-top: 1px solid var(--color-border-strong);
+}
+.nene-public[data-theme^='noir'] .ft__col h4 {
+  letter-spacing: 0.16em;
+}
+.nene-public[data-theme^='noir'] .ft__bar small,
+.nene-public[data-theme^='noir'] .ft__bar .mono {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+}
+
+/* ── 15 · EYECATCH placeholder — neon hatch + hard frame ──────────────────── */
+.nene-public[data-theme^='noir'] .eyecatch {
+  border-color: var(--color-border-strong);
+  border-radius: 0;
+  background: repeating-linear-gradient(
+    135deg,
+    color-mix(in oklch, var(--color-accent) 16%, var(--color-surface-overlay)) 0 11px,
+    color-mix(in oklch, var(--color-accent) 5%, var(--color-surface-overlay)) 11px 22px
+  );
+}
+.nene-public[data-theme^='noir'] .eyecatch::after {
+  border-radius: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
