@@ -1,0 +1,305 @@
+/* ============================================================================
+   NeNe Records — Botanical theme — component overlay (L2)  ·  THE STAR
+   ----------------------------------------------------------------------------
+   Tokens make Botanical green; THIS file makes it feel organic and unwound —
+   no DOM/markup changes, only restyling existing public-site.css classes.
+
+   System: "garden editorial / lived-in"
+     · SOFTEN  — large round corners everywhere; pills stay pills; nothing hard.
+     · LIFT    — cards & widgets float on soft, low, warm-green shadows.
+     · BREATHE — generous spacing rhythm; the feed is calm and unhurried.
+     · SERIF   — gentle Source Serif display headings with relaxed tracking.
+     · LEAF    — a faint organic wash on the hero band + a sprouting eyebrow.
+     · MEDIA   — softly rounded, matted imagery (framed flag), warm on hover.
+
+   Scoped via `.nene-public[data-theme^='botanical']` (light + dark).
+   ========================================================================== */
+
+/* ── 1 · FOUNDATIONS — round, comfortable, gentle serif scale ─────────────── */
+.nene-public[data-theme^='botanical'] {
+  /* display = soft serif (Source Serif 4); body stays Inter (default --font-sans) */
+  --font-display: 'Source Serif 4', 'Noto Serif JP', Georgia, 'Times New Roman', serif;
+  --radius-sm: 10px;
+  --radius-md: 18px;
+  --radius-lg: 28px;
+
+  /* density → comfortable+: a calm, breathing rhythm */
+  --space-lg: 1.75rem;
+  --space-xl: 2.75rem;
+  --space-2xl: 4.5rem;
+  --space-section: clamp(4rem, 2.5rem + 6vw, 7.5rem);
+
+  --leading-body: 1.72;
+  --leading-heading: 1.2;
+  --tracking-display: -0.005em;
+
+  /* wide & airy editorial canvas */
+  --content-w: 1160px;
+  --measure: 70ch;
+  --gutter: clamp(1.5rem, 0.75rem + 3.5vw, 3rem);
+}
+.nene-public[data-theme^='botanical'] .layout.is-2col {
+  grid-template-columns: minmax(0, 1fr) 320px;
+}
+
+/* gentle serif headings throughout (display = Source Serif 4) */
+.nene-public[data-theme^='botanical'] .hero__title,
+.nene-public[data-theme^='botanical'] .section__title,
+.nene-public[data-theme^='botanical'] .featured__title,
+.nene-public[data-theme^='botanical'] .card__title,
+.nene-public[data-theme^='botanical'] .typecard__name,
+.nene-public[data-theme^='botanical'] .pagehead__title,
+.nene-public[data-theme^='botanical'] .row__title {
+  font-weight: var(--weight-semibold);
+  letter-spacing: -0.005em;
+}
+
+/* ── 2 · CHROME — soft, calm header ───────────────────────────────────────── */
+.nene-public[data-theme^='botanical'] .hd {
+  border-bottom: 1px solid var(--color-border);
+  background: color-mix(in oklch, var(--color-surface) 84%, transparent);
+}
+.nene-public[data-theme^='botanical'] .brand__mark {
+  border-radius: 12px;
+  background: var(--color-accent-weak);
+}
+.nene-public[data-theme^='botanical'] .navlink {
+  font-size: var(--text-body-sm);
+}
+.nene-public[data-theme^='botanical'] .brand__name {
+  white-space: nowrap;
+}
+.nene-public[data-theme^='botanical'] .navlink[aria-current='page']::after {
+  height: 2px;
+  bottom: -3px;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+}
+
+/* ── 3 · BUTTONS — fully rounded, soft press ──────────────────────────────── */
+.nene-public[data-theme^='botanical'] .btn {
+  border-radius: var(--radius-full);
+  padding: 13px 26px;
+}
+.nene-public[data-theme^='botanical'] .btn--primary {
+  box-shadow: var(--shadow-sm);
+}
+.nene-public[data-theme^='botanical'] .btn--primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+.nene-public[data-theme^='botanical'] .btn--ghost {
+  border-color: var(--color-border-strong);
+}
+.nene-public[data-theme^='botanical'] .btn--ghost:hover {
+  background: var(--color-accent-weak);
+  border-color: var(--color-accent);
+}
+
+/* ── 4 · EYEBROW / META — quiet label with a small sprouting leaf ─────────── */
+.nene-public[data-theme^='botanical'] .eyebrow {
+  text-transform: none;
+  font-family: var(--font-sans);
+  letter-spacing: 0.02em;
+  font-size: var(--text-body-sm);
+  color: var(--color-accent);
+  font-weight: var(--weight-medium);
+}
+.nene-public[data-theme^='botanical'] .eyebrow::before {
+  width: 9px;
+  height: 9px;
+  border-radius: 0 50% 50% 50%; /* a little leaf */
+  transform: rotate(45deg);
+  background: var(--color-accent);
+}
+.nene-public[data-theme^='botanical'] .tbadge {
+  border-radius: var(--radius-full);
+  text-transform: lowercase;
+  border-color: color-mix(in oklch, var(--color-accent) 26%, transparent);
+}
+
+/* ── 5 · HERO — soft organic wash band, warm rounded art frame ────────────── */
+.nene-public[data-theme^='botanical'] .hero__title {
+  font-size: clamp(2.6rem, 1.7rem + 4vw, 4.6rem);
+  line-height: 1.08;
+}
+.nene-public[data-theme^='botanical'] .hero__title em {
+  color: var(--color-accent);
+  font-style: italic;
+}
+.nene-public[data-theme^='botanical'] .hero__art-frame {
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(
+      130% 120% at 80% 0%,
+      color-mix(in oklch, var(--color-accent) 24%, var(--color-surface-raised)),
+      var(--color-surface-raised)
+    ),
+    radial-gradient(
+      90% 90% at 0% 100%,
+      color-mix(in oklch, var(--color-brand-violet) 12%, transparent),
+      transparent 60%
+    );
+  box-shadow: var(--shadow-lg);
+}
+.nene-public[data-theme^='botanical'] .hero__art-tag {
+  border-radius: var(--radius-full);
+}
+.nene-public[data-theme^='botanical'] .hero__art-tag b {
+  color: var(--color-accent);
+}
+.nene-public[data-theme^='botanical'] .hero__stat b {
+  font-family: var(--font-display);
+  font-weight: var(--weight-semibold);
+}
+
+/* ── 6 · SECTIONS — hairline rule, relaxed serif title ────────────────────── */
+.nene-public[data-theme^='botanical'] .section__head {
+  border-bottom: 1px solid var(--color-border);
+  align-items: flex-end;
+}
+.nene-public[data-theme^='botanical'] .section__title {
+  font-size: clamp(1.7rem, 1.2rem + 1.6vw, 2.5rem);
+}
+.nene-public[data-theme^='botanical'] .section__link {
+  border-radius: var(--radius-full);
+}
+
+/* ── 7 · FEED CARDS — softly floating tiles, rounded matted media ─────────── */
+.nene-public[data-theme^='botanical'] .card {
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-raised);
+  padding: var(--space-md);
+  box-shadow: var(--shadow-sm);
+  transition:
+    transform var(--dur-normal) var(--ease),
+    box-shadow var(--dur-normal) var(--ease);
+}
+.nene-public[data-theme^='botanical'] .card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+.nene-public[data-theme^='botanical'] .card__media,
+.nene-public[data-theme^='botanical'] .featured__media,
+.nene-public[data-theme^='botanical'] .article__hero,
+.nene-public[data-theme^='botanical'] .row__media {
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  padding: 6px; /* matted inset — the "framed" calm */
+  background: var(--color-surface-raised);
+}
+.nene-public[data-theme^='botanical'] .card:hover .card__media {
+  transform: none;
+}
+
+/* ── 8 · FEATURED — a warm, raised garden card ────────────────────────────── */
+.nene-public[data-theme^='botanical'] .featured {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: radial-gradient(
+    120% 140% at 100% 0%,
+    color-mix(in oklch, var(--color-accent) 9%, var(--color-surface-raised)),
+    var(--color-surface-raised)
+  );
+  box-shadow: var(--shadow-md);
+}
+.nene-public[data-theme^='botanical'] .featured__title a:hover {
+  color: var(--color-accent);
+}
+
+/* ── 9 · TYPE NAV — pill-soft tiles that lift & tint on hover ─────────────── */
+.nene-public[data-theme^='botanical'] .typecard {
+  border-radius: var(--radius-lg);
+  border-color: var(--color-border);
+  background: var(--color-surface-raised);
+  box-shadow: var(--shadow-sm);
+}
+.nene-public[data-theme^='botanical'] .typecard:hover {
+  border-color: color-mix(in oklch, var(--color-accent) 50%, var(--color-border));
+  background: var(--color-accent-weak);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+/* ── 10 · SIDEBAR / WIDGETS — soft cards, leafy headings ──────────────────── */
+.nene-public[data-theme^='botanical'] .widget,
+.nene-public[data-theme^='botanical'] .aside section {
+  border-radius: var(--radius-lg);
+  border-color: var(--color-border);
+  box-shadow: var(--shadow-sm);
+}
+.nene-public[data-theme^='botanical'] .search,
+.nene-public[data-theme^='botanical'] .searchbar,
+.nene-public[data-theme^='botanical'] .input,
+.nene-public[data-theme^='botanical'] .textarea {
+  border-radius: var(--radius-full);
+  border-color: var(--color-border);
+}
+.nene-public[data-theme^='botanical'] .textarea {
+  border-radius: var(--radius-lg);
+}
+.nene-public[data-theme^='botanical'] .poplist__rank {
+  font-family: var(--font-display);
+  color: var(--color-accent);
+}
+.nene-public[data-theme^='botanical'] .tag {
+  border-radius: var(--radius-full);
+}
+.nene-public[data-theme^='botanical'] .tag:hover {
+  background: var(--color-accent-weak);
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+/* ── 11 · LIST / ARCHIVE / FILTER — rounded, calm ─────────────────────────── */
+.nene-public[data-theme^='botanical'] .pagehead__row {
+  border-bottom: 1px solid var(--color-border);
+}
+.nene-public[data-theme^='botanical'] .chip,
+.nene-public[data-theme^='botanical'] .viewtoggle,
+.nene-public[data-theme^='botanical'] .pager button,
+.nene-public[data-theme^='botanical'] .pager span {
+  border-radius: var(--radius-full);
+}
+
+/* ── 12 · PROSE — relaxed reading, soft accent marks ──────────────────────── */
+.nene-public[data-theme^='botanical'] .prose blockquote,
+.nene-public[data-theme^='botanical'] .markdown-body blockquote {
+  border-left: 3px solid var(--color-accent);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  background: var(--color-accent-weak);
+  padding: var(--space-md) var(--space-lg);
+  font-style: italic;
+}
+.nene-public[data-theme^='botanical'] .prose code,
+.nene-public[data-theme^='botanical'] .markdown-body code {
+  border-radius: var(--radius-sm);
+}
+
+/* ── 13 · EMPTY STATE — soft rounded frame ────────────────────────────────── */
+.nene-public[data-theme^='botanical'] .empty {
+  border-radius: var(--radius-lg);
+  border-color: var(--color-border-strong);
+}
+.nene-public[data-theme^='botanical'] .empty__icon {
+  border-radius: var(--radius-md);
+}
+
+/* ── 14 · EYECATCH placeholder — soft leafy hatch, rounded ────────────────── */
+.nene-public[data-theme^='botanical'] .eyecatch {
+  border-radius: var(--radius-md);
+  border-color: var(--color-border);
+  background: repeating-linear-gradient(
+    115deg,
+    color-mix(in oklch, var(--color-accent) 14%, var(--color-surface-overlay)) 0 14px,
+    color-mix(in oklch, var(--color-accent) 6%, var(--color-surface-overlay)) 14px 28px
+  );
+}
+.nene-public[data-theme^='botanical'] .eyecatch::after {
+  border-radius: var(--radius-full);
+}
+
+/* ── 15 · FOOTER — quiet close ────────────────────────────────────────────── */
+.nene-public[data-theme^='botanical'] .ft {
+  border-top: 1px solid var(--color-border);
+}

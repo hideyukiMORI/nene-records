@@ -93,6 +93,51 @@ export const PUBLIC_THEMES: readonly PublicThemeMeta[] = [
       accent: 'oklch(86% 0.21 128)',
     },
   },
+  {
+    id: 'botanical',
+    name: 'Botanical',
+    description:
+      'Organic and unhurried — deep sage green on green-cream paper, wide breathing space, big round corners and soft warm shadows. A calm lifestyle / blog register.',
+    author: 'NeNe Records',
+    version: '1.0.0',
+    createdAt: '2026-06-17',
+    thumbnail: '/theme-thumbnails/botanical.webp',
+    preview: {
+      surface: 'oklch(98% 0.009 120)',
+      raised: 'oklch(99.5% 0.006 120)',
+      accent: 'oklch(49% 0.105 150)',
+    },
+  },
+  {
+    id: 'pastel',
+    name: 'Pastel Pop',
+    description:
+      'Playful multi-colour — faint plum-white paper, a coral lead with mint/blue secondary, big round corners and big floaty media. The fun axis.',
+    author: 'NeNe Records',
+    version: '1.0.0',
+    createdAt: '2026-06-17',
+    thumbnail: '/theme-thumbnails/pastel.webp',
+    preview: {
+      surface: 'oklch(99% 0.012 320)',
+      raised: 'oklch(99.7% 0.008 320)',
+      accent: 'oklch(64% 0.16 8)',
+    },
+  },
+  {
+    id: 'newsprint',
+    name: 'Newsprint',
+    description:
+      'Ink-on-paper journalism — warm newsprint cream, near-black ink, a newsprint-red accent, bold tight serif headlines and a dense, ruled, multi-column page.',
+    author: 'NeNe Records',
+    version: '1.0.0',
+    createdAt: '2026-06-17',
+    thumbnail: '/theme-thumbnails/newsprint.webp',
+    preview: {
+      surface: 'oklch(95% 0.008 85)',
+      raised: 'oklch(97% 0.006 85)',
+      accent: 'oklch(50% 0.18 25)',
+    },
+  },
 ]
 
 export const DEFAULT_PUBLIC_THEME_ID = 'consumer'
