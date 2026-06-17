@@ -1,0 +1,91 @@
+/* ============================================================================
+   NeNe Records — Public site theme: Pastel Pop (light + dark)
+   ----------------------------------------------------------------------------
+   Playful, friendly, multi-colour. A faint plum-tinted white paper, a pastel
+   coral/pink lead accent and a mint/blue secondary (brand-violet retuned), big
+   round corners, big media and a light, breezy rhythm. The "fun" axis — the
+   opposite of Botanical's calm and Noir's hard edges.
+
+   Tokens here = palette + foundations (Knob → Derived). The playful personality
+   (big rounding, big media, multi-colour card tiles & tags, floaty shadows,
+   coloured eyebrow bar) lives in components.css (L2).
+   Pastels lose contrast easily — text-primary & on-accent are kept AA in both.
+   Scoped to [data-theme='pastel'] / [data-theme='pastel-dark']. Both AA.
+   ========================================================================== */
+
+/* ── LIGHT — faint plum-white paper ──────────────────────────────────────── */
+[data-theme='pastel'] {
+  --color-surface: oklch(99% 0.012 320);
+  --color-surface-raised: oklch(99.7% 0.008 320);
+  --color-surface-overlay: oklch(95% 0.018 320);
+  --color-surface-sunken: oklch(96.5% 0.015 325);
+
+  --color-text-primary: oklch(30% 0.03 320);
+  --color-text-muted: oklch(50% 0.03 325);
+  --color-text-inverse: oklch(99% 0.008 320);
+
+  --color-border: oklch(90% 0.018 320);
+  --color-border-strong: oklch(80% 0.025 322);
+  --color-focus-ring: oklch(66% 0.15 8);
+
+  /* accent — coral/pink, deepened enough that white reads AA on it */
+  --color-accent: oklch(64% 0.16 8);
+  --color-accent-hover: oklch(58% 0.16 8);
+  --color-accent-weak: color-mix(in oklch, var(--color-accent) 14%, var(--color-surface-raised));
+  --color-on-accent: oklch(99% 0.01 20);
+
+  /* secondary pastel — mint/blue (used for multi-colour pops + logo) */
+  --color-brand-violet: oklch(66% 0.13 215);
+
+  --color-danger: oklch(55% 0.2 25);
+  --color-danger-hover: oklch(49% 0.2 25);
+  --color-ok: oklch(60% 0.13 160);
+  --color-warn: oklch(72% 0.14 75);
+  --color-info: oklch(62% 0.13 235);
+
+  /* shadow — soft, floaty, faintly warm */
+  --shadow-sm: 0 2px 4px oklch(40% 0.03 340 / 0.08);
+  --shadow-md: 0 6px 16px oklch(40% 0.04 340 / 0.1), 0 16px 36px oklch(40% 0.04 340 / 0.08);
+  --shadow-lg: 0 24px 56px oklch(40% 0.05 340 / 0.16);
+  --shadow-focus: 0 0 0 3px color-mix(in oklch, var(--color-focus-ring) 30%, transparent);
+
+  color-scheme: light;
+}
+
+/* ── DARK — soft plum dusk ───────────────────────────────────────────────── */
+[data-theme='pastel-dark'] {
+  --color-surface: oklch(24% 0.03 320);
+  --color-surface-raised: oklch(28% 0.032 320);
+  --color-surface-overlay: oklch(33% 0.035 320);
+  --color-surface-sunken: oklch(20% 0.026 320);
+
+  --color-text-primary: oklch(95% 0.01 320);
+  --color-text-muted: oklch(73% 0.02 322);
+  --color-text-inverse: oklch(24% 0.03 320);
+
+  --color-border: oklch(38% 0.03 320);
+  --color-border-strong: oklch(50% 0.035 320);
+  --color-focus-ring: oklch(80% 0.13 8);
+
+  /* accent — lifted coral-pink; dark text rides on top */
+  --color-accent: oklch(80% 0.12 8);
+  --color-accent-hover: oklch(86% 0.11 8);
+  --color-accent-weak: color-mix(in oklch, var(--color-accent) 18%, var(--color-surface-raised));
+  --color-on-accent: oklch(24% 0.05 10);
+
+  --color-brand-violet: oklch(82% 0.1 205);
+
+  --color-danger: oklch(70% 0.18 25);
+  --color-danger-hover: oklch(76% 0.18 25);
+  --color-ok: oklch(78% 0.13 160);
+  --color-warn: oklch(82% 0.13 80);
+  --color-info: oklch(78% 0.12 235);
+
+  /* shadow — deep but soft, plum-black */
+  --shadow-sm: 0 2px 4px oklch(0% 0 0 / 0.34);
+  --shadow-md: 0 6px 18px oklch(0% 0 0 / 0.42), 0 18px 38px oklch(0% 0 0 / 0.36);
+  --shadow-lg: 0 26px 60px oklch(0% 0 0 / 0.52);
+  --shadow-focus: 0 0 0 3px color-mix(in oklch, var(--color-focus-ring) 32%, transparent);
+
+  color-scheme: dark;
+}

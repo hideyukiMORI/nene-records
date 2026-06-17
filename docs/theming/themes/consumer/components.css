@@ -1,0 +1,311 @@
+/* ============================================================================
+   NeNe Records — Terracotta theme (id=consumer) — component overlay (L2) ★NEW
+   ----------------------------------------------------------------------------
+   The shipped consumer theme had NO bespoke overlay — it read as bare base, so
+   it looked too close to Aurora/Reading. THIS file gives it a face: a warm
+   photo-magazine. No DOM/markup changes, only restyling existing classes.
+
+   System: "warm photo magazine / cover"
+     · DISPLAY — friendly humanist Bricolage Grotesque, bold magazine headlines.
+     · PHOTO    — media is the star: large ratios, rich rounded frames, a gentle
+                  warm vignette, a slow zoom on hover.
+     · FLOAT    — photo cards rest on soft, warm, generous shadows; soft corners.
+     · COVER    — the hero reads like an issue cover (kicker + big title + warm
+                  wash); the featured slot is a full cover-photo lead.
+     · WARM      — terracotta kickers, soft pills, friendly editorial rhythm.
+
+   FONT OVERRIDE (authoring §4): base default display is Saira; Terracotta uses
+   Bricolage Grotesque, so --font-display / --font-chrome are overridden here.
+   Scoped via `.nene-public[data-theme^='consumer']` (light + dark).
+   ========================================================================== */
+
+/* ── 1 · FOUNDATIONS — friendly humanist type, soft corners, std width ────── */
+.nene-public[data-theme^='consumer'] {
+  /* FONT OVERRIDE — Bricolage Grotesque display & chrome (base default = Saira) */
+  --font-display: 'Bricolage Grotesque', 'Saira Semi Condensed', system-ui, sans-serif;
+  --font-chrome: 'Bricolage Grotesque', system-ui, sans-serif;
+
+  /* radius → soft (Aurora is sharp, Botanical is rounder) */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+
+  /* comfortable, magazine rhythm */
+  --space-lg: 1.6rem;
+  --space-xl: 2.6rem;
+  --space-2xl: 4.25rem;
+
+  --leading-heading: 1.1;
+  --tracking-display: -0.02em;
+
+  /* standard editorial width */
+  --content-w: 1180px;
+  --measure: 70ch;
+}
+.nene-public[data-theme^='consumer'] .hero__title,
+.nene-public[data-theme^='consumer'] .section__title,
+.nene-public[data-theme^='consumer'] .featured__title,
+.nene-public[data-theme^='consumer'] .card__title,
+.nene-public[data-theme^='consumer'] .typecard__name,
+.nene-public[data-theme^='consumer'] .pagehead__title,
+.nene-public[data-theme^='consumer'] .row__title {
+  font-weight: 700;
+  letter-spacing: -0.022em;
+}
+
+/* ── 2 · CHROME — warm, friendly header ───────────────────────────────────── */
+.nene-public[data-theme^='consumer'] .hd {
+  border-bottom: 1px solid var(--color-border);
+  background: color-mix(in oklch, var(--color-surface) 85%, transparent);
+}
+.nene-public[data-theme^='consumer'] .brand__mark {
+  border-radius: 11px;
+  background: var(--color-accent-weak);
+}
+.nene-public[data-theme^='consumer'] .brand__name {
+  white-space: nowrap;
+}
+.nene-public[data-theme^='consumer'] .navlink[aria-current='page']::after {
+  height: 3px;
+  bottom: -3px;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+}
+
+/* ── 3 · BUTTONS — soft pills with a warm press ───────────────────────────── */
+.nene-public[data-theme^='consumer'] .btn {
+  border-radius: var(--radius-full);
+  padding: 13px 26px;
+  font-weight: 600;
+}
+.nene-public[data-theme^='consumer'] .btn--primary {
+  box-shadow: var(--shadow-sm);
+}
+.nene-public[data-theme^='consumer'] .btn--primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+.nene-public[data-theme^='consumer'] .btn--ghost:hover {
+  background: var(--color-accent-weak);
+  border-color: var(--color-accent);
+}
+
+/* ── 4 · EYEBROW / BADGES — friendly terracotta kicker ────────────────────── */
+.nene-public[data-theme^='consumer'] .eyebrow {
+  text-transform: none;
+  font-family: var(--font-chrome);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  font-size: var(--text-body-sm);
+  color: var(--color-accent);
+}
+.nene-public[data-theme^='consumer'] .eyebrow::before {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+}
+.nene-public[data-theme^='consumer'] .tbadge {
+  border-radius: var(--radius-full);
+  text-transform: lowercase;
+  font-weight: 500;
+  border-color: color-mix(in oklch, var(--color-accent) 26%, transparent);
+}
+
+/* ── 5 · HERO — issue cover: kicker + big headline + warm wash ────────────── */
+.nene-public[data-theme^='consumer'] .hero__title {
+  font-size: clamp(2.8rem, 1.8rem + 4.4vw, 5rem);
+  line-height: 1.02;
+}
+.nene-public[data-theme^='consumer'] .hero__title em {
+  color: var(--color-accent);
+  font-style: normal;
+}
+.nene-public[data-theme^='consumer'] .hero__art-frame {
+  border-radius: var(--radius-lg);
+  border: 0;
+  background:
+    radial-gradient(120% 120% at 75% 8%,
+      color-mix(in oklch, var(--color-accent) 30%, var(--color-surface-raised)),
+      var(--color-surface-raised)),
+    radial-gradient(90% 90% at 5% 100%,
+      color-mix(in oklch, var(--color-brand-violet) 10%, transparent), transparent 60%);
+  box-shadow: var(--shadow-lg);
+}
+.nene-public[data-theme^='consumer'] .hero__art-tag {
+  border-radius: var(--radius-full);
+}
+.nene-public[data-theme^='consumer'] .hero__art-tag b {
+  color: var(--color-accent);
+}
+.nene-public[data-theme^='consumer'] .hero__stat b {
+  font-family: var(--font-display);
+  font-weight: 700;
+}
+
+/* ── 6 · SECTIONS — hairline rule, big friendly title ─────────────────────── */
+.nene-public[data-theme^='consumer'] .section__head {
+  border-bottom: 1px solid var(--color-border);
+  align-items: flex-end;
+}
+.nene-public[data-theme^='consumer'] .section__title {
+  font-size: clamp(1.8rem, 1.2rem + 1.8vw, 2.6rem);
+}
+.nene-public[data-theme^='consumer'] .section__link {
+  border-radius: var(--radius-full);
+  background: var(--color-accent-weak);
+  color: var(--color-accent);
+  padding: 7px 15px;
+}
+.nene-public[data-theme^='consumer'] .section__link:hover {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+/* ── 7 · FEED CARDS — big photo tiles that float & zoom ───────────────────── */
+.nene-public[data-theme^='consumer'] .cardgrid {
+  grid-template-columns: repeat(auto-fill, minmax(264px, 1fr));
+}
+.nene-public[data-theme^='consumer'] .card {
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-raised);
+  padding: var(--space-sm) var(--space-sm) var(--space-md);
+  box-shadow: var(--shadow-sm);
+  transition:
+    transform var(--dur-normal) var(--ease),
+    box-shadow var(--dur-normal) var(--ease);
+}
+.nene-public[data-theme^='consumer'] .card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-md);
+}
+.nene-public[data-theme^='consumer'] .card__media {
+  --ar: 3 / 2; /* photography sits large */
+  overflow: hidden;
+}
+.nene-public[data-theme^='consumer'] .card__media,
+.nene-public[data-theme^='consumer'] .featured__media,
+.nene-public[data-theme^='consumer'] .article__hero,
+.nene-public[data-theme^='consumer'] .row__media {
+  border-radius: var(--radius-md);
+  border: 0;
+}
+.nene-public[data-theme^='consumer'] .card:hover .card__media {
+  transform: none;
+}
+
+/* ── 8 · FEATURED — a full cover-photo lead ───────────────────────────────── */
+.nene-public[data-theme^='consumer'] .featured {
+  border: 0;
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(120% 140% at 0% 0%,
+      color-mix(in oklch, var(--color-accent) 12%, var(--color-surface-raised)),
+      var(--color-surface-raised));
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+}
+.nene-public[data-theme^='consumer'] .featured__media {
+  --ar: 4 / 3;
+  overflow: hidden;
+}
+.nene-public[data-theme^='consumer'] .featured__title {
+  font-size: clamp(1.7rem, 1.2rem + 1.8vw, 2.6rem);
+}
+.nene-public[data-theme^='consumer'] .featured__title a:hover {
+  color: var(--color-accent);
+}
+
+/* ── 9 · TYPE NAV — soft photo-ish tiles that lift ────────────────────────── */
+.nene-public[data-theme^='consumer'] .typecard {
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-raised);
+  box-shadow: var(--shadow-sm);
+}
+.nene-public[data-theme^='consumer'] .typecard:hover {
+  transform: translateY(-4px);
+  background: var(--color-accent-weak);
+  box-shadow: var(--shadow-md);
+}
+
+/* ── 10 · SIDEBAR / WIDGETS — soft cards, warm headings ───────────────────── */
+.nene-public[data-theme^='consumer'] .widget,
+.nene-public[data-theme^='consumer'] .aside section {
+  border: 0;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+.nene-public[data-theme^='consumer'] .search,
+.nene-public[data-theme^='consumer'] .searchbar,
+.nene-public[data-theme^='consumer'] .input {
+  border-radius: var(--radius-full);
+}
+.nene-public[data-theme^='consumer'] .textarea {
+  border-radius: var(--radius-lg);
+}
+.nene-public[data-theme^='consumer'] .poplist__rank {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--color-accent);
+}
+.nene-public[data-theme^='consumer'] .tag {
+  border-radius: var(--radius-full);
+}
+.nene-public[data-theme^='consumer'] .tag:hover {
+  background: var(--color-accent-weak);
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+/* ── 11 · LIST / ARCHIVE / FILTER — rounded, warm ─────────────────────────── */
+.nene-public[data-theme^='consumer'] .pagehead__row {
+  border-bottom: 1px solid var(--color-border);
+}
+.nene-public[data-theme^='consumer'] .chip,
+.nene-public[data-theme^='consumer'] .viewtoggle,
+.nene-public[data-theme^='consumer'] .pager button,
+.nene-public[data-theme^='consumer'] .pager span {
+  border-radius: var(--radius-full);
+}
+
+/* ── 12 · PROSE — warm, friendly reading ──────────────────────────────────── */
+.nene-public[data-theme^='consumer'] .prose blockquote,
+.nene-public[data-theme^='consumer'] .markdown-body blockquote {
+  border-left: 3px solid var(--color-accent);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  background: var(--color-accent-weak);
+  padding: var(--space-md) var(--space-lg);
+}
+.nene-public[data-theme^='consumer'] .prose code,
+.nene-public[data-theme^='consumer'] .markdown-body code {
+  border-radius: var(--radius-sm);
+}
+
+/* ── 13 · EMPTY STATE — soft rounded frame ────────────────────────────────── */
+.nene-public[data-theme^='consumer'] .empty {
+  border-radius: var(--radius-lg);
+  border-color: var(--color-border-strong);
+}
+.nene-public[data-theme^='consumer'] .empty__icon {
+  border-radius: var(--radius-md);
+}
+
+/* ── 14 · EYECATCH placeholder — warm hatch, rounded ──────────────────────── */
+.nene-public[data-theme^='consumer'] .eyecatch {
+  border-radius: var(--radius-md);
+  border-color: var(--color-border);
+  background: repeating-linear-gradient(
+    120deg,
+    color-mix(in oklch, var(--color-accent) 18%, var(--color-surface-overlay)) 0 16px,
+    color-mix(in oklch, var(--color-accent) 7%, var(--color-surface-overlay)) 16px 32px
+  );
+}
+.nene-public[data-theme^='consumer'] .eyecatch::after {
+  border-radius: var(--radius-full);
+}
+
+/* ── 15 · FOOTER — warm close ─────────────────────────────────────────────── */
+.nene-public[data-theme^='consumer'] .ft {
+  border-top: 1px solid var(--color-border);
+}

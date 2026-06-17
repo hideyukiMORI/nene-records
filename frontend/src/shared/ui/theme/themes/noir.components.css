@@ -22,6 +22,8 @@
 
 /* ── 1 · FOUNDATIONS — sharp edges, dramatic type scale, bold display ─────── */
 .nene-public[data-theme^='noir'] {
+  /* display = Space Grotesk (oversized); body stays Inter (default --font-sans) */
+  --font-display: 'Space Grotesk', 'Noto Sans JP', ui-sans-serif, system-ui, sans-serif;
   /* radius → sharp; squares the pills too (toggle, chips, tags, pager, search) */
   --radius-sm: 0px;
   --radius-md: 0px;

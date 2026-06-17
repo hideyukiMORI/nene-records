@@ -1,30 +1,16 @@
 {
-  "$schema": "../../public-theme.schema.json",
+  "$schema": "../public-theme.schema.json",
   "id": "reading",
   "name": "Reading",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "author": "NeNe Records",
-  "description": "Reading redesign — the intimate 'single book'. Same warm cream paper & quiet brown ink, but components.css builds a reading-first page: a deliberately narrow content width & measure with wide margins, serif-led headings (Source Serif 4), a literary drop cap, hairline rules and small-caps labels. The deliberate opposite of Aurora (wide/ruled/mono) and quieter than consumer.",
+  "description": "An intimate single book — warm cream paper, a quiet brown ink, a serif voice (Source Serif 4 for body and headings). Redesign v3 pushes the differentiation: a deliberately narrow ~1008px canvas and measure, wide gutters, a literary drop cap, the faintest hairline rules and Saira small-caps labels. The quiet opposite of Aurora (wide/ruled/mono) and Newsprint (wide/dense/red). Light + dark, both AA.",
   "supportsModes": ["light", "dark"],
   "fonts": [
-    {
-      "family": "Source Serif 4",
-      "role": "body",
-      "source": "fontsource",
-      "weights": [400, 600]
-    },
-    {
-      "family": "Saira Semi Condensed",
-      "role": "display",
-      "source": "fontsource",
-      "weights": [400, 500, 600]
-    },
-    {
-      "family": "JetBrains Mono",
-      "role": "mono",
-      "source": "fontsource",
-      "weights": [400]
-    }
+    { "family": "Source Serif 4", "role": "display", "source": "fontsource", "weights": [400, 500, 600] },
+    { "family": "Source Serif 4", "role": "body", "source": "fontsource", "weights": [400, 500, 600] },
+    { "family": "Saira Semi Condensed", "role": "chrome", "source": "fontsource", "weights": [500, 600] },
+    { "family": "JetBrains Mono", "role": "mono", "source": "fontsource", "weights": [400, 500] }
   ],
   "tokens": {
     "light": {
@@ -82,12 +68,18 @@
       "color-scheme": "dark"
     }
   },
+  "flags": {
+    "feedLayout": "list",
+    "cardStyle": "flat",
+    "media": "plain",
+    "hero": "minimal",
+    "sectionRule": "hairline",
+    "eyebrow": "caps"
+  },
   "knobs": {
     "accent": { "light": "oklch(46% 0.07 58)", "dark": "oklch(72% 0.075 68)" },
-    "surface": {
-      "light": "oklch(97% 0.02 85)",
-      "dark": "oklch(18% 0.012 70)"
-    },
+    "surface": { "light": "oklch(97% 0.02 85)", "dark": "oklch(18% 0.012 70)" },
+    "textPrimary": { "light": "oklch(23% 0.028 62)", "dark": "oklch(93% 0.016 85)" },
     "fontDisplay": "Source Serif 4",
     "fontBody": "Source Serif 4",
     "fontMono": "JetBrains Mono",

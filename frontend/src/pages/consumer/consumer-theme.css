@@ -1,7 +1,14 @@
 @import '../../shared/ui/theme/themes/consumer-brand.css';
+@import '../../shared/ui/theme/themes/consumer.components.css';
 @import '../../shared/ui/theme/themes/aurora.css';
 @import '../../shared/ui/theme/themes/aurora.components.css';
 @import '../../shared/ui/theme/themes/reading.css';
 @import '../../shared/ui/theme/themes/reading.components.css';
 @import '../../shared/ui/theme/themes/noir.css';
 @import '../../shared/ui/theme/themes/noir.components.css';
+@import '../../shared/ui/theme/themes/botanical.css';
+@import '../../shared/ui/theme/themes/botanical.components.css';
+@import '../../shared/ui/theme/themes/pastel.css';
+@import '../../shared/ui/theme/themes/pastel.components.css';
+@import '../../shared/ui/theme/themes/newsprint.css';
+@import '../../shared/ui/theme/themes/newsprint.components.css';

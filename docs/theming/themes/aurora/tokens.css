@@ -1,109 +1,83 @@
 /* ============================================================================
-   NeNe Records — Public site theme: Aurora — REDESIGN (light + dark)
+   NeNe Records — Public site theme: Aurora — REDESIGN v3 (light + dark)
    ----------------------------------------------------------------------------
-   Cool, structural tech. The hue family is kept from the original Aurora
-   (teal/cyan on cool paper) so the palette still reads as "Aurora" — the
-   redesign happens in components.css (L2): hard hairlines, ruled sections,
-   indexed grids, framed/duotone media, squared chrome and a mono technical
-   register. Tokens here only refine the foundation:
-     · borders strengthened a step (harder structural hairlines),
-     · shadows made crisp & shallow (structure carried by rules, not blur).
-   Authored from brief-aurora-redesign.theme.md per the token contract; scoped
-   under [data-theme='aurora'] / [data-theme='aurora-dark']. Both AA.
+   Cool, structural tech. The teal/cyan hue family on cool paper is kept from
+   Aurora 1.x/2.x so the palette still reads as "Aurora". The v3 redesign
+   pushes the differentiation: a WIDER canvas, DENSER indexed grids, HARDER
+   rules and a thoroughly mono technical register — all in components.css (L2).
+   Tokens here refine the foundation: strengthened structural hairlines and
+   crisp, shallow shadows (structure is carried by rules, not blur).
+   Scoped under [data-theme='aurora'] / [data-theme='aurora-dark']. Both AA.
    ========================================================================== */
 
 /* ── LIGHT — cool near-white paper ───────────────────────────────────────── */
-[data-theme="aurora"] {
-  /* surface */
+[data-theme='aurora'] {
   --color-surface: oklch(98% 0.006 230);
   --color-surface-raised: oklch(99.5% 0.004 230);
   --color-surface-overlay: oklch(94.5% 0.012 230);
   --color-surface-sunken: oklch(96% 0.01 235);
 
-  /* text */
   --color-text-primary: oklch(24% 0.03 250);
   --color-text-muted: oklch(48% 0.03 245);
   --color-text-inverse: oklch(99% 0.004 230);
 
-  /* line — strengthened a step for hard structural hairlines */
   --color-border: oklch(85% 0.014 232);
-  --color-border-strong: oklch(74% 0.022 238);
+  --color-border-strong: oklch(72% 0.024 238);
   --color-focus-ring: oklch(68% 0.13 215);
 
-  /* brand — teal */
   --color-accent: oklch(62% 0.13 200);
   --color-accent-hover: oklch(56% 0.13 200);
-  --color-accent-weak: color-mix(
-    in oklch,
-    var(--color-accent) 12%,
-    var(--color-surface-raised)
-  );
+  --color-accent-weak: color-mix(in oklch, var(--color-accent) 12%, var(--color-surface-raised));
   --color-on-accent: oklch(99% 0.004 230);
 
-  /* brand mark — NENE2 violet (logo only) */
   --color-brand-violet: oklch(56% 0.24 300);
 
-  /* status */
   --color-danger: oklch(52% 0.2 25);
   --color-danger-hover: oklch(46% 0.2 25);
   --color-ok: oklch(55% 0.13 150);
   --color-warn: oklch(70% 0.15 75);
   --color-info: oklch(55% 0.13 250);
 
-  /* shadow — cool-tinted, crisp & shallow (structure = rules, not blur) */
   --shadow-sm: 0 1px 0 oklch(40% 0.04 250 / 0.1);
-  --shadow-md:
-    0 2px 0 oklch(40% 0.04 250 / 0.08), 0 10px 24px oklch(40% 0.04 250 / 0.07);
+  --shadow-md: 0 2px 0 oklch(40% 0.04 250 / 0.08), 0 10px 24px oklch(40% 0.04 250 / 0.07);
   --shadow-lg: 0 14px 36px oklch(38% 0.05 250 / 0.12);
-  --shadow-focus: 0 0 0 3px
-    color-mix(in oklch, var(--color-focus-ring) 30%, transparent);
+  --shadow-focus: 0 0 0 3px color-mix(in oklch, var(--color-focus-ring) 30%, transparent);
 
   color-scheme: light;
 }
 
 /* ── DARK — deep blue-black paper ────────────────────────────────────────── */
-[data-theme="aurora-dark"] {
-  /* surface */
+[data-theme='aurora-dark'] {
   --color-surface: oklch(17% 0.02 250);
   --color-surface-raised: oklch(21% 0.022 250);
   --color-surface-overlay: oklch(26% 0.024 248);
   --color-surface-sunken: oklch(14% 0.018 250);
 
-  /* text */
   --color-text-primary: oklch(94% 0.012 230);
   --color-text-muted: oklch(68% 0.02 235);
   --color-text-inverse: oklch(20% 0.02 250);
 
-  /* line — lifted a step for visible structural hairlines on dark */
   --color-border: oklch(35% 0.024 250);
-  --color-border-strong: oklch(48% 0.028 250);
+  --color-border-strong: oklch(50% 0.03 250);
   --color-focus-ring: oklch(74% 0.13 210);
 
-  /* brand — lifted teal, dark text rides on top */
   --color-accent: oklch(72% 0.13 200);
   --color-accent-hover: oklch(79% 0.13 200);
-  --color-accent-weak: color-mix(
-    in oklch,
-    var(--color-accent) 16%,
-    var(--color-surface-raised)
-  );
+  --color-accent-weak: color-mix(in oklch, var(--color-accent) 16%, var(--color-surface-raised));
   --color-on-accent: oklch(20% 0.04 250);
 
   --color-brand-violet: oklch(72% 0.18 300);
 
-  /* status — lifted for dark legibility */
   --color-danger: oklch(66% 0.18 25);
   --color-danger-hover: oklch(72% 0.18 25);
   --color-ok: oklch(72% 0.14 150);
   --color-warn: oklch(80% 0.14 80);
   --color-info: oklch(74% 0.12 250);
 
-  /* shadow — deep, near-black, crisp top edge */
   --shadow-sm: 0 1px 0 oklch(0% 0 0 / 0.45);
   --shadow-md: 0 2px 0 oklch(0% 0 0 / 0.4), 0 12px 28px oklch(0% 0 0 / 0.45);
   --shadow-lg: 0 18px 44px oklch(0% 0 0 / 0.58);
-  --shadow-focus: 0 0 0 3px
-    color-mix(in oklch, var(--color-focus-ring) 32%, transparent);
+  --shadow-focus: 0 0 0 3px color-mix(in oklch, var(--color-focus-ring) 32%, transparent);
 
   color-scheme: dark;
 }

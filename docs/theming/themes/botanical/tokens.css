@@ -1,0 +1,88 @@
+/* ============================================================================
+   NeNe Records — Public site theme: Botanical (light + dark)
+   ----------------------------------------------------------------------------
+   Organic, relaxed, lived-in. Sage / olive green warmth on a green-cream paper,
+   wide breathing space, round corners and soft shadows. A lifestyle / blog /
+   café register — more organic and unhurried than consumer (warm magazine).
+
+   Tokens here = palette + foundations (Knob → Derived per the contract). The
+   "unwound, leafy" personality (round media, soft elevation, generous rhythm,
+   gentle serif headings) lives in components.css (L2).
+   Scoped to [data-theme='botanical'] / [data-theme='botanical-dark']. Both AA.
+   ========================================================================== */
+
+/* ── LIGHT — green-cream warm paper ──────────────────────────────────────── */
+[data-theme='botanical'] {
+  --color-surface: oklch(98% 0.009 120);
+  --color-surface-raised: oklch(99.5% 0.006 120);
+  --color-surface-overlay: oklch(94% 0.013 125);
+  --color-surface-sunken: oklch(95.5% 0.011 122);
+
+  --color-text-primary: oklch(29% 0.022 150);
+  --color-text-muted: oklch(48% 0.022 150);
+  --color-text-inverse: oklch(99% 0.006 120);
+
+  --color-border: oklch(88% 0.013 130);
+  --color-border-strong: oklch(78% 0.017 135);
+  --color-focus-ring: oklch(52% 0.10 148);
+
+  /* accent — a deep sage (deepened from the brief's L56 so white reads AA on it) */
+  --color-accent: oklch(49% 0.105 150);
+  --color-accent-hover: oklch(43% 0.105 150);
+  --color-accent-weak: color-mix(in oklch, var(--color-accent) 14%, var(--color-surface-raised));
+  --color-on-accent: oklch(99% 0.01 145);
+
+  --color-brand-violet: oklch(52% 0.2 300);
+
+  --color-danger: oklch(52% 0.2 25);
+  --color-danger-hover: oklch(46% 0.2 25);
+  --color-ok: oklch(52% 0.12 150);
+  --color-warn: oklch(68% 0.14 75);
+  --color-info: oklch(54% 0.1 230);
+
+  /* shadow — soft, warm-green tinted, low & wide (the "lift" of the theme) */
+  --shadow-sm: 0 1px 2px oklch(40% 0.04 150 / 0.07);
+  --shadow-md: 0 4px 10px oklch(40% 0.04 150 / 0.08), 0 14px 30px oklch(40% 0.04 150 / 0.07);
+  --shadow-lg: 0 20px 50px oklch(38% 0.05 150 / 0.14);
+  --shadow-focus: 0 0 0 3px color-mix(in oklch, var(--color-focus-ring) 28%, transparent);
+
+  color-scheme: light;
+}
+
+/* ── DARK — warm green charcoal ──────────────────────────────────────────── */
+[data-theme='botanical-dark'] {
+  --color-surface: oklch(22% 0.015 150);
+  --color-surface-raised: oklch(26% 0.017 150);
+  --color-surface-overlay: oklch(31% 0.02 150);
+  --color-surface-sunken: oklch(18% 0.013 150);
+
+  --color-text-primary: oklch(94% 0.01 130);
+  --color-text-muted: oklch(71% 0.016 140);
+  --color-text-inverse: oklch(22% 0.015 150);
+
+  --color-border: oklch(36% 0.018 150);
+  --color-border-strong: oklch(48% 0.022 150);
+  --color-focus-ring: oklch(74% 0.11 145);
+
+  /* accent — lifted sage; dark text rides on top */
+  --color-accent: oklch(75% 0.11 145);
+  --color-accent-hover: oklch(81% 0.11 145);
+  --color-accent-weak: color-mix(in oklch, var(--color-accent) 18%, var(--color-surface-raised));
+  --color-on-accent: oklch(22% 0.04 150);
+
+  --color-brand-violet: oklch(74% 0.16 300);
+
+  --color-danger: oklch(66% 0.18 25);
+  --color-danger-hover: oklch(72% 0.18 25);
+  --color-ok: oklch(74% 0.14 150);
+  --color-warn: oklch(80% 0.14 80);
+  --color-info: oklch(74% 0.1 230);
+
+  /* shadow — deep but soft, green-black */
+  --shadow-sm: 0 1px 2px oklch(0% 0 0 / 0.3);
+  --shadow-md: 0 4px 12px oklch(0% 0 0 / 0.38), 0 16px 32px oklch(0% 0 0 / 0.34);
+  --shadow-lg: 0 24px 56px oklch(0% 0 0 / 0.5);
+  --shadow-focus: 0 0 0 3px color-mix(in oklch, var(--color-focus-ring) 32%, transparent);
+
+  color-scheme: dark;
+}

@@ -1,0 +1,89 @@
+/* ============================================================================
+   NeNe Records — Public site theme: Newsprint (light + dark)
+   ----------------------------------------------------------------------------
+   Ink-on-paper journalism. A warm newsprint cream-grey paper, near-black ink
+   text, a single newsprint-red accent, serif headlines and a dense, ruled,
+   multi-column page. The inverse of Reading (intimate, narrow, single-column):
+   Newsprint is wide, dense and indexical.
+
+   Tokens here = palette + foundations (Knob → Derived). The "broadsheet"
+   personality (bold tight serif heads, hairline rules everywhere, mono
+   datelines, dense grids, drop cap) lives in components.css (L2).
+   Scoped to [data-theme='newsprint'] / [data-theme='newsprint-dark']. Both AA.
+   ========================================================================== */
+
+/* ── LIGHT — warm newsprint cream-grey ───────────────────────────────────── */
+[data-theme='newsprint'] {
+  --color-surface: oklch(95% 0.008 85);
+  --color-surface-raised: oklch(97% 0.006 85);
+  --color-surface-overlay: oklch(91% 0.01 85);
+  --color-surface-sunken: oklch(92.5% 0.009 85);
+
+  --color-text-primary: oklch(22% 0.006 60);
+  --color-text-muted: oklch(44% 0.008 60);
+  --color-text-inverse: oklch(97% 0.006 85);
+
+  /* line — newsprint uses many fine rules; borders are the structure */
+  --color-border: oklch(80% 0.008 75);
+  --color-border-strong: oklch(60% 0.01 70);
+  --color-focus-ring: oklch(50% 0.17 25);
+
+  /* accent — newsprint red */
+  --color-accent: oklch(50% 0.18 25);
+  --color-accent-hover: oklch(44% 0.18 25);
+  --color-accent-weak: color-mix(in oklch, var(--color-accent) 12%, var(--color-surface-raised));
+  --color-on-accent: oklch(98% 0.005 85);
+
+  --color-brand-violet: oklch(44% 0.13 280);
+
+  --color-danger: oklch(50% 0.2 25);
+  --color-danger-hover: oklch(44% 0.2 25);
+  --color-ok: oklch(50% 0.12 150);
+  --color-warn: oklch(64% 0.14 70);
+  --color-info: oklch(44% 0.1 250);
+
+  /* shadow — almost none; newsprint is flat, structure carried by rules */
+  --shadow-sm: 0 1px 0 oklch(40% 0.01 70 / 0.08);
+  --shadow-md: 0 1px 0 oklch(40% 0.01 70 / 0.1);
+  --shadow-lg: 0 2px 0 oklch(40% 0.01 70 / 0.12);
+  --shadow-focus: 0 0 0 3px color-mix(in oklch, var(--color-focus-ring) 28%, transparent);
+
+  color-scheme: light;
+}
+
+/* ── DARK — deep ink charcoal ────────────────────────────────────────────── */
+[data-theme='newsprint-dark'] {
+  --color-surface: oklch(18% 0.006 60);
+  --color-surface-raised: oklch(22% 0.007 60);
+  --color-surface-overlay: oklch(27% 0.008 60);
+  --color-surface-sunken: oklch(14% 0.005 60);
+
+  --color-text-primary: oklch(93% 0.006 80);
+  --color-text-muted: oklch(66% 0.008 70);
+  --color-text-inverse: oklch(18% 0.006 60);
+
+  --color-border: oklch(34% 0.008 60);
+  --color-border-strong: oklch(48% 0.01 60);
+  --color-focus-ring: oklch(64% 0.19 25);
+
+  /* accent — red kept dark enough that white reads AA on it */
+  --color-accent: oklch(52% 0.2 25);
+  --color-accent-hover: oklch(58% 0.19 25);
+  --color-accent-weak: color-mix(in oklch, var(--color-accent) 22%, var(--color-surface-raised));
+  --color-on-accent: oklch(98% 0.005 85);
+
+  --color-brand-violet: oklch(70% 0.13 280);
+
+  --color-danger: oklch(64% 0.19 25);
+  --color-danger-hover: oklch(70% 0.18 25);
+  --color-ok: oklch(72% 0.13 150);
+  --color-warn: oklch(78% 0.13 75);
+  --color-info: oklch(72% 0.1 250);
+
+  --shadow-sm: 0 1px 0 oklch(0% 0 0 / 0.4);
+  --shadow-md: 0 1px 0 oklch(0% 0 0 / 0.45);
+  --shadow-lg: 0 2px 0 oklch(0% 0 0 / 0.5);
+  --shadow-focus: 0 0 0 3px color-mix(in oklch, var(--color-focus-ring) 32%, transparent);
+
+  color-scheme: dark;
+}

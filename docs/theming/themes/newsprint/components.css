@@ -1,0 +1,421 @@
+/* ============================================================================
+   NeNe Records — Newsprint theme — component overlay (L2)  ·  THE STAR
+   ----------------------------------------------------------------------------
+   Tokens make Newsprint ink-coloured; THIS file makes it a broadsheet — no
+   DOM/markup changes, only restyling existing public-site.css classes.
+
+   System: "broadsheet / dense index"
+     · SERIF   — bold, tight Source Serif headlines at every level.
+     · RULE    — fine hairlines everywhere: mastheads, decks, columns, lists.
+     · DENSE   — tighter grids (more columns), compact rhythm; a packed page.
+     · DATELINE— meta set in tracked mono uppercase, like wire datelines.
+     · LEAD     — the featured slot reads as a front-page lead; the hero is a
+                  typographic masthead headline (hero=minimal).
+     · COLUMN   — a vertical rule divides main copy from the sidebar.
+     · DROP CAP — prose opens on a serif drop cap.
+
+   Scoped via `.nene-public[data-theme^='newsprint']` (light + dark).
+   ========================================================================== */
+
+/* ── 1 · FOUNDATIONS — sharp, dense, wide; tight serif heads ──────────────── */
+.nene-public[data-theme^='newsprint'] {
+  /* display = editorial serif (Source Serif 4, bold/tight); body stays Inter */
+  --font-display: 'Source Serif 4', 'Noto Serif JP', Georgia, 'Times New Roman', serif;
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-full: 0px;
+
+  /* density → compact: pull the rhythm in */
+  --space-sm: 0.625rem;
+  --space-md: 0.875rem;
+  --space-lg: 1.25rem;
+  --space-xl: 2rem;
+  --space-2xl: 3.25rem;
+  --space-section: clamp(2.75rem, 1.5rem + 5vw, 5rem);
+
+  --leading-body: 1.56;
+  --leading-heading: 1.08;
+  --tracking-display: -0.02em;
+
+  /* wide, packed canvas */
+  --content-w: 1280px;
+  --measure: 74ch;
+}
+.nene-public[data-theme^='newsprint'] .layout.is-2col {
+  grid-template-columns: minmax(0, 1fr) 280px;
+}
+/* a vertical column rule between main copy and the sidebar */
+.nene-public[data-theme^='newsprint'] .layout.is-2col .aside {
+  border-left: 1px solid var(--color-border-strong);
+  padding-left: clamp(1.25rem, 0.5rem + 2vw, 2.25rem);
+}
+@media (max-width: 1080px) {
+  .nene-public[data-theme^='newsprint'] .layout.is-2col .aside {
+    border-left: 0;
+    padding-left: 0;
+    border-top: 1px solid var(--color-border-strong);
+    padding-top: var(--space-lg);
+  }
+}
+
+/* serif headlines, bold & tight, throughout */
+.nene-public[data-theme^='newsprint'] .hero__title,
+.nene-public[data-theme^='newsprint'] .section__title,
+.nene-public[data-theme^='newsprint'] .featured__title,
+.nene-public[data-theme^='newsprint'] .card__title,
+.nene-public[data-theme^='newsprint'] .typecard__name,
+.nene-public[data-theme^='newsprint'] .pagehead__title,
+.nene-public[data-theme^='newsprint'] .row__title,
+.nene-public[data-theme^='newsprint'] .widget__title,
+.nene-public[data-theme^='newsprint'] .aside section h2 {
+  font-weight: var(--weight-bold);
+  letter-spacing: -0.018em;
+}
+
+/* ── 2 · MASTHEAD — header bracketed by a heavy rule ──────────────────────── */
+.nene-public[data-theme^='newsprint'] .hd {
+  border-bottom: 3px double var(--color-text-primary);
+  background: color-mix(in oklch, var(--color-surface) 90%, transparent);
+}
+.nene-public[data-theme^='newsprint'] .brand__mark {
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-surface-raised);
+}
+.nene-public[data-theme^='newsprint'] .brand__name {
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+.nene-public[data-theme^='newsprint'] .brand__tag {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.62rem;
+}
+.nene-public[data-theme^='newsprint'] .navlink {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.72rem;
+  font-weight: var(--weight-semibold);
+}
+.nene-public[data-theme^='newsprint'] .navlink[aria-current='page']::after {
+  height: 2px;
+  bottom: -3px;
+  background: var(--color-accent);
+}
+
+/* ── 3 · BUTTONS — squared, tight, editorial ──────────────────────────────── */
+.nene-public[data-theme^='newsprint'] .btn {
+  border-radius: 0;
+  font-weight: var(--weight-semibold);
+  padding: 11px 20px;
+}
+.nene-public[data-theme^='newsprint'] .btn--ghost {
+  border-color: var(--color-text-primary);
+}
+
+/* ── 4 · DATELINES — eyebrows / meta in tracked mono caps ─────────────────── */
+.nene-public[data-theme^='newsprint'] .eyebrow {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.66rem;
+  color: var(--color-accent);
+}
+.nene-public[data-theme^='newsprint'] .eyebrow::before {
+  display: none;
+}
+.nene-public[data-theme^='newsprint'] .meta {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.72rem;
+}
+.nene-public[data-theme^='newsprint'] .tbadge {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 0;
+  background: transparent;
+  color: var(--color-accent);
+  padding: 2px 8px;
+}
+.nene-public[data-theme^='newsprint'] .tbadge::before {
+  border-radius: 0;
+  width: 4px;
+  height: 4px;
+}
+
+/* ── 5 · MASTHEAD HEADLINE — hero=minimal: a typographic front page ───────── */
+.nene-public[data-theme^='newsprint'] .hero {
+  border-bottom: 1px solid var(--color-border-strong);
+  padding-bottom: var(--space-xl);
+}
+.nene-public[data-theme^='newsprint'] .hero__title {
+  font-size: clamp(2.8rem, 1.6rem + 5.2vw, 5.6rem);
+  line-height: 1.02;
+  max-width: 18ch;
+}
+.nene-public[data-theme^='newsprint'] .hero__title em {
+  color: var(--color-accent);
+  font-style: italic;
+}
+.nene-public[data-theme^='newsprint'] .hero__lead {
+  max-width: 58ch;
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-md);
+}
+.nene-public[data-theme^='newsprint'] .hero__meta {
+  border-top: 1px solid var(--color-border-strong);
+}
+.nene-public[data-theme^='newsprint'] .hero__stat b {
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+}
+.nene-public[data-theme^='newsprint'] .hero__stat span {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.64rem;
+}
+
+/* ── 6 · SECTIONS — hairline deck + tracked label, mono section index ─────── */
+.nene-public[data-theme^='newsprint'] {
+  counter-reset: news-sec;
+}
+.nene-public[data-theme^='newsprint'] .section {
+  counter-increment: news-sec;
+}
+.nene-public[data-theme^='newsprint'] .section__head {
+  border-bottom: 1px solid var(--color-text-primary);
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-xs);
+  align-items: flex-end;
+}
+.nene-public[data-theme^='newsprint'] .section__title {
+  font-size: clamp(1.6rem, 1.1rem + 1.8vw, 2.4rem);
+}
+.nene-public[data-theme^='newsprint'] .section__title::before {
+  content: 'No.' counter(news-sec);
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 0.42em;
+  letter-spacing: 0.04em;
+  color: var(--color-accent);
+  vertical-align: 0.5em;
+  margin-right: 0.8em;
+}
+.nene-public[data-theme^='newsprint'] .section__link {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.7rem;
+}
+
+/* ── 7 · FEED — dense, ruled column index; grayscale photos ───────────────── */
+.nene-public[data-theme^='newsprint'] .cardgrid {
+  grid-template-columns: repeat(auto-fill, minmax(196px, 1fr));
+  gap: 0;
+}
+.nene-public[data-theme^='newsprint'] .layout.is-2col .cardgrid {
+  grid-template-columns: repeat(auto-fill, minmax(186px, 1fr));
+}
+.nene-public[data-theme^='newsprint'] .card {
+  border: 1px solid var(--color-border);
+  border-top: 2px solid var(--color-text-primary);
+  background: transparent;
+  padding: var(--space-md);
+  gap: var(--space-xs);
+  /* hairline collapse — share rules between adjacent tiles */
+  margin: -0.5px;
+}
+.nene-public[data-theme^='newsprint'] .card__media,
+.nene-public[data-theme^='newsprint'] .featured__media,
+.nene-public[data-theme^='newsprint'] .article__hero,
+.nene-public[data-theme^='newsprint'] .row__media {
+  border: 1px solid var(--color-border-strong);
+  border-radius: 0;
+  filter: grayscale(1) contrast(1.05);
+  transition: filter var(--dur-normal) var(--ease);
+}
+.nene-public[data-theme^='newsprint'] .card:hover .card__media,
+.nene-public[data-theme^='newsprint'] .featured:hover .featured__media,
+.nene-public[data-theme^='newsprint'] .row:hover .row__media {
+  filter: grayscale(0) contrast(1);
+}
+.nene-public[data-theme^='newsprint'] .card__title {
+  font-size: 1.18rem;
+  line-height: 1.12;
+}
+.nene-public[data-theme^='newsprint'] .card:hover .card__title {
+  color: var(--color-accent);
+}
+
+/* ── 8 · LEAD — the featured slot reads as the front-page lead ────────────── */
+.nene-public[data-theme^='newsprint'] .featured {
+  border: 0;
+  border-top: 3px double var(--color-text-primary);
+  border-bottom: 1px solid var(--color-text-primary);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  padding-block: var(--space-lg);
+}
+.nene-public[data-theme^='newsprint'] .featured__title {
+  font-size: clamp(1.9rem, 1.3rem + 2.4vw, 3.1rem);
+  line-height: 1.05;
+}
+.nene-public[data-theme^='newsprint'] .featured__title a:hover {
+  color: var(--color-accent);
+}
+.nene-public[data-theme^='newsprint'] .featured__excerpt {
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+/* ── 9 · TYPE NAV — dense ruled register ──────────────────────────────────── */
+.nene-public[data-theme^='newsprint'] .types {
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0;
+}
+.nene-public[data-theme^='newsprint'] .typecard {
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  background: transparent;
+  margin: -0.5px;
+}
+.nene-public[data-theme^='newsprint'] .typecard:hover {
+  border-color: var(--color-text-primary);
+  background: var(--color-accent-weak);
+  transform: none;
+  box-shadow: none;
+}
+.nene-public[data-theme^='newsprint'] .typecard__slug,
+.nene-public[data-theme^='newsprint'] .typecard__count {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+}
+
+/* ── 10 · SIDEBAR / WIDGETS — ruled, flat, disciplined ────────────────────── */
+.nene-public[data-theme^='newsprint'] .widget,
+.nene-public[data-theme^='newsprint'] .aside section {
+  border: 0;
+  border-top: 2px solid var(--color-text-primary);
+  border-radius: 0;
+  background: transparent;
+  padding: var(--space-md) 0 0;
+  box-shadow: none;
+}
+.nene-public[data-theme^='newsprint'] .search,
+.nene-public[data-theme^='newsprint'] .searchbar,
+.nene-public[data-theme^='newsprint'] .input,
+.nene-public[data-theme^='newsprint'] .textarea {
+  border-radius: 0;
+  border-color: var(--color-border-strong);
+}
+.nene-public[data-theme^='newsprint'] .widget__title,
+.nene-public[data-theme^='newsprint'] .aside section h2 {
+  font-size: 1.05rem;
+}
+.nene-public[data-theme^='newsprint'] .poplist__rank {
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+  color: var(--color-accent);
+}
+.nene-public[data-theme^='newsprint'] .tag {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.7rem;
+  border-radius: 0;
+  border-color: var(--color-border-strong);
+}
+
+/* ── 11 · LIST / ARCHIVE / FILTER — square, mono numerals, ruled ──────────── */
+.nene-public[data-theme^='newsprint'] .pagehead__row {
+  border-bottom: 1px solid var(--color-text-primary);
+}
+.nene-public[data-theme^='newsprint'] .chip,
+.nene-public[data-theme^='newsprint'] .viewtoggle,
+.nene-public[data-theme^='newsprint'] .pager button,
+.nene-public[data-theme^='newsprint'] .pager span {
+  border-radius: 0;
+  border-color: var(--color-border-strong);
+  font-family: var(--font-mono);
+}
+.nene-public[data-theme^='newsprint'] .row {
+  border-top: 1px solid var(--color-border);
+}
+
+/* ── 12 · PROSE — broadsheet body: drop cap, ruled subheads ───────────────── */
+.nene-public[data-theme^='newsprint'] .prose > p:first-of-type::first-letter,
+.nene-public[data-theme^='newsprint'] .markdown-body > p:first-of-type::first-letter {
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+  font-size: 3.4em;
+  line-height: 0.82;
+  float: left;
+  margin: 0.05em 0.12em 0 0;
+  color: var(--color-accent);
+}
+.nene-public[data-theme^='newsprint'] .prose h2,
+.nene-public[data-theme^='newsprint'] .markdown-body h2 {
+  border-top: 1px solid var(--color-border-strong);
+  padding-top: var(--space-sm);
+  letter-spacing: -0.015em;
+}
+.nene-public[data-theme^='newsprint'] .prose blockquote,
+.nene-public[data-theme^='newsprint'] .markdown-body blockquote {
+  border-left: 3px solid var(--color-accent);
+  font-family: var(--font-display);
+}
+.nene-public[data-theme^='newsprint'] .prose code,
+.nene-public[data-theme^='newsprint'] .markdown-body code {
+  border: 1px solid var(--color-border-strong);
+  border-radius: 0;
+}
+
+/* ── 13 · EMPTY STATE — hard ruled frame ──────────────────────────────────── */
+.nene-public[data-theme^='newsprint'] .empty {
+  border-style: solid;
+  border-width: 1px;
+  border-top-width: 3px;
+  border-top-color: var(--color-text-primary);
+  border-radius: 0;
+}
+.nene-public[data-theme^='newsprint'] .empty__icon {
+  border-radius: 0;
+}
+
+/* ── 14 · FOOTER — closed with a heavy double rule ────────────────────────── */
+.nene-public[data-theme^='newsprint'] .ft {
+  border-top: 3px double var(--color-text-primary);
+  background: transparent;
+}
+.nene-public[data-theme^='newsprint'] .ft__bar small,
+.nene-public[data-theme^='newsprint'] .ft__bar .mono {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.72rem;
+}
+
+/* ── 15 · EYECATCH placeholder — fine grayscale halftone hatch ────────────── */
+.nene-public[data-theme^='newsprint'] .eyecatch {
+  border-color: var(--color-border-strong);
+  border-radius: 0;
+  background: repeating-linear-gradient(
+    45deg,
+    color-mix(in oklch, var(--color-text-primary) 12%, var(--color-surface-overlay)) 0 5px,
+    color-mix(in oklch, var(--color-text-primary) 4%, var(--color-surface-overlay)) 5px 10px
+  );
+}
+.nene-public[data-theme^='newsprint'] .eyecatch::after {
+  border-radius: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-family: var(--font-mono);
+}

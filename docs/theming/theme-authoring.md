@@ -95,6 +95,7 @@ authoring.md ──(ClaudeDesign / 作者)──▶ theme bundle ──(validate
   - `baseFontSize`＋`typeScale` → `--text-*` 一式（clamp の下限/上限も比例）。
   - `density` → `--space-*` 一括スケール。`radius` → `--radius-sm/md/lg`。
   - `mood` → 影・ボーダーの色温度。
+- **フォントは明示的に上書き**（重要・落とし穴）。base の既定は `--font-display: Saira` / `--font-sans: Inter` / `--font-mono: JetBrains` / `--font-chrome: Space Grotesk`。manifest の `fonts` で**これと異なるフォントを宣言したら、bundle 側で必ず該当トークンを上書き**する（例: `.nene-public[data-theme^='<id>'] { --font-display: 'Source Serif 4', …; }`）。上書きを忘れると見た目が既定フォントのままになる。許可リスト外のフォントは `public-fonts.ts` への @fontsource 同梱も必要（必要な weight も含めて）。
 - **light/dark 双方**を必ず出力。`color-scheme` も各モードで設定。
 - **アクセシビリティ**: `text-primary` / `on-accent` は背景に対し WCAG AA（4.5:1）。
 

@@ -40,10 +40,11 @@ export const PUBLIC_THEMES: readonly PublicThemeMeta[] = [
     id: 'consumer',
     name: 'Terracotta',
     description:
-      'Warm, soft editorial magazine — terracotta accent on warm paper. The standard baseline: rounded chrome and gentle shadows.',
+      'Warm photo-magazine — terracotta/clay warmth on warm paper, photo-forward media, soft round corners and a friendly editorial voice.',
     author: 'NeNe Records',
-    version: '1.0.0',
+    version: '2.0.0',
     createdAt: '2026-05-24',
+    thumbnail: '/theme-thumbnails/consumer.webp',
     preview: {
       surface: 'oklch(97.5% 0.012 75)',
       raised: 'oklch(99.5% 0.008 75)',
@@ -54,10 +55,11 @@ export const PUBLIC_THEMES: readonly PublicThemeMeta[] = [
     id: 'aurora',
     name: 'Aurora',
     description:
-      'Cool, structural tech — teal on cool paper. A ruled, indexed blueprint layout with hard hairlines and a mono register.',
+      'Cool, structural tech — teal on cool paper. A wide, ruled, indexed blueprint layout with hard hairlines and a mono register.',
     author: 'NeNe Records',
-    version: '2.0.0',
+    version: '3.0.0',
     createdAt: '2026-06-16',
+    thumbnail: '/theme-thumbnails/aurora.webp',
     preview: {
       surface: 'oklch(98% 0.006 230)',
       raised: 'oklch(99.5% 0.004 230)',
@@ -68,10 +70,11 @@ export const PUBLIC_THEMES: readonly PublicThemeMeta[] = [
     id: 'reading',
     name: 'Reading',
     description:
-      'Intimate single-book reading — serif headings, a narrow measure with wide margins, hairline rules and a literary drop cap.',
+      'An intimate single book — warm cream paper, quiet brown ink, a narrow serif-led measure with wide margins and hairline rules.',
     author: 'NeNe Records',
-    version: '2.0.0',
+    version: '3.0.0',
     createdAt: '2026-06-16',
+    thumbnail: '/theme-thumbnails/reading.webp',
     preview: {
       surface: 'oklch(97% 0.02 85)',
       raised: 'oklch(99% 0.014 85)',
@@ -91,6 +94,51 @@ export const PUBLIC_THEMES: readonly PublicThemeMeta[] = [
       surface: 'oklch(15% 0.012 280)',
       raised: 'oklch(19% 0.014 280)',
       accent: 'oklch(86% 0.21 128)',
+    },
+  },
+  {
+    id: 'botanical',
+    name: 'Botanical',
+    description:
+      'Organic and unhurried — deep sage green on green-cream paper, wide breathing space, big round corners and soft warm shadows. A calm lifestyle / blog register.',
+    author: 'NeNe Records',
+    version: '1.0.0',
+    createdAt: '2026-06-17',
+    thumbnail: '/theme-thumbnails/botanical.webp',
+    preview: {
+      surface: 'oklch(98% 0.009 120)',
+      raised: 'oklch(99.5% 0.006 120)',
+      accent: 'oklch(49% 0.105 150)',
+    },
+  },
+  {
+    id: 'pastel',
+    name: 'Pastel Pop',
+    description:
+      'Playful multi-colour — faint plum-white paper, a coral lead with mint/blue secondary, big round corners and big floaty media. The fun axis.',
+    author: 'NeNe Records',
+    version: '1.0.0',
+    createdAt: '2026-06-17',
+    thumbnail: '/theme-thumbnails/pastel.webp',
+    preview: {
+      surface: 'oklch(99% 0.012 320)',
+      raised: 'oklch(99.7% 0.008 320)',
+      accent: 'oklch(64% 0.16 8)',
+    },
+  },
+  {
+    id: 'newsprint',
+    name: 'Newsprint',
+    description:
+      'Ink-on-paper journalism — warm newsprint cream, near-black ink, a newsprint-red accent, bold tight serif headlines and a dense, ruled, multi-column page.',
+    author: 'NeNe Records',
+    version: '1.0.0',
+    createdAt: '2026-06-17',
+    thumbnail: '/theme-thumbnails/newsprint.webp',
+    preview: {
+      surface: 'oklch(95% 0.008 85)',
+      raised: 'oklch(97% 0.006 85)',
+      accent: 'oklch(50% 0.18 25)',
     },
   },
 ]
