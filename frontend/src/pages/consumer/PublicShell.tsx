@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react'
 import './consumer-theme.css'
 import './public-fonts'
-import { Outlet } from 'react-router-dom'
+import { Outlet, ScrollRestoration } from 'react-router-dom'
 import { usePublicNavigationItems } from '@/entities/navigation-item'
 import { publicSettingsToMap, usePublicSettings } from '@/entities/setting'
 import { parseLayoutConfig } from '@/shared/lib/layout-config'
@@ -86,5 +86,14 @@ export function PublicShell() {
   // PublicShell only resolves site-wide data and the document meta. The visual
   // scaffold (header / footer / drawer / theme) is the magazine PublicSiteShell,
   // rendered per page so a record can still opt into a chrome-less `bare` layout.
-  return <Outlet context={site} />
+  //
+  // ScrollRestoration scopes scroll handling to the public site: a new
+  // navigation (e.g. into a record/page) jumps to the top, while back/forward
+  // restores the previous position — without changing the admin's behaviour.
+  return (
+    <>
+      <ScrollRestoration />
+      <Outlet context={site} />
+    </>
+  )
 }
