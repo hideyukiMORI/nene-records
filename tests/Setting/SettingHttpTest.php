@@ -18,6 +18,7 @@ use NeNeRecords\Setting\SettingKeyNotFoundExceptionHandler;
 use NeNeRecords\Setting\SettingRouteRegistrar;
 use NeNeRecords\Setting\SettingValueInvalidExceptionHandler;
 use NeNeRecords\Setting\UpdateSettingHandler;
+use NeNeRecords\Tests\Media\InMemoryMediaRepository;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
@@ -58,7 +59,7 @@ final class SettingHttpTest extends TestCase
 
         $registrar = new SettingRouteRegistrar(
             new ListSettingsHandler(new ListSettingsUseCase($this->repository), $jsonResponse),
-            new ListPublicSettingsHandler(new ListPublicSettingsUseCase($this->repository), $jsonResponse, $this->factory),
+            new ListPublicSettingsHandler(new ListPublicSettingsUseCase($this->repository, new InMemoryMediaRepository()), $jsonResponse, $this->factory),
             new UpdateSettingHandler(new InMemoryUpdateSettingUseCase($this->repository), $jsonResponse),
             new ListSettingRevisionsHandler(new ListSettingRevisionsUseCase($this->repository), $jsonResponse),
         );

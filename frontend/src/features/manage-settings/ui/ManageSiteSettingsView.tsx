@@ -1,7 +1,11 @@
 import { useState } from 'react'
+import { useMediaList } from '@/entities/media'
 import type { SettingItem, SettingRevision } from '@/entities/setting'
 import { useTranslation } from '@/shared/i18n'
 import { Button, Card, ErrorState, LoadingState, Stack, Text, Textarea } from '@/shared/ui'
+
+const inputClass =
+  'rounded-md border border-border bg-surface px-inline-sm py-stack-sm font-sans text-body text-text-primary shadow-sm focus-visible:outline-none focus-visible:shadow-focus disabled:cursor-not-allowed disabled:opacity-50'
 
 // ── Revisions panel (props-driven) ───────────────────────────────────────────
 
@@ -38,6 +42,69 @@ function SettingRevisionsPanel({ revisions, isLoading, isError }: SettingRevisio
   )
 }
 
+// ── Media setting field (logo) ───────────────────────────────────────────────
+
+interface MediaSettingFieldProps {
+  item: SettingItem
+  isSaving: boolean
+  canManageSettings: boolean
+  onSave: (settingKey: string, value: string) => Promise<void>
+}
+
+/**
+ * A `media`-type setting stores a media id. Pick from the image library (a
+ * preview + a simple select); the public site resolves the id to a URL.
+ */
+function MediaSettingField({ item, isSaving, canManageSettings, onSave }: MediaSettingFieldProps) {
+  const { t } = useTranslation()
+  const mediaList = useMediaList()
+  const [value, setValue] = useState(item.value)
+  const images = (mediaList.data?.items ?? []).filter((m) => m.mimeType.startsWith('image/'))
+  const selected = images.find((m) => String(m.id) === value)
+  const dirty = value !== item.value
+
+  return (
+    <div className="flex items-center gap-stack-sm">
+      <span className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-sm border border-border bg-surface-sunken">
+        {selected !== undefined ? (
+          <img src={selected.url} alt="" className="h-full w-full object-cover" />
+        ) : (
+          <Text muted variant="caption">
+            —
+          </Text>
+        )}
+      </span>
+      <select
+        value={value}
+        disabled={isSaving || !canManageSettings || mediaList.isLoading}
+        onChange={(e) => {
+          setValue(e.target.value)
+        }}
+        className={`flex-1 ${inputClass}`}
+      >
+        <option value="">{t('admin.settings.media.none')}</option>
+        {images.map((m) => (
+          <option key={m.id} value={String(m.id)}>
+            {m.originalName}
+          </option>
+        ))}
+      </select>
+      {canManageSettings ? (
+        <Button
+          variant="secondary"
+          size="sm"
+          disabled={isSaving || !dirty}
+          onClick={() => {
+            void onSave(item.settingKey, value)
+          }}
+        >
+          {isSaving ? t('admin.settings.saving') : t('admin.settings.save')}
+        </Button>
+      ) : null}
+    </div>
+  )
+}
+
 // ── Setting card (local form state only) ─────────────────────────────────────
 
 interface SettingCardProps {
@@ -68,9 +135,6 @@ function SettingCard({
   const inputId = `setting-${item.settingKey}`
   const dirty = value !== item.value
 
-  const inputClass =
-    'rounded-md border border-border bg-surface px-inline-sm py-stack-sm font-sans text-body text-text-primary shadow-sm focus-visible:outline-none focus-visible:shadow-focus disabled:cursor-not-allowed disabled:opacity-50'
-
   return (
     <Card as="section">
       {/* ── Header row: label + history toggle ── */}
@@ -88,7 +152,14 @@ function SettingCard({
       </div>
 
       {/* ── Field ── */}
-      {item.dataType === 'markdown' ? (
+      {item.dataType === 'media' ? (
+        <MediaSettingField
+          item={item}
+          isSaving={isSaving}
+          canManageSettings={canManageSettings}
+          onSave={onSave}
+        />
+      ) : item.dataType === 'markdown' ? (
         <div className="flex flex-col gap-stack-sm">
           <Text muted variant="caption">
             Markdown ·{' '}

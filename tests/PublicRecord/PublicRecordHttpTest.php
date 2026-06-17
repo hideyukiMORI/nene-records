@@ -31,6 +31,7 @@ use NeNeRecords\Tests\EntityType\InMemoryEntityTypeRepository;
 use NeNeRecords\Tests\EnumField\InMemoryEnumFieldRepository;
 use NeNeRecords\Tests\FieldDef\InMemoryFieldDefRepository;
 use NeNeRecords\Tests\IntField\InMemoryIntFieldRepository;
+use NeNeRecords\Tests\Media\InMemoryMediaRepository;
 use NeNeRecords\Tests\Setting\InMemorySettingRepository;
 use NeNeRecords\Tests\TextField\InMemoryTextFieldRepository;
 use NeNeRecords\TextField\TextField;
@@ -67,7 +68,7 @@ final class PublicRecordHttpTest extends TestCase
             new TextField(entityId: 10, fieldKey: 'body', value: "## Sample\n\n**bold** line", id: 2),
         ], $entities);
 
-        $publicSettings = new ListPublicSettingsUseCase(new InMemorySettingRepository());
+        $publicSettings = new ListPublicSettingsUseCase(new InMemorySettingRepository(), new InMemoryMediaRepository());
 
         $useCase = new GetPublicRecordViewUseCase(
             $entityTypes,

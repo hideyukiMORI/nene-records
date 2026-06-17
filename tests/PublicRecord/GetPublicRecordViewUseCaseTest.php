@@ -21,6 +21,7 @@ use NeNeRecords\Tests\EntityType\InMemoryEntityTypeRepository;
 use NeNeRecords\Tests\EnumField\InMemoryEnumFieldRepository;
 use NeNeRecords\Tests\FieldDef\InMemoryFieldDefRepository;
 use NeNeRecords\Tests\IntField\InMemoryIntFieldRepository;
+use NeNeRecords\Tests\Media\InMemoryMediaRepository;
 use NeNeRecords\Tests\Setting\InMemorySettingRepository;
 use NeNeRecords\Tests\TextField\InMemoryTextFieldRepository;
 use NeNeRecords\TextField\TextField;
@@ -57,7 +58,7 @@ final class GetPublicRecordViewUseCaseTest extends TestCase
             new InMemoryBoolFieldRepository(),
             new InMemoryDateTimeFieldRepository(),
             new InMemoryEntityRelationRepository(),
-            new ListPublicSettingsUseCase(new InMemorySettingRepository()),
+            new ListPublicSettingsUseCase(new InMemorySettingRepository(), new InMemoryMediaRepository()),
         );
 
         $output = $useCase->execute(new GetPublicRecordViewInput('article', 'hello-world'));
@@ -83,7 +84,7 @@ final class GetPublicRecordViewUseCaseTest extends TestCase
             new InMemoryBoolFieldRepository(),
             new InMemoryDateTimeFieldRepository(),
             new InMemoryEntityRelationRepository(),
-            new ListPublicSettingsUseCase(new InMemorySettingRepository()),
+            new ListPublicSettingsUseCase(new InMemorySettingRepository(), new InMemoryMediaRepository()),
         );
 
         $this->expectException(PublicEntityTypeNotFoundException::class);
@@ -106,7 +107,7 @@ final class GetPublicRecordViewUseCaseTest extends TestCase
             new InMemoryBoolFieldRepository(),
             new InMemoryDateTimeFieldRepository(),
             new InMemoryEntityRelationRepository(),
-            new ListPublicSettingsUseCase(new InMemorySettingRepository()),
+            new ListPublicSettingsUseCase(new InMemorySettingRepository(), new InMemoryMediaRepository()),
         );
 
         $this->expectException(PublicRecordNotFoundException::class);

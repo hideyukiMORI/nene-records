@@ -156,6 +156,13 @@
   height: 22px;
   color: var(--color-brand-violet);
 }
+/* Admin-set logo image (logo_media_id). Fills the mark; cover keeps it tidy. */
+.nene-public .brand__logo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}
 .nene-public .brand__text {
   display: flex;
   flex-direction: column;

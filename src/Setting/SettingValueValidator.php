@@ -7,7 +7,7 @@ namespace NeNeRecords\Setting;
 final class SettingValueValidator
 {
     /** @var list<string> */
-    private const SUPPORTED_DATA_TYPES = ['text', 'markdown', 'bool', 'url'];
+    private const SUPPORTED_DATA_TYPES = ['text', 'markdown', 'bool', 'url', 'media'];
 
     public static function normalize(string $dataType, string $value): string
     {
@@ -26,6 +26,7 @@ final class SettingValueValidator
         match ($dataType) {
             'bool' => self::validateBool($value),
             'url' => self::validateUrl($value),
+            'media' => self::validateMedia($value),
             'text', 'markdown' => null,
             default => self::assertSupportedDataType($dataType),
         };
@@ -62,6 +63,21 @@ final class SettingValueValidator
 
         if (filter_var($value, FILTER_VALIDATE_URL) === false) {
             throw new SettingValueInvalidException('URL setting value must be a valid URL.');
+        }
+    }
+
+    /**
+     * A media setting stores a media id (resolved to a URL in the public API).
+     * Empty clears it; otherwise it must be a positive integer.
+     */
+    private static function validateMedia(string $value): void
+    {
+        if ($value === '') {
+            return;
+        }
+
+        if (filter_var($value, FILTER_VALIDATE_INT) === false || (int) $value <= 0) {
+            throw new SettingValueInvalidException('Media setting value must be a media id.');
         }
     }
 }

@@ -12,6 +12,7 @@ use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RequestScopedHolder;
+use NeNeRecords\Media\MediaRepositoryInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 
@@ -58,7 +59,13 @@ final readonly class SettingServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Setting repository service is invalid.');
                     }
 
-                    return new ListPublicSettingsUseCase($settings);
+                    $media = $container->get(MediaRepositoryInterface::class);
+
+                    if (!$media instanceof MediaRepositoryInterface) {
+                        throw new LogicException('Media repository service is invalid.');
+                    }
+
+                    return new ListPublicSettingsUseCase($settings, $media);
                 },
             )
             ->set(

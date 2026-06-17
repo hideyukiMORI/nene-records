@@ -16,6 +16,10 @@ export interface PublicSite {
   tagline: string
   metaDescription: string
   footerMarkdown: string
+  /** Logo image URL (`logo_media_id` resolved server-side); '' → brand mark. */
+  logo: string
+  /** Footer copyright text; `{year}`/`{site}` tokens substituted at render. */
+  copyrightText: string
   navItems: PublicSiteNavItem[]
   /** Admin-selected public-site theme id (`active_theme` setting). */
   activeTheme: string
