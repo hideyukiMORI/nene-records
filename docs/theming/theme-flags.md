@@ -23,6 +23,7 @@ A だけでも「WP の定番テーマ」級は出せる。語彙に収まらな
 | フラグ        | data 属性      | 値                                              | 効果（base CSS が実装）                                                                                                            |
 | ------------- | -------------- | ----------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
 | `feedLayout`  | `data-feed`    | `grid` \| `list` \| `magazine`                  | 最新フィードの版面。grid=均等カード / list=横長行（`.cardgrid`→1カラム化、`.card`を行化）/ magazine=フィーチャー＋グリッド（現行） |
+| `feedColumns` | `data-feed-cols` | `auto` \| `2` \| `3` \| `4`                   | グリッドフィードの列数。auto=幅に応じた auto-fill（現行）/ 2・3・4=固定列（`.layout__main` のコンテナ幅で段階縮小）。`feedLayout=list` 時は無効 |
 | `cardStyle`   | `data-cards`   | `flat` \| `bordered` \| `shadowed` \| `framed`  | `.card` の意匠（枠/影/額装）                                                                                                       |
 | `media`       | `data-media`   | `plain` \| `duotone` \| `grayscale` \| `framed` | `.card__media` / `.featured__media` / `.article__hero` の見せ方（`filter`/枠）                                                     |
 | `hero`        | `data-hero`    | `standard` \| `fullbleed` \| `minimal`          | `.hero` 構図（minimal=アート省略・タイポ主体 / fullbleed=幅広）                                                                    |

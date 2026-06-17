@@ -72,6 +72,7 @@ export const en = {
   'admin.themeCustomize.typeScale': 'Type scale',
   'admin.themeCustomize.density': 'Density',
   'admin.themeCustomize.feedLayout': 'Feed layout',
+  'admin.themeCustomize.feedColumns': 'Feed columns',
   'admin.themeCustomize.cardStyle': 'Card style',
   'admin.themeCustomize.media': 'Imagery',
   'admin.themeCustomize.hero': 'Hero',

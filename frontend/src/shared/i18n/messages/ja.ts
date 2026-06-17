@@ -65,6 +65,7 @@ export const ja: Partial<MessageCatalog> = {
   'admin.themeCustomize.typeScale': '見出しスケール',
   'admin.themeCustomize.density': '密度',
   'admin.themeCustomize.feedLayout': 'フィード版面',
+  'admin.themeCustomize.feedColumns': 'フィード列数',
   'admin.themeCustomize.cardStyle': 'カード意匠',
   'admin.themeCustomize.media': 'メディア',
   'admin.themeCustomize.hero': 'ヒーロー',

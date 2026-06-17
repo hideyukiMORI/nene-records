@@ -82,6 +82,7 @@
       "additionalProperties": false,
       "properties": {
         "feedLayout": { "enum": ["grid", "list", "magazine"] },
+        "feedColumns": { "enum": ["auto", "2", "3", "4"] },
         "cardStyle": { "enum": ["flat", "bordered", "shadowed", "framed"] },
         "media": { "enum": ["plain", "duotone", "grayscale", "framed"] },
         "hero": { "enum": ["standard", "fullbleed", "minimal"] },
