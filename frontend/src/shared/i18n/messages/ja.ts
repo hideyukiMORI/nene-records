@@ -73,6 +73,8 @@ export const ja: Partial<MessageCatalog> = {
   'admin.themeCustomize.eyebrow': 'アイブロウ',
   'admin.themeCustomize.basic': '基本',
   'admin.themeCustomize.advanced': '詳細設定',
+  'admin.themeCustomize.saved': 'カスタマイズを保存しました',
+  'admin.themeCustomize.saveError': 'カスタマイズを保存できませんでした',
   'admin.themeCustomize.save': '保存',
   'admin.themeCustomize.saving': '保存中…',
   'admin.themeCustomize.reset': 'リセット',
