@@ -250,6 +250,46 @@ export function ThemeCustomizeView({
               }}
             />
           </Field>
+          <Field label={t('admin.themeCustomize.media')}>
+            <Select
+              value={draft.flags?.media}
+              options={FLAG_DEFS.media.options}
+              placeholder={themePlaceholder}
+              onChange={(v) => {
+                setKnob('flags', { ...draft.flags, media: v })
+              }}
+            />
+          </Field>
+          <Field label={t('admin.themeCustomize.hero')}>
+            <Select
+              value={draft.flags?.hero}
+              options={FLAG_DEFS.hero.options}
+              placeholder={themePlaceholder}
+              onChange={(v) => {
+                setKnob('flags', { ...draft.flags, hero: v })
+              }}
+            />
+          </Field>
+          <Field label={t('admin.themeCustomize.sectionRule')}>
+            <Select
+              value={draft.flags?.sectionRule}
+              options={FLAG_DEFS.sectionRule.options}
+              placeholder={themePlaceholder}
+              onChange={(v) => {
+                setKnob('flags', { ...draft.flags, sectionRule: v })
+              }}
+            />
+          </Field>
+          <Field label={t('admin.themeCustomize.eyebrow')}>
+            <Select
+              value={draft.flags?.eyebrow}
+              options={FLAG_DEFS.eyebrow.options}
+              placeholder={themePlaceholder}
+              onChange={(v) => {
+                setKnob('flags', { ...draft.flags, eyebrow: v })
+              }}
+            />
+          </Field>
         </Stack>
 
         <div className="flex items-center gap-inline-sm">

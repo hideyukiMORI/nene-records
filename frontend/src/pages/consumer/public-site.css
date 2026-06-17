@@ -1706,3 +1706,112 @@
   background: var(--color-surface-raised);
   padding: var(--space-md);
 }
+
+/* media — treatment of eyecatch/imagery (the .eyecatch elements that also carry
+   .card__media / .featured__media / .article__hero). plain = default. */
+.nene-public[data-media='grayscale'] .card__media,
+.nene-public[data-media='grayscale'] .featured__media,
+.nene-public[data-media='grayscale'] .article__hero {
+  filter: grayscale(1);
+  transition: filter var(--dur-normal) var(--ease);
+}
+.nene-public[data-media='grayscale'] .card:hover .card__media {
+  filter: grayscale(0);
+}
+
+/* duotone — desaturate, then lift the darks toward the accent (screen blend). */
+.nene-public[data-media='duotone'] .card__media,
+.nene-public[data-media='duotone'] .featured__media,
+.nene-public[data-media='duotone'] .article__hero {
+  filter: grayscale(1) contrast(1.06);
+  isolation: isolate;
+}
+.nene-public[data-media='duotone'] .card__media::before,
+.nene-public[data-media='duotone'] .featured__media::before,
+.nene-public[data-media='duotone'] .article__hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    140deg,
+    color-mix(in oklch, var(--color-accent) 60%, transparent),
+    color-mix(in oklch, var(--color-accent) 28%, transparent)
+  );
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+/* keep the placeholder label legible above the tint */
+.nene-public[data-media='duotone'] .eyecatch::after {
+  position: relative;
+  z-index: 2;
+}
+
+/* framed — inset mat + border around imagery. */
+.nene-public[data-media='framed'] .card__media,
+.nene-public[data-media='framed'] .featured__media,
+.nene-public[data-media='framed'] .article__hero {
+  border: 1px solid var(--color-border-strong);
+  padding: var(--space-2xs);
+  background: var(--color-surface-raised);
+}
+
+/* hero — top hero composition. standard = default. */
+.nene-public[data-hero='minimal'] .hero__grid {
+  grid-template-columns: 1fr;
+}
+.nene-public[data-hero='minimal'] .hero__art {
+  display: none;
+}
+.nene-public[data-hero='minimal'] .hero__lead {
+  max-width: 60ch;
+}
+
+/* fullbleed — a full-width tinted band breaks out behind the hero. */
+.nene-public[data-hero='fullbleed'] .hero {
+  position: relative;
+  padding-block: clamp(3rem, 1.5rem + 6vw, 6rem);
+}
+.nene-public[data-hero='fullbleed'] .hero::before {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  left: 50%;
+  width: 100vw;
+  transform: translateX(-50%);
+  background: var(--color-surface-sunken);
+  z-index: -1;
+}
+
+/* sectionRule — the rule under a section heading. */
+.nene-public[data-rule='none'] .section__head {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+.nene-public[data-rule='hairline'] .section__head {
+  border-bottom: 1px solid var(--color-border);
+}
+.nene-public[data-rule='heavy'] .section__head {
+  border-bottom-width: 4px;
+  border-bottom-color: var(--color-text-primary);
+}
+
+/* eyebrow — small kicker label expression. barred = default-ish (leading bar). */
+.nene-public[data-eyebrow='plain'] .eyebrow {
+  text-transform: none;
+  font-family: var(--font-sans);
+}
+.nene-public[data-eyebrow='plain'] .eyebrow::before {
+  display: none;
+}
+.nene-public[data-eyebrow='caps'] .eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+}
+.nene-public[data-eyebrow='caps'] .eyebrow::before {
+  display: none;
+}
+.nene-public[data-eyebrow='barred'] .eyebrow::before {
+  width: 28px;
+  height: 3px;
+}

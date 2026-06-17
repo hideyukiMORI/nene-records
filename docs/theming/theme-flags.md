@@ -104,8 +104,11 @@ manifest に任意の `flags` を追加（[`public-theme.schema.json`](./public-
 
 ## 8. 実装スライス（#390）
 
-1. 本ドキュメント＋ `flags` スキーマ（←本PR）。
-2. 汎用エンジン v1: `feedLayout`(grid/list) ＋ `cardStyle` を base CSS 実装＋ `flags`→`data-*` 配線。
-3. フラグ拡充（media / hero / sectionRule / eyebrow）。
-4. カスタマイザ simple/pro 分割＋ flags UI ＋ validator enum。
-5. ClaudeCode で JSON テーマ量産。
+1. ✅ 本ドキュメント＋ `flags` スキーマ。
+2. ✅ 汎用エンジン v1: `feedLayout`(grid/list) ＋ `cardStyle` を base CSS 実装＋ `flags`→`data-*` 配線。
+3. ✅ フラグ拡充（media / hero / sectionRule / eyebrow）の base CSS。`public-site.css` の Style flags ブロックに集約。
+4. flags UI ＋ validator enum：
+   - ✅ カスタマイザに全6フラグのプルダウン（`ThemeCustomizeView`）。
+   - ✅ validator の flags enum 検証（`public-theme.schema.json` の `flags` enum ＋ `additionalProperties:false`、Ajv 駆動）。
+   - ⬜ simple/pro モード分割（UI の折りたたみ）。
+5. ⬜ ClaudeCode で JSON テーマ量産。
