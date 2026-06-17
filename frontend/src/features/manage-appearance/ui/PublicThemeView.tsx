@@ -65,7 +65,10 @@ export function PublicThemeView({
         {t('admin.publicTheme.intro')}
       </Text>
       <Card padding="none" className="p-stack-md">
-        <div className="grid max-w-5xl grid-cols-1 gap-stack-sm sm:grid-cols-2 lg:grid-cols-3">
+        <div
+          className="grid gap-stack-sm"
+          style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))' }}
+        >
           {themes.map((theme) => {
             const isSelected = theme.id === activeThemeId
             const date = formatThemeDate(theme.createdAt, locale)
