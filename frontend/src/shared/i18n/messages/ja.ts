@@ -80,8 +80,9 @@ export const ja: Partial<MessageCatalog> = {
   'admin.themeCustomize.headerWidth': 'ヘッダー幅',
   'admin.themeCustomize.headerSticky': 'ヘッダー追従',
   'admin.headerContent.title': 'ヘッダーの内容',
+  'admin.headerPreview.label': 'プレビュー',
   'admin.headerContent.intro':
-    'トップバー（電話・メール・自由テキスト）と CTA ボタンを設定します。配置や表示切替はテーマのカスタマイズ側です。',
+    'トップバー（電話・メール・自由テキスト）と CTA ボタンを設定します。配置や表示切替はテーマのカスタマイズ側です。トグルを ON にしても内容が空だと公開サイトには表示されません（上のプレビューで確認できます）。',
   'admin.headerContent.topbarEnabled': 'トップバーを表示',
   'admin.headerContent.phone': '電話番号',
   'admin.headerContent.email': 'メールアドレス',

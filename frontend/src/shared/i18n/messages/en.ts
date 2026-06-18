@@ -87,8 +87,9 @@ export const en = {
   'admin.themeCustomize.headerWidth': 'Header width',
   'admin.themeCustomize.headerSticky': 'Header sticky',
   'admin.headerContent.title': 'Header content',
+  'admin.headerPreview.label': 'Preview',
   'admin.headerContent.intro':
-    'Configure the Top bar (phone / email / free text) and the CTA button. Layout and visibility live in the theme customizer.',
+    'Configure the Top bar (phone / email / free text) and the CTA button. Layout and visibility live in the theme customizer. Enabling a toggle with empty content shows nothing on the public site — check the preview above.',
   'admin.headerContent.topbarEnabled': 'Show Top bar',
   'admin.headerContent.phone': 'Phone',
   'admin.headerContent.email': 'Email',

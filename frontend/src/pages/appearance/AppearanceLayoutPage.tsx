@@ -4,6 +4,7 @@ import { currentUserHasCapability } from '@/entities/auth'
 import { useMenuList } from '@/entities/menu'
 import {
   HeaderContentView,
+  HeaderPreview,
   PublicThemeView,
   ThemeCustomizeView,
   useHeaderConfigPage,
@@ -52,6 +53,7 @@ function ThemeTab() {
         <Text as="h2" variant="heading-sm">
           {t('admin.headerContent.title')}
         </Text>
+        <HeaderPreview flags={customize.draft.flags} header={headerContent.draft} />
         <HeaderContentView {...headerContent} />
       </Stack>
     </Stack>
