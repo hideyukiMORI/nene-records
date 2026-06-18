@@ -1228,6 +1228,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/public/themes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List public runtime themes
+         * @description Returns runtime (data-driven) themes for the public site. The public site applies the active runtime theme as a scoped stylesheet. No authentication required.
+         */
+        get: operations["listPublicThemes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/entities/{id}/preview-token": {
         parameters: {
             query?: never;
@@ -2293,6 +2313,10 @@ export interface components {
             fonts?: {
                 [key: string]: unknown;
             }[];
+            /** @description Optional asset slots (preview/hero/logo). Each value is a media id (integer) or a safe bundle-relative path; external URLs and data: are rejected server-side. See runtime-themes.md §8. */
+            assets?: {
+                [key: string]: unknown;
+            };
         } & {
             [key: string]: unknown;
         };
@@ -5561,6 +5585,38 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MenuListResponse"];
+                };
+            };
+            /** @description Not Modified — ETag matched, use cached response. */
+            304: {
+                headers: {
+                    ETag?: string;
+                    "Cache-Control"?: string;
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    listPublicThemes: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Theme list. */
+            200: {
+                headers: {
+                    "Cache-Control"?: string;
+                    ETag?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ThemeListResponse"];
                 };
             };
             /** @description Not Modified — ETag matched, use cached response. */

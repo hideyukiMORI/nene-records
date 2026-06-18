@@ -13,6 +13,7 @@ const TEST_SITE: PublicSite = {
   navItems: [],
   activeTheme: 'consumer',
   themeOverrideCss: '',
+  runtimeThemeCss: '',
   themeFlagAttrs: {},
   headerConfig: DEFAULT_HEADER_CONFIG,
 }

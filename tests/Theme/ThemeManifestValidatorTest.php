@@ -46,6 +46,28 @@ final class ThemeManifestValidatorTest extends TestCase
 
         $selfhostFont = ThemeManifestFixture::valid(['fonts' => [['family' => 'X', 'role' => 'body', 'source' => 'selfhost']]]);
         yield 'selfhost font' => [$selfhostFont];
+
+        yield 'asset external url' => [ThemeManifestFixture::valid(['assets' => ['preview' => 'https://evil.test/x.png']])];
+        yield 'asset data uri' => [ThemeManifestFixture::valid(['assets' => ['preview' => 'data:image/png;base64,xxxx']])];
+        yield 'asset protocol-relative' => [ThemeManifestFixture::valid(['assets' => ['preview' => '//evil.test/x.png']])];
+        yield 'asset bad media id' => [ThemeManifestFixture::valid(['assets' => ['preview' => 0]])];
+        yield 'asset per-mode unsafe' => [ThemeManifestFixture::valid(['assets' => ['preview' => ['light' => 'http://x/y.png', 'dark' => 5]]])];
+    }
+
+    /** @param array<string, mixed> $assets */
+    #[DataProvider('provideValidAssets')]
+    public function testValidAssetsPass(array $assets): void
+    {
+        ThemeManifestValidator::validate(ThemeManifestFixture::valid(['assets' => $assets]));
+        $this->addToAssertionCount(1);
+    }
+
+    /** @return iterable<string, array{array<string, mixed>}> */
+    public static function provideValidAssets(): iterable
+    {
+        yield 'media id' => [['preview' => 42]];
+        yield 'bundle path' => [['preview' => 'thumbnails/midnight.webp']];
+        yield 'per-mode media ids' => [['preview' => ['light' => 1, 'dark' => 2]]];
     }
 
     /** Unsafe token values that could break out of `--key: value;` / <style>. */

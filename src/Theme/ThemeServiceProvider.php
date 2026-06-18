@@ -12,6 +12,7 @@ use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RequestScopedHolder;
 use Psr\Container\ContainerInterface;
+use Psr\Http\Message\ResponseFactoryInterface;
 
 final readonly class ThemeServiceProvider implements ServiceProviderInterface
 {
@@ -154,6 +155,25 @@ final readonly class ThemeServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(
+                ListPublicThemesHandler::class,
+                static function (ContainerInterface $container): ListPublicThemesHandler {
+                    $useCase = $container->get(ListThemesUseCaseInterface::class);
+                    $response = $container->get(JsonResponseFactory::class);
+                    $responseFactory = $container->get(ResponseFactoryInterface::class);
+                    if (!$useCase instanceof ListThemesUseCaseInterface) {
+                        throw new LogicException('ListThemes use case service is invalid.');
+                    }
+                    if (!$response instanceof JsonResponseFactory) {
+                        throw new LogicException('JSON response factory service is invalid.');
+                    }
+                    if (!$responseFactory instanceof ResponseFactoryInterface) {
+                        throw new LogicException('Response factory service is invalid.');
+                    }
+
+                    return new ListPublicThemesHandler($useCase, $response, $responseFactory);
+                },
+            )
+            ->set(
                 ThemeNotFoundExceptionHandler::class,
                 static function (ContainerInterface $container): ThemeNotFoundExceptionHandler {
                     $problemDetails = $container->get(ProblemDetailsResponseFactory::class);
@@ -172,6 +192,7 @@ final readonly class ThemeServiceProvider implements ServiceProviderInterface
                     $create = $container->get(CreateThemeHandler::class);
                     $update = $container->get(UpdateThemeHandler::class);
                     $delete = $container->get(DeleteThemeHandler::class);
+                    $listPublic = $container->get(ListPublicThemesHandler::class);
 
                     if (!$list instanceof ListThemesHandler) {
                         throw new LogicException('ListThemes handler service is invalid.');
@@ -188,8 +209,11 @@ final readonly class ThemeServiceProvider implements ServiceProviderInterface
                     if (!$delete instanceof DeleteThemeHandler) {
                         throw new LogicException('DeleteTheme handler service is invalid.');
                     }
+                    if (!$listPublic instanceof ListPublicThemesHandler) {
+                        throw new LogicException('ListPublicThemes handler service is invalid.');
+                    }
 
-                    return new ThemeRouteRegistrar($list, $get, $create, $update, $delete);
+                    return new ThemeRouteRegistrar($list, $get, $create, $update, $delete, $listPublic);
                 },
             );
     }

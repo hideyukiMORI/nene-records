@@ -15,6 +15,7 @@ final readonly class ThemeRouteRegistrar
         private CreateThemeHandler $createHandler,
         private UpdateThemeHandler $updateHandler,
         private DeleteThemeHandler $deleteHandler,
+        private ListPublicThemesHandler $listPublicHandler,
     ) {
     }
 
@@ -25,6 +26,7 @@ final readonly class ThemeRouteRegistrar
         $create = $this->createHandler;
         $update = $this->updateHandler;
         $delete = $this->deleteHandler;
+        $listPublic = $this->listPublicHandler;
 
         $router->get(
             '/api/v1/themes',
@@ -45,6 +47,12 @@ final readonly class ThemeRouteRegistrar
         $router->delete(
             '/api/v1/themes/{key}',
             static fn (ServerRequestInterface $request) => $delete->handle($request),
+        );
+        // Public read (open via ALWAYS_OPEN_PREFIXES /api/v1/public/) — the
+        // public site applies a runtime active theme from this.
+        $router->get(
+            '/api/v1/public/themes',
+            static fn (ServerRequestInterface $request) => $listPublic->handle($request),
         );
     }
 }

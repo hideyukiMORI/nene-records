@@ -4,8 +4,10 @@ import './public-fonts'
 import { Outlet, ScrollRestoration } from 'react-router-dom'
 import { usePublicNavigationItems } from '@/entities/navigation-item'
 import { publicSettingsToMap, usePublicSettings } from '@/entities/setting'
+import { usePublicThemes } from '@/entities/theme'
 import { parseHeaderConfig } from '@/shared/lib/header-config'
 import { parseLayoutConfig } from '@/shared/lib/layout-config'
+import { buildThemeStylesheet, type RuntimeTheme } from '@/shared/lib/runtime-themes'
 import {
   readStoredActiveTheme,
   resolvePublicThemeId,
@@ -15,6 +17,7 @@ import {
   flagAttrsForTheme,
   overrideCssForTheme,
   readStoredThemeOverridesRaw,
+  resolveFlagAttrs,
   storeThemeOverridesRaw,
 } from '@/shared/lib/theme-customization'
 import type { PublicSite } from './public-site-context'
@@ -56,8 +59,23 @@ export function PublicShell() {
   // public settings request is in flight. Derived (no state): use the stored
   // theme until settings settle, then the resolved value (which we persist for
   // the next first paint).
+  // Runtime (data-driven) themes registered via the API. The active theme may
+  // be one of these instead of a built-in; if so we apply its manifest as a
+  // scoped stylesheet rather than relying on static `[data-theme]` CSS.
+  const publicThemesQuery = usePublicThemes()
+  const runtimeThemes = useMemo(
+    () => (publicThemesQuery.data?.items ?? []) as RuntimeTheme[],
+    [publicThemesQuery.data?.items],
+  )
+
   const settingsSettled = publicSettingsQuery.data !== undefined
-  const resolvedTheme = resolvePublicThemeId(settings.active_theme)
+  const runtimeActive = settingsSettled
+    ? runtimeThemes.find((theme) => theme.theme_key === settings.active_theme)
+    : undefined
+  // A runtime active theme keeps its own key; otherwise resolve to a built-in.
+  const resolvedTheme = runtimeActive
+    ? runtimeActive.theme_key
+    : resolvePublicThemeId(settings.active_theme)
   const activeTheme = settingsSettled ? resolvedTheme : readStoredActiveTheme()
   // Customizer overrides: stored raw applied on first paint, fetched value after.
   const overridesRaw = settingsSettled ? settings.theme_overrides : readStoredThemeOverridesRaw()
@@ -67,6 +85,16 @@ export function PublicShell() {
       storeThemeOverridesRaw(settings.theme_overrides)
     }
   }, [settingsSettled, resolvedTheme, settings.theme_overrides])
+
+  // Runtime theme: emit its full token set as a scoped stylesheet, and apply its
+  // structural flags as data-* attributes (manifest flags win, like a theme's
+  // built-in flags). Built-in themes keep static CSS, so these stay empty.
+  const runtimeThemeCss = runtimeActive
+    ? buildThemeStylesheet(runtimeActive.theme_key, runtimeActive.manifest)
+    : ''
+  const runtimeFlagAttrs = runtimeActive
+    ? resolveFlagAttrs(runtimeActive.manifest.flags, undefined)
+    : {}
 
   const site: PublicSite = {
     siteName: settings.site_name ?? 'NeNe Records',
@@ -79,7 +107,8 @@ export function PublicShell() {
     navItems,
     activeTheme,
     themeOverrideCss: overrideCssForTheme(overridesRaw, activeTheme),
-    themeFlagAttrs: flagAttrsForTheme(overridesRaw, activeTheme),
+    themeFlagAttrs: { ...flagAttrsForTheme(overridesRaw, activeTheme), ...runtimeFlagAttrs },
+    runtimeThemeCss,
     headerConfig: parseHeaderConfig(settings.header_config),
   }
 
