@@ -43,4 +43,22 @@ describe('PublicThemeView', () => {
     renderView({ isSaving: true })
     expect(screen.getByRole('button', { name: /Terracotta/ })).toBeDisabled()
   })
+
+  it('renders a composed runtime theme card and selects it by key', () => {
+    const runtime = {
+      id: 'midnight',
+      name: 'Midnight',
+      description: 'Runtime theme.',
+      author: 'Runtime',
+      version: '1.0.0',
+      createdAt: '2026-06-18',
+      preview: { surface: '#101010', raised: '#181818', accent: '#3355ff' },
+    }
+    const { selectTheme } = renderView({
+      themes: [...PUBLIC_THEMES, runtime],
+      activeThemeId: 'consumer',
+    })
+    fireEvent.click(screen.getByRole('button', { name: /Midnight/ }))
+    expect(selectTheme).toHaveBeenCalledWith('midnight')
+  })
 })

@@ -12,3 +12,11 @@ export function usePublicThemes(): UseQueryResult<ThemeListDto, AppError> {
     queryFn: async ({ signal }) => apiClient.get<ThemeListDto>('/api/v1/public/themes', signal),
   })
 }
+
+/** Admin list of runtime themes (auth) — for the theme picker / management. */
+export function useThemes(): UseQueryResult<ThemeListDto, AppError> {
+  return useQuery({
+    queryKey: ['themes', 'admin'],
+    queryFn: async ({ signal }) => apiClient.get<ThemeListDto>('/api/v1/themes', signal),
+  })
+}

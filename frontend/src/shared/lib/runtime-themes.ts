@@ -16,6 +16,8 @@ export interface RuntimeThemeManifest {
   id: string
   name: string
   version: string
+  description?: string
+  author?: string
   tokens?: {
     light?: Record<string, unknown>
     dark?: Record<string, unknown>

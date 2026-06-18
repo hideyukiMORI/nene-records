@@ -123,7 +123,7 @@ POST /api/v1/themes  { manifest JSON }   ← MCP(write)
 2. ✅ **backend**: `themes` テーブル（マイグレーション）＋ Repository ＋ CRUD UseCase/Handler ＋ サーバ側バリデータ（スキーマ＋値サニタイズ）＋ org スコープ。（#423 Phase B）
 3. ✅ **OpenAPI ＋ MCP**: エンドポイント定義 → `npm run codegen`（フロント型）＋ `composer mcp:generate`（MCP ツール）。（#423 Phase C）
 4. 🟡 **公開適用（end-to-end）**: `/api/v1/public/themes`（公開・ETag）＋ `buildThemeStylesheet`（トークン→スコープ `<style>`、値ガード）＋ PublicShell で runtime active テーマを適用、assetRef 検証、`swatchFromManifest`（§8 B案）まで実装（#423 Phase D）。**残**: 管理ピッカーの合成カタログ表示、FOUC キャッシュ（runtime テーマの初回ペイント）。
-5. ⬜ 管理 UI：runtime テーマの一覧/採用/削除（ピッカー拡張・`swatchFromManifest` 利用）。
+5. 🟡 管理 UI：テーマピッカーに runtime テーマを**合成表示**（built-in＋runtime、`swatchFromManifest` でカード）、active 解決を runtime キー対応、採用は `active_theme` 書込みで完了（#423 Phase E）。**残**: 一覧での編集/削除 UI。
 6. ⬜ サムネ A案（media_id）opt-in：manifest 解決＋ピッカー `<img>`（#426）。
 7. ⬜ ClaudeDesign 連携：MCP 資格情報・ブリーフ→manifest の運用手順。
 
