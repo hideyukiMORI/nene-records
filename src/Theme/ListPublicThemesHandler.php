@@ -25,6 +25,7 @@ final readonly class ListPublicThemesHandler
         private ListThemesUseCaseInterface $useCase,
         private JsonResponseFactory $response,
         private ResponseFactoryInterface $responseFactory,
+        private ThemeThumbnailResolver $thumbnails,
     ) {
     }
 
@@ -34,7 +35,7 @@ final readonly class ListPublicThemesHandler
 
         $data = [
             'items' => array_map(
-                static fn (Theme $theme) => ThemeHttpMapper::toArray($theme),
+                fn (Theme $theme) => ThemeHttpMapper::toArray($theme, $this->thumbnails->resolve($theme->manifest)),
                 $output->items,
             ),
         ];

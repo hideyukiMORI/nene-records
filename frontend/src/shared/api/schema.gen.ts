@@ -2325,6 +2325,8 @@ export interface components {
             name: string;
             version: string;
             manifest: components["schemas"]["ThemeManifest"];
+            /** @description Resolved preview image URL from `manifest.assets.preview` (a media id). Empty when there is no preview; the picker then derives a colour swatch from the theme's tokens. */
+            thumbnail_url: string;
             /** Format: date-time */
             created_at: string;
             /** Format: date-time */

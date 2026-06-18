@@ -5901,6 +5901,7 @@ components:
         - name
         - version
         - manifest
+        - thumbnail_url
         - created_at
         - updated_at
       properties:
@@ -5912,6 +5913,12 @@ components:
           type: string
         manifest:
           $ref: '#/components/schemas/ThemeManifest'
+        thumbnail_url:
+          type: string
+          description: >-
+            Resolved preview image URL from `manifest.assets.preview` (a media
+            id). Empty when there is no preview; the picker then derives a colour
+            swatch from the theme's tokens.
         created_at:
           type: string
           format: date-time

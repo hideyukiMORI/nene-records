@@ -14,6 +14,7 @@ final readonly class GetThemeHandler
     public function __construct(
         private ThemeRepositoryInterface $repository,
         private JsonResponseFactory $response,
+        private ThemeThumbnailResolver $thumbnails,
     ) {
     }
 
@@ -28,6 +29,8 @@ final readonly class GetThemeHandler
             throw new ThemeNotFoundException($key);
         }
 
-        return $this->response->create(ThemeHttpMapper::toArray($theme));
+        return $this->response->create(
+            ThemeHttpMapper::toArray($theme, $this->thumbnails->resolve($theme->manifest)),
+        );
     }
 }

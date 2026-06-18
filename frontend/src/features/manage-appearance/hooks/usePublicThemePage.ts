@@ -39,7 +39,11 @@ export interface PublicThemePageState {
   isMutating: boolean
 }
 
-/** Adapt a stored runtime theme into a picker card (swatch from its tokens). */
+/**
+ * Adapt a stored runtime theme into a picker card. Uses the server-resolved
+ * `thumbnail_url` (from `assets.preview` media id, #426 A) when present;
+ * otherwise the card falls back to a swatch derived from the theme's tokens.
+ */
 function runtimeThemeMeta(theme: ThemeDto): PublicThemeMeta {
   const manifest = theme.manifest as RuntimeThemeManifest
   return {
@@ -50,6 +54,7 @@ function runtimeThemeMeta(theme: ThemeDto): PublicThemeMeta {
     version: theme.version,
     createdAt: theme.created_at.slice(0, 10),
     preview: swatchFromManifest(manifest),
+    thumbnail: theme.thumbnail_url !== '' ? theme.thumbnail_url : undefined,
   }
 }
 

@@ -15,6 +15,7 @@ final readonly class UpdateThemeHandler
     public function __construct(
         private UpdateThemeUseCaseInterface $useCase,
         private JsonResponseFactory $response,
+        private ThemeThumbnailResolver $thumbnails,
     ) {
     }
 
@@ -27,6 +28,8 @@ final readonly class UpdateThemeHandler
 
         $output = $this->useCase->execute(new UpdateThemeInput(themeKey: $key, manifest: $manifest));
 
-        return $this->response->create(ThemeHttpMapper::toArray($output->theme));
+        return $this->response->create(
+            ThemeHttpMapper::toArray($output->theme, $this->thumbnails->resolve($output->theme->manifest)),
+        );
     }
 }
