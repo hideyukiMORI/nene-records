@@ -11,6 +11,7 @@ use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RequestScopedHolder;
+use NeNeRecords\Media\MediaRepositoryInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 
@@ -19,6 +20,17 @@ final readonly class ThemeServiceProvider implements ServiceProviderInterface
     public function register(ContainerBuilder $builder): void
     {
         $builder
+            ->set(
+                ThemeThumbnailResolver::class,
+                static function (ContainerInterface $container): ThemeThumbnailResolver {
+                    $media = $container->get(MediaRepositoryInterface::class);
+                    if (!$media instanceof MediaRepositoryInterface) {
+                        throw new LogicException('Media repository service is invalid.');
+                    }
+
+                    return new ThemeThumbnailResolver($media);
+                },
+            )
             ->set(
                 ThemeRepositoryInterface::class,
                 static function (ContainerInterface $container): ThemeRepositoryInterface {
@@ -84,14 +96,18 @@ final readonly class ThemeServiceProvider implements ServiceProviderInterface
                 static function (ContainerInterface $container): ListThemesHandler {
                     $useCase = $container->get(ListThemesUseCaseInterface::class);
                     $response = $container->get(JsonResponseFactory::class);
+                    $thumbnails = $container->get(ThemeThumbnailResolver::class);
                     if (!$useCase instanceof ListThemesUseCaseInterface) {
                         throw new LogicException('ListThemes use case service is invalid.');
                     }
                     if (!$response instanceof JsonResponseFactory) {
                         throw new LogicException('JSON response factory service is invalid.');
                     }
+                    if (!$thumbnails instanceof ThemeThumbnailResolver) {
+                        throw new LogicException('Theme thumbnail resolver service is invalid.');
+                    }
 
-                    return new ListThemesHandler($useCase, $response);
+                    return new ListThemesHandler($useCase, $response, $thumbnails);
                 },
             )
             ->set(
@@ -99,14 +115,18 @@ final readonly class ThemeServiceProvider implements ServiceProviderInterface
                 static function (ContainerInterface $container): GetThemeHandler {
                     $repo = $container->get(ThemeRepositoryInterface::class);
                     $response = $container->get(JsonResponseFactory::class);
+                    $thumbnails = $container->get(ThemeThumbnailResolver::class);
                     if (!$repo instanceof ThemeRepositoryInterface) {
                         throw new LogicException('Theme repository service is invalid.');
                     }
                     if (!$response instanceof JsonResponseFactory) {
                         throw new LogicException('JSON response factory service is invalid.');
                     }
+                    if (!$thumbnails instanceof ThemeThumbnailResolver) {
+                        throw new LogicException('Theme thumbnail resolver service is invalid.');
+                    }
 
-                    return new GetThemeHandler($repo, $response);
+                    return new GetThemeHandler($repo, $response, $thumbnails);
                 },
             )
             ->set(
@@ -114,14 +134,18 @@ final readonly class ThemeServiceProvider implements ServiceProviderInterface
                 static function (ContainerInterface $container): CreateThemeHandler {
                     $useCase = $container->get(CreateThemeUseCaseInterface::class);
                     $response = $container->get(JsonResponseFactory::class);
+                    $thumbnails = $container->get(ThemeThumbnailResolver::class);
                     if (!$useCase instanceof CreateThemeUseCaseInterface) {
                         throw new LogicException('CreateTheme use case service is invalid.');
                     }
                     if (!$response instanceof JsonResponseFactory) {
                         throw new LogicException('JSON response factory service is invalid.');
                     }
+                    if (!$thumbnails instanceof ThemeThumbnailResolver) {
+                        throw new LogicException('Theme thumbnail resolver service is invalid.');
+                    }
 
-                    return new CreateThemeHandler($useCase, $response);
+                    return new CreateThemeHandler($useCase, $response, $thumbnails);
                 },
             )
             ->set(
@@ -129,14 +153,18 @@ final readonly class ThemeServiceProvider implements ServiceProviderInterface
                 static function (ContainerInterface $container): UpdateThemeHandler {
                     $useCase = $container->get(UpdateThemeUseCaseInterface::class);
                     $response = $container->get(JsonResponseFactory::class);
+                    $thumbnails = $container->get(ThemeThumbnailResolver::class);
                     if (!$useCase instanceof UpdateThemeUseCaseInterface) {
                         throw new LogicException('UpdateTheme use case service is invalid.');
                     }
                     if (!$response instanceof JsonResponseFactory) {
                         throw new LogicException('JSON response factory service is invalid.');
                     }
+                    if (!$thumbnails instanceof ThemeThumbnailResolver) {
+                        throw new LogicException('Theme thumbnail resolver service is invalid.');
+                    }
 
-                    return new UpdateThemeHandler($useCase, $response);
+                    return new UpdateThemeHandler($useCase, $response, $thumbnails);
                 },
             )
             ->set(
@@ -160,6 +188,7 @@ final readonly class ThemeServiceProvider implements ServiceProviderInterface
                     $useCase = $container->get(ListThemesUseCaseInterface::class);
                     $response = $container->get(JsonResponseFactory::class);
                     $responseFactory = $container->get(ResponseFactoryInterface::class);
+                    $thumbnails = $container->get(ThemeThumbnailResolver::class);
                     if (!$useCase instanceof ListThemesUseCaseInterface) {
                         throw new LogicException('ListThemes use case service is invalid.');
                     }
@@ -169,8 +198,11 @@ final readonly class ThemeServiceProvider implements ServiceProviderInterface
                     if (!$responseFactory instanceof ResponseFactoryInterface) {
                         throw new LogicException('Response factory service is invalid.');
                     }
+                    if (!$thumbnails instanceof ThemeThumbnailResolver) {
+                        throw new LogicException('Theme thumbnail resolver service is invalid.');
+                    }
 
-                    return new ListPublicThemesHandler($useCase, $response, $responseFactory);
+                    return new ListPublicThemesHandler($useCase, $response, $responseFactory, $thumbnails);
                 },
             )
             ->set(

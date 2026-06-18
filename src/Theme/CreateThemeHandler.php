@@ -14,6 +14,7 @@ final readonly class CreateThemeHandler
     public function __construct(
         private CreateThemeUseCaseInterface $useCase,
         private JsonResponseFactory $response,
+        private ThemeThumbnailResolver $thumbnails,
     ) {
     }
 
@@ -25,6 +26,9 @@ final readonly class CreateThemeHandler
 
         $output = $this->useCase->execute(new CreateThemeInput(manifest: $manifest));
 
-        return $this->response->create(ThemeHttpMapper::toArray($output->theme), 201);
+        return $this->response->create(
+            ThemeHttpMapper::toArray($output->theme, $this->thumbnails->resolve($output->theme->manifest)),
+            201,
+        );
     }
 }
