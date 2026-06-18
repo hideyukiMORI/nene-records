@@ -90,7 +90,10 @@
         "eyebrow": { "enum": ["plain", "caps", "barred"] },
         "headerSearch": { "enum": ["show", "hide"] },
         "headerTheme": { "enum": ["show", "hide"] },
-        "headerTagline": { "enum": ["show", "hide"] }
+        "headerTagline": { "enum": ["show", "hide"] },
+        "headerLayout": { "enum": ["nav-right", "classic", "minimal"] },
+        "headerNavAlign": { "enum": ["start", "center", "end"] },
+        "headerDensity": { "enum": ["compact", "regular", "tall"] }
       }
     },
     "assets": {

@@ -93,14 +93,16 @@
 
 | 値 | 骨格 | ブランド | nav | アクション | 代表 |
 | --- | --- | --- | --- | --- | --- |
-| `classic` | 1行・3分割 | 左 | 中央 | 右 | メディア・EC（**現行の既定**） |
-| `nav-right` | 1行 | 左 | 右 | 右 | ブログ・SaaS |
-| `centered` | 1行・対称 | 中央 | 左右分割 | 右 | ブランド・ファッション |
-| `centered-stack` | 2行・中央 | 中央上 | 下段中央 | 右上 | マガジン・高級系 |
-| `two-row` | 2行・左 | 左上 | Bottom 行フル幅 | 右上 | 大型サイト・官公庁 |
-| `minimal` | 1行 | 左 | （ドロワーのみ） | 右 | ポートフォリオ・LP |
+| `nav-right` | 1行 | 左 | 右 | 右 | ブログ・SaaS（**現行の既定**・実装済み） |
+| `classic` | 1行・3分割 | 左 | 中央 | 右 | メディア・EC（実装済み） |
+| `minimal` | 1行 | 左 | （ドロワーのみ） | 右 | ポートフォリオ・LP（実装済み） |
+| `centered` | 1行・対称 | 中央 | 左右分割 | 右 | ブランド・ファッション（B.2 予定） |
+| `centered-stack` | 2行・中央 | 中央上 | 下段中央 | 右上 | マガジン・高級系（B.2 予定・Bottom行要） |
+| `two-row` | 2行・左 | 左上 | Bottom 行フル幅 | 右上 | 大型サイト・官公庁（B.2 予定・Bottom行要） |
 
 各骨格に対し、`headerWidth` / `headerDensity` / `headerSticky` / `headerSurface` / `headerNavAlign` と要素 ON/OFF を掛けて最終形を作る。Top バー（`data-header-topbar`）は全骨格に付加可能。
+
+> **実装状況（Phase B.1）**: 単一行で成立する `nav-right` / `classic` / `minimal` ＋ `headerNavAlign` / `headerDensity` を base CSS 実装済み。DOM は `.hd__nav`（プライマリnav）と `.hd__actions`（検索/テーマ/メニュー）に分離し3ゾーン flex 化。2行系（`centered-stack` / `two-row`）と対称 `centered`、`headerWidth` は Top/Bottom 行コンテナを要するため **Phase B.2** へ。
 
 ## 6. モバイル時の畳み方ルール
 

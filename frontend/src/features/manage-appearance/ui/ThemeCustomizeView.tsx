@@ -339,6 +339,36 @@ export function ThemeCustomizeView({
                 }}
               />
             </Field>
+            <Field label={t('admin.themeCustomize.headerLayout')}>
+              <Select
+                value={draft.flags?.headerLayout}
+                options={FLAG_DEFS.headerLayout.options}
+                placeholder={themePlaceholder}
+                onChange={(v) => {
+                  setKnob('flags', { ...draft.flags, headerLayout: v })
+                }}
+              />
+            </Field>
+            <Field label={t('admin.themeCustomize.headerNavAlign')}>
+              <Select
+                value={draft.flags?.headerNavAlign}
+                options={FLAG_DEFS.headerNavAlign.options}
+                placeholder={themePlaceholder}
+                onChange={(v) => {
+                  setKnob('flags', { ...draft.flags, headerNavAlign: v })
+                }}
+              />
+            </Field>
+            <Field label={t('admin.themeCustomize.headerDensity')}>
+              <Select
+                value={draft.flags?.headerDensity}
+                options={FLAG_DEFS.headerDensity.options}
+                placeholder={themePlaceholder}
+                onChange={(v) => {
+                  setKnob('flags', { ...draft.flags, headerDensity: v })
+                }}
+              />
+            </Field>
           </Stack>
         </details>
 

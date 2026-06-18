@@ -173,6 +173,8 @@ export function PublicSiteShell({
                 {link.label}
               </Link>
             ))}
+          </nav>
+          <div className="hd__actions">
             <Link className="iconbtn hd__search" to="/search" aria-label="Search" title="Search">
               <IconSearch size={18} />
             </Link>
@@ -187,7 +189,7 @@ export function PublicSiteShell({
             >
               <IconMenu size={18} />
             </button>
-          </nav>
+          </div>
         </div>
       </header>
 

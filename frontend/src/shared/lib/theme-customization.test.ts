@@ -139,4 +139,19 @@ describe('resolveFlagAttrs / flagAttrsForTheme', () => {
     // Invalid values are dropped like any other flag.
     expect(resolveFlagAttrs(undefined, { headerSearch: 'collapsed' })).toEqual({})
   })
+
+  it('maps header layout skeleton + modifiers', () => {
+    expect(
+      resolveFlagAttrs(undefined, {
+        headerLayout: 'classic',
+        headerNavAlign: 'center',
+        headerDensity: 'compact',
+      }),
+    ).toEqual({
+      'data-header': 'classic',
+      'data-header-nav': 'center',
+      'data-header-density': 'compact',
+    })
+    expect(resolveFlagAttrs(undefined, { headerLayout: 'two-row' })).toEqual({})
+  })
 })

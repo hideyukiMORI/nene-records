@@ -183,7 +183,14 @@
   display: flex;
   align-items: center;
   gap: var(--space-lg);
+  /* Default skeleton (= nav-right): primary nav hugs the action cluster on the
+     right. `data-header` layouts re-place it (see Style flags → Header layout). */
   margin-left: auto;
+}
+.nene-public .hd__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
 }
 .nene-public .navlink {
   font-size: var(--text-body-sm);
@@ -1865,4 +1872,52 @@
 }
 .nene-public[data-header-tagline='hide'] .brand__tag {
   display: none;
+}
+
+/* Header layout — skeleton presets (see header-patterns.md §5). The header is a
+   3-zone flex row (brand | nav | actions). Default (no attribute) = `nav-right`:
+   nav + actions clustered right. Flags re-place the primary nav. Actions stay
+   right in every single-row skeleton; the mobile drawer is unaffected. */
+
+/* classic — primary nav centered between the brand and the action cluster. */
+.nene-public[data-header='classic'] .hd__nav {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* nav-right — explicit alias of the default (nav hugs actions on the right). */
+.nene-public[data-header='nav-right'] .hd__nav {
+  margin-left: auto;
+  margin-right: 0;
+}
+
+/* minimal — hide the inline primary nav; the menu button (in actions) opens the
+   drawer for navigation. Search/theme stay unless separately hidden. */
+.nene-public[data-header='minimal'] .hd__nav {
+  display: none;
+}
+.nene-public[data-header='minimal'] .hd__menu {
+  display: grid;
+}
+
+/* headerNavAlign — where the primary nav sits, meaningful under `classic`
+   (start = beside brand, center = middle [default], end = beside actions). */
+.nene-public[data-header='classic'][data-header-nav='start'] .hd__nav {
+  margin-left: var(--space-xl);
+  margin-right: auto;
+}
+.nene-public[data-header='classic'][data-header-nav='end'] .hd__nav {
+  margin-left: auto;
+  margin-right: 0;
+}
+
+/* headerDensity — header row height / vertical rhythm. regular = current 72px. */
+.nene-public[data-header-density='compact'] .hd__in {
+  height: 58px;
+}
+.nene-public[data-header-density='regular'] .hd__in {
+  height: 72px;
+}
+.nene-public[data-header-density='tall'] .hd__in {
+  height: 92px;
 }
