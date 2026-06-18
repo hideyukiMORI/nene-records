@@ -1156,6 +1156,58 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/themes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List runtime themes
+         * @description Returns all runtime (data-driven) themes for the organization.
+         */
+        get: operations["listThemes"];
+        put?: never;
+        /**
+         * Create runtime theme
+         * @description Registers a new runtime theme. The request body is the theme manifest (public-theme.schema.json shape). The server validates structure and sanitises token values before storing; only known CSS variables with safe values are ever emitted to the public site.
+         */
+        post: operations["createTheme"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/themes/{key}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get runtime theme
+         * @description Returns a single runtime theme by its key.
+         */
+        get: operations["getTheme"];
+        /**
+         * Update runtime theme
+         * @description Replaces an existing runtime theme's manifest. The manifest `id` must match the key in the URL (renaming means delete + create).
+         */
+        put: operations["updateTheme"];
+        post?: never;
+        /**
+         * Delete runtime theme
+         * @description Permanently deletes a runtime theme by its key.
+         */
+        delete: operations["deleteTheme"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/public/menus": {
         parameters: {
             query?: never;
@@ -1736,6 +1788,8 @@ export interface components {
             deleted_at: string | null;
             meta_title: string | null;
             meta_description: string | null;
+            /** @description Server-computed plain-text teaser. Present only when the list is requested with `?include=excerpt` (used by the public feed and post-list widgets). Source/length follow the excerpt_* settings. */
+            excerpt?: string;
             /** Format: date-time */
             created_at: string | null;
             /** Format: date-time */
@@ -2215,6 +2269,45 @@ export interface components {
             name: string;
             /** @enum {string|null} */
             location?: "header" | "footer" | null;
+        };
+        /** @description Map of contract token name (no leading --) to a CSS value. Values are sanitised server-side; only safe CSS is emitted to the public site. */
+        ThemeTokenSet: {
+            [key: string]: string;
+        };
+        /** @description Runtime theme manifest (public-theme.schema.json shape). */
+        ThemeManifest: {
+            id: string;
+            name: string;
+            version: string;
+            supportsModes: ("light" | "dark")[];
+            tokens: {
+                light: components["schemas"]["ThemeTokenSet"];
+                dark: components["schemas"]["ThemeTokenSet"];
+            };
+            flags?: {
+                [key: string]: string;
+            };
+            knobs?: {
+                [key: string]: unknown;
+            };
+            fonts?: {
+                [key: string]: unknown;
+            }[];
+        } & {
+            [key: string]: unknown;
+        };
+        ThemeResponse: {
+            theme_key: string;
+            name: string;
+            version: string;
+            manifest: components["schemas"]["ThemeManifest"];
+            /** Format: date-time */
+            created_at: string;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        ThemeListResponse: {
+            items: components["schemas"]["ThemeResponse"][];
         };
         WebhookResponse: {
             /** Format: int64 */
@@ -5315,6 +5408,136 @@ export interface operations {
                 };
                 content?: never;
             };
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    listThemes: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Theme list. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ThemeListResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    createTheme: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ThemeManifest"];
+            };
+        };
+        responses: {
+            /** @description Created theme. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ThemeResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            422: components["responses"]["ValidationFailed"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    getTheme: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Theme key (manifest id). */
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Theme. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ThemeResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    updateTheme: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Theme key (manifest id). */
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ThemeManifest"];
+            };
+        };
+        responses: {
+            /** @description Updated theme. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ThemeResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["ValidationFailed"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    deleteTheme: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Theme key (manifest id). */
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted successfully. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["Unauthorized"];
             404: components["responses"]["NotFound"];
             500: components["responses"]["InternalServerError"];
         };
