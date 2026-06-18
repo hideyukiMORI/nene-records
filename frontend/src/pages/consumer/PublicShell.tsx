@@ -7,7 +7,12 @@ import { publicSettingsToMap, usePublicSettings } from '@/entities/setting'
 import { usePublicThemes } from '@/entities/theme'
 import { parseHeaderConfig } from '@/shared/lib/header-config'
 import { parseLayoutConfig } from '@/shared/lib/layout-config'
-import { buildThemeStylesheet, type RuntimeTheme } from '@/shared/lib/runtime-themes'
+import {
+  buildThemeStylesheet,
+  readStoredRuntimeTheme,
+  type RuntimeTheme,
+  storeRuntimeTheme,
+} from '@/shared/lib/runtime-themes'
 import {
   readStoredActiveTheme,
   resolvePublicThemeId,
@@ -68,33 +73,56 @@ export function PublicShell() {
     [publicThemesQuery.data?.items],
   )
 
+  // Resolving a runtime active theme needs both the settings (active_theme) and
+  // the runtime theme list. Until both settle we use the last-known cached
+  // values so a runtime active theme doesn't flash the default on first paint.
   const settingsSettled = publicSettingsQuery.data !== undefined
-  const runtimeActive = settingsSettled
+  const themesSettled = publicThemesQuery.data !== undefined
+  const bothSettled = settingsSettled && themesSettled
+
+  const runtimeActive = bothSettled
     ? runtimeThemes.find((theme) => theme.theme_key === settings.active_theme)
     : undefined
   // A runtime active theme keeps its own key; otherwise resolve to a built-in.
   const resolvedTheme = runtimeActive
     ? runtimeActive.theme_key
     : resolvePublicThemeId(settings.active_theme)
-  const activeTheme = settingsSettled ? resolvedTheme : readStoredActiveTheme()
+  const activeTheme = bothSettled ? resolvedTheme : readStoredActiveTheme()
   // Customizer overrides: stored raw applied on first paint, fetched value after.
-  const overridesRaw = settingsSettled ? settings.theme_overrides : readStoredThemeOverridesRaw()
-  useEffect(() => {
-    if (settingsSettled) {
-      storeActiveTheme(resolvedTheme)
-      storeThemeOverridesRaw(settings.theme_overrides)
-    }
-  }, [settingsSettled, resolvedTheme, settings.theme_overrides])
+  const overridesRaw = bothSettled ? settings.theme_overrides : readStoredThemeOverridesRaw()
 
   // Runtime theme: emit its full token set as a scoped stylesheet, and apply its
   // structural flags as data-* attributes (manifest flags win, like a theme's
-  // built-in flags). Built-in themes keep static CSS, so these stay empty.
-  const runtimeThemeCss = runtimeActive
+  // built-in flags). Built-in themes keep static CSS, so these stay empty. The
+  // live values are authoritative once both queries settle; before that we read
+  // the FOUC cache.
+  const liveRuntimeThemeCss = runtimeActive
     ? buildThemeStylesheet(runtimeActive.theme_key, runtimeActive.manifest)
     : ''
-  const runtimeFlagAttrs = runtimeActive
+  const liveRuntimeFlagAttrs = runtimeActive
     ? resolveFlagAttrs(runtimeActive.manifest.flags, undefined)
     : {}
+  const cachedRuntimeTheme = readStoredRuntimeTheme()
+  const runtimeThemeCss = bothSettled ? liveRuntimeThemeCss : cachedRuntimeTheme.css
+  const runtimeFlagAttrs = bothSettled ? liveRuntimeFlagAttrs : cachedRuntimeTheme.flags
+
+  const liveRuntimeFlagsJson = JSON.stringify(liveRuntimeFlagAttrs)
+  useEffect(() => {
+    if (bothSettled) {
+      storeActiveTheme(resolvedTheme)
+      storeThemeOverridesRaw(settings.theme_overrides)
+      storeRuntimeTheme({
+        css: liveRuntimeThemeCss,
+        flags: JSON.parse(liveRuntimeFlagsJson) as Record<string, string>,
+      })
+    }
+  }, [
+    bothSettled,
+    resolvedTheme,
+    settings.theme_overrides,
+    liveRuntimeThemeCss,
+    liveRuntimeFlagsJson,
+  ])
 
   const site: PublicSite = {
     siteName: settings.site_name ?? 'NeNe Records',
