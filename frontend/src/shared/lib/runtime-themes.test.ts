@@ -1,8 +1,10 @@
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it } from 'vitest'
 import {
   buildThemeStylesheet,
   isSafeTokenValue,
+  readStoredRuntimeTheme,
   type RuntimeThemeManifest,
+  storeRuntimeTheme,
   swatchFromManifest,
 } from './runtime-themes'
 
@@ -65,6 +67,29 @@ describe('isSafeTokenValue', () => {
     expect(isSafeTokenValue('url(x)')).toBe(false)
     expect(isSafeTokenValue('</style>')).toBe(false)
     expect(isSafeTokenValue('')).toBe(false)
+  })
+})
+
+describe('runtime theme FOUC cache', () => {
+  afterEach(() => {
+    window.localStorage.clear()
+  })
+
+  it('round-trips css + flags', () => {
+    storeRuntimeTheme({
+      css: ".nene-public[data-theme='x']{--a:red;}",
+      flags: { 'data-feed': 'list' },
+    })
+    expect(readStoredRuntimeTheme()).toEqual({
+      css: ".nene-public[data-theme='x']{--a:red;}",
+      flags: { 'data-feed': 'list' },
+    })
+  })
+
+  it('returns empty defaults when unset or malformed', () => {
+    expect(readStoredRuntimeTheme()).toEqual({ css: '', flags: {} })
+    window.localStorage.setItem('nene_public_runtime_theme', 'not json')
+    expect(readStoredRuntimeTheme()).toEqual({ css: '', flags: {} })
   })
 })
 

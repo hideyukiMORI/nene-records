@@ -72,6 +72,61 @@ export function buildThemeStylesheet(themeKey: string, manifest: RuntimeThemeMan
   return emitTokens(themeKey, light) + emitTokens(`${themeKey}-dark`, dark)
 }
 
+// ── First-paint (FOUC) cache ───────────────────────────────────────────────
+// Runtime themes are fetched async (React Query), so on first paint the
+// stylesheet isn't ready and a non-built-in active theme would flash the
+// default. We cache the resolved CSS + flag attrs in localStorage (same
+// FOUC-avoidance the customizer overrides use) and apply them synchronously
+// until the live fetch settles. Built-in themes cache empty values.
+
+const RUNTIME_THEME_STORAGE_KEY = 'nene_public_runtime_theme'
+
+export interface StoredRuntimeTheme {
+  /** Scoped `<style>` body for the active runtime theme ('' for built-in). */
+  css: string
+  /** Structural flag `data-*` attributes from the active runtime theme's manifest. */
+  flags: Record<string, string>
+}
+
+const EMPTY_STORED: StoredRuntimeTheme = { css: '', flags: {} }
+
+export function readStoredRuntimeTheme(): StoredRuntimeTheme {
+  if (typeof window === 'undefined') {
+    return EMPTY_STORED
+  }
+  try {
+    const raw = window.localStorage.getItem(RUNTIME_THEME_STORAGE_KEY)
+    if (raw === null) {
+      return EMPTY_STORED
+    }
+    const data = JSON.parse(raw) as unknown
+    if (typeof data !== 'object' || data === null) {
+      return EMPTY_STORED
+    }
+    const record = data as Record<string, unknown>
+    return {
+      css: typeof record.css === 'string' ? record.css : '',
+      flags:
+        typeof record.flags === 'object' && record.flags !== null
+          ? (record.flags as Record<string, string>)
+          : {},
+    }
+  } catch {
+    return EMPTY_STORED
+  }
+}
+
+export function storeRuntimeTheme(value: StoredRuntimeTheme): void {
+  if (typeof window === 'undefined') {
+    return
+  }
+  try {
+    window.localStorage.setItem(RUNTIME_THEME_STORAGE_KEY, JSON.stringify(value))
+  } catch {
+    // Ignore quota / serialization errors — the cache is best-effort.
+  }
+}
+
 /** Derive the picker's 3-colour swatch from the light token set (#426 B). */
 export function swatchFromManifest(manifest: RuntimeThemeManifest): {
   surface: string

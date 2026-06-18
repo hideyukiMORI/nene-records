@@ -122,7 +122,7 @@ POST /api/v1/themes  { manifest JSON }   ← MCP(write)
 1. ✅ 本ドキュメント＋ Issue（方向確定）。
 2. ✅ **backend**: `themes` テーブル（マイグレーション）＋ Repository ＋ CRUD UseCase/Handler ＋ サーバ側バリデータ（スキーマ＋値サニタイズ）＋ org スコープ。（#423 Phase B）
 3. ✅ **OpenAPI ＋ MCP**: エンドポイント定義 → `npm run codegen`（フロント型）＋ `composer mcp:generate`（MCP ツール）。（#423 Phase C）
-4. 🟡 **公開適用（end-to-end）**: `/api/v1/public/themes`（公開・ETag）＋ `buildThemeStylesheet`（トークン→スコープ `<style>`、値ガード）＋ PublicShell で runtime active テーマを適用、assetRef 検証、`swatchFromManifest`（§8 B案）まで実装（#423 Phase D）。**残**: 管理ピッカーの合成カタログ表示、FOUC キャッシュ（runtime テーマの初回ペイント）。
+4. ✅ **公開適用（end-to-end）**: `/api/v1/public/themes`（公開・ETag）＋ `buildThemeStylesheet`（トークン→スコープ `<style>`、値ガード）＋ PublicShell で runtime active テーマを適用、assetRef 検証、`swatchFromManifest`（§8 B案）（#423 Phase D）。**FOUC キャッシュ**：runtime テーマの CSS＋flag attrs を localStorage（`nene_public_runtime_theme`）に先行保存し、settings/themes 両クエリ settle 前は初回ペイントへ同期適用（`readStoredRuntimeTheme`/`storeRuntimeTheme`）。
 5. ✅ 管理 UI：テーマピッカーに runtime テーマを**合成表示**（built-in＋runtime、`swatchFromManifest` でカード）、active 解決を runtime キー対応、採用は `active_theme` 書込み。runtime カードに**編集（manifest JSON エディタ・サーバ再検証）／削除（確認ダイアログ）**を追加（#423 Phase E）。
 6. ⬜ サムネ A案（media_id）opt-in：manifest 解決＋ピッカー `<img>`（#426）。
 7. ⬜ ClaudeDesign 連携：MCP 資格情報・ブリーフ→manifest の運用手順。
