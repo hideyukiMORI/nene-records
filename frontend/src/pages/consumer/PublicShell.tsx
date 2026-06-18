@@ -4,6 +4,7 @@ import './public-fonts'
 import { Outlet, ScrollRestoration } from 'react-router-dom'
 import { usePublicNavigationItems } from '@/entities/navigation-item'
 import { publicSettingsToMap, usePublicSettings } from '@/entities/setting'
+import { parseHeaderConfig } from '@/shared/lib/header-config'
 import { parseLayoutConfig } from '@/shared/lib/layout-config'
 import {
   readStoredActiveTheme,
@@ -79,6 +80,7 @@ export function PublicShell() {
     activeTheme,
     themeOverrideCss: overrideCssForTheme(overridesRaw, activeTheme),
     themeFlagAttrs: flagAttrsForTheme(overridesRaw, activeTheme),
+    headerConfig: parseHeaderConfig(settings.header_config),
   }
 
   useSiteDocumentMeta(site.siteName, site.metaDescription)
