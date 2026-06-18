@@ -3,8 +3,11 @@ import { Link, Navigate, useParams } from 'react-router-dom'
 import { currentUserHasCapability } from '@/entities/auth'
 import { useMenuList } from '@/entities/menu'
 import {
+  HeaderContentView,
+  HeaderPreview,
   PublicThemeView,
   ThemeCustomizeView,
+  useHeaderConfigPage,
   usePublicThemePage,
   useThemeCustomizePage,
 } from '@/features/manage-appearance'
@@ -36,6 +39,7 @@ function ThemeTab() {
   const { t } = useTranslation()
   const page = usePublicThemePage()
   const customize = useThemeCustomizePage()
+  const headerContent = useHeaderConfigPage()
   return (
     <Stack gap="lg">
       <PublicThemeView {...page} />
@@ -44,6 +48,13 @@ function ThemeTab() {
           {t('admin.themeCustomize.title')}
         </Text>
         <ThemeCustomizeView {...customize} />
+      </Stack>
+      <Stack gap="sm">
+        <Text as="h2" variant="heading-sm">
+          {t('admin.headerContent.title')}
+        </Text>
+        <HeaderPreview flags={customize.draft.flags} header={headerContent.draft} />
+        <HeaderContentView {...headerContent} />
       </Stack>
     </Stack>
   )

@@ -3,10 +3,12 @@ import { Link } from 'react-router-dom'
 import { useEntityTypeList } from '@/entities/entity-type'
 import { usePublicWidgets } from '@/entities/widget'
 import { SiteWidgets } from '@/features/render-widgets'
+import { hasCta, hasTopbarContent, safeHref } from '@/shared/lib/header-config'
 import { NeneMark } from '@/shared/ui'
 import { IconMenu, IconMoon, IconSearch, IconSun, IconX } from '@/shared/ui/icons/Icons'
 import { IconAuto } from '@/shared/ui/icons/magazine-icons'
 import './public-site.css'
+import type { HeaderCta, HeaderTopbar } from '@/shared/lib/header-config'
 import type { PublicSite } from './public-site-context'
 import { type ThemeMode, useConsumerTheme } from './use-consumer-theme'
 
@@ -64,6 +66,32 @@ function ThemeSwitch({ mode, onMode }: { mode: ThemeMode; onMode: (mode: ThemeMo
         </button>
       ))}
     </div>
+  )
+}
+
+/** Thin Top bar above the main header: free text + phone/email contact links. */
+function HeaderTopbarRow({ topbar }: { topbar: HeaderTopbar }) {
+  return (
+    <div className="hd-topbar">
+      <div className="wrap hd-topbar__in">
+        {topbar.infoText !== '' ? <span className="hd-topbar__info">{topbar.infoText}</span> : null}
+        <span className="hd-topbar__contact">
+          {topbar.phone !== '' ? (
+            <a href={`tel:${topbar.phone.replace(/\s+/g, '')}`}>{topbar.phone}</a>
+          ) : null}
+          {topbar.email !== '' ? <a href={`mailto:${topbar.email}`}>{topbar.email}</a> : null}
+        </span>
+      </div>
+    </div>
+  )
+}
+
+/** Header CTA button — a primary call-to-action link in the action cluster. */
+function HeaderCtaButton({ cta }: { cta: HeaderCta }) {
+  return (
+    <a className="btn btn--primary hd__cta" href={safeHref(cta.url)}>
+      {cta.label}
+    </a>
   )
 }
 
@@ -159,6 +187,9 @@ export function PublicSiteShell({
       {...site.themeFlagAttrs}
     >
       {site.themeOverrideCss !== '' ? <style>{site.themeOverrideCss}</style> : null}
+      {hasTopbarContent(site.headerConfig.topbar) ? (
+        <HeaderTopbarRow topbar={site.headerConfig.topbar} />
+      ) : null}
       <header className="hd">
         <div className="wrap hd__in">
           <Brand siteName={site.siteName} tagline={site.tagline} logo={site.logo} />
@@ -173,6 +204,9 @@ export function PublicSiteShell({
                 {link.label}
               </Link>
             ))}
+          </nav>
+          <div className="hd__actions">
+            {hasCta(site.headerConfig.cta) ? <HeaderCtaButton cta={site.headerConfig.cta} /> : null}
             <Link className="iconbtn hd__search" to="/search" aria-label="Search" title="Search">
               <IconSearch size={18} />
             </Link>
@@ -187,7 +221,7 @@ export function PublicSiteShell({
             >
               <IconMenu size={18} />
             </button>
-          </nav>
+          </div>
         </div>
       </header>
 

@@ -57,6 +57,12 @@ export interface ThemeFlags {
   headerSearch?: string
   headerTheme?: string
   headerTagline?: string
+  /** Header skeleton + modifiers (see header-patterns.md §4/§5). */
+  headerLayout?: string
+  headerNavAlign?: string
+  headerDensity?: string
+  headerWidth?: string
+  headerSticky?: string
 }
 
 /** flag key → { data attribute, allowed values }. Mirrors theme-flags.md §2. */
@@ -141,6 +147,45 @@ export const FLAG_DEFS: Record<keyof ThemeFlags, { attr: string; options: readon
       options: [
         { value: 'show', label: 'Show' },
         { value: 'hide', label: 'Hide' },
+      ],
+    },
+    headerLayout: {
+      attr: 'data-header',
+      options: [
+        { value: 'nav-right', label: 'Nav right' },
+        { value: 'classic', label: 'Classic (nav center)' },
+        { value: 'centered', label: 'Centered (nav below)' },
+        { value: 'minimal', label: 'Minimal (menu only)' },
+      ],
+    },
+    headerNavAlign: {
+      attr: 'data-header-nav',
+      options: [
+        { value: 'start', label: 'Start' },
+        { value: 'center', label: 'Center' },
+        { value: 'end', label: 'End' },
+      ],
+    },
+    headerDensity: {
+      attr: 'data-header-density',
+      options: [
+        { value: 'compact', label: 'Compact' },
+        { value: 'regular', label: 'Regular' },
+        { value: 'tall', label: 'Tall' },
+      ],
+    },
+    headerWidth: {
+      attr: 'data-header-width',
+      options: [
+        { value: 'boxed', label: 'Boxed' },
+        { value: 'full', label: 'Full width' },
+      ],
+    },
+    headerSticky: {
+      attr: 'data-header-sticky',
+      options: [
+        { value: 'sticky', label: 'Sticky' },
+        { value: 'none', label: 'Static' },
       ],
     },
   }

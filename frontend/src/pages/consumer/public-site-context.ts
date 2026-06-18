@@ -1,4 +1,5 @@
 import { useOutletContext } from 'react-router-dom'
+import type { HeaderConfig } from '@/shared/lib/header-config'
 import type { PageLayout } from '@/shared/lib/layout-config'
 
 export interface PublicSiteNavItem {
@@ -30,6 +31,8 @@ export interface PublicSite {
   themeOverrideCss: string
   /** Structural style-flag `data-*` attributes for the active theme. */
   themeFlagAttrs: Record<string, string>
+  /** Header content (Top bar + CTA) from the `header_config` setting. */
+  headerConfig: HeaderConfig
 }
 
 export function usePublicSite(): PublicSite {

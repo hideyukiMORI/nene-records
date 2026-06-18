@@ -1,4 +1,5 @@
 import { Outlet } from 'react-router-dom'
+import { DEFAULT_HEADER_CONFIG } from '@/shared/lib/header-config'
 import type { PublicSite } from '@/pages/consumer/public-site-context'
 
 const TEST_SITE: PublicSite = {
@@ -13,6 +14,7 @@ const TEST_SITE: PublicSite = {
   activeTheme: 'consumer',
   themeOverrideCss: '',
   themeFlagAttrs: {},
+  headerConfig: DEFAULT_HEADER_CONFIG,
 }
 
 /**

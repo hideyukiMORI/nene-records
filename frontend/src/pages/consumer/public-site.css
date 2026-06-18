@@ -183,7 +183,45 @@
   display: flex;
   align-items: center;
   gap: var(--space-lg);
+  /* Default skeleton (= nav-right): primary nav hugs the action cluster on the
+     right. `data-header` layouts re-place it (see Style flags → Header layout). */
   margin-left: auto;
+}
+.nene-public .hd__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+}
+/* Header CTA — compact primary button sized for the action cluster. */
+.nene-public .hd__cta {
+  padding: 8px 16px;
+  font-size: var(--text-body-sm);
+}
+
+/* Top bar — thin contact/announcement row above the (sticky) main header
+   (header-patterns.md §2 Top row). Scrolls away; the main header stays pinned. */
+.nene-public .hd-topbar {
+  background: var(--color-surface-raised);
+  border-bottom: 1px solid var(--color-border);
+  font-size: var(--text-meta);
+  color: var(--color-text-muted);
+}
+.nene-public .hd-topbar__in {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  min-height: 34px;
+  padding-block: 4px;
+}
+.nene-public .hd-topbar__contact {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-left: auto;
+}
+.nene-public .hd-topbar__contact a:hover {
+  color: var(--color-text-primary);
 }
 .nene-public .navlink {
   font-size: var(--text-body-sm);
@@ -1618,6 +1656,14 @@
   .nene-public .hd__menu {
     display: grid;
   }
+  /* Top bar takes too much room on phones — fold it away (spec §6). */
+  .nene-public .hd-topbar {
+    display: none;
+  }
+  /* CTA stays useful on mobile but trims to fit alongside the menu button. */
+  .nene-public .hd__cta {
+    padding: 7px 12px;
+  }
   .nene-public .hero__meta {
     gap: var(--space-lg);
   }
@@ -1865,4 +1911,92 @@
 }
 .nene-public[data-header-tagline='hide'] .brand__tag {
   display: none;
+}
+
+/* Header layout — skeleton presets (see header-patterns.md §5). The header is a
+   3-zone flex row (brand | nav | actions). Default (no attribute) = `nav-right`:
+   nav + actions clustered right. Flags re-place the primary nav. Actions stay
+   right in every single-row skeleton; the mobile drawer is unaffected. */
+
+/* classic — primary nav centered between the brand and the action cluster. */
+.nene-public[data-header='classic'] .hd__nav {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* nav-right — explicit alias of the default (nav hugs actions on the right). */
+.nene-public[data-header='nav-right'] .hd__nav {
+  margin-left: auto;
+  margin-right: 0;
+}
+
+/* minimal — hide the inline primary nav; the menu button (in actions) opens the
+   drawer for navigation. Search/theme stay unless separately hidden. */
+.nene-public[data-header='minimal'] .hd__nav {
+  display: none;
+}
+.nene-public[data-header='minimal'] .hd__menu {
+  display: grid;
+}
+
+/* headerNavAlign — where the primary nav sits, meaningful under `classic`
+   (start = beside brand, center = middle [default], end = beside actions). */
+.nene-public[data-header='classic'][data-header-nav='start'] .hd__nav {
+  margin-left: var(--space-xl);
+  margin-right: auto;
+}
+.nene-public[data-header='classic'][data-header-nav='end'] .hd__nav {
+  margin-left: auto;
+  margin-right: 0;
+}
+
+/* headerDensity — header row height / vertical rhythm. regular = current 72px. */
+.nene-public[data-header-density='compact'] .hd__in {
+  height: 58px;
+}
+.nene-public[data-header-density='regular'] .hd__in {
+  height: 72px;
+}
+.nene-public[data-header-density='tall'] .hd__in {
+  height: 92px;
+}
+
+/* centered — brand centered on the top row with actions to its right; the
+   primary nav wraps to a full-width centered second row (magazine/brand style).
+   Frequency research ranks this the #3 skeleton after classic/nav-right. */
+.nene-public[data-header='centered'] .hd__in {
+  flex-wrap: wrap;
+  height: auto;
+  justify-content: flex-start;
+  padding-block: var(--space-sm);
+  row-gap: var(--space-xs);
+}
+.nene-public[data-header='centered'] .brand {
+  order: 0;
+  margin-inline: auto;
+}
+.nene-public[data-header='centered'] .hd__actions {
+  order: 1;
+}
+.nene-public[data-header='centered'] .hd__nav {
+  order: 2;
+  flex-basis: 100%;
+  justify-content: center;
+  margin: 0;
+}
+
+/* headerWidth — boxed = current (.wrap max-width); full = edge-to-edge header
+   content (gutter padding only). Live-site research: full-bleed is the norm. */
+.nene-public[data-header-width='full'] .hd__in {
+  max-width: none;
+}
+
+/* headerSticky — none = static header; sticky = current pinned behaviour
+   (default when unset). Shrink-on-scroll is Phase C (needs JS). */
+.nene-public[data-header-sticky='none'] .hd {
+  position: static;
+}
+.nene-public[data-header-sticky='sticky'] .hd {
+  position: sticky;
+  top: 0;
 }

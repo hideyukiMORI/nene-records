@@ -32,6 +32,11 @@ A だけでも「WP の定番テーマ」級は出せる。語彙に収まらな
 | `headerSearch`  | `data-header-search`  | `show` \| `hide` | ヘッダー検索アイコン（`.hd__search`）の表示。詳細は [`header-patterns.md`](./header-patterns.md) |
 | `headerTheme`   | `data-header-theme`   | `show` \| `hide` | ヘッダーのテーマ切替（`.themesw`）の表示。ヘッダー/ドロワー両方に効く |
 | `headerTagline` | `data-header-tagline` | `show` \| `hide` | ブランドのキャッチコピー（`.brand__tag`）の表示 |
+| `headerLayout`  | `data-header`         | `nav-right` \| `classic` \| `centered` \| `minimal` | ヘッダー骨格。nav-right=既定（nav＋操作を右）/ classic=nav中央 / centered=brand中央＋nav下段 / minimal=インラインnav省略（メニューのみ） |
+| `headerNavAlign` | `data-header-nav`    | `start` \| `center` \| `end` | `classic` 時の nav 位置（ブランド寄り/中央/操作寄り） |
+| `headerDensity` | `data-header-density` | `compact` \| `regular` \| `tall` | ヘッダー行高（regular=現行 72px） |
+| `headerWidth`   | `data-header-width`   | `boxed` \| `full` | ヘッダー内容の幅（boxed=現行 `--content-w` / full=フル幅） |
+| `headerSticky`  | `data-header-sticky`  | `sticky` \| `none` | スクロール追従（既定=sticky・現行挙動 / none=固定しない） |
 
 > ヘッダー構造の全体仕様（グリッド/プリセット/インフォ要素）は [`header-patterns.md`](./header-patterns.md) を参照。
 > 追加フラグは本表に追記して語彙を拡張する。実装は base CSS（`public-site.css` 近傍の専用ファイル）に集約。

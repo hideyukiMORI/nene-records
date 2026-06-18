@@ -93,14 +93,18 @@
 
 | 値 | 骨格 | ブランド | nav | アクション | 代表 |
 | --- | --- | --- | --- | --- | --- |
-| `classic` | 1行・3分割 | 左 | 中央 | 右 | メディア・EC（**現行の既定**） |
-| `nav-right` | 1行 | 左 | 右 | 右 | ブログ・SaaS |
-| `centered` | 1行・対称 | 中央 | 左右分割 | 右 | ブランド・ファッション |
-| `centered-stack` | 2行・中央 | 中央上 | 下段中央 | 右上 | マガジン・高級系 |
-| `two-row` | 2行・左 | 左上 | Bottom 行フル幅 | 右上 | 大型サイト・官公庁 |
-| `minimal` | 1行 | 左 | （ドロワーのみ） | 右 | ポートフォリオ・LP |
+| `nav-right` | 1行 | 左 | 右 | 右 | ブログ・SaaS（**現行の既定**・実装済み） |
+| `classic` | 1行・3分割 | 左 | 中央 | 右 | メディア・EC（実装済み） |
+| `centered` | 2行 | 中央 | 下段中央 | 右上 | ブランド・マガジン（実装済み・brand中央＋nav下段） |
+| `minimal` | 1行 | 左 | （ドロワーのみ） | 右 | ポートフォリオ・LP（実装済み） |
+| `centered-stack` | 2行・対称 | 中央上 | 下段左右分割 | 右上 | 高級系（未実装・将来） |
+| `two-row` | 2行・左 | 左上 | Bottom 行フル幅 | 右上 | 大型サイト・官公庁（未実装・Bottom行要） |
 
 各骨格に対し、`headerWidth` / `headerDensity` / `headerSticky` / `headerSurface` / `headerNavAlign` と要素 ON/OFF を掛けて最終形を作る。Top バー（`data-header-topbar`）は全骨格に付加可能。
+
+> **実装状況**: `nav-right`(既定) / `classic` / `centered` / `minimal` の 4 骨格＋ `headerNavAlign` / `headerDensity` / `headerWidth`(boxed/full) / `headerSticky`(sticky/none) を base CSS 実装済み。DOM は `.hd__nav`（プライマリnav）と `.hd__actions`（検索/テーマ/メニュー）に分離し3ゾーン flex 化。`centered` は flex-wrap で brand 中央＋nav 下段を表現（独立 Bottom 行 DOM 不要）。
+> **実装済み（Phase C 内容）**: Top バー（電話/メール/`infoText`）＋ CTA（label/url）を `header_config` 設定で配線。頻度調査（§11）の結論どおり CTA を一級要素として実装。
+> **未実装（将来）**: 対称 `centered-stack` / `two-row`（独立行 DOM 要）、`headerSticky=shrink` / `headerSurface=overlay`（JS 要）。
 
 ## 6. モバイル時の畳み方ルール
 
@@ -148,23 +152,47 @@
 - **エンジン初期コスト**: 6 骨格 × 密度/幅/sticky/surface × light/dark × レスポンシブの掛け算を base CSS で先に作り込む。`centered-stack` / `two-row` の 2 行系はモバイル集約が一番手間。
 - **組合せの破綻**: 自由組合せで不格好化 → 骨格ごとに推奨モディファイアをプリセットしてガード（[`theme-flags.md`](./theme-flags.md) §7 と同じ方針）。
 - **語彙の天井**: 縦置きサイドヘッダー等の例外は flags に収まらない → bespoke escape hatch。
-- **インフォ要素の安全性**: `infoText` 等の自由入力は XSS 面。サニタイズ／許可タグ限定を契約に明記。
+- **インフォ要素の安全性**: `infoText` は **React テキスト子要素として描画（自動エスケープ）= HTML 不可**で XSS を回避。CTA URL は `safeHref` で `javascript:`/`data:` 等を遮断。
 
-## 10. 実装スライス（提案）
+## 10. 実装スライス
 
-1. ⬜ 本ドキュメント＋ `header*` フラグ・`header` オブジェクトのスキーマ追記。
-2. ⬜ **Phase A（即効）**: 要素 ON/OFF（`search` / `themeToggle` / `tagline`）＋ Top バー（`contact` / `infoText`）。`PublicSiteShell` の条件レンダリング＋ base CSS。
-3. ⬜ **Phase B（骨格）**: `headerLayout` 6 骨格 ＋ `headerNavAlign` / `headerDensity` / `headerWidth` の base CSS。
-4. ⬜ **Phase C（挙動）**: `headerSticky`(shrink) / `headerSurface`(overlay) — JS でスクロール状態を `data-*` に反映。
-5. ⬜ カスタマイザ UI（`ThemeCustomizeView`）: 骨格プルダウン＋要素トグル＋インフォ入力。simple/pro 分割は既存方針に従う。
-6. ⬜ validator の enum 検証（`public-theme.schema.json` ＋ Ajv）。
+1. ✅ 本ドキュメント＋ `header*` フラグのスキーマ追記。
+2. ✅ **Phase A**: 要素 ON/OFF（`headerSearch` / `headerTheme` / `headerTagline`）を base CSS ＋ スタイルフラグ機構で実装（#420）。
+3. ✅ **Phase B**: `headerLayout`（nav-right/classic/centered/minimal）＋ `headerNavAlign` / `headerDensity` / `headerWidth` / `headerSticky`(sticky/none) の base CSS（#421）。DOM を `.hd__nav` / `.hd__actions` に分離。
+4. 🟡 **Phase C（内容）**: Top バー（`phone`/`email`/`infoText`）＋ CTA（`label`/`url`）を **`header_config` 設定（JSON）** で実装済み。バックエンドはマイグレーションで公開設定追加、フロントは `parseHeaderConfig`＋`PublicSiteShell` 描画＋ `HeaderContentView` 管理UI。`safeHref` で URL 安全化。
+5. ⬜ **Phase C（挙動）**: `headerSticky`(shrink) / `headerSurface`(overlay) — JS でスクロール状態を `data-*` に反映。
+6. ⬜ **将来**: 2行系 `centered-stack` / `two-row`（独立行 DOM）、vertical 別プリセットの一括適用、CTA の SPA 内部リンク化。
+7. ✅ カスタマイザ UI（`ThemeCustomizeView`）に骨格/モディファイア/要素トグル、`HeaderContentView` に Top バー/CTA 入力。
+8. ✅ validator の enum 検証（`public-theme.schema.json` ＋ Ajv）。
 
-## 11. プリセット選定のための実データ（任意・補助）
+## 11. プリセット選定の実データ（頻度調査の統合結論）
 
-骨格カタログ（§5）の **文法**は WP ビルダーの収束で確定済み。スクレイピングは文法発見ではなく **「どの詰め方が実際に多いか」の頻度データ**取得に使い、デフォルト提供プリセットの優先順位付けに充てる:
+骨格カタログ（§5）の **文法**は WP ビルダーの収束で確定済み。頻度データは「どの詰め方が実際に多いか」を測りプリセット優先順位を裏付けるために収集した。3 系統を並行調査し（生レポートは [`research/`](./research/)）、結論が三者一致した。
 
-- WordPress.org ブロックパターン「ヘッダー」カテゴリの巡回（分類済み・取得可能を確認済み）。
-- 主要テーマのスターターテンプレ デモを 30–50 サンプリングし、§2 の 9 セルへ正規化集計。
-- 注意: JS 描画デモは構造復元が不安定 → パターンディレクトリ＋ビルダー公式の要素表を主軸に。
+| 調査 | 母数 | レポート |
+| --- | --- | --- |
+| WP ブロックパターン（REST API 集計） | 真ヘッダー 22 件 | [`research/header-frequency-wp-patterns.md`](./research/header-frequency-wp-patterns.md) |
+| 商用テーマビルダー | 8 社 | [`research/header-frequency-builders.md`](./research/header-frequency-builders.md) |
+| 実サイト横断 | 確信 10 サイト | [`research/header-frequency-realworld.md`](./research/header-frequency-realworld.md) |
 
-> 結論: スクレイピングは**必須ではない**が、プリセットの取捨選択と既定値決定の**裏付け**として有効。文法仕様（本書）が先、頻度データは後付けで精度を上げる位置づけ。
+### 統合結論
+
+1. **`classic` + `nav-right` が二大既定**。WPパターンで 95%（classic 50%／nav-right 45%）、実サイトで 100% が「brand左・1行」。→ 本リポの Phase B.1 実装（nav-right=既定・classic・minimal）は正しい。
+2. **`centered` が次点**（ビルダーで一級、ブランド/マガジン系）。2行系 `centered-stack`/`two-row` は実需ほぼ 0% かつモバイル集約コスト高 → **エンジン構築順 `classic`→`nav-right`→`centered`→2行系**。Phase B.2 は `centered` を最優先。
+3. **CTA ボタンは想定より高頻度**（WPパターン 41%／実サイト SaaS で 40%）。§3 では既定 OFF・将来扱いだが **一級要素へ格上げ**し、SaaS/corporate プリセットの既定 ON に。
+4. **検索は普遍ではない**（実サイト 50%・WPパターン 5%、vertical 依存）。「検索 always ON」を再考し、**vertical プリセットで既定を出し分け**る（Phase A の `headerSearch` トグルで site 側が消せる設計は妥当）。
+5. **`themeToggle` はヘッダー実物で 0%**（WP ビルダー 8 社・実サイト 10 サイトとも）。NeNe 独自要素として残すが「業界標準だから」ではない。
+6. **Top バー（電話/住所/告知）は EC・SaaS に集中**（実サイト 30%、ビルダー 8/8 が機能提供、WPパターン文化では 0%）。業界標準の実装は専用欄でなく **サニタイズ済み自由テキスト `infoText`** → Phase C で必須実装。
+7. **sticky/フル幅が事実上の標準**（実サイト：判定可は全て sticky・100% フル幅）。`headerSticky`/`headerWidth` の優先度は高い。
+
+### vertical 別 既定プリセット（実装ターゲット）
+
+| vertical | 骨格 | 既定 ON 要素 | Top バー |
+| --- | --- | --- | --- |
+| SaaS / product | `classic` | CTA・ログイン | 任意 |
+| blog / media | `nav-right` | 検索 | なし |
+| ecommerce | `classic` | 検索・カート・言語 | あり（告知） |
+| portfolio | `nav-right` / `minimal` | 検索・SNS | なし |
+| corporate | `classic` | アカウント・CTA | 任意（連絡先） |
+
+> 限界: 実サイト調査は news 系が bot 拒否で欠落・n=10 と小。ただし「brand左・1行・classic優勢」は三者一致で頑健。
