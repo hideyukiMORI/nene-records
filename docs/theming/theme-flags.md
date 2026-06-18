@@ -29,7 +29,11 @@ A だけでも「WP の定番テーマ」級は出せる。語彙に収まらな
 | `hero`        | `data-hero`    | `standard` \| `fullbleed` \| `minimal`          | `.hero` 構図（minimal=アート省略・タイポ主体 / fullbleed=幅広）                                                                    |
 | `sectionRule` | `data-rule`    | `none` \| `hairline` \| `heavy`                 | `.section__head` の区切り罫                                                                                                        |
 | `eyebrow`     | `data-eyebrow` | `plain` \| `caps` \| `barred`                   | `.eyebrow` の表情（小型キャップス/バー）                                                                                           |
+| `headerSearch`  | `data-header-search`  | `show` \| `hide` | ヘッダー検索アイコン（`.hd__search`）の表示。詳細は [`header-patterns.md`](./header-patterns.md) |
+| `headerTheme`   | `data-header-theme`   | `show` \| `hide` | ヘッダーのテーマ切替（`.themesw`）の表示。ヘッダー/ドロワー両方に効く |
+| `headerTagline` | `data-header-tagline` | `show` \| `hide` | ブランドのキャッチコピー（`.brand__tag`）の表示 |
 
+> ヘッダー構造の全体仕様（グリッド/プリセット/インフォ要素）は [`header-patterns.md`](./header-patterns.md) を参照。
 > 追加フラグは本表に追記して語彙を拡張する。実装は base CSS（`public-site.css` 近傍の専用ファイル）に集約。
 
 ### 適用フロー

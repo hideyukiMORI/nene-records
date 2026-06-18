@@ -1853,3 +1853,16 @@
   width: 28px;
   height: 3px;
 }
+
+/* Header elements — show/hide header affordances (see header-patterns.md §3/§4).
+   Default (no attribute) keeps the current look; only an explicit `hide`
+   removes the element, in the header and the mobile drawer alike. */
+.nene-public[data-header-search='hide'] .hd__search {
+  display: none;
+}
+.nene-public[data-header-theme='hide'] .themesw {
+  display: none;
+}
+.nene-public[data-header-tagline='hide'] .brand__tag {
+  display: none;
+}
