@@ -60,6 +60,7 @@ OpenAPI（`docs/openapi/openapi.yaml`）に CRUD を追加 → `composer mcp:gen
 - **キー allowlist**: emit するのは契約トークン（`public-theme-contract.md` / スキーマ `tokenSet`）のキーのみ。未知キーは破棄（スキーマ `additionalProperties:false` ＋ サーバ検証）。
 - **値サニタイズ（核心）**: 各トークン値を**安全な CSS 値だけ**に制限。許可: `oklch()/rgb()/hsl()/#hex`、`color-mix(in oklch,…)`、`clamp()/min()/max()/calc()`、長さ（`px/rem/em/%/vw/vh`）、既知キーワード。**拒否**: `;` `}` `{` `<` `url(` `expression(` `@import` `/* */` 等の**ブレークアウト/外部参照文字**。→ `--key: <value>;` からの脱出を封じる。
 - **フォント**: `fonts.source` は `fontsource`（同梱 allowlist）/ `system` のみ runtime 可。`selfhost`（新規ファイル）は**デプロイ必須＝MCP 不可**。外部 `@import` 禁止。
+- **アセット参照**: manifest の `assets.*` は**外部 URL（`http(s):`/`//`）と `data:` を拒否**し、`media_id`（整数）または既知拡張子のバンドル相対パスのみ許可（スキーマ `assetRef` 準拠）。詳細は §8。
 - **サーバ側バリデータ（PHP）**: `public-theme.schema.json` をミラーした検証＋上記の値サニタイズを `createTheme/updateTheme` で適用（フロント `validate:themes` は build 時用、ランタイムは API 境界で再検証）。不正は 422。
 - **org 分離**: テーマは org スコープ。JWT `org_id` 強制で他テナントのテーマを読めない/書けない。
 - **MCP safety**: 登録系は `write`。ClaudeDesign の資格情報を最小権限（テーマ CRUD のみ）に。
@@ -69,9 +70,40 @@ OpenAPI（`docs/openapi/openapi.yaml`）に CRUD を追加 → `composer mcp:gen
 - **bespoke `components.css` は対象外**: 唯一無二の DOM 装飾は安全にデータ化できない → **デプロイ必須**。MCP で作れるのは JSON 語彙テーマのみ。
 - **新フォント（selfhost）はデプロイ必須**。runtime テーマは同梱フォント allowlist 内。
 - **語彙の天井**: 真に新規な版面はフラグ/トークンに収まらない（`theme-flags.md §7`）。
-- **アセット**: サムネイル等は別途（media 経由 or 自動生成スワッチ）。
+- **アセット**: サムネイル等は §8 の方式（自動スワッチ＋ media_id）。bespoke 画像同梱はデプロイ必須。
 
-## 8. ClaudeDesign の量産フロー（想定）
+## 8. サムネイル/プレビュー（#426）
+
+管理ピッカーで runtime テーマを見分けるための見た目。**画像必須にしない**のが要点（MCP はバイナリを送れない）。2方式を組み合わせる。
+
+### B案（既定・推奨）— トークンからの自動スワッチ
+
+- ピッカーは `PublicThemeMeta.preview = { surface, raised, accent }` の**3色スワッチ**を持つ（画像が無いときの既存フォールバック）。
+- runtime テーマは **manifest の `tokens.light` から `color-surface` / `color-surface-raised` / `color-accent` を取り出して preview を自動生成**。ClaudeDesign は何も指定しなくても識別可能なカードになる。
+- **画像不要＝常に安全・常に成立**。MCP 量産のデフォルトはこれ。
+
+### A案（任意）— 実写サムネを media_id で
+
+- 実スクショを出したいテーマだけ、`manifest.assets.preview` に **`media_id`（整数）**を持つ。
+- 画像は**既存 Media API でアップロード**（ClaudeDesign が生成→アップロード）→ id を manifest に格納 → 公開 API がサーバ側で **URL に解決**（`logo_media_id` と同流儀／#299 オンデマンド派生）。
+- MCP `createTheme` でバイナリは送らない。「アップロードは Media、テーマは id 参照」で分離。
+
+### 検証（`ThemeManifestValidator` 拡張）
+
+- `assets.preview` 等は **`media_id`（正整数）** か **`assetRef`（外部URL/`data:` 拒否・既知拡張子のバンドル相対パス）** のみ許可。それ以外は 422。
+- `data:`/外部URL を弾くことで、ピッカー描画時の SSRF/混入を防ぐ。
+
+### 解決フロー
+
+```
+manifest.assets.preview
+  ├─ media_id（整数）→ 公開API がメディア URL へ解決 → ピッカー <img>
+  └─ 未指定        → tokens.light から 3色スワッチを自動生成（既定）
+```
+
+> 既定は B（自動スワッチ）。A（media_id）は opt-in。built-in テーマの `public/theme-thumbnails/<id>.webp` 方式は静的テーマ専用で runtime には使わない。
+
+## 9. ClaudeDesign の量産フロー（想定）
 
 ```
 ブリーフ（docs/theming/briefs/*.theme.md 相当）
@@ -85,16 +117,17 @@ POST /api/v1/themes  { manifest JSON }   ← MCP(write)
 公開サイトが manifest を <style> 適用（再ビルド無し）
 ```
 
-## 9. 実装スライス（提案）
+## 10. 実装スライス（提案）
 
-1. ⬜ 本ドキュメント＋ Issue（方向確定）。← **A: 本スライス**
-2. ⬜ **backend**: `themes` テーブル（マイグレーション）＋ Repository ＋ CRUD UseCase/Handler ＋ サーバ側バリデータ（スキーマ＋値サニタイズ）＋ org スコープ。
-3. ⬜ **OpenAPI ＋ MCP**: エンドポイント定義 → `npm run codegen`（フロント型）＋ `composer mcp:generate`（MCP ツール）。
-4. ⬜ **公開適用（end-to-end）**: `buildThemeStylesheet` 一般化、合成カタログ、`/api/v1/public/themes`、FOUC キャッシュ。
+1. ✅ 本ドキュメント＋ Issue（方向確定）。
+2. ✅ **backend**: `themes` テーブル（マイグレーション）＋ Repository ＋ CRUD UseCase/Handler ＋ サーバ側バリデータ（スキーマ＋値サニタイズ）＋ org スコープ。（#423 Phase B）
+3. ✅ **OpenAPI ＋ MCP**: エンドポイント定義 → `npm run codegen`（フロント型）＋ `composer mcp:generate`（MCP ツール）。（#423 Phase C）
+4. ⬜ **公開適用（end-to-end）**: `buildThemeStylesheet` 一般化、合成カタログ、`/api/v1/public/themes`、FOUC キャッシュ。**ここで §8 B案（自動スワッチ）＋ assetRef 検証を同梱**（#426）。
 5. ⬜ 管理 UI：runtime テーマの一覧/採用/削除（ピッカー拡張）。
-6. ⬜ ClaudeDesign 連携：MCP 資格情報・ブリーフ→manifest の運用手順。
+6. ⬜ サムネ A案（media_id）opt-in：manifest 解決＋ピッカー `<img>`（#426）。
+7. ⬜ ClaudeDesign 連携：MCP 資格情報・ブリーフ→manifest の運用手順。
 
-## 10. 関連
+## 11. 関連
 
 - [`theme-flags.md`](./theme-flags.md)（ハイブリッドモデル・フラグ語彙）/ [`public-theme-contract.md`](./public-theme-contract.md)（トークン契約）/ [`public-theme.schema.json`](./public-theme.schema.json)（manifest スキーマ）。
 - [`header-patterns.md`](./header-patterns.md)（ヘッダー文法：runtime テーマでも flags として同居）。
