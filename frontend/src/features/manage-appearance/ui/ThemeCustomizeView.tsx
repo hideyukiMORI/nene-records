@@ -309,6 +309,36 @@ export function ThemeCustomizeView({
                 }}
               />
             </Field>
+            <Field label={t('admin.themeCustomize.headerSearch')}>
+              <Select
+                value={draft.flags?.headerSearch}
+                options={FLAG_DEFS.headerSearch.options}
+                placeholder={themePlaceholder}
+                onChange={(v) => {
+                  setKnob('flags', { ...draft.flags, headerSearch: v })
+                }}
+              />
+            </Field>
+            <Field label={t('admin.themeCustomize.headerTheme')}>
+              <Select
+                value={draft.flags?.headerTheme}
+                options={FLAG_DEFS.headerTheme.options}
+                placeholder={themePlaceholder}
+                onChange={(v) => {
+                  setKnob('flags', { ...draft.flags, headerTheme: v })
+                }}
+              />
+            </Field>
+            <Field label={t('admin.themeCustomize.headerTagline')}>
+              <Select
+                value={draft.flags?.headerTagline}
+                options={FLAG_DEFS.headerTagline.options}
+                placeholder={themePlaceholder}
+                onChange={(v) => {
+                  setKnob('flags', { ...draft.flags, headerTagline: v })
+                }}
+              />
+            </Field>
           </Stack>
         </details>
 

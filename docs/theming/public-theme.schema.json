@@ -87,7 +87,10 @@
         "media": { "enum": ["plain", "duotone", "grayscale", "framed"] },
         "hero": { "enum": ["standard", "fullbleed", "minimal"] },
         "sectionRule": { "enum": ["none", "hairline", "heavy"] },
-        "eyebrow": { "enum": ["plain", "caps", "barred"] }
+        "eyebrow": { "enum": ["plain", "caps", "barred"] },
+        "headerSearch": { "enum": ["show", "hide"] },
+        "headerTheme": { "enum": ["show", "hide"] },
+        "headerTagline": { "enum": ["show", "hide"] }
       }
     },
     "assets": {

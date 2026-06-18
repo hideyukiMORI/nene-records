@@ -53,6 +53,10 @@ export interface ThemeFlags {
   hero?: string
   sectionRule?: string
   eyebrow?: string
+  /** Header element visibility (see header-patterns.md §3/§4). */
+  headerSearch?: string
+  headerTheme?: string
+  headerTagline?: string
 }
 
 /** flag key → { data attribute, allowed values }. Mirrors theme-flags.md §2. */
@@ -116,6 +120,27 @@ export const FLAG_DEFS: Record<keyof ThemeFlags, { attr: string; options: readon
         { value: 'plain', label: 'Plain' },
         { value: 'caps', label: 'Caps' },
         { value: 'barred', label: 'Barred' },
+      ],
+    },
+    headerSearch: {
+      attr: 'data-header-search',
+      options: [
+        { value: 'show', label: 'Show' },
+        { value: 'hide', label: 'Hide' },
+      ],
+    },
+    headerTheme: {
+      attr: 'data-header-theme',
+      options: [
+        { value: 'show', label: 'Show' },
+        { value: 'hide', label: 'Hide' },
+      ],
+    },
+    headerTagline: {
+      attr: 'data-header-tagline',
+      options: [
+        { value: 'show', label: 'Show' },
+        { value: 'hide', label: 'Hide' },
       ],
     },
   }

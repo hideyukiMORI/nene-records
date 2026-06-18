@@ -123,4 +123,20 @@ describe('resolveFlagAttrs / flagAttrsForTheme', () => {
     expect(flagAttrsForTheme(raw, 'reading')).toEqual({ 'data-feed': 'list' })
     expect(flagAttrsForTheme(raw, 'aurora')).toEqual({})
   })
+
+  it('maps header element visibility flags', () => {
+    expect(
+      resolveFlagAttrs(undefined, {
+        headerSearch: 'hide',
+        headerTheme: 'hide',
+        headerTagline: 'show',
+      }),
+    ).toEqual({
+      'data-header-search': 'hide',
+      'data-header-theme': 'hide',
+      'data-header-tagline': 'show',
+    })
+    // Invalid values are dropped like any other flag.
+    expect(resolveFlagAttrs(undefined, { headerSearch: 'collapsed' })).toEqual({})
+  })
 })
