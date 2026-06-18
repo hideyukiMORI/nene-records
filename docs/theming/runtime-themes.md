@@ -125,10 +125,11 @@ POST /api/v1/themes  { manifest JSON }   ← MCP(write)
 4. ✅ **公開適用（end-to-end）**: `/api/v1/public/themes`（公開・ETag）＋ `buildThemeStylesheet`（トークン→スコープ `<style>`、値ガード）＋ PublicShell で runtime active テーマを適用、assetRef 検証、`swatchFromManifest`（§8 B案）（#423 Phase D）。**FOUC キャッシュ**：runtime テーマの CSS＋flag attrs を localStorage（`nene_public_runtime_theme`）に先行保存し、settings/themes 両クエリ settle 前は初回ペイントへ同期適用（`readStoredRuntimeTheme`/`storeRuntimeTheme`）。
 5. ✅ 管理 UI：テーマピッカーに runtime テーマを**合成表示**（built-in＋runtime、`swatchFromManifest` でカード）、active 解決を runtime キー対応、採用は `active_theme` 書込み。runtime カードに**編集（manifest JSON エディタ・サーバ再検証）／削除（確認ダイアログ）**を追加（#423 Phase E）。
 6. ✅ サムネ A案（media_id）opt-in：`ThemeThumbnailResolver` が `assets.preview`(media_id) を URL 解決し `thumbnail_url` をレスポンスに付与、ピッカーが `<img>` 表示（未指定は B 案スワッチ）（#426）。
-7. ⬜ ClaudeDesign 連携：MCP 資格情報・ブリーフ→manifest の運用手順。
+7. ✅ ClaudeDesign 連携：MCP 資格情報・ブリーフ→manifest の運用手順 → [`claudedesign-runtime-themes.md`](./claudedesign-runtime-themes.md)（#431）。
 
 ## 11. 関連
 
 - [`theme-flags.md`](./theme-flags.md)（ハイブリッドモデル・フラグ語彙）/ [`public-theme-contract.md`](./public-theme-contract.md)（トークン契約）/ [`public-theme.schema.json`](./public-theme.schema.json)（manifest スキーマ）。
 - [`header-patterns.md`](./header-patterns.md)（ヘッダー文法：runtime テーマでも flags として同居）。
+- [`claudedesign-runtime-themes.md`](./claudedesign-runtime-themes.md)（ClaudeDesign の登録・運用手順）。
 - 既存ランタイム適用: `frontend/src/shared/lib/theme-customization.ts`（`overrideCssForTheme` / `resolveOverrideStyle` の値ホワイトリスト方針）。
