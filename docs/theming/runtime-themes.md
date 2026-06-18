@@ -131,5 +131,5 @@ POST /api/v1/themes  { manifest JSON }   ← MCP(write)
 
 - [`theme-flags.md`](./theme-flags.md)（ハイブリッドモデル・フラグ語彙）/ [`public-theme-contract.md`](./public-theme-contract.md)（トークン契約）/ [`public-theme.schema.json`](./public-theme.schema.json)（manifest スキーマ）。
 - [`header-patterns.md`](./header-patterns.md)（ヘッダー文法：runtime テーマでも flags として同居）。
-- [`claudedesign-runtime-themes.md`](./claudedesign-runtime-themes.md)（ClaudeDesign の登録・運用手順）。
+- [`claudedesign-runtime-themes.md`](./claudedesign-runtime-themes.md)（ClaudeDesign の登録・運用手順）／ [`claudedesign-mcp-guide.md`](./claudedesign-mcp-guide.md)（MCP ツールの実践ガイド）。
 - 既存ランタイム適用: `frontend/src/shared/lib/theme-customization.ts`（`overrideCssForTheme` / `resolveOverrideStyle` の値ホワイトリスト方針）。
