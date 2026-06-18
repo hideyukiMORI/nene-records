@@ -45,6 +45,7 @@
 - **バージョン**: 改訂ごとに `version` を semver で上げる（運用上の追跡用）。
 - **冪等性**: 同一 manifest の再 PUT は無害。
 - **削除**: `deleteTheme`。active_theme に採用中の key を消す前に別テーマへ切替える（公開側は built-in 既定へフォールバック）。
+- **コミット前プレビュー（推奨）**: `createTheme`/`updateTheme` の前に **`previewTheme`（計算プレビュー・非永続）** を回す。`POST /api/v1/themes/preview` に manifest を渡すと、実際に効くトークン（`applied`）／落ちた値（`dropped`）／**WCAG コントラスト**（text/surface・on-accent/accent… の AA/AAA 判定）を返す。**AA 未達・dropped・warnings があれば自己修正→再 preview**、OK で初めて commit。ブラウザ無し。視覚スクショは Phase 2（将来）。設計: [`theme-preview.md`](./theme-preview.md)。
 
 ## 4. 検証で弾かれるもの（§6 安全規則）
 

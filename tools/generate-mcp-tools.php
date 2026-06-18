@@ -759,6 +759,22 @@ $tools = [
         $themeManifestRequired,
         true,
     ),
+    // Non-mutating dry-run despite POST → safety 'read' (overrides the method default).
+    array_merge(
+        readTool(
+            'previewTheme',
+            'Preview Runtime Theme',
+            'Compute a no-browser preview of a theme manifest: returns the tokens that would render (safe-filtered), the ones dropped, and WCAG contrast for key pairs (light/dark). Non-persistent — use to self-correct contrast/quality before createTheme/updateTheme.',
+            'previewTheme',
+            'POST',
+            '/api/v1/themes/preview',
+            $themeManifestProps,
+            '#/components/schemas/ThemePreviewResponse',
+            $themeManifestRequired,
+            true,
+        ),
+        ['safety' => 'read'],
+    ),
     readTool(
         'getTheme',
         'Get Runtime Theme',

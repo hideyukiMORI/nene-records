@@ -206,6 +206,25 @@ final readonly class ThemeServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(
+                PreviewThemeUseCase::class,
+                static fn (ContainerInterface $container): PreviewThemeUseCase => new PreviewThemeUseCase(),
+            )
+            ->set(
+                PreviewThemeHandler::class,
+                static function (ContainerInterface $container): PreviewThemeHandler {
+                    $useCase = $container->get(PreviewThemeUseCase::class);
+                    $response = $container->get(JsonResponseFactory::class);
+                    if (!$useCase instanceof PreviewThemeUseCase) {
+                        throw new LogicException('PreviewTheme use case service is invalid.');
+                    }
+                    if (!$response instanceof JsonResponseFactory) {
+                        throw new LogicException('JSON response factory service is invalid.');
+                    }
+
+                    return new PreviewThemeHandler($useCase, $response);
+                },
+            )
+            ->set(
                 ThemeNotFoundExceptionHandler::class,
                 static function (ContainerInterface $container): ThemeNotFoundExceptionHandler {
                     $problemDetails = $container->get(ProblemDetailsResponseFactory::class);
@@ -225,6 +244,7 @@ final readonly class ThemeServiceProvider implements ServiceProviderInterface
                     $update = $container->get(UpdateThemeHandler::class);
                     $delete = $container->get(DeleteThemeHandler::class);
                     $listPublic = $container->get(ListPublicThemesHandler::class);
+                    $preview = $container->get(PreviewThemeHandler::class);
 
                     if (!$list instanceof ListThemesHandler) {
                         throw new LogicException('ListThemes handler service is invalid.');
@@ -244,8 +264,11 @@ final readonly class ThemeServiceProvider implements ServiceProviderInterface
                     if (!$listPublic instanceof ListPublicThemesHandler) {
                         throw new LogicException('ListPublicThemes handler service is invalid.');
                     }
+                    if (!$preview instanceof PreviewThemeHandler) {
+                        throw new LogicException('PreviewTheme handler service is invalid.');
+                    }
 
-                    return new ThemeRouteRegistrar($list, $get, $create, $update, $delete, $listPublic);
+                    return new ThemeRouteRegistrar($list, $get, $create, $update, $delete, $listPublic, $preview);
                 },
             );
     }

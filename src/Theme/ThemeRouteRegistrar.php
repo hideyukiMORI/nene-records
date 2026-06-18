@@ -16,6 +16,7 @@ final readonly class ThemeRouteRegistrar
         private UpdateThemeHandler $updateHandler,
         private DeleteThemeHandler $deleteHandler,
         private ListPublicThemesHandler $listPublicHandler,
+        private PreviewThemeHandler $previewHandler,
     ) {
     }
 
@@ -27,6 +28,7 @@ final readonly class ThemeRouteRegistrar
         $update = $this->updateHandler;
         $delete = $this->deleteHandler;
         $listPublic = $this->listPublicHandler;
+        $preview = $this->previewHandler;
 
         $router->get(
             '/api/v1/themes',
@@ -35,6 +37,11 @@ final readonly class ThemeRouteRegistrar
         $router->post(
             '/api/v1/themes',
             static fn (ServerRequestInterface $request) => $create->handle($request),
+        );
+        // Computed preview (non-persistent dry-run): contrast/quality report.
+        $router->post(
+            '/api/v1/themes/preview',
+            static fn (ServerRequestInterface $request) => $preview->handle($request),
         );
         $router->get(
             '/api/v1/themes/{key}',

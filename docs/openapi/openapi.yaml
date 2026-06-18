@@ -2923,6 +2923,35 @@ paths:
           $ref: '#/components/responses/ValidationFailed'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /api/v1/themes/preview:
+    post:
+      tags:
+        - Themes
+      summary: Preview a theme manifest (computed)
+      description: >-
+        Non-persistent dry-run: validates a manifest and returns the tokens that
+        would actually render (safe-filtered), the ones dropped, and WCAG
+        contrast for key pairs in both modes. Lets ClaudeDesign self-correct
+        before committing via createTheme/updateTheme. Always 200 — issues are
+        reported in the body. See theme-preview.md.
+      operationId: previewTheme
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ThemeManifest'
+      responses:
+        '200':
+          description: Computed preview report.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThemePreviewResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /api/v1/themes/{key}:
     get:
       tags:
@@ -5935,6 +5964,65 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ThemeResponse'
+      additionalProperties: false
+    ThemePreviewResponse:
+      type: object
+      description: Computed (no-browser) preview of a theme manifest (#433).
+      required:
+        - valid
+        - errors
+        - applied
+        - dropped
+        - contrast
+        - warnings
+      properties:
+        valid:
+          type: boolean
+          description: Whether the manifest passes structural validation.
+        errors:
+          type: array
+          description: Validation errors (empty when valid).
+          items:
+            type: object
+            additionalProperties: true
+        applied:
+          type: object
+          description: Per-mode tokens that would actually render (safe-filtered).
+          properties:
+            light:
+              type: object
+              additionalProperties:
+                type: string
+            dark:
+              type: object
+              additionalProperties:
+                type: string
+          additionalProperties: false
+        dropped:
+          type: array
+          description: Tokens removed by the safety filter, with reason.
+          items:
+            type: object
+            additionalProperties: true
+        contrast:
+          type: object
+          description: WCAG contrast rows per mode (pair / ratio / aa / aaa / computable).
+          properties:
+            light:
+              type: array
+              items:
+                type: object
+                additionalProperties: true
+            dark:
+              type: array
+              items:
+                type: object
+                additionalProperties: true
+          additionalProperties: false
+        warnings:
+          type: array
+          items:
+            type: string
       additionalProperties: false
 
 
