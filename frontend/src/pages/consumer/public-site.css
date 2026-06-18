@@ -1921,3 +1921,43 @@
 .nene-public[data-header-density='tall'] .hd__in {
   height: 92px;
 }
+
+/* centered — brand centered on the top row with actions to its right; the
+   primary nav wraps to a full-width centered second row (magazine/brand style).
+   Frequency research ranks this the #3 skeleton after classic/nav-right. */
+.nene-public[data-header='centered'] .hd__in {
+  flex-wrap: wrap;
+  height: auto;
+  justify-content: flex-start;
+  padding-block: var(--space-sm);
+  row-gap: var(--space-xs);
+}
+.nene-public[data-header='centered'] .brand {
+  order: 0;
+  margin-inline: auto;
+}
+.nene-public[data-header='centered'] .hd__actions {
+  order: 1;
+}
+.nene-public[data-header='centered'] .hd__nav {
+  order: 2;
+  flex-basis: 100%;
+  justify-content: center;
+  margin: 0;
+}
+
+/* headerWidth — boxed = current (.wrap max-width); full = edge-to-edge header
+   content (gutter padding only). Live-site research: full-bleed is the norm. */
+.nene-public[data-header-width='full'] .hd__in {
+  max-width: none;
+}
+
+/* headerSticky — none = static header; sticky = current pinned behaviour
+   (default when unset). Shrink-on-scroll is Phase C (needs JS). */
+.nene-public[data-header-sticky='none'] .hd {
+  position: static;
+}
+.nene-public[data-header-sticky='sticky'] .hd {
+  position: sticky;
+  top: 0;
+}

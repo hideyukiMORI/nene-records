@@ -77,6 +77,8 @@ export const ja: Partial<MessageCatalog> = {
   'admin.themeCustomize.headerLayout': 'ヘッダー配置',
   'admin.themeCustomize.headerNavAlign': 'ナビの寄せ',
   'admin.themeCustomize.headerDensity': 'ヘッダーの高さ',
+  'admin.themeCustomize.headerWidth': 'ヘッダー幅',
+  'admin.themeCustomize.headerSticky': 'ヘッダー追従',
   'admin.themeCustomize.basic': '基本',
   'admin.themeCustomize.advanced': '詳細設定',
   'admin.themeCustomize.saved': 'カスタマイズを保存しました',

@@ -154,4 +154,18 @@ describe('resolveFlagAttrs / flagAttrsForTheme', () => {
     })
     expect(resolveFlagAttrs(undefined, { headerLayout: 'two-row' })).toEqual({})
   })
+
+  it('maps centered layout + width/sticky modifiers', () => {
+    expect(
+      resolveFlagAttrs(undefined, {
+        headerLayout: 'centered',
+        headerWidth: 'full',
+        headerSticky: 'none',
+      }),
+    ).toEqual({
+      'data-header': 'centered',
+      'data-header-width': 'full',
+      'data-header-sticky': 'none',
+    })
+  })
 })

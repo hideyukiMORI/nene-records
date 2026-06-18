@@ -84,6 +84,8 @@ export const en = {
   'admin.themeCustomize.headerLayout': 'Header layout',
   'admin.themeCustomize.headerNavAlign': 'Nav alignment',
   'admin.themeCustomize.headerDensity': 'Header height',
+  'admin.themeCustomize.headerWidth': 'Header width',
+  'admin.themeCustomize.headerSticky': 'Header sticky',
   'admin.themeCustomize.basic': 'Basics',
   'admin.themeCustomize.advanced': 'Advanced',
   'admin.themeCustomize.saved': 'Customization saved',

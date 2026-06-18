@@ -61,6 +61,8 @@ export interface ThemeFlags {
   headerLayout?: string
   headerNavAlign?: string
   headerDensity?: string
+  headerWidth?: string
+  headerSticky?: string
 }
 
 /** flag key → { data attribute, allowed values }. Mirrors theme-flags.md §2. */
@@ -152,6 +154,7 @@ export const FLAG_DEFS: Record<keyof ThemeFlags, { attr: string; options: readon
       options: [
         { value: 'nav-right', label: 'Nav right' },
         { value: 'classic', label: 'Classic (nav center)' },
+        { value: 'centered', label: 'Centered (nav below)' },
         { value: 'minimal', label: 'Minimal (menu only)' },
       ],
     },
@@ -169,6 +172,20 @@ export const FLAG_DEFS: Record<keyof ThemeFlags, { attr: string; options: readon
         { value: 'compact', label: 'Compact' },
         { value: 'regular', label: 'Regular' },
         { value: 'tall', label: 'Tall' },
+      ],
+    },
+    headerWidth: {
+      attr: 'data-header-width',
+      options: [
+        { value: 'boxed', label: 'Boxed' },
+        { value: 'full', label: 'Full width' },
+      ],
+    },
+    headerSticky: {
+      attr: 'data-header-sticky',
+      options: [
+        { value: 'sticky', label: 'Sticky' },
+        { value: 'none', label: 'Static' },
       ],
     },
   }
