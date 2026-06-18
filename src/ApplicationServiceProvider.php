@@ -99,6 +99,9 @@ use NeNeRecords\Tag\TagSlugConflictExceptionHandler;
 use NeNeRecords\TextField\TextFieldNotFoundExceptionHandler;
 use NeNeRecords\TextField\TextFieldRouteRegistrar;
 use NeNeRecords\TextField\TextFieldServiceProvider;
+use NeNeRecords\Theme\ThemeNotFoundExceptionHandler;
+use NeNeRecords\Theme\ThemeRouteRegistrar;
+use NeNeRecords\Theme\ThemeServiceProvider;
 use NeNeRecords\User\CannotDeleteSelfExceptionHandler;
 use NeNeRecords\User\EmailVerificationTokenExceptionHandler;
 use NeNeRecords\User\InvalidCurrentPasswordExceptionHandler;
@@ -169,7 +172,8 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
             ->addProvider(new OrganizationServiceProvider())
             ->addProvider(new SystemConfigServiceProvider())
             ->addProvider(new DataMigrationServiceProvider())
-            ->addProvider(new OrgExportServiceProvider());
+            ->addProvider(new OrgExportServiceProvider())
+            ->addProvider(new ThemeServiceProvider());
 
         $builder
             ->set(
@@ -206,6 +210,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $systemConfig = $container->get(SystemConfigRouteRegistrar::class);
                     $dataMigration = $container->get(DataMigrationRouteRegistrar::class);
                     $orgExport     = $container->get(OrgExportRouteRegistrar::class);
+                    $theme = $container->get('nene-records.route_registrar.theme');
 
                     if (
                         !$entityType instanceof EntityTypeRouteRegistrar
@@ -239,6 +244,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         || !$systemConfig instanceof SystemConfigRouteRegistrar
                         || !$dataMigration instanceof DataMigrationRouteRegistrar
                         || !$orgExport instanceof OrgExportRouteRegistrar
+                        || !$theme instanceof ThemeRouteRegistrar
                     ) {
                         throw new LogicException('Route registrar service is invalid.');
                     }
@@ -275,6 +281,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $systemConfig,
                         $dataMigration,
                         $orgExport,
+                        $theme,
                     ];
                 },
             )
@@ -328,6 +335,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $organizationNotFound = $container->get(OrganizationNotFoundExceptionHandler::class);
                     $organizationSlugConflict = $container->get(OrganizationSlugConflictExceptionHandler::class);
                     $notificationChannelNotFound = $container->get(NotificationChannelNotFoundExceptionHandler::class);
+                    $themeNotFound = $container->get(ThemeNotFoundExceptionHandler::class);
 
                     foreach ([
                         $entityTypeNotFound,
@@ -377,6 +385,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $organizationNotFound,
                         $organizationSlugConflict,
                         $notificationChannelNotFound,
+                        $themeNotFound,
                     ] as $handler) {
                         if (!$handler instanceof DomainExceptionHandlerInterface) {
                             throw new LogicException('Exception handler service is invalid.');
@@ -431,6 +440,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $organizationNotFound,
                         $organizationSlugConflict,
                         $notificationChannelNotFound,
+                        $themeNotFound,
                     ];
                 },
             );

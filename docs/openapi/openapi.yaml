@@ -46,6 +46,8 @@ tags:
     description: Webhook endpoints for entity create/update/delete event notifications.
   - name: Users
     description: User account management (admin only) and self-service password change.
+  - name: Themes
+    description: Runtime (data-driven) public-site themes, registrable over MCP. See docs/theming/runtime-themes.md.
 paths:
   /api/v1/auth/login:
     post:
@@ -2874,6 +2876,141 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /api/v1/themes:
+    get:
+      tags:
+        - Themes
+      summary: List runtime themes
+      description: Returns all runtime (data-driven) themes for the organization.
+      operationId: listThemes
+      responses:
+        '200':
+          description: Theme list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThemeListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - Themes
+      summary: Create runtime theme
+      description: >-
+        Registers a new runtime theme. The request body is the theme manifest
+        (public-theme.schema.json shape). The server validates structure and
+        sanitises token values before storing; only known CSS variables with
+        safe values are ever emitted to the public site.
+      operationId: createTheme
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ThemeManifest'
+      responses:
+        '201':
+          description: Created theme.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThemeResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/themes/{key}:
+    get:
+      tags:
+        - Themes
+      summary: Get runtime theme
+      description: Returns a single runtime theme by its key.
+      operationId: getTheme
+      parameters:
+        - name: key
+          in: path
+          required: true
+          description: Theme key (manifest id).
+          schema:
+            type: string
+            pattern: '^[a-z][a-z0-9-]{1,40}$'
+      responses:
+        '200':
+          description: Theme.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThemeResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Themes
+      summary: Update runtime theme
+      description: >-
+        Replaces an existing runtime theme's manifest. The manifest `id` must
+        match the key in the URL (renaming means delete + create).
+      operationId: updateTheme
+      parameters:
+        - name: key
+          in: path
+          required: true
+          description: Theme key (manifest id).
+          schema:
+            type: string
+            pattern: '^[a-z][a-z0-9-]{1,40}$'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ThemeManifest'
+      responses:
+        '200':
+          description: Updated theme.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThemeResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - Themes
+      summary: Delete runtime theme
+      description: Permanently deletes a runtime theme by its key.
+      operationId: deleteTheme
+      parameters:
+        - name: key
+          in: path
+          required: true
+          description: Theme key (manifest id).
+          schema:
+            type: string
+            pattern: '^[a-z][a-z0-9-]{1,40}$'
+      responses:
+        '204':
+          description: Deleted successfully.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /api/v1/public/menus:
     get:
       tags:
@@ -5655,6 +5792,100 @@ components:
             - string
             - 'null'
           enum: [header, footer, null]
+      additionalProperties: false
+
+    ThemeTokenSet:
+      type: object
+      description: >-
+        Map of contract token name (no leading --) to a CSS value. Values are
+        sanitised server-side; only safe CSS is emitted to the public site.
+      additionalProperties:
+        type: string
+        minLength: 1
+    ThemeManifest:
+      type: object
+      description: Runtime theme manifest (public-theme.schema.json shape).
+      required:
+        - id
+        - name
+        - version
+        - supportsModes
+        - tokens
+      properties:
+        id:
+          type: string
+          pattern: '^[a-z][a-z0-9-]{1,40}$'
+        name:
+          type: string
+          minLength: 1
+          maxLength: 80
+        version:
+          type: string
+          pattern: '^[0-9]+\.[0-9]+\.[0-9]+$'
+        supportsModes:
+          type: array
+          items:
+            type: string
+            enum: [light, dark]
+          minItems: 2
+        tokens:
+          type: object
+          required:
+            - light
+            - dark
+          properties:
+            light:
+              $ref: '#/components/schemas/ThemeTokenSet'
+            dark:
+              $ref: '#/components/schemas/ThemeTokenSet'
+          additionalProperties: false
+        flags:
+          type: object
+          additionalProperties:
+            type: string
+        knobs:
+          type: object
+          additionalProperties: true
+        fonts:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+      additionalProperties: true
+    ThemeResponse:
+      type: object
+      required:
+        - theme_key
+        - name
+        - version
+        - manifest
+        - created_at
+        - updated_at
+      properties:
+        theme_key:
+          type: string
+        name:
+          type: string
+        version:
+          type: string
+        manifest:
+          $ref: '#/components/schemas/ThemeManifest'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      additionalProperties: false
+    ThemeListResponse:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ThemeResponse'
       additionalProperties: false
 
 

@@ -121,6 +121,32 @@ $idOnly = [
     ],
 ];
 
+// Runtime theme manifest fields (public-theme.schema.json shape). The request
+// body IS the manifest; token values are sanitised server-side. See #423.
+$themeManifestProps = [
+    'id' => [
+        'type' => 'string',
+        'pattern' => '^[a-z][a-z0-9-]{1,40}$',
+        'description' => 'Theme key/id. Must not collide with a built-in theme.',
+    ],
+    'name' => ['type' => 'string', 'minLength' => 1, 'maxLength' => 80],
+    'version' => ['type' => 'string', 'pattern' => '^[0-9]+\\.[0-9]+\\.[0-9]+$'],
+    'supportsModes' => [
+        'type' => 'array',
+        'items' => ['type' => 'string', 'enum' => ['light', 'dark']],
+        'description' => 'Must include both light and dark.',
+    ],
+    'tokens' => [
+        'type' => 'object',
+        'description' => 'Per-mode CSS tokens: {"light":{token:value,…},"dark":{…}}. Keys are contract tokens; values must be safe CSS (no ;{}<>, url(), @import).',
+    ],
+    'flags' => [
+        'type' => 'object',
+        'description' => 'Optional structural style flags (enumerated; e.g. feedLayout, headerLayout).',
+    ],
+];
+$themeManifestRequired = ['id', 'name', 'version', 'supportsModes', 'tokens'];
+
 $tools = [
     readTool(
         'getHealth',
@@ -709,6 +735,83 @@ $tools = [
             'offset' => ['type' => 'integer', 'minimum' => 0],
         ],
         '#/components/schemas/SettingRevisionListResponse',
+        ['key'],
+    ),
+    readTool(
+        'listThemes',
+        'List Runtime Themes',
+        'List all runtime (data-driven) public-site themes for the organization.',
+        'listThemes',
+        'GET',
+        '/api/v1/themes',
+        [],
+        '#/components/schemas/ThemeListResponse',
+    ),
+    readTool(
+        'createTheme',
+        'Create Runtime Theme',
+        'Register a new runtime public-site theme. The input is the theme manifest (tokens + flags). The server validates structure and sanitises token values before storing; unsafe CSS and reserved ids are rejected.',
+        'createTheme',
+        'POST',
+        '/api/v1/themes',
+        $themeManifestProps,
+        null,
+        $themeManifestRequired,
+        true,
+    ),
+    readTool(
+        'getTheme',
+        'Get Runtime Theme',
+        'Get a single runtime theme by its key.',
+        'getTheme',
+        'GET',
+        '/api/v1/themes/{key}',
+        [
+            'key' => [
+                'type' => 'string',
+                'pattern' => '^[a-z][a-z0-9-]{1,40}$',
+                'description' => 'Theme key.',
+            ],
+        ],
+        '#/components/schemas/ThemeResponse',
+        ['key'],
+    ),
+    readTool(
+        'updateTheme',
+        'Update Runtime Theme',
+        'Replace an existing runtime theme manifest. The manifest id must match the key in the path.',
+        'updateTheme',
+        'PUT',
+        '/api/v1/themes/{key}',
+        array_merge(
+            [
+                'key' => [
+                    'type' => 'string',
+                    'pattern' => '^[a-z][a-z0-9-]{1,40}$',
+                    'description' => 'Theme key (must equal the manifest id).',
+                ],
+            ],
+            $themeManifestProps,
+        ),
+        '#/components/schemas/ThemeResponse',
+        array_merge(['key'], $themeManifestRequired),
+        true,
+    ),
+    readTool(
+        'deleteTheme',
+        'Delete Runtime Theme',
+        'Permanently delete a runtime theme by its key.',
+        'deleteTheme',
+        'DELETE',
+        '/api/v1/themes/{key}',
+        [
+            'key' => [
+                'type' => 'string',
+                'pattern' => '^[a-z][a-z0-9-]{1,40}$',
+                'description' => 'Theme key.',
+            ],
+        ],
+        null,
         ['key'],
     ),
 ];
