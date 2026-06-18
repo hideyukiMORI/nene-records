@@ -3044,6 +3044,41 @@ paths:
                 type: string
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /api/v1/public/themes:
+    get:
+      tags:
+        - PublicConsumer
+      summary: List public runtime themes
+      description: >-
+        Returns runtime (data-driven) themes for the public site. The public
+        site applies the active runtime theme as a scoped stylesheet. No
+        authentication required.
+      operationId: listPublicThemes
+      responses:
+        '200':
+          description: Theme list.
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+            ETag:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThemeListResponse'
+        '304':
+          description: Not Modified — ETag matched, use cached response.
+          headers:
+            ETag:
+              schema:
+                type: string
+            Cache-Control:
+              schema:
+                type: string
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /api/v1/entities/{id}/preview-token:
     post:
       tags:
@@ -5851,6 +5886,13 @@ components:
           items:
             type: object
             additionalProperties: true
+        assets:
+          type: object
+          description: >-
+            Optional asset slots (preview/hero/logo). Each value is a media id
+            (integer) or a safe bundle-relative path; external URLs and data:
+            are rejected server-side. See runtime-themes.md §8.
+          additionalProperties: true
       additionalProperties: true
     ThemeResponse:
       type: object

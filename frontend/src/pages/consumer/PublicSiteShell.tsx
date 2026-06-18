@@ -186,6 +186,7 @@ export function PublicSiteShell({
       data-theme-mode={mode}
       {...site.themeFlagAttrs}
     >
+      {site.runtimeThemeCss !== '' ? <style>{site.runtimeThemeCss}</style> : null}
       {site.themeOverrideCss !== '' ? <style>{site.themeOverrideCss}</style> : null}
       {hasTopbarContent(site.headerConfig.topbar) ? (
         <HeaderTopbarRow topbar={site.headerConfig.topbar} />

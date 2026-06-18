@@ -23,6 +23,8 @@ final class ThemeManifestValidator
     private const ID_PATTERN = '/^[a-z][a-z0-9-]{1,40}$/';
     private const VERSION_PATTERN = '/^[0-9]+\.[0-9]+\.[0-9]+$/';
     private const TOKEN_KEY_PATTERN = '/^[a-z][a-z0-9-]*$/';
+    /** Bundle-relative asset path; rejects external URLs and data: (schema $defs.assetRef). */
+    private const ASSET_REF_PATTERN = '#^(?!https?:)(?!//)(?!data:)[A-Za-z0-9._/-]+\.(png|jpg|jpeg|webp|avif|svg)$#';
 
     /** Required contract tokens per mode (mirrors schema $defs.tokenSet.required). */
     private const REQUIRED_TOKENS = [
@@ -97,6 +99,7 @@ final class ThemeManifestValidator
         self::validateTokens($manifest['tokens'] ?? null, $errors);
         self::validateFlags($manifest['flags'] ?? null, $errors);
         self::validateFonts($manifest['fonts'] ?? null, $errors);
+        self::validateAssets($manifest['assets'] ?? null, $errors);
 
         if ($errors !== []) {
             throw new ValidationException($errors);
@@ -198,6 +201,56 @@ final class ThemeManifestValidator
                 $errors[] = new ValidationError("fonts.{$i}.source", 'Runtime fonts must be fontsource or system.', 'invalid');
             }
         }
+    }
+
+    /**
+     * Assets (preview / hero / logo …) may only be a media id (positive int) or
+     * a safe bundle-relative path — never an external URL or `data:` URI, which
+     * the picker would otherwise fetch. Validated recursively so per-mode
+     * objects ({light,dark}) and decoration arrays are covered (#426).
+     *
+     * @param list<ValidationError> $errors
+     */
+    private static function validateAssets(mixed $assets, array &$errors): void
+    {
+        if ($assets === null) {
+            return;
+        }
+        if (!is_array($assets)) {
+            $errors[] = new ValidationError('assets', 'assets must be an object.', 'invalid');
+
+            return;
+        }
+        self::assertAssetNode('assets', $assets, $errors);
+    }
+
+    /**
+     * @param list<ValidationError> $errors
+     */
+    private static function assertAssetNode(string $field, mixed $node, array &$errors): void
+    {
+        if (is_int($node)) {
+            if ($node <= 0) {
+                $errors[] = new ValidationError($field, 'Media id must be a positive integer.', 'invalid');
+            }
+
+            return;
+        }
+        if (is_string($node)) {
+            if (preg_match(self::ASSET_REF_PATTERN, $node) !== 1) {
+                $errors[] = new ValidationError($field, 'Asset must be a media id or safe bundle-relative path (no external URL or data:).', 'unsafe');
+            }
+
+            return;
+        }
+        if (is_array($node)) {
+            foreach ($node as $key => $value) {
+                self::assertAssetNode($field . '.' . (is_string($key) ? $key : (string) $key), $value, $errors);
+            }
+
+            return;
+        }
+        $errors[] = new ValidationError($field, 'Unsupported asset value.', 'invalid');
     }
 
     /**

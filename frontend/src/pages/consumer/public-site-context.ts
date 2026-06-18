@@ -29,6 +29,8 @@ export interface PublicSite {
   activeTheme: string
   /** Customizer overrides for the active theme, as a scoped CSS stylesheet. */
   themeOverrideCss: string
+  /** Runtime (data-driven) active theme tokens as a scoped stylesheet; '' for built-in themes. */
+  runtimeThemeCss: string
   /** Structural style-flag `data-*` attributes for the active theme. */
   themeFlagAttrs: Record<string, string>
   /** Header content (Top bar + CTA) from the `header_config` setting. */

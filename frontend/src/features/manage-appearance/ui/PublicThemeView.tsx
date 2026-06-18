@@ -1,6 +1,7 @@
+import { useState } from 'react'
 import { useTranslation } from '@/shared/i18n'
 import type { PublicThemeMeta } from '@/shared/lib/public-themes'
-import { Card, Stack, Text } from '@/shared/ui'
+import { Card, ConfirmDialog, Stack, Text, Textarea } from '@/shared/ui'
 import { IconCheck } from '@/shared/ui/icons/Icons'
 import type { PublicThemePageState } from '../hooks/usePublicThemePage'
 
@@ -56,8 +57,46 @@ export function PublicThemeView({
   isLoading,
   isSaving,
   pendingThemeId,
+  runtimeThemes,
+  runtimeKeys,
+  deleteTheme,
+  updateTheme,
+  isMutating,
 }: PublicThemePageState) {
   const { t, locale } = useTranslation()
+  const [confirmKey, setConfirmKey] = useState<string | null>(null)
+  const [editKey, setEditKey] = useState<string | null>(null)
+  const [draft, setDraft] = useState('')
+  const [editError, setEditError] = useState<string | null>(null)
+
+  const openEdit = (key: string): void => {
+    const theme = runtimeThemes.find((item) => item.theme_key === key)
+    if (theme === undefined) {
+      return
+    }
+    setDraft(JSON.stringify(theme.manifest, null, 2))
+    setEditError(null)
+    setEditKey(key)
+  }
+
+  const saveEdit = (): void => {
+    if (editKey === null) {
+      return
+    }
+    let manifest: unknown
+    try {
+      manifest = JSON.parse(draft)
+    } catch {
+      setEditError(t('admin.publicTheme.invalidJson'))
+      return
+    }
+    updateTheme(editKey, manifest as Parameters<typeof updateTheme>[1], {
+      onSuccess: () => {
+        setEditKey(null)
+      },
+      onError: setEditError,
+    })
+  }
 
   return (
     <Stack gap="sm">
@@ -72,47 +111,119 @@ export function PublicThemeView({
           {themes.map((theme) => {
             const isSelected = theme.id === activeThemeId
             const date = formatThemeDate(theme.createdAt, locale)
+            const isRuntime = runtimeKeys.has(theme.id)
             return (
-              <button
-                key={theme.id}
-                type="button"
-                aria-pressed={isSelected}
-                disabled={isLoading || isSaving}
-                onClick={() => {
-                  selectTheme(theme.id)
-                }}
-                className={[
-                  'flex flex-col gap-stack-xs rounded-md border bg-surface p-stack-sm text-left transition-colors duration-fast',
-                  'focus-visible:outline-none focus-visible:shadow-focus disabled:opacity-60',
-                  isSelected
-                    ? 'border-accent ring-1 ring-accent'
-                    : 'border-border hover:border-accent',
-                ].join(' ')}
-              >
-                <ThemeThumb theme={theme} />
-                <span className="flex items-center gap-inline-xs">
-                  <span className="min-w-0 flex-1 truncate font-chrome text-caption font-semibold text-text-primary">
-                    {theme.name}
-                  </span>
-                  {pendingThemeId === theme.id ? (
-                    <span className="shrink-0 text-caption text-text-muted">
-                      {t('admin.publicTheme.saving')}
+              <div key={theme.id} className="flex flex-col gap-stack-xs">
+                <button
+                  type="button"
+                  aria-pressed={isSelected}
+                  disabled={isLoading || isSaving}
+                  onClick={() => {
+                    selectTheme(theme.id)
+                  }}
+                  className={[
+                    'flex flex-col gap-stack-xs rounded-md border bg-surface p-stack-sm text-left transition-colors duration-fast',
+                    'focus-visible:outline-none focus-visible:shadow-focus disabled:opacity-60',
+                    isSelected
+                      ? 'border-accent ring-1 ring-accent'
+                      : 'border-border hover:border-accent',
+                  ].join(' ')}
+                >
+                  <ThemeThumb theme={theme} />
+                  <span className="flex items-center gap-inline-xs">
+                    <span className="min-w-0 flex-1 truncate font-chrome text-caption font-semibold text-text-primary">
+                      {theme.name}
                     </span>
-                  ) : isSelected ? (
-                    <IconCheck size={15} className="shrink-0 text-accent" />
-                  ) : null}
-                </span>
-                <span className="line-clamp-2 text-caption text-text-muted">
-                  {theme.description}
-                </span>
-                <span className="font-chrome text-tiny text-text-muted">
-                  {`v${theme.version} · ${theme.author}${date !== '' ? ` · ${date}` : ''}`}
-                </span>
-              </button>
+                    {isRuntime ? (
+                      <span className="shrink-0 rounded-full border border-border px-inline-xs text-tiny text-text-muted">
+                        {t('admin.publicTheme.runtimeBadge')}
+                      </span>
+                    ) : null}
+                    {pendingThemeId === theme.id ? (
+                      <span className="shrink-0 text-caption text-text-muted">
+                        {t('admin.publicTheme.saving')}
+                      </span>
+                    ) : isSelected ? (
+                      <IconCheck size={15} className="shrink-0 text-accent" />
+                    ) : null}
+                  </span>
+                  <span className="line-clamp-2 text-caption text-text-muted">
+                    {theme.description}
+                  </span>
+                  <span className="font-chrome text-tiny text-text-muted">
+                    {`v${theme.version} · ${theme.author}${date !== '' ? ` · ${date}` : ''}`}
+                  </span>
+                </button>
+                {isRuntime ? (
+                  <span className="flex items-center gap-inline-sm px-inline-xs">
+                    <button
+                      type="button"
+                      className="font-chrome text-tiny text-text-muted hover:text-accent"
+                      onClick={() => {
+                        openEdit(theme.id)
+                      }}
+                    >
+                      {t('admin.publicTheme.edit')}
+                    </button>
+                    <button
+                      type="button"
+                      className="font-chrome text-tiny text-text-muted hover:text-danger"
+                      onClick={() => {
+                        setConfirmKey(theme.id)
+                      }}
+                    >
+                      {t('admin.publicTheme.delete')}
+                    </button>
+                  </span>
+                ) : null}
+              </div>
             )
           })}
         </div>
       </Card>
+
+      <ConfirmDialog
+        open={confirmKey !== null}
+        title={t('admin.publicTheme.deleteTitle')}
+        description={t('admin.publicTheme.deleteBody', { name: confirmKey ?? '' })}
+        confirmLabel={t('admin.publicTheme.delete')}
+        cancelLabel={t('common.actions.cancel')}
+        isPending={isMutating}
+        onConfirm={() => {
+          if (confirmKey !== null) {
+            deleteTheme(confirmKey)
+          }
+          setConfirmKey(null)
+        }}
+        onCancel={() => {
+          setConfirmKey(null)
+        }}
+      />
+
+      <ConfirmDialog
+        open={editKey !== null}
+        title={t('admin.publicTheme.editTitle')}
+        description={t('admin.publicTheme.editBody')}
+        errorDetail={editError}
+        confirmLabel={t('admin.publicTheme.save')}
+        cancelLabel={t('common.actions.cancel')}
+        isPending={isMutating}
+        onConfirm={saveEdit}
+        onCancel={() => {
+          setEditKey(null)
+        }}
+      >
+        <Textarea
+          id="runtime-theme-manifest"
+          aria-label={t('admin.publicTheme.editTitle')}
+          value={draft}
+          onChange={(event) => {
+            setDraft(event.target.value)
+          }}
+          rows={16}
+          mono
+        />
+      </ConfirmDialog>
     </Stack>
   )
 }

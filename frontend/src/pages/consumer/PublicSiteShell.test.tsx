@@ -20,6 +20,7 @@ function makeSite(over: Partial<PublicSite> = {}): PublicSite {
     navItems: [],
     activeTheme: 'consumer',
     themeOverrideCss: '',
+    runtimeThemeCss: '',
     themeFlagAttrs: {},
     headerConfig: DEFAULT_HEADER_CONFIG,
     ...over,
