@@ -1232,6 +1232,65 @@
             "responseSchemaRef": null
         },
         {
+            "name": "previewTheme",
+            "title": "Preview Runtime Theme",
+            "description": "Compute a no-browser preview of a theme manifest: returns the tokens that would render (safe-filtered), the ones dropped, and WCAG contrast for key pairs (light/dark). Non-persistent \u2014 use to self-correct contrast/quality before createTheme/updateTheme.",
+            "safety": "read",
+            "source": {
+                "type": "openapi",
+                "operationId": "previewTheme",
+                "method": "POST",
+                "path": "/api/v1/themes/preview"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "pattern": "^[a-z][a-z0-9-]{1,40}$",
+                        "description": "Theme key/id. Must not collide with a built-in theme."
+                    },
+                    "name": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 80
+                    },
+                    "version": {
+                        "type": "string",
+                        "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+                    },
+                    "supportsModes": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "light",
+                                "dark"
+                            ]
+                        },
+                        "description": "Must include both light and dark."
+                    },
+                    "tokens": {
+                        "type": "object",
+                        "description": "Per-mode CSS tokens: {\"light\":{token:value,\u2026},\"dark\":{\u2026}}. Keys are contract tokens; values must be safe CSS (no ;{}<>, url(), @import)."
+                    },
+                    "flags": {
+                        "type": "object",
+                        "description": "Optional structural style flags (enumerated; e.g. feedLayout, headerLayout)."
+                    }
+                },
+                "required": [
+                    "id",
+                    "name",
+                    "version",
+                    "supportsModes",
+                    "tokens"
+                ],
+                "additionalProperties": true
+            },
+            "responseSchemaRef": "#/components/schemas/ThemePreviewResponse"
+        },
+        {
             "name": "getTheme",
             "title": "Get Runtime Theme",
             "description": "Get a single runtime theme by its key.",

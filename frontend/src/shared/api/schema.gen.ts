@@ -1180,6 +1180,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/themes/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Preview a theme manifest (computed)
+         * @description Non-persistent dry-run: validates a manifest and returns the tokens that would actually render (safe-filtered), the ones dropped, and WCAG contrast for key pairs in both modes. Lets ClaudeDesign self-correct before committing via createTheme/updateTheme. Always 200 — issues are reported in the body. See theme-preview.md.
+         */
+        post: operations["previewTheme"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/themes/authoring-guide": {
         parameters: {
             query?: never;
@@ -2354,6 +2374,38 @@ export interface components {
         };
         ThemeListResponse: {
             items: components["schemas"]["ThemeResponse"][];
+        };
+        /** @description Computed (no-browser) preview of a theme manifest (#433). */
+        ThemePreviewResponse: {
+            /** @description Whether the manifest passes structural validation. */
+            valid: boolean;
+            /** @description Validation errors (empty when valid). */
+            errors: {
+                [key: string]: unknown;
+            }[];
+            /** @description Per-mode tokens that would actually render (safe-filtered). */
+            applied: {
+                light?: {
+                    [key: string]: string;
+                };
+                dark?: {
+                    [key: string]: string;
+                };
+            };
+            /** @description Tokens removed by the safety filter, with reason. */
+            dropped: {
+                [key: string]: unknown;
+            }[];
+            /** @description WCAG contrast rows per mode (pair / ratio / aa / aaa / computable). */
+            contrast: {
+                light?: {
+                    [key: string]: unknown;
+                }[];
+                dark?: {
+                    [key: string]: unknown;
+                }[];
+            };
+            warnings: string[];
         };
         /** @description Machine-usable guide for authoring runtime themes over MCP. The `contract` block is derived from the server-side validator. */
         ThemeAuthoringGuideResponse: {
@@ -5535,6 +5587,32 @@ export interface operations {
             };
             401: components["responses"]["Unauthorized"];
             422: components["responses"]["ValidationFailed"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    previewTheme: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ThemeManifest"];
+            };
+        };
+        responses: {
+            /** @description Computed preview report. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ThemePreviewResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
             500: components["responses"]["InternalServerError"];
         };
     };

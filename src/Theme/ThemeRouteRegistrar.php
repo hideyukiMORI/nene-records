@@ -16,6 +16,7 @@ final readonly class ThemeRouteRegistrar
         private UpdateThemeHandler $updateHandler,
         private DeleteThemeHandler $deleteHandler,
         private ListPublicThemesHandler $listPublicHandler,
+        private PreviewThemeHandler $previewHandler,
         private ThemeAuthoringGuideHandler $authoringGuideHandler,
     ) {
     }
@@ -28,6 +29,7 @@ final readonly class ThemeRouteRegistrar
         $update = $this->updateHandler;
         $delete = $this->deleteHandler;
         $listPublic = $this->listPublicHandler;
+        $preview = $this->previewHandler;
         $authoringGuide = $this->authoringGuideHandler;
 
         // In-band authoring guide for MCP agents (#440). The router prioritises
@@ -43,6 +45,11 @@ final readonly class ThemeRouteRegistrar
         $router->post(
             '/api/v1/themes',
             static fn (ServerRequestInterface $request) => $create->handle($request),
+        );
+        // Computed preview (non-persistent dry-run): contrast/quality report.
+        $router->post(
+            '/api/v1/themes/preview',
+            static fn (ServerRequestInterface $request) => $preview->handle($request),
         );
         $router->get(
             '/api/v1/themes/{key}',
