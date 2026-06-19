@@ -4,6 +4,7 @@ import type { PublicThemeMeta } from '@/shared/lib/public-themes'
 import { Card, ConfirmDialog, Stack, Text, Textarea } from '@/shared/ui'
 import { IconCheck } from '@/shared/ui/icons/Icons'
 import type { PublicThemePageState } from '../hooks/usePublicThemePage'
+import { ThemeMiniPreview } from './ThemeMiniPreview'
 
 /** Format an ISO (YYYY-MM-DD) date for the active locale; '' if unparseable. */
 function formatThemeDate(iso: string, locale: string): string {
@@ -15,9 +16,10 @@ function formatThemeDate(iso: string, locale: string): string {
 }
 
 /**
- * Card thumbnail: the theme's preview image when present, otherwise a colour
- * swatch (surface · raised · accent) so every theme still reads at a glance.
- * The image slot is ready ahead of real screenshots (see public-themes.ts).
+ * Card thumbnail: the theme's preview image (`assets.preview`) when present,
+ * otherwise a live mini mockup generated from the theme's own swatch tokens —
+ * so every runtime theme has a recognisable thumbnail with no image upload
+ * (#450). The image stays as an optional override.
  */
 function ThemeThumb({ theme }: { theme: PublicThemeMeta }) {
   if (theme.thumbnail !== undefined && theme.thumbnail !== '') {
@@ -31,17 +33,7 @@ function ThemeThumb({ theme }: { theme: PublicThemeMeta }) {
       />
     )
   }
-  return (
-    <span
-      aria-hidden
-      style={{ aspectRatio: '16 / 7' }}
-      className="flex w-full overflow-hidden rounded-sm border border-border"
-    >
-      <i className="flex-1" style={{ background: theme.preview.surface }} />
-      <i className="flex-1" style={{ background: theme.preview.raised }} />
-      <i className="flex-1" style={{ background: theme.preview.accent }} />
-    </span>
-  )
+  return <ThemeMiniPreview preview={theme.preview} />
 }
 
 /**
