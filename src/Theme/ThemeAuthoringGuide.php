@@ -343,6 +343,8 @@ final class ThemeAuthoringGuide
             'id' => 'example-theme',
             'name' => 'Example Theme',
             'version' => '1.0.0',
+            'description' => 'A clean, accessible starting point — restyle the tokens to make it yours.',
+            'author' => 'ClaudeDesign',
             'supportsModes' => ['light', 'dark'],
             'tokens' => ['light' => $light, 'dark' => $dark],
             'flags' => [
@@ -362,6 +364,12 @@ final class ThemeAuthoringGuide
     private static function optionalFields(): array
     {
         return [
+            'metadata' => [
+                'note' => 'Top-level manifest strings shown in the admin theme picker. Set them so your '
+                    . 'themes are recognisable.',
+                'description' => 'Short blurb under the theme name (≤280 chars).',
+                'author' => 'Author/credit (≤80 chars).',
+            ],
             'fonts' => [
                 'shape' => '{ family, role, source, weights? }',
                 'roles' => ['display', 'body', 'chrome', 'mono'],

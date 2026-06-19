@@ -5931,6 +5931,14 @@ components:
         version:
           type: string
           pattern: '^[0-9]+\.[0-9]+\.[0-9]+$'
+        description:
+          type: string
+          maxLength: 280
+          description: Optional blurb shown under the theme name in the picker.
+        author:
+          type: string
+          maxLength: 80
+          description: Optional author/credit shown in the picker.
         supportsModes:
           type: array
           items:

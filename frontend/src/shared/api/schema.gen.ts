@@ -2359,6 +2359,10 @@ export interface components {
             id: string;
             name: string;
             version: string;
+            /** @description Optional blurb shown under the theme name in the picker. */
+            description?: string;
+            /** @description Optional author/credit shown in the picker. */
+            author?: string;
             supportsModes: ("light" | "dark")[];
             tokens: {
                 light: components["schemas"]["ThemeTokenSet"];
