@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { type ReactNode, useState } from 'react'
 import { useTranslation } from '@/shared/i18n'
 import {
   DENSITY_OPTIONS,
@@ -11,7 +11,7 @@ import {
   WIDTH_OPTIONS,
   type KnobOption,
 } from '@/shared/lib/theme-customization'
-import { Button, Card, Stack, Text } from '@/shared/ui'
+import { Button, Card, ConfirmDialog, Input, Stack, Text, Textarea } from '@/shared/ui'
 import type { ThemeCustomizePageState } from '../hooks/useThemeCustomizePage'
 
 function Field({ label, children }: { label: string; children: ReactNode }) {
@@ -88,6 +88,9 @@ export function ThemeCustomizeView({
   setKnob,
   save,
   reset,
+  canSaveAsTheme,
+  saveAsNewTheme,
+  isCreating,
   isLoading,
   isSaving,
   isDirty,
@@ -95,6 +98,16 @@ export function ThemeCustomizeView({
   const { t } = useTranslation()
   const disabled = isLoading || isSaving
   const themePlaceholder = t('admin.themeCustomize.themeDefault')
+
+  const [saveAsOpen, setSaveAsOpen] = useState(false)
+  const [newName, setNewName] = useState('')
+  const [newDescription, setNewDescription] = useState('')
+
+  const closeSaveAs = () => {
+    setSaveAsOpen(false)
+    setNewName('')
+    setNewDescription('')
+  }
 
   return (
     <Card padding="none" className="p-stack-md">
@@ -399,8 +412,52 @@ export function ThemeCustomizeView({
           <Button variant="ghost" onClick={reset} disabled={disabled}>
             {t('admin.themeCustomize.reset')}
           </Button>
+          <Button
+            variant="ghost"
+            className="ml-auto"
+            onClick={() => {
+              setSaveAsOpen(true)
+            }}
+            disabled={disabled || !canSaveAsTheme}
+          >
+            {t('admin.themeCustomize.saveAsTheme')}
+          </Button>
         </div>
       </Stack>
+
+      <ConfirmDialog
+        open={saveAsOpen}
+        title={t('admin.themeCustomize.saveAsTitle')}
+        description={t('admin.themeCustomize.saveAsDescription')}
+        confirmLabel={t('admin.themeCustomize.saveAsConfirm')}
+        cancelLabel={t('admin.themeCustomize.saveAsCancel')}
+        isPending={isCreating}
+        confirmDisabled={newName.trim() === ''}
+        onConfirm={() => {
+          saveAsNewTheme(newName, newDescription, { onSuccess: closeSaveAs, onError: () => {} })
+        }}
+        onCancel={closeSaveAs}
+      >
+        <Stack gap="sm">
+          <Input
+            id="save-as-theme-name"
+            label={t('admin.themeCustomize.saveAsName')}
+            value={newName}
+            onChange={(event) => {
+              setNewName(event.target.value)
+            }}
+          />
+          <Textarea
+            id="save-as-theme-description"
+            label={t('admin.themeCustomize.saveAsDescriptionLabel')}
+            value={newDescription}
+            rows={2}
+            onChange={(event) => {
+              setNewDescription(event.target.value)
+            }}
+          />
+        </Stack>
+      </ConfirmDialog>
     </Card>
   )
 }
