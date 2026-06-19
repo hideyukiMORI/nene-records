@@ -1,0 +1,252 @@
+// Thin remote MCP server (Streamable HTTP) that bridges docs/mcp/tools.json to
+// the NeNe Records HTTP API, so Claude.ai can register it as a custom connector.
+// VERIFICATION USE: run locally + expose via cloudflared while your PC is on.
+// See docs/integrations/mcp-connector.md.
+
+import { readFileSync } from 'node:fs'
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { randomUUID } from 'node:crypto'
+import express from 'express'
+import { Server } from '@modelcontextprotocol/sdk/server/index.js'
+import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js'
+import {
+  CallToolRequestSchema,
+  ListToolsRequestSchema,
+  isInitializeRequest,
+} from '@modelcontextprotocol/sdk/types.js'
+
+// ── Config (env) ────────────────────────────────────────────────────────────
+const API_BASE = (process.env.NENE_API_BASE ?? 'http://localhost:18082').replace(/\/$/, '')
+const PORT = Number(process.env.MCP_PORT ?? 8765)
+const MCP_PATH = process.env.MCP_PATH ?? '/mcp'
+const READONLY = process.env.MCP_READONLY !== '0' // default: read tools only
+const SCOPE = process.env.MCP_TOOLS ?? 'themes' // 'themes' | 'all'
+const BRIDGE_SECRET = process.env.MCP_BRIDGE_SECRET ?? '' // optional ?key= guard
+
+// Auth: prefer email/password so the bridge can refresh its own JWT (admin
+// tokens expire after 24h — a static NENE_API_TOKEN dies overnight for an
+// always-on bridge). NENE_API_TOKEN still works as a one-shot fallback.
+const API_EMAIL = process.env.NENE_API_EMAIL ?? ''
+const API_PASSWORD = process.env.NENE_API_PASSWORD ?? ''
+const STATIC_TOKEN = process.env.NENE_API_TOKEN ?? ''
+
+if (API_EMAIL === '' && STATIC_TOKEN === '') {
+  console.error(
+    'Set NENE_API_EMAIL + NENE_API_PASSWORD (recommended, auto-refresh) or NENE_API_TOKEN. See the docs.',
+  )
+  process.exit(1)
+}
+
+// Refusing to expose write tools without a guard on a public tunnel is the one
+// hard safety rule of the bridge (see handoff). Fail fast rather than leak it.
+if (!READONLY && BRIDGE_SECRET === '') {
+  console.error(
+    'Write tools are enabled (MCP_READONLY=0) but MCP_BRIDGE_SECRET is empty. ' +
+      'Refusing to expose write over an unauthenticated endpoint. Set MCP_BRIDGE_SECRET.',
+  )
+  process.exit(1)
+}
+
+// ── Load + filter the tool catalogue ────────────────────────────────────────
+const here = dirname(fileURLToPath(import.meta.url))
+const catalogue = JSON.parse(readFileSync(resolve(here, '../docs/mcp/tools.json'), 'utf8'))
+
+/** Normalise an inputSchema: tools.json serialises "no properties" as [] (PHP). */
+function normaliseSchema(schema) {
+  const s = { ...(schema ?? {}) }
+  s.type ??= 'object'
+  if (Array.isArray(s.properties)) s.properties = {}
+  s.properties ??= {}
+  return s
+}
+
+const tools = catalogue.tools
+  .filter((t) => (SCOPE === 'all' ? true : /theme/i.test(t.name)))
+  .filter((t) => (READONLY ? t.safety === 'read' : true))
+  .map((t) => ({
+    name: t.name,
+    description: t.description,
+    inputSchema: normaliseSchema(t.inputSchema),
+    _source: t.source, // { method, path }
+  }))
+
+const byName = new Map(tools.map((t) => [t.name, t]))
+
+console.error(
+  `[mcp-bridge] ${tools.length} tool(s) exposed (scope=${SCOPE}, readonly=${READONLY}): ` +
+    tools.map((t) => t.name).join(', '),
+)
+
+// ── Token manager (auto-refresh so an always-on bridge never expires) ───────
+let currentToken = STATIC_TOKEN
+
+async function login() {
+  if (API_EMAIL === '') {
+    throw new Error('Token expired and no NENE_API_EMAIL/PASSWORD configured to re-login.')
+  }
+  const res = await fetch(`${API_BASE}/api/v1/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify({ email: API_EMAIL, password: API_PASSWORD }),
+  })
+  if (!res.ok) {
+    throw new Error(`Login failed (${res.status}). Check NENE_API_EMAIL/PASSWORD.`)
+  }
+  const data = await res.json()
+  currentToken = data.token
+  console.error('[mcp-bridge] obtained a fresh API token')
+  return currentToken
+}
+
+// ── Proxy a tool call to the NeNe Records HTTP API ──────────────────────────
+async function callTool(name, args) {
+  const tool = byName.get(name)
+  if (!tool) {
+    return { content: [{ type: 'text', text: `Unknown tool: ${name}` }], isError: true }
+  }
+
+  const { method, path } = tool._source
+  const rest = { ...args }
+
+  // Substitute {param} path segments, consuming them from the args.
+  const filledPath = path.replace(/\{(\w+)\}/g, (_, key) => {
+    const value = rest[key]
+    delete rest[key]
+    return encodeURIComponent(String(value ?? ''))
+  })
+
+  let url = API_BASE + filledPath
+  const init = {
+    method,
+    headers: { Accept: 'application/json' },
+  }
+
+  if (method === 'GET' || method === 'DELETE') {
+    const qs = new URLSearchParams()
+    for (const [k, v] of Object.entries(rest)) qs.append(k, String(v))
+    if ([...qs].length > 0) url += `?${qs.toString()}`
+  } else {
+    init.headers['Content-Type'] = 'application/json'
+    init.body = JSON.stringify(rest)
+  }
+
+  try {
+    // On a 401 the JWT likely expired — re-login once and retry transparently.
+    let res = await fetch(url, { ...init, headers: { ...init.headers, Authorization: `Bearer ${currentToken}` } })
+    if (res.status === 401 && API_EMAIL !== '') {
+      await login()
+      res = await fetch(url, { ...init, headers: { ...init.headers, Authorization: `Bearer ${currentToken}` } })
+    }
+    const text = await res.text()
+    return {
+      content: [{ type: 'text', text: text === '' ? `(${res.status})` : text }],
+      isError: !res.ok,
+    }
+  } catch (err) {
+    return { content: [{ type: 'text', text: `Bridge request failed: ${String(err)}` }], isError: true }
+  }
+}
+
+// Surfaced to the model on initialize so an agent (ClaudeDesign) knows the
+// golden loop before touching write tools. The guide tool itself returns the
+// machine-usable contract (required tokens, flag enums, value rules, example).
+const SERVER_INSTRUCTIONS =
+  'NeNe Records runtime themes over MCP. Before you create or update a theme, ' +
+  'call getThemeAuthoringGuide once to fetch the manifest contract (required ' +
+  'tokens for light AND dark, flag enums, token value rules, reserved ids) and ' +
+  'a valid example. Then build the manifest and call createTheme (or updateTheme ' +
+  'to replace an existing one). Use listThemes/getTheme to inspect current state. ' +
+  'A 422 response lists exactly which fields failed — fix those and retry.'
+
+function buildServer() {
+  const server = new Server(
+    { name: 'nene-records-themes', version: '0.1.0' },
+    { capabilities: { tools: {} }, instructions: SERVER_INSTRUCTIONS },
+  )
+  server.setRequestHandler(ListToolsRequestSchema, async () => ({
+    tools: tools.map(({ name, description, inputSchema }) => ({ name, description, inputSchema })),
+  }))
+  server.setRequestHandler(CallToolRequestSchema, async (req) =>
+    callTool(req.params.name, req.params.arguments ?? {}),
+  )
+  return server
+}
+
+// ── HTTP (Streamable HTTP transport, stateful sessions) ─────────────────────
+const app = express()
+app.use(express.json({ limit: '4mb' }))
+
+app.get('/health', (_req, res) => res.json({ ok: true, tools: tools.length }))
+
+/** Optional obscurity guard: if MCP_BRIDGE_SECRET is set, require ?key=<secret>. */
+function guard(req, res) {
+  if (BRIDGE_SECRET !== '' && req.query.key !== BRIDGE_SECRET) {
+    res.status(401).send('Unauthorized')
+    return false
+  }
+  return true
+}
+
+/** sessionId -> transport */
+const transports = {}
+
+app.post(MCP_PATH, async (req, res) => {
+  if (!guard(req, res)) return
+
+  const sessionId = req.headers['mcp-session-id']
+  let transport = sessionId ? transports[sessionId] : undefined
+
+  if (transport === undefined && isInitializeRequest(req.body)) {
+    transport = new StreamableHTTPServerTransport({
+      sessionIdGenerator: () => randomUUID(),
+      onsessioninitialized: (sid) => {
+        transports[sid] = transport
+      },
+    })
+    transport.onclose = () => {
+      if (transport.sessionId) delete transports[transport.sessionId]
+    }
+    await buildServer().connect(transport)
+  } else if (transport === undefined) {
+    res.status(400).json({
+      jsonrpc: '2.0',
+      error: { code: -32000, message: 'Bad Request: no valid session ID' },
+      id: null,
+    })
+    return
+  }
+
+  await transport.handleRequest(req, res, req.body)
+})
+
+async function handleSessionRequest(req, res) {
+  if (!guard(req, res)) return
+  const sessionId = req.headers['mcp-session-id']
+  const transport = sessionId ? transports[sessionId] : undefined
+  if (transport === undefined) {
+    res.status(400).send('Invalid or missing session ID')
+    return
+  }
+  await transport.handleRequest(req, res)
+}
+
+app.get(MCP_PATH, handleSessionRequest)
+app.delete(MCP_PATH, handleSessionRequest)
+
+// Warm the token at boot so bad credentials fail loudly now, not on first call.
+if (STATIC_TOKEN === '') {
+  try {
+    await login()
+  } catch (err) {
+    console.error(`[mcp-bridge] startup login failed: ${String(err)}`)
+    process.exit(1)
+  }
+}
+
+app.listen(PORT, () => {
+  console.error(
+    `[mcp-bridge] listening on http://localhost:${PORT}${MCP_PATH} → ${API_BASE} ` +
+      `(readonly=${READONLY}, guard=${BRIDGE_SECRET !== '' ? 'on' : 'off'})`,
+  )
+})

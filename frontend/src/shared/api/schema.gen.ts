@@ -1200,6 +1200,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/themes/authoring-guide": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Theme authoring guide
+         * @description In-band guide for AI agents (ClaudeDesign) registering runtime themes over MCP. Returns the manifest contract (required tokens, flag enums, token value rules, reserved ids), recipes and a minimal valid example — derived from the server-side validator so it never drifts from what is enforced. See #440.
+         */
+        get: operations["getThemeAuthoringGuide"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/themes/{key}": {
         parameters: {
             query?: never;
@@ -2386,6 +2406,37 @@ export interface components {
                 }[];
             };
             warnings: string[];
+        };
+        /** @description Machine-usable guide for authoring runtime themes over MCP. The `contract` block is derived from the server-side validator. */
+        ThemeAuthoringGuideResponse: {
+            summary: string;
+            authentication: string;
+            /** @description What a manifest must satisfy: required tokens, flag enums, token value rules, reserved ids and id/version patterns. */
+            contract: {
+                [key: string]: unknown;
+            };
+            /** @description Per required-token semantics: { purpose, pairsWith }. pairsWith names the token this one must contrast against (or empty). */
+            tokenDocs: {
+                [key: string]: {
+                    [key: string]: unknown;
+                };
+            };
+            /** @description What each structural flag controls. */
+            flagDocs: {
+                [key: string]: string;
+            };
+            recipes: {
+                [key: string]: unknown;
+            }[];
+            exampleManifest: components["schemas"]["ThemeManifest"];
+            /** @description Shapes and examples for the optional fonts and assets blocks. */
+            optionalFields: {
+                [key: string]: unknown;
+            };
+            commonMistakes: string[];
+            relatedTools: {
+                [key: string]: string;
+            };
         };
         WebhookResponse: {
             /** Format: int64 */
@@ -5559,6 +5610,28 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ThemePreviewResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    getThemeAuthoringGuide: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authoring guide. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ThemeAuthoringGuideResponse"];
                 };
             };
             401: components["responses"]["Unauthorized"];

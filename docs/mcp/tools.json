@@ -1137,6 +1137,24 @@
             "responseSchemaRef": "#/components/schemas/SettingRevisionListResponse"
         },
         {
+            "name": "getThemeAuthoringGuide",
+            "title": "Theme Authoring Guide",
+            "description": "Read this FIRST before creating or updating a runtime theme. Returns the manifest contract (required tokens, flag enums, token value rules, reserved ids), recipes, common mistakes and a minimal valid example manifest. Derived from the server validator so it matches exactly what createTheme/updateTheme enforce.",
+            "safety": "read",
+            "source": {
+                "type": "openapi",
+                "operationId": "getThemeAuthoringGuide",
+                "method": "GET",
+                "path": "/api/v1/themes/authoring-guide"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": [],
+                "additionalProperties": false
+            },
+            "responseSchemaRef": "#/components/schemas/ThemeAuthoringGuideResponse"
+        },
+        {
             "name": "listThemes",
             "title": "List Runtime Themes",
             "description": "List all runtime (data-driven) public-site themes for the organization.",
