@@ -2415,6 +2415,10 @@ export interface components {
             contract: {
                 [key: string]: unknown;
             };
+            /** @description How a runtime theme actually renders: base engine + tokens (CSS vars) + flags (data-* attributes). Includes the optional engine tokens beyond the colour contract, flag→attribute map and the WCAG AA contrast target. */
+            renderModel: {
+                [key: string]: unknown;
+            };
             /** @description Per required-token semantics: { purpose, pairsWith }. pairsWith names the token this one must contrast against (or empty). */
             tokenDocs: {
                 [key: string]: {

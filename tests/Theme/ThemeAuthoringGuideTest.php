@@ -74,4 +74,51 @@ final class ThemeAuthoringGuideTest extends TestCase
         self::assertNotEmpty($guide['commonMistakes']);
         self::assertNotSame('', $guide['summary']);
     }
+
+    public function testRenderModelDescribesTheEngineContract(): void
+    {
+        $rm = ThemeAuthoringGuide::build()['renderModel'];
+
+        self::assertNotSame('', $rm['premise']);
+        self::assertStringContainsString('public-site.css', $rm['premise']);
+        self::assertStringContainsString('AA', $rm['contrastTarget']);
+        self::assertSame(ThemeManifestValidator::contract()['requiredTokens'], $rm['requiredTokens']);
+    }
+
+    public function testFlagAttributesMatchTheFrontendDefs(): void
+    {
+        $attrs = ThemeAuthoringGuide::build()['renderModel']['flagAttributes'];
+        $contract = ThemeManifestValidator::contract();
+
+        // Same flags as the contract, and each attribute string must appear in
+        // the frontend FLAG_DEFS source — so a rename there fails this test.
+        self::assertEqualsCanonicalizing(array_keys($contract['flags']), array_keys($attrs));
+        $frontend = self::readFrontend('src/shared/lib/theme-customization.ts');
+        foreach ($attrs as $flag => $attr) {
+            self::assertStringContainsString("attr: '{$attr}'", $frontend, "flag {$flag}");
+        }
+    }
+
+    public function testOptionalTokensCoverEveryEngineVarNoDrift(): void
+    {
+        $rm = ThemeAuthoringGuide::build()['renderModel'];
+        $documented = array_merge($rm['requiredTokens'], array_keys($rm['optionalTokens']));
+
+        // Every var(--x) the base engine reads must be a token an author can set.
+        $css = self::readFrontend('src/pages/consumer/public-site.css');
+        preg_match_all('/var\(--([a-z0-9-]+)\)/', $css, $matches);
+        $engineVars = array_values(array_unique($matches[1]));
+        self::assertNotEmpty($engineVars);
+
+        $missing = array_diff($engineVars, $documented);
+        self::assertSame([], array_values($missing), 'undocumented engine vars: ' . implode(', ', $missing));
+    }
+
+    private static function readFrontend(string $relative): string
+    {
+        $path = dirname(__DIR__, 2) . '/frontend/' . $relative;
+        self::assertFileExists($path);
+
+        return (string) file_get_contents($path);
+    }
 }

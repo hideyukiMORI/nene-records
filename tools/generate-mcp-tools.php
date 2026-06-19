@@ -738,6 +738,16 @@ $tools = [
         ['key'],
     ),
     readTool(
+        'listMedia',
+        'List Media',
+        'List uploaded media items (newest first). Use this to find the media id for a theme manifest assets.preview / hero / background slot.',
+        'listMedia',
+        'GET',
+        '/api/v1/media',
+        [],
+        '#/components/schemas/MediaListResponse',
+    ),
+    readTool(
         'getThemeAuthoringGuide',
         'Theme Authoring Guide',
         'Read this FIRST before creating or updating a runtime theme. Returns the manifest contract (required tokens, flag enums, token value rules, reserved ids), recipes, common mistakes and a minimal valid example manifest. Derived from the server validator so it matches exactly what createTheme/updateTheme enforce.',
