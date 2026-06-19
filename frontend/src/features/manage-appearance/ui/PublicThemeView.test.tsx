@@ -35,12 +35,16 @@ describe('PublicThemeView', () => {
   it('renders a card per registered theme and marks the active one', () => {
     renderView()
     const active = screen.getByRole('button', { name: /Terracotta/ })
-    expect(active).toHaveAttribute('aria-pressed', 'true')
+    expect(active).toHaveAttribute('aria-current', 'true')
   })
 
-  it('calls selectTheme when a theme card is clicked', () => {
+  it('opens a details modal on card click and applies only on confirm', () => {
     const { selectTheme } = renderView({ activeThemeId: 'other' })
+    // A single card click opens details — it must NOT apply yet.
     fireEvent.click(screen.getByRole('button', { name: /Terracotta/ }))
+    expect(selectTheme).not.toHaveBeenCalled()
+    // Explicit apply in the modal applies it.
+    fireEvent.click(screen.getByRole('button', { name: /Apply this theme/ }))
     expect(selectTheme).toHaveBeenCalledWith('consumer')
   })
 
@@ -64,6 +68,7 @@ describe('PublicThemeView', () => {
       activeThemeId: 'consumer',
     })
     fireEvent.click(screen.getByRole('button', { name: /Midnight/ }))
+    fireEvent.click(screen.getByRole('button', { name: /Apply this theme/ }))
     expect(selectTheme).toHaveBeenCalledWith('midnight')
   })
 

@@ -56,10 +56,13 @@ export function PublicThemeView({
   isMutating,
 }: PublicThemePageState) {
   const { t, locale } = useTranslation()
+  const [detailsId, setDetailsId] = useState<string | null>(null)
   const [confirmKey, setConfirmKey] = useState<string | null>(null)
   const [editKey, setEditKey] = useState<string | null>(null)
   const [draft, setDraft] = useState('')
   const [editError, setEditError] = useState<string | null>(null)
+
+  const detailsTheme = themes.find((theme) => theme.id === detailsId)
 
   const openEdit = (key: string): void => {
     const theme = runtimeThemes.find((item) => item.theme_key === key)
@@ -108,10 +111,10 @@ export function PublicThemeView({
               <div key={theme.id} className="flex flex-col gap-stack-xs">
                 <button
                   type="button"
-                  aria-pressed={isSelected}
+                  aria-current={isSelected ? 'true' : undefined}
                   disabled={isLoading || isSaving}
                   onClick={() => {
-                    selectTheme(theme.id)
+                    setDetailsId(theme.id)
                   }}
                   className={[
                     'flex flex-col gap-stack-xs rounded-md border bg-surface p-stack-sm text-left transition-colors duration-fast',
@@ -216,6 +219,40 @@ export function PublicThemeView({
           mono
         />
       </ConfirmDialog>
+
+      {detailsTheme !== undefined ? (
+        <ConfirmDialog
+          open
+          title={detailsTheme.name}
+          confirmLabel={
+            detailsTheme.id === activeThemeId
+              ? t('admin.publicTheme.applied')
+              : t('admin.publicTheme.apply')
+          }
+          cancelLabel={t('common.actions.cancel')}
+          confirmDisabled={detailsTheme.id === activeThemeId}
+          isPending={pendingThemeId === detailsTheme.id}
+          onConfirm={() => {
+            selectTheme(detailsTheme.id)
+            setDetailsId(null)
+          }}
+          onCancel={() => {
+            setDetailsId(null)
+          }}
+        >
+          <Stack gap="sm">
+            <ThemeThumb theme={detailsTheme} />
+            <Text variant="caption">{detailsTheme.description}</Text>
+            <Text muted variant="caption">
+              {`v${detailsTheme.version} · ${detailsTheme.author}${
+                formatThemeDate(detailsTheme.createdAt, locale) !== ''
+                  ? ` · ${formatThemeDate(detailsTheme.createdAt, locale)}`
+                  : ''
+              }`}
+            </Text>
+          </Stack>
+        </ConfirmDialog>
+      ) : null}
     </Stack>
   )
 }

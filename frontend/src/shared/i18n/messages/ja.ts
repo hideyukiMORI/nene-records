@@ -52,6 +52,8 @@ export const ja: Partial<MessageCatalog> = {
   'admin.publicTheme.intro': 'すべての公開ページに適用するテーマを選びます。',
   'admin.publicTheme.saving': '保存中…',
   'admin.publicTheme.runtimeBadge': 'Runtime',
+  'admin.publicTheme.apply': 'このテーマを適用',
+  'admin.publicTheme.applied': '適用中',
   'admin.publicTheme.edit': '編集',
   'admin.publicTheme.delete': '削除',
   'admin.publicTheme.deleteTitle': 'テーマを削除',
