@@ -58,13 +58,15 @@ final class ThemeManifestValidator
 
     /**
      * Built-in (static) theme ids — runtime themes must not shadow them.
-     * Mirrors frontend/src/shared/lib/public-themes.ts PUBLIC_THEMES + the
-     * authoring bundles under themes/. Keep in sync when built-ins change.
+     * Must cover every `[data-theme='id']` defined under
+     * frontend/src/shared/ui/theme/themes/*.css; ThemeReservedKeysSyncTest
+     * fails if a built-in is added without updating this list.
      */
     private const RESERVED_KEYS = [
-        'consumer', 'aurora', 'reading', 'noir', 'botanical', 'pastel',
-        'newsprint', 'academia', 'coastal', 'funk',
-        'synthwave', 'terminal', 'western', 'y2k',
+        'academia', 'aurora', 'botanical', 'brutalist', 'coastal', 'comic',
+        'consumer', 'deco', 'funk', 'gothic', 'japandi', 'kraft', 'luxe',
+        'memphis', 'nebula', 'newsprint', 'noir', 'pastel', 'reading', 'riso',
+        'stadium', 'sumi', 'swiss', 'synthwave', 'terminal', 'western', 'y2k',
     ];
 
     private const MAX_TOKEN_VALUE_LEN = 200;
