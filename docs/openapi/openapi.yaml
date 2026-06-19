@@ -2975,6 +2975,28 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /api/v1/themes/engine-css:
+    get:
+      tags:
+        - Themes
+      summary: Public-site base engine CSS
+      description: >-
+        Returns the deployed public-site base engine CSS so an AI agent can copy
+        exact flag implementations (e.g. [data-cards='framed']) instead of
+        guessing radius/border/padding. Runtime themes restyle this engine via
+        tokens and flags; per-theme components.css is not included. See #448.
+      operationId: getThemeEngineCss
+      responses:
+        '200':
+          description: Engine CSS.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThemeEngineCssResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /api/v1/themes/{key}:
     get:
       tags:
@@ -6115,6 +6137,27 @@ components:
           type: object
           additionalProperties:
             type: string
+      additionalProperties: false
+    ThemeEngineCssResponse:
+      type: object
+      description: Deployed public-site base engine CSS (#448).
+      required:
+        - source
+        - bytes
+        - css
+        - note
+      properties:
+        source:
+          type: string
+          description: Repo-relative path of the engine CSS.
+        bytes:
+          type: integer
+          description: Length of the returned CSS in bytes.
+        css:
+          type: string
+          description: The full base engine stylesheet (includes flag implementations).
+        note:
+          type: string
       additionalProperties: false
 
 

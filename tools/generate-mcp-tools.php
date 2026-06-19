@@ -758,6 +758,16 @@ $tools = [
         '#/components/schemas/MediaListResponse',
     ),
     readTool(
+        'getThemeEngineCss',
+        'Theme Engine CSS',
+        'Returns the deployed public-site base engine CSS. Use it to copy exact flag implementations (e.g. the rules under [data-cards=\'framed\'] / [data-media=\'duotone\']) — radius, border, padding — instead of guessing. Runtime themes restyle this engine via tokens and flags.',
+        'getThemeEngineCss',
+        'GET',
+        '/api/v1/themes/engine-css',
+        [],
+        '#/components/schemas/ThemeEngineCssResponse',
+    ),
+    readTool(
         'getThemeAuthoringGuide',
         'Theme Authoring Guide',
         'Read this FIRST before creating or updating a runtime theme. Returns the manifest contract (required tokens, flag enums, token value rules, reserved ids), recipes, common mistakes and a minimal valid example manifest. Derived from the server validator so it matches exactly what createTheme/updateTheme enforce.',
