@@ -16,6 +16,7 @@ final readonly class ThemeRouteRegistrar
         private UpdateThemeHandler $updateHandler,
         private DeleteThemeHandler $deleteHandler,
         private ListPublicThemesHandler $listPublicHandler,
+        private ThemeAuthoringGuideHandler $authoringGuideHandler,
     ) {
     }
 
@@ -27,7 +28,14 @@ final readonly class ThemeRouteRegistrar
         $update = $this->updateHandler;
         $delete = $this->deleteHandler;
         $listPublic = $this->listPublicHandler;
+        $authoringGuide = $this->authoringGuideHandler;
 
+        // In-band authoring guide for MCP agents (#440). The router prioritises
+        // this static path over /themes/{key} (fewer path params win).
+        $router->get(
+            '/api/v1/themes/authoring-guide',
+            static fn (ServerRequestInterface $request) => $authoringGuide->handle($request),
+        );
         $router->get(
             '/api/v1/themes',
             static fn (ServerRequestInterface $request) => $list->handle($request),
