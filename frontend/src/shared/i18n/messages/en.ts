@@ -134,6 +134,11 @@ export const en = {
   'admin.themeCustomize.savedAsTheme': 'Theme created',
   'admin.themeCustomize.saveAsError': 'Could not create theme',
   'admin.themeCustomize.saveAsUnavailable': 'This theme cannot be captured.',
+  'admin.themeCustomize.unsavedTitle': 'Unsaved changes',
+  'admin.themeCustomize.unsavedBody':
+    'You have unsaved customizer changes. Leave without saving? Use “Save” or “Save as theme” to keep them.',
+  'admin.themeCustomize.unsavedLeave': 'Leave without saving',
+  'admin.themeCustomize.unsavedStay': 'Stay',
   'admin.menus.listTitle': 'Menus',
   'admin.menus.new': '+ New',
   'admin.menus.newMenuName': 'New menu',

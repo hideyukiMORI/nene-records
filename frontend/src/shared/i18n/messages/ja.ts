@@ -127,6 +127,11 @@ export const ja: Partial<MessageCatalog> = {
   'admin.themeCustomize.savedAsTheme': 'テーマを作成しました',
   'admin.themeCustomize.saveAsError': 'テーマを作成できませんでした',
   'admin.themeCustomize.saveAsUnavailable': 'このテーマは保存できません。',
+  'admin.themeCustomize.unsavedTitle': '未保存の変更があります',
+  'admin.themeCustomize.unsavedBody':
+    'カスタマイザの変更が未保存です。保存せずに離れますか？「保存」または「テーマとして保存」で残せます。',
+  'admin.themeCustomize.unsavedLeave': '保存せずに離れる',
+  'admin.themeCustomize.unsavedStay': 'とどまる',
   'admin.menus.listTitle': 'メニュー一覧',
   'admin.menus.new': '＋ 新規',
   'admin.menus.newMenuName': '新しいメニュー',
