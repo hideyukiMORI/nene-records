@@ -59,6 +59,8 @@ export const en = {
   'admin.publicTheme.intro': 'Pick the theme applied to every public page.',
   'admin.publicTheme.saving': 'Saving…',
   'admin.publicTheme.runtimeBadge': 'Runtime',
+  'admin.publicTheme.apply': 'Apply this theme',
+  'admin.publicTheme.applied': 'Currently applied',
   'admin.publicTheme.edit': 'Edit',
   'admin.publicTheme.delete': 'Delete',
   'admin.publicTheme.deleteTitle': 'Delete theme',
