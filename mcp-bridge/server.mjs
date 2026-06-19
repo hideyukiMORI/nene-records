@@ -107,10 +107,21 @@ async function callTool(name, args) {
   }
 }
 
+// Surfaced to the model on initialize so an agent (ClaudeDesign) knows the
+// golden loop before touching write tools. The guide tool itself returns the
+// machine-usable contract (required tokens, flag enums, value rules, example).
+const SERVER_INSTRUCTIONS =
+  'NeNe Records runtime themes over MCP. Before you create or update a theme, ' +
+  'call getThemeAuthoringGuide once to fetch the manifest contract (required ' +
+  'tokens for light AND dark, flag enums, token value rules, reserved ids) and ' +
+  'a valid example. Then build the manifest and call createTheme (or updateTheme ' +
+  'to replace an existing one). Use listThemes/getTheme to inspect current state. ' +
+  'A 422 response lists exactly which fields failed — fix those and retry.'
+
 function buildServer() {
   const server = new Server(
     { name: 'nene-records-themes', version: '0.1.0' },
-    { capabilities: { tools: {} } },
+    { capabilities: { tools: {} }, instructions: SERVER_INSTRUCTIONS },
   )
   server.setRequestHandler(ListToolsRequestSchema, async () => ({
     tools: tools.map(({ name, description, inputSchema }) => ({ name, description, inputSchema })),
