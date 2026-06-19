@@ -2363,10 +2363,24 @@ export interface components {
             contract: {
                 [key: string]: unknown;
             };
+            /** @description Per required-token semantics: { purpose, pairsWith }. pairsWith names the token this one must contrast against (or empty). */
+            tokenDocs: {
+                [key: string]: {
+                    [key: string]: unknown;
+                };
+            };
+            /** @description What each structural flag controls. */
+            flagDocs: {
+                [key: string]: string;
+            };
             recipes: {
                 [key: string]: unknown;
             }[];
             exampleManifest: components["schemas"]["ThemeManifest"];
+            /** @description Shapes and examples for the optional fonts and assets blocks. */
+            optionalFields: {
+                [key: string]: unknown;
+            };
             commonMistakes: string[];
             relatedTools: {
                 [key: string]: string;
