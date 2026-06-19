@@ -64,6 +64,17 @@ final class ThemeAuthoringGuideTest extends TestCase
         self::assertArrayHasKey('preview', $optional['assets']['example']);
     }
 
+    public function testGuideAdvertisesDescriptionAndAuthorMetadata(): void
+    {
+        $guide = ThemeAuthoringGuide::build();
+
+        self::assertArrayHasKey('metadata', $guide['optionalFields']);
+        self::assertArrayHasKey('description', $guide['optionalFields']['metadata']);
+        self::assertArrayHasKey('author', $guide['optionalFields']['metadata']);
+        // The example should model it so ClaudeDesign copies the field.
+        self::assertNotSame('', $guide['exampleManifest']['description']);
+    }
+
     public function testGuideListsTheThemeToolsAndIsActionable(): void
     {
         $guide = ThemeAuthoringGuide::build();

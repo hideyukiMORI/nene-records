@@ -140,6 +140,16 @@ $themeManifestProps = [
         'type' => 'object',
         'description' => 'Per-mode CSS tokens: {"light":{token:value,…},"dark":{…}}. Keys are contract tokens; values must be safe CSS (no ;{}<>, url(), @import).',
     ],
+    'description' => [
+        'type' => 'string',
+        'maxLength' => 280,
+        'description' => 'Optional short blurb shown under the theme name in the picker.',
+    ],
+    'author' => [
+        'type' => 'string',
+        'maxLength' => 80,
+        'description' => 'Optional author/credit shown in the picker.',
+    ],
     'flags' => [
         'type' => 'object',
         'description' => 'Optional structural style flags (enumerated; e.g. feedLayout, headerLayout).',
