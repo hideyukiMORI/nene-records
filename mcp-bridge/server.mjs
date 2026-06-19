@@ -61,8 +61,11 @@ function normaliseSchema(schema) {
   return s
 }
 
+// In 'themes' scope, expose theme tools plus the read-only media tools an agent
+// needs to resolve assets.preview media ids (never media write/delete).
+const THEMES_SCOPE_EXTRA = new Set(['listMedia', 'getMediaById'])
 const tools = catalogue.tools
-  .filter((t) => (SCOPE === 'all' ? true : /theme/i.test(t.name)))
+  .filter((t) => (SCOPE === 'all' ? true : /theme/i.test(t.name) || THEMES_SCOPE_EXTRA.has(t.name)))
   .filter((t) => (READONLY ? t.safety === 'read' : true))
   .map((t) => ({
     name: t.name,

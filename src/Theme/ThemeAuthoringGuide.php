@@ -75,6 +75,87 @@ final class ThemeAuthoringGuide
     ];
 
     /**
+     * flag key → the data-* attribute the base engine reads it as.
+     * Keys MUST equal contract().flags; values MUST mirror the frontend
+     * theme-customization.ts FLAG_DEFS (a test asserts both).
+     */
+    private const FLAG_ATTRS = [
+        'feedLayout' => 'data-feed',
+        'feedColumns' => 'data-feed-cols',
+        'cardStyle' => 'data-cards',
+        'media' => 'data-media',
+        'hero' => 'data-hero',
+        'sectionRule' => 'data-rule',
+        'eyebrow' => 'data-eyebrow',
+        'headerSearch' => 'data-header-search',
+        'headerTheme' => 'data-header-theme',
+        'headerTagline' => 'data-header-tagline',
+        'headerLayout' => 'data-header',
+        'headerNavAlign' => 'data-header-nav',
+        'headerDensity' => 'data-header-density',
+        'headerWidth' => 'data-header-width',
+        'headerSticky' => 'data-header-sticky',
+    ];
+
+    /**
+     * Optional engine tokens beyond the required colour contract. A runtime
+     * theme MAY override any of these (the engine reads them as var(--token));
+     * omit them to inherit the engine defaults. [group, drives]. The set MUST
+     * cover every non-contract var the base engine (public-site.css) reads — a
+     * test enforces that, so the menu never drifts from the engine.
+     *
+     * @var array<string, array{string, string}>
+     */
+    private const OPTIONAL_TOKENS = [
+        // Layout
+        'content-w' => ['layout', 'Max width of the page container.'],
+        'gutter' => ['layout', 'Horizontal page gutter.'],
+        'measure' => ['layout', 'Prose line length (readable measure).'],
+        // Type families
+        'font-display' => ['fontFamily', 'Font stack for display/headings.'],
+        'font-sans' => ['fontFamily', 'Font stack for body text.'],
+        'font-mono' => ['fontFamily', 'Font stack for monospace.'],
+        // Type sizes
+        'text-display' => ['fontSize', 'Hero/display size.'],
+        'text-h1' => ['fontSize', 'H1 size.'],
+        'text-h2' => ['fontSize', 'H2 size.'],
+        'text-h3' => ['fontSize', 'H3 size.'],
+        'text-body' => ['fontSize', 'Body text size.'],
+        'text-body-sm' => ['fontSize', 'Small body text size.'],
+        'text-meta' => ['fontSize', 'Meta/caption size.'],
+        'text-overline' => ['fontSize', 'Overline/eyebrow size.'],
+        // Line height / tracking / weight
+        'leading-tight' => ['typography', 'Line-height for tight blocks.'],
+        'leading-heading' => ['typography', 'Line-height for headings.'],
+        'leading-body' => ['typography', 'Line-height for body.'],
+        'tracking-display' => ['typography', 'Letter-spacing for display text.'],
+        'tracking-overline' => ['typography', 'Letter-spacing for overlines.'],
+        'weight-medium' => ['typography', 'Medium font weight.'],
+        'weight-semibold' => ['typography', 'Semibold font weight.'],
+        'weight-bold' => ['typography', 'Bold font weight.'],
+        // Spacing scale
+        'space-2xs' => ['spacing', 'Spacing step 2xs.'],
+        'space-xs' => ['spacing', 'Spacing step xs.'],
+        'space-sm' => ['spacing', 'Spacing step sm.'],
+        'space-md' => ['spacing', 'Spacing step md.'],
+        'space-lg' => ['spacing', 'Spacing step lg.'],
+        'space-xl' => ['spacing', 'Spacing step xl.'],
+        'space-2xl' => ['spacing', 'Spacing step 2xl.'],
+        'space-section' => ['spacing', 'Vertical rhythm between sections.'],
+        // Radii
+        'radius-sm' => ['radius', 'Small corner radius.'],
+        'radius-md' => ['radius', 'Medium corner radius.'],
+        'radius-lg' => ['radius', 'Large corner radius.'],
+        'radius-full' => ['radius', 'Pill/circular radius.'],
+        // Motion
+        'dur-fast' => ['motion', 'Fast transition duration.'],
+        'dur-normal' => ['motion', 'Normal transition duration.'],
+        'ease' => ['motion', 'Default easing function.'],
+        // Elevation (shadow-sm/md/lg are in the required contract)
+        'shadow-focus' => ['elevation', 'Focus-ring shadow.'],
+    ];
+
+    /**
      * @return array<string, mixed>
      */
     public static function build(): array
@@ -90,6 +171,7 @@ final class ThemeAuthoringGuide
             'authentication' => 'All theme tools require an authenticated admin token; the MCP bridge already attaches it. '
                 . 'Data is organization-scoped (JWT org_id).',
             'contract' => $contract,
+            'renderModel' => self::renderModel($contract['requiredTokens']),
             'tokenDocs' => self::tokenDocs(),
             'flagDocs' => self::FLAG_DOCS,
             'recipes' => self::recipes(),
@@ -125,6 +207,40 @@ final class ThemeAuthoringGuide
         }
 
         return $docs;
+    }
+
+    /**
+     * How a registered runtime theme actually renders, so ClaudeDesign reasons
+     * about it without the repo (#444). A runtime theme is NOT a bespoke
+     * stylesheet: it restyles a fixed base engine via CSS variables + structural
+     * data-attributes. Built-in themes' per-theme structural CSS is unavailable.
+     *
+     * @param list<string> $requiredTokens
+     *
+     * @return array<string, mixed>
+     */
+    private static function renderModel(array $requiredTokens): array
+    {
+        $optional = [];
+        foreach (self::OPTIONAL_TOKENS as $token => [$group, $drives]) {
+            $optional[$token] = ['group' => $group, 'drives' => $drives];
+        }
+
+        return [
+            'premise' => 'A runtime theme renders as: the fixed base engine stylesheet (public-site.css) '
+                . '+ your tokens (emitted as CSS custom properties) + your structural flags (emitted as '
+                . 'data-* attributes the engine reads). There is NO per-theme structural CSS: built-in themes '
+                . 'ship a *.components.css, but runtime themes cannot — you style by setting tokens and flags only.',
+            'cssVarRule' => "Each token `foo` is emitted as `--foo` on `.nene-public[data-theme='<id>']` "
+                . '(and `<id>-dark` for the dark set); the engine consumes it via var(--foo).',
+            'tokenScope' => 'requiredTokens must be set in both light and dark. You MAY also override any '
+                . 'optionalTokens below (the engine reads them too); omit them to keep the engine defaults.',
+            'requiredTokens' => $requiredTokens,
+            'optionalTokens' => $optional,
+            'flagAttributes' => self::FLAG_ATTRS,
+            'contrastTarget' => 'WCAG AA: 4.5:1 for body text, 3:1 for large text and UI/borders. '
+                . 'Use previewTheme to compute actual ratios before committing.',
+        ];
     }
 
     /**

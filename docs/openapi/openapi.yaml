@@ -6056,6 +6056,7 @@ components:
         - summary
         - authentication
         - contract
+        - renderModel
         - tokenDocs
         - flagDocs
         - recipes
@@ -6073,6 +6074,14 @@ components:
           description: >-
             What a manifest must satisfy: required tokens, flag enums, token
             value rules, reserved ids and id/version patterns.
+          additionalProperties: true
+        renderModel:
+          type: object
+          description: >-
+            How a runtime theme actually renders: base engine + tokens (CSS
+            vars) + flags (data-* attributes). Includes the optional engine
+            tokens beyond the colour contract, flag→attribute map and the
+            WCAG AA contrast target.
           additionalProperties: true
         tokenDocs:
           type: object
