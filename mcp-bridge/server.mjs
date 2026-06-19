@@ -18,15 +18,33 @@ import {
 
 // ── Config (env) ────────────────────────────────────────────────────────────
 const API_BASE = (process.env.NENE_API_BASE ?? 'http://localhost:18082').replace(/\/$/, '')
-const API_TOKEN = process.env.NENE_API_TOKEN ?? ''
 const PORT = Number(process.env.MCP_PORT ?? 8765)
 const MCP_PATH = process.env.MCP_PATH ?? '/mcp'
 const READONLY = process.env.MCP_READONLY !== '0' // default: read tools only
 const SCOPE = process.env.MCP_TOOLS ?? 'themes' // 'themes' | 'all'
 const BRIDGE_SECRET = process.env.MCP_BRIDGE_SECRET ?? '' // optional ?key= guard
 
-if (API_TOKEN === '') {
-  console.error('NENE_API_TOKEN is required (admin endpoints need auth). See the docs.')
+// Auth: prefer email/password so the bridge can refresh its own JWT (admin
+// tokens expire after 24h — a static NENE_API_TOKEN dies overnight for an
+// always-on bridge). NENE_API_TOKEN still works as a one-shot fallback.
+const API_EMAIL = process.env.NENE_API_EMAIL ?? ''
+const API_PASSWORD = process.env.NENE_API_PASSWORD ?? ''
+const STATIC_TOKEN = process.env.NENE_API_TOKEN ?? ''
+
+if (API_EMAIL === '' && STATIC_TOKEN === '') {
+  console.error(
+    'Set NENE_API_EMAIL + NENE_API_PASSWORD (recommended, auto-refresh) or NENE_API_TOKEN. See the docs.',
+  )
+  process.exit(1)
+}
+
+// Refusing to expose write tools without a guard on a public tunnel is the one
+// hard safety rule of the bridge (see handoff). Fail fast rather than leak it.
+if (!READONLY && BRIDGE_SECRET === '') {
+  console.error(
+    'Write tools are enabled (MCP_READONLY=0) but MCP_BRIDGE_SECRET is empty. ' +
+      'Refusing to expose write over an unauthenticated endpoint. Set MCP_BRIDGE_SECRET.',
+  )
   process.exit(1)
 }
 
@@ -60,6 +78,27 @@ console.error(
     tools.map((t) => t.name).join(', '),
 )
 
+// ── Token manager (auto-refresh so an always-on bridge never expires) ───────
+let currentToken = STATIC_TOKEN
+
+async function login() {
+  if (API_EMAIL === '') {
+    throw new Error('Token expired and no NENE_API_EMAIL/PASSWORD configured to re-login.')
+  }
+  const res = await fetch(`${API_BASE}/api/v1/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify({ email: API_EMAIL, password: API_PASSWORD }),
+  })
+  if (!res.ok) {
+    throw new Error(`Login failed (${res.status}). Check NENE_API_EMAIL/PASSWORD.`)
+  }
+  const data = await res.json()
+  currentToken = data.token
+  console.error('[mcp-bridge] obtained a fresh API token')
+  return currentToken
+}
+
 // ── Proxy a tool call to the NeNe Records HTTP API ──────────────────────────
 async function callTool(name, args) {
   const tool = byName.get(name)
@@ -80,10 +119,7 @@ async function callTool(name, args) {
   let url = API_BASE + filledPath
   const init = {
     method,
-    headers: {
-      Authorization: `Bearer ${API_TOKEN}`,
-      Accept: 'application/json',
-    },
+    headers: { Accept: 'application/json' },
   }
 
   if (method === 'GET' || method === 'DELETE') {
@@ -96,7 +132,12 @@ async function callTool(name, args) {
   }
 
   try {
-    const res = await fetch(url, init)
+    // On a 401 the JWT likely expired — re-login once and retry transparently.
+    let res = await fetch(url, { ...init, headers: { ...init.headers, Authorization: `Bearer ${currentToken}` } })
+    if (res.status === 401 && API_EMAIL !== '') {
+      await login()
+      res = await fetch(url, { ...init, headers: { ...init.headers, Authorization: `Bearer ${currentToken}` } })
+    }
     const text = await res.text()
     return {
       content: [{ type: 'text', text: text === '' ? `(${res.status})` : text }],
@@ -193,6 +234,19 @@ async function handleSessionRequest(req, res) {
 app.get(MCP_PATH, handleSessionRequest)
 app.delete(MCP_PATH, handleSessionRequest)
 
+// Warm the token at boot so bad credentials fail loudly now, not on first call.
+if (STATIC_TOKEN === '') {
+  try {
+    await login()
+  } catch (err) {
+    console.error(`[mcp-bridge] startup login failed: ${String(err)}`)
+    process.exit(1)
+  }
+}
+
 app.listen(PORT, () => {
-  console.error(`[mcp-bridge] listening on http://localhost:${PORT}${MCP_PATH} → ${API_BASE}`)
+  console.error(
+    `[mcp-bridge] listening on http://localhost:${PORT}${MCP_PATH} → ${API_BASE} ` +
+      `(readonly=${READONLY}, guard=${BRIDGE_SECRET !== '' ? 'on' : 'off'})`,
+  )
 })
