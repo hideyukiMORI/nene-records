@@ -18,6 +18,7 @@ final readonly class ThemeRouteRegistrar
         private ListPublicThemesHandler $listPublicHandler,
         private PreviewThemeHandler $previewHandler,
         private ThemeAuthoringGuideHandler $authoringGuideHandler,
+        private ThemeEngineCssHandler $engineCssHandler,
     ) {
     }
 
@@ -31,12 +32,18 @@ final readonly class ThemeRouteRegistrar
         $listPublic = $this->listPublicHandler;
         $preview = $this->previewHandler;
         $authoringGuide = $this->authoringGuideHandler;
+        $engineCss = $this->engineCssHandler;
 
         // In-band authoring guide for MCP agents (#440). The router prioritises
-        // this static path over /themes/{key} (fewer path params win).
+        // these static paths over /themes/{key} (fewer path params win).
         $router->get(
             '/api/v1/themes/authoring-guide',
             static fn (ServerRequestInterface $request) => $authoringGuide->handle($request),
+        );
+        // Deployed base engine CSS (flag implementations) for exact authoring (#448).
+        $router->get(
+            '/api/v1/themes/engine-css',
+            static fn (ServerRequestInterface $request) => $engineCss->handle($request),
         );
         $router->get(
             '/api/v1/themes',

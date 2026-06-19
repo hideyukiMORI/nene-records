@@ -1220,6 +1220,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/themes/engine-css": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Public-site base engine CSS
+         * @description Returns the deployed public-site base engine CSS so an AI agent can copy exact flag implementations (e.g. [data-cards='framed']) instead of guessing radius/border/padding. Runtime themes restyle this engine via tokens and flags; per-theme components.css is not included. See #448.
+         */
+        get: operations["getThemeEngineCss"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/themes/{key}": {
         parameters: {
             query?: never;
@@ -2441,6 +2461,16 @@ export interface components {
             relatedTools: {
                 [key: string]: string;
             };
+        };
+        /** @description Deployed public-site base engine CSS (#448). */
+        ThemeEngineCssResponse: {
+            /** @description Repo-relative path of the engine CSS. */
+            source: string;
+            /** @description Length of the returned CSS in bytes. */
+            bytes: number;
+            /** @description The full base engine stylesheet (includes flag implementations). */
+            css: string;
+            note: string;
         };
         WebhookResponse: {
             /** Format: int64 */
@@ -5636,6 +5666,28 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ThemeAuthoringGuideResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    getThemeEngineCss: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Engine CSS. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ThemeEngineCssResponse"];
                 };
             };
             401: components["responses"]["Unauthorized"];

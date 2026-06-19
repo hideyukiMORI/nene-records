@@ -262,6 +262,9 @@ final class ThemeAuthoringGuide
                 . 'ship a *.components.css, but runtime themes cannot — you style by setting tokens and flags only.',
             'cssVarRule' => "Each token `foo` is emitted as `--foo` on `.nene-public[data-theme='<id>']` "
                 . '(and `<id>-dark` for the dark set); the engine consumes it via var(--foo).',
+            'engineCssTool' => 'Call getThemeEngineCss for the deployed base engine CSS, including the exact '
+                . "flag implementations (e.g. [data-cards='framed'] .card radius/border/padding) — copy those "
+                . 'values rather than guessing.',
             'tokenScope' => 'requiredTokens must be set in both light and dark. You MAY also override any '
                 . 'optionalTokens below (the engine reads them too); omit them to keep the engine defaults.',
             'requiredTokens' => $requiredTokens,

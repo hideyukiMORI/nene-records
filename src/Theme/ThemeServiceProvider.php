@@ -236,6 +236,17 @@ final readonly class ThemeServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(
+                ThemeEngineCssHandler::class,
+                static function (ContainerInterface $container): ThemeEngineCssHandler {
+                    $response = $container->get(JsonResponseFactory::class);
+                    if (!$response instanceof JsonResponseFactory) {
+                        throw new LogicException('JSON response factory service is invalid.');
+                    }
+
+                    return new ThemeEngineCssHandler($response);
+                },
+            )
+            ->set(
                 ThemeNotFoundExceptionHandler::class,
                 static function (ContainerInterface $container): ThemeNotFoundExceptionHandler {
                     $problemDetails = $container->get(ProblemDetailsResponseFactory::class);
@@ -257,6 +268,7 @@ final readonly class ThemeServiceProvider implements ServiceProviderInterface
                     $listPublic = $container->get(ListPublicThemesHandler::class);
                     $preview = $container->get(PreviewThemeHandler::class);
                     $authoringGuide = $container->get(ThemeAuthoringGuideHandler::class);
+                    $engineCss = $container->get(ThemeEngineCssHandler::class);
 
                     if (!$list instanceof ListThemesHandler) {
                         throw new LogicException('ListThemes handler service is invalid.');
@@ -282,8 +294,11 @@ final readonly class ThemeServiceProvider implements ServiceProviderInterface
                     if (!$authoringGuide instanceof ThemeAuthoringGuideHandler) {
                         throw new LogicException('ThemeAuthoringGuide handler service is invalid.');
                     }
+                    if (!$engineCss instanceof ThemeEngineCssHandler) {
+                        throw new LogicException('ThemeEngineCss handler service is invalid.');
+                    }
 
-                    return new ThemeRouteRegistrar($list, $get, $create, $update, $delete, $listPublic, $preview, $authoringGuide);
+                    return new ThemeRouteRegistrar($list, $get, $create, $update, $delete, $listPublic, $preview, $authoringGuide, $engineCss);
                 },
             );
     }
