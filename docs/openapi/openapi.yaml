@@ -2923,6 +2923,29 @@ paths:
           $ref: '#/components/responses/ValidationFailed'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /api/v1/themes/authoring-guide:
+    get:
+      tags:
+        - Themes
+      summary: Theme authoring guide
+      description: >-
+        In-band guide for AI agents (ClaudeDesign) registering runtime themes
+        over MCP. Returns the manifest contract (required tokens, flag enums,
+        token value rules, reserved ids), recipes and a minimal valid example —
+        derived from the server-side validator so it never drifts from what is
+        enforced. See #440.
+      operationId: getThemeAuthoringGuide
+      responses:
+        '200':
+          description: Authoring guide.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThemeAuthoringGuideResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /api/v1/themes/{key}:
     get:
       tags:
@@ -5935,6 +5958,46 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ThemeResponse'
+      additionalProperties: false
+    ThemeAuthoringGuideResponse:
+      type: object
+      description: >-
+        Machine-usable guide for authoring runtime themes over MCP. The
+        `contract` block is derived from the server-side validator.
+      required:
+        - summary
+        - authentication
+        - contract
+        - recipes
+        - exampleManifest
+        - commonMistakes
+        - relatedTools
+      properties:
+        summary:
+          type: string
+        authentication:
+          type: string
+        contract:
+          type: object
+          description: >-
+            What a manifest must satisfy: required tokens, flag enums, token
+            value rules, reserved ids and id/version patterns.
+          additionalProperties: true
+        recipes:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        exampleManifest:
+          $ref: '#/components/schemas/ThemeManifest'
+        commonMistakes:
+          type: array
+          items:
+            type: string
+        relatedTools:
+          type: object
+          additionalProperties:
+            type: string
       additionalProperties: false
 
 

@@ -738,6 +738,16 @@ $tools = [
         ['key'],
     ),
     readTool(
+        'getThemeAuthoringGuide',
+        'Theme Authoring Guide',
+        'Read this FIRST before creating or updating a runtime theme. Returns the manifest contract (required tokens, flag enums, token value rules, reserved ids), recipes, common mistakes and a minimal valid example manifest. Derived from the server validator so it matches exactly what createTheme/updateTheme enforce.',
+        'getThemeAuthoringGuide',
+        'GET',
+        '/api/v1/themes/authoring-guide',
+        [],
+        '#/components/schemas/ThemeAuthoringGuideResponse',
+    ),
+    readTool(
         'listThemes',
         'List Runtime Themes',
         'List all runtime (data-driven) public-site themes for the organization.',
