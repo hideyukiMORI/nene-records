@@ -156,6 +156,35 @@ final class ThemeAuthoringGuide
     ];
 
     /**
+     * Fonts actually bundled into the public site (frontend public-fonts.ts), so
+     * runtime themes can only use these via --font-* tokens — anything else
+     * silently falls back (#446). [family (as used in CSS), fontsource slug, kind].
+     * A test asserts each slug is imported in public-fonts.ts.
+     *
+     * @var list<array{family: string, slug: string, kind: string}>
+     */
+    private const AVAILABLE_FONTS = [
+        ['family' => 'Bricolage Grotesque', 'slug' => 'bricolage-grotesque', 'kind' => 'display'],
+        ['family' => 'Archivo', 'slug' => 'archivo', 'kind' => 'display'],
+        ['family' => 'Oswald', 'slug' => 'oswald', 'kind' => 'display'],
+        ['family' => 'Saira Condensed', 'slug' => 'saira-condensed', 'kind' => 'display'],
+        ['family' => 'Source Serif 4', 'slug' => 'source-serif-4', 'kind' => 'serif'],
+        ['family' => 'EB Garamond', 'slug' => 'eb-garamond', 'kind' => 'serif'],
+        ['family' => 'Playfair Display', 'slug' => 'playfair-display', 'kind' => 'serif'],
+        ['family' => 'Shippori Mincho', 'slug' => 'shippori-mincho', 'kind' => 'serif (JP)'],
+        ['family' => 'Nunito', 'slug' => 'nunito', 'kind' => 'sans (rounded)'],
+        ['family' => 'Nunito Sans', 'slug' => 'nunito-sans', 'kind' => 'sans'],
+        ['family' => 'Varela Round', 'slug' => 'varela-round', 'kind' => 'sans (rounded)'],
+        ['family' => 'Fredoka', 'slug' => 'fredoka', 'kind' => 'display (rounded)'],
+        ['family' => 'Space Mono', 'slug' => 'space-mono', 'kind' => 'mono'],
+        ['family' => 'Orbitron', 'slug' => 'orbitron', 'kind' => 'display (techno)'],
+        ['family' => 'Poiret One', 'slug' => 'poiret-one', 'kind' => 'display (thin)'],
+        ['family' => 'Bangers', 'slug' => 'bangers', 'kind' => 'display (comic)'],
+        ['family' => 'Rye', 'slug' => 'rye', 'kind' => 'display (western)'],
+        ['family' => 'UnifrakturCook', 'slug' => 'unifrakturcook', 'kind' => 'display (blackletter)'],
+    ];
+
+    /**
      * @return array<string, mixed>
      */
     public static function build(): array
@@ -240,6 +269,19 @@ final class ThemeAuthoringGuide
             'flagAttributes' => self::FLAG_ATTRS,
             'contrastTarget' => 'WCAG AA: 4.5:1 for body text, 3:1 for large text and UI/borders. '
                 . 'Use previewTheme to compute actual ratios before committing.',
+            'fonts' => [
+                'note' => 'The public site only renders fonts that are bundled (listed in availableFonts) '
+                    . 'or generic system fonts. Set --font-display / --font-sans / --font-mono tokens to a '
+                    . 'family from availableFonts (quote multi-word names) with a generic fallback, e.g. '
+                    . "--font-display: \"'Bricolage Grotesque', sans-serif\". A family NOT in availableFonts "
+                    . 'silently falls back. The manifest `fonts` array is metadata only — it does NOT load fonts.',
+                'available' => self::AVAILABLE_FONTS,
+                'systemStacks' => [
+                    'sans' => 'ui-sans-serif, system-ui, sans-serif',
+                    'serif' => 'ui-serif, Georgia, serif',
+                    'mono' => 'ui-monospace, monospace',
+                ],
+            ],
         ];
     }
 
