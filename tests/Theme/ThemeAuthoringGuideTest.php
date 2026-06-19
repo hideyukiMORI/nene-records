@@ -114,6 +114,23 @@ final class ThemeAuthoringGuideTest extends TestCase
         self::assertSame([], array_values($missing), 'undocumented engine vars: ' . implode(', ', $missing));
     }
 
+    public function testAvailableFontsAreActuallyBundledInThePublicSite(): void
+    {
+        $fonts = ThemeAuthoringGuide::build()['renderModel']['fonts']['available'];
+        self::assertNotEmpty($fonts);
+
+        // Every advertised font must be imported by the public site, or the
+        // theme would set a family that silently falls back (#446).
+        $publicFonts = self::readFrontend('src/pages/consumer/public-fonts.ts');
+        foreach ($fonts as $font) {
+            self::assertStringContainsString(
+                "@fontsource/{$font['slug']}/",
+                $publicFonts,
+                "font {$font['family']} ({$font['slug']}) is not bundled in public-fonts.ts",
+            );
+        }
+    }
+
     private static function readFrontend(string $relative): string
     {
         $path = dirname(__DIR__, 2) . '/frontend/' . $relative;

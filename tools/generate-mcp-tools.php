@@ -144,6 +144,16 @@ $themeManifestProps = [
         'type' => 'object',
         'description' => 'Optional structural style flags (enumerated; e.g. feedLayout, headerLayout).',
     ],
+    'fonts' => [
+        'type' => 'array',
+        'description' => 'Optional metadata list of {family, role, source} (source must be fontsource or system). Note: does NOT load fonts at runtime — the public site only renders families bundled in the authoring guide renderModel.fonts.available; set those via the font-* tokens.',
+        'items' => ['type' => 'object', 'additionalProperties' => true],
+    ],
+    'assets' => [
+        'type' => 'object',
+        'description' => 'Optional asset slots (preview/hero/background). Each value is a media id (positive integer, from listMedia) or a safe bundle-relative path. assets.preview drives the picker thumbnail.',
+        'additionalProperties' => true,
+    ],
 ];
 $themeManifestRequired = ['id', 'name', 'version', 'supportsModes', 'tokens'];
 
