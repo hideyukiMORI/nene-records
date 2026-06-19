@@ -70,6 +70,43 @@ final class ThemeManifestValidator
     private const MAX_TOKEN_VALUE_LEN = 200;
 
     /**
+     * Substrings that make a token value unsafe (external / script-bearing).
+     * Extracted so the authoring guide (#440) can expose them verbatim.
+     *
+     * @var list<string>
+     */
+    private const UNSAFE_VALUE_SUBSTRINGS = ['url(', '@import', 'expression(', 'javascript:', '/*', '*/'];
+
+    /** Break-out characters rejected in any token value. */
+    private const UNSAFE_VALUE_CHARS = ';{}<>\\`';
+
+    /**
+     * Contract that ClaudeDesign must satisfy to register a theme over MCP.
+     * Derived from this validator so the authoring guide can never drift from
+     * what is actually enforced (#440).
+     *
+     * @return array<string, mixed>
+     */
+    public static function contract(): array
+    {
+        return [
+            'idPattern' => self::ID_PATTERN,
+            'versionPattern' => self::VERSION_PATTERN,
+            'tokenKeyPattern' => self::TOKEN_KEY_PATTERN,
+            'assetRefPattern' => self::ASSET_REF_PATTERN,
+            'requiredTokens' => self::REQUIRED_TOKENS,
+            'flags' => self::FLAG_ENUMS,
+            'reservedIds' => self::RESERVED_KEYS,
+            'tokenValueRules' => [
+                'maxLength' => self::MAX_TOKEN_VALUE_LEN,
+                'forbiddenChars' => self::UNSAFE_VALUE_CHARS,
+                'forbiddenSubstrings' => self::UNSAFE_VALUE_SUBSTRINGS,
+            ],
+            'fontSources' => ['fontsource', 'system'],
+        ];
+    }
+
+    /**
      * @param array<string, mixed> $manifest
      *
      * @throws ValidationException when the manifest is malformed or unsafe
@@ -265,12 +302,12 @@ final class ThemeManifestValidator
             return false;
         }
         // Declaration / stylesheet break-out characters.
-        if (preg_match('/[;{}<>\\\\`]/', $trimmed) === 1) {
+        if (preg_match('/[' . preg_quote(self::UNSAFE_VALUE_CHARS, '/') . ']/', $trimmed) === 1) {
             return false;
         }
         // External / script-bearing constructs (case-insensitive).
         $lower = strtolower($trimmed);
-        foreach (['url(', '@import', 'expression(', 'javascript:', '/*', '*/'] as $needle) {
+        foreach (self::UNSAFE_VALUE_SUBSTRINGS as $needle) {
             if (str_contains($lower, $needle)) {
                 return false;
             }
