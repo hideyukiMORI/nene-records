@@ -2,6 +2,18 @@ import { useMutation, useQueryClient, type UseMutationResult } from '@tanstack/r
 import { apiClient, type AppError } from '@/shared/api/client'
 import type { ThemeDto, ThemeManifestDto } from './api-types'
 
+/** Register a new runtime theme from a full manifest. The server validates and may 422. */
+export function useCreateTheme(): UseMutationResult<ThemeDto, AppError, ThemeManifestDto> {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (manifest: ThemeManifestDto) =>
+      apiClient.post<ThemeDto>('/api/v1/themes', manifest),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['themes'] })
+    },
+  })
+}
+
 /** Delete a runtime theme by key. Invalidates the theme lists on success. */
 export function useDeleteTheme(): UseMutationResult<undefined, AppError, string> {
   const queryClient = useQueryClient()

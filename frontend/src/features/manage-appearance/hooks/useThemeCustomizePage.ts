@@ -1,8 +1,17 @@
 import { useState } from 'react'
 import { useUpdateSetting, useSettingList } from '@/entities/setting'
+import { type ThemeManifestDto, useCreateTheme, useThemes } from '@/entities/theme'
 import { useTranslation } from '@/shared/i18n'
 import { resolvePublicThemeId } from '@/shared/lib/public-themes'
 import { parseThemeOverrides, type ThemeOverrides } from '@/shared/lib/theme-customization'
+import {
+  type BaseThemeTokens,
+  baseThemeTokens,
+  buildThemeManifestFromCustomization,
+  builtInThemeIds,
+  slugifyThemeId,
+  uniqueThemeId,
+} from '@/shared/lib/theme-from-customization'
 import { useToast } from '@/shared/ui'
 
 const ACTIVE_THEME_KEY = 'active_theme'
@@ -19,6 +28,15 @@ export interface ThemeCustomizePageState {
   save: () => void
   /** Clear this theme's overrides. */
   reset: () => void
+  /** Whether the current customization can be captured as a new runtime theme. */
+  canSaveAsTheme: boolean
+  /** Save the current base + draft as a brand-new runtime theme (createTheme). */
+  saveAsNewTheme: (
+    name: string,
+    description: string,
+    opts: { onSuccess: () => void; onError: (message?: string) => void },
+  ) => void
+  isCreating: boolean
   isLoading: boolean
   isSaving: boolean
   isDirty: boolean
@@ -36,6 +54,8 @@ function clean(overrides: ThemeOverrides): ThemeOverrides {
 export function useThemeCustomizePage(): ThemeCustomizePageState {
   const settingsQuery = useSettingList()
   const updateSetting = useUpdateSetting()
+  const themesQuery = useThemes()
+  const createTheme = useCreateTheme()
   const { showToast } = useToast()
   const { t } = useTranslation()
 
@@ -88,6 +108,23 @@ export function useThemeCustomizePage(): ThemeCustomizePageState {
     )
   }
 
+  // Full token base for the current theme: built-in (from extracted data) or,
+  // when customizing a runtime theme, that theme's own manifest tokens.
+  const runtimeThemes = themesQuery.data?.items ?? []
+  const base: BaseThemeTokens | undefined =
+    baseThemeTokens(themeId) ??
+    (() => {
+      const tokens = runtimeThemes.find((theme) => theme.theme_key === themeId)?.manifest.tokens
+      const light = tokens?.light
+      const dark = tokens?.dark
+      return light !== undefined && dark !== undefined ? { light, dark } : undefined
+    })()
+
+  const takenIds = new Set<string>([
+    ...builtInThemeIds(),
+    ...runtimeThemes.map((theme) => theme.theme_key),
+  ])
+
   return {
     themeId,
     draft,
@@ -99,6 +136,32 @@ export function useThemeCustomizePage(): ThemeCustomizePageState {
       setDraft({})
       persist({})
     },
+    canSaveAsTheme: base !== undefined,
+    saveAsNewTheme: (name, description, opts) => {
+      if (base === undefined) {
+        opts.onError(t('admin.themeCustomize.saveAsUnavailable'))
+        return
+      }
+      const id = uniqueThemeId(slugifyThemeId(name), takenIds)
+      const manifest = buildThemeManifestFromCustomization({
+        id,
+        name: name.trim(),
+        description: description.trim() === '' ? undefined : description,
+        baseTokens: base,
+        overrides: clean(draft),
+      })
+      createTheme.mutate(manifest as unknown as ThemeManifestDto, {
+        onSuccess: () => {
+          showToast(t('admin.themeCustomize.savedAsTheme'), 'success')
+          opts.onSuccess()
+        },
+        onError: () => {
+          showToast(t('admin.themeCustomize.saveAsError'), 'error')
+          opts.onError()
+        },
+      })
+    },
+    isCreating: createTheme.isPending,
     isLoading: settingsQuery.isLoading,
     isSaving: updateSetting.isPending,
     isDirty: JSON.stringify(clean(draft)) !== JSON.stringify(stored),
