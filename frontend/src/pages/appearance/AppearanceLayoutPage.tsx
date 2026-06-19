@@ -19,7 +19,8 @@ import {
   useManageWidgetsPage,
 } from '@/features/manage-widgets'
 import { useTranslation } from '@/shared/i18n'
-import { Button, Stack, Text } from '@/shared/ui'
+import { useUnsavedChangesGuard } from '@/shared/lib/use-unsaved-changes-guard'
+import { Button, ConfirmDialog, Stack, Text } from '@/shared/ui'
 
 const TOUR_LS_KEY = 'nene_layout_tour_seen'
 
@@ -40,6 +41,8 @@ function ThemeTab() {
   const page = usePublicThemePage()
   const customize = useThemeCustomizePage()
   const headerContent = useHeaderConfigPage()
+  // Warn before leaving with unsaved customizer edits (route change + tab close).
+  const blocker = useUnsavedChangesGuard(customize.isDirty)
   return (
     <Stack gap="lg">
       <PublicThemeView {...page} />
@@ -56,6 +59,22 @@ function ThemeTab() {
         <HeaderPreview flags={customize.draft.flags} header={headerContent.draft} />
         <HeaderContentView {...headerContent} />
       </Stack>
+
+      {blocker.state === 'blocked' ? (
+        <ConfirmDialog
+          open
+          title={t('admin.themeCustomize.unsavedTitle')}
+          description={t('admin.themeCustomize.unsavedBody')}
+          confirmLabel={t('admin.themeCustomize.unsavedLeave')}
+          cancelLabel={t('admin.themeCustomize.unsavedStay')}
+          onConfirm={() => {
+            blocker.proceed()
+          }}
+          onCancel={() => {
+            blocker.reset()
+          }}
+        />
+      ) : null}
     </Stack>
   )
 }
