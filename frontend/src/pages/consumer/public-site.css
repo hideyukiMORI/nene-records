@@ -1718,6 +1718,15 @@
     --motion-reveal-shift: 32px;
   }
 
+  /* Per-type pacing: the larger Latest-records cards read better slower; the
+     compact Browse-by-type cards can move a touch quicker. */
+  .nene-public[data-motion-reveal] .card[data-motion-reveal-item] {
+    --motion-reveal-dur: 1200ms;
+  }
+  .nene-public[data-motion-reveal] .typecard[data-motion-reveal-item] {
+    --motion-reveal-dur: 800ms;
+  }
+
   .nene-public[data-motion-reveal='subtle'] [data-motion-reveal-item][data-revealed],
   .nene-public[data-motion-reveal='standard'] [data-motion-reveal-item][data-revealed] {
     opacity: 1;
