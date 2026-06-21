@@ -2,19 +2,24 @@ import { type RefObject, useEffect } from 'react'
 
 /**
  * First-party scroll-reveal (#371 S1). Tags matching descendants of `containerRef`
- * with `data-motion-reveal-item` and, when each scrolls into view, adds
- * `data-revealed` (then stops observing it). The accompanying CSS animates the
- * transition and — crucially — only hides elements that carry BOTH the theme's
+ * with `data-motion-reveal-item` and reveals them (`data-revealed`) so the CSS can
+ * fade/slide them in. CSS only hides elements that carry BOTH the theme's
  * `data-motion-reveal` flag AND this JS-applied `data-motion-reveal-item`, so a
  * no-JS / no-IntersectionObserver visitor sees everything immediately.
  *
- * Public feeds load their cards asynchronously (react-query), so the targets are
- * not in the DOM when the effect first runs. A MutationObserver picks up nodes
- * added after mount (and on route change). Items that enter the viewport in the
- * same batch get a small staggered delay so a grid row cascades in visibly.
+ * Resilience rules (a reveal must never strand content hidden):
+ *  - Anything already in or above the viewport is revealed right away — this
+ *    covers above-the-fold content and SPA back-navigation (the shell remounts
+ *    with cached content at a restored scroll position, where IntersectionObserver
+ *    would otherwise not re-fire and leave cards stuck at opacity 0).
+ *  - Only genuinely below-the-fold elements are deferred to the IntersectionObserver
+ *    for a scroll-triggered reveal.
+ *  - Feeds load asynchronously (react-query); a MutationObserver picks up nodes
+ *    added after mount and on route change.
  *
- * The caller gates `enabled` (off when the flag is off or reduced-motion is on).
- * `scanKey` (e.g. the route pathname) forces a fresh observer on navigation.
+ * Items revealed in the same batch get a small staggered delay so a grid row
+ * cascades in visibly. The caller gates `enabled` (off when the flag is off or
+ * reduced-motion is on); `scanKey` (route pathname) forces a fresh observer.
  */
 const ITEM_ATTR = 'data-motion-reveal-item'
 const REVEALED_ATTR = 'data-revealed'
@@ -31,6 +36,13 @@ export interface ScrollRevealOptions {
   scanKey?: string
 }
 
+function reveal(el: Element, delayMs: number): void {
+  if (el instanceof HTMLElement) {
+    el.style.setProperty(DELAY_VAR, `${String(delayMs)}ms`)
+  }
+  el.setAttribute(REVEALED_ATTR, '')
+}
+
 export function useScrollReveal({
   containerRef,
   enabled,
@@ -43,6 +55,8 @@ export function useScrollReveal({
       return undefined
     }
 
+    const rafIds: number[] = []
+
     const observer = new IntersectionObserver(
       (entries, obs) => {
         let staggerIndex = 0
@@ -50,29 +64,42 @@ export function useScrollReveal({
           if (!entry.isIntersecting) {
             continue
           }
-          // Items revealing together cascade; one-at-a-time scrolling has no delay.
-          if (entry.target instanceof HTMLElement) {
-            entry.target.style.setProperty(DELAY_VAR, `${String(staggerIndex * STAGGER_STEP_MS)}ms`)
-          }
-          entry.target.setAttribute(REVEALED_ATTR, '')
+          reveal(entry.target, staggerIndex * STAGGER_STEP_MS)
           obs.unobserve(entry.target)
           staggerIndex += 1
         }
       },
-      // Reveal slightly before fully in view; tiny threshold so tall items count.
       { rootMargin: '0px 0px -8% 0px', threshold: 0.04 },
     )
 
     const tagAndObserve = (): void => {
+      const inView: Element[] = []
       root.querySelectorAll(selector).forEach((el) => {
-        if (!el.hasAttribute(ITEM_ATTR) && !el.hasAttribute(REVEALED_ATTR)) {
-          el.setAttribute(ITEM_ATTR, '')
+        if (el.hasAttribute(ITEM_ATTR) || el.hasAttribute(REVEALED_ATTR)) {
+          return
+        }
+        el.setAttribute(ITEM_ATTR, '')
+        // Reveal anything not strictly below the fold straight away; defer the
+        // rest to scroll. window.innerHeight is safe here (browser-only effect).
+        if (el.getBoundingClientRect().top < window.innerHeight) {
+          inView.push(el)
+        } else {
           observer.observe(el)
         }
       })
+
+      if (inView.length > 0) {
+        // One frame later, so the opacity:0 initial state has painted and the
+        // reveal animates rather than snapping.
+        const id = requestAnimationFrame(() => {
+          inView.forEach((el, index) => {
+            reveal(el, index * STAGGER_STEP_MS)
+          })
+        })
+        rafIds.push(id)
+      }
     }
 
-    // Tag what is already present, then keep up with async-rendered content.
     tagAndObserve()
     const mutationObserver =
       typeof MutationObserver === 'undefined'
@@ -85,6 +112,9 @@ export function useScrollReveal({
     return () => {
       observer.disconnect()
       mutationObserver?.disconnect()
+      rafIds.forEach((id) => {
+        cancelAnimationFrame(id)
+      })
     }
   }, [containerRef, enabled, selector, scanKey])
 }

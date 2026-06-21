@@ -29,6 +29,21 @@ class MockIntersectionObserver {
   }
 }
 
+/** Force an element's vertical position relative to the (768px tall) jsdom viewport. */
+function setTop(el: Element, top: number): void {
+  el.getBoundingClientRect = () =>
+    ({
+      top,
+      bottom: top + 100,
+      left: 0,
+      right: 0,
+      width: 100,
+      height: 100,
+      x: 0,
+      y: top,
+    }) as DOMRect
+}
+
 function mountContainer(html: string): HTMLDivElement {
   const root = document.createElement('div')
   root.innerHTML = html
@@ -47,6 +62,12 @@ beforeEach(() => {
   observed = []
   lastCallback = null
   vi.stubGlobal('IntersectionObserver', MockIntersectionObserver)
+  // Run rAF synchronously so the in-view reveal is observable in the test.
+  vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => {
+    cb(0)
+    return 1
+  })
+  vi.stubGlobal('cancelAnimationFrame', () => {})
 })
 
 afterEach(() => {
@@ -55,24 +76,36 @@ afterEach(() => {
 })
 
 describe('useScrollReveal', () => {
-  it('tags and observes only matching elements when enabled', () => {
+  it('tags matching elements and reveals the ones already in view', () => {
     const root = mountContainer(
       '<div class="card">a</div><div class="card">b</div><div class="x">c</div>',
     )
+    root.querySelectorAll('.card').forEach((card) => {
+      setTop(card, 100)
+    }) // in view (< 768)
     renderReveal(root, true)
 
     root.querySelectorAll('.card').forEach((card) => {
       expect(card.hasAttribute('data-motion-reveal-item')).toBe(true)
+      expect(card.hasAttribute('data-revealed')).toBe(true)
     })
-    expect(observed).toHaveLength(2)
+    // In-view items are revealed directly, not handed to the IntersectionObserver.
+    expect(observed).toHaveLength(0)
     expect(root.querySelector('.x')?.hasAttribute('data-motion-reveal-item')).toBe(false)
   })
 
-  it('reveals and unobserves an element once it intersects', () => {
+  it('defers below-the-fold elements to the IntersectionObserver and reveals on intersect', () => {
     const root = mountContainer('<div class="card">a</div>')
-    renderReveal(root, true)
     const card = root.querySelector('.card')
     expect(card).not.toBeNull()
+    if (card !== null) {
+      setTop(card, 5000)
+    } // below the fold (> 768)
+    renderReveal(root, true)
+
+    expect(card?.hasAttribute('data-motion-reveal-item')).toBe(true)
+    expect(card?.hasAttribute('data-revealed')).toBe(false)
+    expect(observed).toHaveLength(1)
 
     act(() => {
       lastCallback?.(
@@ -82,7 +115,6 @@ describe('useScrollReveal', () => {
     })
 
     expect(card?.hasAttribute('data-revealed')).toBe(true)
-    // The only observed element was unobserved on reveal.
     expect(observed).toHaveLength(0)
   })
 
