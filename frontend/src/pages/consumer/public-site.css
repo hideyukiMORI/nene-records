@@ -1705,15 +1705,16 @@
   .nene-public[data-motion-reveal='subtle'] [data-motion-reveal-item],
   .nene-public[data-motion-reveal='standard'] [data-motion-reveal-item] {
     opacity: 0;
-    transform: translateY(var(--motion-reveal-shift, 8px));
+    transform: translateY(var(--motion-reveal-shift, 16px));
     transition:
       opacity var(--motion-reveal-dur) var(--ease),
       transform var(--motion-reveal-dur) var(--ease);
+    transition-delay: var(--motion-reveal-delay, 0ms);
     will-change: opacity, transform;
   }
 
   .nene-public[data-motion-reveal='standard'] [data-motion-reveal-item] {
-    --motion-reveal-shift: 18px;
+    --motion-reveal-shift: 32px;
   }
 
   .nene-public[data-motion-reveal='subtle'] [data-motion-reveal-item][data-revealed],
