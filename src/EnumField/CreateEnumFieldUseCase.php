@@ -15,7 +15,7 @@ final readonly class CreateEnumFieldUseCase implements CreateEnumFieldUseCaseInt
     private const ENUM_DATA_TYPE = 'enum';
 
     public function __construct(
-        private EnumFieldRepositoryInterface $intFields,
+        private EnumFieldRepositoryInterface $enumFields,
         private EntityRepositoryInterface $entities,
         private FieldDefRepositoryInterface $fieldDefs,
     ) {
@@ -31,7 +31,7 @@ final readonly class CreateEnumFieldUseCase implements CreateEnumFieldUseCaseInt
 
         $this->assertEnumFieldKeyRegistered($entity->entityTypeId, $input->fieldKey);
 
-        $id = $this->intFields->save(new EnumField(
+        $id = $this->enumFields->save(new EnumField(
             entityId: $input->entityId,
             fieldKey: $input->fieldKey,
             value: $input->value,

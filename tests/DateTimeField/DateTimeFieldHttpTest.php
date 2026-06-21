@@ -91,7 +91,7 @@ final class DateTimeFieldHttpTest extends TestCase
             new ProcessScheduledPublishHandler(new ProcessScheduledPublishUseCase($this->entities), $jsonResponse),
         );
 
-        $intFieldRegistrar = new DateTimeFieldRouteRegistrar(
+        $dateTimeFieldRegistrar = new DateTimeFieldRouteRegistrar(
             new ListDateTimeFieldsHandler(new ListDateTimeFieldsUseCase($this->datetimeFields), $jsonResponse),
             new GetDateTimeFieldByIdHandler(new GetDateTimeFieldByIdUseCase($this->datetimeFields), $jsonResponse),
             new CreateDateTimeFieldHandler(new CreateDateTimeFieldUseCase($this->datetimeFields, $this->entities, $this->fieldDefs), $jsonResponse),
@@ -109,7 +109,7 @@ final class DateTimeFieldHttpTest extends TestCase
                 new FieldKeyNotRegisteredExceptionHandler($problemDetails),
                 new FieldTypeMismatchExceptionHandler($problemDetails),
             ],
-            routeRegistrars: [$entityRegistrar, $intFieldRegistrar],
+            routeRegistrars: [$entityRegistrar, $dateTimeFieldRegistrar],
         ))->create();
     }
 

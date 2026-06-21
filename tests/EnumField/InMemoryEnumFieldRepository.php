@@ -75,22 +75,22 @@ final class InMemoryEnumFieldRepository implements EnumFieldRepositoryInterface
         return array_slice($active, $offset, $limit);
     }
 
-    public function save(EnumField $intField): int
+    public function save(EnumField $enumField): int
     {
         $id = $this->nextId++;
         $this->fields[$id] = new EnumField(
-            entityId: $intField->entityId,
-            fieldKey: $intField->fieldKey,
-            value: $intField->value,
+            entityId: $enumField->entityId,
+            fieldKey: $enumField->fieldKey,
+            value: $enumField->value,
             id: $id,
         );
 
         return $id;
     }
 
-    public function update(EnumField $intField): void
+    public function update(EnumField $enumField): void
     {
-        $id = $intField->id;
+        $id = $enumField->id;
 
         if ($id === null) {
             return;
@@ -100,7 +100,7 @@ final class InMemoryEnumFieldRepository implements EnumFieldRepositoryInterface
             throw new EnumFieldNotFoundException($id);
         }
 
-        $this->fields[$id] = $intField;
+        $this->fields[$id] = $enumField;
     }
 
     public function delete(int $id): void

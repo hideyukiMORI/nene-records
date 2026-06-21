@@ -7,23 +7,23 @@ namespace NeNeRecords\EnumField;
 final readonly class GetEnumFieldByIdUseCase implements GetEnumFieldByIdUseCaseInterface
 {
     public function __construct(
-        private EnumFieldRepositoryInterface $intFields,
+        private EnumFieldRepositoryInterface $enumFields,
     ) {
     }
 
     public function execute(GetEnumFieldByIdInput $input): GetEnumFieldByIdOutput
     {
-        $intField = $this->intFields->findById($input->id);
+        $enumField = $this->enumFields->findById($input->id);
 
-        if ($intField === null) {
+        if ($enumField === null) {
             throw new EnumFieldNotFoundException($input->id);
         }
 
         return new GetEnumFieldByIdOutput(
-            id: (int) $intField->id,
-            entityId: $intField->entityId,
-            fieldKey: $intField->fieldKey,
-            value: $intField->value,
+            id: (int) $enumField->id,
+            entityId: $enumField->entityId,
+            fieldKey: $enumField->fieldKey,
+            value: $enumField->value,
         );
     }
 }

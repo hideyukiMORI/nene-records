@@ -7,18 +7,18 @@ namespace NeNeRecords\BoolField;
 final readonly class DeleteBoolFieldUseCase implements DeleteBoolFieldUseCaseInterface
 {
     public function __construct(
-        private BoolFieldRepositoryInterface $intFields,
+        private BoolFieldRepositoryInterface $boolFields,
     ) {
     }
 
     public function execute(DeleteBoolFieldByIdInput $input): void
     {
-        $intField = $this->intFields->findById($input->id);
+        $boolField = $this->boolFields->findById($input->id);
 
-        if ($intField === null) {
+        if ($boolField === null) {
             throw new BoolFieldNotFoundException($input->id);
         }
 
-        $this->intFields->delete($input->id);
+        $this->boolFields->delete($input->id);
     }
 }

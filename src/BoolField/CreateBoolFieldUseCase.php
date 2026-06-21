@@ -15,7 +15,7 @@ final readonly class CreateBoolFieldUseCase implements CreateBoolFieldUseCaseInt
     private const BOOL_DATA_TYPE = 'bool';
 
     public function __construct(
-        private BoolFieldRepositoryInterface $intFields,
+        private BoolFieldRepositoryInterface $boolFields,
         private EntityRepositoryInterface $entities,
         private FieldDefRepositoryInterface $fieldDefs,
     ) {
@@ -31,7 +31,7 @@ final readonly class CreateBoolFieldUseCase implements CreateBoolFieldUseCaseInt
 
         $this->assertBoolFieldKeyRegistered($entity->entityTypeId, $input->fieldKey);
 
-        $id = $this->intFields->save(new BoolField(
+        $id = $this->boolFields->save(new BoolField(
             entityId: $input->entityId,
             fieldKey: $input->fieldKey,
             value: $input->value,

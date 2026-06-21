@@ -41,11 +41,11 @@ final readonly class DateTimeFieldServiceProvider implements ServiceProviderInte
             ->set(
                 CreateDateTimeFieldUseCaseInterface::class,
                 static function (ContainerInterface $container): CreateDateTimeFieldUseCaseInterface {
-                    $intFields = $container->get(DateTimeFieldRepositoryInterface::class);
+                    $dateTimeFields = $container->get(DateTimeFieldRepositoryInterface::class);
                     $entities = $container->get(EntityRepositoryInterface::class);
                     $fieldDefs = $container->get(FieldDefRepositoryInterface::class);
 
-                    if (!$intFields instanceof DateTimeFieldRepositoryInterface) {
+                    if (!$dateTimeFields instanceof DateTimeFieldRepositoryInterface) {
                         throw new LogicException('datetime field repository service is invalid.');
                     }
 
@@ -57,7 +57,7 @@ final readonly class DateTimeFieldServiceProvider implements ServiceProviderInte
                         throw new LogicException('Field definition repository service is invalid.');
                     }
 
-                    return new CreateDateTimeFieldUseCase($intFields, $entities, $fieldDefs);
+                    return new CreateDateTimeFieldUseCase($dateTimeFields, $entities, $fieldDefs);
                 },
             )
             ->set(
@@ -167,11 +167,11 @@ final readonly class DateTimeFieldServiceProvider implements ServiceProviderInte
             ->set(
                 UpdateDateTimeFieldUseCaseInterface::class,
                 static function (ContainerInterface $container): UpdateDateTimeFieldUseCaseInterface {
-                    $intFields = $container->get(DateTimeFieldRepositoryInterface::class);
+                    $dateTimeFields = $container->get(DateTimeFieldRepositoryInterface::class);
                     $entities = $container->get(EntityRepositoryInterface::class);
                     $fieldDefs = $container->get(FieldDefRepositoryInterface::class);
 
-                    if (!$intFields instanceof DateTimeFieldRepositoryInterface) {
+                    if (!$dateTimeFields instanceof DateTimeFieldRepositoryInterface) {
                         throw new LogicException('datetime field repository service is invalid.');
                     }
 
@@ -183,7 +183,7 @@ final readonly class DateTimeFieldServiceProvider implements ServiceProviderInte
                         throw new LogicException('Field definition repository service is invalid.');
                     }
 
-                    return new UpdateDateTimeFieldUseCase($intFields, $entities, $fieldDefs);
+                    return new UpdateDateTimeFieldUseCase($dateTimeFields, $entities, $fieldDefs);
                 },
             )
             ->set(

@@ -76,29 +76,29 @@ final readonly class PdoEnumFieldRepository implements EnumFieldRepositoryInterf
         );
     }
 
-    public function save(EnumField $intField): int
+    public function save(EnumField $enumField): int
     {
         $this->query->execute(
             'INSERT INTO enum_fields (organization_id, entity_id, field_key, value) VALUES (?, ?, ?, ?)',
-            [$this->orgId->get(), $intField->entityId, $intField->fieldKey, $intField->value],
+            [$this->orgId->get(), $enumField->entityId, $enumField->fieldKey, $enumField->value],
         );
 
         return $this->query->lastInsertId();
     }
 
-    public function update(EnumField $intField): void
+    public function update(EnumField $enumField): void
     {
-        if ($intField->id === null) {
+        if ($enumField->id === null) {
             throw new LogicException('EnumField id is required when updating.');
         }
 
         $affected = $this->query->execute(
             'UPDATE enum_fields SET field_key = ?, value = ? WHERE id = ? AND is_deleted = 0 AND organization_id = ?',
-            [$intField->fieldKey, $intField->value, $intField->id, $this->orgId->get()],
+            [$enumField->fieldKey, $enumField->value, $enumField->id, $this->orgId->get()],
         );
 
         if ($affected === 0) {
-            throw new EnumFieldNotFoundException($intField->id);
+            throw new EnumFieldNotFoundException($enumField->id);
         }
     }
 

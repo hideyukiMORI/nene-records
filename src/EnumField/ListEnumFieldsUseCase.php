@@ -7,15 +7,15 @@ namespace NeNeRecords\EnumField;
 final readonly class ListEnumFieldsUseCase implements ListEnumFieldsUseCaseInterface
 {
     public function __construct(
-        private EnumFieldRepositoryInterface $intFields,
+        private EnumFieldRepositoryInterface $enumFields,
     ) {
     }
 
     public function execute(ListEnumFieldsInput $input): ListEnumFieldsOutput
     {
         $rows = $input->entityId !== null
-            ? $this->intFields->findByEntityId($input->entityId, $input->limit, $input->offset)
-            : $this->intFields->findAll($input->limit, $input->offset);
+            ? $this->enumFields->findByEntityId($input->entityId, $input->limit, $input->offset)
+            : $this->enumFields->findAll($input->limit, $input->offset);
 
         $items = array_map(
             static fn (EnumField $field) => new ListEnumFieldItem(

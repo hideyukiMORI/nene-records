@@ -15,7 +15,7 @@ final readonly class UpdateEnumFieldUseCase implements UpdateEnumFieldUseCaseInt
     private const ENUM_DATA_TYPE = 'enum';
 
     public function __construct(
-        private EnumFieldRepositoryInterface $intFields,
+        private EnumFieldRepositoryInterface $enumFields,
         private EntityRepositoryInterface $entities,
         private FieldDefRepositoryInterface $fieldDefs,
     ) {
@@ -23,7 +23,7 @@ final readonly class UpdateEnumFieldUseCase implements UpdateEnumFieldUseCaseInt
 
     public function execute(UpdateEnumFieldInput $input): UpdateEnumFieldOutput
     {
-        $existing = $this->intFields->findById($input->id);
+        $existing = $this->enumFields->findById($input->id);
 
         if ($existing === null) {
             throw new EnumFieldNotFoundException($input->id);
@@ -43,7 +43,7 @@ final readonly class UpdateEnumFieldUseCase implements UpdateEnumFieldUseCaseInt
             value: $input->value,
             id: $input->id,
         );
-        $this->intFields->update($updated);
+        $this->enumFields->update($updated);
 
         return new UpdateEnumFieldOutput(
             id: $input->id,

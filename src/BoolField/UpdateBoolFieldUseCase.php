@@ -15,7 +15,7 @@ final readonly class UpdateBoolFieldUseCase implements UpdateBoolFieldUseCaseInt
     private const BOOL_DATA_TYPE = 'bool';
 
     public function __construct(
-        private BoolFieldRepositoryInterface $intFields,
+        private BoolFieldRepositoryInterface $boolFields,
         private EntityRepositoryInterface $entities,
         private FieldDefRepositoryInterface $fieldDefs,
     ) {
@@ -23,7 +23,7 @@ final readonly class UpdateBoolFieldUseCase implements UpdateBoolFieldUseCaseInt
 
     public function execute(UpdateBoolFieldInput $input): UpdateBoolFieldOutput
     {
-        $existing = $this->intFields->findById($input->id);
+        $existing = $this->boolFields->findById($input->id);
 
         if ($existing === null) {
             throw new BoolFieldNotFoundException($input->id);
@@ -43,7 +43,7 @@ final readonly class UpdateBoolFieldUseCase implements UpdateBoolFieldUseCaseInt
             value: $input->value,
             id: $input->id,
         );
-        $this->intFields->update($updated);
+        $this->boolFields->update($updated);
 
         return new UpdateBoolFieldOutput(
             id: $input->id,

@@ -76,29 +76,29 @@ final readonly class PdoDateTimeFieldRepository implements DateTimeFieldReposito
         );
     }
 
-    public function save(DateTimeField $intField): int
+    public function save(DateTimeField $dateTimeField): int
     {
         $this->query->execute(
             'INSERT INTO datetime_fields (organization_id, entity_id, field_key, value) VALUES (?, ?, ?, ?)',
-            [$this->orgId->get(), $intField->entityId, $intField->fieldKey, $intField->value],
+            [$this->orgId->get(), $dateTimeField->entityId, $dateTimeField->fieldKey, $dateTimeField->value],
         );
 
         return $this->query->lastInsertId();
     }
 
-    public function update(DateTimeField $intField): void
+    public function update(DateTimeField $dateTimeField): void
     {
-        if ($intField->id === null) {
+        if ($dateTimeField->id === null) {
             throw new LogicException('DateTimeField id is required when updating.');
         }
 
         $affected = $this->query->execute(
             'UPDATE datetime_fields SET field_key = ?, value = ? WHERE id = ? AND is_deleted = 0 AND organization_id = ?',
-            [$intField->fieldKey, $intField->value, $intField->id, $this->orgId->get()],
+            [$dateTimeField->fieldKey, $dateTimeField->value, $dateTimeField->id, $this->orgId->get()],
         );
 
         if ($affected === 0) {
-            throw new DateTimeFieldNotFoundException($intField->id);
+            throw new DateTimeFieldNotFoundException($dateTimeField->id);
         }
     }
 
