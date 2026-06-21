@@ -125,4 +125,29 @@ describe('useScrollReveal', () => {
     expect(observed).toHaveLength(0)
     expect(root.querySelector('.card')?.hasAttribute('data-motion-reveal-item')).toBe(false)
   })
+
+  it('re-establishes the reveal when the effect re-runs on an already-tagged item', () => {
+    // Reproduces the StrictMode / back-navigation regression: an item tagged but
+    // not yet revealed must be re-observed (not skipped) when the effect re-runs.
+    const root = mountContainer('<div class="card">a</div>')
+    const card = root.querySelector('.card')
+    if (card !== null) {
+      setTop(card, 5000) // below the fold → observed, not auto-revealed
+    }
+    const ref = { current: root } as RefObject<HTMLElement | null>
+
+    const { rerender } = renderHook(
+      ({ key }: { key: string }) => {
+        useScrollReveal({ containerRef: ref, enabled: true, selector: '.card', scanKey: key })
+      },
+      { initialProps: { key: '/' } },
+    )
+    expect(observed).toHaveLength(1)
+
+    // Effect teardown (mock disconnect empties `observed`) + re-run.
+    rerender({ key: '/next' })
+
+    expect(card?.hasAttribute('data-revealed')).toBe(false)
+    expect(observed).toHaveLength(1) // re-observed, not skipped
+  })
 })

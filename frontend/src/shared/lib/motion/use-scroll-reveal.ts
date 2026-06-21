@@ -75,7 +75,12 @@ export function useScrollReveal({
     const tagAndObserve = (): void => {
       const inView: Element[] = []
       root.querySelectorAll(selector).forEach((el) => {
-        if (el.hasAttribute(ITEM_ATTR) || el.hasAttribute(REVEALED_ATTR)) {
+        // Skip only items that are already revealed. A tagged-but-unrevealed
+        // item must be re-processed: under React StrictMode (and on remount) the
+        // effect runs, its cleanup cancels the pending reveal / disconnects the
+        // observer, then it runs again — if we skipped on the tag alone the item
+        // would stay at opacity 0 forever (the home feed vanishing on back-nav).
+        if (el.hasAttribute(REVEALED_ATTR)) {
           return
         }
         el.setAttribute(ITEM_ATTR, '')
