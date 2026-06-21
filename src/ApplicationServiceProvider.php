@@ -13,6 +13,9 @@ use NeNeRecords\Analytics\AnalyticsRouteRegistrar;
 use NeNeRecords\Analytics\AnalyticsServiceProvider;
 use NeNeRecords\Auth\AuthRouteRegistrar;
 use NeNeRecords\Auth\InvalidCredentialsExceptionHandler;
+use NeNeRecords\BlocksField\BlocksFieldNotFoundExceptionHandler;
+use NeNeRecords\BlocksField\BlocksFieldRouteRegistrar;
+use NeNeRecords\BlocksField\BlocksFieldServiceProvider;
 use NeNeRecords\BoolField\BoolFieldNotFoundExceptionHandler;
 use NeNeRecords\BoolField\BoolFieldRouteRegistrar;
 use NeNeRecords\BoolField\BoolFieldServiceProvider;
@@ -148,6 +151,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
             ->addProvider(new FieldDefServiceProvider())
             ->addProvider(new EntityServiceProvider())
             ->addProvider(new TextFieldServiceProvider())
+            ->addProvider(new BlocksFieldServiceProvider())
             ->addProvider(new IntFieldServiceProvider())
             ->addProvider(new EnumFieldServiceProvider())
             ->addProvider(new BoolFieldServiceProvider())
@@ -184,6 +188,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $fieldDef = $container->get('nene-records.route_registrar.field_def');
                     $entity = $container->get('nene-records.route_registrar.entity');
                     $textField = $container->get('nene-records.route_registrar.text_field');
+                    $blocksField = $container->get('nene-records.route_registrar.blocks_field');
                     $intField = $container->get('nene-records.route_registrar.int_field');
                     $enumField = $container->get('nene-records.route_registrar.enum_field');
                     $boolField = $container->get('nene-records.route_registrar.bool_field');
@@ -218,6 +223,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         || !$fieldDef instanceof FieldDefRouteRegistrar
                         || !$entity instanceof EntityRouteRegistrar
                         || !$textField instanceof TextFieldRouteRegistrar
+                        || !$blocksField instanceof BlocksFieldRouteRegistrar
                         || !$intField instanceof IntFieldRouteRegistrar
                         || !$enumField instanceof EnumFieldRouteRegistrar
                         || !$boolField instanceof BoolFieldRouteRegistrar
@@ -256,6 +262,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $fieldDef,
                         $entity,
                         $textField,
+                        $blocksField,
                         $intField,
                         $enumField,
                         $boolField,
@@ -296,6 +303,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $entityNotFound = $container->get(EntityNotFoundExceptionHandler::class);
                     $duplicateEntitySlug = $container->get(DuplicateEntitySlugExceptionHandler::class);
                     $textFieldNotFound = $container->get(TextFieldNotFoundExceptionHandler::class);
+                    $blocksFieldNotFound = $container->get(BlocksFieldNotFoundExceptionHandler::class);
                     $intFieldNotFound = $container->get(IntFieldNotFoundExceptionHandler::class);
                     $enumFieldNotFound = $container->get(EnumFieldNotFoundExceptionHandler::class);
                     $boolFieldNotFound = $container->get(BoolFieldNotFoundExceptionHandler::class);
@@ -346,6 +354,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $entityNotFound,
                         $duplicateEntitySlug,
                         $textFieldNotFound,
+                        $blocksFieldNotFound,
                         $intFieldNotFound,
                         $enumFieldNotFound,
                         $boolFieldNotFound,
@@ -401,6 +410,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $entityNotFound,
                         $duplicateEntitySlug,
                         $textFieldNotFound,
+                        $blocksFieldNotFound,
                         $intFieldNotFound,
                         $enumFieldNotFound,
                         $boolFieldNotFound,
