@@ -2208,6 +2208,42 @@ paths:
                 $ref: '#/components/schemas/WebhookResponse'
         '422':
           $ref: '#/components/responses/ValidationFailed'
+  /api/v1/webhooks/process-deliveries:
+    post:
+      tags:
+        - Webhooks
+      summary: Process webhook deliveries
+      description: >-
+        Drains the webhook delivery queue — sends due deliveries with retry and
+        exponential backoff. Intended for cron job invocation. The delivery queue
+        is not organization-scoped, so a single call drains all tenants.
+      operationId: processWebhookDeliveries
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          description: Maximum number of due deliveries to process in this run.
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000
+            default: 50
+      responses:
+        '200':
+          description: Summary of the queue drain.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcessWebhookDeliveriesResponse'
+              examples:
+                ok:
+                  value:
+                    processed: 3
+                    delivered: 2
+                    retried: 1
+                    failed: 0
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /api/v1/webhooks/{id}:
     parameters:
       - name: id
@@ -4739,6 +4775,30 @@ components:
           items:
             type: integer
             format: int64
+    ProcessWebhookDeliveriesResponse:
+      type: object
+      required:
+        - processed
+        - delivered
+        - retried
+        - failed
+      properties:
+        processed:
+          type: integer
+          minimum: 0
+          description: Number of due deliveries claimed and attempted this run.
+        delivered:
+          type: integer
+          minimum: 0
+          description: Deliveries that succeeded.
+        retried:
+          type: integer
+          minimum: 0
+          description: Deliveries that failed but were rescheduled with backoff.
+        failed:
+          type: integer
+          minimum: 0
+          description: Deliveries that exhausted their attempt budget and were marked failed.
     EntityListResponse:
       type: object
       required:

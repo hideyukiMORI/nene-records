@@ -231,6 +231,23 @@ final readonly class WebhookServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(
+                ProcessWebhookDeliveriesHandler::class,
+                static function (ContainerInterface $container): ProcessWebhookDeliveriesHandler {
+                    $processor = $container->get(WebhookDeliveryProcessor::class);
+                    $response = $container->get(JsonResponseFactory::class);
+
+                    if (!$processor instanceof WebhookDeliveryProcessor) {
+                        throw new LogicException('Webhook delivery processor service is invalid.');
+                    }
+
+                    if (!$response instanceof JsonResponseFactory) {
+                        throw new LogicException('JSON response factory service is invalid.');
+                    }
+
+                    return new ProcessWebhookDeliveriesHandler($processor, $response);
+                },
+            )
+            ->set(
                 WebhookNotFoundExceptionHandler::class,
                 static function (ContainerInterface $container): WebhookNotFoundExceptionHandler {
                     $problemDetails = $container->get(ProblemDetailsResponseFactory::class);
@@ -250,6 +267,7 @@ final readonly class WebhookServiceProvider implements ServiceProviderInterface
                     $create = $container->get(CreateWebhookHandler::class);
                     $update = $container->get(UpdateWebhookHandler::class);
                     $delete = $container->get(DeleteWebhookHandler::class);
+                    $processDeliveries = $container->get(ProcessWebhookDeliveriesHandler::class);
 
                     if (!$list instanceof ListWebhooksHandler) {
                         throw new LogicException('ListWebhooks handler service is invalid.');
@@ -271,7 +289,11 @@ final readonly class WebhookServiceProvider implements ServiceProviderInterface
                         throw new LogicException('DeleteWebhook handler service is invalid.');
                     }
 
-                    return new WebhookRouteRegistrar($list, $getById, $create, $update, $delete);
+                    if (!$processDeliveries instanceof ProcessWebhookDeliveriesHandler) {
+                        throw new LogicException('ProcessWebhookDeliveries handler service is invalid.');
+                    }
+
+                    return new WebhookRouteRegistrar($list, $getById, $create, $update, $delete, $processDeliveries);
                 },
             );
     }

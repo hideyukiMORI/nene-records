@@ -1,3 +1,7 @@
 # NeNe Records scheduled publish processor
 # Runs every minute — transitions scheduled entities to published when scheduled_at has passed.
 * * * * * wget -q -O- --post-data="" http://app/api/v1/entities/process-scheduled
+
+# NeNe Records webhook delivery worker (#466)
+# Runs every minute — drains the webhook_deliveries queue (send with retry/backoff).
+* * * * * wget -q -O- --post-data="" http://app/api/v1/webhooks/process-deliveries
