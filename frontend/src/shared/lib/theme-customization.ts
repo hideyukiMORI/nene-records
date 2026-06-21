@@ -63,6 +63,9 @@ export interface ThemeFlags {
   headerDensity?: string
   headerWidth?: string
   headerSticky?: string
+  /** Motion capability layer (see #371 / theme-flags.md §6). First-party JS implements
+   *  the behaviour; themes only declare the flag. Gated by prefers-reduced-motion. */
+  motionReveal?: string
 }
 
 /** flag key → { data attribute, allowed values }. Mirrors theme-flags.md §2. */
@@ -186,6 +189,14 @@ export const FLAG_DEFS: Record<keyof ThemeFlags, { attr: string; options: readon
       options: [
         { value: 'sticky', label: 'Sticky' },
         { value: 'none', label: 'Static' },
+      ],
+    },
+    motionReveal: {
+      attr: 'data-motion-reveal',
+      options: [
+        { value: 'off', label: 'Off' },
+        { value: 'subtle', label: 'Subtle' },
+        { value: 'standard', label: 'Standard' },
       ],
     },
   }

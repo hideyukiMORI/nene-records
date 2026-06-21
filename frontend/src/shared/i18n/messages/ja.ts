@@ -94,6 +94,7 @@ export const ja: Partial<MessageCatalog> = {
   'admin.themeCustomize.headerDensity': 'ヘッダーの高さ',
   'admin.themeCustomize.headerWidth': 'ヘッダー幅',
   'admin.themeCustomize.headerSticky': 'ヘッダー追従',
+  'admin.themeCustomize.motionReveal': 'スクロール演出',
   'admin.headerContent.title': 'ヘッダーの内容',
   'admin.headerPreview.label': 'プレビュー',
   'admin.headerContent.intro':

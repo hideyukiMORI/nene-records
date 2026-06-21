@@ -1,16 +1,21 @@
-import { type ReactNode, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { type ReactNode, useMemo, useRef, useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import { useEntityTypeList } from '@/entities/entity-type'
 import { usePublicWidgets } from '@/entities/widget'
 import { SiteWidgets } from '@/features/render-widgets'
 import { hasCta, hasTopbarContent, safeHref } from '@/shared/lib/header-config'
+import { useScrollReveal } from '@/shared/lib/motion/use-scroll-reveal'
 import { NeneMark } from '@/shared/ui'
 import { IconMenu, IconMoon, IconSearch, IconSun, IconX } from '@/shared/ui/icons/Icons'
 import { IconAuto } from '@/shared/ui/icons/magazine-icons'
 import './public-site.css'
 import type { HeaderCta, HeaderTopbar } from '@/shared/lib/header-config'
+import { useConsumerMotion } from './use-consumer-motion'
 import type { PublicSite } from './public-site-context'
 import { type ThemeMode, useConsumerTheme } from './use-consumer-theme'
+
+/** Repeating content blocks that scroll-reveal targets (#371 S1). */
+const REVEAL_SELECTOR = '.card, .typecard, .section__head, .article__head'
 
 export interface PublicSiteShellProps {
   site: PublicSite
@@ -146,6 +151,18 @@ export function PublicSiteShell({
   const { mode, resolvedTheme, setMode } = useConsumerTheme(site.activeTheme)
   const [drawerOpen, setDrawerOpen] = useState(false)
 
+  // Motion capability layer (#371): the theme declares `data-motion-reveal`;
+  // first-party JS implements scroll-reveal, gated by prefers-reduced-motion.
+  const mainRef = useRef<HTMLElement>(null)
+  const { pathname } = useLocation()
+  const motion = useConsumerMotion(site.themeFlagAttrs)
+  useScrollReveal({
+    containerRef: mainRef,
+    enabled: motion.reveal !== 'off',
+    selector: REVEAL_SELECTOR,
+    scanKey: pathname,
+  })
+
   // Render `sidebar` / `aside` regions as side columns when widgets are placed
   // there (and the page opts in). Empty regions collapse, so the grid steps down
   // from three → two → single column as content allows.
@@ -226,7 +243,7 @@ export function PublicSiteShell({
         </div>
       </header>
 
-      <main>
+      <main ref={mainRef}>
         {hero}
         <div className="wrap">
           <div className={`layout ${layoutModifier}`}>

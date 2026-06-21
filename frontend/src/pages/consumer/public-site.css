@@ -61,6 +61,7 @@
   --ease: cubic-bezier(0.4, 0, 0.2, 1);
   --dur-fast: 120ms;
   --dur-normal: 220ms;
+  --motion-reveal-dur: 520ms;
 
   display: flex;
   flex-direction: column;
@@ -1693,6 +1694,35 @@
     white-space: nowrap;
   }
 }
+/* ── Motion capability: scroll-reveal (#371 S1) ──────────────────────────────
+   First-party JS (use-scroll-reveal) tags in-view candidates with
+   [data-motion-reveal-item] and flips [data-revealed] once they enter the
+   viewport. We hide the initial state ONLY when the theme's data-motion-reveal
+   flag is set AND JS has tagged the element — so a no-JS visitor sees content
+   immediately. The whole block is wrapped in no-preference, so reduced-motion
+   users never get the hidden initial state (reinforced by the reduce block). */
+@media (prefers-reduced-motion: no-preference) {
+  .nene-public[data-motion-reveal='subtle'] [data-motion-reveal-item],
+  .nene-public[data-motion-reveal='standard'] [data-motion-reveal-item] {
+    opacity: 0;
+    transform: translateY(var(--motion-reveal-shift, 8px));
+    transition:
+      opacity var(--motion-reveal-dur) var(--ease),
+      transform var(--motion-reveal-dur) var(--ease);
+    will-change: opacity, transform;
+  }
+
+  .nene-public[data-motion-reveal='standard'] [data-motion-reveal-item] {
+    --motion-reveal-shift: 18px;
+  }
+
+  .nene-public[data-motion-reveal='subtle'] [data-motion-reveal-item][data-revealed],
+  .nene-public[data-motion-reveal='standard'] [data-motion-reveal-item][data-revealed] {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .nene-public * {
     transition: none !important;

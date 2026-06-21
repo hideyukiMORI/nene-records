@@ -95,7 +95,8 @@
         "headerNavAlign": { "enum": ["start", "center", "end"] },
         "headerDensity": { "enum": ["compact", "regular", "tall"] },
         "headerWidth": { "enum": ["boxed", "full"] },
-        "headerSticky": { "enum": ["sticky", "none"] }
+        "headerSticky": { "enum": ["sticky", "none"] },
+        "motionReveal": { "enum": ["off", "subtle", "standard"] }
       }
     },
     "assets": {
