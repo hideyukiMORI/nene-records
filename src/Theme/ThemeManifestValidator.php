@@ -55,6 +55,7 @@ final class ThemeManifestValidator
         'headerWidth' => ['boxed', 'full'],
         'headerSticky' => ['sticky', 'none'],
         'motionReveal' => ['off', 'subtle', 'standard'],
+        'motionHeader' => ['static', 'shrink'],
     ];
 
     /**

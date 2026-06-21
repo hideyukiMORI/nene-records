@@ -35,4 +35,18 @@ describe('useConsumerMotion', () => {
     const { result } = renderHook(() => useConsumerMotion({}))
     expect(result.current.reveal).toBe('off')
   })
+
+  it('passes the header flag through and defaults to static', () => {
+    stubReducedMotion(false)
+    expect(
+      renderHook(() => useConsumerMotion({ 'data-motion-header': 'shrink' })).result.current.header,
+    ).toBe('shrink')
+    expect(renderHook(() => useConsumerMotion({})).result.current.header).toBe('static')
+  })
+
+  it('forces the header static under reduced-motion', () => {
+    stubReducedMotion(true)
+    const { result } = renderHook(() => useConsumerMotion({ 'data-motion-header': 'shrink' }))
+    expect(result.current.header).toBe('static')
+  })
 })

@@ -96,7 +96,8 @@
         "headerDensity": { "enum": ["compact", "regular", "tall"] },
         "headerWidth": { "enum": ["boxed", "full"] },
         "headerSticky": { "enum": ["sticky", "none"] },
-        "motionReveal": { "enum": ["off", "subtle", "standard"] }
+        "motionReveal": { "enum": ["off", "subtle", "standard"] },
+        "motionHeader": { "enum": ["static", "shrink"] }
       }
     },
     "assets": {

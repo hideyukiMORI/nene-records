@@ -102,6 +102,7 @@ export const en = {
   'admin.themeCustomize.headerWidth': 'Header width',
   'admin.themeCustomize.headerSticky': 'Header sticky',
   'admin.themeCustomize.motionReveal': 'Scroll reveal',
+  'admin.themeCustomize.motionHeader': 'Header shrink',
   'admin.headerContent.title': 'Header content',
   'admin.headerPreview.label': 'Preview',
   'admin.headerContent.intro':

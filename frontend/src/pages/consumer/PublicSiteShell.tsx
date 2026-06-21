@@ -4,6 +4,7 @@ import { useEntityTypeList } from '@/entities/entity-type'
 import { usePublicWidgets } from '@/entities/widget'
 import { SiteWidgets } from '@/features/render-widgets'
 import { hasCta, hasTopbarContent, safeHref } from '@/shared/lib/header-config'
+import { useHeaderShrink } from '@/shared/lib/motion/use-header-shrink'
 import { useScrollReveal } from '@/shared/lib/motion/use-scroll-reveal'
 import { NeneMark } from '@/shared/ui'
 import { IconMenu, IconMoon, IconSearch, IconSun, IconX } from '@/shared/ui/icons/Icons'
@@ -154,6 +155,7 @@ export function PublicSiteShell({
   // Motion capability layer (#371): the theme declares `data-motion-reveal`;
   // first-party JS implements scroll-reveal, gated by prefers-reduced-motion.
   const mainRef = useRef<HTMLElement>(null)
+  const sentinelRef = useRef<HTMLDivElement>(null)
   const { pathname } = useLocation()
   const motion = useConsumerMotion(site.themeFlagAttrs)
   useScrollReveal({
@@ -161,6 +163,10 @@ export function PublicSiteShell({
     enabled: motion.reveal !== 'off',
     selector: REVEAL_SELECTOR,
     scanKey: pathname,
+  })
+  const headerShrunk = useHeaderShrink({
+    enabled: motion.header === 'shrink',
+    sentinelRef,
   })
 
   // Render `sidebar` / `aside` regions as side columns when widgets are placed
@@ -202,7 +208,11 @@ export function PublicSiteShell({
       data-theme={resolvedTheme}
       data-theme-mode={mode}
       {...site.themeFlagAttrs}
+      data-shrunk={headerShrunk ? '' : undefined}
     >
+      {/* Zero-height marker at the page top; when it scrolls away the sticky
+          header compacts (motionHeader='shrink'). See use-header-shrink. */}
+      <div ref={sentinelRef} className="motion-sentinel" aria-hidden="true" />
       {site.runtimeThemeCss !== '' ? <style>{site.runtimeThemeCss}</style> : null}
       {site.themeOverrideCss !== '' ? <style>{site.themeOverrideCss}</style> : null}
       {hasTopbarContent(site.headerConfig.topbar) ? (

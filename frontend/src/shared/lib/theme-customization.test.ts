@@ -176,4 +176,11 @@ describe('resolveFlagAttrs / flagAttrsForTheme', () => {
     // Invalid values are dropped like any other flag.
     expect(resolveFlagAttrs(undefined, { motionReveal: 'fancy' })).toEqual({})
   })
+
+  it('maps the motion-header capability flag', () => {
+    expect(resolveFlagAttrs(undefined, { motionHeader: 'shrink' })).toEqual({
+      'data-motion-header': 'shrink',
+    })
+    expect(resolveFlagAttrs(undefined, { motionHeader: 'wobble' })).toEqual({})
+  })
 })

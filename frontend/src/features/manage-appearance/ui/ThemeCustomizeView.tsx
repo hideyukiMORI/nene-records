@@ -412,6 +412,16 @@ export function ThemeCustomizeView({
                 }}
               />
             </Field>
+            <Field label={t('admin.themeCustomize.motionHeader')}>
+              <Select
+                value={draft.flags?.motionHeader}
+                options={FLAG_DEFS.motionHeader.options}
+                placeholder={themePlaceholder}
+                onChange={(v) => {
+                  setKnob('flags', { ...draft.flags, motionHeader: v })
+                }}
+              />
+            </Field>
           </Stack>
         </details>
 

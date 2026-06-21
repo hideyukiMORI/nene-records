@@ -13,6 +13,8 @@ import { usePrefersReducedMotion } from '@/shared/lib/motion/use-prefers-reduced
 export interface ConsumerMotion {
   /** `off` | `subtle` | `standard` — forced `off` under reduced-motion. */
   reveal: string
+  /** `static` | `shrink` — forced `static` under reduced-motion. */
+  header: string
 }
 
 export function useConsumerMotion(flagAttrs: Record<string, string>): ConsumerMotion {
@@ -20,5 +22,6 @@ export function useConsumerMotion(flagAttrs: Record<string, string>): ConsumerMo
 
   return {
     reveal: reduced ? 'off' : (flagAttrs['data-motion-reveal'] ?? 'off'),
+    header: reduced ? 'static' : (flagAttrs['data-motion-header'] ?? 'static'),
   }
 }
