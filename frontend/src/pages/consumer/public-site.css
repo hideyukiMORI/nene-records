@@ -1696,22 +1696,38 @@
   }
 }
 /* ── Motion capability: scroll-reveal (#371 S1) ──────────────────────────────
-   First-party JS (use-scroll-reveal) tags in-view candidates with
-   [data-motion-reveal-item] and flips [data-revealed] once they enter the
-   viewport. We hide the initial state ONLY when the theme's data-motion-reveal
-   flag is set AND JS has tagged the element — so a no-JS visitor sees content
-   immediately. The whole block is wrapped in no-preference, so reduced-motion
-   users never get the hidden initial state (reinforced by the reduce block). */
-@media (prefers-reduced-motion: no-preference) {
-  .nene-public[data-motion-reveal='subtle'] [data-motion-reveal-item],
-  .nene-public[data-motion-reveal='standard'] [data-motion-reveal-item] {
+   First-party JS (use-scroll-reveal) tags candidates with [data-motion-reveal-item]
+   and flips [data-revealed] when they enter (or already sit in) the viewport.
+   The fade-in is a keyframe animation, NOT a transition: a transition from a
+   JS-set opacity:0 in the same frame snaps instantly (the start value is never
+   painted), which is why the reveal looked instant. A keyframe owns its `from`
+   state and always plays. Hidden state applies ONLY when the theme flag is on
+   AND JS has tagged the item, so no-JS visitors see everything. Wrapped in
+   no-preference so reduced-motion users never get the hidden state. */
+@keyframes nene-reveal {
+  from {
     opacity: 0;
     transform: translateY(var(--motion-reveal-shift, 16px));
-    /* Ease-out (glide in, settle gently) — reveal-specific, not the global --ease. */
-    transition:
-      opacity var(--motion-reveal-dur) cubic-bezier(0.16, 1, 0.3, 1),
-      transform var(--motion-reveal-dur) cubic-bezier(0.16, 1, 0.3, 1);
-    transition-delay: calc(var(--motion-reveal-index, 0) * var(--motion-reveal-step, 120ms));
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Hidden until revealed. */
+  .nene-public[data-motion-reveal='subtle'] [data-motion-reveal-item]:not([data-revealed]),
+  .nene-public[data-motion-reveal='standard'] [data-motion-reveal-item]:not([data-revealed]) {
+    opacity: 0;
+  }
+
+  /* Reveal = play the keyframe. `both` holds opacity:0 through the stagger delay,
+     then settles at the final state. Ease-out glides in and settles gently. */
+  .nene-public[data-motion-reveal='subtle'] [data-motion-reveal-item][data-revealed],
+  .nene-public[data-motion-reveal='standard'] [data-motion-reveal-item][data-revealed] {
+    animation: nene-reveal var(--motion-reveal-dur, 1000ms) cubic-bezier(0.16, 1, 0.3, 1)
+      calc(var(--motion-reveal-index, 0) * var(--motion-reveal-step, 120ms)) both;
     will-change: opacity, transform;
   }
 
@@ -1728,12 +1744,6 @@
   .nene-public[data-motion-reveal] .typecard[data-motion-reveal-item] {
     --motion-reveal-dur: 800ms;
     --motion-reveal-step: 90ms;
-  }
-
-  .nene-public[data-motion-reveal='subtle'] [data-motion-reveal-item][data-revealed],
-  .nene-public[data-motion-reveal='standard'] [data-motion-reveal-item][data-revealed] {
-    opacity: 1;
-    transform: none;
   }
 }
 

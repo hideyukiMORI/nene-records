@@ -56,8 +56,6 @@ export function useScrollReveal({
       return undefined
     }
 
-    const rafIds: number[] = []
-
     const observer = new IntersectionObserver(
       (entries, obs) => {
         let staggerIndex = 0
@@ -74,36 +72,27 @@ export function useScrollReveal({
     )
 
     const tagAndObserve = (): void => {
-      const inView: Element[] = []
+      let inViewIndex = 0
       root.querySelectorAll(selector).forEach((el) => {
         // Skip only items that are already revealed. A tagged-but-unrevealed
         // item must be re-processed: under React StrictMode (and on remount) the
-        // effect runs, its cleanup cancels the pending reveal / disconnects the
-        // observer, then it runs again — if we skipped on the tag alone the item
-        // would stay at opacity 0 forever (the home feed vanishing on back-nav).
+        // effect runs, its cleanup disconnects the observer, then it runs again —
+        // if we skipped on the tag alone the item would stay hidden forever (the
+        // home feed vanishing on back-nav).
         if (el.hasAttribute(REVEALED_ATTR)) {
           return
         }
         el.setAttribute(ITEM_ATTR, '')
-        // Reveal anything not strictly below the fold straight away; defer the
-        // rest to scroll. window.innerHeight is safe here (browser-only effect).
+        // Anything in or above the viewport reveals straight away; the CSS
+        // keyframe handles the fade-in from opacity 0, so there is no need to
+        // wait a frame. Genuinely below-the-fold items wait for scroll.
         if (el.getBoundingClientRect().top < window.innerHeight) {
-          inView.push(el)
+          reveal(el, inViewIndex)
+          inViewIndex += 1
         } else {
           observer.observe(el)
         }
       })
-
-      if (inView.length > 0) {
-        // One frame later, so the opacity:0 initial state has painted and the
-        // reveal animates rather than snapping.
-        const id = requestAnimationFrame(() => {
-          inView.forEach((el, index) => {
-            reveal(el, index)
-          })
-        })
-        rafIds.push(id)
-      }
     }
 
     tagAndObserve()
@@ -118,9 +107,6 @@ export function useScrollReveal({
     return () => {
       observer.disconnect()
       mutationObserver?.disconnect()
-      rafIds.forEach((id) => {
-        cancelAnimationFrame(id)
-      })
     }
   }, [containerRef, enabled, selector, scanKey])
 }
