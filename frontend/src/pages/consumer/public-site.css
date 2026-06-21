@@ -1948,6 +1948,48 @@
   z-index: -1;
 }
 
+/* split — balanced 50/50 columns with a full-height art panel. */
+.nene-public[data-hero='split'] .hero {
+  padding-block: clamp(3rem, 1.5rem + 5vw, 5.5rem);
+}
+.nene-public[data-hero='split'] .hero__grid {
+  grid-template-columns: 1fr 1fr;
+  align-items: stretch;
+}
+.nene-public[data-hero='split'] .hero__copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.nene-public[data-hero='split'] .hero__art,
+.nene-public[data-hero='split'] .hero__art-frame {
+  height: 100%;
+}
+.nene-public[data-hero='split'] .hero__art-frame img {
+  height: 100%;
+  object-fit: cover;
+}
+
+/* gradient — a full-width accent-tinted gradient band behind the hero. */
+.nene-public[data-hero='gradient'] .hero {
+  position: relative;
+  padding-block: clamp(3rem, 1.5rem + 6vw, 6rem);
+}
+.nene-public[data-hero='gradient'] .hero::before {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  left: 50%;
+  width: 100vw;
+  transform: translateX(-50%);
+  background: linear-gradient(
+    135deg,
+    color-mix(in oklch, var(--color-accent) 20%, var(--color-surface)),
+    var(--color-surface) 62%
+  );
+  z-index: -1;
+}
+
 /* sectionRule — the rule under a section heading. */
 .nene-public[data-rule='none'] .section__head {
   border-bottom: none;

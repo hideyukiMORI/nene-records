@@ -85,7 +85,7 @@
         "feedColumns": { "enum": ["auto", "1", "2", "3", "4"] },
         "cardStyle": { "enum": ["flat", "bordered", "shadowed", "framed"] },
         "media": { "enum": ["plain", "duotone", "grayscale", "framed"] },
-        "hero": { "enum": ["standard", "fullbleed", "minimal"] },
+        "hero": { "enum": ["standard", "fullbleed", "minimal", "split", "gradient"] },
         "sectionRule": { "enum": ["none", "hairline", "heavy"] },
         "eyebrow": { "enum": ["plain", "caps", "barred"] },
         "headerSearch": { "enum": ["show", "hide"] },

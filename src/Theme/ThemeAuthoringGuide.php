@@ -61,7 +61,7 @@ final class ThemeAuthoringGuide
         'feedColumns' => 'Column count of the feed grid; auto = responsive.',
         'cardStyle' => 'Visual treatment of cards (flat / bordered / shadowed / framed).',
         'media' => 'Image/thumbnail rendering treatment (plain / duotone / grayscale / framed).',
-        'hero' => 'Top hero/banner layout (standard / fullbleed / minimal).',
+        'hero' => 'Top hero/banner layout (standard / fullbleed / minimal / split / gradient).',
         'sectionRule' => 'Divider style between sections (none / hairline / heavy).',
         'eyebrow' => 'Style of the small kicker label above titles (plain / caps / barred).',
         'headerSearch' => 'Show or hide the header search control.',

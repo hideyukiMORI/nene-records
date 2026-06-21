@@ -114,6 +114,8 @@ export const FLAG_DEFS: Record<keyof ThemeFlags, { attr: string; options: readon
         { value: 'standard', label: 'Standard' },
         { value: 'fullbleed', label: 'Full bleed' },
         { value: 'minimal', label: 'Minimal' },
+        { value: 'split', label: 'Split' },
+        { value: 'gradient', label: 'Gradient' },
       ],
     },
     sectionRule: {

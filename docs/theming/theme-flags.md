@@ -26,7 +26,7 @@ A だけでも「WP の定番テーマ」級は出せる。語彙に収まらな
 | `feedColumns` | `data-feed-cols` | `auto` \| `1` \| `2` \| `3` \| `4`            | グリッドフィードの列数。auto=幅に応じた auto-fill（現行）/ 1〜4=固定列（デスクトップ/タブレットは尊重、スマホ幅 ≤430px で 1 列に畳む。4 は ≤620px で 2 列）。`feedLayout=list` 時は無効 |
 | `cardStyle`   | `data-cards`   | `flat` \| `bordered` \| `shadowed` \| `framed`  | `.card` の意匠（枠/影/額装）                                                                                                       |
 | `media`       | `data-media`   | `plain` \| `duotone` \| `grayscale` \| `framed` | `.card__media` / `.featured__media` / `.article__hero` の見せ方（`filter`/枠）                                                     |
-| `hero`        | `data-hero`    | `standard` \| `fullbleed` \| `minimal`          | `.hero` 構図（minimal=アート省略・タイポ主体 / fullbleed=幅広）                                                                    |
+| `hero`        | `data-hero`    | `standard` \| `fullbleed` \| `minimal` \| `split` \| `gradient` | `.hero` 構図（minimal=アート省略・タイポ主体 / fullbleed=幅広帯 / split=均等2カラム＋アート全高 / gradient=アクセント色のグラデ帯）。CSS-only・DOM不変 |
 | `sectionRule` | `data-rule`    | `none` \| `hairline` \| `heavy`                 | `.section__head` の区切り罫                                                                                                        |
 | `eyebrow`     | `data-eyebrow` | `plain` \| `caps` \| `barred`                   | `.eyebrow` の表情（小型キャップス/バー）                                                                                           |
 | `headerSearch`  | `data-header-search`  | `show` \| `hide` | ヘッダー検索アイコン（`.hd__search`）の表示。詳細は [`header-patterns.md`](./header-patterns.md) |
