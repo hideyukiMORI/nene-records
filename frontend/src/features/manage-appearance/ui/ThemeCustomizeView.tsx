@@ -15,9 +15,14 @@ import { Button, Card, ConfirmDialog, Input, Stack, Text, Textarea } from '@/sha
 import type { ThemeCustomizePageState } from '../hooks/useThemeCustomizePage'
 
 function Field({ label, children }: { label: string; children: ReactNode }) {
+  // Fixed-width label column + left-grouped control: keeps each control right
+  // next to its label (no wide spread on large screens) while controls still
+  // line up in a tidy column.
   return (
-    <label className="flex items-center justify-between gap-inline-md">
-      <span className="font-chrome text-caption font-semibold text-text-primary">{label}</span>
+    <label className="flex items-center gap-inline-md">
+      <span className="w-44 shrink-0 font-chrome text-caption font-semibold text-text-primary">
+        {label}
+      </span>
       {children}
     </label>
   )
