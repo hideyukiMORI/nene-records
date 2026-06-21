@@ -72,6 +72,7 @@ final class ThemeAuthoringGuide
         'headerDensity' => 'Vertical density/height of the header (compact / regular / tall).',
         'headerWidth' => 'Header content width (boxed / full-bleed).',
         'headerSticky' => 'Whether the header sticks to the top on scroll (sticky / none).',
+        'motionReveal' => 'Scroll-into-view fade for cards/headings (off / subtle / standard); first-party, disabled under prefers-reduced-motion.',
     ];
 
     /**
@@ -95,6 +96,7 @@ final class ThemeAuthoringGuide
         'headerDensity' => 'data-header-density',
         'headerWidth' => 'data-header-width',
         'headerSticky' => 'data-header-sticky',
+        'motionReveal' => 'data-motion-reveal',
     ];
 
     /**
@@ -150,6 +152,7 @@ final class ThemeAuthoringGuide
         // Motion
         'dur-fast' => ['motion', 'Fast transition duration.'],
         'dur-normal' => ['motion', 'Normal transition duration.'],
+        'motion-reveal-dur' => ['motion', 'Scroll-reveal fade duration (motionReveal flag).'],
         'ease' => ['motion', 'Default easing function.'],
         // Elevation (shadow-sm/md/lg are in the required contract)
         'shadow-focus' => ['elevation', 'Focus-ring shadow.'],

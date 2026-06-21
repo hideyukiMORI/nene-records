@@ -168,4 +168,12 @@ describe('resolveFlagAttrs / flagAttrsForTheme', () => {
       'data-header-sticky': 'none',
     })
   })
+
+  it('maps the motion-reveal capability flag', () => {
+    expect(resolveFlagAttrs(undefined, { motionReveal: 'subtle' })).toEqual({
+      'data-motion-reveal': 'subtle',
+    })
+    // Invalid values are dropped like any other flag.
+    expect(resolveFlagAttrs(undefined, { motionReveal: 'fancy' })).toEqual({})
+  })
 })

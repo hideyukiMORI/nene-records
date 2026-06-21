@@ -101,6 +101,7 @@ export const en = {
   'admin.themeCustomize.headerDensity': 'Header height',
   'admin.themeCustomize.headerWidth': 'Header width',
   'admin.themeCustomize.headerSticky': 'Header sticky',
+  'admin.themeCustomize.motionReveal': 'Scroll reveal',
   'admin.headerContent.title': 'Header content',
   'admin.headerPreview.label': 'Preview',
   'admin.headerContent.intro':

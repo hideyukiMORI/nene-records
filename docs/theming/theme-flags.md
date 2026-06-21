@@ -37,6 +37,7 @@ A だけでも「WP の定番テーマ」級は出せる。語彙に収まらな
 | `headerDensity` | `data-header-density` | `compact` \| `regular` \| `tall` | ヘッダー行高（regular=現行 72px） |
 | `headerWidth`   | `data-header-width`   | `boxed` \| `full` | ヘッダー内容の幅（boxed=現行 `--content-w` / full=フル幅） |
 | `headerSticky`  | `data-header-sticky`  | `sticky` \| `none` | スクロール追従（既定=sticky・現行挙動 / none=固定しない） |
+| `motionReveal`  | `data-motion-reveal`  | `off` \| `subtle` \| `standard` | スクロール進入時のフェードイン（モーション能力レイヤ #371）。第一者JSが `.card`/`.typecard`/見出しに適用、`prefers-reduced-motion` で無効・JS無効でも要素は表示。テーマは flag を宣言するのみ |
 
 > ヘッダー構造の全体仕様（グリッド/プリセット/インフォ要素）は [`header-patterns.md`](./header-patterns.md) を参照。
 > 追加フラグは本表に追記して語彙を拡張する。実装は base CSS（`public-site.css` 近傍の専用ファイル）に集約。

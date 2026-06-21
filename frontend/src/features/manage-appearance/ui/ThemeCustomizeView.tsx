@@ -402,6 +402,16 @@ export function ThemeCustomizeView({
                 }}
               />
             </Field>
+            <Field label={t('admin.themeCustomize.motionReveal')}>
+              <Select
+                value={draft.flags?.motionReveal}
+                options={FLAG_DEFS.motionReveal.options}
+                placeholder={themePlaceholder}
+                onChange={(v) => {
+                  setKnob('flags', { ...draft.flags, motionReveal: v })
+                }}
+              />
+            </Field>
           </Stack>
         </details>
 
