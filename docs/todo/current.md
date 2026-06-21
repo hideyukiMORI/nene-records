@@ -1,6 +1,6 @@
 # Current Work
 
-Last updated: 2026-06-14
+Last updated: 2026-06-21
 
 ## 状態サマリー
 
@@ -34,27 +34,68 @@ Last updated: 2026-06-14
 
 **M15 — ウィジェット（Epic #324・全フェーズ）: 完了（2026-06-13）**
 
-最新の検証基準: PHPUnit 691 tests / PHPStan level 8 / CS-Fixer / OpenAPI / MCP ＋
-`npm run check`（type-check / lint / prettier / test / knip / storybook）全グリーン。
+**M16 — 公開サイトのテーマシステム（Epic #367・コア）: 完了（2026-06-20）**
+
+最新の検証基準: PHPUnit 764 tests / 2172 assertions / PHPStan level 8（1114 files）/
+CS-Fixer / OpenAPI / MCP（83 tools）＋ Playwright E2E 157 tests ＋
+`npm run check`（type-check / lint / prettier / test / validate:themes / knip / storybook）全グリーン。
 
 ---
 
-## 進行中エピック
+## 進行中エピック（現在のフロンティア）
 
-### #347 名前付きメニュー移行（location → menus）
+> 直近の作業文脈は新しいハンドオフが正本:
+> `docs/todo/handoff-2026-06-17-public-theme-system.md`（テーマシステム）/
+> `docs/todo/handoff-2026-06-19-mcp-connector.md`（MCP コネクタ）。
 
-| Phase | PR | Summary |
+現在の主戦線は **公開サイトのテーマ作り込み（#362 / #367 系）**。コア（runtime テーマ・
+カスタマイザ・スタイルフラグエンジン・MCP bridge）は M16 で完了し、残りは以下の派生フェーズ。
+
+| Issue | 内容 | 状態 |
 | --- | --- | --- |
-| PR1 | #348 | feat: 名前付きメニューのバックエンド基盤（`menus` + `navigation_items.menu_id` + 移行） |
-| PR2a | #349 | feat: メニューウィジェットを名前付きメニュー選択へ |
-| PR3 | — | chore: `navigation_items.location` / `NavLocations` を撤去（#352 スライス5 と同一） |
+| #390 | テーマを「JSONプリセット＋汎用エンジン（スタイルフラグ）」へ — ハイブリッド | 進行中（全6フラグ base CSS・カスタマイザ UI・validator 実装済み。残: ClaudeCode による JSON テーマ量産） |
+| #372 | テーマ カスタマイザ（トークン上書きノブ）Phase 2 | 残: 画像ノブ（logo/hero・メディア #299 連携）、ライブプレビュー（iframe） |
+| #371 | モーション/インタラクション能力レイヤ Phase 1.5 | 未着手（hero バリアント / scroll-reveal / View Transitions） |
+| #373 | ClaudeDesign「MD→テーマ」量産パイプライン＋バリデータ Phase 3 | 未着手 |
+| #362 | 公開サイトのテーマ/見た目の作り込み（design-first / ダークモード対応）epic | 進行中（上記を束ねる） |
+| #311 | Custom Page（sandboxed iframe + 二重表現SEO + ClaudeDesign 連携）厳格契約 | 設計 issue（オープン） |
+| #402 | トップフィードの列数フラグ（feedColumns） | オープン（#403/#404 で初期実装済み・残点検あり） |
+| #435 | ClaudeDesign 向け MCP 実践ガイド（ドキュメント） | オープン（PR #436） |
 
-PR3 で旧 `location` バケツモデルを完全撤去。項目は `menu_id` で名前付きメニューに所属、
-ヘッダー/フッターは region ウィジェット（#350）で描画。`menus.location`（テーマ表示場所）は存置。
+### 完了済みエピック（旧「進行中」）
 
-### #352 外観 › レイアウトビルダー
+- **#347 名前付きメニュー移行（location → menus）: 完了** — PR1 #348 / PR2a #349 / region 一本化 #350・#351。
+  `navigation_items.location` は migration（`20260614000000_drop_location_from_navigation_items`）で撤去済み・`NavLocations` 参照ゼロ。
+  項目は `menu_id` で名前付きメニューに所属、ヘッダー/フッターは region ウィジェットで描画。
+  `menus.location`（テーマ表示場所）は方針どおり存置。
+- **#352 外観 › レイアウトビルダー: 完了** — スライス1〜5（#353〜#358）＋ページ別 cfg・公開接続（#360/#361/#408）まで全マージ。
+  `layout_config` 設定（`20260617000001_add_layout_config_setting`）で永続化済み。
 
-スライス1〜4（#353〜#358）実装済み。スライス5（後片付け）は #347 PR3 に統合。
+---
+
+## M16 — 公開サイトのテーマシステム（Epic #367・コア）: 完了（2026-06-20）
+
+公開サイト（consumer フロント）の WordPress 風テーマ機能。**色だけ → 版面ごと変わる
+＋管理者カスタマイズ＋ClaudeDesign で JSON 量産**まで到達。正本は
+`docs/todo/handoff-2026-06-17-public-theme-system.md` ＋ `docs/theming/`。
+
+| 領域 | PR（抜粋） | Summary |
+| --- | --- | --- |
+| ヘッダー設定 | #420 / #422 | feat: ヘッダー要素トグル・コンテンツ設定 |
+| runtime テーマ基盤 | #425 / #428 / #429 | feat: DB manifest 駆動の runtime テーマ（backend / 公開 / FOUC 回避） |
+| テーマサムネ | #430 | feat: テーマサムネのメディア指定 |
+| ハイブリッドエンジン | #394 / #401 | feat: スタイルフラグエンジン v2 ＋ ビルトインテーマ量産 |
+| feedColumns | #403 / #404 | feat: トップフィードの列数フラグ |
+| カスタマイザ | #399 / #405 | feat: chrome 設定 ＋ カスタマイズのトースト |
+| MCP bridge | #438 | feat: MCP bridge（OpenAPI 境界経由でテーマ操作を Claude.ai へ） |
+| オーサリングガイド | #441 / #443 | feat: getThemeAuthoringGuide（サーバ検証由来の manifest 契約） |
+| 描画モデル/フォント/CSS | #444 / #446 / #448 | feat: renderModel ＋ availableFonts ＋ getThemeEngineCss |
+| ミニプレビュー | #450 / #452 | feat: テーマピッカーの実物ミニレンダリング |
+| テーマ保存/詳細 | #454 / #460 / #462 | feat: 「テーマとして保存」/ 詳細モーダル＋明示適用 / 未保存変更ガード |
+| reserved keys 同期 | #458 | fix: RESERVED_KEYS を全ビルトイン id に同期 |
+
+**残（派生フェーズ・進行中）:** #390（JSON テーマ量産）/ #372（画像ノブ・ライブプレビュー）/
+#371（モーション層）/ #373（MD→テーマ パイプライン）。詳細は上記「進行中エピック」。
 
 ---
 

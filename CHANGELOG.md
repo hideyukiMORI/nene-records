@@ -6,6 +6,25 @@ NeNe Records does not yet follow Semantic Versioning — entries are grouped by 
 
 ---
 
+## [M11–M16 サマリー] — 2026-05-28 〜 2026-06-20
+
+> このまとめは CHANGELOG が M10 で停止していたドリフトの補填（#468）。各マイルストーンの
+> Issue/PR 内訳は `docs/todo/current.md` を正本とする。以降は同 file を都度更新すること。
+
+### Added
+- **M11 通知・運用** — 通知チャンネル（email/slack/discord/chatwork/webhook、#263/#267）、管理 GUI（#273/#280）、Webhook 非同期化（DB キュー＋ワーカー、#285/#295）、コメントスパム対策（#264/#292）。
+- **M12 メディアライブラリ強化** — ストレージ抽象化 Local/S3（#299/#300）、寸法/alt/storage_key（#301）、オンデマンド派生（WebP/AVIF＋キャッシュ、#302）、レスポンシブ srcset（#303）、使用箇所逆引き＋削除ガード（#304/#305）。
+- **M13 管理コンソール再設計** — Console 仕様への再設計・タイプ並び替え（#298）。
+- **M14 公開レイアウト & Custom Page** — 型付きレイアウトプリセット（#307/#308）、2/3カラム領域配置（#309/#310）、サニタイズ html フィールド（#312/#313）、bundle フィールド＋サンドボックス iframe（#316/#317）、iframe 自動高さ＋SEO テキスト（#318/#319）、セッションを httpOnly Cookie へ（#314/#315）。
+- **M15 ウィジェット（Epic #324）** — recent-posts/menu/toc/search/tag-cloud/popular-posts/calendar、公開ページ `/search`・`/tag/:slug`・`/archive/:y/:m(/:d)`（#325〜#342）。
+- **M16 公開サイトのテーマシステム（Epic #367・コア）** — runtime テーマ（DB manifest 駆動、#425/#428/#429）、ハイブリッドなスタイルフラグエンジン（#394/#401）、カスタマイザ（#399/#405）、MCP bridge（#438）、オーサリングガイド/描画モデル（#441/#444/#446/#448）、テーマ保存/詳細モーダル/未保存ガード（#454/#460/#462）。
+- 名前付きメニュー移行（Epic #347）とレイアウトビルダー（Epic #352）を完了。
+
+### Changed
+- 検証基準: PHPUnit 545 → **764 tests**、MCP **83 tools**、Playwright E2E 157 tests を維持。
+
+---
+
 ## [E2E テスト拡充 — 包括的ブラウザシナリオ] — 2026-05-27
 
 ### Added
