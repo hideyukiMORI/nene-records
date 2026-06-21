@@ -122,6 +122,124 @@ final class MediaUseCaseTest extends TestCase
         $useCase->execute($input);
     }
 
+    public function testUploadSvgIsSanitizedBeforeStorage(): void
+    {
+        $storageRoot = sys_get_temp_dir() . '/nene_media_test_' . uniqid('', true);
+        mkdir($storageRoot, 0755, true);
+
+        $tmpFile = tempnam(sys_get_temp_dir(), 'nene_upload_');
+        file_put_contents(
+            $tmpFile,
+            '<svg xmlns="http://www.w3.org/2000/svg"><script>fetch("/steal")</script><rect width="1" height="1" onload="x()"/></svg>',
+        );
+
+        $mediaRepo = new InMemoryMediaRepository();
+        $useCase = new UploadMediaUseCase($mediaRepo, new LocalStorage($storageRoot));
+
+        $output = $useCase->execute(new UploadMediaInput(
+            tmpPath: $tmpFile,
+            originalName: 'logo.svg',
+            mimeType: 'image/svg+xml',
+            size: filesize($tmpFile) ?: 0,
+        ));
+
+        self::assertSame('image/svg+xml', $output->mimeType);
+
+        $saved = $mediaRepo->findById($output->id);
+        self::assertNotNull($saved);
+        self::assertStringEndsWith('.svg', $saved->storageKey);
+
+        $stored = (string) file_get_contents($storageRoot . '/' . $saved->storageKey);
+        self::assertStringNotContainsStringIgnoringCase('script', $stored);
+        self::assertStringNotContainsString('fetch(', $stored);
+        self::assertStringNotContainsStringIgnoringCase('onload', $stored);
+        self::assertStringContainsString('<rect', $stored);
+
+        unlink($tmpFile);
+    }
+
+    public function testUploadSvgSpoofedAsPngIsDetectedAndSanitized(): void
+    {
+        $storageRoot = sys_get_temp_dir() . '/nene_media_test_' . uniqid('', true);
+        mkdir($storageRoot, 0755, true);
+
+        $tmpFile = tempnam(sys_get_temp_dir(), 'nene_upload_');
+        file_put_contents($tmpFile, '<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script></svg>');
+
+        $mediaRepo = new InMemoryMediaRepository();
+        $useCase = new UploadMediaUseCase($mediaRepo, new LocalStorage($storageRoot));
+
+        // Declared as PNG to try to dodge the SVG path — content sniff must catch it.
+        $output = $useCase->execute(new UploadMediaInput(
+            tmpPath: $tmpFile,
+            originalName: 'evil.png',
+            mimeType: 'image/png',
+            size: filesize($tmpFile) ?: 0,
+        ));
+
+        self::assertSame('image/svg+xml', $output->mimeType);
+
+        $saved = $mediaRepo->findById($output->id);
+        self::assertNotNull($saved);
+        self::assertStringEndsWith('.svg', $saved->storageKey);
+
+        $stored = (string) file_get_contents($storageRoot . '/' . $saved->storageKey);
+        self::assertStringNotContainsString('alert(1)', $stored);
+
+        unlink($tmpFile);
+    }
+
+    public function testUploadOversizeSvgIsRejected(): void
+    {
+        $storageRoot = sys_get_temp_dir() . '/nene_media_test_' . uniqid('', true);
+        mkdir($storageRoot, 0755, true);
+
+        $tmpFile = tempnam(sys_get_temp_dir(), 'nene_upload_');
+        $padding = str_repeat('<rect width="1" height="1"/>', 3000); // > 64 KiB
+        file_put_contents($tmpFile, '<svg xmlns="http://www.w3.org/2000/svg">' . $padding . '</svg>');
+
+        $mediaRepo = new InMemoryMediaRepository();
+        $useCase = new UploadMediaUseCase($mediaRepo, new LocalStorage($storageRoot));
+
+        $this->expectException(MediaTooLargeException::class);
+
+        try {
+            $useCase->execute(new UploadMediaInput(
+                tmpPath: $tmpFile,
+                originalName: 'big.svg',
+                mimeType: 'image/svg+xml',
+                size: filesize($tmpFile) ?: 0,
+            ));
+        } finally {
+            unlink($tmpFile);
+        }
+    }
+
+    public function testUploadInvalidSvgIsRejected(): void
+    {
+        $storageRoot = sys_get_temp_dir() . '/nene_media_test_' . uniqid('', true);
+        mkdir($storageRoot, 0755, true);
+
+        $tmpFile = tempnam(sys_get_temp_dir(), 'nene_upload_');
+        file_put_contents($tmpFile, '<svg xmlns="http://www.w3.org/2000/svg"><rect'); // truncated / unparseable
+
+        $mediaRepo = new InMemoryMediaRepository();
+        $useCase = new UploadMediaUseCase($mediaRepo, new LocalStorage($storageRoot));
+
+        $this->expectException(MediaInvalidTypeException::class);
+
+        try {
+            $useCase->execute(new UploadMediaInput(
+                tmpPath: $tmpFile,
+                originalName: 'broken.svg',
+                mimeType: 'image/svg+xml',
+                size: filesize($tmpFile) ?: 0,
+            ));
+        } finally {
+            unlink($tmpFile);
+        }
+    }
+
     public function testDeleteRemovesMediaRecord(): void
     {
         $seeded = new Media(

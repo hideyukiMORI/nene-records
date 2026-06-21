@@ -79,4 +79,13 @@ describe('validateThemeCss', () => {
     const css = `.nene-public { width: expression(alert(1)); }`
     expect(validateThemeCss(css, { themeId: 'aurora' }).length).toBeGreaterThan(0)
   })
+
+  it('flags active content inside a data:image/svg+xml URI', () => {
+    const css = `.nene-public { background: url("data:image/svg+xml,%3Csvg%20onload%3D%22x()%22%3E%3C/svg%3E"); }`
+    expect(
+      validateThemeCss(css, { themeId: 'aurora' }).some((i) =>
+        i.message.includes('on* event handler'),
+      ),
+    ).toBe(true)
+  })
 })
