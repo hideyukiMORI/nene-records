@@ -183,4 +183,9 @@ describe('resolveFlagAttrs / flagAttrsForTheme', () => {
     })
     expect(resolveFlagAttrs(undefined, { motionHeader: 'wobble' })).toEqual({})
   })
+
+  it('maps the new hero variants (split / gradient)', () => {
+    expect(resolveFlagAttrs(undefined, { hero: 'split' })).toEqual({ 'data-hero': 'split' })
+    expect(resolveFlagAttrs(undefined, { hero: 'gradient' })).toEqual({ 'data-hero': 'gradient' })
+  })
 })

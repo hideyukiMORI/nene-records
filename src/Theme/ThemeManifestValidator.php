@@ -43,7 +43,7 @@ final class ThemeManifestValidator
         'feedColumns' => ['auto', '1', '2', '3', '4'],
         'cardStyle' => ['flat', 'bordered', 'shadowed', 'framed'],
         'media' => ['plain', 'duotone', 'grayscale', 'framed'],
-        'hero' => ['standard', 'fullbleed', 'minimal'],
+        'hero' => ['standard', 'fullbleed', 'minimal', 'split', 'gradient'],
         'sectionRule' => ['none', 'hairline', 'heavy'],
         'eyebrow' => ['plain', 'caps', 'barred'],
         'headerSearch' => ['show', 'hide'],
