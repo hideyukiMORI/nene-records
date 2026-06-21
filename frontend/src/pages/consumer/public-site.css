@@ -61,7 +61,7 @@
   --ease: cubic-bezier(0.4, 0, 0.2, 1);
   --dur-fast: 120ms;
   --dur-normal: 220ms;
-  --motion-reveal-dur: 520ms;
+  --motion-reveal-dur: 760ms;
 
   display: flex;
   flex-direction: column;
@@ -1706,9 +1706,10 @@
   .nene-public[data-motion-reveal='standard'] [data-motion-reveal-item] {
     opacity: 0;
     transform: translateY(var(--motion-reveal-shift, 16px));
+    /* Ease-out (glide in, settle gently) — reveal-specific, not the global --ease. */
     transition:
-      opacity var(--motion-reveal-dur) var(--ease),
-      transform var(--motion-reveal-dur) var(--ease);
+      opacity var(--motion-reveal-dur) cubic-bezier(0.16, 1, 0.3, 1),
+      transform var(--motion-reveal-dur) cubic-bezier(0.16, 1, 0.3, 1);
     transition-delay: var(--motion-reveal-delay, 0ms);
     will-change: opacity, transform;
   }

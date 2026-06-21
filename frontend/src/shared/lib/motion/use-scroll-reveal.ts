@@ -24,7 +24,7 @@ import { type RefObject, useEffect } from 'react'
 const ITEM_ATTR = 'data-motion-reveal-item'
 const REVEALED_ATTR = 'data-revealed'
 const DELAY_VAR = '--motion-reveal-delay'
-const STAGGER_STEP_MS = 80
+const STAGGER_STEP_MS = 110
 
 export interface ScrollRevealOptions {
   containerRef: RefObject<HTMLElement | null>
