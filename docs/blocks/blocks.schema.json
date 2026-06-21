@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nene-records.dev/schemas/blocks.schema.json",
+  "title": "Post Blocks Document",
+  "description": "Canonical shape of a `blocks` field value (epic #486): an ordered list of curated, typed blocks. Server validation lives in src/BlocksField/BlocksDocumentValidator.php (the trust boundary); this schema is the contract source for the frontend (Ajv) and codegen. Curated typed blocks, NOT a free-form page builder.",
+  "type": "array",
+  "maxItems": 200,
+  "items": { "$ref": "#/$defs/block" },
+  "$defs": {
+    "block": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "data"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Client-generated stable key (React key / future anchor). Opaque.",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "type": { "enum": ["text", "callout"] },
+        "data": { "type": "object" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "type": { "const": "text" } } },
+          "then": { "properties": { "data": { "$ref": "#/$defs/textData" } } }
+        },
+        {
+          "if": { "properties": { "type": { "const": "callout" } } },
+          "then": { "properties": { "data": { "$ref": "#/$defs/calloutData" } } }
+        }
+      ]
+    },
+    "textData": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["markdown"],
+      "properties": {
+        "markdown": { "type": "string", "minLength": 1, "maxLength": 50000 }
+      }
+    },
+    "calloutData": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "body"],
+      "properties": {
+        "kind": { "enum": ["info", "warn", "ok", "danger"] },
+        "title": { "type": "string", "maxLength": 200 },
+        "body": { "type": "string", "minLength": 1, "maxLength": 50000 }
+      }
+    }
+  }
+}

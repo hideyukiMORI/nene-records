@@ -407,6 +407,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/blocks-fields": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List blocks fields
+         * @description Returns non-deleted blocks fields.
+         */
+        get: operations["listBlocksFields"];
+        put?: never;
+        /** Create blocks field */
+        post: operations["createBlocksField"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/blocks-fields/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get blocks field by id */
+        get: operations["getBlocksFieldById"];
+        /** Update blocks field */
+        put: operations["updateBlocksField"];
+        post?: never;
+        /** Soft delete blocks field */
+        delete: operations["deleteBlocksField"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/int-fields": {
         parameters: {
             query?: never;
@@ -2033,6 +2073,38 @@ export interface components {
         };
         TextFieldListResponse: {
             items: components["schemas"]["TextFieldResponse"][];
+            limit: number;
+            offset: number;
+        };
+        BlocksFieldResponse: {
+            /** Format: int64 */
+            id: number;
+            /** Format: int64 */
+            entity_id: number;
+            field_key: string;
+            /** @description JSON document (string): an ordered array of blocks `[{id,type,data}]`. See docs/blocks/blocks.schema.json. Server-validated by BlocksDocumentValidator. */
+            value: string;
+            /** @description BCP-47 locale code (e.g. "ja", "en-US"). Null indicates the default/global value. */
+            locale: string | null;
+        };
+        CreateBlocksFieldRequest: {
+            /** Format: int64 */
+            entity_id: number;
+            field_key: string;
+            /** @description JSON document (string): an ordered array of blocks `[{id,type,data}]`. */
+            value: string;
+            /** @description BCP-47 locale code. Omit for the default/global value. */
+            locale?: string | null;
+        };
+        UpdateBlocksFieldRequest: {
+            field_key: string;
+            /** @description JSON document (string): an ordered array of blocks `[{id,type,data}]`. */
+            value: string;
+            /** @description BCP-47 locale code. Omit to keep as the default/global value. */
+            locale?: string | null;
+        };
+        BlocksFieldListResponse: {
+            items: components["schemas"]["BlocksFieldResponse"][];
             limit: number;
             offset: number;
         };
@@ -3779,6 +3851,160 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description Text field soft-deleted. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    listBlocksFields: {
+        parameters: {
+            query?: {
+                /** @example 20 */
+                limit?: components["parameters"]["LimitQuery"];
+                /** @example 0 */
+                offset?: components["parameters"]["OffsetQuery"];
+                /** @example 1 */
+                entity_id?: components["parameters"]["EntityIdQuery"];
+                /** @example 1 */
+                entity_type_id?: components["parameters"]["EntityTypeIdQuery"];
+                /** @description Filter by locale code (e.g. "ja", "en"). When omitted, rows of all locales are returned. */
+                locale?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Paginated blocks field list. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BlocksFieldListResponse"];
+                };
+            };
+            422: components["responses"]["ValidationFailed"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    createBlocksField: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateBlocksFieldRequest"];
+            };
+        };
+        responses: {
+            /** @description Blocks field created. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BlocksFieldResponse"];
+                };
+            };
+            404: components["responses"]["NotFound"];
+            /** @description Validation failed (malformed blocks document, unknown block type, unregistered field key, or field type mismatch). */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblemDetails"] | components["schemas"]["ProblemDetails"];
+                };
+            };
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    getBlocksFieldById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @example 1 */
+                id: components["parameters"]["IdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Blocks field found. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BlocksFieldResponse"];
+                };
+            };
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    updateBlocksField: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @example 1 */
+                id: components["parameters"]["IdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateBlocksFieldRequest"];
+            };
+        };
+        responses: {
+            /** @description Blocks field updated. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BlocksFieldResponse"];
+                };
+            };
+            404: components["responses"]["NotFound"];
+            /** @description Validation failed (malformed blocks document, unknown block type, unregistered field key, or field type mismatch). */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ValidationProblemDetails"] | components["schemas"]["ProblemDetails"];
+                };
+            };
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    deleteBlocksField: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @example 1 */
+                id: components["parameters"]["IdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Blocks field soft-deleted. */
             204: {
                 headers: {
                     [name: string]: unknown;
