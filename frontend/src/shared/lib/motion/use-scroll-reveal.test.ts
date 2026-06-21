@@ -29,19 +29,13 @@ class MockIntersectionObserver {
   }
 }
 
-/** Force an element's vertical position relative to the (768px tall) jsdom viewport. */
-function setTop(el: Element, top: number): void {
-  el.getBoundingClientRect = () =>
-    ({
-      top,
-      bottom: top + 100,
-      left: 0,
-      right: 0,
-      width: 100,
-      height: 100,
-      x: 0,
-      y: top,
-    }) as DOMRect
+function intersect(...targets: Element[]): void {
+  const entries = targets.map(
+    (target) => ({ isIntersecting: true, target }) as IntersectionObserverEntry,
+  )
+  act(() => {
+    lastCallback?.(entries, fakeObserver)
+  })
 }
 
 function mountContainer(html: string): HTMLDivElement {
@@ -62,12 +56,6 @@ beforeEach(() => {
   observed = []
   lastCallback = null
   vi.stubGlobal('IntersectionObserver', MockIntersectionObserver)
-  // Run rAF synchronously so the in-view reveal is observable in the test.
-  vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => {
-    cb(0)
-    return 1
-  })
-  vi.stubGlobal('cancelAnimationFrame', () => {})
 })
 
 afterEach(() => {
@@ -76,45 +64,33 @@ afterEach(() => {
 })
 
 describe('useScrollReveal', () => {
-  it('tags matching elements and reveals the ones already in view', () => {
+  it('tags and observes only matching elements when enabled', () => {
     const root = mountContainer(
       '<div class="card">a</div><div class="card">b</div><div class="x">c</div>',
     )
-    root.querySelectorAll('.card').forEach((card) => {
-      setTop(card, 100)
-    }) // in view (< 768)
     renderReveal(root, true)
 
     root.querySelectorAll('.card').forEach((card) => {
       expect(card.hasAttribute('data-motion-reveal-item')).toBe(true)
-      expect(card.hasAttribute('data-revealed')).toBe(true)
+      expect(card.hasAttribute('data-revealed')).toBe(false) // not until it intersects
     })
-    // In-view items are revealed directly, not handed to the IntersectionObserver.
-    expect(observed).toHaveLength(0)
+    expect(observed).toHaveLength(2)
     expect(root.querySelector('.x')?.hasAttribute('data-motion-reveal-item')).toBe(false)
   })
 
-  it('defers below-the-fold elements to the IntersectionObserver and reveals on intersect', () => {
-    const root = mountContainer('<div class="card">a</div>')
-    const card = root.querySelector('.card')
-    expect(card).not.toBeNull()
-    if (card !== null) {
-      setTop(card, 5000)
-    } // below the fold (> 768)
+  it('reveals, unobserves and staggers items as they intersect', () => {
+    const root = mountContainer('<div class="card">a</div><div class="card">b</div>')
     renderReveal(root, true)
+    const [first, second] = root.querySelectorAll<HTMLElement>('.card')
+    expect(observed).toHaveLength(2)
 
-    expect(card?.hasAttribute('data-motion-reveal-item')).toBe(true)
-    expect(card?.hasAttribute('data-revealed')).toBe(false)
-    expect(observed).toHaveLength(1)
+    intersect(first, second)
 
-    act(() => {
-      lastCallback?.(
-        [{ isIntersecting: true, target: card } as IntersectionObserverEntry],
-        fakeObserver,
-      )
-    })
-
-    expect(card?.hasAttribute('data-revealed')).toBe(true)
+    expect(first.hasAttribute('data-revealed')).toBe(true)
+    expect(second.hasAttribute('data-revealed')).toBe(true)
+    // Cascade index applied for the second item in the batch.
+    expect(first.style.getPropertyValue('--motion-reveal-index')).toBe('0')
+    expect(second.style.getPropertyValue('--motion-reveal-index')).toBe('1')
     expect(observed).toHaveLength(0)
   })
 
@@ -126,14 +102,10 @@ describe('useScrollReveal', () => {
     expect(root.querySelector('.card')?.hasAttribute('data-motion-reveal-item')).toBe(false)
   })
 
-  it('re-establishes the reveal when the effect re-runs on an already-tagged item', () => {
-    // Reproduces the StrictMode / back-navigation regression: an item tagged but
-    // not yet revealed must be re-observed (not skipped) when the effect re-runs.
+  it('re-observes an already-tagged but unrevealed item when the effect re-runs', () => {
+    // Guards the StrictMode / back-navigation regression: a tagged-but-unrevealed
+    // item must be re-observed (not skipped) when the effect re-runs.
     const root = mountContainer('<div class="card">a</div>')
-    const card = root.querySelector('.card')
-    if (card !== null) {
-      setTop(card, 5000) // below the fold → observed, not auto-revealed
-    }
     const ref = { current: root } as RefObject<HTMLElement | null>
 
     const { rerender } = renderHook(
@@ -147,7 +119,7 @@ describe('useScrollReveal', () => {
     // Effect teardown (mock disconnect empties `observed`) + re-run.
     rerender({ key: '/next' })
 
-    expect(card?.hasAttribute('data-revealed')).toBe(false)
+    expect(root.querySelector('.card')?.hasAttribute('data-revealed')).toBe(false)
     expect(observed).toHaveLength(1) // re-observed, not skipped
   })
 })

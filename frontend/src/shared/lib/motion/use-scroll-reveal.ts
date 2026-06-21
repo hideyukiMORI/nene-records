@@ -7,13 +7,13 @@ import { type RefObject, useEffect } from 'react'
  * `data-motion-reveal` flag AND this JS-applied `data-motion-reveal-item`, so a
  * no-JS / no-IntersectionObserver visitor sees everything immediately.
  *
- * Resilience rules (a reveal must never strand content hidden):
- *  - Anything already in or above the viewport is revealed right away — this
- *    covers above-the-fold content and SPA back-navigation (the shell remounts
- *    with cached content at a restored scroll position, where IntersectionObserver
- *    would otherwise not re-fire and leave cards stuck at opacity 0).
- *  - Only genuinely below-the-fold elements are deferred to the IntersectionObserver
- *    for a scroll-triggered reveal.
+ * Every tagged item is handed to one IntersectionObserver: it fires the initial
+ * intersection state asynchronously (so items already in view reveal on load) and
+ * again as below-the-fold items scroll in. Notes:
+ *  - A fresh observer is created per effect run, so SPA back-navigation (the shell
+ *    remounts with cached content) re-evaluates intersection and reveals correctly.
+ *  - We do NOT eagerly reveal "in view at mount" — that raced with async content
+ *    still shifting the layout and revealed sections before the reader reached them.
  *  - Feeds load asynchronously (react-query); a MutationObserver picks up nodes
  *    added after mount and on route change.
  *
@@ -72,26 +72,22 @@ export function useScrollReveal({
     )
 
     const tagAndObserve = (): void => {
-      let inViewIndex = 0
       root.querySelectorAll(selector).forEach((el) => {
-        // Skip only items that are already revealed. A tagged-but-unrevealed
-        // item must be re-processed: under React StrictMode (and on remount) the
-        // effect runs, its cleanup disconnects the observer, then it runs again —
-        // if we skipped on the tag alone the item would stay hidden forever (the
-        // home feed vanishing on back-nav).
+        // Skip only items that are already revealed. A tagged-but-unrevealed item
+        // must be re-processed: under React StrictMode (and on remount) the effect
+        // runs, its cleanup disconnects the observer, then it runs again — if we
+        // skipped on the tag alone the item would stay hidden forever.
         if (el.hasAttribute(REVEALED_ATTR)) {
           return
         }
         el.setAttribute(ITEM_ATTR, '')
-        // Anything in or above the viewport reveals straight away; the CSS
-        // keyframe handles the fade-in from opacity 0, so there is no need to
-        // wait a frame. Genuinely below-the-fold items wait for scroll.
-        if (el.getBoundingClientRect().top < window.innerHeight) {
-          reveal(el, inViewIndex)
-          inViewIndex += 1
-        } else {
-          observer.observe(el)
-        }
+        // Hand everything to the IntersectionObserver: it fires the initial
+        // intersection state asynchronously for items already in view (so they
+        // reveal on load) and again as below-the-fold items are scrolled in. The
+        // keyframe reveal plays reliably either way. Doing this for ALL items
+        // (rather than eagerly revealing "in view at mount") avoids revealing
+        // sections while async content is still shifting the layout.
+        observer.observe(el)
       })
     }
 
