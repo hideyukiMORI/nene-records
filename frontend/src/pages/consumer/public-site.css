@@ -1754,6 +1754,33 @@
   }
 }
 
+/* ── Motion capability: header sticky-shrink (#371 S2) ───────────────────────
+   First-party JS (use-header-shrink) sets data-shrunk on the root once the page
+   scrolls past the top sentinel. data-shrunk is only ever set when the flag is
+   on AND not reduced-motion (JS gate), so reduced-motion users never shrink. */
+.nene-public .motion-sentinel {
+  height: 0;
+}
+
+.nene-public[data-motion-header='shrink'] .hd__in,
+.nene-public[data-motion-header='shrink'] .brand__mark {
+  transition:
+    height var(--dur-normal) var(--ease),
+    width var(--dur-normal) var(--ease),
+    box-shadow var(--dur-normal) var(--ease);
+}
+
+.nene-public[data-motion-header='shrink'][data-shrunk] .hd__in {
+  height: 56px;
+}
+.nene-public[data-motion-header='shrink'][data-shrunk] .brand__mark {
+  width: 28px;
+  height: 28px;
+}
+.nene-public[data-motion-header='shrink'][data-shrunk] .hd {
+  box-shadow: 0 2px 14px color-mix(in oklch, var(--color-text-primary) 12%, transparent);
+}
+
 /* ── Style flags (preset engine) ──────────────────────────────────────────
    Structural variations selected by theme/customizer flags and applied as
    data-* attributes on .nene-public (see docs/theming/theme-flags.md).

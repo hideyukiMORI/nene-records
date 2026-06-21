@@ -73,6 +73,7 @@ final class ThemeAuthoringGuide
         'headerWidth' => 'Header content width (boxed / full-bleed).',
         'headerSticky' => 'Whether the header sticks to the top on scroll (sticky / none).',
         'motionReveal' => 'Scroll-into-view fade for cards/headings (off / subtle / standard); first-party, disabled under prefers-reduced-motion.',
+        'motionHeader' => 'Sticky header compaction on scroll (static / shrink); first-party, disabled under prefers-reduced-motion.',
     ];
 
     /**
@@ -97,6 +98,7 @@ final class ThemeAuthoringGuide
         'headerWidth' => 'data-header-width',
         'headerSticky' => 'data-header-sticky',
         'motionReveal' => 'data-motion-reveal',
+        'motionHeader' => 'data-motion-header',
     ];
 
     /**
