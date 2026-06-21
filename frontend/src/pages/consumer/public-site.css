@@ -62,6 +62,7 @@
   --dur-fast: 120ms;
   --dur-normal: 220ms;
   --motion-reveal-dur: 1000ms;
+  --motion-reveal-step: 120ms;
 
   display: flex;
   flex-direction: column;
@@ -1710,7 +1711,7 @@
     transition:
       opacity var(--motion-reveal-dur) cubic-bezier(0.16, 1, 0.3, 1),
       transform var(--motion-reveal-dur) cubic-bezier(0.16, 1, 0.3, 1);
-    transition-delay: var(--motion-reveal-delay, 0ms);
+    transition-delay: calc(var(--motion-reveal-index, 0) * var(--motion-reveal-step, 120ms));
     will-change: opacity, transform;
   }
 
@@ -1718,13 +1719,15 @@
     --motion-reveal-shift: 32px;
   }
 
-  /* Per-type pacing: the larger Latest-records cards read better slower; the
-     compact Browse-by-type cards can move a touch quicker. */
+  /* Per-type pacing: the larger Latest-records cards read better slow with a
+     pronounced cascade; the compact Browse-by-type cards stay snappy and tight. */
   .nene-public[data-motion-reveal] .card[data-motion-reveal-item] {
-    --motion-reveal-dur: 1200ms;
+    --motion-reveal-dur: 1400ms;
+    --motion-reveal-step: 260ms;
   }
   .nene-public[data-motion-reveal] .typecard[data-motion-reveal-item] {
     --motion-reveal-dur: 800ms;
+    --motion-reveal-step: 90ms;
   }
 
   .nene-public[data-motion-reveal='subtle'] [data-motion-reveal-item][data-revealed],

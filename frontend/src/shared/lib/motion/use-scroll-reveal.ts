@@ -23,8 +23,9 @@ import { type RefObject, useEffect } from 'react'
  */
 const ITEM_ATTR = 'data-motion-reveal-item'
 const REVEALED_ATTR = 'data-revealed'
-const DELAY_VAR = '--motion-reveal-delay'
-const STAGGER_STEP_MS = 150
+// JS only sets the cascade INDEX; the per-step delay (and duration) live in CSS
+// so each element type can be paced independently (see public-site.css).
+const INDEX_VAR = '--motion-reveal-index'
 
 export interface ScrollRevealOptions {
   containerRef: RefObject<HTMLElement | null>
@@ -36,9 +37,9 @@ export interface ScrollRevealOptions {
   scanKey?: string
 }
 
-function reveal(el: Element, delayMs: number): void {
+function reveal(el: Element, staggerIndex: number): void {
   if (el instanceof HTMLElement) {
-    el.style.setProperty(DELAY_VAR, `${String(delayMs)}ms`)
+    el.style.setProperty(INDEX_VAR, String(staggerIndex))
   }
   el.setAttribute(REVEALED_ATTR, '')
 }
@@ -64,7 +65,7 @@ export function useScrollReveal({
           if (!entry.isIntersecting) {
             continue
           }
-          reveal(entry.target, staggerIndex * STAGGER_STEP_MS)
+          reveal(entry.target, staggerIndex)
           obs.unobserve(entry.target)
           staggerIndex += 1
         }
@@ -98,7 +99,7 @@ export function useScrollReveal({
         // reveal animates rather than snapping.
         const id = requestAnimationFrame(() => {
           inView.forEach((el, index) => {
-            reveal(el, index * STAGGER_STEP_MS)
+            reveal(el, index)
           })
         })
         rafIds.push(id)
