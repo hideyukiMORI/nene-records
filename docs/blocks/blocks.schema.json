@@ -18,7 +18,19 @@
           "minLength": 1,
           "maxLength": 64
         },
-        "type": { "enum": ["text", "callout", "hero", "gallery", "chart", "group", "columns"] },
+        "type": {
+          "enum": [
+            "text",
+            "callout",
+            "hero",
+            "gallery",
+            "chart",
+            "group",
+            "columns",
+            "spacer",
+            "divider"
+          ]
+        },
         "data": { "type": "object" }
       },
       "allOf": [
@@ -49,6 +61,39 @@
         {
           "if": { "properties": { "type": { "const": "columns" } } },
           "then": { "properties": { "data": { "$ref": "#/$defs/columnsData" } } }
+        },
+        {
+          "if": { "properties": { "type": { "const": "spacer" } } },
+          "then": { "properties": { "data": { "$ref": "#/$defs/spacerData" } } }
+        },
+        {
+          "if": { "properties": { "type": { "const": "divider" } } },
+          "then": { "properties": { "data": { "$ref": "#/$defs/dividerData" } } }
+        }
+      ]
+    },
+    "spacerData": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["size"],
+      "description": "Vertical whitespace block (#491 WS2).",
+      "properties": { "size": { "enum": ["sm", "md", "lg"] } }
+    },
+    "dividerData": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Horizontal rule block (#491 WS2). No options.",
+      "properties": {}
+    },
+    "leafBlock": {
+      "description": "A non-container (leaf) block — what a group/columns child may be (no nesting; depth 2). Mirrors the server validator, which rejects containers nested in containers.",
+      "allOf": [
+        { "$ref": "#/$defs/block" },
+        {
+          "not": {
+            "required": ["type"],
+            "properties": { "type": { "enum": ["group", "columns"] } }
+          }
         }
       ]
     },
@@ -67,7 +112,11 @@
             "additionalProperties": false,
             "required": ["children"],
             "properties": {
-              "children": { "type": "array", "maxItems": 20, "items": { "$ref": "#/$defs/block" } }
+              "children": {
+                "type": "array",
+                "maxItems": 20,
+                "items": { "$ref": "#/$defs/leafBlock" }
+              }
             }
           }
         }
@@ -80,7 +129,7 @@
       "description": "Layout container holding child blocks (#491 WS2). The server validator further restricts children to leaf blocks (no container nesting; depth 2).",
       "properties": {
         "tone": { "enum": ["plain", "muted", "card"] },
-        "children": { "type": "array", "maxItems": 30, "items": { "$ref": "#/$defs/block" } }
+        "children": { "type": "array", "maxItems": 30, "items": { "$ref": "#/$defs/leafBlock" } }
       }
     },
     "textData": {

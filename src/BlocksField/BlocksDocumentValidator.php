@@ -50,6 +50,8 @@ final class BlocksDocumentValidator
 
     private const MAX_COLUMN_CHILDREN = 20;
 
+    private const SPACER_SIZES = ['sm', 'md', 'lg'];
+
     private const MAX_GALLERY_ITEMS = 50;
     private const MAX_SERIES_POINTS = 60;
     private const MAX_SERIES_LABEL_LEN = 120;
@@ -142,6 +144,7 @@ final class BlocksDocumentValidator
             'chart' => $this->validateChartData($path, $data, $errors),
             'group' => $this->validateGroupData($path, $data, $count, $errors),
             'columns' => $this->validateColumnsData($path, $data, $count, $errors),
+            'spacer' => $this->validateSpacerData($path, $data, $errors),
             default => null,
         };
     }
@@ -219,6 +222,18 @@ final class BlocksDocumentValidator
                 // Column children are leaf blocks only (no container-in-container) → depth 2.
                 $this->validateBlock("{$path}.data.columns[{$c}].children[{$i}]", $child, false, $count, $errors);
             }
+        }
+    }
+
+    /**
+     * @param array<array-key, mixed> $data
+     * @param list<ValidationError> $errors
+     */
+    private function validateSpacerData(string $path, array $data, array &$errors): void
+    {
+        $size = $data['size'] ?? null;
+        if (!is_string($size) || !in_array($size, self::SPACER_SIZES, true)) {
+            $errors[] = new ValidationError("{$path}.data.size", 'Spacer size must be one of: ' . implode(', ', self::SPACER_SIZES) . '.', 'invalid');
         }
     }
 

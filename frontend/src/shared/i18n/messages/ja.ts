@@ -592,6 +592,7 @@ export const ja: Partial<MessageCatalog> = {
   'admin.blocks.childEdit': '編集',
   'admin.blocks.childCollapse': '閉じる',
   'admin.blocks.error.childrenRequired': 'ブロックを1つ以上追加してください。',
+  'admin.blocks.error.childrenInvalid': '内側のブロックに未入力/不備があります。',
   // columns (#491 WS2)
   'admin.blocks.type.columns': 'カラム',
   'admin.blocks.type.columns.desc': 'レスポンシブな多段組みレイアウト',
@@ -599,6 +600,16 @@ export const ja: Partial<MessageCatalog> = {
   'admin.blocks.columns.add': 'カラムを追加',
   'admin.blocks.columns.remove': 'カラムを削除',
   'admin.blocks.columns.label': 'カラム {{n}}',
+  // spacer / divider (#491 WS2)
+  'admin.blocks.type.spacer': 'スペーサー',
+  'admin.blocks.type.spacer.desc': '縦方向の余白',
+  'admin.blocks.type.divider': '区切り線',
+  'admin.blocks.type.divider.desc': '水平の罫線',
+  'admin.blocks.field.spacerSize': '高さ',
+  'admin.blocks.spacerSize.sm': '小',
+  'admin.blocks.spacerSize.md': '中',
+  'admin.blocks.spacerSize.lg': '大',
+  'admin.blocks.divider.hint': '水平の罫線です（設定なし）。',
 
   // ── Home hero (#486) ──────────────────────────────────────────────────────
   'admin.homeHero.title': 'ホームヒーロー',

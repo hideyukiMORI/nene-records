@@ -169,4 +169,16 @@ describe('BlocksRenderer', () => {
     expect(screen.getByText('Left col')).toBeInTheDocument()
     expect(screen.getByText('Right col')).toBeInTheDocument()
   })
+
+  it('renders spacer (with size) and divider blocks', () => {
+    const doc = JSON.stringify([
+      { id: 's', type: 'spacer', data: { size: 'lg' } },
+      { id: 'd', type: 'divider', data: {} },
+    ])
+
+    const { container } = renderWithProviders(<BlocksRenderer documentJson={doc} />)
+
+    expect(container.querySelector('.spacer')?.getAttribute('data-spacer-size')).toBe('lg')
+    expect(container.querySelector('hr.divider')).not.toBeNull()
+  })
 })

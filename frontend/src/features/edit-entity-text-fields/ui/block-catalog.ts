@@ -28,6 +28,16 @@ export const BLOCK_CATALOG: readonly BlockCatalogEntry[] = [
     labelKey: 'admin.blocks.type.columns',
     descKey: 'admin.blocks.type.columns.desc',
   },
+  {
+    type: 'spacer',
+    labelKey: 'admin.blocks.type.spacer',
+    descKey: 'admin.blocks.type.spacer.desc',
+  },
+  {
+    type: 'divider',
+    labelKey: 'admin.blocks.type.divider',
+    descKey: 'admin.blocks.type.divider.desc',
+  },
 ]
 
 const CATALOG_BY_TYPE = Object.fromEntries(

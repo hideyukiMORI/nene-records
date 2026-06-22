@@ -14,6 +14,7 @@ import {
   IconX,
 } from '@/shared/ui/icons/Icons'
 import {
+  MAX_BLOCKS_PER_DOCUMENT,
   createBlock,
   parseBlocksDocument,
   serializeBlocksDocument,
@@ -23,9 +24,11 @@ import {
   type CalloutBlockData,
   type ChartBlockData,
   type ColumnsBlockData,
+  type DividerBlockData,
   type GalleryBlockData,
   type GroupBlockData,
   type HeroBlockData,
+  type SpacerBlockData,
   type TextBlockData,
 } from '@/shared/lib/blocks-document'
 import { BLOCK_CATALOG, blockCatalogEntry } from './block-catalog'
@@ -64,6 +67,10 @@ function blockTypeIcon(type: BlockType) {
       return IconCopy
     case 'columns':
       return IconLayout
+    case 'spacer':
+      return IconChevronDown
+    case 'divider':
+      return IconMenu
   }
 }
 
@@ -89,6 +96,9 @@ function rawSummary(block: Block): string {
       return block.data.columns
         .flatMap((column) => column.children.map((child) => rawSummary(child)))
         .join(' · ')
+    case 'spacer':
+    case 'divider':
+      return ''
   }
 }
 
@@ -180,7 +190,9 @@ export function BlocksFieldEditor({
       | GalleryBlockData
       | ChartBlockData
       | GroupBlockData
-      | ColumnsBlockData,
+      | ColumnsBlockData
+      | SpacerBlockData
+      | DividerBlockData,
   ) => {
     emit(
       blocks.map((block): Block => {
@@ -202,6 +214,10 @@ export function BlocksFieldEditor({
             return { ...block, data: data as GroupBlockData }
           case 'columns':
             return { ...block, data: data as ColumnsBlockData }
+          case 'spacer':
+            return { ...block, data: data as SpacerBlockData }
+          case 'divider':
+            return { ...block, data: data as DividerBlockData }
         }
       }),
     )
@@ -248,7 +264,7 @@ export function BlocksFieldEditor({
             key={entry.type}
             variant="secondary"
             size="sm"
-            disabled={disabled}
+            disabled={disabled || blocks.length >= MAX_BLOCKS_PER_DOCUMENT}
             onClick={() => {
               addBlock(entry.type)
             }}

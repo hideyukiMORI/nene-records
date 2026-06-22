@@ -595,6 +595,7 @@ export const en = {
   'admin.blocks.childEdit': 'Edit',
   'admin.blocks.childCollapse': 'Done',
   'admin.blocks.error.childrenRequired': 'Add at least one block.',
+  'admin.blocks.error.childrenInvalid': 'One or more blocks inside need attention.',
   // columns (#491 WS2)
   'admin.blocks.type.columns': 'Columns',
   'admin.blocks.type.columns.desc': 'A responsive multi-column layout',
@@ -602,6 +603,16 @@ export const en = {
   'admin.blocks.columns.add': 'Add column',
   'admin.blocks.columns.remove': 'Remove column',
   'admin.blocks.columns.label': 'Column {{n}}',
+  // spacer / divider (#491 WS2)
+  'admin.blocks.type.spacer': 'Spacer',
+  'admin.blocks.type.spacer.desc': 'Vertical whitespace',
+  'admin.blocks.type.divider': 'Divider',
+  'admin.blocks.type.divider.desc': 'A horizontal rule',
+  'admin.blocks.field.spacerSize': 'Height',
+  'admin.blocks.spacerSize.sm': 'Small',
+  'admin.blocks.spacerSize.md': 'Medium',
+  'admin.blocks.spacerSize.lg': 'Large',
+  'admin.blocks.divider.hint': 'A horizontal rule — no settings.',
 
   // ── Home hero (#486) ──────────────────────────────────────────────────────
   'admin.homeHero.title': 'Home hero',

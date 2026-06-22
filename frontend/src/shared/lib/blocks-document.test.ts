@@ -316,6 +316,19 @@ describe('blocks-document', () => {
     expect(validateBlock(createBlock('group'))).toBe('children-required')
   })
 
+  it('flags a container whose child is invalid as children-invalid (mirrors server recursion)', () => {
+    const group = parseBlocksDocument(
+      JSON.stringify([
+        {
+          id: 'g',
+          type: 'group',
+          data: { tone: 'plain', children: [{ id: 't', type: 'text', data: { markdown: '' } }] },
+        },
+      ]),
+    )[0]
+    expect(group && validateBlock(group)).toBe('children-invalid')
+  })
+
   it('parses/validates a columns block (2-4 columns, leaf-only children)', () => {
     const doc = JSON.stringify([
       {
@@ -348,5 +361,25 @@ describe('blocks-document', () => {
 
   it('flags an all-empty columns block as children-required', () => {
     expect(validateBlock(createBlock('columns'))).toBe('children-required')
+  })
+
+  it('parses/validates spacer and divider leaf blocks', () => {
+    const blocks = parseBlocksDocument(
+      JSON.stringify([
+        { id: 's', type: 'spacer', data: { size: 'lg' } },
+        { id: 'd', type: 'divider', data: {} },
+        { id: 's2', type: 'spacer', data: { size: 'bogus' } },
+      ]),
+    )
+    expect(blocks.map((b) => b.type)).toEqual(['spacer', 'divider', 'spacer'])
+    const spacer = blocks[0]
+    if (spacer?.type === 'spacer') {
+      expect(spacer.data.size).toBe('lg')
+    }
+    const fallback = blocks[2]
+    if (fallback?.type === 'spacer') {
+      expect(fallback.data.size).toBe('md') // invalid size coerced to default
+    }
+    expect(blocks.every((b) => validateBlock(b) === null)).toBe(true)
   })
 })

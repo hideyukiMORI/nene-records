@@ -9,6 +9,9 @@ import {
   GALLERY_LAYOUTS,
   GROUP_TONES,
   HERO_VARIANTS,
+  MAX_COLUMN_CHILDREN,
+  MAX_GROUP_CHILDREN,
+  SPACER_SIZES,
   createBlock,
   validateBlock,
   type Block,
@@ -19,6 +22,7 @@ import {
   type ChartBlockData,
   type ChartType,
   type ColumnsBlockData,
+  type DividerBlockData,
   type GalleryBlockData,
   type GalleryItem,
   type GalleryLayout,
@@ -29,6 +33,8 @@ import {
   type HeroVariant,
   type LeafBlock,
   type SeriesPoint,
+  type SpacerBlockData,
+  type SpacerSize,
   type TextBlockData,
 } from '@/shared/lib/blocks-document'
 import { BLOCK_CATALOG, blockCatalogEntry } from './block-catalog'
@@ -43,6 +49,8 @@ type BlockDataChange =
   | ChartBlockData
   | GroupBlockData
   | ColumnsBlockData
+  | SpacerBlockData
+  | DividerBlockData
 
 /** Leaf block types a container (group / columns) may hold (no nesting; depth 2). */
 const GROUP_CHILD_CATALOG = BLOCK_CATALOG.filter(
@@ -84,6 +92,12 @@ const GROUP_TONE_LABEL_KEY: Record<GroupTone, MessageKey> = {
   plain: 'admin.blocks.groupTone.plain',
   muted: 'admin.blocks.groupTone.muted',
   card: 'admin.blocks.groupTone.card',
+}
+
+const SPACER_SIZE_LABEL_KEY: Record<SpacerSize, MessageKey> = {
+  sm: 'admin.blocks.spacerSize.sm',
+  md: 'admin.blocks.spacerSize.md',
+  lg: 'admin.blocks.spacerSize.lg',
 }
 
 /** Settings form for the selected block (text / callout / hero / gallery). */
@@ -266,8 +280,13 @@ export function BlockInspector({
           idPrefix={idPrefix}
           items={data.children}
           disabled={disabled}
+          maxItems={MAX_GROUP_CHILDREN}
           error={
-            errorCode === 'children-required' ? t('admin.blocks.error.childrenRequired') : undefined
+            errorCode === 'children-required'
+              ? t('admin.blocks.error.childrenRequired')
+              : errorCode === 'children-invalid'
+                ? t('admin.blocks.error.childrenInvalid')
+                : undefined
           }
           onChange={(children) => {
             onChange({ ...data, children })
@@ -311,6 +330,13 @@ export function BlockInspector({
             {t('admin.blocks.columns.add')}
           </Button>
         </div>
+        {errorCode === 'children-required' || errorCode === 'children-invalid' ? (
+          <span role="alert" className="font-sans text-caption text-danger">
+            {errorCode === 'children-required'
+              ? t('admin.blocks.error.childrenRequired')
+              : t('admin.blocks.error.childrenInvalid')}
+          </span>
+        ) : null}
         {data.columns.map((column, columnIndex) => (
           <div
             key={columnIndex}
@@ -323,6 +349,7 @@ export function BlockInspector({
               idPrefix={`${idPrefix}-col${String(columnIndex)}`}
               items={column.children}
               disabled={disabled}
+              maxItems={MAX_COLUMN_CHILDREN}
               onChange={(children) => {
                 setColumns(data.columns.map((col, i) => (i === columnIndex ? { children } : col)))
               }}
@@ -330,6 +357,35 @@ export function BlockInspector({
           </div>
         ))}
       </Stack>
+    )
+  }
+
+  if (block.type === 'spacer') {
+    const data = block.data
+    return (
+      <Select
+        id={`${idPrefix}-spacer-size`}
+        label={t('admin.blocks.field.spacerSize')}
+        value={data.size}
+        disabled={disabled}
+        onChange={(event) => {
+          onChange({ size: event.target.value as SpacerSize })
+        }}
+      >
+        {SPACER_SIZES.map((size) => (
+          <option key={size} value={size}>
+            {t(SPACER_SIZE_LABEL_KEY[size])}
+          </option>
+        ))}
+      </Select>
+    )
+  }
+
+  if (block.type === 'divider') {
+    return (
+      <span className="font-sans text-caption text-text-muted">
+        {t('admin.blocks.divider.hint')}
+      </span>
     )
   }
 
@@ -812,6 +868,8 @@ interface GroupChildrenFieldProps {
   items: LeafBlock[]
   disabled: boolean
   error?: string | undefined
+  /** Max children (mirrors the server cap); the add palette disables at the limit. */
+  maxItems: number
   onChange: (items: LeafBlock[]) => void
 }
 
@@ -825,10 +883,12 @@ function GroupChildrenField({
   items,
   disabled,
   error,
+  maxItems,
   onChange,
 }: GroupChildrenFieldProps) {
   const { t } = useTranslation()
   const [openIndex, setOpenIndex] = useState<number | null>(null)
+  const atCapacity = items.length >= maxItems
 
   const add = (type: BlockType) => {
     onChange([...items, createBlock(type) as LeafBlock])
@@ -873,7 +933,7 @@ function GroupChildrenField({
             type="button"
             variant="ghost"
             size="sm"
-            disabled={disabled}
+            disabled={disabled || atCapacity}
             onClick={() => {
               add(entry.type)
             }}
