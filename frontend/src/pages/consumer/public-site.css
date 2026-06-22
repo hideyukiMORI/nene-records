@@ -2338,3 +2338,18 @@
     grid-template-columns: repeat(4, 1fr);
   }
 }
+/* spacer / divider blocks (#491 WS2). */
+.nene-public .spacer[data-spacer-size='sm'] {
+  height: var(--space-md);
+}
+.nene-public .spacer[data-spacer-size='md'] {
+  height: var(--space-xl);
+}
+.nene-public .spacer[data-spacer-size='lg'] {
+  height: var(--space-2xl);
+}
+.nene-public .divider {
+  border: 0;
+  border-top: 1px solid var(--color-border);
+  margin-block: var(--space-xl);
+}

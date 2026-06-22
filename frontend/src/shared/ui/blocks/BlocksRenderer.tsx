@@ -77,6 +77,10 @@ function ConsumerBlock({ block }: { block: Block }) {
       return <ConsumerGroup data={block.data} />
     case 'columns':
       return <ConsumerColumns data={block.data} />
+    case 'spacer':
+      return <div className="spacer" data-spacer-size={block.data.size} aria-hidden="true" />
+    case 'divider':
+      return <hr className="divider" />
   }
 }
 

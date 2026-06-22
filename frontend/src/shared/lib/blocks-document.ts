@@ -12,7 +12,17 @@
  * shared/ui) can import it.
  */
 
-const BLOCK_TYPES = ['text', 'callout', 'hero', 'gallery', 'chart', 'group', 'columns'] as const
+const BLOCK_TYPES = [
+  'text',
+  'callout',
+  'hero',
+  'gallery',
+  'chart',
+  'group',
+  'columns',
+  'spacer',
+  'divider',
+] as const
 export type BlockType = (typeof BLOCK_TYPES)[number]
 
 export const CALLOUT_KINDS = ['info', 'warn', 'ok', 'danger'] as const
@@ -29,6 +39,14 @@ export type ChartType = (typeof CHART_TYPES)[number]
 
 export const GROUP_TONES = ['plain', 'muted', 'card'] as const
 export type GroupTone = (typeof GROUP_TONES)[number]
+
+export const SPACER_SIZES = ['sm', 'md', 'lg'] as const
+export type SpacerSize = (typeof SPACER_SIZES)[number]
+
+/** Block caps — mirror the server validator (`BlocksDocumentValidator`); enforced in the editor. */
+export const MAX_BLOCKS_PER_DOCUMENT = 200
+export const MAX_GROUP_CHILDREN = 30
+export const MAX_COLUMN_CHILDREN = 20
 
 export interface TextBlockData {
   markdown: string
@@ -89,6 +107,14 @@ export interface ChartBlockData {
   summary: string
 }
 
+/** Vertical whitespace block (#491 WS2). */
+export interface SpacerBlockData {
+  size: SpacerSize
+}
+
+/** Horizontal rule block (#491 WS2); no options. */
+export type DividerBlockData = Record<string, never>
+
 /** Leaf (non-container) blocks. A group's children are leaf blocks only (depth 2). */
 export type LeafBlock =
   | { id: string; type: 'text'; data: TextBlockData }
@@ -96,6 +122,8 @@ export type LeafBlock =
   | { id: string; type: 'hero'; data: HeroBlockData }
   | { id: string; type: 'gallery'; data: GalleryBlockData }
   | { id: string; type: 'chart'; data: ChartBlockData }
+  | { id: string; type: 'spacer'; data: SpacerBlockData }
+  | { id: string; type: 'divider'; data: DividerBlockData }
 
 /** Layout container holding leaf child blocks (#491 WS2); not nestable in another container. */
 export interface GroupBlockData {
@@ -129,6 +157,7 @@ export type BlockValidationCode =
   | 'series-label-required'
   | 'summary-required'
   | 'children-required'
+  | 'children-invalid'
 
 function isBlockType(value: string): value is BlockType {
   return (BLOCK_TYPES as readonly string[]).includes(value)
@@ -149,6 +178,10 @@ function isGroupTone(value: unknown): value is GroupTone {
 /** True for non-container blocks (a container's children are leaf-only; depth 2). */
 function isLeafBlock(block: Block): block is LeafBlock {
   return block.type !== 'group' && block.type !== 'columns'
+}
+
+function isSpacerSize(value: unknown): value is SpacerSize {
+  return typeof value === 'string' && (SPACER_SIZES as readonly string[]).includes(value)
 }
 
 function isGalleryLayout(value: unknown): value is GalleryLayout {
@@ -262,6 +295,10 @@ export function createBlock(type: BlockType): Block {
       return { id: newBlockId(), type, data: { tone: 'plain', children: [] } }
     case 'columns':
       return { id: newBlockId(), type, data: { columns: [{ children: [] }, { children: [] }] } }
+    case 'spacer':
+      return { id: newBlockId(), type, data: { size: 'md' } }
+    case 'divider':
+      return { id: newBlockId(), type, data: {} }
   }
 }
 
@@ -401,6 +438,10 @@ function coerceBlock(raw: unknown, index: number, allowContainers: boolean): Blo
       })
       return { id, type, data: { columns } }
     }
+    case 'spacer':
+      return { id, type, data: { size: isSpacerSize(record.size) ? record.size : 'md' } }
+    case 'divider':
+      return { id, type, data: {} }
   }
 }
 
@@ -539,11 +580,26 @@ export function validateBlock(block: Block): BlockValidationCode | null {
       }
       return block.data.summary.trim() === '' ? 'summary-required' : null
     case 'group':
-      return block.data.children.length === 0 ? 'children-required' : null
-    case 'columns':
-      return block.data.columns.every((col) => col.children.length === 0)
-        ? 'children-required'
+      if (block.data.children.length === 0) {
+        return 'children-required'
+      }
+      // Recurse: the server validates children too, so flag a container whose
+      // child is invalid (else the user hits a silent 422 on save).
+      return block.data.children.some((child) => validateBlock(child) !== null)
+        ? 'children-invalid'
         : null
+    case 'columns':
+      if (block.data.columns.every((col) => col.children.length === 0)) {
+        return 'children-required'
+      }
+      return block.data.columns.some((col) =>
+        col.children.some((child) => validateBlock(child) !== null),
+      )
+        ? 'children-invalid'
+        : null
+    case 'spacer':
+    case 'divider':
+      return null
   }
 }
 

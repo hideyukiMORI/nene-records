@@ -336,4 +336,18 @@ final class BlocksDocumentValidatorTest extends TestCase
             '[{"id":"cols","type":"columns","data":{"columns":[{"children":[{"id":"g","type":"group","data":{"tone":"plain","children":[]}}]},{"children":[]}]}}]',
         );
     }
+
+    public function testAcceptsSpacerAndDivider(): void
+    {
+        $this->validator->validate(
+            '[{"id":"s","type":"spacer","data":{"size":"md"}},{"id":"d","type":"divider","data":{}}]',
+        );
+        $this->addToAssertionCount(1);
+    }
+
+    public function testRejectsSpacerWithInvalidSize(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->validator->validate('[{"id":"s","type":"spacer","data":{"size":"huge"}}]');
+    }
 }

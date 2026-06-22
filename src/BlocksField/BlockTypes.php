@@ -22,6 +22,8 @@ final class BlockTypes
         'chart',
         'group',
         'columns',
+        'spacer',
+        'divider',
     ];
 
     public static function isValid(string $type): bool
