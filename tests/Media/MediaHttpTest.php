@@ -370,6 +370,41 @@ final class MediaHttpTest extends TestCase
 
     // ── Derivatives ────────────────────────────────────────────────────────────
 
+    // ── Serve security headers ───────────────────────────────────────────────
+
+    public function testServeSvgSetsSecurityHardeningHeaders(): void
+    {
+        $this->storage->write(
+            '2026/05/icon.svg',
+            '<svg xmlns="http://www.w3.org/2000/svg"><rect width="1" height="1"/></svg>',
+        );
+
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/media/2026/05/icon.svg'),
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('image/svg+xml', $response->getHeaderLine('Content-Type'));
+        self::assertSame('nosniff', $response->getHeaderLine('X-Content-Type-Options'));
+        self::assertStringContainsString("default-src 'none'", $response->getHeaderLine('Content-Security-Policy'));
+    }
+
+    public function testServeNonSvgKeepsBaselineCspAndNosniff(): void
+    {
+        $this->seedStorageImage('2026/05/pic.png', 4, 4);
+
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/media/2026/05/pic.png'),
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('nosniff', $response->getHeaderLine('X-Content-Type-Options'));
+        // Non-SVG keeps the framework baseline CSP; only SVG gets the locked-down 'none'.
+        self::assertStringNotContainsString("default-src 'none'", $response->getHeaderLine('Content-Security-Policy'));
+    }
+
+    // ── Derivatives ────────────────────────────────────────────────────────────
+
     public function testDerivativeGeneratesResizedImageAndCachesIt(): void
     {
         $this->seedStorageImage('2026/05/pic.png', 800, 400);

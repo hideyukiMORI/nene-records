@@ -43,11 +43,26 @@ final readonly class ServeMediaHandler
         }
 
         $stream = $this->streamFactory->createStreamFromResource($this->storage->readStream($key));
+        $isSvg = str_ends_with(strtolower($key), '.svg');
 
-        return $this->responseFactory->createResponse(200)
-            ->withHeader('Content-Type', $this->storage->mimeType($key))
+        $response = $this->responseFactory->createResponse(200)
+            ->withHeader('Content-Type', $isSvg ? 'image/svg+xml' : $this->storage->mimeType($key))
             ->withHeader('Content-Length', (string) $this->storage->size($key))
             ->withHeader('Cache-Control', 'public, max-age=31536000, immutable')
+            // Never let the browser sniff a different (executable) type.
+            ->withHeader('X-Content-Type-Options', 'nosniff')
             ->withBody($stream);
+
+        if ($isSvg) {
+            // Defence in depth: uploads are already deep-sanitised, but if an SVG
+            // is opened top-level / via <object>, this CSP blocks any script from
+            // running in the app origin. <img>/CSS embedding is unaffected.
+            $response = $response->withHeader(
+                'Content-Security-Policy',
+                "default-src 'none'; style-src 'unsafe-inline'",
+            );
+        }
+
+        return $response;
     }
 }

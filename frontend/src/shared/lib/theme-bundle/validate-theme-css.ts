@@ -1,4 +1,5 @@
 import postcss, { type AtRule, type ChildNode } from 'postcss'
+import { findDataUriSvgIssues } from './sanitize-svg'
 import type { ValidationIssue } from './validate-manifest'
 
 export interface ThemeCssOptions {
@@ -38,9 +39,13 @@ function isKeyframeChild(node: ChildNode): boolean {
  *    `.nene-public` — a theme can't leak styles into the admin/other themes;
  *  - no `@import` (no remote or local stylesheet pulls);
  *  - no external `url()` (assets are bundled / data URIs only);
- *  - no executable constructs (`javascript:`, `expression()`, …).
+ *  - no executable constructs (`javascript:`, `expression()`, …);
+ *  - `data:image/svg+xml` URIs are decoded and screened for active content
+ *    (<script>, on* handlers, external href) — see {@link findDataUriSvgIssues}.
  *
- * NOTE (slice 1): contrast-AA and deep SVG sanitisation are not covered yet.
+ * This is the author-facing CI gate. The authoritative SVG sanitiser is
+ * server-side (`src/Media/SvgSanitizer.php`, applied on media upload). Contrast
+ * AA is checked separately server-side (`src/Theme/ColorContrast.php`).
  */
 export function validateThemeCss(css: string, { themeId }: ThemeCssOptions): ValidationIssue[] {
   const issues: ValidationIssue[] = []
@@ -82,6 +87,9 @@ export function validateThemeCss(css: string, { themeId }: ThemeCssOptions): Val
     }
     if (DANGEROUS.test(value)) {
       issues.push({ path: decl.prop, message: 'value contains a disallowed construct' })
+    }
+    for (const message of findDataUriSvgIssues(value)) {
+      issues.push({ path: decl.prop, message })
     }
   })
 
