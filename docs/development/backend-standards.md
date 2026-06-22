@@ -234,6 +234,35 @@ List operations use `List{Entity}Item` inside `List{Entity}sOutput` — same as 
 - Shared kernel (future): `src/Shared/` with ADR — not a dumping ground for convenience helpers.
 - **ApplicationServiceProvider** aggregates domain providers and exposes route registrar list — it does not contain business logic.
 
+### Intentional per-type duplication (field-type modules) — NOT debt
+
+The five field-value modules — `src/{Text,Int,Enum,Bool,DateTime}Field/` — are
+**deliberately near-identical** (each ~32 classes following the canonical tree above).
+This is **NENE2 convention compliance, not technical debt.** Do **not** "DRY" it by
+introducing an `AbstractFieldRepository`, a shared trait, or a generic
+`FieldRepositoryInterface<T>`.
+
+Why this is the intended design:
+
+- **NENE2 prioritizes explicitness over DRY.** The framework itself ships **zero
+  `abstract class` and zero `trait`** and documents the trade-off
+  (`vendor/hideyukimori/nene2/docs/explanation/why-explicit-wiring.md`: "Verbose for
+  large class counts" is accepted on purpose; `domain-layer.md`: "Group by domain
+  concept, not by layer type"). Its Non-Goals exclude reflection/annotation DI and
+  Active-Record-style models.
+- **The zero-tolerance rules above already forbid the usual de-duplication tools**:
+  no layer-grouped roots, no generic `src/Util/`, shared kernel only via ADR.
+- **A shared base is technically a poor fit here anyway:** PHP has no generics; only
+  `TextField` carries a divergent signature (`?string $locale`, `findByEntityTypeId`,
+  `findByEntityIds`), so the interfaces cannot be unified; and the container's
+  start-up `instanceof` fail-fast guards assume one concrete interface per type.
+- **If the type count ever outgrows hand-written providers**, the NENE2-aligned
+  response is to re-evaluate the framework fit (per `why-explicit-wiring.md`), **not**
+  to bolt on autowiring or abstraction.
+
+Acceptable in-grain cleanups only: class-local `private`/`private static` helpers,
+fixing copy-paste naming residue. Anything that crosses the module boundary needs an ADR.
+
 ### Forbidden placements (automatic PR reject)
 
 - Business logic in handlers beyond format validation

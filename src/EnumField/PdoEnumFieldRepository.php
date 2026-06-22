@@ -8,6 +8,14 @@ use LogicException;
 use Nene2\Database\DatabaseQueryExecutorInterface;
 use Nene2\Http\RequestScopedHolder;
 
+/**
+ * Per-type field-value repository (text/int/enum/bool/datetime).
+ *
+ * The five *Field modules are intentionally near-duplicated: NENE2 convention
+ * (explicit wiring over DRY; the framework ships zero abstract classes/traits),
+ * NOT debt. Do NOT extract a shared AbstractFieldRepository / trait / generic.
+ * Rationale: docs/development/backend-standards.md → "Intentional per-type duplication".
+ */
 final readonly class PdoEnumFieldRepository implements EnumFieldRepositoryInterface
 {
     /**
