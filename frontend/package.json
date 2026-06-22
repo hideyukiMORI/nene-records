@@ -18,9 +18,9 @@
   "scripts": {
     "dev": "vite",
     "mock": "VITE_MOCK_API=true vite",
-    "build": "tsc --noEmit && vite build",
+    "build": "tsc -p tsconfig.app.json --noEmit && vite build",
     "preview": "vite preview",
-    "type-check": "tsc --noEmit",
+    "type-check": "tsc -p tsconfig.app.json --noEmit",
     "lint": "eslint . --max-warnings 0",
     "format": "prettier --check .",
     "format:fix": "prettier --write .",

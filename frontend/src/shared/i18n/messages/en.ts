@@ -979,5 +979,9 @@ export const en = {
   'public.comments.form.error': 'Could not submit comment. Please try again.',
 } as const
 
-/** Complete message catalog type — derived from the English source of truth. */
-export type MessageCatalog = typeof en
+/**
+ * Complete message catalog type — keys derived from the English source of truth,
+ * values widened to `string` so translated catalogs (ja/de/…) aren't checked
+ * against the English string literals (which would reject every translation).
+ */
+export type MessageCatalog = Record<keyof typeof en, string>
