@@ -61,7 +61,7 @@ export function HomePage() {
   const { data, isLoading, isError } = useDashboardSummary()
   const pinnedQuery = usePinnedEntityTypes()
   const pinnedTypes = pinnedQuery.data ?? []
-  const canManageEntities = currentUserHasCapability('manage_entities')
+  const canManageEntities = currentUserHasCapability('edit_content')
 
   // Daily access counts for the sparkline — last SPARK_DAYS days ending today.
   const range = useMemo(() => {

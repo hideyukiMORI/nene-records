@@ -1,5 +1,5 @@
 export type TextVariant = 'body' | 'caption' | 'heading-sm' | 'heading-md'
-export type TextElement = 'p' | 'span' | 'h1' | 'h2' | 'h3'
+export type TextElement = 'p' | 'span' | 'h1' | 'h2' | 'h3' | 'div' | 'dt' | 'dd'
 
 export interface TextProps {
   as?: TextElement

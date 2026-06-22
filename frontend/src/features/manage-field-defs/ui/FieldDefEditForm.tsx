@@ -17,7 +17,10 @@ const DATA_TYPE_LABEL_KEYS: Record<FieldDataType, MessageKey> = {
   enum: 'admin.fieldDefs.dataType.enum',
   bool: 'admin.fieldDefs.dataType.bool',
   datetime: 'admin.fieldDefs.dataType.datetime',
+  image: 'admin.fieldDefs.dataType.image',
+  file: 'admin.fieldDefs.dataType.file',
   relation: 'admin.fieldDefs.dataType.relation',
+  blocks: 'admin.fieldDefs.dataType.blocks',
 }
 
 export interface FieldDefEditFormProps {

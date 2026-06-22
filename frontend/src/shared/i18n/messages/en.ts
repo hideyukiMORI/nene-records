@@ -490,6 +490,7 @@ export const en = {
   'admin.fieldDefs.dataType.image': 'Image',
   'admin.fieldDefs.dataType.file': 'File',
   'admin.fieldDefs.dataType.relation': 'Relation',
+  'admin.fieldDefs.dataType.blocks': 'Blocks',
 
   // ── Media upload ─────────────────────────────────────────────────────────
   'admin.media.panelTitle': 'Media',

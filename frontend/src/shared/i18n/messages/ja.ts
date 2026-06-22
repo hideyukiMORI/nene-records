@@ -487,6 +487,7 @@ export const ja: Partial<MessageCatalog> = {
   'admin.fieldDefs.dataType.image': '画像',
   'admin.fieldDefs.dataType.file': 'ファイル',
   'admin.fieldDefs.dataType.relation': 'リレーション',
+  'admin.fieldDefs.dataType.blocks': 'ブロック',
 
   // ── Media upload ─────────────────────────────────────────────────────────
   'admin.media.panelTitle': 'メディア',

@@ -1,6 +1,6 @@
 export type SettingKey = string
 
-export type SettingDataType = 'text' | 'markdown' | 'bool' | 'url'
+export type SettingDataType = 'text' | 'markdown' | 'bool' | 'url' | 'media'
 
 export interface SettingItem {
   settingKey: SettingKey
