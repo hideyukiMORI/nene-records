@@ -315,4 +315,38 @@ describe('blocks-document', () => {
   it('flags an empty group as children-required', () => {
     expect(validateBlock(createBlock('group'))).toBe('children-required')
   })
+
+  it('parses/validates a columns block (2-4 columns, leaf-only children)', () => {
+    const doc = JSON.stringify([
+      {
+        id: 'cols',
+        type: 'columns',
+        data: {
+          columns: [
+            {
+              children: [
+                { id: 'a', type: 'text', data: { markdown: 'Left' } },
+                { id: 'nested', type: 'group', data: { tone: 'plain', children: [] } },
+              ],
+            },
+            { children: [{ id: 'b', type: 'callout', data: { kind: 'info', body: 'Right' } }] },
+          ],
+        },
+      },
+    ])
+    const blocks = parseBlocksDocument(doc)
+    const cols = blocks[0]
+    expect(cols?.type).toBe('columns')
+    if (cols?.type === 'columns') {
+      expect(cols.data.columns).toHaveLength(2)
+      // the nested container child is dropped (leaf-only, depth 2)
+      expect(cols.data.columns[0]?.children.map((c) => c.type)).toEqual(['text'])
+      expect(validateBlock(cols)).toBeNull()
+      expect(parseBlocksDocument(serializeBlocksDocument(blocks))).toEqual(blocks)
+    }
+  })
+
+  it('flags an all-empty columns block as children-required', () => {
+    expect(validateBlock(createBlock('columns'))).toBe('children-required')
+  })
 })

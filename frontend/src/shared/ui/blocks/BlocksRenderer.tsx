@@ -4,6 +4,7 @@ import {
   type Block,
   type CalloutKind,
   type ChartBlockData,
+  type ColumnsBlockData,
   type GalleryBlockData,
   type GroupBlockData,
   type HeroBlockData,
@@ -74,7 +75,31 @@ function ConsumerBlock({ block }: { block: Block }) {
       return <ConsumerChart data={block.data} />
     case 'group':
       return <ConsumerGroup data={block.data} />
+    case 'columns':
+      return <ConsumerColumns data={block.data} />
   }
+}
+
+/**
+ * Columns block (#491 WS2): a responsive multi-column layout (2-4 columns of leaf
+ * blocks). Stacks to one column on narrow viewports (see `.columns` in
+ * public-site.css). Children are leaf blocks only (depth 2).
+ */
+function ConsumerColumns({ data }: { data: ColumnsBlockData }) {
+  if (data.columns.length === 0) {
+    return null
+  }
+  return (
+    <div className="columns" data-columns={data.columns.length}>
+      {data.columns.map((column, index) => (
+        <div key={index} className="columns__col">
+          {column.children.map((child) => (
+            <ConsumerBlock key={child.id} block={child} />
+          ))}
+        </div>
+      ))}
+    </div>
+  )
 }
 
 /**

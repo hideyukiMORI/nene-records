@@ -146,4 +146,27 @@ describe('BlocksRenderer', () => {
     expect(group?.querySelector('.callout')).not.toBeNull()
     expect(screen.getByText('Grouped note')).toBeInTheDocument()
   })
+
+  it('renders a columns block with one rendered column per data column', () => {
+    const doc = JSON.stringify([
+      {
+        id: 'cols',
+        type: 'columns',
+        data: {
+          columns: [
+            { children: [{ id: 'a', type: 'text', data: { markdown: 'Left col' } }] },
+            { children: [{ id: 'b', type: 'text', data: { markdown: 'Right col' } }] },
+          ],
+        },
+      },
+    ])
+
+    const { container } = renderWithProviders(<BlocksRenderer documentJson={doc} />)
+
+    const columns = container.querySelector('.columns')
+    expect(columns?.getAttribute('data-columns')).toBe('2')
+    expect(container.querySelectorAll('.columns__col')).toHaveLength(2)
+    expect(screen.getByText('Left col')).toBeInTheDocument()
+    expect(screen.getByText('Right col')).toBeInTheDocument()
+  })
 })

@@ -18,6 +18,7 @@ import {
   type CalloutKind,
   type ChartBlockData,
   type ChartType,
+  type ColumnsBlockData,
   type GalleryBlockData,
   type GalleryItem,
   type GalleryLayout,
@@ -41,9 +42,12 @@ type BlockDataChange =
   | GalleryBlockData
   | ChartBlockData
   | GroupBlockData
+  | ColumnsBlockData
 
-/** Leaf block types a group may contain (no container-in-container; depth 2). */
-const GROUP_CHILD_CATALOG = BLOCK_CATALOG.filter((entry) => entry.type !== 'group')
+/** Leaf block types a container (group / columns) may hold (no nesting; depth 2). */
+const GROUP_CHILD_CATALOG = BLOCK_CATALOG.filter(
+  (entry) => entry.type !== 'group' && entry.type !== 'columns',
+)
 
 interface BlockInspectorProps {
   block: Block
@@ -269,6 +273,62 @@ export function BlockInspector({
             onChange({ ...data, children })
           }}
         />
+      </Stack>
+    )
+  }
+
+  if (block.type === 'columns') {
+    const data = block.data
+    const setColumns = (columns: ColumnsBlockData['columns']) => {
+      onChange({ ...data, columns })
+    }
+    return (
+      <Stack gap="sm">
+        <div className="flex items-center gap-inline-sm">
+          <span className="flex-1 font-sans text-caption font-medium text-text-primary">
+            {t('admin.blocks.columns.count', { count: String(data.columns.length) })}
+          </span>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            disabled={disabled || data.columns.length <= 2}
+            onClick={() => {
+              setColumns(data.columns.slice(0, -1))
+            }}
+          >
+            {t('admin.blocks.columns.remove')}
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            disabled={disabled || data.columns.length >= 4}
+            onClick={() => {
+              setColumns([...data.columns, { children: [] }])
+            }}
+          >
+            {t('admin.blocks.columns.add')}
+          </Button>
+        </div>
+        {data.columns.map((column, columnIndex) => (
+          <div
+            key={columnIndex}
+            className="flex flex-col gap-stack-xs rounded-md border border-border p-inline-sm"
+          >
+            <span className="font-sans text-caption font-medium text-text-muted">
+              {t('admin.blocks.columns.label', { n: String(columnIndex + 1) })}
+            </span>
+            <GroupChildrenField
+              idPrefix={`${idPrefix}-col${String(columnIndex)}`}
+              items={column.children}
+              disabled={disabled}
+              onChange={(children) => {
+                setColumns(data.columns.map((col, i) => (i === columnIndex ? { children } : col)))
+              }}
+            />
+          </div>
+        ))}
       </Stack>
     )
   }

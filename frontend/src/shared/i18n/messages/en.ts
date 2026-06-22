@@ -595,6 +595,13 @@ export const en = {
   'admin.blocks.childEdit': 'Edit',
   'admin.blocks.childCollapse': 'Done',
   'admin.blocks.error.childrenRequired': 'Add at least one block.',
+  // columns (#491 WS2)
+  'admin.blocks.type.columns': 'Columns',
+  'admin.blocks.type.columns.desc': 'A responsive multi-column layout',
+  'admin.blocks.columns.count': '{{count}} columns',
+  'admin.blocks.columns.add': 'Add column',
+  'admin.blocks.columns.remove': 'Remove column',
+  'admin.blocks.columns.label': 'Column {{n}}',
 
   // ── Home hero (#486) ──────────────────────────────────────────────────────
   'admin.homeHero.title': 'Home hero',

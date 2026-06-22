@@ -38,11 +38,17 @@ final class BlocksDocumentValidator
     private const CHART_TYPES = ['bar', 'line'];
 
     /** Layout/container blocks that hold child blocks; cannot be nested in each other (depth 2). */
-    private const CONTAINER_TYPES = ['group'];
+    private const CONTAINER_TYPES = ['group', 'columns'];
 
     private const GROUP_TONES = ['plain', 'muted', 'card'];
 
     private const MAX_GROUP_CHILDREN = 30;
+
+    private const MIN_COLUMNS = 2;
+
+    private const MAX_COLUMNS = 4;
+
+    private const MAX_COLUMN_CHILDREN = 20;
 
     private const MAX_GALLERY_ITEMS = 50;
     private const MAX_SERIES_POINTS = 60;
@@ -135,6 +141,7 @@ final class BlocksDocumentValidator
             'gallery' => $this->validateGalleryData($path, $data, $errors),
             'chart' => $this->validateChartData($path, $data, $errors),
             'group' => $this->validateGroupData($path, $data, $count, $errors),
+            'columns' => $this->validateColumnsData($path, $data, $count, $errors),
             default => null,
         };
     }
@@ -166,6 +173,52 @@ final class BlocksDocumentValidator
         foreach ($children as $i => $child) {
             // Children are leaf blocks only (no container-in-container) → depth capped at 2.
             $this->validateBlock("{$path}.data.children[{$i}]", $child, false, $count, $errors);
+        }
+    }
+
+    /**
+     * @param array<array-key, mixed> $data
+     * @param list<ValidationError> $errors
+     */
+    private function validateColumnsData(string $path, array $data, int &$count, array &$errors): void
+    {
+        $columns = $data['columns'] ?? null;
+        if (!is_array($columns) || !array_is_list($columns)) {
+            $errors[] = new ValidationError("{$path}.data.columns", 'Columns must be an array of column objects.', 'invalid');
+
+            return;
+        }
+
+        if (count($columns) < self::MIN_COLUMNS || count($columns) > self::MAX_COLUMNS) {
+            $errors[] = new ValidationError("{$path}.data.columns", 'A columns block must have between ' . self::MIN_COLUMNS . ' and ' . self::MAX_COLUMNS . ' columns.', 'invalid');
+
+            return;
+        }
+
+        foreach ($columns as $c => $column) {
+            if (!is_array($column)) {
+                $errors[] = new ValidationError("{$path}.data.columns[{$c}]", 'Each column must be an object.', 'invalid');
+
+                continue;
+            }
+
+            $children = $column['children'] ?? null;
+            if (!is_array($children) || !array_is_list($children)) {
+                $errors[] = new ValidationError("{$path}.data.columns[{$c}].children", 'Column children must be an array of blocks.', 'invalid');
+
+                continue;
+            }
+
+            if (count($children) > self::MAX_COLUMN_CHILDREN) {
+                $errors[] = new ValidationError("{$path}.data.columns[{$c}].children", 'A column may contain at most ' . self::MAX_COLUMN_CHILDREN . ' blocks.', 'invalid');
+
+                continue;
+            }
+
+            foreach ($children as $i => $child) {
+                // Column children are leaf blocks only (no container-in-container) → depth 2.
+                $this->validateBlock("{$path}.data.columns[{$c}].children[{$i}]", $child, false, $count, $errors);
+            }
         }
     }
 

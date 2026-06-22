@@ -12,7 +12,7 @@
  * shared/ui) can import it.
  */
 
-const BLOCK_TYPES = ['text', 'callout', 'hero', 'gallery', 'chart', 'group'] as const
+const BLOCK_TYPES = ['text', 'callout', 'hero', 'gallery', 'chart', 'group', 'columns'] as const
 export type BlockType = (typeof BLOCK_TYPES)[number]
 
 export const CALLOUT_KINDS = ['info', 'warn', 'ok', 'danger'] as const
@@ -103,7 +103,20 @@ export interface GroupBlockData {
   children: LeafBlock[]
 }
 
-export type Block = LeafBlock | { id: string; type: 'group'; data: GroupBlockData }
+/** One column of a columns block; holds leaf children. */
+export interface ColumnsColumn {
+  children: LeafBlock[]
+}
+
+/** Multi-column layout container (#491 WS2); 2-4 columns of leaf blocks. */
+export interface ColumnsBlockData {
+  columns: ColumnsColumn[]
+}
+
+export type Block =
+  | LeafBlock
+  | { id: string; type: 'group'; data: GroupBlockData }
+  | { id: string; type: 'columns'; data: ColumnsBlockData }
 
 export type BlockValidationCode =
   | 'markdown-required'
@@ -131,6 +144,11 @@ function isHeroVariant(value: unknown): value is HeroVariant {
 
 function isGroupTone(value: unknown): value is GroupTone {
   return typeof value === 'string' && (GROUP_TONES as readonly string[]).includes(value)
+}
+
+/** True for non-container blocks (a container's children are leaf-only; depth 2). */
+function isLeafBlock(block: Block): block is LeafBlock {
+  return block.type !== 'group' && block.type !== 'columns'
 }
 
 function isGalleryLayout(value: unknown): value is GalleryLayout {
@@ -242,6 +260,8 @@ export function createBlock(type: BlockType): Block {
       }
     case 'group':
       return { id: newBlockId(), type, data: { tone: 'plain', children: [] } }
+    case 'columns':
+      return { id: newBlockId(), type, data: { columns: [{ children: [] }, { children: [] }] } }
   }
 }
 
@@ -288,7 +308,7 @@ function coerceBlock(raw: unknown, index: number, allowContainers: boolean): Blo
   }
 
   // Container blocks are not nestable inside another container (depth 2).
-  if (!allowContainers && type === 'group') {
+  if (!allowContainers && (type === 'group' || type === 'columns')) {
     return null
   }
 
@@ -360,12 +380,26 @@ function coerceBlock(raw: unknown, index: number, allowContainers: boolean): Blo
       const rawChildren = Array.isArray(record.children) ? record.children : []
       const children = rawChildren
         .map((child, childIndex) => coerceBlock(child, childIndex, false))
-        .filter((child): child is LeafBlock => child !== null && child.type !== 'group')
+        .filter((child): child is LeafBlock => child !== null && isLeafBlock(child))
       return {
         id,
         type,
         data: { tone: isGroupTone(record.tone) ? record.tone : 'plain', children },
       }
+    }
+    case 'columns': {
+      const rawColumns = Array.isArray(record.columns) ? record.columns : []
+      const columns = rawColumns.map((col) => {
+        const colRecord =
+          typeof col === 'object' && col !== null ? (col as Record<string, unknown>) : {}
+        const rawChildren = Array.isArray(colRecord.children) ? colRecord.children : []
+        return {
+          children: rawChildren
+            .map((child, childIndex) => coerceBlock(child, childIndex, false))
+            .filter((child): child is LeafBlock => child !== null && isLeafBlock(child)),
+        }
+      })
+      return { id, type, data: { columns } }
     }
   }
 }
@@ -443,6 +477,17 @@ function normalizeBlock(block: Block): Block {
       },
     }
   }
+  if (block.type === 'columns') {
+    return {
+      id: block.id,
+      type: 'columns',
+      data: {
+        columns: block.data.columns.map((col) => ({
+          children: col.children.map(normalizeBlock) as LeafBlock[],
+        })),
+      },
+    }
+  }
   return block
 }
 
@@ -495,6 +540,10 @@ export function validateBlock(block: Block): BlockValidationCode | null {
       return block.data.summary.trim() === '' ? 'summary-required' : null
     case 'group':
       return block.data.children.length === 0 ? 'children-required' : null
+    case 'columns':
+      return block.data.columns.every((col) => col.children.length === 0)
+        ? 'children-required'
+        : null
   }
 }
 
