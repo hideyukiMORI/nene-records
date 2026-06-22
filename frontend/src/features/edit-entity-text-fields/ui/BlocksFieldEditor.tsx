@@ -5,6 +5,7 @@ import {
   IconChevronDown,
   IconChevronUp,
   IconFileText,
+  IconImage,
   IconLayout,
   IconMenu,
   IconMessageCircle,
@@ -18,6 +19,7 @@ import {
   type Block,
   type BlockType,
   type CalloutBlockData,
+  type GalleryBlockData,
   type HeroBlockData,
   type TextBlockData,
 } from '@/shared/lib/blocks-document'
@@ -47,6 +49,8 @@ function blockTypeIcon(type: BlockType) {
       return IconMessageCircle
     case 'hero':
       return IconLayout
+    case 'gallery':
+      return IconImage
   }
 }
 
@@ -60,6 +64,8 @@ function rawSummary(block: Block): string {
     }
     case 'hero':
       return block.data.heading.replace(/\*/g, '')
+    case 'gallery':
+      return block.data.items.map((item) => item.caption ?? item.alt).join(', ')
   }
 }
 
@@ -128,7 +134,10 @@ export function BlocksFieldEditor({
     emit(next)
   }
 
-  const updateData = (blockId: string, data: TextBlockData | CalloutBlockData | HeroBlockData) => {
+  const updateData = (
+    blockId: string,
+    data: TextBlockData | CalloutBlockData | HeroBlockData | GalleryBlockData,
+  ) => {
     emit(
       blocks.map((block): Block => {
         if (block.id !== blockId) {
@@ -141,6 +150,8 @@ export function BlocksFieldEditor({
             return { ...block, data: data as CalloutBlockData }
           case 'hero':
             return { ...block, data: data as HeroBlockData }
+          case 'gallery':
+            return { ...block, data: data as GalleryBlockData }
         }
       }),
     )

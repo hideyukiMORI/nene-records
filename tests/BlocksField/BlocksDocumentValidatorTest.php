@@ -154,4 +154,42 @@ final class BlocksDocumentValidatorTest extends TestCase
             '[{"id":"h1","type":"hero","data":{"variant":"standard","heading":"x","media":{"mediaId":"1","url":"https://evil.example/x.png"}}}]',
         );
     }
+
+    public function testAcceptsValidGalleryBlock(): void
+    {
+        $json = json_encode([
+            ['id' => 'g1', 'type' => 'gallery', 'data' => [
+                'layout' => 'carousel',
+                'items' => [
+                    ['mediaId' => '1', 'url' => '/media/2026/06/a.png', 'alt' => 'A', 'caption' => 'First'],
+                    ['mediaId' => '2', 'url' => '/media/2026/06/b.png', 'alt' => 'B'],
+                ],
+            ]],
+        ], JSON_THROW_ON_ERROR);
+
+        $this->validator->validate($json);
+        $this->addToAssertionCount(1);
+    }
+
+    public function testRejectsGalleryWithoutItems(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->validator->validate('[{"id":"g1","type":"gallery","data":{"layout":"grid","items":[]}}]');
+    }
+
+    public function testRejectsGalleryItemWithoutAlt(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->validator->validate(
+            '[{"id":"g1","type":"gallery","data":{"layout":"carousel","items":[{"mediaId":"1","url":"/media/2026/06/a.png"}]}}]',
+        );
+    }
+
+    public function testRejectsGalleryItemNonRelativeUrl(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->validator->validate(
+            '[{"id":"g1","type":"gallery","data":{"layout":"grid","items":[{"mediaId":"1","url":"https://evil.example/a.png","alt":"A"}]}}]',
+        );
+    }
 }

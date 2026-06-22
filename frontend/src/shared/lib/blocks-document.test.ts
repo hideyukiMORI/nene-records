@@ -165,4 +165,37 @@ describe('blocks-document', () => {
     }[]
     expect(parsed[0]?.data.media?.url).toBe('/media/2026/06/a.png')
   })
+
+  it('parses, validates, and serializes gallery blocks', () => {
+    const doc = JSON.stringify([
+      {
+        id: 'g',
+        type: 'gallery',
+        data: {
+          layout: 'grid',
+          items: [
+            { mediaId: '1', url: '/media/2026/06/a.png', alt: 'A', caption: '  ' },
+            { mediaId: '2', url: '/media/2026/06/b.png', alt: '' },
+          ],
+        },
+      },
+    ])
+    const block = parseBlocksDocument(doc)[0]
+    expect(block?.type).toBe('gallery')
+    if (block?.type === 'gallery') {
+      expect(block.data.layout).toBe('grid')
+      expect(block.data.items).toHaveLength(2)
+      expect(validateBlock(block)).toBe('alt-required')
+
+      // empty caption dropped on serialize
+      const parsed = JSON.parse(serializeBlocksDocument([block])) as {
+        data: { items: { caption?: string }[] }
+      }[]
+      expect(parsed[0]?.data.items[0]).not.toHaveProperty('caption')
+    }
+
+    expect(
+      validateBlock({ id: 'g', type: 'gallery', data: { layout: 'carousel', items: [] } }),
+    ).toBe('items-required')
+  })
 })

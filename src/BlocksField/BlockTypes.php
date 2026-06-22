@@ -8,8 +8,8 @@ namespace NeNeRecords\BlocksField;
  * Whitelist of post-block types (#486). Each type has a known consumer renderer,
  * an admin inspector form, and a `data` shape validated by
  * {@see BlocksDocumentValidator}. Curated typed blocks (Gutenberg-style column),
- * NOT a free-form page builder. S1 ships `text` and `callout`, S2 adds `hero`;
- * later slices add `gallery`/`carousel` and `chart`.
+ * NOT a free-form page builder. S1 ships `text` and `callout`, S2 adds `hero`,
+ * S4 adds `gallery`; a later slice adds `chart`.
  */
 final class BlockTypes
 {
@@ -18,6 +18,7 @@ final class BlockTypes
         'text',
         'callout',
         'hero',
+        'gallery',
     ];
 
     public static function isValid(string $type): bool

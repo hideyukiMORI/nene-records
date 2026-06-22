@@ -551,6 +551,15 @@ export const ja: Partial<MessageCatalog> = {
   'admin.blocks.media.loading': '読み込み中…',
   'admin.blocks.media.loadError': 'メディアライブラリを読み込めませんでした。',
   'admin.blocks.media.empty': 'ライブラリに画像がありません。',
+  'admin.blocks.media.caption': 'キャプション',
+  'admin.blocks.media.addImage': '画像を追加',
+  'admin.blocks.type.gallery': 'ギャラリー',
+  'admin.blocks.type.gallery.desc': '画像のカルーセル／グリッド',
+  'admin.blocks.field.layout': 'レイアウト',
+  'admin.blocks.field.images': '画像',
+  'admin.blocks.galleryLayout.carousel': 'カルーセル',
+  'admin.blocks.galleryLayout.grid': 'グリッド',
+  'admin.blocks.error.altRequired': '代替テキストは必須です。',
 
   // ── Tags ─────────────────────────────────────────────────────────────────
   'admin.tags.eyebrow': '管理',

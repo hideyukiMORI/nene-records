@@ -31,6 +31,10 @@ final class BlocksDocumentValidator
     /** @var list<string> */
     private const HERO_VARIANTS = ['standard', 'minimal', 'fullbleed'];
 
+    /** @var list<string> */
+    private const GALLERY_LAYOUTS = ['carousel', 'grid'];
+
+    private const MAX_GALLERY_ITEMS = 50;
     private const MAX_HEADING_LEN = 300;
     private const MAX_LEAD_LEN = 2000;
     private const MAX_CTA_LABEL_LEN = 120;
@@ -102,6 +106,7 @@ final class BlocksDocumentValidator
             'text' => $this->validateTextData($path, $data, $errors),
             'callout' => $this->validateCalloutData($path, $data, $errors),
             'hero' => $this->validateHeroData($path, $data, $errors),
+            'gallery' => $this->validateGalleryData($path, $data, $errors),
             default => null,
         };
     }
@@ -201,6 +206,71 @@ final class BlocksDocumentValidator
         $alt = $media['alt'] ?? null;
         if ($alt !== null && (!is_string($alt) || strlen($alt) > self::MAX_HEADING_LEN)) {
             $errors[] = new ValidationError("{$field}.alt", 'Media alt must be a string (max ' . self::MAX_HEADING_LEN . ' chars).', 'invalid');
+        }
+    }
+
+    /**
+     * Gallery block (#486 S4): an ordered list of library images shown as a
+     * scroll-snap carousel (no-JS) or a grid. Every item needs a non-empty alt
+     * (C4 SEO/a11y); url must be a same-origin /media path.
+     *
+     * @param array<array-key, mixed> $data
+     * @param list<ValidationError> $errors
+     */
+    private function validateGalleryData(string $path, array $data, array &$errors): void
+    {
+        $layout = $data['layout'] ?? null;
+        if (!is_string($layout) || !in_array($layout, self::GALLERY_LAYOUTS, true)) {
+            $errors[] = new ValidationError("{$path}.data.layout", 'Gallery layout must be one of: ' . implode(', ', self::GALLERY_LAYOUTS) . '.', 'invalid');
+        }
+
+        $items = $data['items'] ?? null;
+        if (!is_array($items) || !array_is_list($items) || $items === []) {
+            $errors[] = new ValidationError("{$path}.data.items", 'Gallery requires at least one image.', 'invalid');
+
+            return;
+        }
+
+        if (count($items) > self::MAX_GALLERY_ITEMS) {
+            $errors[] = new ValidationError("{$path}.data.items", 'Gallery may contain at most ' . self::MAX_GALLERY_ITEMS . ' images.', 'invalid');
+
+            return;
+        }
+
+        foreach ($items as $index => $item) {
+            $this->validateGalleryItem("{$path}.data.items[{$index}]", $item, $errors);
+        }
+    }
+
+    /**
+     * @param list<ValidationError> $errors
+     */
+    private function validateGalleryItem(string $field, mixed $item, array &$errors): void
+    {
+        if (!is_array($item)) {
+            $errors[] = new ValidationError($field, 'Gallery item must be an object.', 'invalid');
+
+            return;
+        }
+
+        $mediaId = $item['mediaId'] ?? null;
+        if (!is_string($mediaId) || $mediaId === '' || strlen($mediaId) > self::MAX_ID_LEN) {
+            $errors[] = new ValidationError("{$field}.mediaId", 'Gallery item requires a non-empty mediaId.', 'invalid');
+        }
+
+        $url = $item['url'] ?? null;
+        if (!is_string($url) || $url === '' || strlen($url) > self::MAX_URL_LEN || !str_starts_with($url, '/')) {
+            $errors[] = new ValidationError("{$field}.url", 'Gallery item url must be a site-relative path (e.g. /media/...).', 'invalid');
+        }
+
+        $alt = $item['alt'] ?? null;
+        if (!is_string($alt) || $alt === '' || strlen($alt) > self::MAX_HEADING_LEN) {
+            $errors[] = new ValidationError("{$field}.alt", 'Gallery item requires alt text (C4).', 'invalid');
+        }
+
+        $caption = $item['caption'] ?? null;
+        if ($caption !== null && (!is_string($caption) || strlen($caption) > self::MAX_HEADING_LEN)) {
+            $errors[] = new ValidationError("{$field}.caption", 'Gallery caption must be a string (max ' . self::MAX_HEADING_LEN . ' chars).', 'invalid');
         }
     }
 

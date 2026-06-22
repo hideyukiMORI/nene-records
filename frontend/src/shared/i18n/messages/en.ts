@@ -554,6 +554,15 @@ export const en = {
   'admin.blocks.media.loading': 'Loading…',
   'admin.blocks.media.loadError': 'Could not load the media library.',
   'admin.blocks.media.empty': 'No images in the library yet.',
+  'admin.blocks.media.caption': 'Caption',
+  'admin.blocks.media.addImage': 'Add image',
+  'admin.blocks.type.gallery': 'Gallery',
+  'admin.blocks.type.gallery.desc': 'Carousel or grid of images',
+  'admin.blocks.field.layout': 'Layout',
+  'admin.blocks.field.images': 'Images',
+  'admin.blocks.galleryLayout.carousel': 'Carousel',
+  'admin.blocks.galleryLayout.grid': 'Grid',
+  'admin.blocks.error.altRequired': 'Alt text is required.',
 
   // ── Tags ─────────────────────────────────────────────────────────────────
   'admin.tags.eyebrow': 'Manage',

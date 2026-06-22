@@ -76,4 +76,27 @@ describe('BlocksRenderer', () => {
     expect(img).not.toBeNull()
     expect(img?.getAttribute('alt')).toBe('Cover')
   })
+
+  it('renders gallery slides with captions', () => {
+    const doc = JSON.stringify([
+      {
+        id: 'g',
+        type: 'gallery',
+        data: {
+          layout: 'carousel',
+          items: [
+            { mediaId: '1', url: '/media/2026/06/a.png', alt: 'First', caption: 'Cap1' },
+            { mediaId: '2', url: '/media/2026/06/b.png', alt: 'Second' },
+          ],
+        },
+      },
+    ])
+
+    const { container } = renderWithProviders(<BlocksRenderer documentJson={doc} />)
+
+    expect(container.querySelector('.gallery--carousel')).not.toBeNull()
+    expect(container.querySelectorAll('.gallery__slide')).toHaveLength(2)
+    expect(screen.getByText('Cap1')).toBeInTheDocument()
+    expect(container.querySelector('img[alt="First"]')).not.toBeNull()
+  })
 })

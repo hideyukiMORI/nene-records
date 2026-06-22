@@ -2203,3 +2203,38 @@
   border-block: 1px solid var(--color-border);
   background: var(--color-surface-sunken);
 }
+/* gallery block (#486 S4) — no-JS scroll-snap carousel or a CSS grid. */
+.nene-public .gallery {
+  margin-block: var(--space-xl);
+}
+.nene-public .gallery__track {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.nene-public .gallery--carousel .gallery__track {
+  display: flex;
+  gap: var(--space-md);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-bottom: var(--space-2xs);
+}
+.nene-public .gallery--carousel .gallery__slide {
+  flex: 0 0 min(80%, 360px);
+  scroll-snap-align: start;
+}
+.nene-public .gallery--grid .gallery__track {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: var(--space-sm);
+}
+.nene-public .gallery__media {
+  width: 100%;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+}
+.nene-public .gallery__cap {
+  margin: var(--space-2xs) 0 0;
+  font-size: var(--text-meta);
+  color: var(--color-text-muted);
+}

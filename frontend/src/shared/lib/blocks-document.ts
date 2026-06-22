@@ -1,5 +1,5 @@
 /**
- * Typed post-block document model (epic #486 S1b–S2).
+ * Typed post-block document model (epic #486 S1b–S4).
  *
  * A `blocks` field value is an ordered list of curated, typed blocks
  * (`[{ id, type, data }]`) serialized to a JSON string. The trust boundary is the
@@ -12,7 +12,7 @@
  * shared/ui) can import it.
  */
 
-const BLOCK_TYPES = ['text', 'callout', 'hero'] as const
+const BLOCK_TYPES = ['text', 'callout', 'hero', 'gallery'] as const
 export type BlockType = (typeof BLOCK_TYPES)[number]
 
 export const CALLOUT_KINDS = ['info', 'warn', 'ok', 'danger'] as const
@@ -20,6 +20,9 @@ export type CalloutKind = (typeof CALLOUT_KINDS)[number]
 
 export const HERO_VARIANTS = ['standard', 'minimal', 'fullbleed'] as const
 export type HeroVariant = (typeof HERO_VARIANTS)[number]
+
+export const GALLERY_LAYOUTS = ['carousel', 'grid'] as const
+export type GalleryLayout = (typeof GALLERY_LAYOUTS)[number]
 
 export interface TextBlockData {
   markdown: string
@@ -54,16 +57,32 @@ export interface HeroBlockData {
   media?: HeroMedia
 }
 
+/** A gallery slide: a library image (url like HeroMedia) + required alt (C4) + caption. */
+export interface GalleryItem {
+  mediaId: string
+  url: string
+  alt: string
+  caption?: string
+}
+
+export interface GalleryBlockData {
+  layout: GalleryLayout
+  items: GalleryItem[]
+}
+
 export type Block =
   | { id: string; type: 'text'; data: TextBlockData }
   | { id: string; type: 'callout'; data: CalloutBlockData }
   | { id: string; type: 'hero'; data: HeroBlockData }
+  | { id: string; type: 'gallery'; data: GalleryBlockData }
 
 export type BlockValidationCode =
   | 'markdown-required'
   | 'body-required'
   | 'kind-invalid'
   | 'heading-required'
+  | 'items-required'
+  | 'alt-required'
 
 function isBlockType(value: string): value is BlockType {
   return (BLOCK_TYPES as readonly string[]).includes(value)
@@ -75,6 +94,10 @@ function isCalloutKind(value: unknown): value is CalloutKind {
 
 function isHeroVariant(value: unknown): value is HeroVariant {
   return typeof value === 'string' && (HERO_VARIANTS as readonly string[]).includes(value)
+}
+
+function isGalleryLayout(value: unknown): value is GalleryLayout {
+  return typeof value === 'string' && (GALLERY_LAYOUTS as readonly string[]).includes(value)
 }
 
 function optionalString(record: Record<string, unknown>, key: string): string | undefined {
@@ -95,6 +118,30 @@ function coerceMedia(raw: unknown): HeroMedia | undefined {
     url: record.url,
     ...(alt !== undefined && alt !== '' ? { alt } : {}),
   }
+}
+
+function coerceGalleryItems(raw: unknown): GalleryItem[] {
+  if (!Array.isArray(raw)) {
+    return []
+  }
+  const items: GalleryItem[] = []
+  for (const entry of raw) {
+    if (typeof entry !== 'object' || entry === null) {
+      continue
+    }
+    const record = entry as Record<string, unknown>
+    if (typeof record.url !== 'string' || record.url === '') {
+      continue
+    }
+    const caption = typeof record.caption === 'string' ? record.caption : undefined
+    items.push({
+      mediaId: typeof record.mediaId === 'string' ? record.mediaId : '',
+      url: record.url,
+      alt: typeof record.alt === 'string' ? record.alt : '',
+      ...(caption !== undefined && caption !== '' ? { caption } : {}),
+    })
+  }
+  return items
 }
 
 /** Client-generated stable key (React key / future anchor); opaque, <= 64 chars. */
@@ -123,6 +170,8 @@ export function createBlock(type: BlockType): Block {
           ghostUrl: '',
         },
       }
+    case 'gallery':
+      return { id: newBlockId(), type, data: { layout: 'carousel', items: [] } }
   }
 }
 
@@ -208,6 +257,15 @@ function coerceBlock(raw: unknown, index: number): Block | null {
           media: coerceMedia(record.media),
         },
       }
+    case 'gallery':
+      return {
+        id,
+        type,
+        data: {
+          layout: isGalleryLayout(record.layout) ? record.layout : 'carousel',
+          items: coerceGalleryItems(record.items),
+        },
+      }
   }
 }
 
@@ -242,6 +300,23 @@ export function serializeBlocksDocument(blocks: Block[]): string {
         },
       }
     }
+    if (block.type === 'gallery') {
+      return {
+        id: block.id,
+        type: 'gallery',
+        data: {
+          layout: block.data.layout,
+          items: block.data.items.map((item) => ({
+            mediaId: item.mediaId,
+            url: item.url,
+            alt: item.alt,
+            ...(item.caption !== undefined && item.caption.trim() !== ''
+              ? { caption: item.caption }
+              : {}),
+          })),
+        },
+      }
+    }
     return block
   })
   return JSON.stringify(normalized)
@@ -270,6 +345,11 @@ export function validateBlock(block: Block): BlockValidationCode | null {
       return block.data.body.trim() === '' ? 'body-required' : null
     case 'hero':
       return block.data.heading.trim() === '' ? 'heading-required' : null
+    case 'gallery':
+      if (block.data.items.length === 0) {
+        return 'items-required'
+      }
+      return block.data.items.some((item) => item.alt.trim() === '') ? 'alt-required' : null
   }
 }
 

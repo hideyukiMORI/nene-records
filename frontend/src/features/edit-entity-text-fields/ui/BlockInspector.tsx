@@ -2,13 +2,18 @@ import { useState } from 'react'
 import { type Media } from '@/entities/media'
 import { type MessageKey, useTranslation } from '@/shared/i18n'
 import { Button, Input, ResponsiveImage, Select, Stack } from '@/shared/ui'
+import { IconChevronDown, IconChevronUp, IconX } from '@/shared/ui/icons/Icons'
 import {
   CALLOUT_KINDS,
+  GALLERY_LAYOUTS,
   HERO_VARIANTS,
   type Block,
   type BlockValidationCode,
   type CalloutBlockData,
   type CalloutKind,
+  type GalleryBlockData,
+  type GalleryItem,
+  type GalleryLayout,
   type HeroBlockData,
   type HeroMedia,
   type HeroVariant,
@@ -22,7 +27,7 @@ interface BlockInspectorProps {
   errorCode: BlockValidationCode | null
   disabled: boolean
   idPrefix: string
-  onChange: (data: TextBlockData | CalloutBlockData | HeroBlockData) => void
+  onChange: (data: TextBlockData | CalloutBlockData | HeroBlockData | GalleryBlockData) => void
 }
 
 const KIND_LABEL_KEY: Record<CalloutKind, MessageKey> = {
@@ -38,7 +43,12 @@ const VARIANT_LABEL_KEY: Record<HeroVariant, MessageKey> = {
   fullbleed: 'admin.blocks.heroVariant.fullbleed',
 }
 
-/** Settings form for the selected block (text / callout / hero). */
+const LAYOUT_LABEL_KEY: Record<GalleryLayout, MessageKey> = {
+  carousel: 'admin.blocks.galleryLayout.carousel',
+  grid: 'admin.blocks.galleryLayout.grid',
+}
+
+/** Settings form for the selected block (text / callout / hero / gallery). */
 export function BlockInspector({
   block,
   errorCode,
@@ -100,6 +110,37 @@ export function BlockInspector({
           error={errorCode === 'body-required' ? t('admin.blocks.error.bodyRequired') : undefined}
           onChange={(body) => {
             onChange({ ...data, body })
+          }}
+        />
+      </Stack>
+    )
+  }
+
+  if (block.type === 'gallery') {
+    const data = block.data
+    return (
+      <Stack gap="sm">
+        <Select
+          id={`${idPrefix}-layout`}
+          label={t('admin.blocks.field.layout')}
+          value={data.layout}
+          disabled={disabled}
+          onChange={(event) => {
+            onChange({ ...data, layout: event.target.value as GalleryLayout })
+          }}
+        >
+          {GALLERY_LAYOUTS.map((layout) => (
+            <option key={layout} value={layout}>
+              {t(LAYOUT_LABEL_KEY[layout])}
+            </option>
+          ))}
+        </Select>
+        <GalleryItemsField
+          idPrefix={idPrefix}
+          items={data.items}
+          disabled={disabled}
+          onChange={(items) => {
+            onChange({ ...data, items })
           }}
         />
       </Stack>
@@ -289,6 +330,154 @@ function HeroMediaField({ idPrefix, media, disabled, onChange }: HeroMediaFieldP
           onSelect={handleSelect}
           onClose={() => {
             setPickerOpen(false)
+          }}
+        />
+      ) : null}
+    </div>
+  )
+}
+
+interface GalleryItemsFieldProps {
+  idPrefix: string
+  items: GalleryItem[]
+  disabled: boolean
+  onChange: (items: GalleryItem[]) => void
+}
+
+/** Repeater of gallery slides — each a library image + required alt (C4) + caption (#486 S4). */
+function GalleryItemsField({ idPrefix, items, disabled, onChange }: GalleryItemsFieldProps) {
+  const { t } = useTranslation()
+  // null = closed, -1 = adding a new slide, >= 0 = replacing slide i's image
+  const [pickFor, setPickFor] = useState<number | null>(null)
+
+  const update = (index: number, patch: Partial<GalleryItem>) => {
+    onChange(items.map((item, i) => (i === index ? { ...item, ...patch } : item)))
+  }
+  const move = (index: number, direction: -1 | 1) => {
+    const target = index + direction
+    if (target < 0 || target >= items.length) {
+      return
+    }
+    const next = items.slice()
+    const [moved] = next.splice(index, 1)
+    next.splice(target, 0, moved)
+    onChange(next)
+  }
+  const remove = (index: number) => {
+    onChange(items.filter((_, i) => i !== index))
+  }
+  const handleSelect = (media: Media) => {
+    if (pickFor === -1) {
+      onChange([...items, { mediaId: String(media.id), url: media.url, alt: media.altText ?? '' }])
+    } else if (pickFor !== null) {
+      update(pickFor, { mediaId: String(media.id), url: media.url })
+    }
+    setPickFor(null)
+  }
+
+  return (
+    <div className="flex flex-col gap-stack-sm">
+      <span className="font-sans text-caption font-medium text-text-primary">
+        {t('admin.blocks.field.images')}
+      </span>
+      {items.map((item, index) => (
+        <div
+          key={item.mediaId}
+          className="flex flex-col gap-stack-xs rounded-md border border-border p-inline-sm"
+        >
+          <div className="flex items-center gap-inline-sm">
+            <ResponsiveImage
+              src={item.url}
+              alt={item.alt}
+              sizes="80px"
+              className="h-12 w-16 rounded border border-border object-cover"
+            />
+            <Button
+              variant="secondary"
+              size="sm"
+              disabled={disabled}
+              onClick={() => {
+                setPickFor(index)
+              }}
+            >
+              {t('admin.blocks.media.change')}
+            </Button>
+            <span className="flex-1" />
+            <button
+              type="button"
+              className="rounded p-1 text-text-muted hover:text-text-primary disabled:opacity-40"
+              title={t('admin.blocks.moveUp')}
+              disabled={disabled || index === 0}
+              onClick={() => {
+                move(index, -1)
+              }}
+            >
+              <IconChevronUp size={15} />
+            </button>
+            <button
+              type="button"
+              className="rounded p-1 text-text-muted hover:text-text-primary disabled:opacity-40"
+              title={t('admin.blocks.moveDown')}
+              disabled={disabled || index === items.length - 1}
+              onClick={() => {
+                move(index, 1)
+              }}
+            >
+              <IconChevronDown size={15} />
+            </button>
+            <button
+              type="button"
+              className="rounded p-1 text-text-muted hover:text-danger disabled:opacity-40"
+              title={t('common.actions.delete')}
+              disabled={disabled}
+              onClick={() => {
+                remove(index)
+              }}
+            >
+              <IconX size={15} />
+            </button>
+          </div>
+          <Input
+            id={`${idPrefix}-item-${String(index)}-alt`}
+            label={t('admin.blocks.media.alt')}
+            value={item.alt}
+            disabled={disabled}
+            autoComplete="off"
+            error={item.alt.trim() === '' ? t('admin.blocks.error.altRequired') : undefined}
+            onChange={(event) => {
+              update(index, { alt: event.target.value })
+            }}
+          />
+          <Input
+            id={`${idPrefix}-item-${String(index)}-caption`}
+            label={t('admin.blocks.media.caption')}
+            value={item.caption ?? ''}
+            disabled={disabled}
+            autoComplete="off"
+            onChange={(event) => {
+              update(index, { caption: event.target.value })
+            }}
+          />
+        </div>
+      ))}
+      <div>
+        <Button
+          variant="secondary"
+          size="sm"
+          disabled={disabled}
+          onClick={() => {
+            setPickFor(-1)
+          }}
+        >
+          {t('admin.blocks.media.addImage')}
+        </Button>
+      </div>
+      {pickFor !== null ? (
+        <MediaSelectorModal
+          currentMediaId={pickFor >= 0 ? (items[pickFor]?.mediaId ?? null) : null}
+          onSelect={handleSelect}
+          onClose={() => {
+            setPickFor(null)
           }}
         />
       ) : null}

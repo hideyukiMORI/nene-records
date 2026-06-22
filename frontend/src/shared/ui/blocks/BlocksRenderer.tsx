@@ -3,6 +3,7 @@ import {
   parseBlocksDocument,
   type Block,
   type CalloutKind,
+  type GalleryBlockData,
   type HeroBlockData,
 } from '@/shared/lib/blocks-document'
 import { PublicMarkdownContent } from '@/shared/ui/markdown'
@@ -65,7 +66,38 @@ function ConsumerBlock({ block }: { block: Block }) {
     }
     case 'hero':
       return <ConsumerHero data={block.data} />
+    case 'gallery':
+      return <ConsumerGallery data={block.data} />
   }
+}
+
+/**
+ * Gallery block (#486 S4): a no-JS scroll-snap carousel or a CSS grid of library
+ * images. Each slide's alt is the C4 a11y/SEO projection (the <img alt>).
+ */
+function ConsumerGallery({ data }: { data: GalleryBlockData }) {
+  if (data.items.length === 0) {
+    return null
+  }
+  return (
+    <section className={`gallery gallery--${data.layout}`}>
+      <ul className="gallery__track">
+        {data.items.map((item) => (
+          <li className="gallery__slide" key={item.mediaId}>
+            <ResponsiveImage
+              src={item.url}
+              alt={item.alt}
+              sizes="(max-width: 768px) 90vw, 360px"
+              className="gallery__media"
+            />
+            {item.caption !== undefined && item.caption.trim() !== '' ? (
+              <p className="gallery__cap">{item.caption}</p>
+            ) : null}
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
 }
 
 /**
