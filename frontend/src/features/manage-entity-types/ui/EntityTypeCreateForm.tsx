@@ -11,6 +11,7 @@ const STARTER_LABEL_KEY: Record<EntityTypeStarter, MessageKey> = {
   blank: 'admin.entityTypes.starter.blank',
   article: 'admin.entityTypes.starter.article',
   rich_page: 'admin.entityTypes.starter.richPage',
+  custom_page: 'admin.entityTypes.starter.customPage',
 }
 
 export interface EntityTypeCreateFormProps {

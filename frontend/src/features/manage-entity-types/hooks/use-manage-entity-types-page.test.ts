@@ -79,6 +79,34 @@ describe('useManageEntityTypesPage', () => {
     expect(fields.find((f) => f.field_key === 'content')?.data_type).toBe('blocks')
   })
 
+  it('provisions title + a bundle body for the custom_page starter (and sets custom layout)', async () => {
+    seedEntityTypes([])
+
+    const { result } = renderHookWithProviders(() => useManageEntityTypesPage())
+    await waitFor(() => {
+      expect(result.current.items).toHaveLength(0)
+    })
+
+    await act(async () => {
+      // Resolves only if the post-create default_layout=custom update also succeeds.
+      await result.current.createEntityType({
+        name: 'Promo',
+        slug: 'promo',
+        isPinned: false,
+        starter: 'custom_page',
+      })
+    })
+
+    await waitFor(() => {
+      expect(result.current.items.map((t) => t.slug)).toContain('promo')
+    })
+
+    const created = result.current.items.find((t) => t.slug === 'promo')
+    const fields = fieldDefStoreSnapshot().filter((f) => f.entity_type_id === created?.id)
+    expect(fields.map((f) => f.field_key)).toEqual(['title', 'content'])
+    expect(fields.find((f) => f.field_key === 'content')?.data_type).toBe('bundle')
+  })
+
   it('deletes the targeted entity type', async () => {
     seedEntityTypes([
       { id: 1, name: 'Article', slug: 'article' },

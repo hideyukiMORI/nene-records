@@ -388,6 +388,7 @@ export const en = {
   'admin.entityTypes.starter.blank': 'Blank (no fields)',
   'admin.entityTypes.starter.article': 'Article (title + Markdown body)',
   'admin.entityTypes.starter.richPage': 'Rich page (title + blocks body)',
+  'admin.entityTypes.starter.customPage': 'Custom page (title + sandboxed bundle, custom layout)',
   'admin.entityTypes.editForm.title': 'Edit content type',
   'admin.entityTypes.editForm.save': 'Save changes',
   'admin.entityTypes.editForm.saving': 'Saving…',
