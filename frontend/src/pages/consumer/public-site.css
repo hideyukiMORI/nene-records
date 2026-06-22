@@ -2296,3 +2296,21 @@
   color: var(--color-text-muted);
   text-align: center;
 }
+/* group block (#491 WS2) — layout container with a tone (plain / muted band / card). */
+.nene-public .group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  margin-block: var(--space-xl);
+}
+.nene-public .group[data-group-tone='muted'] {
+  background: var(--color-surface-sunken);
+  padding: var(--space-lg);
+  border-radius: var(--radius-md);
+}
+.nene-public .group[data-group-tone='card'] {
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  padding: var(--space-lg);
+  border-radius: var(--radius-md);
+}

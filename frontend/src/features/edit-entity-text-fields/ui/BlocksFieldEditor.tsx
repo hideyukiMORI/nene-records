@@ -4,6 +4,7 @@ import { Button, Card, EmptyState, Stack, Text } from '@/shared/ui'
 import {
   IconChevronDown,
   IconChevronUp,
+  IconCopy,
   IconFileText,
   IconImage,
   IconLayers,
@@ -22,6 +23,7 @@ import {
   type CalloutBlockData,
   type ChartBlockData,
   type GalleryBlockData,
+  type GroupBlockData,
   type HeroBlockData,
   type TextBlockData,
 } from '@/shared/lib/blocks-document'
@@ -57,6 +59,8 @@ function blockTypeIcon(type: BlockType) {
       return IconImage
     case 'chart':
       return IconLayers
+    case 'group':
+      return IconCopy
   }
 }
 
@@ -76,6 +80,8 @@ function rawSummary(block: Block): string {
       return block.data.title !== undefined && block.data.title.trim() !== ''
         ? block.data.title
         : block.data.summary
+    case 'group':
+      return block.data.children.map((child) => rawSummary(child)).join(' · ')
   }
 }
 
@@ -160,7 +166,13 @@ export function BlocksFieldEditor({
 
   const updateData = (
     blockId: string,
-    data: TextBlockData | CalloutBlockData | HeroBlockData | GalleryBlockData | ChartBlockData,
+    data:
+      | TextBlockData
+      | CalloutBlockData
+      | HeroBlockData
+      | GalleryBlockData
+      | ChartBlockData
+      | GroupBlockData,
   ) => {
     emit(
       blocks.map((block): Block => {
@@ -178,6 +190,8 @@ export function BlocksFieldEditor({
             return { ...block, data: data as GalleryBlockData }
           case 'chart':
             return { ...block, data: data as ChartBlockData }
+          case 'group':
+            return { ...block, data: data as GroupBlockData }
         }
       }),
     )

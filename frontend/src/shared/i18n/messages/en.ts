@@ -584,6 +584,17 @@ export const en = {
   'admin.blocks.error.itemsRequired': 'Add at least one image.',
   'admin.blocks.error.seriesRequired': 'Add at least two data points.',
   'admin.blocks.error.labelRequired': 'Label is required.',
+  // group (#491 WS2)
+  'admin.blocks.type.group': 'Group',
+  'admin.blocks.type.group.desc': 'A container that lays out other blocks',
+  'admin.blocks.field.tone': 'Tone',
+  'admin.blocks.field.children': 'Blocks in this group',
+  'admin.blocks.groupTone.plain': 'Plain',
+  'admin.blocks.groupTone.muted': 'Muted band',
+  'admin.blocks.groupTone.card': 'Card',
+  'admin.blocks.childEdit': 'Edit',
+  'admin.blocks.childCollapse': 'Done',
+  'admin.blocks.error.childrenRequired': 'Add at least one block.',
 
   // ── Home hero (#486) ──────────────────────────────────────────────────────
   'admin.homeHero.title': 'Home hero',

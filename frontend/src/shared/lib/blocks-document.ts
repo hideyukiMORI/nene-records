@@ -12,7 +12,7 @@
  * shared/ui) can import it.
  */
 
-const BLOCK_TYPES = ['text', 'callout', 'hero', 'gallery', 'chart'] as const
+const BLOCK_TYPES = ['text', 'callout', 'hero', 'gallery', 'chart', 'group'] as const
 export type BlockType = (typeof BLOCK_TYPES)[number]
 
 export const CALLOUT_KINDS = ['info', 'warn', 'ok', 'danger'] as const
@@ -26,6 +26,9 @@ export type GalleryLayout = (typeof GALLERY_LAYOUTS)[number]
 
 export const CHART_TYPES = ['bar', 'line'] as const
 export type ChartType = (typeof CHART_TYPES)[number]
+
+export const GROUP_TONES = ['plain', 'muted', 'card'] as const
+export type GroupTone = (typeof GROUP_TONES)[number]
 
 export interface TextBlockData {
   markdown: string
@@ -86,12 +89,21 @@ export interface ChartBlockData {
   summary: string
 }
 
-export type Block =
+/** Leaf (non-container) blocks. A group's children are leaf blocks only (depth 2). */
+export type LeafBlock =
   | { id: string; type: 'text'; data: TextBlockData }
   | { id: string; type: 'callout'; data: CalloutBlockData }
   | { id: string; type: 'hero'; data: HeroBlockData }
   | { id: string; type: 'gallery'; data: GalleryBlockData }
   | { id: string; type: 'chart'; data: ChartBlockData }
+
+/** Layout container holding leaf child blocks (#491 WS2); not nestable in another container. */
+export interface GroupBlockData {
+  tone: GroupTone
+  children: LeafBlock[]
+}
+
+export type Block = LeafBlock | { id: string; type: 'group'; data: GroupBlockData }
 
 export type BlockValidationCode =
   | 'markdown-required'
@@ -103,6 +115,7 @@ export type BlockValidationCode =
   | 'series-required'
   | 'series-label-required'
   | 'summary-required'
+  | 'children-required'
 
 function isBlockType(value: string): value is BlockType {
   return (BLOCK_TYPES as readonly string[]).includes(value)
@@ -114,6 +127,10 @@ function isCalloutKind(value: unknown): value is CalloutKind {
 
 function isHeroVariant(value: unknown): value is HeroVariant {
   return typeof value === 'string' && (HERO_VARIANTS as readonly string[]).includes(value)
+}
+
+function isGroupTone(value: unknown): value is GroupTone {
+  return typeof value === 'string' && (GROUP_TONES as readonly string[]).includes(value)
 }
 
 function isGalleryLayout(value: unknown): value is GalleryLayout {
@@ -223,6 +240,8 @@ export function createBlock(type: BlockType): Block {
         type,
         data: { chartType: 'bar', title: '', series: [], summary: '' },
       }
+    case 'group':
+      return { id: newBlockId(), type, data: { tone: 'plain', children: [] } }
   }
 }
 
@@ -249,7 +268,7 @@ export function parseBlocksDocument(json: string): Block[] {
 
   const blocks: Block[] = []
   for (const [index, raw] of decoded.entries()) {
-    const block = coerceBlock(raw, index)
+    const block = coerceBlock(raw, index, true)
     if (block !== null) {
       blocks.push(block)
     }
@@ -257,7 +276,7 @@ export function parseBlocksDocument(json: string): Block[] {
   return blocks
 }
 
-function coerceBlock(raw: unknown, index: number): Block | null {
+function coerceBlock(raw: unknown, index: number, allowContainers: boolean): Block | null {
   if (typeof raw !== 'object' || raw === null) {
     return null
   }
@@ -265,6 +284,11 @@ function coerceBlock(raw: unknown, index: number): Block | null {
   const candidate = raw as Record<string, unknown>
   const type = candidate.type
   if (typeof type !== 'string' || !isBlockType(type)) {
+    return null
+  }
+
+  // Container blocks are not nestable inside another container (depth 2).
+  if (!allowContainers && type === 'group') {
     return null
   }
 
@@ -332,72 +356,94 @@ function coerceBlock(raw: unknown, index: number): Block | null {
           summary: typeof record.summary === 'string' ? record.summary : '',
         },
       }
+    case 'group': {
+      const rawChildren = Array.isArray(record.children) ? record.children : []
+      const children = rawChildren
+        .map((child, childIndex) => coerceBlock(child, childIndex, false))
+        .filter((child): child is LeafBlock => child !== null && child.type !== 'group')
+      return {
+        id,
+        type,
+        data: { tone: isGroupTone(record.tone) ? record.tone : 'plain', children },
+      }
+    }
   }
 }
 
 /** Serialize the editor's blocks to the stored JSON string, dropping empty optionals. */
 export function serializeBlocksDocument(blocks: Block[]): string {
-  const normalized = blocks.map((block): Block => {
-    if (block.type === 'callout') {
-      const { kind, body, title } = block.data
-      return {
-        id: block.id,
-        type: 'callout',
-        data: { kind, body, ...optional({ title }) },
-      }
+  return JSON.stringify(blocks.map(normalizeBlock))
+}
+
+function normalizeBlock(block: Block): Block {
+  if (block.type === 'callout') {
+    const { kind, body, title } = block.data
+    return {
+      id: block.id,
+      type: 'callout',
+      data: { kind, body, ...optional({ title }) },
     }
-    if (block.type === 'hero') {
-      const { variant, heading } = block.data
-      return {
-        id: block.id,
-        type: 'hero',
-        data: {
-          variant,
-          heading,
-          ...optional({
-            kicker: block.data.kicker,
-            lead: block.data.lead,
-            ctaLabel: block.data.ctaLabel,
-            ctaUrl: block.data.ctaUrl,
-            ghostLabel: block.data.ghostLabel,
-            ghostUrl: block.data.ghostUrl,
-          }),
-          ...(block.data.media !== undefined ? { media: block.data.media } : {}),
-        },
-      }
+  }
+  if (block.type === 'hero') {
+    const { variant, heading } = block.data
+    return {
+      id: block.id,
+      type: 'hero',
+      data: {
+        variant,
+        heading,
+        ...optional({
+          kicker: block.data.kicker,
+          lead: block.data.lead,
+          ctaLabel: block.data.ctaLabel,
+          ctaUrl: block.data.ctaUrl,
+          ghostLabel: block.data.ghostLabel,
+          ghostUrl: block.data.ghostUrl,
+        }),
+        ...(block.data.media !== undefined ? { media: block.data.media } : {}),
+      },
     }
-    if (block.type === 'gallery') {
-      return {
-        id: block.id,
-        type: 'gallery',
-        data: {
-          layout: block.data.layout,
-          items: block.data.items.map((item) => ({
-            mediaId: item.mediaId,
-            url: item.url,
-            alt: item.alt,
-            ...(item.caption !== undefined && item.caption.trim() !== ''
-              ? { caption: item.caption }
-              : {}),
-          })),
-        },
-      }
+  }
+  if (block.type === 'gallery') {
+    return {
+      id: block.id,
+      type: 'gallery',
+      data: {
+        layout: block.data.layout,
+        items: block.data.items.map((item) => ({
+          mediaId: item.mediaId,
+          url: item.url,
+          alt: item.alt,
+          ...(item.caption !== undefined && item.caption.trim() !== ''
+            ? { caption: item.caption }
+            : {}),
+        })),
+      },
     }
-    if (block.type === 'chart') {
-      return {
-        id: block.id,
-        type: 'chart',
-        data: {
-          chartType: block.data.chartType,
-          ...optional({ title: block.data.title }),
-          series: block.data.series,
-          summary: block.data.summary,
-        },
-      }
+  }
+  if (block.type === 'chart') {
+    return {
+      id: block.id,
+      type: 'chart',
+      data: {
+        chartType: block.data.chartType,
+        ...optional({ title: block.data.title }),
+        series: block.data.series,
+        summary: block.data.summary,
+      },
     }
-    return block
-  })
-  return JSON.stringify(normalized)
+  }
+  if (block.type === 'group') {
+    return {
+      id: block.id,
+      type: 'group',
+      data: {
+        tone: block.data.tone,
+        children: block.data.children.map(normalizeBlock) as LeafBlock[],
+      },
+    }
+  }
+  return block
 }
 
 /** Keep only fields whose value is defined, preserving empty strings. */
@@ -447,6 +493,8 @@ export function validateBlock(block: Block): BlockValidationCode | null {
         return 'series-label-required'
       }
       return block.data.summary.trim() === '' ? 'summary-required' : null
+    case 'group':
+      return block.data.children.length === 0 ? 'children-required' : null
   }
 }
 

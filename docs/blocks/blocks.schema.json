@@ -18,7 +18,7 @@
           "minLength": 1,
           "maxLength": 64
         },
-        "type": { "enum": ["text", "callout", "hero", "gallery", "chart"] },
+        "type": { "enum": ["text", "callout", "hero", "gallery", "chart", "group"] },
         "data": { "type": "object" }
       },
       "allOf": [
@@ -41,8 +41,22 @@
         {
           "if": { "properties": { "type": { "const": "chart" } } },
           "then": { "properties": { "data": { "$ref": "#/$defs/chartData" } } }
+        },
+        {
+          "if": { "properties": { "type": { "const": "group" } } },
+          "then": { "properties": { "data": { "$ref": "#/$defs/groupData" } } }
         }
       ]
+    },
+    "groupData": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tone", "children"],
+      "description": "Layout container holding child blocks (#491 WS2). The server validator further restricts children to leaf blocks (no container nesting; depth 2).",
+      "properties": {
+        "tone": { "enum": ["plain", "muted", "card"] },
+        "children": { "type": "array", "maxItems": 30, "items": { "$ref": "#/$defs/block" } }
+      }
     },
     "textData": {
       "type": "object",

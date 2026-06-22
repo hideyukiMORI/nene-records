@@ -37,6 +37,13 @@ final class BlocksDocumentValidator
     /** @var list<string> */
     private const CHART_TYPES = ['bar', 'line'];
 
+    /** Layout/container blocks that hold child blocks; cannot be nested in each other (depth 2). */
+    private const CONTAINER_TYPES = ['group'];
+
+    private const GROUP_TONES = ['plain', 'muted', 'card'];
+
+    private const MAX_GROUP_CHILDREN = 30;
+
     private const MAX_GALLERY_ITEMS = 50;
     private const MAX_SERIES_POINTS = 60;
     private const MAX_SERIES_LABEL_LEN = 120;
@@ -65,9 +72,10 @@ final class BlocksDocumentValidator
         }
 
         $errors = [];
+        $count = 0;
 
         foreach ($decoded as $index => $block) {
-            $this->validateBlock($index, $block, $errors);
+            $this->validateBlock("value[{$index}]", $block, true, $count, $errors);
         }
 
         if ($errors !== []) {
@@ -78,9 +86,16 @@ final class BlocksDocumentValidator
     /**
      * @param list<ValidationError> $errors
      */
-    private function validateBlock(int $index, mixed $block, array &$errors): void
+    private function validateBlock(string $path, mixed $block, bool $allowContainers, int &$count, array &$errors): void
     {
-        $path = "value[{$index}]";
+        // Cap total nodes including nested children; add the overflow error once.
+        if (++$count > self::MAX_BLOCKS) {
+            if ($count === self::MAX_BLOCKS + 1) {
+                $errors[] = new ValidationError('value', 'A blocks document may contain at most ' . self::MAX_BLOCKS . ' blocks (including nested).', 'invalid');
+            }
+
+            return;
+        }
 
         if (!is_array($block)) {
             $errors[] = new ValidationError($path, 'Each block must be an object.', 'invalid');
@@ -100,6 +115,12 @@ final class BlocksDocumentValidator
             return;
         }
 
+        if (!$allowContainers && in_array($type, self::CONTAINER_TYPES, true)) {
+            $errors[] = new ValidationError("{$path}.type", 'Container blocks cannot be nested inside another container.', 'invalid');
+
+            return;
+        }
+
         $data = $block['data'] ?? null;
         if (!is_array($data)) {
             $errors[] = new ValidationError("{$path}.data", 'Block data must be an object.', 'invalid');
@@ -113,8 +134,39 @@ final class BlocksDocumentValidator
             'hero' => $this->validateHeroData($path, $data, $errors),
             'gallery' => $this->validateGalleryData($path, $data, $errors),
             'chart' => $this->validateChartData($path, $data, $errors),
+            'group' => $this->validateGroupData($path, $data, $count, $errors),
             default => null,
         };
+    }
+
+    /**
+     * @param array<array-key, mixed> $data
+     * @param list<ValidationError> $errors
+     */
+    private function validateGroupData(string $path, array $data, int &$count, array &$errors): void
+    {
+        $tone = $data['tone'] ?? null;
+        if (!is_string($tone) || !in_array($tone, self::GROUP_TONES, true)) {
+            $errors[] = new ValidationError("{$path}.data.tone", 'Group tone must be one of: ' . implode(', ', self::GROUP_TONES) . '.', 'invalid');
+        }
+
+        $children = $data['children'] ?? null;
+        if (!is_array($children) || !array_is_list($children)) {
+            $errors[] = new ValidationError("{$path}.data.children", 'Group children must be an array of blocks.', 'invalid');
+
+            return;
+        }
+
+        if (count($children) > self::MAX_GROUP_CHILDREN) {
+            $errors[] = new ValidationError("{$path}.data.children", 'A group may contain at most ' . self::MAX_GROUP_CHILDREN . ' blocks.', 'invalid');
+
+            return;
+        }
+
+        foreach ($children as $i => $child) {
+            // Children are leaf blocks only (no container-in-container) → depth capped at 2.
+            $this->validateBlock("{$path}.data.children[{$i}]", $child, false, $count, $errors);
+        }
     }
 
     /**
