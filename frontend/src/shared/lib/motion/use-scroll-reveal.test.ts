@@ -81,16 +81,17 @@ describe('useScrollReveal', () => {
   it('reveals, unobserves and staggers items as they intersect', () => {
     const root = mountContainer('<div class="card">a</div><div class="card">b</div>')
     renderReveal(root, true)
-    const [first, second] = root.querySelectorAll<HTMLElement>('.card')
+    const cards = [...root.querySelectorAll<HTMLElement>('.card')]
+    const [first, second] = cards
     expect(observed).toHaveLength(2)
 
-    intersect(first, second)
+    intersect(...cards)
 
-    expect(first.hasAttribute('data-revealed')).toBe(true)
-    expect(second.hasAttribute('data-revealed')).toBe(true)
+    expect(first?.hasAttribute('data-revealed')).toBe(true)
+    expect(second?.hasAttribute('data-revealed')).toBe(true)
     // Cascade index applied for the second item in the batch.
-    expect(first.style.getPropertyValue('--motion-reveal-index')).toBe('0')
-    expect(second.style.getPropertyValue('--motion-reveal-index')).toBe('1')
+    expect(first?.style.getPropertyValue('--motion-reveal-index')).toBe('0')
+    expect(second?.style.getPropertyValue('--motion-reveal-index')).toBe('1')
     expect(observed).toHaveLength(0)
   })
 

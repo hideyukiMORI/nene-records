@@ -44,10 +44,10 @@ export function mapCreateInputToDto(input: CreateOrganizationInput): CreateOrgan
 
 export function mapUpdateInputToDto(input: UpdateOrganizationInput): UpdateOrganizationDto {
   return {
-    name: input.name,
-    slug: input.slug,
-    plan: input.plan,
-    is_active: input.isActive,
-    custom_domain: input.customDomain,
+    ...(input.name !== undefined ? { name: input.name } : {}),
+    ...(input.slug !== undefined ? { slug: input.slug } : {}),
+    ...(input.plan !== undefined ? { plan: input.plan } : {}),
+    ...(input.isActive !== undefined ? { is_active: input.isActive } : {}),
+    ...(input.customDomain !== undefined ? { custom_domain: input.customDomain } : {}),
   }
 }

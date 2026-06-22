@@ -22,11 +22,12 @@ export function mapFieldDefDtoToModel(dto: FieldDefDto): FieldDef {
     entityTypeId: dto.entity_type_id,
     fieldKey: dto.field_key,
     dataType: mapDataType(dto.data_type),
-    targetEntityTypeId: dto.target_entity_type_id,
-    cardinality:
-      dto.cardinality !== undefined && isRelationCardinality(dto.cardinality)
-        ? dto.cardinality
-        : undefined,
+    ...(dto.target_entity_type_id !== undefined
+      ? { targetEntityTypeId: dto.target_entity_type_id }
+      : {}),
+    ...(dto.cardinality !== undefined && isRelationCardinality(dto.cardinality)
+      ? { cardinality: dto.cardinality }
+      : {}),
     region: dto.region ?? null,
     displayOrder: dto.display_order ?? 0,
   }
@@ -48,8 +49,12 @@ export function mapCreateInputToDto(input: CreateFieldDefInput): CreateFieldDefD
   }
 
   if (input.dataType === 'relation') {
-    dto.target_entity_type_id = input.targetEntityTypeId
-    dto.cardinality = input.cardinality
+    if (input.targetEntityTypeId !== undefined) {
+      dto.target_entity_type_id = input.targetEntityTypeId
+    }
+    if (input.cardinality !== undefined) {
+      dto.cardinality = input.cardinality
+    }
   }
 
   if (input.region !== undefined) {

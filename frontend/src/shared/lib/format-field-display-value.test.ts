@@ -25,6 +25,7 @@ describe('getRecordDisplayLabel', () => {
           entityId: 1,
           fieldKey: 'title',
           value: 'Hello',
+          locale: null,
         },
       ],
       'Record #1',

@@ -21,7 +21,7 @@ const FIELD_LIST_PARAMS = { limit: 100, offset: 0 } as const
 export interface PublicScalarFieldDisplay {
   kind: 'scalar'
   fieldKey: string
-  dataType: Exclude<FieldDataType, 'relation'>
+  dataType: FieldDataType
   displayValue: string
   region: ContentRegion | null
 }

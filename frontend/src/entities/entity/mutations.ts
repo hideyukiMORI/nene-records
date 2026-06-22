@@ -5,7 +5,7 @@ import type {
   GeneratePreviewTokenResponseDto,
   ScheduleEntityResponseDto,
 } from './api-types'
-import type { EntityId } from './ids'
+import { type EntityId, toEntityId } from './ids'
 import {
   mapCreateInputToDto,
   mapEntityDtoToModel,
@@ -112,7 +112,7 @@ export function useScheduleEntity(): UseMutationResult<
       return mapScheduleResponseDtoToOutput(dto)
     },
     onSuccess: async (_data, variables) => {
-      queryClient.removeQueries({ queryKey: entityKeys.detail(variables.id) })
+      queryClient.removeQueries({ queryKey: entityKeys.detail(toEntityId(variables.id)) })
       await queryClient.invalidateQueries({ queryKey: entityKeys.lists() })
     },
   })

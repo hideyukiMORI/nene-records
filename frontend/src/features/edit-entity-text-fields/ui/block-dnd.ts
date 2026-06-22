@@ -24,7 +24,11 @@ export function clearBlockDragPayload(): void {
 export function computeBlockDropIndex(container: HTMLElement, clientY: number): number {
   const cards = [...container.querySelectorAll('[data-bcard]')]
   for (let i = 0; i < cards.length; i++) {
-    const rect = cards[i].getBoundingClientRect()
+    const card = cards[i]
+    if (card === undefined) {
+      continue
+    }
+    const rect = card.getBoundingClientRect()
     if (clientY < rect.top + rect.height / 2) {
       return i
     }

@@ -26,7 +26,7 @@ function serverMessage(error: unknown, fallback: string): string {
 
 export interface EntityStatusPanelState {
   entity: Entity
-  entityTypeSlug?: string
+  entityTypeSlug?: string | undefined
   slugInput: string
   layout: PublicLayoutKey | null
   showScheduleForm: boolean

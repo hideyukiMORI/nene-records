@@ -116,8 +116,11 @@ export const userHandlers = [
     const index = users.findIndex((u) => u.id === Number(params.id))
     if (index === -1) return notFound()
     const body = (await request.json()) as { role?: string }
-    users[index] = { ...users[index], role: body.role ?? users[index].role, updated_at: now() }
-    return HttpResponse.json(users[index])
+    const current = users[index]
+    if (current === undefined) return notFound()
+    const updated = { ...current, role: body.role ?? current.role, updated_at: now() }
+    users[index] = updated
+    return HttpResponse.json(updated)
   }),
 
   // Change email
@@ -125,7 +128,9 @@ export const userHandlers = [
     const index = users.findIndex((u) => u.id === Number(params.id))
     if (index === -1) return notFound()
     const body = (await request.json()) as { email?: string }
-    users[index] = { ...users[index], email: body.email ?? users[index].email, updated_at: now() }
+    const current = users[index]
+    if (current === undefined) return notFound()
+    users[index] = { ...current, email: body.email ?? current.email, updated_at: now() }
     return new HttpResponse(null, { status: 204 })
   }),
 
@@ -138,18 +143,21 @@ export const userHandlers = [
       full_name?: string | null
       job_title?: string | null
     }
-    users[index] = {
-      ...users[index],
-      display_name: body.display_name ?? users[index].display_name,
-      full_name: body.full_name ?? users[index].full_name,
-      job_title: body.job_title ?? users[index].job_title,
+    const current = users[index]
+    if (current === undefined) return notFound()
+    const updated = {
+      ...current,
+      display_name: body.display_name ?? current.display_name,
+      full_name: body.full_name ?? current.full_name,
+      job_title: body.job_title ?? current.job_title,
       updated_at: now(),
     }
+    users[index] = updated
     return HttpResponse.json({
-      user_id: users[index].id,
-      display_name: users[index].display_name,
-      full_name: users[index].full_name,
-      job_title: users[index].job_title,
+      user_id: updated.id,
+      display_name: updated.display_name,
+      full_name: updated.full_name,
+      job_title: updated.job_title,
     })
   }),
 

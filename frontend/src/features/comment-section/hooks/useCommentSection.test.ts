@@ -45,7 +45,7 @@ describe('useCommentSection', () => {
     await waitFor(() => {
       expect(result.current.comments).toHaveLength(1)
     })
-    expect(result.current.comments[0].authorName).toBe('Alice')
+    expect(result.current.comments[0]?.authorName).toBe('Alice')
   })
 
   it('submits a comment and shows the pending-moderation success state', async () => {

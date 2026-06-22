@@ -100,12 +100,14 @@ export function HomePage() {
           canManageEntities && newRecordSlug ? (
             <Button
               variant="primary"
-              leftIcon={<span aria-hidden="true">+</span>}
               onClick={() => {
                 void navigate(`/admin/${newRecordSlug}`)
               }}
             >
-              {t('admin.home.newRecord')}
+              <span className="inline-flex items-center gap-inline-sm">
+                <span aria-hidden="true">+</span>
+                {t('admin.home.newRecord')}
+              </span>
             </Button>
           ) : undefined
         }

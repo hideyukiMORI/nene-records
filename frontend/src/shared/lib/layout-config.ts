@@ -47,7 +47,7 @@ export function bodyColumns(page: PageLayout): readonly (WidgetRegion | 'main')[
   if (columns < 3 && mainPos === 'center') mainPos = 'left' // center is 3-column only
   if (mainPos === 'left') return ['main', ...sides]
   if (mainPos === 'right') return [...sides, 'main']
-  return [sides[0], 'main', sides[1]] // center: side | main | side
+  return [sides[0] ?? 'sidebar', 'main', sides[1] ?? 'aside'] // center: side | main | side
 }
 
 /** Side regions actually rendered by a single page's config (excludes `main`). */

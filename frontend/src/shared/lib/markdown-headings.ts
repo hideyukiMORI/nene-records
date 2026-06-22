@@ -68,8 +68,8 @@ export function extractHeadings(markdown: string): MarkdownHeading[] {
       continue
     }
 
-    const depth = match[1].length
-    const text = stripInlineMarkdown(match[2])
+    const depth = (match[1] ?? '').length
+    const text = stripInlineMarkdown(match[2] ?? '')
     if (text === '') {
       continue
     }

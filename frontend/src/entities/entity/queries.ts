@@ -230,9 +230,9 @@ export function defaultEntityListParams(
     relationFilters,
     limit: DEFAULT_LIST_PARAMS.limit,
     offset,
-    q: q !== '' ? q : undefined,
-    status,
-    sortKey,
-    sortOrder,
+    ...(q !== undefined && q !== '' ? { q } : {}),
+    ...(status !== undefined ? { status } : {}),
+    ...(sortKey !== undefined ? { sortKey } : {}),
+    ...(sortOrder !== undefined ? { sortOrder } : {}),
   }
 }

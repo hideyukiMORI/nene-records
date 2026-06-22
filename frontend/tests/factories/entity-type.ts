@@ -10,6 +10,9 @@ export function buildEntityType(overrides: Partial<EntityType> = {}): EntityType
     id: toEntityTypeId(1),
     name: 'Article',
     slug: 'article',
+    isPinned: false,
+    defaultLayout: 'standard',
+    displayOrder: 0,
     ...overrides,
   }
 }

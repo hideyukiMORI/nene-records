@@ -34,7 +34,7 @@ export function WebhookForm({
     setEvents((prev) => (prev.includes(event) ? prev.filter((e) => e !== event) : [...prev, event]))
   }
 
-  const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.SyntheticEvent<HTMLElement>) => {
     e.preventDefault()
     await onSubmit({
       url,

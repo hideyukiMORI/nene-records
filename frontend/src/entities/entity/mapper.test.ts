@@ -7,16 +7,33 @@ describe('entity mapper', () => {
     const model = mapEntityDtoToModel({
       id: 1,
       entity_type_id: 2,
+      slug: null,
+      layout: null,
+      status: 'draft',
+      published_at: null,
+      scheduled_at: null,
       is_deleted: false,
       deleted_at: null,
+      meta_title: null,
+      meta_description: null,
+      created_at: null,
+      updated_at: null,
     })
 
     expect(model).toEqual({
       id: toEntityId(1),
       entityTypeId: 2,
+      slug: null,
       layout: null,
+      status: 'draft',
+      publishedAt: null,
+      scheduledAt: null,
       isDeleted: false,
       deletedAt: null,
+      metaTitle: null,
+      metaDescription: null,
+      createdAt: null,
+      updatedAt: null,
     })
   })
 
@@ -26,8 +43,17 @@ describe('entity mapper', () => {
         {
           id: 3,
           entity_type_id: 1,
+          slug: null,
+          layout: null,
+          status: 'draft',
+          published_at: null,
+          scheduled_at: null,
           is_deleted: false,
           deleted_at: null,
+          meta_title: null,
+          meta_description: null,
+          created_at: null,
+          updated_at: null,
         },
       ],
       limit: 20,

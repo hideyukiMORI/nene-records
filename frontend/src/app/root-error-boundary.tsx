@@ -10,13 +10,13 @@ interface RootErrorBoundaryState {
 }
 
 export class RootErrorBoundary extends Component<RootErrorBoundaryProps, RootErrorBoundaryState> {
-  state: RootErrorBoundaryState = { hasError: false }
+  override state: RootErrorBoundaryState = { hasError: false }
 
   static getDerivedStateFromError(): RootErrorBoundaryState {
     return { hasError: true }
   }
 
-  componentDidCatch(error: Error, info: ErrorInfo): void {
+  override componentDidCatch(error: Error, info: ErrorInfo): void {
     if (import.meta.env.DEV) {
       console.error('Root error boundary caught:', error, info)
     }
@@ -27,7 +27,7 @@ export class RootErrorBoundary extends Component<RootErrorBoundaryProps, RootErr
     window.location.assign('/')
   }
 
-  render(): ReactNode {
+  override render(): ReactNode {
     if (this.state.hasError) {
       return (
         <main className="mx-auto flex min-h-screen max-w-3xl items-center px-inline-md py-stack-xl">

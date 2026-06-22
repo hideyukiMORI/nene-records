@@ -48,7 +48,7 @@ export function UsersPage() {
         onCloseInviteForm={page.closeInviteForm}
         onInvite={page.inviteUser}
         isUpdatingRole={page.isUpdatingRole}
-        onChangeRole={page.updateRole}
+        onChangeRole={(user, role) => page.updateRole(user.id, role)}
         resetPasswordTarget={page.resetPasswordTarget}
         isResettingPassword={page.isResettingPassword}
         resetPasswordErrorTitle={page.resetPasswordErrorTitle}

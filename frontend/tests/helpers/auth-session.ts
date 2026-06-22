@@ -2,7 +2,6 @@ import { authStore } from '@/entities/auth'
 
 export function seedAdminSession(): void {
   authStore.setSession({
-    token: 'test-token',
     expiresAt: new Date(Date.now() + 86_400_000).toISOString(),
     email: 'admin@example.com',
     role: 'admin',
@@ -11,7 +10,6 @@ export function seedAdminSession(): void {
 
 export function seedEditorSession(): void {
   authStore.setSession({
-    token: 'test-token',
     expiresAt: new Date(Date.now() + 86_400_000).toISOString(),
     email: 'editor@example.com',
     role: 'editor',

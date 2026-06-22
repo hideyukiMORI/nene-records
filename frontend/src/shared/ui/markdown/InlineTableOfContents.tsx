@@ -11,7 +11,7 @@ export interface InlineTableOfContentsProps {
   /** Deepest heading level to include (inclusive). Default 3. */
   maxDepth?: number
   /** Minimum number of in-range headings required to render. Default 3. */
-  minHeadings?: number
+  minHeadings?: number | undefined
 }
 
 /**

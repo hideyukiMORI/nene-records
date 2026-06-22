@@ -317,6 +317,12 @@ export function BlockInspector({
         media={data.media}
         disabled={disabled}
         onChange={(media) => {
+          if (media === undefined) {
+            const next = { ...data }
+            delete next.media
+            onChange(next)
+            return
+          }
           onChange({ ...data, media })
         }}
       />
@@ -415,7 +421,7 @@ interface GalleryItemsFieldProps {
   idPrefix: string
   items: GalleryItem[]
   disabled: boolean
-  error?: string
+  error?: string | undefined
   onChange: (items: GalleryItem[]) => void
 }
 
@@ -435,6 +441,9 @@ function GalleryItemsField({ idPrefix, items, disabled, error, onChange }: Galle
     }
     const next = items.slice()
     const [moved] = next.splice(index, 1)
+    if (moved === undefined) {
+      return
+    }
     next.splice(target, 0, moved)
     onChange(next)
   }
@@ -569,7 +578,7 @@ interface SeriesFieldProps {
   idPrefix: string
   series: SeriesPoint[]
   disabled: boolean
-  error?: string
+  error?: string | undefined
   onChange: (series: SeriesPoint[]) => void
 }
 
@@ -587,6 +596,9 @@ function SeriesField({ idPrefix, series, disabled, error, onChange }: SeriesFiel
     }
     const next = series.slice()
     const [moved] = next.splice(index, 1)
+    if (moved === undefined) {
+      return
+    }
     next.splice(target, 0, moved)
     onChange(next)
   }

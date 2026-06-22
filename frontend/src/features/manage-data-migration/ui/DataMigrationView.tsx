@@ -112,7 +112,7 @@ export function DataMigrationView({
               </label>
               <Select
                 id="target-org"
-                value={targetOrgId}
+                value={String(targetOrgId)}
                 onChange={(e) => {
                   onTargetOrgIdChange(Number(e.target.value))
                 }}

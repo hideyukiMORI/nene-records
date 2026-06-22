@@ -66,6 +66,8 @@ export function LayoutTour({ onDone }: { onDone: () => void }) {
   const step = TOUR_STEPS[i]
   const last = i === TOUR_STEPS.length - 1
 
+  if (step === undefined) return null
+
   return (
     <Overlay onClose={onDone}>
       <Stack gap="md">

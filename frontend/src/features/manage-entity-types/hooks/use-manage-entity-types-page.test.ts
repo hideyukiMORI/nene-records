@@ -25,7 +25,7 @@ describe('useManageEntityTypesPage', () => {
     await waitFor(() => {
       expect(result.current.items).toHaveLength(1)
     })
-    expect(result.current.items[0].name).toBe('Article')
+    expect(result.current.items[0]?.name).toBe('Article')
   })
 
   it('creates an entity type which appears in the list', async () => {
@@ -56,8 +56,12 @@ describe('useManageEntityTypesPage', () => {
       expect(result.current.items).toHaveLength(2)
     })
 
+    const target = result.current.items[0]
+    if (target === undefined) {
+      throw new Error('expected at least one entity type')
+    }
     act(() => {
-      result.current.requestDelete(result.current.items[0])
+      result.current.requestDelete(target)
     })
     expect(result.current.deleteTarget?.slug).toBe('article')
 
@@ -68,6 +72,6 @@ describe('useManageEntityTypesPage', () => {
     await waitFor(() => {
       expect(result.current.items).toHaveLength(1)
     })
-    expect(result.current.items[0].slug).toBe('page')
+    expect(result.current.items[0]?.slug).toBe('page')
   })
 })

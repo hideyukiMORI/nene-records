@@ -23,6 +23,7 @@ function makeSite(over: Partial<PublicSite> = {}): PublicSite {
     runtimeThemeCss: '',
     themeFlagAttrs: {},
     headerConfig: DEFAULT_HEADER_CONFIG,
+    homeHero: '',
     ...over,
   }
 }

@@ -14,6 +14,7 @@ describe('text-field mapper', () => {
       entity_id: 2,
       field_key: 'title',
       value: 'Hello',
+      locale: null,
     })
 
     expect(model).toEqual({
@@ -21,12 +22,13 @@ describe('text-field mapper', () => {
       entityId: 2,
       fieldKey: 'title',
       value: 'Hello',
+      locale: null,
     })
   })
 
   it('maps list dto to model', () => {
     const model = mapTextFieldListDtoToModel({
-      items: [{ id: 3, entity_id: 1, field_key: 'body', value: 'Text' }],
+      items: [{ id: 3, entity_id: 1, field_key: 'body', value: 'Text', locale: null }],
       limit: 100,
       offset: 0,
     })

@@ -35,7 +35,7 @@ export function mapCreateInputToDto(input: CreateBlocksFieldInput): CreateBlocks
     entity_id: input.entityId,
     field_key: input.fieldKey,
     value: input.value,
-    locale: input.locale,
+    ...(input.locale !== undefined ? { locale: input.locale } : {}),
   }
 }
 
@@ -43,6 +43,6 @@ export function mapUpdateInputToDto(input: UpdateBlocksFieldInput): UpdateBlocks
   return {
     field_key: input.fieldKey,
     value: input.value,
-    locale: input.locale,
+    ...(input.locale !== undefined ? { locale: input.locale } : {}),
   }
 }

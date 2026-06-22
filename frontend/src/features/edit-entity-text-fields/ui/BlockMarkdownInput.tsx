@@ -8,7 +8,7 @@ interface BlockMarkdownInputProps {
   label: string
   value: string
   disabled: boolean
-  error?: string
+  error?: string | undefined
   onChange: (value: string) => void
 }
 

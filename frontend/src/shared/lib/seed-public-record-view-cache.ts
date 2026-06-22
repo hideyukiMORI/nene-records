@@ -8,6 +8,7 @@ import { dateTimeFieldKeys } from '@/entities/datetime-field/query-keys'
 import type { EnumFieldListDto } from '@/entities/enum-field/api-types'
 import { mapEnumFieldListDtoToModel } from '@/entities/enum-field/mapper'
 import { enumFieldKeys } from '@/entities/enum-field/query-keys'
+import type { EntityDto } from '@/entities/entity/api-types'
 import { mapEntityDtoToModel } from '@/entities/entity/mapper'
 import { toEntityId } from '@/entities/entity/ids'
 import { entityKeys } from '@/entities/entity/query-keys'
@@ -51,7 +52,7 @@ export function seedPublicRecordViewCache(
 
   queryClient.setQueryData(
     entityKeys.detail(toEntityId(bootstrap.entityId)),
-    mapEntityDtoToModel(bootstrap.entity),
+    mapEntityDtoToModel(bootstrap.entity as EntityDto),
   )
 
   queryClient.setQueryData(

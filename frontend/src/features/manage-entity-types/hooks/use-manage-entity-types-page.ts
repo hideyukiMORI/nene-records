@@ -56,7 +56,7 @@ export function useManageEntityTypesPage() {
           name: values.name,
           slug: values.slug,
           isPinned: values.isPinned,
-          labels: Object.keys(labels).length > 0 ? labels : undefined,
+          ...(Object.keys(labels).length > 0 ? { labels } : {}),
           permalinkPattern,
           defaultLayout: values.defaultLayout,
         },

@@ -23,20 +23,20 @@ export function perceivedLightness(color: string): number {
   // oklch(L …) / oklab(L …): the first component is perceptual lightness.
   const okl = /^okl(?:ch|ab)\(\s*([\d.]+)(%?)/.exec(s)
   if (okl !== null) {
-    const value = Number.parseFloat(okl[1])
+    const value = Number.parseFloat(okl[1] ?? '0')
     return clamp01(okl[2] === '%' ? value / 100 : value)
   }
 
   // hsl(h s l%): lightness is the third component.
   const hsl = /^hsla?\(\s*[\d.]+(?:deg)?[\s,]+[\d.]+%[\s,]+([\d.]+)%/.exec(s)
-  if (hsl !== null) return clamp01(Number.parseFloat(hsl[1]) / 100)
+  if (hsl !== null) return clamp01(Number.parseFloat(hsl[1] ?? '0') / 100)
 
   const rgb = /^rgba?\(\s*([\d.]+)[\s,]+([\d.]+)[\s,]+([\d.]+)/.exec(s)
   if (rgb !== null) {
     return srgbLuminance([
-      Number.parseFloat(rgb[1]),
-      Number.parseFloat(rgb[2]),
-      Number.parseFloat(rgb[3]),
+      Number.parseFloat(rgb[1] ?? '0'),
+      Number.parseFloat(rgb[2] ?? '0'),
+      Number.parseFloat(rgb[3] ?? '0'),
     ])
   }
 

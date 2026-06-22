@@ -292,22 +292,26 @@ function coerceBlock(raw: unknown, index: number): Block | null {
         },
       }
     }
-    case 'hero':
+    case 'hero': {
+      const media = coerceMedia(record.media)
       return {
         id,
         type,
         data: {
           variant: isHeroVariant(record.variant) ? record.variant : 'standard',
           heading: typeof record.heading === 'string' ? record.heading : '',
-          kicker: optionalString(record, 'kicker'),
-          lead: optionalString(record, 'lead'),
-          ctaLabel: optionalString(record, 'ctaLabel'),
-          ctaUrl: optionalString(record, 'ctaUrl'),
-          ghostLabel: optionalString(record, 'ghostLabel'),
-          ghostUrl: optionalString(record, 'ghostUrl'),
-          media: coerceMedia(record.media),
+          ...defined({
+            kicker: optionalString(record, 'kicker'),
+            lead: optionalString(record, 'lead'),
+            ctaLabel: optionalString(record, 'ctaLabel'),
+            ctaUrl: optionalString(record, 'ctaUrl'),
+            ghostLabel: optionalString(record, 'ghostLabel'),
+            ghostUrl: optionalString(record, 'ghostUrl'),
+          }),
+          ...(media !== undefined ? { media } : {}),
         },
       }
+    }
     case 'gallery':
       return {
         id,
@@ -323,7 +327,7 @@ function coerceBlock(raw: unknown, index: number): Block | null {
         type,
         data: {
           chartType: isChartType(record.chartType) ? record.chartType : 'bar',
-          title: optionalString(record, 'title'),
+          ...defined({ title: optionalString(record, 'title') }),
           series: coerceSeries(record.series),
           summary: typeof record.summary === 'string' ? record.summary : '',
         },
@@ -394,6 +398,17 @@ export function serializeBlocksDocument(blocks: Block[]): string {
     return block
   })
   return JSON.stringify(normalized)
+}
+
+/** Keep only fields whose value is defined, preserving empty strings. */
+function defined(fields: Record<string, string | undefined>): Record<string, string> {
+  const out: Record<string, string> = {}
+  for (const [key, value] of Object.entries(fields)) {
+    if (value !== undefined) {
+      out[key] = value
+    }
+  }
+  return out
 }
 
 /** Keep only string fields that are non-empty after trimming. */
