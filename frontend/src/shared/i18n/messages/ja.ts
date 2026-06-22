@@ -382,6 +382,8 @@ export const ja: Partial<MessageCatalog> = {
   'admin.entityTypes.starter.blank': '空（項目なし）',
   'admin.entityTypes.starter.article': '記事（タイトル＋Markdown本文）',
   'admin.entityTypes.starter.richPage': 'リッチページ（タイトル＋ブロック本文）',
+  'admin.entityTypes.starter.customPage':
+    'カスタムページ（タイトル＋サンドボックスbundle・custom レイアウト）',
   'admin.entityTypes.editForm.title': 'コンテンツタイプを編集',
   'admin.entityTypes.editForm.save': '変更を保存',
   'admin.entityTypes.editForm.saving': '保存中…',

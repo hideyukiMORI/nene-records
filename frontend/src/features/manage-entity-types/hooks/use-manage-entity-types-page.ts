@@ -30,6 +30,12 @@ const STARTER_FIELDS: Record<
     { fieldKey: 'title', dataType: 'text' },
     { fieldKey: 'content', dataType: 'blocks' },
   ],
+  // Custom page (#311 / WS3-S3d): title + a sandboxed bundle body; the type also
+  // defaults to the `custom` full-bleed layout (set after creation below).
+  custom_page: [
+    { fieldKey: 'title', dataType: 'text' },
+    { fieldKey: 'content', dataType: 'bundle' },
+  ],
 }
 
 export function useManageEntityTypesPage() {
@@ -56,8 +62,21 @@ export function useManageEntityTypesPage() {
           displayOrder: index,
         })
       }
+      // A custom page defaults its records to the full-bleed `custom` layout.
+      if (starter === 'custom_page') {
+        await updateMutation.mutateAsync({
+          id: created.id,
+          input: {
+            name: created.name,
+            slug: created.slug,
+            isPinned: created.isPinned,
+            permalinkPattern: null,
+            defaultLayout: 'custom',
+          },
+        })
+      }
     },
-    [createMutation, createFieldDefMutation],
+    [createMutation, createFieldDefMutation, updateMutation],
   )
 
   const requestEdit = useCallback((entityType: EntityType) => {
