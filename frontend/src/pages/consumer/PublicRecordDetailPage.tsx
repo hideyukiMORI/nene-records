@@ -272,6 +272,32 @@ function PublicRecordDetailContent({
     )
   }
 
+  // `custom` (#311 / WS3-S3c): the record IS a custom page — keep the site
+  // header/footer chrome, but drop the article chrome (backlink / title / byline /
+  // comments / related) so a sandboxed-bundle body fills the content host.
+  if (variant === 'custom') {
+    return (
+      <PageContentContext.Provider value={pageMarkdown}>
+        <PublicSiteShell site={site} activeTypeSlug={entityTypeSlug} withSidebar={false}>
+          <div className="custom-page">
+            <PublicRecordDetailView
+              entity={entity}
+              fieldRows={fieldRows}
+              entityTypeSlugById={entityTypeSlugById}
+              entityTypePatternById={entityTypePatternById}
+              isLoading={isLoading}
+              isError={isError}
+              errorTitle={errorTitle}
+              onRetry={() => {
+                void refetch()
+              }}
+            />
+          </div>
+        </PublicSiteShell>
+      </PageContentContext.Provider>
+    )
+  }
+
   // Multi-column layouts surface the global widget sidebar as the second column
   // of the shell's top-level `.layout` grid — a sibling of the article, not a
   // region nested inside it. `align-items: start` then aligns the sidebar's top

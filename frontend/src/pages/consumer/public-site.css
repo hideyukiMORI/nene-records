@@ -2353,3 +2353,9 @@
   border-top: 1px solid var(--color-border);
   margin-block: var(--space-xl);
 }
+/* custom-layout page host (#311 / WS3-S3c): full content-width, chrome-less body. */
+.nene-public .custom-page {
+  display: block;
+  width: 100%;
+  margin-block: var(--space-lg);
+}
