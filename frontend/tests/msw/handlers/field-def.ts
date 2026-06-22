@@ -1,9 +1,35 @@
 import { http, HttpResponse } from 'msw'
 
-type FieldDataType = 'text' | 'int' | 'enum' | 'bool' | 'datetime' | 'relation'
+type FieldDataType =
+  | 'text'
+  | 'markdown'
+  | 'html'
+  | 'bundle'
+  | 'int'
+  | 'enum'
+  | 'bool'
+  | 'datetime'
+  | 'image'
+  | 'file'
+  | 'relation'
+  | 'blocks'
 type RelationCardinality = 'one' | 'many'
 
-const FIELD_DATA_TYPES: FieldDataType[] = ['text', 'int', 'enum', 'bool', 'datetime', 'relation']
+// Mirrors entities/field-def/enum FIELD_DATA_TYPES — keep in sync.
+const FIELD_DATA_TYPES: FieldDataType[] = [
+  'text',
+  'markdown',
+  'html',
+  'bundle',
+  'int',
+  'enum',
+  'bool',
+  'datetime',
+  'image',
+  'file',
+  'relation',
+  'blocks',
+]
 
 function isFieldDataType(value: string): value is FieldDataType {
   return (FIELD_DATA_TYPES as string[]).includes(value)
@@ -29,6 +55,11 @@ export function resetFieldDefStore(): void {
 export function seedFieldDefs(seed: FieldDefRecord[]): void {
   items = [...seed]
   nextId = Math.max(0, ...seed.map((item) => item.id)) + 1
+}
+
+/** Test peek into the created field-def records (e.g. to assert starter provisioning). */
+export function fieldDefStoreSnapshot(): readonly FieldDefRecord[] {
+  return [...items]
 }
 
 export function findFieldDefForEntityType(

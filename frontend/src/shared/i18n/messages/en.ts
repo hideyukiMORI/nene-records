@@ -382,6 +382,12 @@ export const en = {
   'admin.entityTypes.createForm.title': 'Create content type',
   'admin.entityTypes.createForm.submit': 'Create content type',
   'admin.entityTypes.createForm.submitting': 'Creating…',
+  'admin.entityTypes.createForm.starterLabel': 'Starter fields',
+  'admin.entityTypes.createForm.starterHelp':
+    'Provisions fields right after creation. Rich page adds a blocks body so you compose the page with the block editor.',
+  'admin.entityTypes.starter.blank': 'Blank (no fields)',
+  'admin.entityTypes.starter.article': 'Article (title + Markdown body)',
+  'admin.entityTypes.starter.richPage': 'Rich page (title + blocks body)',
   'admin.entityTypes.editForm.title': 'Edit content type',
   'admin.entityTypes.editForm.save': 'Save changes',
   'admin.entityTypes.editForm.saving': 'Saving…',
