@@ -1,5 +1,13 @@
 # Handoff: 外観 › レイアウト（レイアウトビルダー）実装中 (2026-06-14)
 
+> ✅ **完了 / SUPERSEDED（2026-06-21 追記）** — 本ハンドオフが扱うレイアウトビルダー
+> （Epic **#352**）と名前付きメニュー移行（Epic **#347**）は**いずれも完了・CLOSED 済み**。
+> スライス1〜5（PR #353〜#358）＋ページ別 cfg・公開接続（#360/#361/#408）まで全マージ、
+> `layout_config` 設定で永続化済み。`navigation_items.location`/`NavLocations` は撤去、
+> `menus.location` は方針どおり存置。**本書は歴史的経緯の記録として残置**。
+> 最新の現状は `docs/todo/current.md`、その後のテーマ作業は
+> `handoff-2026-06-17-public-theme-system.md` を参照。
+
 ClaudeDesign 仕様（`appearance-layout-handoff` / 配布名 `nene-records_008`）に基づく
 **レイアウトビルダー**を多スライスで実装中。本書は途中再開のための引き継ぎ。
 
