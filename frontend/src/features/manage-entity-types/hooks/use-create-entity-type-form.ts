@@ -2,6 +2,14 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
+/**
+ * Starter field presets provisioned right after a content type is created
+ * (#491 WS1): `rich_page` gives a blocks body so authors compose the page with
+ * the block editor without an admin adding fields manually.
+ */
+export const ENTITY_TYPE_STARTERS = ['blank', 'article', 'rich_page'] as const
+export type EntityTypeStarter = (typeof ENTITY_TYPE_STARTERS)[number]
+
 export const createEntityTypeFormSchema = z.object({
   name: z.string().trim().min(1, 'Name is required'),
   slug: z
@@ -9,6 +17,7 @@ export const createEntityTypeFormSchema = z.object({
     .trim()
     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Use lowercase letters, numbers, and hyphens'),
   isPinned: z.boolean().default(false),
+  starter: z.enum(['blank', 'article', 'rich_page']).default('blank'),
 })
 
 export type CreateEntityTypeFormValues = z.infer<typeof createEntityTypeFormSchema>
@@ -58,6 +67,7 @@ export function useCreateEntityTypeForm() {
       name: '',
       slug: '',
       isPinned: false,
+      starter: 'blank',
     },
   })
 }

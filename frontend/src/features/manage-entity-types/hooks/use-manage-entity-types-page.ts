@@ -8,15 +8,34 @@ import {
   type EntityType,
   type EntityTypeId,
 } from '@/entities/entity-type'
+import { useCreateFieldDef, type FieldDataType } from '@/entities/field-def'
 import {
   formValuesToLabels,
   type CreateEntityTypeFormValues,
   type EditEntityTypeFormValues,
+  type EntityTypeStarter,
 } from './use-create-entity-type-form'
+
+/** Fields auto-provisioned per starter when a content type is created (#491 WS1). */
+const STARTER_FIELDS: Record<
+  EntityTypeStarter,
+  readonly { fieldKey: string; dataType: FieldDataType }[]
+> = {
+  blank: [],
+  article: [
+    { fieldKey: 'title', dataType: 'text' },
+    { fieldKey: 'body', dataType: 'markdown' },
+  ],
+  rich_page: [
+    { fieldKey: 'title', dataType: 'text' },
+    { fieldKey: 'content', dataType: 'blocks' },
+  ],
+}
 
 export function useManageEntityTypesPage() {
   const listQuery = useEntityTypeList()
   const createMutation = useCreateEntityType()
+  const createFieldDefMutation = useCreateFieldDef()
   const updateMutation = useUpdateEntityType()
   const deleteMutation = useDeleteEntityType()
   const reorderMutation = useReorderEntityTypes()
@@ -25,9 +44,20 @@ export function useManageEntityTypesPage() {
 
   const createEntityType = useCallback(
     async (values: CreateEntityTypeFormValues) => {
-      await createMutation.mutateAsync(values)
+      const { starter, ...typeInput } = values
+      const created = await createMutation.mutateAsync(typeInput)
+      // Provision the starter's fields (e.g. rich_page → title + blocks body).
+      for (const [index, field] of STARTER_FIELDS[starter].entries()) {
+        await createFieldDefMutation.mutateAsync({
+          entityTypeId: created.id,
+          fieldKey: field.fieldKey,
+          dataType: field.dataType,
+          region: null,
+          displayOrder: index,
+        })
+      }
     },
-    [createMutation],
+    [createMutation, createFieldDefMutation],
   )
 
   const requestEdit = useCallback((entityType: EntityType) => {
@@ -119,8 +149,8 @@ export function useManageEntityTypesPage() {
     errorTitle: listQuery.error?.title ?? null,
     refetch: listQuery.refetch,
     createEntityType,
-    isCreating: createMutation.isPending,
-    createErrorTitle: createMutation.error?.title ?? null,
+    isCreating: createMutation.isPending || createFieldDefMutation.isPending,
+    createErrorTitle: createMutation.error?.title ?? createFieldDefMutation.error?.title ?? null,
     editTarget,
     requestEdit,
     cancelEdit,

@@ -376,6 +376,12 @@ export const ja: Partial<MessageCatalog> = {
   'admin.entityTypes.createForm.title': 'コンテンツタイプを作成',
   'admin.entityTypes.createForm.submit': 'コンテンツタイプを作成',
   'admin.entityTypes.createForm.submitting': '作成中…',
+  'admin.entityTypes.createForm.starterLabel': 'スターター項目',
+  'admin.entityTypes.createForm.starterHelp':
+    '作成直後に項目を自動追加します。リッチページはブロック本文を追加し、ブロックエディタでページを組めます。',
+  'admin.entityTypes.starter.blank': '空（項目なし）',
+  'admin.entityTypes.starter.article': '記事（タイトル＋Markdown本文）',
+  'admin.entityTypes.starter.richPage': 'リッチページ（タイトル＋ブロック本文）',
   'admin.entityTypes.editForm.title': 'コンテンツタイプを編集',
   'admin.entityTypes.editForm.save': '変更を保存',
   'admin.entityTypes.editForm.saving': '保存中…',

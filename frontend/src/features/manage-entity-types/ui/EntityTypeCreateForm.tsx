@@ -1,8 +1,17 @@
 import { Controller } from 'react-hook-form'
-import { useTranslation } from '@/shared/i18n'
-import { Button, Card, Input, Stack, Text } from '@/shared/ui'
-import type { CreateEntityTypeFormValues } from '../hooks/use-create-entity-type-form'
-import { useCreateEntityTypeForm } from '../hooks/use-create-entity-type-form'
+import { type MessageKey, useTranslation } from '@/shared/i18n'
+import { Button, Card, Input, Select, Stack, Text } from '@/shared/ui'
+import type {
+  CreateEntityTypeFormValues,
+  EntityTypeStarter,
+} from '../hooks/use-create-entity-type-form'
+import { ENTITY_TYPE_STARTERS, useCreateEntityTypeForm } from '../hooks/use-create-entity-type-form'
+
+const STARTER_LABEL_KEY: Record<EntityTypeStarter, MessageKey> = {
+  blank: 'admin.entityTypes.starter.blank',
+  article: 'admin.entityTypes.starter.article',
+  rich_page: 'admin.entityTypes.starter.richPage',
+}
 
 export interface EntityTypeCreateFormProps {
   isSubmitting: boolean
@@ -69,6 +78,29 @@ export function EntityTypeCreateForm({
             />
           )}
         />
+        <Controller
+          name="starter"
+          control={control}
+          render={({ field }) => (
+            <Select
+              id="entity-type-starter"
+              label={t('admin.entityTypes.createForm.starterLabel')}
+              disabled={isSubmitting}
+              value={field.value}
+              onChange={field.onChange}
+              onBlur={field.onBlur}
+            >
+              {ENTITY_TYPE_STARTERS.map((starter) => (
+                <option key={starter} value={starter}>
+                  {t(STARTER_LABEL_KEY[starter])}
+                </option>
+              ))}
+            </Select>
+          )}
+        />
+        <Text muted variant="caption">
+          {t('admin.entityTypes.createForm.starterHelp')}
+        </Text>
         {serverErrorTitle !== null ? <Text muted>{serverErrorTitle}</Text> : null}
         <Button
           type="submit"
