@@ -84,29 +84,29 @@ final readonly class PdoBoolFieldRepository implements BoolFieldRepositoryInterf
         );
     }
 
-    public function save(BoolField $intField): int
+    public function save(BoolField $boolField): int
     {
         $this->query->execute(
             'INSERT INTO bool_fields (organization_id, entity_id, field_key, value) VALUES (?, ?, ?, ?)',
-            [$this->orgId->get(), $intField->entityId, $intField->fieldKey, $intField->value],
+            [$this->orgId->get(), $boolField->entityId, $boolField->fieldKey, $boolField->value],
         );
 
         return $this->query->lastInsertId();
     }
 
-    public function update(BoolField $intField): void
+    public function update(BoolField $boolField): void
     {
-        if ($intField->id === null) {
+        if ($boolField->id === null) {
             throw new LogicException('BoolField id is required when updating.');
         }
 
         $affected = $this->query->execute(
             'UPDATE bool_fields SET field_key = ?, value = ? WHERE id = ? AND is_deleted = 0 AND organization_id = ?',
-            [$intField->fieldKey, $intField->value, $intField->id, $this->orgId->get()],
+            [$boolField->fieldKey, $boolField->value, $boolField->id, $this->orgId->get()],
         );
 
         if ($affected === 0) {
-            throw new BoolFieldNotFoundException($intField->id);
+            throw new BoolFieldNotFoundException($boolField->id);
         }
     }
 

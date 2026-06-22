@@ -41,11 +41,11 @@ final readonly class BoolFieldServiceProvider implements ServiceProviderInterfac
             ->set(
                 CreateBoolFieldUseCaseInterface::class,
                 static function (ContainerInterface $container): CreateBoolFieldUseCaseInterface {
-                    $intFields = $container->get(BoolFieldRepositoryInterface::class);
+                    $boolFields = $container->get(BoolFieldRepositoryInterface::class);
                     $entities = $container->get(EntityRepositoryInterface::class);
                     $fieldDefs = $container->get(FieldDefRepositoryInterface::class);
 
-                    if (!$intFields instanceof BoolFieldRepositoryInterface) {
+                    if (!$boolFields instanceof BoolFieldRepositoryInterface) {
                         throw new LogicException('bool field repository service is invalid.');
                     }
 
@@ -57,7 +57,7 @@ final readonly class BoolFieldServiceProvider implements ServiceProviderInterfac
                         throw new LogicException('Field definition repository service is invalid.');
                     }
 
-                    return new CreateBoolFieldUseCase($intFields, $entities, $fieldDefs);
+                    return new CreateBoolFieldUseCase($boolFields, $entities, $fieldDefs);
                 },
             )
             ->set(
@@ -167,11 +167,11 @@ final readonly class BoolFieldServiceProvider implements ServiceProviderInterfac
             ->set(
                 UpdateBoolFieldUseCaseInterface::class,
                 static function (ContainerInterface $container): UpdateBoolFieldUseCaseInterface {
-                    $intFields = $container->get(BoolFieldRepositoryInterface::class);
+                    $boolFields = $container->get(BoolFieldRepositoryInterface::class);
                     $entities = $container->get(EntityRepositoryInterface::class);
                     $fieldDefs = $container->get(FieldDefRepositoryInterface::class);
 
-                    if (!$intFields instanceof BoolFieldRepositoryInterface) {
+                    if (!$boolFields instanceof BoolFieldRepositoryInterface) {
                         throw new LogicException('bool field repository service is invalid.');
                     }
 
@@ -183,7 +183,7 @@ final readonly class BoolFieldServiceProvider implements ServiceProviderInterfac
                         throw new LogicException('Field definition repository service is invalid.');
                     }
 
-                    return new UpdateBoolFieldUseCase($intFields, $entities, $fieldDefs);
+                    return new UpdateBoolFieldUseCase($boolFields, $entities, $fieldDefs);
                 },
             )
             ->set(

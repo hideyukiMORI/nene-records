@@ -91,7 +91,7 @@ final class EnumFieldHttpTest extends TestCase
             new ProcessScheduledPublishHandler(new ProcessScheduledPublishUseCase($this->entities), $jsonResponse),
         );
 
-        $intFieldRegistrar = new EnumFieldRouteRegistrar(
+        $enumFieldRegistrar = new EnumFieldRouteRegistrar(
             new ListEnumFieldsHandler(new ListEnumFieldsUseCase($this->enumFields), $jsonResponse),
             new GetEnumFieldByIdHandler(new GetEnumFieldByIdUseCase($this->enumFields), $jsonResponse),
             new CreateEnumFieldHandler(new CreateEnumFieldUseCase($this->enumFields, $this->entities, $this->fieldDefs), $jsonResponse),
@@ -109,7 +109,7 @@ final class EnumFieldHttpTest extends TestCase
                 new FieldKeyNotRegisteredExceptionHandler($problemDetails),
                 new FieldTypeMismatchExceptionHandler($problemDetails),
             ],
-            routeRegistrars: [$entityRegistrar, $intFieldRegistrar],
+            routeRegistrars: [$entityRegistrar, $enumFieldRegistrar],
         ))->create();
     }
 

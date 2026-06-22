@@ -7,18 +7,18 @@ namespace NeNeRecords\DateTimeField;
 final readonly class DeleteDateTimeFieldUseCase implements DeleteDateTimeFieldUseCaseInterface
 {
     public function __construct(
-        private DateTimeFieldRepositoryInterface $intFields,
+        private DateTimeFieldRepositoryInterface $dateTimeFields,
     ) {
     }
 
     public function execute(DeleteDateTimeFieldByIdInput $input): void
     {
-        $intField = $this->intFields->findById($input->id);
+        $dateTimeField = $this->dateTimeFields->findById($input->id);
 
-        if ($intField === null) {
+        if ($dateTimeField === null) {
             throw new DateTimeFieldNotFoundException($input->id);
         }
 
-        $this->intFields->delete($input->id);
+        $this->dateTimeFields->delete($input->id);
     }
 }

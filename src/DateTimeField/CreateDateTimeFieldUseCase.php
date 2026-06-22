@@ -15,7 +15,7 @@ final readonly class CreateDateTimeFieldUseCase implements CreateDateTimeFieldUs
     private const DATETIME_DATA_TYPE = 'datetime';
 
     public function __construct(
-        private DateTimeFieldRepositoryInterface $intFields,
+        private DateTimeFieldRepositoryInterface $dateTimeFields,
         private EntityRepositoryInterface $entities,
         private FieldDefRepositoryInterface $fieldDefs,
     ) {
@@ -31,7 +31,7 @@ final readonly class CreateDateTimeFieldUseCase implements CreateDateTimeFieldUs
 
         $this->assertDateTimeFieldKeyRegistered($entity->entityTypeId, $input->fieldKey);
 
-        $id = $this->intFields->save(new DateTimeField(
+        $id = $this->dateTimeFields->save(new DateTimeField(
             entityId: $input->entityId,
             fieldKey: $input->fieldKey,
             value: $input->value,

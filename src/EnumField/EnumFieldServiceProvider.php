@@ -41,11 +41,11 @@ final readonly class EnumFieldServiceProvider implements ServiceProviderInterfac
             ->set(
                 CreateEnumFieldUseCaseInterface::class,
                 static function (ContainerInterface $container): CreateEnumFieldUseCaseInterface {
-                    $intFields = $container->get(EnumFieldRepositoryInterface::class);
+                    $enumFields = $container->get(EnumFieldRepositoryInterface::class);
                     $entities = $container->get(EntityRepositoryInterface::class);
                     $fieldDefs = $container->get(FieldDefRepositoryInterface::class);
 
-                    if (!$intFields instanceof EnumFieldRepositoryInterface) {
+                    if (!$enumFields instanceof EnumFieldRepositoryInterface) {
                         throw new LogicException('enum field repository service is invalid.');
                     }
 
@@ -57,7 +57,7 @@ final readonly class EnumFieldServiceProvider implements ServiceProviderInterfac
                         throw new LogicException('Field definition repository service is invalid.');
                     }
 
-                    return new CreateEnumFieldUseCase($intFields, $entities, $fieldDefs);
+                    return new CreateEnumFieldUseCase($enumFields, $entities, $fieldDefs);
                 },
             )
             ->set(
@@ -167,11 +167,11 @@ final readonly class EnumFieldServiceProvider implements ServiceProviderInterfac
             ->set(
                 UpdateEnumFieldUseCaseInterface::class,
                 static function (ContainerInterface $container): UpdateEnumFieldUseCaseInterface {
-                    $intFields = $container->get(EnumFieldRepositoryInterface::class);
+                    $enumFields = $container->get(EnumFieldRepositoryInterface::class);
                     $entities = $container->get(EntityRepositoryInterface::class);
                     $fieldDefs = $container->get(FieldDefRepositoryInterface::class);
 
-                    if (!$intFields instanceof EnumFieldRepositoryInterface) {
+                    if (!$enumFields instanceof EnumFieldRepositoryInterface) {
                         throw new LogicException('enum field repository service is invalid.');
                     }
 
@@ -183,7 +183,7 @@ final readonly class EnumFieldServiceProvider implements ServiceProviderInterfac
                         throw new LogicException('Field definition repository service is invalid.');
                     }
 
-                    return new UpdateEnumFieldUseCase($intFields, $entities, $fieldDefs);
+                    return new UpdateEnumFieldUseCase($enumFields, $entities, $fieldDefs);
                 },
             )
             ->set(

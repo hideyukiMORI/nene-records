@@ -22,9 +22,9 @@ interface EnumFieldRepositoryInterface
      */
     public function findByEntityId(int $entityId, int $limit, int $offset): array;
 
-    public function save(EnumField $intField): int;
+    public function save(EnumField $enumField): int;
 
-    public function update(EnumField $intField): void;
+    public function update(EnumField $enumField): void;
 
     /**
      * Soft delete: sets is_deleted and deleted_at.

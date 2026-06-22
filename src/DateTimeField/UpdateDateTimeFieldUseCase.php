@@ -15,7 +15,7 @@ final readonly class UpdateDateTimeFieldUseCase implements UpdateDateTimeFieldUs
     private const DATETIME_DATA_TYPE = 'datetime';
 
     public function __construct(
-        private DateTimeFieldRepositoryInterface $intFields,
+        private DateTimeFieldRepositoryInterface $dateTimeFields,
         private EntityRepositoryInterface $entities,
         private FieldDefRepositoryInterface $fieldDefs,
     ) {
@@ -23,7 +23,7 @@ final readonly class UpdateDateTimeFieldUseCase implements UpdateDateTimeFieldUs
 
     public function execute(UpdateDateTimeFieldInput $input): UpdateDateTimeFieldOutput
     {
-        $existing = $this->intFields->findById($input->id);
+        $existing = $this->dateTimeFields->findById($input->id);
 
         if ($existing === null) {
             throw new DateTimeFieldNotFoundException($input->id);
@@ -43,7 +43,7 @@ final readonly class UpdateDateTimeFieldUseCase implements UpdateDateTimeFieldUs
             value: $input->value,
             id: $input->id,
         );
-        $this->intFields->update($updated);
+        $this->dateTimeFields->update($updated);
 
         return new UpdateDateTimeFieldOutput(
             id: $input->id,

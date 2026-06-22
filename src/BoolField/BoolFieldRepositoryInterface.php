@@ -22,9 +22,9 @@ interface BoolFieldRepositoryInterface
      */
     public function findByEntityId(int $entityId, int $limit, int $offset): array;
 
-    public function save(BoolField $intField): int;
+    public function save(BoolField $boolField): int;
 
-    public function update(BoolField $intField): void;
+    public function update(BoolField $boolField): void;
 
     /**
      * Soft delete: sets is_deleted and deleted_at.

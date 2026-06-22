@@ -75,22 +75,22 @@ final class InMemoryDateTimeFieldRepository implements DateTimeFieldRepositoryIn
         return array_slice($active, $offset, $limit);
     }
 
-    public function save(DateTimeField $intField): int
+    public function save(DateTimeField $dateTimeField): int
     {
         $id = $this->nextId++;
         $this->fields[$id] = new DateTimeField(
-            entityId: $intField->entityId,
-            fieldKey: $intField->fieldKey,
-            value: $intField->value,
+            entityId: $dateTimeField->entityId,
+            fieldKey: $dateTimeField->fieldKey,
+            value: $dateTimeField->value,
             id: $id,
         );
 
         return $id;
     }
 
-    public function update(DateTimeField $intField): void
+    public function update(DateTimeField $dateTimeField): void
     {
-        $id = $intField->id;
+        $id = $dateTimeField->id;
 
         if ($id === null) {
             return;
@@ -100,7 +100,7 @@ final class InMemoryDateTimeFieldRepository implements DateTimeFieldRepositoryIn
             throw new DateTimeFieldNotFoundException($id);
         }
 
-        $this->fields[$id] = $intField;
+        $this->fields[$id] = $dateTimeField;
     }
 
     public function delete(int $id): void

@@ -7,15 +7,15 @@ namespace NeNeRecords\BoolField;
 final readonly class ListBoolFieldsUseCase implements ListBoolFieldsUseCaseInterface
 {
     public function __construct(
-        private BoolFieldRepositoryInterface $intFields,
+        private BoolFieldRepositoryInterface $boolFields,
     ) {
     }
 
     public function execute(ListBoolFieldsInput $input): ListBoolFieldsOutput
     {
         $rows = $input->entityId !== null
-            ? $this->intFields->findByEntityId($input->entityId, $input->limit, $input->offset)
-            : $this->intFields->findAll($input->limit, $input->offset);
+            ? $this->boolFields->findByEntityId($input->entityId, $input->limit, $input->offset)
+            : $this->boolFields->findAll($input->limit, $input->offset);
 
         $items = array_map(
             static fn (BoolField $field) => new ListBoolFieldItem(

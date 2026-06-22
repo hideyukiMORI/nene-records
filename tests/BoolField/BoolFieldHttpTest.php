@@ -91,7 +91,7 @@ final class BoolFieldHttpTest extends TestCase
             new ProcessScheduledPublishHandler(new ProcessScheduledPublishUseCase($this->entities), $jsonResponse),
         );
 
-        $intFieldRegistrar = new BoolFieldRouteRegistrar(
+        $boolFieldRegistrar = new BoolFieldRouteRegistrar(
             new ListBoolFieldsHandler(new ListBoolFieldsUseCase($this->boolFields), $jsonResponse),
             new GetBoolFieldByIdHandler(new GetBoolFieldByIdUseCase($this->boolFields), $jsonResponse),
             new CreateBoolFieldHandler(new CreateBoolFieldUseCase($this->boolFields, $this->entities, $this->fieldDefs), $jsonResponse),
@@ -109,7 +109,7 @@ final class BoolFieldHttpTest extends TestCase
                 new FieldKeyNotRegisteredExceptionHandler($problemDetails),
                 new FieldTypeMismatchExceptionHandler($problemDetails),
             ],
-            routeRegistrars: [$entityRegistrar, $intFieldRegistrar],
+            routeRegistrars: [$entityRegistrar, $boolFieldRegistrar],
         ))->create();
     }
 

@@ -7,23 +7,23 @@ namespace NeNeRecords\BoolField;
 final readonly class GetBoolFieldByIdUseCase implements GetBoolFieldByIdUseCaseInterface
 {
     public function __construct(
-        private BoolFieldRepositoryInterface $intFields,
+        private BoolFieldRepositoryInterface $boolFields,
     ) {
     }
 
     public function execute(GetBoolFieldByIdInput $input): GetBoolFieldByIdOutput
     {
-        $intField = $this->intFields->findById($input->id);
+        $boolField = $this->boolFields->findById($input->id);
 
-        if ($intField === null) {
+        if ($boolField === null) {
             throw new BoolFieldNotFoundException($input->id);
         }
 
         return new GetBoolFieldByIdOutput(
-            id: (int) $intField->id,
-            entityId: $intField->entityId,
-            fieldKey: $intField->fieldKey,
-            value: $intField->value,
+            id: (int) $boolField->id,
+            entityId: $boolField->entityId,
+            fieldKey: $boolField->fieldKey,
+            value: $boolField->value,
         );
     }
 }

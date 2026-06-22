@@ -22,9 +22,9 @@ interface DateTimeFieldRepositoryInterface
      */
     public function findByEntityId(int $entityId, int $limit, int $offset): array;
 
-    public function save(DateTimeField $intField): int;
+    public function save(DateTimeField $dateTimeField): int;
 
-    public function update(DateTimeField $intField): void;
+    public function update(DateTimeField $dateTimeField): void;
 
     /**
      * Soft delete: sets is_deleted and deleted_at.

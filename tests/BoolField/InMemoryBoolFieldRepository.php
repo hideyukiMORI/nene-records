@@ -75,22 +75,22 @@ final class InMemoryBoolFieldRepository implements BoolFieldRepositoryInterface
         return array_slice($active, $offset, $limit);
     }
 
-    public function save(BoolField $intField): int
+    public function save(BoolField $boolField): int
     {
         $id = $this->nextId++;
         $this->fields[$id] = new BoolField(
-            entityId: $intField->entityId,
-            fieldKey: $intField->fieldKey,
-            value: $intField->value,
+            entityId: $boolField->entityId,
+            fieldKey: $boolField->fieldKey,
+            value: $boolField->value,
             id: $id,
         );
 
         return $id;
     }
 
-    public function update(BoolField $intField): void
+    public function update(BoolField $boolField): void
     {
-        $id = $intField->id;
+        $id = $boolField->id;
 
         if ($id === null) {
             return;
@@ -100,7 +100,7 @@ final class InMemoryBoolFieldRepository implements BoolFieldRepositoryInterface
             throw new BoolFieldNotFoundException($id);
         }
 
-        $this->fields[$id] = $intField;
+        $this->fields[$id] = $boolField;
     }
 
     public function delete(int $id): void

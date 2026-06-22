@@ -7,18 +7,18 @@ namespace NeNeRecords\EnumField;
 final readonly class DeleteEnumFieldUseCase implements DeleteEnumFieldUseCaseInterface
 {
     public function __construct(
-        private EnumFieldRepositoryInterface $intFields,
+        private EnumFieldRepositoryInterface $enumFields,
     ) {
     }
 
     public function execute(DeleteEnumFieldByIdInput $input): void
     {
-        $intField = $this->intFields->findById($input->id);
+        $enumField = $this->enumFields->findById($input->id);
 
-        if ($intField === null) {
+        if ($enumField === null) {
             throw new EnumFieldNotFoundException($input->id);
         }
 
-        $this->intFields->delete($input->id);
+        $this->enumFields->delete($input->id);
     }
 }
