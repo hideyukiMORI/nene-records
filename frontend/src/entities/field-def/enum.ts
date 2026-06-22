@@ -10,6 +10,7 @@ export const FIELD_DATA_TYPES = [
   'image',
   'file',
   'relation',
+  'blocks',
 ] as const
 
 export type FieldDataType = (typeof FIELD_DATA_TYPES)[number]

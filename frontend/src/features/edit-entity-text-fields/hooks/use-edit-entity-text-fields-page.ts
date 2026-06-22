@@ -32,6 +32,12 @@ import {
   useUpdateTextField,
   type TextField,
 } from '@/entities/text-field'
+import {
+  useBlocksFieldList,
+  useCreateBlocksField,
+  useUpdateBlocksField,
+  type BlocksField,
+} from '@/entities/block'
 
 const EDITABLE_DATA_TYPES: FieldDataType[] = FIELD_DATA_TYPES.filter(
   (dataType) => dataType !== 'relation',
@@ -93,6 +99,7 @@ export function useEditEntityTextFieldsPage(entityTypeId: number, entityId: numb
   const enumFieldQuery = useEnumFieldList(listParams)
   const boolFieldQuery = useBoolFieldList(listParams)
   const dateTimeFieldQuery = useDateTimeFieldList(listParams)
+  const blocksFieldQuery = useBlocksFieldList(listParams)
   const createTextMutation = useCreateTextField()
   const updateTextMutation = useUpdateTextField()
   const createIntMutation = useCreateIntField()
@@ -103,6 +110,8 @@ export function useEditEntityTextFieldsPage(entityTypeId: number, entityId: numb
   const updateBoolMutation = useUpdateBoolField()
   const createDateTimeMutation = useCreateDateTimeField()
   const updateDateTimeMutation = useUpdateDateTimeField()
+  const createBlocksMutation = useCreateBlocksField()
+  const updateBlocksMutation = useUpdateBlocksField()
 
   const editableFieldDefs = useMemo(
     () =>
@@ -146,6 +155,15 @@ export function useEditEntityTextFieldsPage(entityTypeId: number, entityId: numb
     return dateTimeFieldQuery.data?.items ?? []
   }, [dateTimeFieldQuery.data?.items])
 
+  const blocksFieldsForEntity = useMemo((): BlocksField[] => {
+    return blocksFieldQuery.data?.items ?? []
+  }, [blocksFieldQuery.data?.items])
+
+  const blocksFieldsForLocale = useMemo(
+    () => blocksFieldsForEntity.filter((f) => f.locale === selectedLocale),
+    [blocksFieldsForEntity, selectedLocale],
+  )
+
   const initialValues = useMemo((): Record<string, string> => {
     return Object.fromEntries(
       editableFieldDefs.map((fieldDef) => {
@@ -179,12 +197,19 @@ export function useEditEntityTextFieldsPage(entityTypeId: number, entityId: numb
               existing !== undefined ? isoToDatetimeLocal(existing.value) : '',
             ]
           }
+          case 'blocks': {
+            const existing = blocksFieldsForLocale.find(
+              (item) => item.fieldKey === fieldDef.fieldKey,
+            )
+            return [fieldDef.fieldKey, existing?.value ?? '']
+          }
           default:
             return [fieldDef.fieldKey, '']
         }
       }),
     )
   }, [
+    blocksFieldsForLocale,
     boolFieldsForEntity,
     dateTimeFieldsForEntity,
     editableFieldDefs,
@@ -294,11 +319,35 @@ export function useEditEntityTextFieldsPage(entityTypeId: number, entityId: numb
             }
             break
           }
+          case 'blocks': {
+            // value is the JSON blocks document; normalize empty to a valid array.
+            const normalized = rawValue.trim() === '' ? '[]' : rawValue
+            const existing = blocksFieldsForLocale.find(
+              (item) => item.fieldKey === fieldDef.fieldKey,
+            )
+
+            if (existing !== undefined) {
+              await updateBlocksMutation.mutateAsync({
+                id: existing.id,
+                input: { fieldKey: fieldDef.fieldKey, value: normalized, locale: selectedLocale },
+              })
+            } else if (normalized !== '[]') {
+              await createBlocksMutation.mutateAsync({
+                entityId,
+                fieldKey: fieldDef.fieldKey,
+                value: normalized,
+                locale: selectedLocale,
+              })
+            }
+            break
+          }
         }
       }
     },
     [
+      blocksFieldsForLocale,
       boolFieldsForEntity,
+      createBlocksMutation,
       createBoolMutation,
       createDateTimeMutation,
       createEnumMutation,
@@ -311,6 +360,7 @@ export function useEditEntityTextFieldsPage(entityTypeId: number, entityId: numb
       intFieldsForEntity,
       selectedLocale,
       textFieldsForLocale,
+      updateBlocksMutation,
       updateBoolMutation,
       updateDateTimeMutation,
       updateEnumMutation,
@@ -326,7 +376,8 @@ export function useEditEntityTextFieldsPage(entityTypeId: number, entityId: numb
     intFieldQuery.isLoading ||
     enumFieldQuery.isLoading ||
     boolFieldQuery.isLoading ||
-    dateTimeFieldQuery.isLoading
+    dateTimeFieldQuery.isLoading ||
+    blocksFieldQuery.isLoading
   const isError =
     entityQuery.isError ||
     fieldDefQuery.isError ||
@@ -334,7 +385,8 @@ export function useEditEntityTextFieldsPage(entityTypeId: number, entityId: numb
     intFieldQuery.isError ||
     enumFieldQuery.isError ||
     boolFieldQuery.isError ||
-    dateTimeFieldQuery.isError
+    dateTimeFieldQuery.isError ||
+    blocksFieldQuery.isError
   const errorTitle =
     entityQuery.error?.title ??
     fieldDefQuery.error?.title ??
@@ -343,6 +395,7 @@ export function useEditEntityTextFieldsPage(entityTypeId: number, entityId: numb
     enumFieldQuery.error?.title ??
     boolFieldQuery.error?.title ??
     dateTimeFieldQuery.error?.title ??
+    blocksFieldQuery.error?.title ??
     null
 
   return {
@@ -364,6 +417,7 @@ export function useEditEntityTextFieldsPage(entityTypeId: number, entityId: numb
         enumFieldQuery.refetch(),
         boolFieldQuery.refetch(),
         dateTimeFieldQuery.refetch(),
+        blocksFieldQuery.refetch(),
       ])
     },
     saveTextFields,
@@ -377,7 +431,9 @@ export function useEditEntityTextFieldsPage(entityTypeId: number, entityId: numb
       createBoolMutation.isPending ||
       updateBoolMutation.isPending ||
       createDateTimeMutation.isPending ||
-      updateDateTimeMutation.isPending,
+      updateDateTimeMutation.isPending ||
+      createBlocksMutation.isPending ||
+      updateBlocksMutation.isPending,
     saveErrorTitle:
       createTextMutation.error?.title ??
       updateTextMutation.error?.title ??
@@ -389,6 +445,8 @@ export function useEditEntityTextFieldsPage(entityTypeId: number, entityId: numb
       updateBoolMutation.error?.title ??
       createDateTimeMutation.error?.title ??
       updateDateTimeMutation.error?.title ??
+      createBlocksMutation.error?.title ??
+      updateBlocksMutation.error?.title ??
       null,
   }
 }

@@ -505,6 +505,28 @@ export const ja: Partial<MessageCatalog> = {
   'admin.markdownEditor.write': '編集',
   'admin.markdownEditor.empty': 'プレビューする内容がありません。',
 
+  // ── Blocks editor (#486) ──────────────────────────────────────────────────
+  'admin.blocks.add': '{{type}}を追加',
+  'admin.blocks.empty.title': 'ブロックがありません',
+  'admin.blocks.empty.description': '上のボタンからブロックを追加して本文を組み立てましょう。',
+  'admin.blocks.type.text': 'テキスト',
+  'admin.blocks.type.text.desc': 'Markdown 本文',
+  'admin.blocks.type.callout': 'コールアウト',
+  'admin.blocks.type.callout.desc': 'info / warn / ok / danger',
+  'admin.blocks.field.kind': '種別',
+  'admin.blocks.field.title': 'タイトル',
+  'admin.blocks.field.body': '本文（Markdown）',
+  'admin.blocks.kind.info': '情報',
+  'admin.blocks.kind.warn': '注意',
+  'admin.blocks.kind.ok': '成功',
+  'admin.blocks.kind.danger': '危険',
+  'admin.blocks.error.bodyRequired': '本文は必須です。',
+  'admin.blocks.card.empty': '（空）',
+  'admin.blocks.card.invalid': '要確認',
+  'admin.blocks.moveUp': '上へ移動',
+  'admin.blocks.moveDown': '下へ移動',
+  'admin.blocks.deselect': '閉じる',
+
   // ── Tags ─────────────────────────────────────────────────────────────────
   'admin.tags.eyebrow': '管理',
   'admin.tags.pageTitle': 'タグ',

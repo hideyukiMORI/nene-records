@@ -2123,3 +2123,63 @@
   position: sticky;
   top: 0;
 }
+
+/* ===== typed post blocks (#486) — first-party, token-driven, theme-following.
+   Markdown blocks flow through .markdown-body (PublicMarkdownContent). ===== */
+.nene-public .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.nene-public .blocks {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+.nene-public .blocks .block--text > .markdown-body {
+  margin: 0;
+}
+/* callout — border-left + --color-{kind}, background = tint of the kind. */
+.nene-public .callout {
+  margin: 0;
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+  border: 1px solid color-mix(in oklch, var(--cl, var(--color-info)) 30%, var(--color-border));
+  border-left: 3px solid var(--cl, var(--color-info));
+  background: color-mix(in oklch, var(--cl, var(--color-info)) 9%, var(--color-surface-raised));
+}
+.nene-public .callout[data-callout-kind='info'] {
+  --cl: var(--color-info);
+}
+.nene-public .callout[data-callout-kind='warn'] {
+  --cl: var(--color-warn);
+}
+.nene-public .callout[data-callout-kind='ok'] {
+  --cl: var(--color-ok);
+}
+.nene-public .callout[data-callout-kind='danger'] {
+  --cl: var(--color-danger);
+}
+.nene-public .callout__body {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+}
+.nene-public .callout__title {
+  margin: 0;
+  font-size: var(--text-body);
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--color-text-primary);
+}
+.nene-public .callout__body .markdown-body {
+  margin: 0;
+  font-size: var(--text-body-sm);
+}

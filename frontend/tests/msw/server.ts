@@ -1,5 +1,6 @@
 import { setupServer } from 'msw/node'
 import { authHandlers } from './handlers/auth'
+import { blocksFieldHandlers } from './handlers/blocks-field'
 import { boolFieldHandlers } from './handlers/bool-field'
 import { commentHandlers } from './handlers/comment'
 import { dateTimeFieldHandlers } from './handlers/datetime-field'
@@ -26,6 +27,7 @@ export const mswServer = setupServer(
   ...enumFieldHandlers,
   ...boolFieldHandlers,
   ...dateTimeFieldHandlers,
+  ...blocksFieldHandlers,
   ...tagHandlers,
   ...userHandlers,
   ...commentHandlers,

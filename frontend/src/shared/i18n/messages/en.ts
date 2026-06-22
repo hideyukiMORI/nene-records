@@ -508,6 +508,28 @@ export const en = {
   'admin.markdownEditor.write': 'Write',
   'admin.markdownEditor.empty': 'Nothing to preview.',
 
+  // ── Blocks editor (#486) ──────────────────────────────────────────────────
+  'admin.blocks.add': 'Add {{type}}',
+  'admin.blocks.empty.title': 'No blocks yet',
+  'admin.blocks.empty.description': 'Add a block above to start composing the body.',
+  'admin.blocks.type.text': 'Text',
+  'admin.blocks.type.text.desc': 'Markdown body',
+  'admin.blocks.type.callout': 'Callout',
+  'admin.blocks.type.callout.desc': 'info / warn / ok / danger',
+  'admin.blocks.field.kind': 'Kind',
+  'admin.blocks.field.title': 'Title',
+  'admin.blocks.field.body': 'Body (Markdown)',
+  'admin.blocks.kind.info': 'Info',
+  'admin.blocks.kind.warn': 'Warning',
+  'admin.blocks.kind.ok': 'Success',
+  'admin.blocks.kind.danger': 'Danger',
+  'admin.blocks.error.bodyRequired': 'Body is required.',
+  'admin.blocks.card.empty': '(empty)',
+  'admin.blocks.card.invalid': 'Needs attention',
+  'admin.blocks.moveUp': 'Move up',
+  'admin.blocks.moveDown': 'Move down',
+  'admin.blocks.deselect': 'Close',
+
   // ── Tags ─────────────────────────────────────────────────────────────────
   'admin.tags.eyebrow': 'Manage',
   'admin.tags.pageTitle': 'Tags',

@@ -1,6 +1,7 @@
 import type { Entity } from '@/entities/entity'
 import { isMarkdownBodyField } from '@/shared/lib/is-markdown-body-field'
 import { SandboxedBundle, SanitizedHtml, Text } from '@/shared/ui'
+import { BlocksRenderer } from '@/shared/ui/blocks'
 import { PublicMarkdownContent } from '@/shared/ui/markdown'
 import type { PublicFieldRow } from '../hooks/use-public-view-entity-record-page'
 import { PublicRelationFieldDisplay } from './PublicRelationFieldDisplay'
@@ -47,6 +48,16 @@ export function PublicRecordFieldList({
           return (
             <div key={row.fieldKey} className="prose">
               <PublicMarkdownContent markdown={row.displayValue === '—' ? '' : row.displayValue} />
+            </div>
+          )
+        }
+
+        // Typed post blocks (#486) render as the article body via first-party,
+        // theme-following block renderers — no field-key label.
+        if (row.dataType === 'blocks') {
+          return (
+            <div key={row.fieldKey} className="prose">
+              <BlocksRenderer documentJson={row.displayValue === '—' ? '' : row.displayValue} />
             </div>
           )
         }
