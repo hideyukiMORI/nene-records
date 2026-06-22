@@ -5,9 +5,11 @@ import { useMenuList } from '@/entities/menu'
 import {
   HeaderContentView,
   HeaderPreview,
+  HomeHeroView,
   PublicThemeView,
   ThemeCustomizeView,
   useHeaderConfigPage,
+  useHomeHeroPage,
   usePublicThemePage,
   useThemeCustomizePage,
 } from '@/features/manage-appearance'
@@ -41,6 +43,7 @@ function ThemeTab() {
   const page = usePublicThemePage()
   const customize = useThemeCustomizePage()
   const headerContent = useHeaderConfigPage()
+  const homeHero = useHomeHeroPage()
   // Warn before leaving with unsaved customizer edits (route change + tab close).
   const blocker = useUnsavedChangesGuard(customize.isDirty)
   return (
@@ -59,6 +62,7 @@ function ThemeTab() {
         <HeaderPreview flags={customize.draft.flags} header={headerContent.draft} />
         <HeaderContentView {...headerContent} />
       </Stack>
+      <HomeHeroView {...homeHero} />
 
       {blocker.state === 'blocked' ? (
         <ConfirmDialog

@@ -575,6 +575,17 @@ export const ja: Partial<MessageCatalog> = {
   'admin.blocks.error.seriesRequired': 'データ点を2つ以上追加してください。',
   'admin.blocks.error.labelRequired': 'ラベルは必須です。',
 
+  // ── Home hero (#486) ──────────────────────────────────────────────────────
+  'admin.homeHero.title': 'ホームヒーロー',
+  'admin.homeHero.description':
+    'ホームの masthead を hero ブロックで上書きします。空にすると自動 hero を使用します。',
+  'admin.homeHero.fieldLabel': 'hero ブロック',
+  'admin.homeHero.save': 'ホームヒーローを保存',
+  'admin.homeHero.saving': '保存中…',
+  'admin.homeHero.saved': 'ホームヒーローを保存しました。',
+  'admin.homeHero.saveError': 'ホームヒーローを保存できませんでした。',
+  'admin.homeHero.loading': '読み込み中…',
+
   // ── Tags ─────────────────────────────────────────────────────────────────
   'admin.tags.eyebrow': '管理',
   'admin.tags.pageTitle': 'タグ',

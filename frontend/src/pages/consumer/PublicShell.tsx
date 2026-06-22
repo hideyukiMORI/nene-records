@@ -138,6 +138,7 @@ export function PublicShell() {
     themeFlagAttrs: { ...flagAttrsForTheme(overridesRaw, activeTheme), ...runtimeFlagAttrs },
     runtimeThemeCss,
     headerConfig: parseHeaderConfig(settings.header_config),
+    homeHero: settings.home_hero ?? '',
   }
 
   useSiteDocumentMeta(site.siteName, site.metaDescription)

@@ -35,6 +35,8 @@ export interface PublicSite {
   themeFlagAttrs: Record<string, string>
   /** Header content (Top bar + CTA) from the `header_config` setting. */
   headerConfig: HeaderConfig
+  /** Home masthead — a JSON blocks document (one hero block); '' / '[]' → auto stats-hero. */
+  homeHero: string
 }
 
 export function usePublicSite(): PublicSite {

@@ -16,6 +16,7 @@ const TEST_SITE: PublicSite = {
   runtimeThemeCss: '',
   themeFlagAttrs: {},
   headerConfig: DEFAULT_HEADER_CONFIG,
+  homeHero: '',
 }
 
 /**

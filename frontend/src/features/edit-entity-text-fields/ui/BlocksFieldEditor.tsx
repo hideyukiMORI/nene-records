@@ -34,12 +34,14 @@ import {
 } from './block-dnd'
 import { BlockInspector } from './BlockInspector'
 
-interface BlocksFieldEditorProps {
+export interface BlocksFieldEditorProps {
   id: string
   label: string
   /** The stored field value: a JSON-string blocks document. */
   value: string
   disabled: boolean
+  /** Restrict the palette to these block types (default: all). */
+  allowedTypes?: readonly BlockType[]
   onChange: (value: string) => void
 }
 
@@ -92,9 +94,17 @@ export function BlocksFieldEditor({
   label,
   value,
   disabled,
+  allowedTypes,
   onChange,
 }: BlocksFieldEditorProps) {
   const { t } = useTranslation()
+  const palette = useMemo(
+    () =>
+      allowedTypes === undefined
+        ? BLOCK_CATALOG
+        : BLOCK_CATALOG.filter((entry) => allowedTypes.includes(entry.type)),
+    [allowedTypes],
+  )
   const blocks = useMemo(() => parseBlocksDocument(value), [value])
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [dropIndex, setDropIndex] = useState<number | null>(null)
@@ -203,7 +213,7 @@ export function BlocksFieldEditor({
       </Text>
 
       <div className="flex flex-wrap gap-inline-sm">
-        {BLOCK_CATALOG.map((entry) => (
+        {palette.map((entry) => (
           <Button
             key={entry.type}
             variant="secondary"

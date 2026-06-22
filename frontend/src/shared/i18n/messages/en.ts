@@ -578,6 +578,17 @@ export const en = {
   'admin.blocks.error.seriesRequired': 'Add at least two data points.',
   'admin.blocks.error.labelRequired': 'Label is required.',
 
+  // ── Home hero (#486) ──────────────────────────────────────────────────────
+  'admin.homeHero.title': 'Home hero',
+  'admin.homeHero.description':
+    'Override the home masthead with a hero block. Leave it empty to use the automatic hero.',
+  'admin.homeHero.fieldLabel': 'Hero block',
+  'admin.homeHero.save': 'Save home hero',
+  'admin.homeHero.saving': 'Saving…',
+  'admin.homeHero.saved': 'Home hero saved.',
+  'admin.homeHero.saveError': 'Could not save the home hero.',
+  'admin.homeHero.loading': 'Loading…',
+
   // ── Tags ─────────────────────────────────────────────────────────────────
   'admin.tags.eyebrow': 'Manage',
   'admin.tags.pageTitle': 'Tags',

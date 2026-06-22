@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { renderWithProviders } from '@tests/render/render-with-providers'
@@ -44,5 +44,21 @@ describe('BlocksFieldEditor', () => {
     renderWithProviders(<Harness initial={doc} />)
 
     expect(screen.getByText('Callout')).toBeInTheDocument()
+  })
+
+  it('limits the palette to allowedTypes', () => {
+    renderWithProviders(
+      <BlocksFieldEditor
+        id="f"
+        label="x"
+        value=""
+        disabled={false}
+        allowedTypes={['hero']}
+        onChange={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: 'Add Hero' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Add Text' })).toBeNull()
   })
 })
