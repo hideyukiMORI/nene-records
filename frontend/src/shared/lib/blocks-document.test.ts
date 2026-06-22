@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   createBlock,
   isSafeHref,
+  isSafeMediaUrl,
   parseBlocksDocument,
   serializeBlocksDocument,
   validateBlock,
@@ -114,7 +115,7 @@ describe('blocks-document', () => {
     expect(coerced[0]).toMatchObject({ data: { variant: 'standard' } })
   })
 
-  it('allowlists safe hrefs', () => {
+  it('allowlists safe hrefs and rejects protocol-relative open-redirects', () => {
     expect(isSafeHref('/path')).toBe(true)
     expect(isSafeHref('https://example.com')).toBe(true)
     expect(isSafeHref('#anchor')).toBe(true)
@@ -122,6 +123,18 @@ describe('blocks-document', () => {
     expect(isSafeHref('javascript:alert(1)')).toBe(false)
     expect(isSafeHref('data:text/html,x')).toBe(false)
     expect(isSafeHref('')).toBe(false)
+    // protocol-relative / backslash-authority → open redirect
+    expect(isSafeHref('//evil.com')).toBe(false)
+    expect(isSafeHref('/\\evil.com')).toBe(false)
+  })
+
+  it('accepts relative or https media urls and rejects external/insecure ones', () => {
+    expect(isSafeMediaUrl('/media/2026/06/a.png')).toBe(true)
+    expect(isSafeMediaUrl('https://cdn.example.com/a.png')).toBe(true)
+    expect(isSafeMediaUrl('//evil.com/a.png')).toBe(false)
+    expect(isSafeMediaUrl('/\\evil.com/a.png')).toBe(false)
+    expect(isSafeMediaUrl('http://insecure/a.png')).toBe(false)
+    expect(isSafeMediaUrl('')).toBe(false)
   })
 
   it('creates a hero block with defaults', () => {
@@ -197,5 +210,78 @@ describe('blocks-document', () => {
     expect(
       validateBlock({ id: 'g', type: 'gallery', data: { layout: 'carousel', items: [] } }),
     ).toBe('items-required')
+  })
+
+  it('parses, validates, and serializes chart blocks', () => {
+    const doc = JSON.stringify([
+      {
+        id: 'k',
+        type: 'chart',
+        data: {
+          chartType: 'line',
+          title: '  ',
+          series: [
+            { label: 'A', value: 1 },
+            { label: 'B', value: 2 },
+          ],
+          summary: 'Up.',
+        },
+      },
+    ])
+    const block = parseBlocksDocument(doc)[0]
+    expect(block?.type).toBe('chart')
+    if (block?.type === 'chart') {
+      expect(block.data.series).toHaveLength(2)
+      expect(validateBlock(block)).toBeNull()
+      const parsed = JSON.parse(serializeBlocksDocument([block])) as {
+        data: Record<string, unknown>
+      }[]
+      expect(parsed[0]?.data).not.toHaveProperty('title')
+    }
+
+    expect(
+      validateBlock({
+        id: 'k',
+        type: 'chart',
+        data: { chartType: 'bar', series: [{ label: 'A', value: 1 }], summary: 'x' },
+      }),
+    ).toBe('series-required')
+    expect(
+      validateBlock({
+        id: 'k',
+        type: 'chart',
+        data: {
+          chartType: 'bar',
+          series: [
+            { label: 'A', value: 1 },
+            { label: 'B', value: 2 },
+          ],
+          summary: '',
+        },
+      }),
+    ).toBe('summary-required')
+    expect(
+      validateBlock({
+        id: 'k',
+        type: 'chart',
+        data: {
+          chartType: 'bar',
+          series: [
+            { label: '', value: 1 },
+            { label: 'B', value: 2 },
+          ],
+          summary: 'x',
+        },
+      }),
+    ).toBe('series-label-required')
+
+    // non-numeric values are dropped on parse
+    const coerced = parseBlocksDocument(
+      '[{"id":"k","type":"chart","data":{"chartType":"bar","summary":"x","series":[{"label":"A","value":"NaN"},{"label":"B","value":2}]}}]',
+    )
+    const chart = coerced[0]
+    if (chart?.type === 'chart') {
+      expect(chart.data.series).toHaveLength(1)
+    }
   })
 })

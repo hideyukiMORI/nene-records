@@ -12,7 +12,7 @@
  * shared/ui) can import it.
  */
 
-const BLOCK_TYPES = ['text', 'callout', 'hero', 'gallery'] as const
+const BLOCK_TYPES = ['text', 'callout', 'hero', 'gallery', 'chart'] as const
 export type BlockType = (typeof BLOCK_TYPES)[number]
 
 export const CALLOUT_KINDS = ['info', 'warn', 'ok', 'danger'] as const
@@ -23,6 +23,9 @@ export type HeroVariant = (typeof HERO_VARIANTS)[number]
 
 export const GALLERY_LAYOUTS = ['carousel', 'grid'] as const
 export type GalleryLayout = (typeof GALLERY_LAYOUTS)[number]
+
+export const CHART_TYPES = ['bar', 'line'] as const
+export type ChartType = (typeof CHART_TYPES)[number]
 
 export interface TextBlockData {
   markdown: string
@@ -70,11 +73,25 @@ export interface GalleryBlockData {
   items: GalleryItem[]
 }
 
+/** A chart data point: a label and a numeric value. */
+export interface SeriesPoint {
+  label: string
+  value: number
+}
+
+export interface ChartBlockData {
+  chartType: ChartType
+  title?: string
+  series: SeriesPoint[]
+  summary: string
+}
+
 export type Block =
   | { id: string; type: 'text'; data: TextBlockData }
   | { id: string; type: 'callout'; data: CalloutBlockData }
   | { id: string; type: 'hero'; data: HeroBlockData }
   | { id: string; type: 'gallery'; data: GalleryBlockData }
+  | { id: string; type: 'chart'; data: ChartBlockData }
 
 export type BlockValidationCode =
   | 'markdown-required'
@@ -83,6 +100,9 @@ export type BlockValidationCode =
   | 'heading-required'
   | 'items-required'
   | 'alt-required'
+  | 'series-required'
+  | 'series-label-required'
+  | 'summary-required'
 
 function isBlockType(value: string): value is BlockType {
   return (BLOCK_TYPES as readonly string[]).includes(value)
@@ -100,6 +120,10 @@ function isGalleryLayout(value: unknown): value is GalleryLayout {
   return typeof value === 'string' && (GALLERY_LAYOUTS as readonly string[]).includes(value)
 }
 
+function isChartType(value: unknown): value is ChartType {
+  return typeof value === 'string' && (CHART_TYPES as readonly string[]).includes(value)
+}
+
 function optionalString(record: Record<string, unknown>, key: string): string | undefined {
   return typeof record[key] === 'string' ? record[key] : undefined
 }
@@ -109,7 +133,7 @@ function coerceMedia(raw: unknown): HeroMedia | undefined {
     return undefined
   }
   const record = raw as Record<string, unknown>
-  if (typeof record.url !== 'string' || record.url === '') {
+  if (typeof record.url !== 'string' || !isSafeMediaUrl(record.url)) {
     return undefined
   }
   const alt = typeof record.alt === 'string' ? record.alt : undefined
@@ -130,7 +154,7 @@ function coerceGalleryItems(raw: unknown): GalleryItem[] {
       continue
     }
     const record = entry as Record<string, unknown>
-    if (typeof record.url !== 'string' || record.url === '') {
+    if (typeof record.url !== 'string' || !isSafeMediaUrl(record.url)) {
       continue
     }
     const caption = typeof record.caption === 'string' ? record.caption : undefined
@@ -142,6 +166,27 @@ function coerceGalleryItems(raw: unknown): GalleryItem[] {
     })
   }
   return items
+}
+
+function coerceSeries(raw: unknown): SeriesPoint[] {
+  if (!Array.isArray(raw)) {
+    return []
+  }
+  const points: SeriesPoint[] = []
+  for (const entry of raw) {
+    if (typeof entry !== 'object' || entry === null) {
+      continue
+    }
+    const record = entry as Record<string, unknown>
+    if (typeof record.value !== 'number' || !Number.isFinite(record.value)) {
+      continue
+    }
+    points.push({
+      label: typeof record.label === 'string' ? record.label : '',
+      value: record.value,
+    })
+  }
+  return points
 }
 
 /** Client-generated stable key (React key / future anchor); opaque, <= 64 chars. */
@@ -172,6 +217,12 @@ export function createBlock(type: BlockType): Block {
       }
     case 'gallery':
       return { id: newBlockId(), type, data: { layout: 'carousel', items: [] } }
+    case 'chart':
+      return {
+        id: newBlockId(),
+        type,
+        data: { chartType: 'bar', title: '', series: [], summary: '' },
+      }
   }
 }
 
@@ -266,6 +317,17 @@ function coerceBlock(raw: unknown, index: number): Block | null {
           items: coerceGalleryItems(record.items),
         },
       }
+    case 'chart':
+      return {
+        id,
+        type,
+        data: {
+          chartType: isChartType(record.chartType) ? record.chartType : 'bar',
+          title: optionalString(record, 'title'),
+          series: coerceSeries(record.series),
+          summary: typeof record.summary === 'string' ? record.summary : '',
+        },
+      }
   }
 }
 
@@ -317,6 +379,18 @@ export function serializeBlocksDocument(blocks: Block[]): string {
         },
       }
     }
+    if (block.type === 'chart') {
+      return {
+        id: block.id,
+        type: 'chart',
+        data: {
+          chartType: block.data.chartType,
+          ...optional({ title: block.data.title }),
+          series: block.data.series,
+          summary: block.data.summary,
+        },
+      }
+    }
     return block
   })
   return JSON.stringify(normalized)
@@ -350,6 +424,14 @@ export function validateBlock(block: Block): BlockValidationCode | null {
         return 'items-required'
       }
       return block.data.items.some((item) => item.alt.trim() === '') ? 'alt-required' : null
+    case 'chart':
+      if (block.data.series.length < 2) {
+        return 'series-required'
+      }
+      if (block.data.series.some((point) => point.label.trim() === '')) {
+        return 'series-label-required'
+      }
+      return block.data.summary.trim() === '' ? 'summary-required' : null
   }
 }
 
@@ -360,8 +442,23 @@ export function validateBlock(block: Block): BlockValidationCode | null {
  */
 export function isSafeHref(url: string): boolean {
   const trimmed = url.trim()
-  if (trimmed === '') {
+  // Reject empty and protocol-relative `//host` / backslash-authority `/\host`
+  // (browser resolves those cross-origin → open redirect).
+  if (trimmed === '' || /^[/\\]{2}/.test(trimmed)) {
     return false
   }
   return /^(https?:\/\/|mailto:|\/|#)/i.test(trimmed)
+}
+
+/**
+ * Library image url: a same-origin relative `/...` path (local driver) or an
+ * `https://` absolute url (object-storage / CDN driver). Mirrors the server's
+ * `isSafeMediaUrl`; rejects protocol-relative and insecure schemes.
+ */
+export function isSafeMediaUrl(url: string): boolean {
+  const trimmed = url.trim()
+  if (trimmed === '' || /^[/\\]{2}/.test(trimmed)) {
+    return false
+  }
+  return trimmed.startsWith('https://') || trimmed.startsWith('/')
 }

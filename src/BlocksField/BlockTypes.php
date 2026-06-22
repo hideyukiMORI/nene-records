@@ -9,7 +9,7 @@ namespace NeNeRecords\BlocksField;
  * an admin inspector form, and a `data` shape validated by
  * {@see BlocksDocumentValidator}. Curated typed blocks (Gutenberg-style column),
  * NOT a free-form page builder. S1 ships `text` and `callout`, S2 adds `hero`,
- * S4 adds `gallery`; a later slice adds `chart`.
+ * S4 adds `gallery`, S5 adds `chart`.
  */
 final class BlockTypes
 {
@@ -19,6 +19,7 @@ final class BlockTypes
         'callout',
         'hero',
         'gallery',
+        'chart',
     ];
 
     public static function isValid(string $type): bool

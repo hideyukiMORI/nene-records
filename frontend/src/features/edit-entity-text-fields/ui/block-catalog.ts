@@ -21,6 +21,7 @@ export const BLOCK_CATALOG: readonly BlockCatalogEntry[] = [
     labelKey: 'admin.blocks.type.gallery',
     descKey: 'admin.blocks.type.gallery.desc',
   },
+  { type: 'chart', labelKey: 'admin.blocks.type.chart', descKey: 'admin.blocks.type.chart.desc' },
 ]
 
 const CATALOG_BY_TYPE = Object.fromEntries(

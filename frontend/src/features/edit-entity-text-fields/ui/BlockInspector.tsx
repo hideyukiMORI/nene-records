@@ -5,29 +5,40 @@ import { Button, Input, ResponsiveImage, Select, Stack } from '@/shared/ui'
 import { IconChevronDown, IconChevronUp, IconX } from '@/shared/ui/icons/Icons'
 import {
   CALLOUT_KINDS,
+  CHART_TYPES,
   GALLERY_LAYOUTS,
   HERO_VARIANTS,
   type Block,
   type BlockValidationCode,
   type CalloutBlockData,
   type CalloutKind,
+  type ChartBlockData,
+  type ChartType,
   type GalleryBlockData,
   type GalleryItem,
   type GalleryLayout,
   type HeroBlockData,
   type HeroMedia,
   type HeroVariant,
+  type SeriesPoint,
   type TextBlockData,
 } from '@/shared/lib/blocks-document'
 import { BlockMarkdownInput } from './BlockMarkdownInput'
 import { MediaSelectorModal } from './MediaSelectorModal'
+
+type BlockDataChange =
+  | TextBlockData
+  | CalloutBlockData
+  | HeroBlockData
+  | GalleryBlockData
+  | ChartBlockData
 
 interface BlockInspectorProps {
   block: Block
   errorCode: BlockValidationCode | null
   disabled: boolean
   idPrefix: string
-  onChange: (data: TextBlockData | CalloutBlockData | HeroBlockData | GalleryBlockData) => void
+  onChange: (data: BlockDataChange) => void
 }
 
 const KIND_LABEL_KEY: Record<CalloutKind, MessageKey> = {
@@ -46,6 +57,11 @@ const VARIANT_LABEL_KEY: Record<HeroVariant, MessageKey> = {
 const LAYOUT_LABEL_KEY: Record<GalleryLayout, MessageKey> = {
   carousel: 'admin.blocks.galleryLayout.carousel',
   grid: 'admin.blocks.galleryLayout.grid',
+}
+
+const CHART_TYPE_LABEL_KEY: Record<ChartType, MessageKey> = {
+  bar: 'admin.blocks.chartType.bar',
+  line: 'admin.blocks.chartType.line',
 }
 
 /** Settings form for the selected block (text / callout / hero / gallery). */
@@ -139,8 +155,66 @@ export function BlockInspector({
           idPrefix={idPrefix}
           items={data.items}
           disabled={disabled}
+          error={errorCode === 'items-required' ? t('admin.blocks.error.itemsRequired') : undefined}
           onChange={(items) => {
             onChange({ ...data, items })
+          }}
+        />
+      </Stack>
+    )
+  }
+
+  if (block.type === 'chart') {
+    const data = block.data
+    return (
+      <Stack gap="sm">
+        <Select
+          id={`${idPrefix}-chart-type`}
+          label={t('admin.blocks.field.chartType')}
+          value={data.chartType}
+          disabled={disabled}
+          onChange={(event) => {
+            onChange({ ...data, chartType: event.target.value as ChartType })
+          }}
+        >
+          {CHART_TYPES.map((chartType) => (
+            <option key={chartType} value={chartType}>
+              {t(CHART_TYPE_LABEL_KEY[chartType])}
+            </option>
+          ))}
+        </Select>
+        <Input
+          id={`${idPrefix}-chart-title`}
+          label={t('admin.blocks.field.title')}
+          value={data.title ?? ''}
+          disabled={disabled}
+          autoComplete="off"
+          onChange={(event) => {
+            onChange({ ...data, title: event.target.value })
+          }}
+        />
+        <SeriesField
+          idPrefix={idPrefix}
+          series={data.series}
+          disabled={disabled}
+          error={
+            errorCode === 'series-required' ? t('admin.blocks.error.seriesRequired') : undefined
+          }
+          onChange={(series) => {
+            onChange({ ...data, series })
+          }}
+        />
+        <Input
+          id={`${idPrefix}-chart-summary`}
+          label={t('admin.blocks.field.summary')}
+          value={data.summary}
+          disabled={disabled}
+          autoComplete="off"
+          error={
+            errorCode === 'summary-required' ? t('admin.blocks.error.summaryRequired') : undefined
+          }
+          onChange={(event) => {
+            onChange({ ...data, summary: event.target.value })
           }}
         />
       </Stack>
@@ -341,11 +415,12 @@ interface GalleryItemsFieldProps {
   idPrefix: string
   items: GalleryItem[]
   disabled: boolean
+  error?: string
   onChange: (items: GalleryItem[]) => void
 }
 
 /** Repeater of gallery slides — each a library image + required alt (C4) + caption (#486 S4). */
-function GalleryItemsField({ idPrefix, items, disabled, onChange }: GalleryItemsFieldProps) {
+function GalleryItemsField({ idPrefix, items, disabled, error, onChange }: GalleryItemsFieldProps) {
   const { t } = useTranslation()
   // null = closed, -1 = adding a new slide, >= 0 = replacing slide i's image
   const [pickFor, setPickFor] = useState<number | null>(null)
@@ -380,9 +455,14 @@ function GalleryItemsField({ idPrefix, items, disabled, onChange }: GalleryItems
       <span className="font-sans text-caption font-medium text-text-primary">
         {t('admin.blocks.field.images')}
       </span>
+      {error !== undefined ? (
+        <span role="alert" className="font-sans text-caption text-danger">
+          {error}
+        </span>
+      ) : null}
       {items.map((item, index) => (
         <div
-          key={item.mediaId}
+          key={`${item.mediaId}-${String(index)}`}
           className="flex flex-col gap-stack-xs rounded-md border border-border p-inline-sm"
         >
           <div className="flex items-center gap-inline-sm">
@@ -481,6 +561,124 @@ function GalleryItemsField({ idPrefix, items, disabled, onChange }: GalleryItems
           }}
         />
       ) : null}
+    </div>
+  )
+}
+
+interface SeriesFieldProps {
+  idPrefix: string
+  series: SeriesPoint[]
+  disabled: boolean
+  error?: string
+  onChange: (series: SeriesPoint[]) => void
+}
+
+/** Repeater of chart data points — label + numeric value (#486 S5). */
+function SeriesField({ idPrefix, series, disabled, error, onChange }: SeriesFieldProps) {
+  const { t } = useTranslation()
+
+  const update = (index: number, patch: Partial<SeriesPoint>) => {
+    onChange(series.map((point, i) => (i === index ? { ...point, ...patch } : point)))
+  }
+  const move = (index: number, direction: -1 | 1) => {
+    const target = index + direction
+    if (target < 0 || target >= series.length) {
+      return
+    }
+    const next = series.slice()
+    const [moved] = next.splice(index, 1)
+    next.splice(target, 0, moved)
+    onChange(next)
+  }
+  const remove = (index: number) => {
+    onChange(series.filter((_, i) => i !== index))
+  }
+
+  return (
+    <div className="flex flex-col gap-stack-xs">
+      <span className="font-sans text-caption font-medium text-text-primary">
+        {t('admin.blocks.field.series')}
+      </span>
+      {error !== undefined ? (
+        <span role="alert" className="font-sans text-caption text-danger">
+          {error}
+        </span>
+      ) : null}
+      {series.map((point, index) => (
+        <div key={index} className="flex items-end gap-inline-sm">
+          <div className="flex-1">
+            <Input
+              id={`${idPrefix}-series-${String(index)}-label`}
+              label={t('admin.blocks.series.label')}
+              value={point.label}
+              disabled={disabled}
+              autoComplete="off"
+              error={point.label.trim() === '' ? t('admin.blocks.error.labelRequired') : undefined}
+              onChange={(event) => {
+                update(index, { label: event.target.value })
+              }}
+            />
+          </div>
+          <div className="w-24">
+            <Input
+              id={`${idPrefix}-series-${String(index)}-value`}
+              label={t('admin.blocks.series.value')}
+              type="number"
+              value={String(point.value)}
+              disabled={disabled}
+              onChange={(event) => {
+                const next = Number(event.target.value)
+                update(index, { value: Number.isFinite(next) ? next : 0 })
+              }}
+            />
+          </div>
+          <button
+            type="button"
+            className="rounded p-1 text-text-muted hover:text-text-primary disabled:opacity-40"
+            title={t('admin.blocks.moveUp')}
+            disabled={disabled || index === 0}
+            onClick={() => {
+              move(index, -1)
+            }}
+          >
+            <IconChevronUp size={15} />
+          </button>
+          <button
+            type="button"
+            className="rounded p-1 text-text-muted hover:text-text-primary disabled:opacity-40"
+            title={t('admin.blocks.moveDown')}
+            disabled={disabled || index === series.length - 1}
+            onClick={() => {
+              move(index, 1)
+            }}
+          >
+            <IconChevronDown size={15} />
+          </button>
+          <button
+            type="button"
+            className="rounded p-1 text-text-muted hover:text-danger disabled:opacity-40"
+            title={t('common.actions.delete')}
+            disabled={disabled}
+            onClick={() => {
+              remove(index)
+            }}
+          >
+            <IconX size={15} />
+          </button>
+        </div>
+      ))}
+      <div>
+        <Button
+          variant="secondary"
+          size="sm"
+          disabled={disabled}
+          onClick={() => {
+            onChange([...series, { label: '', value: 0 }])
+          }}
+        >
+          {t('admin.blocks.series.add')}
+        </Button>
+      </div>
     </div>
   )
 }

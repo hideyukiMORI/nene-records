@@ -1,7 +1,9 @@
-import { describe, expect, it } from 'vitest'
-import { screen } from '@testing-library/react'
+import { afterEach, describe, expect, it } from 'vitest'
+import { cleanup, screen } from '@testing-library/react'
 import { renderWithProviders } from '@tests/render/render-with-providers'
 import { BlocksRenderer } from './BlocksRenderer'
+
+afterEach(cleanup)
 
 describe('BlocksRenderer', () => {
   it('renders text and callout blocks', () => {
@@ -98,5 +100,30 @@ describe('BlocksRenderer', () => {
     expect(container.querySelectorAll('.gallery__slide')).toHaveLength(2)
     expect(screen.getByText('Cap1')).toBeInTheDocument()
     expect(container.querySelector('img[alt="First"]')).not.toBeNull()
+  })
+
+  it('renders a chart as SVG plus an sr-only data table', () => {
+    const doc = JSON.stringify([
+      {
+        id: 'k',
+        type: 'chart',
+        data: {
+          chartType: 'bar',
+          title: 'Monthly',
+          series: [
+            { label: 'Jan', value: 4 },
+            { label: 'Feb', value: 6 },
+          ],
+          summary: 'Up from Jan to Feb.',
+        },
+      },
+    ])
+
+    const { container } = renderWithProviders(<BlocksRenderer documentJson={doc} />)
+
+    expect(container.querySelector('.chart[data-chart-type="bar"]')).not.toBeNull()
+    expect(container.querySelectorAll('.chart__bar')).toHaveLength(2)
+    expect(screen.getByText('Up from Jan to Feb.')).toBeInTheDocument()
+    expect(container.querySelectorAll('.chart__table tbody tr')).toHaveLength(2)
   })
 })

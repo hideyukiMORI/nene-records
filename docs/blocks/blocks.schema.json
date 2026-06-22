@@ -18,7 +18,7 @@
           "minLength": 1,
           "maxLength": 64
         },
-        "type": { "enum": ["text", "callout", "hero", "gallery"] },
+        "type": { "enum": ["text", "callout", "hero", "gallery", "chart"] },
         "data": { "type": "object" }
       },
       "allOf": [
@@ -37,6 +37,10 @@
         {
           "if": { "properties": { "type": { "const": "gallery" } } },
           "then": { "properties": { "data": { "$ref": "#/$defs/galleryData" } } }
+        },
+        {
+          "if": { "properties": { "type": { "const": "chart" } } },
+          "then": { "properties": { "data": { "$ref": "#/$defs/chartData" } } }
         }
       ]
     },
@@ -79,7 +83,7 @@
       "type": "object",
       "additionalProperties": false,
       "required": ["mediaId", "url"],
-      "description": "A picker-selected library image. url is a site-relative /media/... path (the media metadata API is admin-only, so the consumer renders the stored url directly, like the image field type).",
+      "description": "A picker-selected library image. url is a same-origin /media/... path (local driver) or an https:// url (object-storage/CDN driver); the consumer renders the stored url directly (the media metadata API is admin-only), like the image field type. Protocol-relative // and insecure schemes are rejected server-side.",
       "properties": {
         "mediaId": { "type": "string", "minLength": 1, "maxLength": 64 },
         "url": { "type": "string", "minLength": 1, "maxLength": 2000 },
@@ -110,6 +114,32 @@
         "url": { "type": "string", "minLength": 1, "maxLength": 2000 },
         "alt": { "type": "string", "minLength": 1, "maxLength": 300 },
         "caption": { "type": "string", "maxLength": 300 }
+      }
+    },
+    "chartData": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["chartType", "series", "summary"],
+      "description": "First-party bar/line chart. summary is the required sr-only projection (C4); the consumer also renders a data table.",
+      "properties": {
+        "chartType": { "enum": ["bar", "line"] },
+        "title": { "type": "string", "maxLength": 300 },
+        "series": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 60,
+          "items": { "$ref": "#/$defs/seriesPoint" }
+        },
+        "summary": { "type": "string", "minLength": 1, "maxLength": 2000 }
+      }
+    },
+    "seriesPoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["label", "value"],
+      "properties": {
+        "label": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "value": { "type": "number" }
       }
     }
   }

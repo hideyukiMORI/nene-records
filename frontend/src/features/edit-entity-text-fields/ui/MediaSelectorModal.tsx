@@ -31,10 +31,11 @@ export function MediaSelectorModal({ currentMediaId, onSelect, onClose }: MediaS
       <div
         role="dialog"
         aria-modal="true"
+        aria-labelledby="block-media-picker-title"
         className="relative flex w-full max-w-2xl flex-col gap-stack-sm rounded-md border border-border bg-surface-raised p-inline-lg shadow-md"
       >
         <div className="flex items-center justify-between">
-          <Text as="h2" variant="heading-sm">
+          <Text as="h2" id="block-media-picker-title" variant="heading-sm">
             {t('admin.blocks.media.pickerTitle')}
           </Text>
           <button

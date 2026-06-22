@@ -147,11 +147,28 @@ final class BlocksDocumentValidatorTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testRejectsHeroMediaWithNonRelativeUrl(): void
+    public function testRejectsHeroMediaProtocolRelativeUrl(): void
     {
         $this->expectException(ValidationException::class);
         $this->validator->validate(
-            '[{"id":"h1","type":"hero","data":{"variant":"standard","heading":"x","media":{"mediaId":"1","url":"https://evil.example/x.png"}}}]',
+            '[{"id":"h1","type":"hero","data":{"variant":"standard","heading":"x","media":{"mediaId":"1","url":"//evil.example/x.png"}}}]',
+        );
+    }
+
+    public function testAcceptsHeroMediaHttpsUrl(): void
+    {
+        // Object-storage / CDN drivers (S3) return absolute https URLs.
+        $this->validator->validate(
+            '[{"id":"h1","type":"hero","data":{"variant":"standard","heading":"x","media":{"mediaId":"1","url":"https://cdn.example.com/media/2026/06/x.png"}}}]',
+        );
+        $this->addToAssertionCount(1);
+    }
+
+    public function testRejectsHeroCtaProtocolRelativeUrl(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->validator->validate(
+            '[{"id":"h1","type":"hero","data":{"variant":"standard","heading":"x","ctaUrl":"//evil.example"}}]',
         );
     }
 
@@ -185,11 +202,53 @@ final class BlocksDocumentValidatorTest extends TestCase
         );
     }
 
-    public function testRejectsGalleryItemNonRelativeUrl(): void
+    public function testRejectsGalleryItemInsecureUrl(): void
     {
         $this->expectException(ValidationException::class);
         $this->validator->validate(
-            '[{"id":"g1","type":"gallery","data":{"layout":"grid","items":[{"mediaId":"1","url":"https://evil.example/a.png","alt":"A"}]}}]',
+            '[{"id":"g1","type":"gallery","data":{"layout":"grid","items":[{"mediaId":"1","url":"//evil.example/a.png","alt":"A"}]}}]',
+        );
+    }
+
+    public function testAcceptsValidChartBlock(): void
+    {
+        $json = json_encode([
+            ['id' => 'k1', 'type' => 'chart', 'data' => [
+                'chartType' => 'bar',
+                'title' => 'Monthly',
+                'series' => [
+                    ['label' => 'Jan', 'value' => 4],
+                    ['label' => 'Feb', 'value' => 6.5],
+                ],
+                'summary' => 'Up from Jan to Feb.',
+            ]],
+        ], JSON_THROW_ON_ERROR);
+
+        $this->validator->validate($json);
+        $this->addToAssertionCount(1);
+    }
+
+    public function testRejectsChartWithoutSummary(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->validator->validate(
+            '[{"id":"k1","type":"chart","data":{"chartType":"bar","series":[{"label":"A","value":1},{"label":"B","value":2}]}}]',
+        );
+    }
+
+    public function testRejectsChartWithTooFewPoints(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->validator->validate(
+            '[{"id":"k1","type":"chart","data":{"chartType":"line","summary":"x","series":[{"label":"A","value":1}]}}]',
+        );
+    }
+
+    public function testRejectsChartPointWithNonNumericValue(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->validator->validate(
+            '[{"id":"k1","type":"chart","data":{"chartType":"bar","summary":"x","series":[{"label":"A","value":"NaN"},{"label":"B","value":2}]}}]',
         );
     }
 }

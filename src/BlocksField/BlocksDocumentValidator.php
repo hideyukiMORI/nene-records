@@ -34,7 +34,12 @@ final class BlocksDocumentValidator
     /** @var list<string> */
     private const GALLERY_LAYOUTS = ['carousel', 'grid'];
 
+    /** @var list<string> */
+    private const CHART_TYPES = ['bar', 'line'];
+
     private const MAX_GALLERY_ITEMS = 50;
+    private const MAX_SERIES_POINTS = 60;
+    private const MAX_SERIES_LABEL_LEN = 120;
     private const MAX_HEADING_LEN = 300;
     private const MAX_LEAD_LEN = 2000;
     private const MAX_CTA_LABEL_LEN = 120;
@@ -107,6 +112,7 @@ final class BlocksDocumentValidator
             'callout' => $this->validateCalloutData($path, $data, $errors),
             'hero' => $this->validateHeroData($path, $data, $errors),
             'gallery' => $this->validateGalleryData($path, $data, $errors),
+            'chart' => $this->validateChartData($path, $data, $errors),
             default => null,
         };
     }
@@ -199,8 +205,8 @@ final class BlocksDocumentValidator
         }
 
         $url = $media['url'] ?? null;
-        if (!is_string($url) || $url === '' || strlen($url) > self::MAX_URL_LEN || !str_starts_with($url, '/')) {
-            $errors[] = new ValidationError("{$field}.url", 'Media url must be a site-relative path (e.g. /media/...).', 'invalid');
+        if (!is_string($url) || strlen($url) > self::MAX_URL_LEN || !$this->isSafeMediaUrl($url)) {
+            $errors[] = new ValidationError("{$field}.url", 'Media url must be a same-origin /media path or an https URL.', 'invalid');
         }
 
         $alt = $media['alt'] ?? null;
@@ -259,8 +265,8 @@ final class BlocksDocumentValidator
         }
 
         $url = $item['url'] ?? null;
-        if (!is_string($url) || $url === '' || strlen($url) > self::MAX_URL_LEN || !str_starts_with($url, '/')) {
-            $errors[] = new ValidationError("{$field}.url", 'Gallery item url must be a site-relative path (e.g. /media/...).', 'invalid');
+        if (!is_string($url) || strlen($url) > self::MAX_URL_LEN || !$this->isSafeMediaUrl($url)) {
+            $errors[] = new ValidationError("{$field}.url", 'Gallery item url must be a same-origin /media path or an https URL.', 'invalid');
         }
 
         $alt = $item['alt'] ?? null;
@@ -271,6 +277,68 @@ final class BlocksDocumentValidator
         $caption = $item['caption'] ?? null;
         if ($caption !== null && (!is_string($caption) || strlen($caption) > self::MAX_HEADING_LEN)) {
             $errors[] = new ValidationError("{$field}.caption", 'Gallery caption must be a string (max ' . self::MAX_HEADING_LEN . ' chars).', 'invalid');
+        }
+    }
+
+    /**
+     * Chart block (#486 S5): a first-party bar/line chart over labelled numeric
+     * points, with a required one-line summary projected sr-only (C4) alongside a
+     * data table on the consumer.
+     *
+     * @param array<array-key, mixed> $data
+     * @param list<ValidationError> $errors
+     */
+    private function validateChartData(string $path, array $data, array &$errors): void
+    {
+        $chartType = $data['chartType'] ?? null;
+        if (!is_string($chartType) || !in_array($chartType, self::CHART_TYPES, true)) {
+            $errors[] = new ValidationError("{$path}.data.chartType", 'Chart type must be one of: ' . implode(', ', self::CHART_TYPES) . '.', 'invalid');
+        }
+
+        $this->validateOptionalString("{$path}.data.title", $data['title'] ?? null, self::MAX_HEADING_LEN, $errors);
+
+        $summary = $data['summary'] ?? null;
+        if (!is_string($summary) || $summary === '' || strlen($summary) > self::MAX_LEAD_LEN) {
+            $errors[] = new ValidationError("{$path}.data.summary", 'Chart requires a non-empty summary (C4).', 'invalid');
+        }
+
+        $series = $data['series'] ?? null;
+        if (!is_array($series) || !array_is_list($series) || count($series) < 2) {
+            $errors[] = new ValidationError("{$path}.data.series", 'Chart requires at least two data points.', 'invalid');
+
+            return;
+        }
+
+        if (count($series) > self::MAX_SERIES_POINTS) {
+            $errors[] = new ValidationError("{$path}.data.series", 'Chart may contain at most ' . self::MAX_SERIES_POINTS . ' data points.', 'invalid');
+
+            return;
+        }
+
+        foreach ($series as $index => $point) {
+            $this->validateSeriesPoint("{$path}.data.series[{$index}]", $point, $errors);
+        }
+    }
+
+    /**
+     * @param list<ValidationError> $errors
+     */
+    private function validateSeriesPoint(string $field, mixed $point, array &$errors): void
+    {
+        if (!is_array($point)) {
+            $errors[] = new ValidationError($field, 'Data point must be an object.', 'invalid');
+
+            return;
+        }
+
+        $label = $point['label'] ?? null;
+        if (!is_string($label) || $label === '' || strlen($label) > self::MAX_SERIES_LABEL_LEN) {
+            $errors[] = new ValidationError("{$field}.label", 'Data point requires a non-empty label.', 'invalid');
+        }
+
+        $value = $point['value'] ?? null;
+        if (!is_int($value) && !is_float($value)) {
+            $errors[] = new ValidationError("{$field}.value", 'Data point value must be a number.', 'invalid');
         }
     }
 
@@ -299,8 +367,9 @@ final class BlocksDocumentValidator
     }
 
     /**
-     * Allowlist safe link targets; blocks `javascript:`/`data:` and other schemes
-     * that could execute script when rendered as an href.
+     * Allowlist safe link targets; blocks `javascript:`/`data:` (script execution)
+     * and protocol-relative `//host` / backslash-authority `/\host` forms that the
+     * browser resolves cross-origin (open redirect / phishing).
      */
     private function isSafeUrl(string $url): bool
     {
@@ -309,6 +378,40 @@ final class BlocksDocumentValidator
             return true;
         }
 
+        if ($this->hasAuthorityPrefix($trimmed)) {
+            return false;
+        }
+
         return preg_match('#^(https?://|mailto:|/|\#)#i', $trimmed) === 1;
+    }
+
+    /**
+     * Library image url: a same-origin relative `/...` path (local driver) or an
+     * `https://` absolute url (object-storage / CDN driver). Rejects protocol-
+     * relative / backslash-authority forms and insecure schemes.
+     */
+    private function isSafeMediaUrl(string $url): bool
+    {
+        $trimmed = trim($url);
+        if ($trimmed === '' || $this->hasAuthorityPrefix($trimmed)) {
+            return false;
+        }
+        if (str_starts_with($trimmed, 'https://')) {
+            return true;
+        }
+
+        return str_starts_with($trimmed, '/');
+    }
+
+    /** True when the first two chars are both '/' or '\' (protocol-relative authority). */
+    private function hasAuthorityPrefix(string $url): bool
+    {
+        if (strlen($url) < 2) {
+            return false;
+        }
+        $a = $url[0];
+        $b = $url[1];
+
+        return ($a === '/' || $a === '\\') && ($b === '/' || $b === '\\');
     }
 }

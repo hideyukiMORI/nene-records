@@ -3,6 +3,7 @@ import {
   parseBlocksDocument,
   type Block,
   type CalloutKind,
+  type ChartBlockData,
   type GalleryBlockData,
   type HeroBlockData,
 } from '@/shared/lib/blocks-document'
@@ -68,7 +69,138 @@ function ConsumerBlock({ block }: { block: Block }) {
       return <ConsumerHero data={block.data} />
     case 'gallery':
       return <ConsumerGallery data={block.data} />
+    case 'chart':
+      return <ConsumerChart data={block.data} />
   }
+}
+
+/**
+ * Chart block (#486 S5): a first-party minimal bar/line SVG (C2 — no charting
+ * library, no JS) with the data also projected as an sr-only summary + table (C4).
+ */
+function ConsumerChart({ data }: { data: ChartBlockData }) {
+  const series = data.series
+  if (series.length < 2) {
+    return null
+  }
+
+  const width = 640
+  const height = 240
+  const padLeft = 46
+  const padRight = 10
+  const padTop = 24
+  const padBottom = 28
+  const innerWidth = width - padLeft - padRight
+  const innerHeight = height - padTop - padBottom
+  const count = series.length
+  const max = Math.max(1, ...series.map((point) => point.value))
+  const slot = innerWidth / count
+  const center = (index: number) => padLeft + slot * index + slot / 2
+  const yOf = (value: number) => padTop + innerHeight * (1 - value / max)
+  const barWidth = slot * 0.6
+  const isBar = data.chartType === 'bar'
+  // Keep line points / dots / value labels on-canvas even for negative values
+  // (bars already collapse to height 0 via Math.max below).
+  const clampY = (value: number) => Math.min(padTop + innerHeight, Math.max(padTop, yOf(value)))
+  const linePoints = series
+    .map((point, index) => `${center(index).toFixed(1)},${clampY(point.value).toFixed(1)}`)
+    .join(' ')
+  const ticks = [0, 0.25, 0.5, 0.75, 1]
+  const formatTick = (value: number) =>
+    Number.isInteger(value) ? String(value) : String(Number(value.toFixed(2)))
+  const title = data.title
+
+  return (
+    <figure className="chart" data-chart-type={data.chartType}>
+      {title !== undefined && title.trim() !== '' ? (
+        <figcaption className="chart__title">{title}</figcaption>
+      ) : null}
+      <div className="chart__plot">
+        <svg
+          viewBox={`0 0 ${String(width)} ${String(height)}`}
+          aria-hidden="true"
+          className="chart__svg"
+        >
+          {ticks.map((fraction) => {
+            const gridY = padTop + innerHeight * (1 - fraction)
+            return (
+              <g key={fraction}>
+                <line
+                  x1={padLeft}
+                  x2={width - padRight}
+                  y1={gridY}
+                  y2={gridY}
+                  className={fraction === 0 ? 'chart__axis' : 'chart__grid'}
+                />
+                <text x={padLeft - 8} y={gridY + 4} textAnchor="end" className="chart__ytick">
+                  {formatTick(max * fraction)}
+                </text>
+              </g>
+            )
+          })}
+          {isBar
+            ? series.map((point, index) => (
+                <rect
+                  key={index}
+                  x={padLeft + slot * index + (slot - barWidth) / 2}
+                  y={yOf(point.value)}
+                  width={barWidth}
+                  height={Math.max(0, padTop + innerHeight - yOf(point.value))}
+                  rx="3"
+                  className="chart__bar"
+                />
+              ))
+            : null}
+          {isBar ? null : <polyline points={linePoints} fill="none" className="chart__line" />}
+          {isBar
+            ? null
+            : series.map((point, index) => (
+                <circle
+                  key={index}
+                  cx={center(index)}
+                  cy={clampY(point.value)}
+                  r="3.5"
+                  className="chart__dot"
+                />
+              ))}
+          {series.map((point, index) => (
+            <text
+              key={index}
+              x={center(index)}
+              y={clampY(point.value) - 7}
+              textAnchor="middle"
+              className="chart__val"
+            >
+              {point.value}
+            </text>
+          ))}
+        </svg>
+        <div className="chart__labels" aria-hidden="true">
+          {series.map((point, index) => (
+            <span key={index}>{point.label}</span>
+          ))}
+        </div>
+      </div>
+      <span className="sr-only">{data.summary}</span>
+      <table className="chart__table sr-only">
+        <caption>{title ?? ''}</caption>
+        <thead>
+          <tr>
+            <th scope="col">ラベル</th>
+            <th scope="col">値</th>
+          </tr>
+        </thead>
+        <tbody>
+          {series.map((point, index) => (
+            <tr key={index}>
+              <th scope="row">{point.label}</th>
+              <td>{point.value}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </figure>
+  )
 }
 
 /**
@@ -82,8 +214,8 @@ function ConsumerGallery({ data }: { data: GalleryBlockData }) {
   return (
     <section className={`gallery gallery--${data.layout}`}>
       <ul className="gallery__track">
-        {data.items.map((item) => (
-          <li className="gallery__slide" key={item.mediaId}>
+        {data.items.map((item, index) => (
+          <li className="gallery__slide" key={`${item.mediaId}-${String(index)}`}>
             <ResponsiveImage
               src={item.url}
               alt={item.alt}
