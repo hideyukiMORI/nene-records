@@ -12,6 +12,7 @@ export const createEntityTypeFormSchema = z.object({
 })
 
 export type CreateEntityTypeFormValues = z.infer<typeof createEntityTypeFormSchema>
+type CreateEntityTypeFormInput = z.input<typeof createEntityTypeFormSchema>
 
 export const editEntityTypeFormSchema = createEntityTypeFormSchema.extend({
   labelJa: z.string().optional(),
@@ -28,6 +29,7 @@ export const editEntityTypeFormSchema = createEntityTypeFormSchema.extend({
 })
 
 export type EditEntityTypeFormValues = z.infer<typeof editEntityTypeFormSchema>
+type EditEntityTypeFormInput = z.input<typeof editEntityTypeFormSchema>
 
 /** Maps the flat label_* form fields to a locale-keyed labels Record. */
 export function formValuesToLabels(values: EditEntityTypeFormValues): Record<string, string> {
@@ -50,7 +52,7 @@ export const EDIT_LABEL_FIELDS = [
 ] as const
 
 export function useCreateEntityTypeForm() {
-  return useForm<CreateEntityTypeFormValues>({
+  return useForm<CreateEntityTypeFormInput, unknown, CreateEntityTypeFormValues>({
     resolver: zodResolver(createEntityTypeFormSchema),
     defaultValues: {
       name: '',
@@ -60,8 +62,8 @@ export function useCreateEntityTypeForm() {
   })
 }
 
-export function useEditEntityTypeForm(defaultValues: EditEntityTypeFormValues) {
-  return useForm<EditEntityTypeFormValues>({
+export function useEditEntityTypeForm(defaultValues: EditEntityTypeFormInput) {
+  return useForm<EditEntityTypeFormInput, unknown, EditEntityTypeFormValues>({
     resolver: zodResolver(editEntityTypeFormSchema),
     defaultValues,
   })

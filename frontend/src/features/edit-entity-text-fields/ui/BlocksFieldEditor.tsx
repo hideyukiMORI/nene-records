@@ -136,6 +136,9 @@ export function BlocksFieldEditor({
     }
     const next = blocks.slice()
     const [moved] = next.splice(index, 1)
+    if (moved === undefined) {
+      return
+    }
     next.splice(target, 0, moved)
     emit(next)
   }
@@ -147,6 +150,9 @@ export function BlocksFieldEditor({
     }
     const next = blocks.slice()
     const [moved] = next.splice(fromIndex, 1)
+    if (moved === undefined) {
+      return
+    }
     const adjusted = toIndex > fromIndex ? toIndex - 1 : toIndex
     next.splice(adjusted, 0, moved)
     emit(next)

@@ -1,6 +1,6 @@
 export type EntityStatusDto = 'draft' | 'published' | 'archived' | 'scheduled'
 
-export type LayoutDto = 'standard' | 'full' | 'bare'
+export type LayoutDto = 'standard' | 'full' | 'two-col' | 'three-col' | 'bare' | 'custom'
 
 export interface EntityDto {
   id: number

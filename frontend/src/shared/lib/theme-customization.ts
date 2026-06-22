@@ -50,27 +50,27 @@ export interface ColorPair {
 
 /** Structural style flags — enumerated; implemented once in base CSS. */
 export interface ThemeFlags {
-  feedLayout?: string
-  feedColumns?: string
-  cardStyle?: string
-  media?: string
-  hero?: string
-  sectionRule?: string
-  eyebrow?: string
+  feedLayout?: string | undefined
+  feedColumns?: string | undefined
+  cardStyle?: string | undefined
+  media?: string | undefined
+  hero?: string | undefined
+  sectionRule?: string | undefined
+  eyebrow?: string | undefined
   /** Header element visibility (see header-patterns.md §3/§4). */
-  headerSearch?: string
-  headerTheme?: string
-  headerTagline?: string
+  headerSearch?: string | undefined
+  headerTheme?: string | undefined
+  headerTagline?: string | undefined
   /** Header skeleton + modifiers (see header-patterns.md §4/§5). */
-  headerLayout?: string
-  headerNavAlign?: string
-  headerDensity?: string
-  headerWidth?: string
-  headerSticky?: string
+  headerLayout?: string | undefined
+  headerNavAlign?: string | undefined
+  headerDensity?: string | undefined
+  headerWidth?: string | undefined
+  headerSticky?: string | undefined
   /** Motion capability layer (see #371 / theme-flags.md §6). First-party JS implements
    *  the behaviour; themes only declare the flag. Gated by prefers-reduced-motion. */
-  motionReveal?: string
-  motionHeader?: string
+  motionReveal?: string | undefined
+  motionHeader?: string | undefined
 }
 
 /** flag key → { data attribute, allowed values }. Mirrors theme-flags.md §2. */
@@ -365,25 +365,32 @@ export function resolveOverrideStyle(overrides: ThemeOverrides): Record<string, 
     style['--color-accent-hover'] = `color-mix(in oklch, ${overrides.accent}, black 12%)`
   }
   if (isOption(FONT_OPTIONS, overrides.fontBody)) {
-    style['--font-sans'] = FONT_STACKS[overrides.fontBody]
+    const stack = FONT_STACKS[overrides.fontBody]
+    if (stack !== undefined) style['--font-sans'] = stack
   }
   if (isOption(DISPLAY_FONT_OPTIONS, overrides.fontDisplay)) {
-    style['--font-display'] = DISPLAY_FONT_STACKS[overrides.fontDisplay]
+    const stack = DISPLAY_FONT_STACKS[overrides.fontDisplay]
+    if (stack !== undefined) style['--font-display'] = stack
   }
   if (isOption(MONO_FONT_OPTIONS, overrides.fontMono)) {
-    style['--font-mono'] = MONO_FONT_STACKS[overrides.fontMono]
+    const stack = MONO_FONT_STACKS[overrides.fontMono]
+    if (stack !== undefined) style['--font-mono'] = stack
   }
   if (isOption(WIDTH_OPTIONS, overrides.contentWidth)) {
-    style['--content-w'] = WIDTH_VALUES[overrides.contentWidth]
+    const width = WIDTH_VALUES[overrides.contentWidth]
+    if (width !== undefined) style['--content-w'] = width
   }
   if (isOption(GUTTER_OPTIONS, overrides.gutter)) {
-    style['--gutter'] = GUTTER_VALUES[overrides.gutter]
+    const gutter = GUTTER_VALUES[overrides.gutter]
+    if (gutter !== undefined) style['--gutter'] = gutter
   }
   if (isOption(RADIUS_OPTIONS, overrides.radius)) {
     const radius = RADIUS_VALUES[overrides.radius]
-    style['--radius-sm'] = radius.sm
-    style['--radius-md'] = radius.md
-    style['--radius-lg'] = radius.lg
+    if (radius !== undefined) {
+      style['--radius-sm'] = radius.sm
+      style['--radius-md'] = radius.md
+      style['--radius-lg'] = radius.lg
+    }
   }
 
   // Type scale: recompute the fixed-rem text tokens from base × scale.
@@ -396,16 +403,20 @@ export function resolveOverrideStyle(overrides: ThemeOverrides): Record<string, 
     const scale = hasTypeScale
       ? TYPE_SCALE_VALUES[overrides.typeScale as string]
       : TYPE_SCALE_VALUES.default
-    for (const [name, step] of TEXT_STEPS) {
-      style[`--text-${name}`] = rem(base * scale ** step)
+    if (base !== undefined && scale !== undefined) {
+      for (const [name, step] of TEXT_STEPS) {
+        style[`--text-${name}`] = rem(base * scale ** step)
+      }
     }
   }
 
   // Density: scale the whole space ramp.
   if (isOption(DENSITY_OPTIONS, overrides.density)) {
     const factor = DENSITY_FACTORS[overrides.density]
-    for (const [name, value] of SPACE_SCALE) {
-      style[`--space-${name}`] = rem(value * factor)
+    if (factor !== undefined) {
+      for (const [name, value] of SPACE_SCALE) {
+        style[`--space-${name}`] = rem(value * factor)
+      }
     }
   }
 

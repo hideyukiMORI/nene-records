@@ -6,7 +6,7 @@ import { Text } from '@/shared/ui/primitives/Text'
 export interface ConfirmDialogProps {
   open: boolean
   title: string
-  description?: string
+  description?: string | undefined
   errorDetail?: string | null
   confirmLabel?: string
   cancelLabel?: string

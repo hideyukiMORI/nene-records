@@ -1,6 +1,7 @@
-import type { FieldDataType, FieldDef } from '@/entities/field-def'
+import type { FieldDef } from '@/entities/field-def'
 import { useTranslation } from '@/shared/i18n'
 import { ConfirmDialog, Stack, Text } from '@/shared/ui'
+import type { CreateFieldDefFormValues } from '../hooks/use-create-field-def-form'
 import { FieldDefCreateForm } from './FieldDefCreateForm'
 import { FieldDefEditForm } from './FieldDefEditForm'
 import { FieldDefListPanel } from './FieldDefListPanel'
@@ -20,10 +21,10 @@ export interface ManageFieldDefsViewProps {
   deleteTarget: FieldDef | null
   isDeleting: boolean
   onRetry: () => void
-  onCreate: (values: { fieldKey: string; dataType: FieldDataType }) => Promise<void>
+  onCreate: (values: CreateFieldDefFormValues) => Promise<void>
   onRequestEdit: (fieldDef: FieldDef) => void
   onCancelEdit: () => void
-  onUpdate: (values: { fieldKey: string; dataType: FieldDataType }) => Promise<void>
+  onUpdate: (values: CreateFieldDefFormValues) => Promise<void>
   onRequestDelete: (fieldDef: FieldDef) => void
   onCancelDelete: () => void
   onConfirmDelete: () => Promise<void>

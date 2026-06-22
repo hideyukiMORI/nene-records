@@ -142,8 +142,10 @@ export const fieldDefHandlers = [
       entity_type_id: body.entity_type_id,
       field_key: body.field_key,
       data_type: body.data_type,
-      target_entity_type_id: body.target_entity_type_id,
-      cardinality: body.cardinality,
+      ...(body.target_entity_type_id !== undefined
+        ? { target_entity_type_id: body.target_entity_type_id }
+        : {}),
+      ...(body.cardinality !== undefined ? { cardinality: body.cardinality } : {}),
     }
     items = [...items, created]
 
@@ -241,8 +243,10 @@ export const fieldDefHandlers = [
       entity_type_id: body.entity_type_id,
       field_key: body.field_key,
       data_type: body.data_type,
-      target_entity_type_id: body.target_entity_type_id,
-      cardinality: body.cardinality,
+      ...(body.target_entity_type_id !== undefined
+        ? { target_entity_type_id: body.target_entity_type_id }
+        : {}),
+      ...(body.cardinality !== undefined ? { cardinality: body.cardinality } : {}),
     }
     items = items.map((item, itemIndex) => (itemIndex === index ? updated : item))
 

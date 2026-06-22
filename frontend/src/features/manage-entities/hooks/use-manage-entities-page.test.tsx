@@ -84,7 +84,7 @@ describe('useManageEntitiesPage', () => {
     await waitFor(() => {
       expect(result.current.total).toBe(1)
     })
-    expect(result.current.items[0].id).toBe(2)
+    expect(result.current.items[0]?.id).toBe(2)
     expect(result.current.isFilterActive).toBe(true)
   })
 
@@ -128,6 +128,6 @@ describe('useManageEntitiesPage', () => {
       expect(result.current.searchQuery).toBe('alpha')
       expect(result.current.total).toBe(1)
     })
-    expect(result.current.items[0].id).toBe(1)
+    expect(result.current.items[0]?.id).toBe(1)
   })
 })

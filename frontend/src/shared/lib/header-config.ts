@@ -60,7 +60,7 @@ export function safeHref(url: string): string {
     // No scheme and not clearly relative (e.g. "example.com/x") — treat as https.
     return `https://${trimmed}`
   }
-  return SAFE_SCHEMES.includes(match[1].toLowerCase()) ? trimmed : ''
+  return SAFE_SCHEMES.includes((match[1] ?? '').toLowerCase()) ? trimmed : ''
 }
 
 function asString(value: unknown): string {

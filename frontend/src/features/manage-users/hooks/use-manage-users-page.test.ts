@@ -101,8 +101,12 @@ describe('useManageUsersPage', () => {
       expect(result.current.users).toHaveLength(2)
     })
 
+    const target = result.current.users[1]
+    if (target === undefined) {
+      throw new Error('expected at least two users')
+    }
     act(() => {
-      result.current.requestDelete(result.current.users[1])
+      result.current.requestDelete(target)
     })
     expect(result.current.deleteTarget?.id).toBe(2)
 
@@ -113,6 +117,6 @@ describe('useManageUsersPage', () => {
     await waitFor(() => {
       expect(result.current.users).toHaveLength(1)
     })
-    expect(result.current.users[0].email).toBe('admin@example.com')
+    expect(result.current.users[0]?.email).toBe('admin@example.com')
   })
 })

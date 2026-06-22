@@ -30,7 +30,9 @@ export function computeDropIndex(
   const cards = [...container.querySelectorAll('[data-wcard]')]
   const pos = flow === 'row' ? clientX : clientY
   for (let i = 0; i < cards.length; i++) {
-    const r = cards[i].getBoundingClientRect()
+    const card = cards[i]
+    if (card === undefined) continue
+    const r = card.getBoundingClientRect()
     const mid = flow === 'row' ? r.left + r.width / 2 : r.top + r.height / 2
     if (pos < mid) return i
   }

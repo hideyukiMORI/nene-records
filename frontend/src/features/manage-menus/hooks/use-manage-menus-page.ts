@@ -87,8 +87,8 @@ export function useManageMenusPage() {
   const addItem = useCallback(
     async (label: string, url: string) => {
       if (activeMenu === null) return
-      const nextOrder =
-        activeItems.length > 0 ? activeItems[activeItems.length - 1].displayOrder + 1 : 0
+      const last = activeItems[activeItems.length - 1]
+      const nextOrder = last !== undefined ? last.displayOrder + 1 : 0
       await createItem.mutateAsync({
         label,
         url: url.trim() === '' ? '/' : url,
@@ -128,6 +128,7 @@ export function useManageMenusPage() {
       if (target < 0 || target >= activeItems.length) return
       const a = activeItems[index]
       const b = activeItems[target]
+      if (a === undefined || b === undefined) return
       await Promise.all([
         updateItem.mutateAsync({
           id: a.id,

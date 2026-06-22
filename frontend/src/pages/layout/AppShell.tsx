@@ -48,10 +48,9 @@ function NavItem({ to, end, icon, label, onClick, rail = false }: NavItemProps) 
   return (
     <NavLink
       to={to}
-      end={end}
-      onClick={onClick}
-      title={rail ? label : undefined}
-      aria-label={rail ? label : undefined}
+      {...(end !== undefined ? { end } : {})}
+      {...(onClick !== undefined ? { onClick } : {})}
+      {...(rail ? { title: label, 'aria-label': label } : {})}
       className={({ isActive }) =>
         [
           'flex items-center rounded-md py-1.5 font-chrome text-sm font-medium transition-colors duration-fast',

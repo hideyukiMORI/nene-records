@@ -146,7 +146,7 @@ export function useThemeCustomizePage(): ThemeCustomizePageState {
       const manifest = buildThemeManifestFromCustomization({
         id,
         name: name.trim(),
-        description: description.trim() === '' ? undefined : description,
+        ...(description.trim() === '' ? {} : { description }),
         baseTokens: base,
         overrides: clean(draft),
       })

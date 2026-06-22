@@ -1,10 +1,12 @@
+import type { PublicLayoutKey } from '@/shared/lib/resolve-layout'
+
 export interface EntityTypeDto {
   id: number
   name: string
   slug: string
   is_pinned: boolean
   /** Default public-page layout for records of this type. May be absent on older payloads. */
-  default_layout?: 'standard' | 'full' | 'bare'
+  default_layout?: PublicLayoutKey
   /** Sidebar / pinned ordering (ascending). May be absent on older payloads. */
   display_order?: number
   /** Locale-keyed display names, e.g. {"ja":"投稿","fr":"Articles"}. Empty object = no overrides. */
@@ -37,5 +39,5 @@ export interface UpdateEntityTypeDto {
   is_pinned?: boolean
   labels?: Record<string, string>
   permalink_pattern?: string | null
-  default_layout?: 'standard' | 'full' | 'bare'
+  default_layout?: PublicLayoutKey
 }

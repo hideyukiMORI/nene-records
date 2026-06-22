@@ -61,7 +61,7 @@ export function HomePage() {
   const { data, isLoading, isError } = useDashboardSummary()
   const pinnedQuery = usePinnedEntityTypes()
   const pinnedTypes = pinnedQuery.data ?? []
-  const canManageEntities = currentUserHasCapability('manage_entities')
+  const canManageEntities = currentUserHasCapability('edit_content')
 
   // Daily access counts for the sparkline — last SPARK_DAYS days ending today.
   const range = useMemo(() => {
@@ -100,12 +100,14 @@ export function HomePage() {
           canManageEntities && newRecordSlug ? (
             <Button
               variant="primary"
-              leftIcon={<span aria-hidden="true">+</span>}
               onClick={() => {
                 void navigate(`/admin/${newRecordSlug}`)
               }}
             >
-              {t('admin.home.newRecord')}
+              <span className="inline-flex items-center gap-inline-sm">
+                <span aria-hidden="true">+</span>
+                {t('admin.home.newRecord')}
+              </span>
             </Button>
           ) : undefined
         }

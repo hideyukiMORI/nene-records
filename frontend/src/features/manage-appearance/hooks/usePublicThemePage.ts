@@ -54,7 +54,7 @@ function runtimeThemeMeta(theme: ThemeDto): PublicThemeMeta {
     version: theme.version,
     createdAt: theme.created_at.slice(0, 10),
     preview: swatchFromManifest(manifest),
-    thumbnail: theme.thumbnail_url !== '' ? theme.thumbnail_url : undefined,
+    ...(theme.thumbnail_url !== '' ? { thumbnail: theme.thumbnail_url } : {}),
   }
 }
 

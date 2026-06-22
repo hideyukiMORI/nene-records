@@ -51,9 +51,13 @@ describe('resolveOverrideStyle', () => {
     const style = resolveOverrideStyle({ fontSize: 'large', typeScale: 'dramatic' })
     expect(style['--text-body']).toBe('1.1875rem')
     // h3 = base * scale^1 > body
-    expect(parseFloat(style['--text-h3'])).toBeGreaterThan(parseFloat(style['--text-body']))
+    expect(parseFloat(style['--text-h3'] ?? '')).toBeGreaterThan(
+      parseFloat(style['--text-body'] ?? ''),
+    )
     // overline = base * scale^-2 < body
-    expect(parseFloat(style['--text-overline'])).toBeLessThan(parseFloat(style['--text-body']))
+    expect(parseFloat(style['--text-overline'] ?? '')).toBeLessThan(
+      parseFloat(style['--text-body'] ?? ''),
+    )
     // clamp-based hero tokens are NOT overridden
     expect(style['--text-display']).toBeUndefined()
   })

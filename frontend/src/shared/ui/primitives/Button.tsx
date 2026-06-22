@@ -1,16 +1,11 @@
 export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost' | 'subtle'
 export type ButtonSize = 'sm' | 'md'
 
-export interface ButtonProps {
+export interface ButtonProps extends Omit<React.ComponentPropsWithoutRef<'button'>, 'type'> {
   variant?: ButtonVariant
   size?: ButtonSize
-  disabled?: boolean
   type?: 'button' | 'submit' | 'reset'
   children: React.ReactNode
-  className?: string
-  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void
-  onFocus?: (event: React.FocusEvent<HTMLButtonElement>) => void
-  onBlur?: (event: React.FocusEvent<HTMLButtonElement>) => void
   /** Stable hook for E2E tests; prefer this over matching on (i18n) button text. */
   'data-testid'?: string
 }
@@ -45,14 +40,10 @@ const sizeClasses: Record<ButtonSize, string> = {
 export function Button({
   variant = 'primary',
   size = 'md',
-  disabled = false,
   type = 'button',
   children,
   className,
-  onClick,
-  onFocus,
-  onBlur,
-  'data-testid': dataTestId,
+  ...rest
 }: ButtonProps) {
   const classes = [
     'inline-flex items-center justify-center rounded-sm border font-chrome font-semibold tracking-tight transition-colors duration-fast ease-default',
@@ -65,15 +56,7 @@ export function Button({
     .join(' ')
 
   return (
-    <button
-      type={type}
-      disabled={disabled}
-      className={classes}
-      onClick={onClick}
-      onFocus={onFocus}
-      onBlur={onBlur}
-      data-testid={dataTestId}
-    >
+    <button type={type} className={classes} {...rest}>
       {children}
     </button>
   )

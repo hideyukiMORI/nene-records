@@ -9,7 +9,7 @@ export interface CardProps extends HTMLAttributes<HTMLElement> {
   padding?: CardPadding
   /** Adds the accent hover treatment for clickable cards. */
   interactive?: boolean
-  className?: string
+  className?: string | undefined
   children: ReactNode
 }
 

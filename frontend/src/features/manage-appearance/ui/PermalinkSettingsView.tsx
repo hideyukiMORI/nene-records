@@ -62,7 +62,7 @@ function PermalinkRow({ entityType, onSaved }: { entityType: EntityType; onSaved
         name: entityType.name,
         slug: entityType.slug,
         isPinned: entityType.isPinned,
-        labels: entityType.labels,
+        ...(entityType.labels !== undefined ? { labels: entityType.labels } : {}),
         permalinkPattern,
       },
     })

@@ -40,9 +40,9 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
   const response = await fetch(url, {
     method: options.method ?? 'GET',
     headers,
-    body: options.body !== undefined ? JSON.stringify(options.body) : undefined,
     credentials: 'include',
-    signal: options.signal,
+    ...(options.body !== undefined ? { body: JSON.stringify(options.body) } : {}),
+    ...(options.signal !== undefined ? { signal: options.signal } : {}),
   })
 
   if (!response.ok) {

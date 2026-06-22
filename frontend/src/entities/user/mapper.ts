@@ -6,15 +6,15 @@ export function mapUserDtoToModel(dto: UserDto): User {
     id: dto.id,
     email: dto.email,
     role: dto.role as UserRole,
-    organizationId: dto.organization_id,
-    orgRole: dto.org_role,
+    organizationId: dto.organization_id ?? null,
+    orgRole: dto.org_role ?? null,
     status: dto.status,
     pendingEmail: dto.pending_email ?? null,
     displayName: dto.display_name ?? null,
     fullName: dto.full_name ?? null,
     jobTitle: dto.job_title ?? null,
-    createdAt: dto.created_at,
-    updatedAt: dto.updated_at,
+    createdAt: dto.created_at ?? null,
+    updatedAt: dto.updated_at ?? null,
   }
 }
 
@@ -26,8 +26,8 @@ export function mapUserListDtoToModel(dto: UserListDto): UserList {
 
 export function mapUserProfileDtoToModel(dto: UserProfileDto): UserProfile {
   return {
-    displayName: dto.display_name,
-    fullName: dto.full_name,
-    jobTitle: dto.job_title,
+    displayName: dto.display_name ?? null,
+    fullName: dto.full_name ?? null,
+    jobTitle: dto.job_title ?? null,
   }
 }

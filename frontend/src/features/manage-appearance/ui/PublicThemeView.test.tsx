@@ -105,11 +105,15 @@ describe('PublicThemeView', () => {
     // Built-in themes have no edit/delete; only the one runtime theme does.
     const cardDelete = screen.getAllByRole('button', { name: /^Delete$/ })
     expect(cardDelete).toHaveLength(1)
-    fireEvent.click(cardDelete[0])
+    const [firstDelete] = cardDelete
+    if (firstDelete === undefined) throw new Error('expected a card Delete button')
+    fireEvent.click(firstDelete)
     // Confirm dialog now adds a second "Delete" (confirm) button — click it.
     const afterOpen = screen.getAllByRole('button', { name: /^Delete$/ })
     expect(afterOpen.length).toBeGreaterThan(1)
-    fireEvent.click(afterOpen[afterOpen.length - 1])
+    const confirmDelete = afterOpen.at(-1)
+    if (confirmDelete === undefined) throw new Error('expected a confirm Delete button')
+    fireEvent.click(confirmDelete)
     expect(deleteTheme).toHaveBeenCalledWith('midnight')
   })
 })

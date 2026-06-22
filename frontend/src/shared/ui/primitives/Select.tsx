@@ -7,7 +7,7 @@ export interface SelectProps {
   /** Visible label; omit and pass `aria-label` for compact inline selects. */
   label?: string
   name?: string
-  value?: string
+  value?: string | undefined
   onChange: (event: React.ChangeEvent<HTMLSelectElement>) => void
   onBlur?: (event: React.FocusEvent<HTMLSelectElement>) => void
   disabled?: boolean

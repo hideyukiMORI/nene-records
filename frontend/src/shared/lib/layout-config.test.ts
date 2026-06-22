@@ -71,16 +71,16 @@ describe('bodyColumns', () => {
 describe('allActiveSideRegions', () => {
   it('unions side regions across home and record', () => {
     const cfg = {
-      home: { columns: 2, mainPos: 'left' as const, swap: false }, // sidebar
-      record: { columns: 1, mainPos: 'left' as const, swap: false }, // none
+      home: { columns: 2 as const, mainPos: 'left' as const, swap: false }, // sidebar
+      record: { columns: 1 as const, mainPos: 'left' as const, swap: false }, // none
     }
     expect(allActiveSideRegions(cfg).sort()).toEqual(['sidebar'])
   })
 
   it('is empty when every page is single-column', () => {
     const cfg = {
-      home: { columns: 1, mainPos: 'left' as const, swap: false },
-      record: { columns: 1, mainPos: 'left' as const, swap: false },
+      home: { columns: 1 as const, mainPos: 'left' as const, swap: false },
+      record: { columns: 1 as const, mainPos: 'left' as const, swap: false },
     }
     expect(allActiveSideRegions(cfg)).toEqual([])
   })
