@@ -7,8 +7,8 @@
  * override the active theme's tokens). Values are constrained/sanitised here —
  * we only ever emit known CSS variables with validated values, never raw input.
  *
- * Knobs: accent (色) / body font (フォント) / content width (幅) / gutter (余白)
- * / radius (角丸) / font size × type scale (→ `--text-*`) / density (→ `--space-*`).
+ * Knobs: accent (色) / body・display・mono font (フォント) / content width (幅)
+ * / gutter (余白) / radius (角丸) / font size × type scale (→ `--text-*`) / density (→ `--space-*`).
  * Derived tokens that reference these (e.g. `--color-accent-weak`) auto-follow.
  */
 
@@ -18,6 +18,10 @@ export interface ThemeOverrides {
   accent?: string
   /** Body font key (see FONT_OPTIONS). Maps to `--font-sans`. */
   fontBody?: string
+  /** Display/heading font key (see DISPLAY_FONT_OPTIONS). Maps to `--font-display`. */
+  fontDisplay?: string
+  /** Mono/eyebrow font key (see MONO_FONT_OPTIONS). Maps to `--font-mono`. */
+  fontMono?: string
   /** Content width preset key (see WIDTH_OPTIONS). Maps to `--content-w`. */
   contentWidth?: string
   /** Gutter preset key (see GUTTER_OPTIONS). Maps to `--gutter`. */
@@ -233,6 +237,36 @@ const FONT_STACKS: Record<string, string> = {
   system: 'ui-sans-serif, system-ui, sans-serif',
 }
 
+/** Display/heading font allowlist (→ `--font-display`). All self-hosted via @fontsource. */
+export const DISPLAY_FONT_OPTIONS: readonly KnobOption[] = [
+  { value: 'playfair', label: 'Playfair Display (serif)' },
+  { value: 'bricolage', label: 'Bricolage Grotesque' },
+  { value: 'archivo', label: 'Archivo' },
+  { value: 'oswald', label: 'Oswald' },
+  { value: 'source-serif', label: 'Source Serif 4 (serif)' },
+  { value: 'system', label: 'System sans' },
+]
+
+const DISPLAY_FONT_STACKS: Record<string, string> = {
+  playfair: "'Playfair Display', Georgia, 'Times New Roman', serif",
+  bricolage: "'Bricolage Grotesque', 'Noto Sans JP', system-ui, sans-serif",
+  archivo: "'Archivo', 'Arial Narrow', system-ui, sans-serif",
+  oswald: "'Oswald', 'Noto Sans JP', system-ui, sans-serif",
+  'source-serif': "'Source Serif 4', 'Noto Serif JP', Georgia, serif",
+  system: 'ui-sans-serif, system-ui, sans-serif',
+}
+
+/** Mono/eyebrow font allowlist (→ `--font-mono`). All self-hosted via @fontsource. */
+export const MONO_FONT_OPTIONS: readonly KnobOption[] = [
+  { value: 'space-mono', label: 'Space Mono' },
+  { value: 'system', label: 'System mono' },
+]
+
+const MONO_FONT_STACKS: Record<string, string> = {
+  'space-mono': "'Space Mono', ui-monospace, 'Cascadia Code', monospace",
+  system: "ui-monospace, 'Cascadia Code', 'Courier New', monospace",
+}
+
 export const WIDTH_OPTIONS: readonly KnobOption[] = [
   { value: 'narrow', label: 'Narrow' },
   { value: 'default', label: 'Default' },
@@ -332,6 +366,12 @@ export function resolveOverrideStyle(overrides: ThemeOverrides): Record<string, 
   }
   if (isOption(FONT_OPTIONS, overrides.fontBody)) {
     style['--font-sans'] = FONT_STACKS[overrides.fontBody]
+  }
+  if (isOption(DISPLAY_FONT_OPTIONS, overrides.fontDisplay)) {
+    style['--font-display'] = DISPLAY_FONT_STACKS[overrides.fontDisplay]
+  }
+  if (isOption(MONO_FONT_OPTIONS, overrides.fontMono)) {
+    style['--font-mono'] = MONO_FONT_STACKS[overrides.fontMono]
   }
   if (isOption(WIDTH_OPTIONS, overrides.contentWidth)) {
     style['--content-w'] = WIDTH_VALUES[overrides.contentWidth]

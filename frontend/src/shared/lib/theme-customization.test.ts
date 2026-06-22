@@ -25,6 +25,18 @@ describe('resolveOverrideStyle', () => {
     expect(style['--radius-md']).toBe('2px')
   })
 
+  it('emits display and mono font variables for valid keys', () => {
+    const style = resolveOverrideStyle({ fontDisplay: 'playfair', fontMono: 'space-mono' })
+    expect(style['--font-display']).toContain('Playfair Display')
+    expect(style['--font-mono']).toContain('Space Mono')
+  })
+
+  it('ignores unknown display / mono font keys', () => {
+    const style = resolveOverrideStyle({ fontDisplay: 'evil-font', fontMono: 'evil-font' })
+    expect(style['--font-display']).toBeUndefined()
+    expect(style['--font-mono']).toBeUndefined()
+  })
+
   it('ignores invalid / unknown values (no injection)', () => {
     const style = resolveOverrideStyle({
       accent: 'red; } body { display:none',

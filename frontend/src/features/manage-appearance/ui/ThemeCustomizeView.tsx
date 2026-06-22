@@ -2,10 +2,12 @@ import { type ReactNode, useState } from 'react'
 import { useTranslation } from '@/shared/i18n'
 import {
   DENSITY_OPTIONS,
+  DISPLAY_FONT_OPTIONS,
   FLAG_DEFS,
   FONT_OPTIONS,
   FONT_SIZE_OPTIONS,
   GUTTER_OPTIONS,
+  MONO_FONT_OPTIONS,
   RADIUS_OPTIONS,
   TYPE_SCALE_OPTIONS,
   WIDTH_OPTIONS,
@@ -186,6 +188,26 @@ export function ThemeCustomizeView({
               placeholder={themePlaceholder}
               onChange={(v) => {
                 setKnob('fontBody', v)
+              }}
+            />
+          </Field>
+          <Field label={t('admin.themeCustomize.fontDisplay')}>
+            <Select
+              value={draft.fontDisplay}
+              options={DISPLAY_FONT_OPTIONS}
+              placeholder={themePlaceholder}
+              onChange={(v) => {
+                setKnob('fontDisplay', v)
+              }}
+            />
+          </Field>
+          <Field label={t('admin.themeCustomize.fontMono')}>
+            <Select
+              value={draft.fontMono}
+              options={MONO_FONT_OPTIONS}
+              placeholder={themePlaceholder}
+              onChange={(v) => {
+                setKnob('fontMono', v)
               }}
             />
           </Field>

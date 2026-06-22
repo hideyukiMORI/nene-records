@@ -73,6 +73,8 @@ export const ja: Partial<MessageCatalog> = {
   'admin.themeCustomize.surface': '背景（light / dark）',
   'admin.themeCustomize.text': '文字（light / dark）',
   'admin.themeCustomize.font': '本文フォント',
+  'admin.themeCustomize.fontDisplay': '見出しフォント',
+  'admin.themeCustomize.fontMono': 'モノスペースフォント',
   'admin.themeCustomize.width': 'コンテンツ幅',
   'admin.themeCustomize.gutter': '左右余白',
   'admin.themeCustomize.radius': '角丸',

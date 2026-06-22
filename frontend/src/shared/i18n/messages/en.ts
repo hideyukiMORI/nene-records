@@ -80,6 +80,8 @@ export const en = {
   'admin.themeCustomize.surface': 'Surface (light / dark)',
   'admin.themeCustomize.text': 'Text (light / dark)',
   'admin.themeCustomize.font': 'Body font',
+  'admin.themeCustomize.fontDisplay': 'Display font',
+  'admin.themeCustomize.fontMono': 'Mono font',
   'admin.themeCustomize.width': 'Content width',
   'admin.themeCustomize.gutter': 'Side margin',
   'admin.themeCustomize.radius': 'Corners',
