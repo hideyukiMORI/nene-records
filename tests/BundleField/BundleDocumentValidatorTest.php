@@ -53,4 +53,19 @@ final class BundleDocumentValidatorTest extends TestCase
         self::assertSame('# Hi', BundleDocumentValidator::seoTextOf('{"html":"x","seoText":"# Hi"}'));
         self::assertSame('', BundleDocumentValidator::seoTextOf('legacy raw html'));
     }
+
+    public function testAcceptsLargeBundleUnderNewCap(): void
+    {
+        // ~200KB html — exceeds the old TEXT/50KB ceiling, fits LONGTEXT (#491 WS3-S3b).
+        $html = str_repeat('a', 200000);
+        $this->validator->validate(json_encode(['html' => $html, 'seoText' => '# Big'], JSON_THROW_ON_ERROR));
+        $this->addToAssertionCount(1);
+    }
+
+    public function testRejectsBundleOverHtmlCap(): void
+    {
+        $html = str_repeat('a', BundleDocumentValidator::MAX_HTML_LEN + 1);
+        $this->expectException(ValidationException::class);
+        $this->validator->validate(json_encode(['html' => $html, 'seoText' => '# x'], JSON_THROW_ON_ERROR));
+    }
 }

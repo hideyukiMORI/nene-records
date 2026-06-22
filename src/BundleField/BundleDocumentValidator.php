@@ -23,8 +23,9 @@ use Nene2\Validation\ValidationException;
  */
 final class BundleDocumentValidator
 {
-    public const MAX_HTML_LEN = 50000;
-    public const MAX_SEO_TEXT_LEN = 10000;
+    // text_fields.value is LONGTEXT (#491 WS3-S3b), so a real self-contained bundle fits.
+    public const MAX_HTML_LEN = 1000000;
+    public const MAX_SEO_TEXT_LEN = 50000;
 
     public function validate(string $json): void
     {
