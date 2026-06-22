@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NeNeRecords\TextField;
 
+use NeNeRecords\BundleField\BundleDocumentValidator;
 use NeNeRecords\Entity\EntityNotFoundException;
 use NeNeRecords\Entity\EntityRepositoryInterface;
 use NeNeRecords\FieldDef\FieldDefRepositoryInterface;
@@ -36,7 +37,11 @@ final readonly class UpdateTextFieldUseCase implements UpdateTextFieldUseCaseInt
             throw new EntityNotFoundException($existing->entityId);
         }
 
-        $this->assertTextFieldKeyRegistered($entity->entityTypeId, $input->fieldKey);
+        $dataType = $this->assertTextFieldKeyRegistered($entity->entityTypeId, $input->fieldKey);
+
+        if ($dataType === 'bundle') {
+            (new BundleDocumentValidator())->validate($input->value);
+        }
 
         $updated = new TextField(
             entityId: $existing->entityId,
@@ -56,7 +61,7 @@ final readonly class UpdateTextFieldUseCase implements UpdateTextFieldUseCaseInt
         );
     }
 
-    private function assertTextFieldKeyRegistered(int $entityTypeId, string $fieldKey): void
+    private function assertTextFieldKeyRegistered(int $entityTypeId, string $fieldKey): string
     {
         $fieldDef = $this->fieldDefs->findByEntityTypeIdAndFieldKey($entityTypeId, $fieldKey);
 
@@ -67,5 +72,7 @@ final readonly class UpdateTextFieldUseCase implements UpdateTextFieldUseCaseInt
         if (!in_array($fieldDef->dataType, self::TEXT_BACKED_DATA_TYPES, true)) {
             throw new FieldTypeMismatchException($fieldKey, 'text', $fieldDef->dataType);
         }
+
+        return $fieldDef->dataType;
     }
 }

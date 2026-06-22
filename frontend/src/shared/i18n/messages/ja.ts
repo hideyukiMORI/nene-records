@@ -486,6 +486,10 @@ export const ja: Partial<MessageCatalog> = {
   'admin.fieldDefs.html.hint': 'CSS込みのHTMLを使えます。表示時にスクリプトは除去されます。',
   'admin.fieldDefs.bundle.hint':
     'HTMLドキュメント一式（JS/CSS可）。公開ページではサンドボックスiframe内で隔離実行されます。',
+  'admin.bundle.htmlLabel': 'バンドルHTML（サンドボックス）',
+  'admin.bundle.seoLabel': 'クロール用テキスト（必須）',
+  'admin.bundle.seoHint':
+    'バンドルの可視内容を忠実に表す Markdown。クローラ向けにサーバ描画され、no-JS / スクリーンリーダーのフォールバックにも使われます。',
   'admin.fieldDefs.dataType.int': '整数',
   'admin.fieldDefs.dataType.enum': '列挙型',
   'admin.fieldDefs.dataType.bool': 'ブール値',

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NeNeRecords\TextField;
 
+use NeNeRecords\BundleField\BundleDocumentValidator;
 use NeNeRecords\Entity\EntityNotFoundException;
 use NeNeRecords\Entity\EntityRepositoryInterface;
 use NeNeRecords\FieldDef\FieldDefRepositoryInterface;
@@ -30,7 +31,13 @@ final readonly class CreateTextFieldUseCase implements CreateTextFieldUseCaseInt
             throw new EntityNotFoundException($input->entityId);
         }
 
-        $this->assertTextFieldKeyRegistered($entity->entityTypeId, $input->fieldKey);
+        $dataType = $this->assertTextFieldKeyRegistered($entity->entityTypeId, $input->fieldKey);
+
+        // Bundle is a typed envelope { html, seoText } (dual-representation, #311) —
+        // validate it; everything else text-backed is opaque text.
+        if ($dataType === 'bundle') {
+            (new BundleDocumentValidator())->validate($input->value);
+        }
 
         $id = $this->textFields->save(new TextField(
             entityId: $input->entityId,
@@ -48,7 +55,7 @@ final readonly class CreateTextFieldUseCase implements CreateTextFieldUseCaseInt
         );
     }
 
-    private function assertTextFieldKeyRegistered(int $entityTypeId, string $fieldKey): void
+    private function assertTextFieldKeyRegistered(int $entityTypeId, string $fieldKey): string
     {
         $fieldDef = $this->fieldDefs->findByEntityTypeIdAndFieldKey($entityTypeId, $fieldKey);
 
@@ -59,5 +66,7 @@ final readonly class CreateTextFieldUseCase implements CreateTextFieldUseCaseInt
         if (!in_array($fieldDef->dataType, self::TEXT_BACKED_DATA_TYPES, true)) {
             throw new FieldTypeMismatchException($fieldKey, 'text', $fieldDef->dataType);
         }
+
+        return $fieldDef->dataType;
     }
 }

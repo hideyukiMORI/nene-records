@@ -45,6 +45,10 @@
             <h2><?= $e($field->fieldKey) ?></h2>
             <div class="markdown-body"><?= $renderMarkdown($field->displayValue) ?></div>
           </section>
+        <?php elseif ($field->dataType === 'bundle'): ?>
+          <section class="bundle-seo">
+            <div class="markdown-body"><?= $renderBundleSeo($field->displayValue) ?></div>
+          </section>
         <?php else: ?>
           <section>
             <h2><?= $e($field->fieldKey) ?></h2>

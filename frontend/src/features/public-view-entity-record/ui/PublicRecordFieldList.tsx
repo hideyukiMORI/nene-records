@@ -1,4 +1,5 @@
 import type { Entity } from '@/entities/entity'
+import { parseBundleDocument } from '@/shared/lib/bundle-document'
 import { isMarkdownBodyField } from '@/shared/lib/is-markdown-body-field'
 import { SandboxedBundle, SanitizedHtml, Text } from '@/shared/ui'
 import { BlocksRenderer } from '@/shared/ui/blocks'
@@ -62,16 +63,30 @@ export function PublicRecordFieldList({
           )
         }
 
+        // Custom-page bundle (#311 / WS3): the sandboxed iframe IS the page (no
+        // field-key label). Its crawlable seoText twin is projected sr-only for
+        // assistive tech + JS crawlers; the SSR document carries the same text
+        // server-rendered for no-JS / basic crawlers.
+        if (row.dataType === 'bundle') {
+          const bundle = parseBundleDocument(row.displayValue === '—' ? '' : row.displayValue)
+          return (
+            <div key={row.fieldKey}>
+              {bundle.seoText.trim() !== '' ? (
+                <div className="sr-only">
+                  <PublicMarkdownContent markdown={bundle.seoText} />
+                </div>
+              ) : null}
+              <SandboxedBundle html={bundle.html} />
+            </div>
+          )
+        }
+
         return (
           <div key={row.fieldKey} className="flex flex-col gap-stack-xs">
             <Text as="dt" variant="heading-sm">
               {row.fieldKey}
             </Text>
-            {row.dataType === 'bundle' ? (
-              <dd>
-                <SandboxedBundle html={row.displayValue === '—' ? '' : row.displayValue} />
-              </dd>
-            ) : row.dataType === 'html' ? (
+            {row.dataType === 'html' ? (
               <dd>
                 <SanitizedHtml html={row.displayValue === '—' ? '' : row.displayValue} />
               </dd>
