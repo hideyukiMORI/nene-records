@@ -166,6 +166,42 @@ final class BlocksDocumentValidator
         $this->validateOptionalString("{$path}.data.ghostLabel", $data['ghostLabel'] ?? null, self::MAX_CTA_LABEL_LEN, $errors);
         $this->validateOptionalUrl("{$path}.data.ctaUrl", $data['ctaUrl'] ?? null, $errors);
         $this->validateOptionalUrl("{$path}.data.ghostUrl", $data['ghostUrl'] ?? null, $errors);
+
+        $media = $data['media'] ?? null;
+        if ($media !== null) {
+            $this->validateMedia("{$path}.data.media", $media, $errors);
+        }
+    }
+
+    /**
+     * Picker-selected library image: a site-relative `/media/...` URL (rendered
+     * directly on the consumer; the media metadata API is admin-only) plus its
+     * mediaId for provenance and an optional alt (C4 SEO/a11y).
+     *
+     * @param list<ValidationError> $errors
+     */
+    private function validateMedia(string $field, mixed $media, array &$errors): void
+    {
+        if (!is_array($media)) {
+            $errors[] = new ValidationError($field, 'Media must be an object.', 'invalid');
+
+            return;
+        }
+
+        $mediaId = $media['mediaId'] ?? null;
+        if (!is_string($mediaId) || $mediaId === '' || strlen($mediaId) > self::MAX_ID_LEN) {
+            $errors[] = new ValidationError("{$field}.mediaId", 'Media requires a non-empty mediaId.', 'invalid');
+        }
+
+        $url = $media['url'] ?? null;
+        if (!is_string($url) || $url === '' || strlen($url) > self::MAX_URL_LEN || !str_starts_with($url, '/')) {
+            $errors[] = new ValidationError("{$field}.url", 'Media url must be a site-relative path (e.g. /media/...).', 'invalid');
+        }
+
+        $alt = $media['alt'] ?? null;
+        if ($alt !== null && (!is_string($alt) || strlen($alt) > self::MAX_HEADING_LEN)) {
+            $errors[] = new ValidationError("{$field}.alt", 'Media alt must be a string (max ' . self::MAX_HEADING_LEN . ' chars).', 'invalid');
+        }
     }
 
     /**

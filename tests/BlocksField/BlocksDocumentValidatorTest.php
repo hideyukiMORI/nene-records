@@ -132,4 +132,26 @@ final class BlocksDocumentValidatorTest extends TestCase
             '[{"id":"h1","type":"hero","data":{"variant":"standard","heading":"x","ctaUrl":"javascript:alert(1)"}}]',
         );
     }
+
+    public function testAcceptsHeroWithMedia(): void
+    {
+        $json = json_encode([
+            ['id' => 'h1', 'type' => 'hero', 'data' => [
+                'variant' => 'standard',
+                'heading' => 'Title',
+                'media' => ['mediaId' => '42', 'url' => '/media/2026/06/cover.png', 'alt' => 'Cover'],
+            ]],
+        ], JSON_THROW_ON_ERROR);
+
+        $this->validator->validate($json);
+        $this->addToAssertionCount(1);
+    }
+
+    public function testRejectsHeroMediaWithNonRelativeUrl(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->validator->validate(
+            '[{"id":"h1","type":"hero","data":{"variant":"standard","heading":"x","media":{"mediaId":"1","url":"https://evil.example/x.png"}}}]',
+        );
+    }
 }

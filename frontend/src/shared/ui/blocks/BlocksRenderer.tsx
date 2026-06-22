@@ -6,6 +6,7 @@ import {
   type HeroBlockData,
 } from '@/shared/lib/blocks-document'
 import { PublicMarkdownContent } from '@/shared/ui/markdown'
+import { ResponsiveImage } from '@/shared/ui/media/ResponsiveImage'
 
 export interface BlocksRendererProps {
   /** The stored `blocks` field value — a JSON-string blocks document. */
@@ -67,7 +68,11 @@ function ConsumerBlock({ block }: { block: Block }) {
   }
 }
 
-/** Hero block (#486 S2): reuses existing `.hero__*` presentation; variant → data-hero (C9). */
+/**
+ * Hero block (#486 S2–S3): reuses existing `.hero__*` presentation; variant →
+ * data-hero (C9). Art image (S3) shows in a two-column grid for standard /
+ * fullbleed; the `minimal` variant is copy-only.
+ */
 function ConsumerHero({ data }: { data: HeroBlockData }) {
   if (data.heading.trim() === '') {
     return null
@@ -75,8 +80,10 @@ function ConsumerHero({ data }: { data: HeroBlockData }) {
   const lead = data.lead?.trim()
   const primary = ctaProps(data.ctaLabel, data.ctaUrl)
   const ghost = ctaProps(data.ghostLabel, data.ghostUrl)
-  return (
-    <section className="hero--block" data-hero={data.variant}>
+  const media = data.media
+
+  const copy = (
+    <div className="hero__copy">
       {data.kicker !== undefined && data.kicker.trim() !== '' ? (
         <p className="eyebrow hero__kicker">{data.kicker}</p>
       ) : null}
@@ -96,6 +103,27 @@ function ConsumerHero({ data }: { data: HeroBlockData }) {
           ) : null}
         </div>
       ) : null}
+    </div>
+  )
+
+  return (
+    <section className="hero--block" data-hero={data.variant}>
+      {media !== undefined && data.variant !== 'minimal' ? (
+        <div className="hero__grid">
+          {copy}
+          <div className="hero__art">
+            <div className="hero__art-frame">
+              <ResponsiveImage
+                src={media.url}
+                alt={media.alt ?? ''}
+                sizes="(max-width: 768px) 100vw, 480px"
+              />
+            </div>
+          </div>
+        </div>
+      ) : (
+        copy
+      )}
     </section>
   )
 }

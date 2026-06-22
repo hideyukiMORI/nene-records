@@ -131,4 +131,38 @@ describe('blocks-document', () => {
       expect(hero.data.variant).toBe('standard')
     }
   })
+
+  it('coerces and serializes hero media (url required)', () => {
+    const doc = JSON.stringify([
+      {
+        id: 'h',
+        type: 'hero',
+        data: {
+          variant: 'standard',
+          heading: 'X',
+          media: { mediaId: '7', url: '/media/2026/06/a.png', alt: 'A' },
+        },
+      },
+    ])
+    const blocks = parseBlocksDocument(doc)
+    expect(blocks[0]).toMatchObject({
+      data: { media: { mediaId: '7', url: '/media/2026/06/a.png', alt: 'A' } },
+    })
+
+    // media without a url is dropped
+    const noUrl = parseBlocksDocument(
+      '[{"id":"h","type":"hero","data":{"variant":"standard","heading":"X","media":{"mediaId":"7"}}}]',
+    )
+    const block = noUrl[0]
+    expect(block?.type).toBe('hero')
+    if (block?.type === 'hero') {
+      expect(block.data.media).toBeUndefined()
+    }
+
+    // round-trips through serialize
+    const parsed = JSON.parse(serializeBlocksDocument(blocks)) as {
+      data: { media?: { url: string } }
+    }[]
+    expect(parsed[0]?.data.media?.url).toBe('/media/2026/06/a.png')
+  })
 })

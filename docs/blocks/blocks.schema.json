@@ -67,7 +67,19 @@
         "ctaLabel": { "type": "string", "maxLength": 120 },
         "ctaUrl": { "type": "string", "maxLength": 2000 },
         "ghostLabel": { "type": "string", "maxLength": 120 },
-        "ghostUrl": { "type": "string", "maxLength": 2000 }
+        "ghostUrl": { "type": "string", "maxLength": 2000 },
+        "media": { "$ref": "#/$defs/mediaRef" }
+      }
+    },
+    "mediaRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mediaId", "url"],
+      "description": "A picker-selected library image. url is a site-relative /media/... path (the media metadata API is admin-only, so the consumer renders the stored url directly, like the image field type).",
+      "properties": {
+        "mediaId": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "url": { "type": "string", "minLength": 1, "maxLength": 2000 },
+        "alt": { "type": "string", "maxLength": 300 }
       }
     }
   }

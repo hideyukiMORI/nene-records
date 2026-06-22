@@ -540,6 +540,17 @@ export const ja: Partial<MessageCatalog> = {
   'admin.blocks.field.ghostLabel': '副CTAラベル',
   'admin.blocks.field.ghostUrl': '副CTAリンク',
   'admin.blocks.error.headingRequired': '見出しは必須です。',
+  'admin.blocks.field.image': '画像',
+  'admin.blocks.media.none': '画像が未選択です',
+  'admin.blocks.media.select': 'ライブラリから選択',
+  'admin.blocks.media.change': '変更',
+  'admin.blocks.media.remove': '削除',
+  'admin.blocks.media.alt': '代替テキスト',
+  'admin.blocks.media.pickerTitle': 'メディアライブラリ',
+  'admin.blocks.media.close': '閉じる',
+  'admin.blocks.media.loading': '読み込み中…',
+  'admin.blocks.media.loadError': 'メディアライブラリを読み込めませんでした。',
+  'admin.blocks.media.empty': 'ライブラリに画像がありません。',
 
   // ── Tags ─────────────────────────────────────────────────────────────────
   'admin.tags.eyebrow': '管理',

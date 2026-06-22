@@ -56,4 +56,24 @@ describe('BlocksRenderer', () => {
     expect(safe.getAttribute('href')).toBe('/releases')
     expect(screen.queryByText('Bad')).toBeNull()
   })
+
+  it('renders the hero art image from stored media', () => {
+    const doc = JSON.stringify([
+      {
+        id: 'h1',
+        type: 'hero',
+        data: {
+          variant: 'standard',
+          heading: 'X',
+          media: { mediaId: '7', url: '/media/2026/06/a.png', alt: 'Cover' },
+        },
+      },
+    ])
+
+    const { container } = renderWithProviders(<BlocksRenderer documentJson={doc} />)
+
+    const img = container.querySelector('.hero__art img')
+    expect(img).not.toBeNull()
+    expect(img?.getAttribute('alt')).toBe('Cover')
+  })
 })

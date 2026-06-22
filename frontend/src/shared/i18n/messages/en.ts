@@ -543,6 +543,17 @@ export const en = {
   'admin.blocks.field.ghostLabel': 'Secondary CTA label',
   'admin.blocks.field.ghostUrl': 'Secondary CTA link',
   'admin.blocks.error.headingRequired': 'Heading is required.',
+  'admin.blocks.field.image': 'Image',
+  'admin.blocks.media.none': 'No image selected',
+  'admin.blocks.media.select': 'Select from library',
+  'admin.blocks.media.change': 'Change',
+  'admin.blocks.media.remove': 'Remove',
+  'admin.blocks.media.alt': 'Alt text',
+  'admin.blocks.media.pickerTitle': 'Media library',
+  'admin.blocks.media.close': 'Close',
+  'admin.blocks.media.loading': 'Loading…',
+  'admin.blocks.media.loadError': 'Could not load the media library.',
+  'admin.blocks.media.empty': 'No images in the library yet.',
 
   // ── Tags ─────────────────────────────────────────────────────────────────
   'admin.tags.eyebrow': 'Manage',

@@ -31,6 +31,17 @@ export interface CalloutBlockData {
   title?: string
 }
 
+/**
+ * A picker-selected library image. `url` is a site-relative `/media/...` path
+ * rendered directly on the consumer (the media metadata API is admin-only, so we
+ * store the url like the `image` field type); `mediaId` is kept for provenance.
+ */
+export interface HeroMedia {
+  mediaId: string
+  url: string
+  alt?: string
+}
+
 export interface HeroBlockData {
   variant: HeroVariant
   heading: string
@@ -40,6 +51,7 @@ export interface HeroBlockData {
   ctaUrl?: string
   ghostLabel?: string
   ghostUrl?: string
+  media?: HeroMedia
 }
 
 export type Block =
@@ -67,6 +79,22 @@ function isHeroVariant(value: unknown): value is HeroVariant {
 
 function optionalString(record: Record<string, unknown>, key: string): string | undefined {
   return typeof record[key] === 'string' ? record[key] : undefined
+}
+
+function coerceMedia(raw: unknown): HeroMedia | undefined {
+  if (typeof raw !== 'object' || raw === null) {
+    return undefined
+  }
+  const record = raw as Record<string, unknown>
+  if (typeof record.url !== 'string' || record.url === '') {
+    return undefined
+  }
+  const alt = typeof record.alt === 'string' ? record.alt : undefined
+  return {
+    mediaId: typeof record.mediaId === 'string' ? record.mediaId : '',
+    url: record.url,
+    ...(alt !== undefined && alt !== '' ? { alt } : {}),
+  }
 }
 
 /** Client-generated stable key (React key / future anchor); opaque, <= 64 chars. */
@@ -177,6 +205,7 @@ function coerceBlock(raw: unknown, index: number): Block | null {
           ctaUrl: optionalString(record, 'ctaUrl'),
           ghostLabel: optionalString(record, 'ghostLabel'),
           ghostUrl: optionalString(record, 'ghostUrl'),
+          media: coerceMedia(record.media),
         },
       }
   }
@@ -209,6 +238,7 @@ export function serializeBlocksDocument(blocks: Block[]): string {
             ghostLabel: block.data.ghostLabel,
             ghostUrl: block.data.ghostUrl,
           }),
+          ...(block.data.media !== undefined ? { media: block.data.media } : {}),
         },
       }
     }
