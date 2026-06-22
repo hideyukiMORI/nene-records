@@ -22,6 +22,7 @@ import {
   type BlockType,
   type CalloutBlockData,
   type ChartBlockData,
+  type ColumnsBlockData,
   type GalleryBlockData,
   type GroupBlockData,
   type HeroBlockData,
@@ -61,6 +62,8 @@ function blockTypeIcon(type: BlockType) {
       return IconLayers
     case 'group':
       return IconCopy
+    case 'columns':
+      return IconLayout
   }
 }
 
@@ -82,6 +85,10 @@ function rawSummary(block: Block): string {
         : block.data.summary
     case 'group':
       return block.data.children.map((child) => rawSummary(child)).join(' · ')
+    case 'columns':
+      return block.data.columns
+        .flatMap((column) => column.children.map((child) => rawSummary(child)))
+        .join(' · ')
   }
 }
 
@@ -172,7 +179,8 @@ export function BlocksFieldEditor({
       | HeroBlockData
       | GalleryBlockData
       | ChartBlockData
-      | GroupBlockData,
+      | GroupBlockData
+      | ColumnsBlockData,
   ) => {
     emit(
       blocks.map((block): Block => {
@@ -192,6 +200,8 @@ export function BlocksFieldEditor({
             return { ...block, data: data as ChartBlockData }
           case 'group':
             return { ...block, data: data as GroupBlockData }
+          case 'columns':
+            return { ...block, data: data as ColumnsBlockData }
         }
       }),
     )

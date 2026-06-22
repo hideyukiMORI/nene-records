@@ -18,7 +18,7 @@
           "minLength": 1,
           "maxLength": 64
         },
-        "type": { "enum": ["text", "callout", "hero", "gallery", "chart", "group"] },
+        "type": { "enum": ["text", "callout", "hero", "gallery", "chart", "group", "columns"] },
         "data": { "type": "object" }
       },
       "allOf": [
@@ -45,8 +45,33 @@
         {
           "if": { "properties": { "type": { "const": "group" } } },
           "then": { "properties": { "data": { "$ref": "#/$defs/groupData" } } }
+        },
+        {
+          "if": { "properties": { "type": { "const": "columns" } } },
+          "then": { "properties": { "data": { "$ref": "#/$defs/columnsData" } } }
         }
       ]
+    },
+    "columnsData": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["columns"],
+      "description": "Multi-column layout container (#491 WS2). 2-4 columns, each holding leaf child blocks (no container nesting; depth 2, server-enforced).",
+      "properties": {
+        "columns": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 4,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["children"],
+            "properties": {
+              "children": { "type": "array", "maxItems": 20, "items": { "$ref": "#/$defs/block" } }
+            }
+          }
+        }
+      }
     },
     "groupData": {
       "type": "object",

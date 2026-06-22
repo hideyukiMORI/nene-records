@@ -296,4 +296,44 @@ final class BlocksDocumentValidatorTest extends TestCase
             '[{"id":"g1","type":"group","data":{"tone":"plain","children":[{"id":"c1","type":"text","data":{}}]}}]',
         );
     }
+
+    public function testAcceptsValidColumnsBlock(): void
+    {
+        $json = json_encode([
+            ['id' => 'cols', 'type' => 'columns', 'data' => [
+                'columns' => [
+                    ['children' => [['id' => 'a', 'type' => 'text', 'data' => ['markdown' => 'Left']]]],
+                    ['children' => [['id' => 'b', 'type' => 'callout', 'data' => ['kind' => 'info', 'body' => 'Right']]]],
+                ],
+            ]],
+        ], JSON_THROW_ON_ERROR);
+
+        $this->validator->validate($json);
+        $this->addToAssertionCount(1);
+    }
+
+    public function testRejectsColumnsWithTooFewColumns(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->validator->validate(
+            '[{"id":"cols","type":"columns","data":{"columns":[{"children":[]}]}}]',
+        );
+    }
+
+    public function testRejectsColumnsWithTooManyColumns(): void
+    {
+        $cols = array_fill(0, 5, ['children' => []]);
+        $this->expectException(ValidationException::class);
+        $this->validator->validate(
+            json_encode([['id' => 'cols', 'type' => 'columns', 'data' => ['columns' => $cols]]], JSON_THROW_ON_ERROR),
+        );
+    }
+
+    public function testRejectsContainerNestedInsideColumn(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->validator->validate(
+            '[{"id":"cols","type":"columns","data":{"columns":[{"children":[{"id":"g","type":"group","data":{"tone":"plain","children":[]}}]},{"children":[]}]}}]',
+        );
+    }
 }

@@ -592,6 +592,13 @@ export const ja: Partial<MessageCatalog> = {
   'admin.blocks.childEdit': '編集',
   'admin.blocks.childCollapse': '閉じる',
   'admin.blocks.error.childrenRequired': 'ブロックを1つ以上追加してください。',
+  // columns (#491 WS2)
+  'admin.blocks.type.columns': 'カラム',
+  'admin.blocks.type.columns.desc': 'レスポンシブな多段組みレイアウト',
+  'admin.blocks.columns.count': '{{count}} カラム',
+  'admin.blocks.columns.add': 'カラムを追加',
+  'admin.blocks.columns.remove': 'カラムを削除',
+  'admin.blocks.columns.label': 'カラム {{n}}',
 
   // ── Home hero (#486) ──────────────────────────────────────────────────────
   'admin.homeHero.title': 'ホームヒーロー',
