@@ -284,4 +284,35 @@ describe('blocks-document', () => {
       expect(chart.data.series).toHaveLength(1)
     }
   })
+
+  it('parses/validates a group and drops nested containers (leaf-only, depth 2)', () => {
+    const doc = JSON.stringify([
+      {
+        id: 'g1',
+        type: 'group',
+        data: {
+          tone: 'card',
+          children: [
+            { id: 'c1', type: 'text', data: { markdown: 'inside' } },
+            { id: 'c2', type: 'group', data: { tone: 'plain', children: [] } },
+          ],
+        },
+      },
+    ])
+    const blocks = parseBlocksDocument(doc)
+    expect(blocks).toHaveLength(1)
+    const group = blocks[0]
+    expect(group?.type).toBe('group')
+    if (group?.type === 'group') {
+      expect(group.data.tone).toBe('card')
+      // the nested group child is dropped on parse (containers can't nest)
+      expect(group.data.children.map((child) => child.type)).toEqual(['text'])
+      expect(validateBlock(group)).toBeNull()
+      expect(parseBlocksDocument(serializeBlocksDocument(blocks))).toEqual(blocks)
+    }
+  })
+
+  it('flags an empty group as children-required', () => {
+    expect(validateBlock(createBlock('group'))).toBe('children-required')
+  })
 })

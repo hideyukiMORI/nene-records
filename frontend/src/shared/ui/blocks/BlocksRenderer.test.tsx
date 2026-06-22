@@ -126,4 +126,24 @@ describe('BlocksRenderer', () => {
     expect(screen.getByText('Up from Jan to Feb.')).toBeInTheDocument()
     expect(container.querySelectorAll('.chart__table tbody tr')).toHaveLength(2)
   })
+
+  it('renders a group container with its leaf children and tone', () => {
+    const doc = JSON.stringify([
+      {
+        id: 'g1',
+        type: 'group',
+        data: {
+          tone: 'card',
+          children: [{ id: 'c1', type: 'callout', data: { kind: 'info', body: 'Grouped note' } }],
+        },
+      },
+    ])
+
+    const { container } = renderWithProviders(<BlocksRenderer documentJson={doc} />)
+
+    const group = container.querySelector('.group')
+    expect(group?.getAttribute('data-group-tone')).toBe('card')
+    expect(group?.querySelector('.callout')).not.toBeNull()
+    expect(screen.getByText('Grouped note')).toBeInTheDocument()
+  })
 })

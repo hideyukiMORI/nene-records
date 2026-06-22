@@ -20,6 +20,7 @@ final class BlockTypes
         'hero',
         'gallery',
         'chart',
+        'group',
     ];
 
     public static function isValid(string $type): bool

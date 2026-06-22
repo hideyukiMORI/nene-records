@@ -581,6 +581,17 @@ export const ja: Partial<MessageCatalog> = {
   'admin.blocks.error.itemsRequired': '画像を1枚以上追加してください。',
   'admin.blocks.error.seriesRequired': 'データ点を2つ以上追加してください。',
   'admin.blocks.error.labelRequired': 'ラベルは必須です。',
+  // group (#491 WS2)
+  'admin.blocks.type.group': 'グループ',
+  'admin.blocks.type.group.desc': '他のブロックをまとめて配置する入れ物',
+  'admin.blocks.field.tone': 'トーン',
+  'admin.blocks.field.children': 'グループ内のブロック',
+  'admin.blocks.groupTone.plain': '標準',
+  'admin.blocks.groupTone.muted': '帯（淡色）',
+  'admin.blocks.groupTone.card': 'カード',
+  'admin.blocks.childEdit': '編集',
+  'admin.blocks.childCollapse': '閉じる',
+  'admin.blocks.error.childrenRequired': 'ブロックを1つ以上追加してください。',
 
   // ── Home hero (#486) ──────────────────────────────────────────────────────
   'admin.homeHero.title': 'ホームヒーロー',

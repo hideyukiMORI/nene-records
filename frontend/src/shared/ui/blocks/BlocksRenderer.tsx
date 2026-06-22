@@ -5,6 +5,7 @@ import {
   type CalloutKind,
   type ChartBlockData,
   type GalleryBlockData,
+  type GroupBlockData,
   type HeroBlockData,
 } from '@/shared/lib/blocks-document'
 import { PublicMarkdownContent } from '@/shared/ui/markdown'
@@ -71,7 +72,27 @@ function ConsumerBlock({ block }: { block: Block }) {
       return <ConsumerGallery data={block.data} />
     case 'chart':
       return <ConsumerChart data={block.data} />
+    case 'group':
+      return <ConsumerGroup data={block.data} />
   }
+}
+
+/**
+ * Group block (#491 WS2): a layout container that renders its leaf children with
+ * a tone (plain / muted band / bordered card). Children are leaf blocks only
+ * (depth 2), so this never recurses into another group.
+ */
+function ConsumerGroup({ data }: { data: GroupBlockData }) {
+  if (data.children.length === 0) {
+    return null
+  }
+  return (
+    <div className="group" data-group-tone={data.tone}>
+      {data.children.map((child) => (
+        <ConsumerBlock key={child.id} block={child} />
+      ))}
+    </div>
+  )
 }
 
 /**

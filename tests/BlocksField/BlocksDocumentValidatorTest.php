@@ -251,4 +251,49 @@ final class BlocksDocumentValidatorTest extends TestCase
             '[{"id":"k1","type":"chart","data":{"chartType":"bar","summary":"x","series":[{"label":"A","value":"NaN"},{"label":"B","value":2}]}}]',
         );
     }
+
+    public function testAcceptsValidGroupBlockWithLeafChildren(): void
+    {
+        $json = json_encode([
+            ['id' => 'g1', 'type' => 'group', 'data' => [
+                'tone' => 'card',
+                'children' => [
+                    ['id' => 'c1', 'type' => 'text', 'data' => ['markdown' => 'Inside']],
+                    ['id' => 'c2', 'type' => 'callout', 'data' => ['kind' => 'info', 'body' => 'Note']],
+                ],
+            ]],
+        ], JSON_THROW_ON_ERROR);
+
+        $this->validator->validate($json);
+        $this->addToAssertionCount(1);
+    }
+
+    public function testAcceptsEmptyGroup(): void
+    {
+        $this->validator->validate('[{"id":"g1","type":"group","data":{"tone":"plain","children":[]}}]');
+        $this->addToAssertionCount(1);
+    }
+
+    public function testRejectsGroupWithInvalidTone(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->validator->validate('[{"id":"g1","type":"group","data":{"tone":"wild","children":[]}}]');
+    }
+
+    public function testRejectsContainerNestedInsideContainer(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->validator->validate(
+            '[{"id":"g1","type":"group","data":{"tone":"plain","children":[{"id":"g2","type":"group","data":{"tone":"plain","children":[]}}]}}]',
+        );
+    }
+
+    public function testRejectsGroupChildWithInvalidData(): void
+    {
+        // A leaf child with invalid data propagates an error from the nested path.
+        $this->expectException(ValidationException::class);
+        $this->validator->validate(
+            '[{"id":"g1","type":"group","data":{"tone":"plain","children":[{"id":"c1","type":"text","data":{}}]}}]',
+        );
+    }
 }
