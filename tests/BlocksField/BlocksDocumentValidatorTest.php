@@ -93,4 +93,162 @@ final class BlocksDocumentValidatorTest extends TestCase
         $this->expectException(ValidationException::class);
         $this->validator->validate(json_encode($blocks, JSON_THROW_ON_ERROR));
     }
+
+    public function testAcceptsValidHeroBlock(): void
+    {
+        $json = json_encode([
+            ['id' => 'h1', 'type' => 'hero', 'data' => [
+                'variant' => 'standard',
+                'kicker' => 'Spring',
+                'heading' => 'New *releases*',
+                'lead' => 'Lead text.',
+                'ctaLabel' => 'Browse',
+                'ctaUrl' => '/releases',
+                'ghostLabel' => 'Archive',
+                'ghostUrl' => 'https://example.com/archive',
+            ]],
+        ], JSON_THROW_ON_ERROR);
+
+        $this->validator->validate($json);
+        $this->addToAssertionCount(1);
+    }
+
+    public function testRejectsHeroWithoutHeading(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->validator->validate('[{"id":"h1","type":"hero","data":{"variant":"standard"}}]');
+    }
+
+    public function testRejectsHeroWithInvalidVariant(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->validator->validate('[{"id":"h1","type":"hero","data":{"variant":"wild","heading":"x"}}]');
+    }
+
+    public function testRejectsHeroWithUnsafeCtaUrl(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->validator->validate(
+            '[{"id":"h1","type":"hero","data":{"variant":"standard","heading":"x","ctaUrl":"javascript:alert(1)"}}]',
+        );
+    }
+
+    public function testAcceptsHeroWithMedia(): void
+    {
+        $json = json_encode([
+            ['id' => 'h1', 'type' => 'hero', 'data' => [
+                'variant' => 'standard',
+                'heading' => 'Title',
+                'media' => ['mediaId' => '42', 'url' => '/media/2026/06/cover.png', 'alt' => 'Cover'],
+            ]],
+        ], JSON_THROW_ON_ERROR);
+
+        $this->validator->validate($json);
+        $this->addToAssertionCount(1);
+    }
+
+    public function testRejectsHeroMediaProtocolRelativeUrl(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->validator->validate(
+            '[{"id":"h1","type":"hero","data":{"variant":"standard","heading":"x","media":{"mediaId":"1","url":"//evil.example/x.png"}}}]',
+        );
+    }
+
+    public function testAcceptsHeroMediaHttpsUrl(): void
+    {
+        // Object-storage / CDN drivers (S3) return absolute https URLs.
+        $this->validator->validate(
+            '[{"id":"h1","type":"hero","data":{"variant":"standard","heading":"x","media":{"mediaId":"1","url":"https://cdn.example.com/media/2026/06/x.png"}}}]',
+        );
+        $this->addToAssertionCount(1);
+    }
+
+    public function testRejectsHeroCtaProtocolRelativeUrl(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->validator->validate(
+            '[{"id":"h1","type":"hero","data":{"variant":"standard","heading":"x","ctaUrl":"//evil.example"}}]',
+        );
+    }
+
+    public function testAcceptsValidGalleryBlock(): void
+    {
+        $json = json_encode([
+            ['id' => 'g1', 'type' => 'gallery', 'data' => [
+                'layout' => 'carousel',
+                'items' => [
+                    ['mediaId' => '1', 'url' => '/media/2026/06/a.png', 'alt' => 'A', 'caption' => 'First'],
+                    ['mediaId' => '2', 'url' => '/media/2026/06/b.png', 'alt' => 'B'],
+                ],
+            ]],
+        ], JSON_THROW_ON_ERROR);
+
+        $this->validator->validate($json);
+        $this->addToAssertionCount(1);
+    }
+
+    public function testRejectsGalleryWithoutItems(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->validator->validate('[{"id":"g1","type":"gallery","data":{"layout":"grid","items":[]}}]');
+    }
+
+    public function testRejectsGalleryItemWithoutAlt(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->validator->validate(
+            '[{"id":"g1","type":"gallery","data":{"layout":"carousel","items":[{"mediaId":"1","url":"/media/2026/06/a.png"}]}}]',
+        );
+    }
+
+    public function testRejectsGalleryItemInsecureUrl(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->validator->validate(
+            '[{"id":"g1","type":"gallery","data":{"layout":"grid","items":[{"mediaId":"1","url":"//evil.example/a.png","alt":"A"}]}}]',
+        );
+    }
+
+    public function testAcceptsValidChartBlock(): void
+    {
+        $json = json_encode([
+            ['id' => 'k1', 'type' => 'chart', 'data' => [
+                'chartType' => 'bar',
+                'title' => 'Monthly',
+                'series' => [
+                    ['label' => 'Jan', 'value' => 4],
+                    ['label' => 'Feb', 'value' => 6.5],
+                ],
+                'summary' => 'Up from Jan to Feb.',
+            ]],
+        ], JSON_THROW_ON_ERROR);
+
+        $this->validator->validate($json);
+        $this->addToAssertionCount(1);
+    }
+
+    public function testRejectsChartWithoutSummary(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->validator->validate(
+            '[{"id":"k1","type":"chart","data":{"chartType":"bar","series":[{"label":"A","value":1},{"label":"B","value":2}]}}]',
+        );
+    }
+
+    public function testRejectsChartWithTooFewPoints(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->validator->validate(
+            '[{"id":"k1","type":"chart","data":{"chartType":"line","summary":"x","series":[{"label":"A","value":1}]}}]',
+        );
+    }
+
+    public function testRejectsChartPointWithNonNumericValue(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->validator->validate(
+            '[{"id":"k1","type":"chart","data":{"chartType":"bar","summary":"x","series":[{"label":"A","value":"NaN"},{"label":"B","value":2}]}}]',
+        );
+    }
 }

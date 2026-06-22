@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { FieldDataType, FieldDef } from '@/entities/field-def'
 import { useTranslation } from '@/shared/i18n'
 import { Button, Card, EmptyState, Input, Stack, Text } from '@/shared/ui'
+import { BlocksFieldEditor } from './BlocksFieldEditor'
 import { FileFieldInput } from './FileFieldInput'
 import { ImageFieldInput } from './ImageFieldInput'
 import { MarkdownFieldInput } from './MarkdownFieldInput'
@@ -100,6 +101,21 @@ export function EntityTextFieldsForm({
                 disabled={isSubmitting}
                 onChange={(val) => {
                   setValues((current) => ({ ...current, [fieldDef.fieldKey]: val }))
+                }}
+              />
+            )
+          }
+
+          if (fieldDef.dataType === 'blocks') {
+            return (
+              <BlocksFieldEditor
+                key={fieldDef.fieldKey}
+                id={fieldId}
+                label={label}
+                value={values[fieldDef.fieldKey] ?? ''}
+                disabled={isSubmitting}
+                onChange={(json) => {
+                  setValues((current) => ({ ...current, [fieldDef.fieldKey]: json }))
                 }}
               />
             )

@@ -1,5 +1,7 @@
 import { PublicHomeBody, PublicHomeHero, usePublicHomePage } from '@/features/public-home'
+import { parseBlocksDocument } from '@/shared/lib/blocks-document'
 import { activeSideRegions } from '@/shared/lib/layout-config'
+import { BlocksRenderer } from '@/shared/ui/blocks'
 import { PublicSiteShell } from './PublicSiteShell'
 import { usePublicSite } from './public-site-context'
 
@@ -29,21 +31,29 @@ export function PublicIndexPage() {
   // a side region renders when the config enables it AND it has widgets.
   const homeSides = activeSideRegions(site.homeLayout)
 
+  // A configured `home_hero` block replaces the auto stats-hero (fallback when empty).
+  const hasHomeHero = parseBlocksDocument(site.homeHero).length > 0
+  const hero = hasHomeHero ? (
+    <div className="wrap">
+      <BlocksRenderer documentJson={site.homeHero} />
+    </div>
+  ) : (
+    <PublicHomeHero
+      siteName={site.siteName}
+      metaDescription={site.metaDescription}
+      totalPublished={totalPublished}
+      typeCount={typeCount}
+      browseHref={browseHref}
+    />
+  )
+
   return (
     <PublicSiteShell
       site={site}
       isHome
       withSidebar={homeSides.includes('sidebar')}
       withAside={homeSides.includes('aside')}
-      hero={
-        <PublicHomeHero
-          siteName={site.siteName}
-          metaDescription={site.metaDescription}
-          totalPublished={totalPublished}
-          typeCount={typeCount}
-          browseHref={browseHref}
-        />
-      }
+      hero={hero}
     >
       <PublicHomeBody
         featured={featured}

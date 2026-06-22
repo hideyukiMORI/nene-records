@@ -12,6 +12,7 @@ import { useDateTimeFieldList } from '@/entities/datetime-field'
 import { useEnumFieldList } from '@/entities/enum-field'
 import { useIntFieldList } from '@/entities/int-field'
 import { useTextFieldList } from '@/entities/text-field'
+import { useBlocksFieldList } from '@/entities/block'
 import { formatFieldDisplayValue } from '@/shared/lib/format-field-display-value'
 import type { ContentRegion } from '@/shared/lib/resolve-layout'
 
@@ -43,6 +44,7 @@ export function usePublicViewEntityRecordPage(entityTypeId: number, entityId: nu
   const enumFieldQuery = useEnumFieldList(listParams)
   const boolFieldQuery = useBoolFieldList(listParams)
   const dateTimeFieldQuery = useDateTimeFieldList(listParams)
+  const blocksFieldQuery = useBlocksFieldList(listParams)
 
   const fieldRows = useMemo((): PublicFieldRow[] => {
     const fieldDefs = fieldDefQuery.data?.items ?? []
@@ -86,6 +88,12 @@ export function usePublicViewEntityRecordPage(entityTypeId: number, entityId: nu
             dateTimeFieldQuery.data?.items.find((item) => item.fieldKey === fieldDef.fieldKey)
               ?.value ?? null
           break
+        case 'blocks':
+          // The JSON blocks document; passed through to BlocksRenderer.
+          raw =
+            blocksFieldQuery.data?.items.find((item) => item.fieldKey === fieldDef.fieldKey)
+              ?.value ?? null
+          break
       }
 
       return [
@@ -99,6 +107,7 @@ export function usePublicViewEntityRecordPage(entityTypeId: number, entityId: nu
       ]
     })
   }, [
+    blocksFieldQuery.data?.items,
     boolFieldQuery.data?.items,
     dateTimeFieldQuery.data?.items,
     enumFieldQuery.data?.items,
@@ -114,7 +123,8 @@ export function usePublicViewEntityRecordPage(entityTypeId: number, entityId: nu
     intFieldQuery.isLoading ||
     enumFieldQuery.isLoading ||
     boolFieldQuery.isLoading ||
-    dateTimeFieldQuery.isLoading
+    dateTimeFieldQuery.isLoading ||
+    blocksFieldQuery.isLoading
   const isError =
     entityQuery.isError ||
     fieldDefQuery.isError ||
@@ -122,7 +132,8 @@ export function usePublicViewEntityRecordPage(entityTypeId: number, entityId: nu
     intFieldQuery.isError ||
     enumFieldQuery.isError ||
     boolFieldQuery.isError ||
-    dateTimeFieldQuery.isError
+    dateTimeFieldQuery.isError ||
+    blocksFieldQuery.isError
   const errorTitle =
     entityQuery.error?.title ??
     fieldDefQuery.error?.title ??
@@ -131,6 +142,7 @@ export function usePublicViewEntityRecordPage(entityTypeId: number, entityId: nu
     enumFieldQuery.error?.title ??
     boolFieldQuery.error?.title ??
     dateTimeFieldQuery.error?.title ??
+    blocksFieldQuery.error?.title ??
     null
 
   return {
@@ -148,6 +160,7 @@ export function usePublicViewEntityRecordPage(entityTypeId: number, entityId: nu
         enumFieldQuery.refetch(),
         boolFieldQuery.refetch(),
         dateTimeFieldQuery.refetch(),
+        blocksFieldQuery.refetch(),
       ])
     },
   }
