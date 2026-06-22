@@ -28,6 +28,14 @@ final class BlocksDocumentValidator
     /** @var list<string> */
     private const CALLOUT_KINDS = ['info', 'warn', 'ok', 'danger'];
 
+    /** @var list<string> */
+    private const HERO_VARIANTS = ['standard', 'minimal', 'fullbleed'];
+
+    private const MAX_HEADING_LEN = 300;
+    private const MAX_LEAD_LEN = 2000;
+    private const MAX_CTA_LABEL_LEN = 120;
+    private const MAX_URL_LEN = 2000;
+
     /**
      * @throws ValidationException when the document is malformed or a block is invalid
      */
@@ -93,6 +101,7 @@ final class BlocksDocumentValidator
         match ($type) {
             'text' => $this->validateTextData($path, $data, $errors),
             'callout' => $this->validateCalloutData($path, $data, $errors),
+            'hero' => $this->validateHeroData($path, $data, $errors),
             default => null,
         };
     }
@@ -129,5 +138,71 @@ final class BlocksDocumentValidator
         if ($title !== null && (!is_string($title) || strlen($title) > self::MAX_TITLE_LEN)) {
             $errors[] = new ValidationError("{$path}.data.title", 'Callout title must be a string (max ' . self::MAX_TITLE_LEN . ' chars).', 'invalid');
         }
+    }
+
+    /**
+     * Hero block (#486 S2): a kicker/heading/lead with up to two CTAs. Reuses the
+     * existing `.hero__*` presentation on the consumer (variant via `data-hero`).
+     * Image art is a later slice (S3 media picker), so no media field here.
+     *
+     * @param array<array-key, mixed> $data
+     * @param list<ValidationError> $errors
+     */
+    private function validateHeroData(string $path, array $data, array &$errors): void
+    {
+        $variant = $data['variant'] ?? null;
+        if (!is_string($variant) || !in_array($variant, self::HERO_VARIANTS, true)) {
+            $errors[] = new ValidationError("{$path}.data.variant", 'Hero variant must be one of: ' . implode(', ', self::HERO_VARIANTS) . '.', 'invalid');
+        }
+
+        $heading = $data['heading'] ?? null;
+        if (!is_string($heading) || $heading === '' || strlen($heading) > self::MAX_HEADING_LEN) {
+            $errors[] = new ValidationError("{$path}.data.heading", 'Hero requires a non-empty heading (max ' . self::MAX_HEADING_LEN . ' chars).', 'invalid');
+        }
+
+        $this->validateOptionalString("{$path}.data.kicker", $data['kicker'] ?? null, self::MAX_TITLE_LEN, $errors);
+        $this->validateOptionalString("{$path}.data.lead", $data['lead'] ?? null, self::MAX_LEAD_LEN, $errors);
+        $this->validateOptionalString("{$path}.data.ctaLabel", $data['ctaLabel'] ?? null, self::MAX_CTA_LABEL_LEN, $errors);
+        $this->validateOptionalString("{$path}.data.ghostLabel", $data['ghostLabel'] ?? null, self::MAX_CTA_LABEL_LEN, $errors);
+        $this->validateOptionalUrl("{$path}.data.ctaUrl", $data['ctaUrl'] ?? null, $errors);
+        $this->validateOptionalUrl("{$path}.data.ghostUrl", $data['ghostUrl'] ?? null, $errors);
+    }
+
+    /**
+     * @param list<ValidationError> $errors
+     */
+    private function validateOptionalString(string $field, mixed $value, int $max, array &$errors): void
+    {
+        if ($value !== null && (!is_string($value) || strlen($value) > $max)) {
+            $errors[] = new ValidationError($field, "Field must be a string (max {$max} chars).", 'invalid');
+        }
+    }
+
+    /**
+     * @param list<ValidationError> $errors
+     */
+    private function validateOptionalUrl(string $field, mixed $value, array &$errors): void
+    {
+        if ($value === null) {
+            return;
+        }
+
+        if (!is_string($value) || strlen($value) > self::MAX_URL_LEN || !$this->isSafeUrl($value)) {
+            $errors[] = new ValidationError($field, 'URL must be http(s), mailto, or a site-relative path (#/...).', 'invalid');
+        }
+    }
+
+    /**
+     * Allowlist safe link targets; blocks `javascript:`/`data:` and other schemes
+     * that could execute script when rendered as an href.
+     */
+    private function isSafeUrl(string $url): bool
+    {
+        $trimmed = trim($url);
+        if ($trimmed === '') {
+            return true;
+        }
+
+        return preg_match('#^(https?://|mailto:|/|\#)#i', $trimmed) === 1;
     }
 }

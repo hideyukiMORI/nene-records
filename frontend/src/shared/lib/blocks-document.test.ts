@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   createBlock,
+  isSafeHref,
   parseBlocksDocument,
   serializeBlocksDocument,
   validateBlock,
@@ -79,5 +80,55 @@ describe('blocks-document', () => {
     expect(
       validateBlock({ id: 'a', type: 'callout', data: { kind: 'info', body: 'x' } }),
     ).toBeNull()
+  })
+
+  it('parses, validates, and serializes hero blocks', () => {
+    const doc = JSON.stringify([
+      {
+        id: 'h1',
+        type: 'hero',
+        data: { variant: 'minimal', heading: 'Title', ctaLabel: 'Go', ctaUrl: '/x', lead: '  ' },
+      },
+    ])
+
+    const blocks = parseBlocksDocument(doc)
+    expect(blocks[0]).toMatchObject({
+      type: 'hero',
+      data: { variant: 'minimal', heading: 'Title' },
+    })
+
+    // heading required
+    expect(
+      validateBlock({ id: 'h', type: 'hero', data: { variant: 'standard', heading: '' } }),
+    ).toBe('heading-required')
+    expect(validateBlock(blocks[0] as Block)).toBeNull()
+
+    // empty optionals (lead) dropped on serialize
+    const json = serializeBlocksDocument(blocks)
+    const data = (JSON.parse(json) as { data: Record<string, unknown> }[])[0]?.data
+    expect(data).not.toHaveProperty('lead')
+    expect(data).toMatchObject({ ctaLabel: 'Go', ctaUrl: '/x' })
+
+    // unknown hero variant coerces to standard
+    const coerced = parseBlocksDocument('[{"id":"h","type":"hero","data":{"heading":"x"}}]')
+    expect(coerced[0]).toMatchObject({ data: { variant: 'standard' } })
+  })
+
+  it('allowlists safe hrefs', () => {
+    expect(isSafeHref('/path')).toBe(true)
+    expect(isSafeHref('https://example.com')).toBe(true)
+    expect(isSafeHref('#anchor')).toBe(true)
+    expect(isSafeHref('mailto:a@b.c')).toBe(true)
+    expect(isSafeHref('javascript:alert(1)')).toBe(false)
+    expect(isSafeHref('data:text/html,x')).toBe(false)
+    expect(isSafeHref('')).toBe(false)
+  })
+
+  it('creates a hero block with defaults', () => {
+    const hero = createBlock('hero')
+    expect(hero.type).toBe('hero')
+    if (hero.type === 'hero') {
+      expect(hero.data.variant).toBe('standard')
+    }
   })
 })

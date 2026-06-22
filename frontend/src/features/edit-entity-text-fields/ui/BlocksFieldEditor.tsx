@@ -5,6 +5,7 @@ import {
   IconChevronDown,
   IconChevronUp,
   IconFileText,
+  IconLayout,
   IconMenu,
   IconMessageCircle,
   IconX,
@@ -17,6 +18,7 @@ import {
   type Block,
   type BlockType,
   type CalloutBlockData,
+  type HeroBlockData,
   type TextBlockData,
 } from '@/shared/lib/blocks-document'
 import { BLOCK_CATALOG, blockCatalogEntry } from './block-catalog'
@@ -38,17 +40,31 @@ interface BlocksFieldEditorProps {
 }
 
 function blockTypeIcon(type: BlockType) {
-  return type === 'text' ? IconFileText : IconMessageCircle
+  switch (type) {
+    case 'text':
+      return IconFileText
+    case 'callout':
+      return IconMessageCircle
+    case 'hero':
+      return IconLayout
+  }
+}
+
+function rawSummary(block: Block): string {
+  switch (block.type) {
+    case 'text':
+      return block.data.markdown
+    case 'callout': {
+      const title = block.data.title
+      return title !== undefined && title.trim() !== '' ? title : block.data.body
+    }
+    case 'hero':
+      return block.data.heading.replace(/\*/g, '')
+  }
 }
 
 function blockSummary(block: Block): string {
-  const raw =
-    block.type === 'text'
-      ? block.data.markdown
-      : block.data.title !== undefined && block.data.title.trim() !== ''
-        ? block.data.title
-        : block.data.body
-  const text = raw.replace(/\s+/g, ' ').trim()
+  const text = rawSummary(block).replace(/\s+/g, ' ').trim()
   return text.length > 80 ? `${text.slice(0, 80)}…` : text
 }
 
@@ -112,16 +128,20 @@ export function BlocksFieldEditor({
     emit(next)
   }
 
-  const updateData = (blockId: string, data: TextBlockData | CalloutBlockData) => {
+  const updateData = (blockId: string, data: TextBlockData | CalloutBlockData | HeroBlockData) => {
     emit(
-      blocks.map((block) => {
+      blocks.map((block): Block => {
         if (block.id !== blockId) {
           return block
         }
-        if (block.type === 'text') {
-          return { ...block, data: data as TextBlockData }
+        switch (block.type) {
+          case 'text':
+            return { ...block, data: data as TextBlockData }
+          case 'callout':
+            return { ...block, data: data as CalloutBlockData }
+          case 'hero':
+            return { ...block, data: data as HeroBlockData }
         }
-        return { ...block, data: data as CalloutBlockData }
       }),
     )
   }

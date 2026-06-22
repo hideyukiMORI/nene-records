@@ -15,6 +15,7 @@ export const BLOCK_CATALOG: readonly BlockCatalogEntry[] = [
     labelKey: 'admin.blocks.type.callout',
     descKey: 'admin.blocks.type.callout.desc',
   },
+  { type: 'hero', labelKey: 'admin.blocks.type.hero', descKey: 'admin.blocks.type.hero.desc' },
 ]
 
 const CATALOG_BY_TYPE = Object.fromEntries(

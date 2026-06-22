@@ -93,4 +93,43 @@ final class BlocksDocumentValidatorTest extends TestCase
         $this->expectException(ValidationException::class);
         $this->validator->validate(json_encode($blocks, JSON_THROW_ON_ERROR));
     }
+
+    public function testAcceptsValidHeroBlock(): void
+    {
+        $json = json_encode([
+            ['id' => 'h1', 'type' => 'hero', 'data' => [
+                'variant' => 'standard',
+                'kicker' => 'Spring',
+                'heading' => 'New *releases*',
+                'lead' => 'Lead text.',
+                'ctaLabel' => 'Browse',
+                'ctaUrl' => '/releases',
+                'ghostLabel' => 'Archive',
+                'ghostUrl' => 'https://example.com/archive',
+            ]],
+        ], JSON_THROW_ON_ERROR);
+
+        $this->validator->validate($json);
+        $this->addToAssertionCount(1);
+    }
+
+    public function testRejectsHeroWithoutHeading(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->validator->validate('[{"id":"h1","type":"hero","data":{"variant":"standard"}}]');
+    }
+
+    public function testRejectsHeroWithInvalidVariant(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->validator->validate('[{"id":"h1","type":"hero","data":{"variant":"wild","heading":"x"}}]');
+    }
+
+    public function testRejectsHeroWithUnsafeCtaUrl(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->validator->validate(
+            '[{"id":"h1","type":"hero","data":{"variant":"standard","heading":"x","ctaUrl":"javascript:alert(1)"}}]',
+        );
+    }
 }

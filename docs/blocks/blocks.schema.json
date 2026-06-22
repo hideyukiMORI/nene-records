@@ -18,7 +18,7 @@
           "minLength": 1,
           "maxLength": 64
         },
-        "type": { "enum": ["text", "callout"] },
+        "type": { "enum": ["text", "callout", "hero"] },
         "data": { "type": "object" }
       },
       "allOf": [
@@ -29,6 +29,10 @@
         {
           "if": { "properties": { "type": { "const": "callout" } } },
           "then": { "properties": { "data": { "$ref": "#/$defs/calloutData" } } }
+        },
+        {
+          "if": { "properties": { "type": { "const": "hero" } } },
+          "then": { "properties": { "data": { "$ref": "#/$defs/heroData" } } }
         }
       ]
     },
@@ -48,6 +52,22 @@
         "kind": { "enum": ["info", "warn", "ok", "danger"] },
         "title": { "type": "string", "maxLength": 200 },
         "body": { "type": "string", "minLength": 1, "maxLength": 50000 }
+      }
+    },
+    "heroData": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["variant", "heading"],
+      "description": "Reuses the existing .hero__* presentation; variant maps to data-hero. Image art arrives in a later slice (S3 media picker).",
+      "properties": {
+        "variant": { "enum": ["standard", "minimal", "fullbleed"] },
+        "heading": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "kicker": { "type": "string", "maxLength": 200 },
+        "lead": { "type": "string", "maxLength": 2000 },
+        "ctaLabel": { "type": "string", "maxLength": 120 },
+        "ctaUrl": { "type": "string", "maxLength": 2000 },
+        "ghostLabel": { "type": "string", "maxLength": 120 },
+        "ghostUrl": { "type": "string", "maxLength": 2000 }
       }
     }
   }

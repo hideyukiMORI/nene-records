@@ -2183,3 +2183,23 @@
   margin: 0;
   font-size: var(--text-body-sm);
 }
+/* hero block (#486 S2) — reuses .hero__* element styles; per-block variant via
+   data-hero on the block itself (the site-wide data-hero stays on the shell). */
+.nene-public .hero--block {
+  margin-block: var(--space-xl);
+}
+.nene-public .hero--block .hero__title {
+  font-size: var(--text-h1);
+}
+.nene-public .hero--block .hero__lead {
+  margin-bottom: var(--space-lg);
+}
+.nene-public .hero--block[data-hero='minimal'] .hero__title {
+  max-width: 20ch;
+}
+.nene-public .hero--block[data-hero='fullbleed'] {
+  padding: var(--space-xl);
+  border-radius: var(--radius-md);
+  border-block: 1px solid var(--color-border);
+  background: var(--color-surface-sunken);
+}
