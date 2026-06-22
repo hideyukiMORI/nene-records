@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeNeRecords\Tests\Tag;
 
 use Nene2\Config\DatabaseConfig;
+use Nene2\Database\DatabaseConstraintException;
 use Nene2\Database\PdoConnectionFactory;
 use Nene2\Database\PdoDatabaseQueryExecutor;
 use Nene2\Http\RequestScopedHolder;
@@ -86,5 +87,32 @@ final class PdoTagRepositoryTest extends TestCase
         self::assertCount(2, $tags);
         self::assertSame('a', $tags[0]->slug);
         self::assertSame('b', $tags[1]->slug);
+    }
+
+    public function testSameSlugIsAllowedAcrossOrganizations(): void
+    {
+        $orgOne = new RequestScopedHolder();
+        $orgOne->set(1);
+        $orgTwo = new RequestScopedHolder();
+        $orgTwo->set(2);
+
+        $repositoryOne = new PdoTagRepository($this->executor, $orgOne);
+        $repositoryTwo = new PdoTagRepository($this->executor, $orgTwo);
+
+        $idOne = $repositoryOne->save(new Tag(slug: 'shared', name: 'Shared (org 1)'));
+        $idTwo = $repositoryTwo->save(new Tag(slug: 'shared', name: 'Shared (org 2)'));
+
+        self::assertNotSame($idOne, $idTwo);
+        self::assertSame('Shared (org 1)', $repositoryOne->findBySlug('shared')?->name);
+        self::assertSame('Shared (org 2)', $repositoryTwo->findBySlug('shared')?->name);
+    }
+
+    public function testDuplicateSlugWithinOrganizationIsRejected(): void
+    {
+        $repository = new PdoTagRepository($this->executor, $this->orgId);
+        $repository->save(new Tag(slug: 'dup', name: 'First'));
+
+        $this->expectException(DatabaseConstraintException::class);
+        $repository->save(new Tag(slug: 'dup', name: 'Second'));
     }
 }
