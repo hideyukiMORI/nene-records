@@ -489,6 +489,10 @@ export const en = {
   'admin.fieldDefs.html.hint': 'HTML with CSS is allowed; scripts are removed on display.',
   'admin.fieldDefs.bundle.hint':
     'A full HTML document (JS/CSS allowed). Runs isolated in a sandboxed iframe on the public page.',
+  'admin.bundle.htmlLabel': 'Bundle HTML (sandboxed)',
+  'admin.bundle.seoLabel': 'Crawlable text (required)',
+  'admin.bundle.seoHint':
+    'Markdown that faithfully represents the bundle’s visible content. Server-rendered for crawlers and used as the no-JS / screen-reader fallback.',
   'admin.fieldDefs.dataType.int': 'Integer',
   'admin.fieldDefs.dataType.enum': 'Enum',
   'admin.fieldDefs.dataType.bool': 'Boolean',

@@ -7,6 +7,7 @@ namespace NeNeRecords\PublicRecord;
 use Nene2\Config\AppConfig;
 use Nene2\Routing\Router;
 use Nene2\View\HtmlResponseFactory;
+use NeNeRecords\BundleField\BundleDocumentValidator;
 use NeNeRecords\Setting\ListPublicSettingsUseCaseInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -60,6 +61,9 @@ final readonly class RenderPublicRecordViewHandler
             'includeViteClient' => $this->config->debug,
             'viteUrl' => rtrim($viteUrl, '/'),
             'renderMarkdown' => static fn (string $markdown): string => PublicMarkdownRenderer::toSafeHtml($markdown),
+            // A bundle's crawlable twin (#311): render its seoText markdown server-side
+            // (the sandboxed iframe itself is SPA-only / invisible to crawlers).
+            'renderBundleSeo' => static fn (string $raw): string => PublicMarkdownRenderer::toSafeHtml(BundleDocumentValidator::seoTextOf($raw)),
         ]);
     }
 

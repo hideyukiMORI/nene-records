@@ -3,6 +3,7 @@ import type { FieldDataType, FieldDef } from '@/entities/field-def'
 import { useTranslation } from '@/shared/i18n'
 import { Button, Card, EmptyState, Input, Stack, Text } from '@/shared/ui'
 import { BlocksFieldEditor } from './BlocksFieldEditor'
+import { BundleFieldEditor } from './BundleFieldEditor'
 import { FileFieldInput } from './FileFieldInput'
 import { ImageFieldInput } from './ImageFieldInput'
 import { MarkdownFieldInput } from './MarkdownFieldInput'
@@ -121,7 +122,22 @@ export function EntityTextFieldsForm({
             )
           }
 
-          if (fieldDef.dataType === 'html' || fieldDef.dataType === 'bundle') {
+          if (fieldDef.dataType === 'bundle') {
+            return (
+              <BundleFieldEditor
+                key={fieldDef.fieldKey}
+                id={fieldId}
+                label={label}
+                value={values[fieldDef.fieldKey] ?? ''}
+                disabled={isSubmitting}
+                onChange={(val) => {
+                  setValues((current) => ({ ...current, [fieldDef.fieldKey]: val }))
+                }}
+              />
+            )
+          }
+
+          if (fieldDef.dataType === 'html') {
             return (
               <div key={fieldDef.fieldKey} className="flex flex-col gap-stack-xs">
                 <label
@@ -132,7 +148,7 @@ export function EntityTextFieldsForm({
                 </label>
                 <textarea
                   id={fieldId}
-                  rows={fieldDef.dataType === 'bundle' ? 16 : 10}
+                  rows={10}
                   disabled={isSubmitting}
                   value={values[fieldDef.fieldKey] ?? ''}
                   onChange={(event) => {
@@ -144,11 +160,7 @@ export function EntityTextFieldsForm({
                   className="rounded-sm border border-border bg-surface-raised px-inline-sm py-stack-xs font-mono text-caption text-text-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                 />
                 <span className="font-sans text-caption text-text-muted">
-                  {t(
-                    fieldDef.dataType === 'bundle'
-                      ? 'admin.fieldDefs.bundle.hint'
-                      : 'admin.fieldDefs.html.hint',
-                  )}
+                  {t('admin.fieldDefs.html.hint')}
                 </span>
               </div>
             )
