@@ -15,6 +15,7 @@ final readonly class WebhookRouteRegistrar
         private CreateWebhookHandler $createHandler,
         private UpdateWebhookHandler $updateHandler,
         private DeleteWebhookHandler $deleteHandler,
+        private ProcessWebhookDeliveriesHandler $processDeliveriesHandler,
     ) {
     }
 
@@ -25,6 +26,7 @@ final readonly class WebhookRouteRegistrar
         $create = $this->createHandler;
         $update = $this->updateHandler;
         $delete = $this->deleteHandler;
+        $processDeliveries = $this->processDeliveriesHandler;
 
         $router->get(
             '/api/v1/webhooks',
@@ -33,6 +35,12 @@ final readonly class WebhookRouteRegistrar
         $router->post(
             '/api/v1/webhooks',
             static fn (ServerRequestInterface $request) => $create->handle($request),
+        );
+        // Cron-triggered queue drain — registered before the {id} routes so the
+        // literal path is never shadowed. Public (see AdminApiAuthMiddleware).
+        $router->post(
+            '/api/v1/webhooks/process-deliveries',
+            static fn (ServerRequestInterface $request) => $processDeliveries->handle($request),
         );
         $router->get(
             '/api/v1/webhooks/{id}',

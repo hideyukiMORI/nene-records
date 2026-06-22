@@ -845,6 +845,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/webhooks/process-deliveries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Process webhook deliveries
+         * @description Drains the webhook delivery queue — sends due deliveries with retry and exponential backoff. Intended for cron job invocation. The delivery queue is not organization-scoped, so a single call drains all tenants.
+         */
+        post: operations["processWebhookDeliveries"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/webhooks/{id}": {
         parameters: {
             query?: never;
@@ -1960,6 +1980,16 @@ export interface components {
         ProcessScheduledPublishResponse: {
             published_count: number;
             published_ids: number[];
+        };
+        ProcessWebhookDeliveriesResponse: {
+            /** @description Number of due deliveries claimed and attempted this run. */
+            processed: number;
+            /** @description Deliveries that succeeded. */
+            delivered: number;
+            /** @description Deliveries that failed but were rescheduled with backoff. */
+            retried: number;
+            /** @description Deliveries that exhausted their attempt budget and were marked failed. */
+            failed: number;
         };
         EntityListResponse: {
             items: components["schemas"]["EntityResponse"][];
@@ -5081,6 +5111,30 @@ export interface operations {
                 };
             };
             422: components["responses"]["ValidationFailed"];
+        };
+    };
+    processWebhookDeliveries: {
+        parameters: {
+            query?: {
+                /** @description Maximum number of due deliveries to process in this run. */
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Summary of the queue drain. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProcessWebhookDeliveriesResponse"];
+                };
+            };
+            500: components["responses"]["InternalServerError"];
         };
     };
     getWebhookById: {

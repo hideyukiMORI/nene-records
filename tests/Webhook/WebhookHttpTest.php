@@ -15,10 +15,13 @@ use NeNeRecords\Webhook\GetWebhookByIdHandler;
 use NeNeRecords\Webhook\GetWebhookByIdUseCase;
 use NeNeRecords\Webhook\ListWebhooksHandler;
 use NeNeRecords\Webhook\ListWebhooksUseCase;
+use NeNeRecords\Webhook\ProcessWebhookDeliveriesHandler;
 use NeNeRecords\Webhook\UpdateWebhookHandler;
 use NeNeRecords\Webhook\UpdateWebhookUseCase;
+use NeNeRecords\Webhook\WebhookDeliveryProcessor;
 use NeNeRecords\Webhook\WebhookNotFoundExceptionHandler;
 use NeNeRecords\Webhook\WebhookRouteRegistrar;
+use NeNeRecords\Webhook\WebhookSendResult;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
@@ -40,12 +43,16 @@ final class WebhookHttpTest extends TestCase
         $jsonResponse = new JsonResponseFactory($this->factory, $this->factory);
         $problemDetails = new ProblemDetailsResponseFactory($this->factory, $this->factory);
 
+        $deliveries = new InMemoryWebhookDeliveryRepository();
+        $processor = new WebhookDeliveryProcessor($deliveries, new FakeWebhookSender(WebhookSendResult::ok(200)));
+
         $registrar = new WebhookRouteRegistrar(
             new ListWebhooksHandler(new ListWebhooksUseCase($this->webhooks), $jsonResponse),
             new GetWebhookByIdHandler(new GetWebhookByIdUseCase($this->webhooks), $jsonResponse),
             new CreateWebhookHandler(new CreateWebhookUseCase($this->webhooks), $jsonResponse),
             new UpdateWebhookHandler(new UpdateWebhookUseCase($this->webhooks), $jsonResponse),
             new DeleteWebhookHandler(new DeleteWebhookUseCase($this->webhooks), $jsonResponse),
+            new ProcessWebhookDeliveriesHandler($processor, $jsonResponse),
         );
 
         $this->application = (new RuntimeApplicationFactory(

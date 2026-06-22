@@ -90,6 +90,29 @@ final class AdminApiAuthMiddlewareTest extends TestCase
         self::assertSame(401, $this->middleware->process($request, $this->passThrough())->getStatusCode());
     }
 
+    public function testScheduledPublishCronEndpointIsOpenWithoutAuth(): void
+    {
+        // The cron container POSTs this without credentials — it must pass through.
+        $request = $this->factory->createServerRequest('POST', 'https://example.test/api/v1/entities/process-scheduled');
+
+        self::assertSame(204, $this->middleware->process($request, $this->passThrough())->getStatusCode());
+    }
+
+    public function testProcessWebhookDeliveriesCronEndpointIsOpenWithoutAuth(): void
+    {
+        $request = $this->factory->createServerRequest('POST', 'https://example.test/api/v1/webhooks/process-deliveries');
+
+        self::assertSame(204, $this->middleware->process($request, $this->passThrough())->getStatusCode());
+    }
+
+    public function testOtherWebhookWritesStillRequireAuth(): void
+    {
+        // Opening process-deliveries must not open the rest of /api/v1/webhooks.
+        $request = $this->factory->createServerRequest('POST', 'https://example.test/api/v1/webhooks');
+
+        self::assertSame(401, $this->middleware->process($request, $this->passThrough())->getStatusCode());
+    }
+
     public function testInvalidTokenReturns401(): void
     {
         $request = $this->factory

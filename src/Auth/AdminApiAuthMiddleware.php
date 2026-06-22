@@ -16,18 +16,28 @@ use Psr\Http\Server\RequestHandlerInterface;
  * Method-aware API authentication middleware.
  *
  * Protection rules (first match wins):
- *  1. Always open: /health, /api/v1/auth/*, paths starting with /api/v1/public/
+ *  1. Always open: /health, /api/v1/auth/*, /api/v1/public/*, and the
+ *     cron-triggered batch endpoints (process-scheduled / process-deliveries)
  *  2. Always protected (all HTTP methods): paths starting with /api/v1/settings
  *  3. Protected for non-GET methods: all other /api/v1/ paths
  *  4. Everything else: open (static assets, public HTML pages)
  */
 final readonly class AdminApiAuthMiddleware implements MiddlewareInterface
 {
-    /** @var list<string> */
+    /**
+     * Open prefixes. The two `process-*` entries are full paths (not true
+     * prefixes) for cron-triggered batch jobs: the cron container drains them
+     * over HTTP without credentials. They expose no data, are idempotent, and
+     * remain rate-limited by ThrottleMiddleware (#466).
+     *
+     * @var list<string>
+     */
     private const ALWAYS_OPEN_PREFIXES = [
         '/health',
         '/api/v1/auth/',
         '/api/v1/public/',
+        '/api/v1/entities/process-scheduled',
+        '/api/v1/webhooks/process-deliveries',
     ];
 
     /** @var list<string> */
