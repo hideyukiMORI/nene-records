@@ -111,6 +111,7 @@
 
 ## 8. 関連
 
+- **手を動かす版（MCP ツールの使い方・レシピ）: [`claudedesign-mcp-guide.md`](./claudedesign-mcp-guide.md)**
 - 設計: [`runtime-themes.md`](./runtime-themes.md)（§5 公開適用 / §6 セキュリティ / §8 サムネ）
 - 契約: [`public-theme.schema.json`](./public-theme.schema.json) / [`public-theme-contract.md`](./public-theme-contract.md) / [`theme-flags.md`](./theme-flags.md) / [`header-patterns.md`](./header-patterns.md)
 - ブリーフ実例: [`briefs/`](./briefs/) / 記入例: [`examples/`](./examples/)
