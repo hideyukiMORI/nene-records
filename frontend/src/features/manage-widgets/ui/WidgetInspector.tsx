@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import type { EntityType } from '@/entities/entity-type'
 import type { Menu } from '@/entities/menu'
 import type { Widget } from '@/entities/widget'
@@ -5,6 +6,48 @@ import { useTranslation } from '@/shared/i18n'
 import { WIDGET_REGIONS, type WidgetRegion } from '@/shared/lib/resolve-layout'
 import { Button, Card, Input, Select, Text } from '@/shared/ui'
 import { WIDGET_CATALOG_BY_TYPE, type SettingDescriptor } from '../widget-catalog'
+
+/**
+ * Free-text / numeric inspector field with a local draft so edits commit on blur
+ * / Enter instead of firing a PUT on every keystroke (which raced with the
+ * refetch and corrupted the input). Reset via `key={widget.id-field}`.
+ */
+function DraftInput({
+  id,
+  label,
+  type,
+  value,
+  onCommit,
+}: {
+  id: string
+  label: string
+  type?: 'text' | 'number'
+  value: string
+  onCommit: (raw: string) => void
+}) {
+  const [draft, setDraft] = useState(value)
+  return (
+    <Input
+      id={id}
+      label={label}
+      type={type ?? 'text'}
+      value={draft}
+      onChange={(e) => {
+        setDraft(e.target.value)
+      }}
+      onBlur={() => {
+        if (draft !== value) {
+          onCommit(draft)
+        }
+      }}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') {
+          e.currentTarget.blur()
+        }
+      }}
+    />
+  )
+}
 
 export interface WidgetInspectorProps {
   widget: Widget | null
@@ -102,27 +145,30 @@ export function WidgetInspector({
       )
     }
     if (s.editor === 'int') {
+      const fallback = s.def ?? 1
       return (
-        <Input
-          key={s.key}
+        <DraftInput
+          key={`${String(widget.id)}-${s.key}`}
           id={`insp-${s.key}`}
           type="number"
           label={t(s.labelKey)}
-          value={String(typeof value === 'number' ? value : (s.def ?? 1))}
-          onChange={(e) => {
-            onSettings(widget.id, { [s.key]: Number(e.target.value) || 1 })
+          value={String(typeof value === 'number' ? value : fallback)}
+          onCommit={(raw) => {
+            // Parse without the `|| 1` trap that forced 0 / empty to 1.
+            const parsed = Number.parseInt(raw, 10)
+            onSettings(widget.id, { [s.key]: Number.isFinite(parsed) ? parsed : fallback })
           }}
         />
       )
     }
     return (
-      <Input
-        key={s.key}
+      <DraftInput
+        key={`${String(widget.id)}-${s.key}`}
         id={`insp-${s.key}`}
         label={t(s.labelKey)}
         value={typeof value === 'string' ? value : ''}
-        onChange={(e) => {
-          onSettings(widget.id, { [s.key]: e.target.value })
+        onCommit={(raw) => {
+          onSettings(widget.id, { [s.key]: raw })
         }}
       />
     )
@@ -133,12 +179,13 @@ export function WidgetInspector({
       <Text as="h2" variant="heading-sm">
         {t(entry.labelKey)}
       </Text>
-      <Input
+      <DraftInput
+        key={`${String(widget.id)}-title`}
         id="insp-title"
         label={t('admin.widgets.titleLabel')}
         value={widget.title ?? ''}
-        onChange={(e) => {
-          onTitle(widget.id, e.target.value)
+        onCommit={(raw) => {
+          onTitle(widget.id, raw)
         }}
       />
       {entry.settings.map(renderField)}
