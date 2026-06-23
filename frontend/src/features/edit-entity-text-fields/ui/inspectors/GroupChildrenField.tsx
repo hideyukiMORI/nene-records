@@ -12,6 +12,7 @@ import {
 import { moveItem } from '@/shared/lib/move-item'
 import { BLOCK_CATALOG, blockCatalogEntry } from '../block-catalog'
 import { BlockInspector } from '../BlockInspector'
+import { FieldError } from './FieldError'
 
 /** Leaf block types a container (group / columns) may hold (no nesting; depth 2). */
 const GROUP_CHILD_CATALOG = BLOCK_CATALOG.filter(
@@ -69,11 +70,7 @@ export function GroupChildrenField({
       <span className="font-sans text-caption font-medium text-text-primary">
         {t('admin.blocks.field.children')}
       </span>
-      {error !== undefined ? (
-        <span role="alert" className="font-sans text-caption text-danger">
-          {error}
-        </span>
-      ) : null}
+      {error !== undefined ? <FieldError>{error}</FieldError> : null}
       <div className="flex flex-wrap gap-inline-sm">
         {GROUP_CHILD_CATALOG.map((entry) => (
           <Button

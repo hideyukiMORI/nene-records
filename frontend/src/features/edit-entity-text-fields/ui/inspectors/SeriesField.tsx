@@ -3,6 +3,8 @@ import { Button, Input } from '@/shared/ui'
 import { IconChevronDown, IconChevronUp, IconX } from '@/shared/ui/icons/Icons'
 import { type SeriesPoint } from '@/shared/lib/blocks-document'
 import { moveItem } from '@/shared/lib/move-item'
+import { FieldError } from './FieldError'
+import { RepeaterIconButton } from './RepeaterIconButton'
 
 interface SeriesFieldProps {
   idPrefix: string
@@ -34,11 +36,7 @@ export function SeriesField({ idPrefix, series, disabled, error, onChange }: Ser
       <span className="font-sans text-caption font-medium text-text-primary">
         {t('admin.blocks.field.series')}
       </span>
-      {error !== undefined ? (
-        <span role="alert" className="font-sans text-caption text-danger">
-          {error}
-        </span>
-      ) : null}
+      {error !== undefined ? <FieldError>{error}</FieldError> : null}
       {series.map((point, index) => (
         <div key={index} className="flex items-end gap-inline-sm">
           <div className="flex-1">
@@ -67,9 +65,7 @@ export function SeriesField({ idPrefix, series, disabled, error, onChange }: Ser
               }}
             />
           </div>
-          <button
-            type="button"
-            className="rounded p-1 text-text-muted hover:text-text-primary disabled:opacity-40"
+          <RepeaterIconButton
             title={t('admin.blocks.moveUp')}
             disabled={disabled || index === 0}
             onClick={() => {
@@ -77,10 +73,8 @@ export function SeriesField({ idPrefix, series, disabled, error, onChange }: Ser
             }}
           >
             <IconChevronUp size={15} />
-          </button>
-          <button
-            type="button"
-            className="rounded p-1 text-text-muted hover:text-text-primary disabled:opacity-40"
+          </RepeaterIconButton>
+          <RepeaterIconButton
             title={t('admin.blocks.moveDown')}
             disabled={disabled || index === series.length - 1}
             onClick={() => {
@@ -88,10 +82,9 @@ export function SeriesField({ idPrefix, series, disabled, error, onChange }: Ser
             }}
           >
             <IconChevronDown size={15} />
-          </button>
-          <button
-            type="button"
-            className="rounded p-1 text-text-muted hover:text-danger disabled:opacity-40"
+          </RepeaterIconButton>
+          <RepeaterIconButton
+            danger
             title={t('common.actions.delete')}
             disabled={disabled}
             onClick={() => {
@@ -99,7 +92,7 @@ export function SeriesField({ idPrefix, series, disabled, error, onChange }: Ser
             }}
           >
             <IconX size={15} />
-          </button>
+          </RepeaterIconButton>
         </div>
       ))}
       <div>

@@ -23,6 +23,7 @@ import {
 } from '@/shared/lib/blocks-document'
 import { BlockMarkdownInput } from './BlockMarkdownInput'
 import { EnumSelect } from './inspectors/EnumSelect'
+import { FieldError } from './inspectors/FieldError'
 import { GalleryItemsField } from './inspectors/GalleryItemsField'
 import { GroupChildrenField } from './inspectors/GroupChildrenField'
 import { HeroMediaField } from './inspectors/HeroMediaField'
@@ -294,11 +295,11 @@ export function BlockInspector({
             </Button>
           </div>
           {errorCode === 'children-required' || errorCode === 'children-invalid' ? (
-            <span role="alert" className="font-sans text-caption text-danger">
+            <FieldError>
               {errorCode === 'children-required'
                 ? t('admin.blocks.error.childrenRequired')
                 : t('admin.blocks.error.childrenInvalid')}
-            </span>
+            </FieldError>
           ) : null}
           {data.columns.map((column, columnIndex) => (
             <div
