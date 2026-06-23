@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import { Link, NavLink, Outlet, Navigate } from 'react-router-dom'
 import { currentUserIsSuperadmin } from '@/entities/auth'
 import { IconBuilding, IconDatabase, IconHome, IconSettings } from '@/shared/ui/icons/Icons'
@@ -70,7 +71,9 @@ export function SuperadminShell() {
       {/* Main content */}
       <main className="flex-1 overflow-auto">
         <div className="mx-auto max-w-5xl p-8">
-          <Outlet />
+          <Suspense fallback={null}>
+            <Outlet />
+          </Suspense>
         </div>
       </main>
     </div>

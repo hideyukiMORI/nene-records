@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import {
   authStore,
@@ -525,7 +525,9 @@ export function AppShell() {
             </button>
           </div>
           <div className="px-4 py-6 sm:px-6 sm:py-8">
-            <Outlet />
+            <Suspense fallback={null}>
+              <Outlet />
+            </Suspense>
           </div>
         </main>
 

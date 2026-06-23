@@ -1,39 +1,46 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
-import { Navigate } from 'react-router-dom'
-import { AcceptInvitePage } from '@/pages/accept-invite/AcceptInvitePage'
-import { AppearanceLayoutPage } from '@/pages/appearance/AppearanceLayoutPage'
-import { PublicBrowsePage } from '@/pages/consumer/PublicBrowsePage'
-import { PublicIndexPage } from '@/pages/consumer/PublicIndexPage'
-import { PublicRecordDetailPage } from '@/pages/consumer/PublicRecordDetailPage'
-import { PublicDateArchivePage } from '@/pages/consumer/PublicDateArchivePage'
-import { PublicSearchPage } from '@/pages/consumer/PublicSearchPage'
+import { lazy, Suspense, type ComponentType } from 'react'
+import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
+// Eager: route frame + entry/error pages (needed immediately; the shells render
+// the Suspense fallback while a lazy content page chunk loads).
 import { PublicShell } from '@/pages/consumer/PublicShell'
-import { PublicTagArchivePage } from '@/pages/consumer/PublicTagArchivePage'
-import { EntityRecordPage } from '@/pages/entity-record/EntityRecordPage'
-import { EntityRecordsPage } from '@/pages/entity-records/EntityRecordsPage'
-import { EntityTypesPage } from '@/pages/entity-types/EntityTypesPage'
-import { FieldDefsPage } from '@/pages/field-defs/FieldDefsPage'
 import { ForbiddenPage } from '@/pages/forbidden/ForbiddenPage'
-import { HomePage } from '@/pages/home/HomePage'
 import { AppShell } from '@/pages/layout/AppShell'
 import { LoginPage } from '@/pages/login/LoginPage'
-import { MediaPage } from '@/pages/media/MediaPage'
 import { NotFoundPage } from '@/pages/not-found/NotFoundPage'
-import { ResetPasswordPage } from '@/pages/reset-password/ResetPasswordPage'
-import { SiteSettingsPage } from '@/pages/settings/SiteSettingsPage'
-import { VerifyEmailPage } from '@/pages/verify-email/VerifyEmailPage'
-import { CommentsPage } from '@/pages/comments/CommentsPage'
-import { UserEditPage } from '@/pages/users/UserEditPage'
-import { UsersPage } from '@/pages/users/UsersPage'
-import { WebhooksPage } from '@/pages/webhooks/WebhooksPage'
-import { NotificationChannelsPage } from '@/pages/notifications/NotificationChannelsPage'
-import { TagsPage } from '@/pages/tags/TagsPage'
 import { SuperadminShell } from '@/pages/superadmin/SuperadminShell'
-import { OrganizationsPage } from '@/pages/superadmin/OrganizationsPage'
-import { OrganizationDetailPage } from '@/pages/superadmin/OrganizationDetailPage'
-import { SettingsPage } from '@/pages/superadmin/SettingsPage'
-import { DataMigrationPage } from '@/pages/superadmin/DataMigrationPage'
 import { RequireAuth } from '@/app/RequireAuth'
+
+// Lazy: per-route code splitting for the content pages (named exports → default).
+const named = <T,>(loader: () => Promise<Record<string, T>>, name: string) =>
+  lazy(() => loader().then((m) => ({ default: m[name] as ComponentType })))
+
+const AcceptInvitePage = named(() => import('@/pages/accept-invite/AcceptInvitePage'), 'AcceptInvitePage') // prettier-ignore
+const ResetPasswordPage = named(() => import('@/pages/reset-password/ResetPasswordPage'), 'ResetPasswordPage') // prettier-ignore
+const VerifyEmailPage = named(() => import('@/pages/verify-email/VerifyEmailPage'), 'VerifyEmailPage') // prettier-ignore
+const HomePage = named(() => import('@/pages/home/HomePage'), 'HomePage')
+const EntityTypesPage = named(() => import('@/pages/entity-types/EntityTypesPage'), 'EntityTypesPage') // prettier-ignore
+const TagsPage = named(() => import('@/pages/tags/TagsPage'), 'TagsPage')
+const CommentsPage = named(() => import('@/pages/comments/CommentsPage'), 'CommentsPage')
+const AppearanceLayoutPage = named(() => import('@/pages/appearance/AppearanceLayoutPage'), 'AppearanceLayoutPage') // prettier-ignore
+const MediaPage = named(() => import('@/pages/media/MediaPage'), 'MediaPage')
+const WebhooksPage = named(() => import('@/pages/webhooks/WebhooksPage'), 'WebhooksPage')
+const NotificationChannelsPage = named(() => import('@/pages/notifications/NotificationChannelsPage'), 'NotificationChannelsPage') // prettier-ignore
+const SiteSettingsPage = named(() => import('@/pages/settings/SiteSettingsPage'), 'SiteSettingsPage') // prettier-ignore
+const UsersPage = named(() => import('@/pages/users/UsersPage'), 'UsersPage')
+const UserEditPage = named(() => import('@/pages/users/UserEditPage'), 'UserEditPage')
+const FieldDefsPage = named(() => import('@/pages/field-defs/FieldDefsPage'), 'FieldDefsPage')
+const EntityRecordsPage = named(() => import('@/pages/entity-records/EntityRecordsPage'), 'EntityRecordsPage') // prettier-ignore
+const EntityRecordPage = named(() => import('@/pages/entity-record/EntityRecordPage'), 'EntityRecordPage') // prettier-ignore
+const OrganizationsPage = named(() => import('@/pages/superadmin/OrganizationsPage'), 'OrganizationsPage') // prettier-ignore
+const OrganizationDetailPage = named(() => import('@/pages/superadmin/OrganizationDetailPage'), 'OrganizationDetailPage') // prettier-ignore
+const SettingsPage = named(() => import('@/pages/superadmin/SettingsPage'), 'SettingsPage')
+const DataMigrationPage = named(() => import('@/pages/superadmin/DataMigrationPage'), 'DataMigrationPage') // prettier-ignore
+const PublicIndexPage = named(() => import('@/pages/consumer/PublicIndexPage'), 'PublicIndexPage') // prettier-ignore
+const PublicSearchPage = named(() => import('@/pages/consumer/PublicSearchPage'), 'PublicSearchPage') // prettier-ignore
+const PublicTagArchivePage = named(() => import('@/pages/consumer/PublicTagArchivePage'), 'PublicTagArchivePage') // prettier-ignore
+const PublicDateArchivePage = named(() => import('@/pages/consumer/PublicDateArchivePage'), 'PublicDateArchivePage') // prettier-ignore
+const PublicBrowsePage = named(() => import('@/pages/consumer/PublicBrowsePage'), 'PublicBrowsePage') // prettier-ignore
+const PublicRecordDetailPage = named(() => import('@/pages/consumer/PublicRecordDetailPage'), 'PublicRecordDetailPage') // prettier-ignore
 
 function AdminShell() {
   return (
@@ -142,5 +149,11 @@ const router = createBrowserRouter([
 ])
 
 export function AppRouter() {
-  return <RouterProvider router={router} />
+  // Top-level boundary for lazy routes that sit outside a shell (the auth pages);
+  // shells provide their own Suspense so the nav stays visible during page load.
+  return (
+    <Suspense fallback={null}>
+      <RouterProvider router={router} />
+    </Suspense>
+  )
 }
