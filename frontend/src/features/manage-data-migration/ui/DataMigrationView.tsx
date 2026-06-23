@@ -37,7 +37,7 @@ export function DataMigrationView({
           </Text>
         )}
         {isStatusError && (
-          <Text muted className="mt-3 text-red-500">
+          <Text muted className="mt-3 text-danger">
             Failed to load migration status.
           </Text>
         )}
@@ -46,15 +46,15 @@ export function DataMigrationView({
           <>
             <div className="mt-3 mb-4">
               {hasUnassigned ? (
-                <div className="rounded-md bg-amber-50 border border-amber-200 px-4 py-3 dark:bg-amber-950/20 dark:border-amber-900/40">
-                  <Text className="font-semibold text-amber-800 dark:text-amber-300">
+                <div className="rounded-md bg-warning-weak border border-warning px-4 py-3">
+                  <Text className="font-semibold text-warning">
                     {migrationStatus.total.toLocaleString()} unassigned record
                     {migrationStatus.total !== 1 ? 's' : ''} found
                   </Text>
                 </div>
               ) : (
-                <div className="rounded-md bg-green-50 border border-green-200 px-4 py-3 dark:bg-green-950/20 dark:border-green-900/40">
-                  <Text className="font-semibold text-green-800 dark:text-green-300">
+                <div className="rounded-md bg-success-weak border border-success px-4 py-3">
+                  <Text className="font-semibold text-success">
                     All records are assigned to an organization. ✓
                   </Text>
                 </div>

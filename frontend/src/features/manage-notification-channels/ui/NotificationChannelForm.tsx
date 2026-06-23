@@ -173,7 +173,7 @@ export function NotificationChannelForm({
     >
       <Stack gap="sm">
         {serverErrorTitle !== null && (
-          <Text className="text-error text-sm">{serverErrorTitle}</Text>
+          <Text className="text-danger text-sm">{serverErrorTitle}</Text>
         )}
 
         {!isEdit && (
@@ -213,7 +213,7 @@ export function NotificationChannelForm({
             className="w-full rounded-md border border-border bg-surface px-3 py-2 font-sans text-sm text-text placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent"
           />
           {errors['label'] !== undefined && (
-            <p className="mt-1 font-sans text-xs text-error">{errors['label']}</p>
+            <p className="mt-1 font-sans text-xs text-danger">{errors['label']}</p>
           )}
         </div>
 
@@ -221,7 +221,7 @@ export function NotificationChannelForm({
           <div key={field.key}>
             <label className="mb-1 block font-sans text-sm font-medium text-text">
               {field.label}
-              {field.required && <span className="ml-1 text-error">*</span>}
+              {field.required && <span className="ml-1 text-danger">*</span>}
             </label>
             {field.multiline === true ? (
               <textarea
@@ -245,7 +245,7 @@ export function NotificationChannelForm({
               />
             )}
             {errors[field.key] !== undefined && (
-              <p className="mt-1 font-sans text-xs text-error">{errors[field.key]}</p>
+              <p className="mt-1 font-sans text-xs text-danger">{errors[field.key]}</p>
             )}
           </div>
         ))}

@@ -232,7 +232,7 @@ export function ManageOrganizationDetailView({
       </Card>
 
       {/* Danger zone */}
-      <div className="rounded-lg border border-red-200 bg-red-50 p-6 dark:border-red-900/40 dark:bg-red-950/20">
+      <div className="rounded-lg border border-danger bg-danger-weak p-6">
         <Text as="h2" variant="heading-sm">
           Danger Zone
         </Text>

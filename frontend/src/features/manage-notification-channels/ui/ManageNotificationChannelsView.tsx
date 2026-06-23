@@ -140,7 +140,7 @@ export function ManageNotificationChannelsView({
                   <span
                     className={`inline-block rounded px-1.5 py-0.5 font-sans text-caption ${
                       channel.isEnabled
-                        ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                        ? 'bg-success/15 text-success'
                         : 'bg-surface text-text-muted'
                     }`}
                   >
@@ -149,12 +149,12 @@ export function ManageNotificationChannelsView({
                       : t('admin.notifications.status.disabled')}
                   </span>
                   {testSuccess === channel.id && (
-                    <span className="font-sans text-caption text-green-600 dark:text-green-400">
+                    <span className="font-sans text-caption text-success">
                       {t('admin.notifications.testSent')}
                     </span>
                   )}
                   {testError === channel.id && (
-                    <span className="font-sans text-caption text-error">
+                    <span className="font-sans text-caption text-danger">
                       {t('admin.notifications.testFailed')}
                     </span>
                   )}

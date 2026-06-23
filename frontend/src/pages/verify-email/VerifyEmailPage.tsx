@@ -48,7 +48,7 @@ export function VerifyEmailPage() {
           {token === '' || verify.isError ? (
             <div
               role="alert"
-              className="rounded-md border border-red-200 bg-red-50 px-inline-sm py-stack-xs text-sm text-red-700 dark:border-red-800 dark:bg-red-950/30 dark:text-red-300"
+              className="rounded-md border border-danger bg-danger-weak px-inline-sm py-stack-xs text-sm text-danger"
             >
               {token === '' ? t('admin.verifyEmail.invalid') : errorMessage()}
             </div>
@@ -56,7 +56,7 @@ export function VerifyEmailPage() {
             <Stack gap="md">
               <div
                 role="status"
-                className="rounded-md border border-green-200 bg-green-50 px-inline-sm py-stack-xs text-sm text-green-700 dark:border-green-800 dark:bg-green-950/30 dark:text-green-300"
+                className="rounded-md border border-success bg-success-weak px-inline-sm py-stack-xs text-sm text-success"
               >
                 {t('admin.verifyEmail.success')}
               </div>

@@ -164,7 +164,7 @@ export function AppShell() {
         {/* ── Overlay backdrop (mobile only) ──────────────────────────────── */}
         {sidebarOpen ? (
           <div
-            className="fixed inset-0 z-20 bg-black/50 lg:hidden"
+            className="fixed inset-0 z-20 bg-scrim lg:hidden"
             aria-hidden="true"
             onClick={closeSidebar}
           />

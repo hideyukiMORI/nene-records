@@ -213,7 +213,7 @@ export function ManageOrganizationsView({
                   </td>
                   <td className="px-4 py-3">
                     {org.isActive ? (
-                      <span className="text-xs text-green-600 dark:text-green-400">Active</span>
+                      <span className="text-xs text-success">Active</span>
                     ) : (
                       <span className="text-xs text-text-muted">Inactive</span>
                     )}
@@ -231,7 +231,7 @@ export function ManageOrganizationsView({
                         onClick={() => {
                           onSetDeleteTarget(org)
                         }}
-                        className="text-xs text-red-500 hover:text-red-700"
+                        className="text-xs text-danger hover:text-danger-hover"
                       >
                         Delete
                       </button>

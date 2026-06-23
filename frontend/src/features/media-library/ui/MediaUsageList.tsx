@@ -28,17 +28,17 @@ export function MediaUsageList({ usages, isLoading }: MediaUsageListProps) {
   return (
     <div
       role="alert"
-      className="rounded-md border border-amber-200 bg-amber-50 px-inline-sm py-stack-xs"
+      className="rounded-md border border-warning bg-warning-weak px-inline-sm py-stack-xs"
     >
       <Stack gap="xs">
-        <Text variant="caption" className="font-medium text-amber-800">
+        <Text variant="caption" className="font-medium text-warning">
           {t('admin.media.usages.blocked', { count: usages.length })}
         </Text>
         <ul className="flex flex-col gap-stack-xs">
           {usages.map((usage) => (
             <li
               key={`${String(usage.entityId)}-${usage.fieldKey}`}
-              className="text-caption leading-body text-amber-800"
+              className="text-caption leading-body text-warning"
             >
               <Link
                 to={`/admin/${usage.entityTypeSlug}/${String(usage.entityId)}`}

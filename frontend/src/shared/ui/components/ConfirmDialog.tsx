@@ -66,7 +66,7 @@ export function ConfirmDialog({
         {errorDetail !== null ? (
           <div
             role="alert"
-            className="rounded-md border border-red-200 bg-red-50 px-inline-sm py-stack-xs text-sm text-red-700"
+            className="rounded-md border border-danger bg-danger-weak px-inline-sm py-stack-xs text-sm text-danger"
           >
             {errorDetail}
           </div>
