@@ -12,6 +12,47 @@ export interface ManageMenusViewProps {
 // Master/detail columns. Constant so the arbitrary value is not a className literal.
 const MENUS_GRID_CLASS = 'grid grid-cols-1 gap-stack-lg lg:grid-cols-[260px_1fr]'
 
+/**
+ * Menu name field with a local draft so renaming commits on blur / Enter rather
+ * than firing a PATCH on every keystroke (which also corrupted the input as the
+ * refetched server value overwrote it mid-type). Reset via `key={menu.id}`.
+ */
+function MenuNameEditor({
+  name,
+  label,
+  onRename,
+}: {
+  name: string
+  label: string
+  onRename: (name: string) => void
+}) {
+  const [draft, setDraft] = useState(name)
+  const commit = () => {
+    const next = draft.trim()
+    if (next === '') {
+      setDraft(name)
+    } else if (next !== name) {
+      onRename(next)
+    }
+  }
+  return (
+    <Input
+      id="menu-name"
+      label={label}
+      value={draft}
+      onChange={(e) => {
+        setDraft(e.target.value)
+      }}
+      onBlur={commit}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') {
+          e.currentTarget.blur()
+        }
+      }}
+    />
+  )
+}
+
 export function ManageMenusView({ page }: ManageMenusViewProps) {
   const { t } = useTranslation()
   const navigate = useNavigate()
@@ -97,12 +138,12 @@ export function ManageMenusView({ page }: ManageMenusViewProps) {
           <Card className="flex flex-col gap-stack-sm">
             <div className="flex items-end justify-between gap-inline-md">
               <div className="flex-1">
-                <Input
-                  id="menu-name"
+                <MenuNameEditor
+                  key={activeMenu.id}
+                  name={activeMenu.name}
                   label={t('admin.menus.nameLabel')}
-                  value={activeMenu.name}
-                  onChange={(e) => {
-                    void page.renameMenu(e.target.value)
+                  onRename={(name) => {
+                    void page.renameMenu(name)
                   }}
                 />
                 <Text as="span" muted variant="caption">
