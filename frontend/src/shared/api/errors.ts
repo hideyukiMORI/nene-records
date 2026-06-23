@@ -41,20 +41,31 @@ export class AppError extends Error {
   }
 }
 
+function isProblemDetails(value: unknown): value is ProblemDetails {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    typeof (value as ProblemDetails).status === 'number' &&
+    typeof (value as ProblemDetails).title === 'string'
+  )
+}
+
 export async function parseProblemDetails(response: Response): Promise<AppError> {
   try {
-    const body = (await response.json()) as ProblemDetails
-    return new AppError({
-      ...body,
-      status: body.status,
-      instance: body.instance,
-    })
+    const body: unknown = await response.json()
+    // Only trust a body that is actually a Problem Details document. A valid but
+    // non-conforming JSON (e.g. {}, [], {message}) would otherwise yield
+    // status=undefined, breaking AppError.isRetryable (5xx treated as final).
+    if (isProblemDetails(body)) {
+      return new AppError({ ...body, instance: body.instance || response.url })
+    }
   } catch {
-    return new AppError({
-      type: 'about:blank',
-      title: response.statusText || 'Request failed',
-      status: response.status,
-      instance: response.url,
-    })
+    // Non-JSON body — fall through to the synthetic error below.
   }
+  return new AppError({
+    type: 'about:blank',
+    title: response.statusText || 'Request failed',
+    status: response.status,
+    instance: response.url,
+  })
 }
