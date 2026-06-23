@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from '@/shared/i18n'
 import {
   IconArrow,
   IconArrowLeft,
@@ -130,6 +131,7 @@ export function PublicRecordListView({
   errorTitle,
   onRetry,
 }: PublicRecordListViewProps) {
+  const { t } = useTranslation()
   const [view, setView] = useState<BrowseView>(readStoredView)
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -141,18 +143,18 @@ export function PublicRecordListView({
   const rangeStart = offset + 1
   const rangeEnd = Math.min(offset + items.length, total)
   const sub =
-    isLoading || isError || isUnknownType
+    isLoading || isError || isUnknownType || total === 0
       ? ''
-      : total === 0
-        ? ''
-        : total > pageSize
-          ? `${String(total)} records · showing ${String(rangeStart)}–${String(rangeEnd)}`
-          : `${String(total)} record${total === 1 ? '' : 's'}`
+      : total > pageSize
+        ? t('public.browse.subRange', { total, start: rangeStart, end: rangeEnd })
+        : t(total === 1 ? 'public.browse.recordCount.one' : 'public.browse.recordCount.other', {
+            count: total,
+          })
 
   return (
     <div className="pagehead">
       <Link className="backlink" to="/">
-        <IconArrowLeft size={16} /> All records
+        <IconArrowLeft size={16} /> {t('public.nav.allRecords')}
       </Link>
       <h1 className="pagehead__title">{typeName}</h1>
       {sub !== '' ? <p className="pagehead__sub">{sub}</p> : null}
@@ -170,11 +172,11 @@ export function PublicRecordListView({
             </Link>
           ))}
         </div>
-        <div className="viewtoggle" role="group" aria-label="View">
+        <div className="viewtoggle" role="group" aria-label={t('public.browse.viewToggle.label')}>
           <button
             type="button"
             aria-pressed={view === 'list'}
-            aria-label="List view"
+            aria-label={t('public.browse.viewToggle.list')}
             onClick={() => {
               setView('list')
             }}
@@ -184,7 +186,7 @@ export function PublicRecordListView({
           <button
             type="button"
             aria-pressed={view === 'grid'}
-            aria-label="Grid view"
+            aria-label={t('public.browse.viewToggle.grid')}
             onClick={() => {
               setView('grid')
             }}
@@ -195,13 +197,13 @@ export function PublicRecordListView({
       </div>
 
       {isLoading ? (
-        <p className="searchhint">Loading…</p>
+        <p className="searchhint">{t('public.browse.loading')}</p>
       ) : isError ? (
         <div className="empty" style={{ marginTop: '2rem' }}>
-          <h3 className="empty__title">Could not load records</h3>
-          <p className="empty__text">{errorTitle ?? 'Unknown error'}</p>
+          <h3 className="empty__title">{t('public.browse.error.title')}</h3>
+          <p className="empty__text">{errorTitle ?? t('common.error.unknown')}</p>
           <button type="button" className="btn btn--ghost" onClick={onRetry}>
-            Retry
+            {t('common.actions.retry')}
           </button>
         </div>
       ) : isUnknownType ? (
@@ -209,10 +211,12 @@ export function PublicRecordListView({
           <span className="empty__icon">
             <IconInbox size={26} />
           </span>
-          <h3 className="empty__title">Entity type not found</h3>
-          <p className="empty__text">No public content for “{entityTypeSlug}”.</p>
+          <h3 className="empty__title">{t('public.browse.unknownType.title')}</h3>
+          <p className="empty__text">
+            {t('public.browse.unknownType.description', { slug: entityTypeSlug })}
+          </p>
           <Link className="btn btn--ghost" to="/">
-            Back to latest
+            {t('public.nav.backToLatest')}
           </Link>
         </div>
       ) : items.length === 0 ? (
@@ -220,13 +224,12 @@ export function PublicRecordListView({
           <span className="empty__icon">
             <IconInbox size={26} />
           </span>
-          <h3 className="empty__title">No published {typeName.toLowerCase()} yet</h3>
-          <p className="empty__text">
-            Published records of this type will be listed newest-first; drafts and scheduled records
-            stay hidden until they go live.
-          </p>
+          <h3 className="empty__title">
+            {t('public.browse.empty.title', { type: typeName.toLowerCase() })}
+          </h3>
+          <p className="empty__text">{t('public.browse.empty.description')}</p>
           <Link className="btn btn--ghost" to="/">
-            Back to latest
+            {t('public.nav.backToLatest')}
           </Link>
         </div>
       ) : (
@@ -245,10 +248,10 @@ export function PublicRecordListView({
             </div>
           )}
           {hasPreviousPage || hasNextPage ? (
-            <nav className="pager" aria-label="Pagination">
+            <nav className="pager" aria-label={t('public.browse.pager.label')}>
               <button
                 type="button"
-                aria-label="Previous page"
+                aria-label={t('public.browse.pager.previous')}
                 disabled={!hasPreviousPage}
                 onClick={onPreviousPage}
               >
@@ -256,7 +259,7 @@ export function PublicRecordListView({
               </button>
               <button
                 type="button"
-                aria-label="Next page"
+                aria-label={t('public.browse.pager.next')}
                 disabled={!hasNextPage}
                 onClick={onNextPage}
               >

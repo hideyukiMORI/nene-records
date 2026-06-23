@@ -3,6 +3,7 @@ import {
   PublicEntityResultGroup,
   type PublicEntityTypeGroup,
 } from '@/features/public-entity-results'
+import { useTranslation } from '@/shared/i18n'
 import { IconArrowLeft, IconInbox } from '@/shared/ui/icons/magazine-icons'
 
 export interface PublicDateArchiveViewProps {
@@ -26,15 +27,20 @@ export function PublicDateArchiveView({
   errorTitle,
   onRetry,
 }: PublicDateArchiveViewProps) {
+  const { t } = useTranslation()
+
   return (
     <div className="pagehead">
       <Link className="backlink" to="/">
-        <IconArrowLeft size={16} /> All records
+        <IconArrowLeft size={16} /> {t('public.nav.allRecords')}
       </Link>
       <h1 className="pagehead__title">{title}</h1>
       {valid && !isLoading && !isError && total > 0 ? (
         <p className="pagehead__sub">
-          {total} record{total === 1 ? '' : 's'} published in this period.
+          {t(
+            total === 1 ? 'public.dateArchive.subCount.one' : 'public.dateArchive.subCount.other',
+            { count: total },
+          )}
         </p>
       ) : null}
 
@@ -43,20 +49,20 @@ export function PublicDateArchiveView({
           <span className="empty__icon">
             <IconInbox size={26} />
           </span>
-          <h3 className="empty__title">Invalid date</h3>
-          <p className="empty__text">This archive URL is not a valid date.</p>
+          <h3 className="empty__title">{t('public.dateArchive.invalid.title')}</h3>
+          <p className="empty__text">{t('public.dateArchive.invalid.description')}</p>
           <Link className="btn btn--ghost" to="/">
-            Back to latest
+            {t('public.nav.backToLatest')}
           </Link>
         </div>
       ) : isLoading ? (
-        <p className="searchhint">Loading…</p>
+        <p className="searchhint">{t('public.dateArchive.loading')}</p>
       ) : isError ? (
         <div className="empty" style={{ marginTop: '2rem' }}>
-          <h3 className="empty__title">Could not load this archive</h3>
-          <p className="empty__text">{errorTitle ?? 'Unknown error'}</p>
+          <h3 className="empty__title">{t('public.dateArchive.error.title')}</h3>
+          <p className="empty__text">{errorTitle ?? t('common.error.unknown')}</p>
           <button type="button" className="btn btn--ghost" onClick={onRetry}>
-            Retry
+            {t('common.actions.retry')}
           </button>
         </div>
       ) : total === 0 ? (
@@ -64,12 +70,10 @@ export function PublicDateArchiveView({
           <span className="empty__icon">
             <IconInbox size={26} />
           </span>
-          <h3 className="empty__title">No records in this period</h3>
-          <p className="empty__text">
-            Nothing was published then. Pick another date, or browse the latest.
-          </p>
+          <h3 className="empty__title">{t('public.dateArchive.empty.title')}</h3>
+          <p className="empty__text">{t('public.dateArchive.empty.description')}</p>
           <Link className="btn btn--ghost" to="/">
-            Back to latest
+            {t('public.nav.backToLatest')}
           </Link>
         </div>
       ) : (

@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { useTranslation } from '@/shared/i18n'
 import { IconArrow, IconArrowUpRight, IconInbox } from '@/shared/ui/icons/magazine-icons'
 import type { HomeFeedItem, HomeTypeItem } from '../hooks/use-public-home-page'
 import heroUrl from './assets/hero.png'
@@ -23,6 +24,7 @@ function TypeBadge({ slug, name }: { slug: string; name: string }) {
 }
 
 function Featured({ item }: { item: HomeFeedItem }) {
+  const { t } = useTranslation()
   return (
     <article className="featured">
       <Eyecatch label={item.eyecatchLabel} className="featured__media" />
@@ -37,7 +39,7 @@ function Featured({ item }: { item: HomeFeedItem }) {
         {item.excerpt !== '' ? <p className="featured__excerpt">{item.excerpt}</p> : null}
         <div className="featured__foot">
           <Link className="section__link" to={item.href}>
-            Read article <IconArrow size={15} />
+            {t('public.home.readArticle')} <IconArrow size={15} />
           </Link>
         </div>
       </div>
@@ -64,30 +66,29 @@ function ArticleCard({ item }: { item: HomeFeedItem }) {
 }
 
 function EmptyFeed() {
+  const { t } = useTranslation()
   return (
     <div className="empty">
       <span className="empty__icon">
         <IconInbox size={26} />
       </span>
-      <h3 className="empty__title">No published records yet</h3>
-      <p className="empty__text">
-        When records are published they appear here, newest first. Draft and scheduled records stay
-        hidden until their publish time passes.
-      </p>
+      <h3 className="empty__title">{t('public.home.empty.title')}</h3>
+      <p className="empty__text">{t('public.home.empty.description')}</p>
       <Link className="btn btn--ghost" to="/search">
-        Search records
+        {t('public.home.empty.searchCta')}
       </Link>
     </div>
   )
 }
 
 function FeedError({ title, onRetry }: { title: string | null; onRetry: () => void }) {
+  const { t } = useTranslation()
   return (
     <div className="empty">
-      <h3 className="empty__title">Couldn’t load the latest records</h3>
-      <p className="empty__text">{title ?? 'Something went wrong. Please try again.'}</p>
+      <h3 className="empty__title">{t('public.home.error.title')}</h3>
+      <p className="empty__text">{title ?? t('public.home.error.fallback')}</p>
       <button type="button" className="btn btn--ghost" onClick={onRetry}>
-        Retry
+        {t('common.actions.retry')}
       </button>
     </div>
   )
@@ -109,45 +110,46 @@ export function PublicHomeHero({
   typeCount,
   browseHref,
 }: PublicHomeHeroProps) {
+  const { t } = useTranslation()
   return (
     <section className="wrap hero" aria-labelledby="hero-title">
       <div className="hero__grid">
         <div className="hero__copy">
-          <p className="eyebrow hero__kicker">{siteName} — publishing platform</p>
+          <p className="eyebrow hero__kicker">{t('public.home.hero.kicker', { siteName })}</p>
           <h1 className="hero__title" id="hero-title">
-            One record.
+            {t('public.home.hero.titleLine1')}
             <br />
-            <em>Every</em> reader.
+            <em>{t('public.home.hero.titleEmphasis')}</em> {t('public.home.hero.titleRest')}
           </h1>
           {metaDescription !== '' ? <p className="hero__lead">{metaDescription}</p> : null}
           <div className="hero__cta">
             <Link className="btn btn--primary" to="#latest">
-              Read the latest <IconArrow size={17} />
+              {t('public.home.hero.ctaLatest')} <IconArrow size={17} />
             </Link>
             <Link className="btn btn--ghost" to={browseHref}>
-              Browse by type
+              {t('public.home.browseByType')}
             </Link>
           </div>
           <div className="hero__meta">
             <div className="hero__stat">
               <b>{totalPublished}</b>
-              <span>published records</span>
+              <span>{t('public.home.hero.statRecords')}</span>
             </div>
             <div className="hero__stat">
               <b>{typeCount}</b>
-              <span>entity types</span>
+              <span>{t('public.home.hero.statTypes')}</span>
             </div>
             <div className="hero__stat">
               <b>60+</b>
-              <span>MCP tools</span>
+              <span>{t('public.home.hero.statMcp')}</span>
             </div>
           </div>
         </div>
         <div className="hero__art">
           <div className="hero__art-frame">
-            <img src={heroUrl} alt="Typed records, published everywhere" />
+            <img src={heroUrl} alt={t('public.home.hero.artAlt')} />
             <span className="hero__art-tag">
-              <b>{'>>'}</b> typed · readable · agent-ready
+              <b>{'>>'}</b> {t('public.home.hero.artTag')}
             </span>
           </div>
         </div>
@@ -176,26 +178,27 @@ export function PublicHomeBody({
   errorTitle,
   onRetry,
 }: PublicHomeBodyProps) {
+  const { t } = useTranslation()
   return (
     <>
       <section className="section" id="latest" aria-labelledby="latest-h">
         <div className="section__head">
           <div>
-            <p className="eyebrow">Newest first</p>
+            <p className="eyebrow">{t('public.home.latest.eyebrow')}</p>
             <h2 className="section__title" id="latest-h">
-              Latest records
+              {t('public.home.latest.title')}
             </h2>
           </div>
           {types[0] !== undefined ? (
             <Link className="section__link" to={types[0].href}>
-              All records <IconArrowUpRight size={15} />
+              {t('public.nav.allRecords')} <IconArrowUpRight size={15} />
             </Link>
           ) : null}
         </div>
         {isError ? (
           <FeedError title={errorTitle} onRetry={onRetry} />
         ) : isLoading ? (
-          <p className="meta">Loading latest records…</p>
+          <p className="meta">{t('public.home.latest.loading')}</p>
         ) : featured === null ? (
           <EmptyFeed />
         ) : (
@@ -216,9 +219,9 @@ export function PublicHomeBody({
         <section className="section" aria-labelledby="types-h">
           <div className="section__head">
             <div>
-              <p className="eyebrow">Entrances</p>
+              <p className="eyebrow">{t('public.home.types.eyebrow')}</p>
               <h2 className="section__title" id="types-h">
-                Browse by type
+                {t('public.home.browseByType')}
               </h2>
             </div>
           </div>
