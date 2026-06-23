@@ -22,7 +22,16 @@ function createAppQueryClient(): QueryClient {
     },
   })
 
-  seedPublicRecordViewCache(queryClient)
+  // Runs in a useState initializer, outside RootErrorBoundary — a malformed
+  // server-injected bootstrap must not white-screen the app; skip seeding and
+  // let the queries fetch normally instead.
+  try {
+    seedPublicRecordViewCache(queryClient)
+  } catch (error) {
+    if (import.meta.env.DEV) {
+      console.error('Failed to seed public record view cache:', error)
+    }
+  }
 
   return queryClient
 }
