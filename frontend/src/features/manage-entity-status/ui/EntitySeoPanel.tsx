@@ -1,5 +1,5 @@
 import { useTranslation } from '@/shared/i18n'
-import { Button, Stack, Text, Textarea } from '@/shared/ui'
+import { Button, Input, Stack, Text, Textarea } from '@/shared/ui'
 
 interface EntitySeoPanelProps {
   metaTitle: string
@@ -27,22 +27,16 @@ export function EntitySeoPanel({
           {t('admin.entitySeo.title')}
         </Text>
 
-        <Stack gap="xs">
-          <label htmlFor="entity-meta-title" className="text-sm font-medium text-text-primary">
-            {t('admin.entitySeo.metaTitle')}
-          </label>
-          <input
-            id="entity-meta-title"
-            type="text"
-            value={metaTitle}
-            onChange={(e) => {
-              onMetaTitleChange(e.target.value)
-            }}
-            placeholder={t('admin.entitySeo.metaTitle.placeholder')}
-            maxLength={255}
-            className="w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
-          />
-        </Stack>
+        <Input
+          id="entity-meta-title"
+          label={t('admin.entitySeo.metaTitle')}
+          value={metaTitle}
+          onChange={(e) => {
+            onMetaTitleChange(e.target.value)
+          }}
+          placeholder={t('admin.entitySeo.metaTitle.placeholder')}
+          maxLength={255}
+        />
 
         <Stack gap="xs">
           <Textarea

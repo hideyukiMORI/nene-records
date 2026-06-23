@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { useId, type ReactNode } from 'react'
 import { Button } from '@/shared/ui/primitives/Button'
 import { Stack } from '@/shared/ui/primitives/Stack'
 import { Text } from '@/shared/ui/primitives/Text'
@@ -40,6 +40,10 @@ export function ConfirmDialog({
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
+  // Unique per instance so simultaneously-open dialogs don't share an
+  // aria-labelledby target (screen-reader label resolution would break).
+  const titleId = useId()
+
   if (!open) {
     return null
   }
@@ -48,12 +52,12 @@ export function ConfirmDialog({
     <Modal
       onClose={onCancel}
       closeLabel="Close dialog"
-      labelledBy="confirm-dialog-title"
+      labelledBy={titleId}
       panelClassName="max-w-md shadow-md"
     >
       <Stack gap="md">
         <Stack gap="xs">
-          <Text as="h2" id="confirm-dialog-title" variant="heading-sm">
+          <Text as="h2" id={titleId} variant="heading-sm">
             {title}
           </Text>
           {description !== undefined ? <Text muted>{description}</Text> : null}
