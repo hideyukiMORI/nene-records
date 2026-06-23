@@ -1021,6 +1021,35 @@ export const en = {
   'public.comments.form.submitting': 'Submitting…',
   'public.comments.form.success': 'Your comment has been submitted and is awaiting moderation.',
   'public.comments.form.error': 'Could not submit comment. Please try again.',
+
+  // ── Superadmin · System settings ──
+  'admin.superSettings.pageTitle': 'System settings',
+  'admin.superSettings.pageDesc': 'Manage system-wide settings such as tenant resolution.',
+  'admin.superSettings.loading': 'Loading…',
+  'admin.superSettings.resolutionTitle': 'Tenant resolution',
+  'admin.superSettings.resolutionDesc': 'Choose how a request is matched to an organization.',
+  'admin.superSettings.mode.single.label': 'Single-tenant (fixed org)',
+  'admin.superSettings.mode.single.desc':
+    'Pin every request to one organization. Best for single-org operation.',
+  'admin.superSettings.mode.subdomain.label': 'Subdomain',
+  'admin.superSettings.mode.subdomain.desc':
+    'Resolve the org from the subdomain (e.g. acme.example.com). For production SaaS.',
+  'admin.superSettings.mode.path.label': 'Path prefix',
+  'admin.superSettings.mode.path.desc':
+    'Resolve the org from the URL path (e.g. /org/acme/…). Simple, no DNS setup.',
+  'admin.superSettings.orgSlugLabel': 'Organization slug',
+  'admin.superSettings.orgSlugHelp': 'Pin every request to the organization with this slug.',
+  'admin.superSettings.baseDomainLabel': 'Base domain',
+  'admin.superSettings.baseDomainHelp':
+    'e.g. example.com → extract “acme” from a request to acme.example.com.',
+  'admin.superSettings.pathHelp':
+    'Use the first URL path segment as the org slug. e.g. /acme/api/v1/entities → acme.',
+  'admin.superSettings.saving': 'Saving…',
+  'admin.superSettings.save': 'Save settings',
+  'admin.superSettings.toast.saved': 'Settings saved.',
+  'admin.superSettings.toast.error': 'Could not save settings.',
+  'admin.superSettings.currentTitle': 'Current settings (saved in DB)',
+  'admin.superSettings.currentResolution': 'Resolution mode',
 } as const
 
 /**
