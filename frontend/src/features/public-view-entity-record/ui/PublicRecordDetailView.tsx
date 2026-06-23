@@ -1,4 +1,5 @@
 import type { Entity } from '@/entities/entity'
+import { useTranslation } from '@/shared/i18n'
 import { Button, Stack, Text } from '@/shared/ui'
 import type { PublicFieldRow } from '../hooks/use-public-view-entity-record-page'
 import { PublicRecordFieldList } from './PublicRecordFieldList'
@@ -24,28 +25,30 @@ export function PublicRecordDetailView({
   errorTitle,
   onRetry,
 }: PublicRecordDetailViewProps) {
+  const { t } = useTranslation()
+
   if (isLoading) {
-    return <Text muted>Loading…</Text>
+    return <Text muted>{t('public.record.loading')}</Text>
   }
 
   if (isError) {
     return (
       <Stack gap="sm">
-        <Text variant="heading-sm">Could not load record</Text>
-        <Text muted>{errorTitle ?? 'Unknown error'}</Text>
+        <Text variant="heading-sm">{t('public.record.error.title')}</Text>
+        <Text muted>{errorTitle ?? t('common.error.unknown')}</Text>
         <Button variant="secondary" onClick={onRetry}>
-          Retry
+          {t('common.actions.retry')}
         </Button>
       </Stack>
     )
   }
 
   if (entity === null) {
-    return <Text muted>Record not found.</Text>
+    return <Text muted>{t('public.record.notFound.title')}</Text>
   }
 
   if (fieldRows.length === 0) {
-    return <Text muted>No fields defined for this record.</Text>
+    return <Text muted>{t('public.record.noFields')}</Text>
   }
 
   return (

@@ -3,6 +3,7 @@ import {
   PublicEntityResultGroup,
   type PublicEntityTypeGroup,
 } from '@/features/public-entity-results'
+import { useTranslation } from '@/shared/i18n'
 import { IconArrowLeft, IconInbox } from '@/shared/ui/icons/magazine-icons'
 
 export interface PublicTagArchiveViewProps {
@@ -24,26 +25,31 @@ export function PublicTagArchiveView({
   errorTitle,
   onRetry,
 }: PublicTagArchiveViewProps) {
+  const { t } = useTranslation()
+
   return (
     <div className="pagehead">
       <Link className="backlink" to="/">
-        <IconArrowLeft size={16} /> All records
+        <IconArrowLeft size={16} /> {t('public.nav.allRecords')}
       </Link>
       <h1 className="pagehead__title">#{tagName}</h1>
       {!isLoading && !isError && total > 0 ? (
         <p className="pagehead__sub">
-          {total} record{total === 1 ? '' : 's'} tagged “{tagName}”.
+          {t(total === 1 ? 'public.tagArchive.subCount.one' : 'public.tagArchive.subCount.other', {
+            count: total,
+            tag: tagName,
+          })}
         </p>
       ) : null}
 
       {isLoading ? (
-        <p className="searchhint">Loading…</p>
+        <p className="searchhint">{t('public.tagArchive.loading')}</p>
       ) : isError ? (
         <div className="empty" style={{ marginTop: '2rem' }}>
-          <h3 className="empty__title">Could not load this tag</h3>
-          <p className="empty__text">{errorTitle ?? 'Unknown error'}</p>
+          <h3 className="empty__title">{t('public.tagArchive.error.title')}</h3>
+          <p className="empty__text">{errorTitle ?? t('common.error.unknown')}</p>
           <button type="button" className="btn btn--ghost" onClick={onRetry}>
-            Retry
+            {t('common.actions.retry')}
           </button>
         </div>
       ) : total === 0 ? (
@@ -51,10 +57,10 @@ export function PublicTagArchiveView({
           <span className="empty__icon">
             <IconInbox size={26} />
           </span>
-          <h3 className="empty__title">Nothing tagged “{tagName}”</h3>
-          <p className="empty__text">No published records carry this tag yet.</p>
+          <h3 className="empty__title">{t('public.tagArchive.empty.title', { tag: tagName })}</h3>
+          <p className="empty__text">{t('public.tagArchive.empty.description')}</p>
           <Link className="btn btn--ghost" to="/">
-            Back to latest
+            {t('public.nav.backToLatest')}
           </Link>
         </div>
       ) : (

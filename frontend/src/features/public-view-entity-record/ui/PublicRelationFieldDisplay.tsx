@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import type { RelationFieldDef } from '@/entities/field-def'
+import { useTranslation } from '@/shared/i18n'
 import { Button, Stack, Text } from '@/shared/ui'
 import { usePublicRelationFieldDisplay } from '../hooks/use-public-relation-field-display'
 
@@ -16,6 +17,7 @@ export function PublicRelationFieldDisplay({
   entityTypeSlugById,
   entityTypePatternById,
 }: PublicRelationFieldDisplayProps) {
+  const { t } = useTranslation()
   const { targets, isLoading, isError, errorTitle, refetch } = usePublicRelationFieldDisplay(
     entityId,
     fieldDef,
@@ -30,7 +32,7 @@ export function PublicRelationFieldDisplay({
           {fieldDef.fieldKey}
         </Text>
         <Text as="dd" muted>
-          Loading…
+          {t('public.record.loading')}
         </Text>
       </div>
     )
@@ -44,10 +46,10 @@ export function PublicRelationFieldDisplay({
         </Text>
         <Stack gap="sm">
           <Text as="dd" muted>
-            {errorTitle ?? 'Could not load relation'}
+            {errorTitle ?? t('public.relation.loadError')}
           </Text>
           <Button variant="secondary" size="sm" onClick={() => void refetch()}>
-            Retry
+            {t('common.actions.retry')}
           </Button>
         </Stack>
       </div>

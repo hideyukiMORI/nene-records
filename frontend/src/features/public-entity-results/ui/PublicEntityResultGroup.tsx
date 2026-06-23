@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import type { Entity } from '@/entities/entity'
 import type { EntityType } from '@/entities/entity-type'
 import { defaultTextFieldListParamsForEntityType, useTextFieldList } from '@/entities/text-field'
+import { useTranslation } from '@/shared/i18n'
 import { getRecordDisplayLabel } from '@/shared/lib/get-record-display-label'
 import { resolvePermalink } from '@/shared/lib/resolve-permalink'
 
@@ -12,6 +13,7 @@ export interface PublicEntityResultGroupProps {
 
 /** One entity type's results, with titles resolved from its text fields. */
 export function PublicEntityResultGroup({ entityType, entities }: PublicEntityResultGroupProps) {
+  const { t } = useTranslation()
   const entityTypeId = Number(entityType.id)
   const textFieldQuery = useTextFieldList(defaultTextFieldListParamsForEntityType(entityTypeId), {
     enabled: entityTypeId > 0,
@@ -40,7 +42,11 @@ export function PublicEntityResultGroup({ entityType, entities }: PublicEntityRe
                 </div>
                 <h3 className="row__title">
                   <Link to={url}>
-                    {getRecordDisplayLabel(id, textFields, `Record #${String(id)}`)}
+                    {getRecordDisplayLabel(
+                      id,
+                      textFields,
+                      t('public.results.recordFallback', { id }),
+                    )}
                   </Link>
                 </h3>
               </div>

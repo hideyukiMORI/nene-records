@@ -4,6 +4,7 @@ import {
   PublicEntityResultGroup,
   type PublicEntityTypeGroup,
 } from '@/features/public-entity-results'
+import { useTranslation } from '@/shared/i18n'
 import { IconArrowLeft, IconInbox } from '@/shared/ui/icons/magazine-icons'
 import { IconSearch } from '@/shared/ui/icons/Icons'
 
@@ -30,15 +31,16 @@ export function PublicSearchView({
   onSearch,
   onRetry,
 }: PublicSearchViewProps) {
+  const { t } = useTranslation()
   const [input, setInput] = useState(query)
 
   return (
     <div className="pagehead">
       <Link className="backlink" to="/">
-        <IconArrowLeft size={16} /> All records
+        <IconArrowLeft size={16} /> {t('public.nav.allRecords')}
       </Link>
-      <h1 className="pagehead__title">Search</h1>
-      <p className="pagehead__sub">Find published records by title, excerpt, or tag.</p>
+      <h1 className="pagehead__title">{t('public.search.title')}</h1>
+      <p className="pagehead__sub">{t('public.search.sub')}</p>
 
       <form
         className="searchbar"
@@ -55,8 +57,8 @@ export function PublicSearchView({
           type="search"
           value={input}
           autoComplete="off"
-          placeholder="Search records…"
-          aria-label="Search records"
+          placeholder={t('public.search.inputPlaceholder')}
+          aria-label={t('public.search.inputLabel')}
           onChange={(event) => {
             setInput(event.target.value)
           }}
@@ -64,15 +66,15 @@ export function PublicSearchView({
       </form>
 
       {!hasQuery ? (
-        <p className="searchhint">Type a keyword and press Enter to search published records.</p>
+        <p className="searchhint">{t('public.search.prompt')}</p>
       ) : isLoading ? (
-        <p className="searchhint">Searching…</p>
+        <p className="searchhint">{t('public.search.loading')}</p>
       ) : isError ? (
         <div className="empty" style={{ marginTop: '2rem' }}>
-          <h3 className="empty__title">Could not search</h3>
-          <p className="empty__text">{errorTitle ?? 'Unknown error'}</p>
+          <h3 className="empty__title">{t('public.search.error.title')}</h3>
+          <p className="empty__text">{errorTitle ?? t('common.error.unknown')}</p>
           <button type="button" className="btn btn--ghost" onClick={onRetry}>
-            Retry
+            {t('common.actions.retry')}
           </button>
         </div>
       ) : total === 0 ? (
@@ -80,18 +82,19 @@ export function PublicSearchView({
           <span className="empty__icon">
             <IconInbox size={26} />
           </span>
-          <h3 className="empty__title">No results for “{query}”</h3>
-          <p className="empty__text">
-            No published records match that search. Try another word, or browse by type.
-          </p>
+          <h3 className="empty__title">{t('public.search.empty.title', { query })}</h3>
+          <p className="empty__text">{t('public.search.empty.description')}</p>
           <Link className="btn btn--ghost" to="/">
-            Back to latest
+            {t('public.nav.backToLatest')}
           </Link>
         </div>
       ) : (
         <>
           <p className="searchhint">
-            {total} result{total === 1 ? '' : 's'} for “{query}”
+            {t(total === 1 ? 'public.search.resultCount.one' : 'public.search.resultCount.other', {
+              count: total,
+              query,
+            })}
           </p>
           <div style={{ marginTop: 'var(--space-lg)' }}>
             {groups.map((group) => (
