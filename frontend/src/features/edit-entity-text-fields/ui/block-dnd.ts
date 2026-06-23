@@ -1,10 +1,12 @@
-import type { BlockType } from '@/shared/lib/blocks-document'
-
 /**
  * Drag payload for the block board. dataTransfer is opaque during dragover, so
  * the active payload is kept in a module ref (mirrors manage-widgets/widget-dnd).
+ *
+ * The board only reorders existing blocks (palette uses click-to-add), so the
+ * payload carries just the dragged block id. Re-add a `'new'` variant here if a
+ * drag-from-palette flow is introduced (see widget-dnd for the shape).
  */
-export type BlockDragPayload = { kind: 'new'; type: BlockType } | { kind: 'move'; id: string }
+export type BlockDragPayload = { kind: 'move'; id: string }
 
 let current: BlockDragPayload | null = null
 
