@@ -212,6 +212,7 @@ export const ja: Partial<MessageCatalog> = {
     '「メニュー」タブで名前付きリンク集をつくり、ここで「メニュー」ウィジェットとして領域に置きます。',
   'admin.menus.toast.created': 'メニューを作成しました。',
   'admin.menus.toast.deleted': 'メニューを削除しました。',
+  'admin.menus.toast.error': 'メニューの変更を保存できませんでした。',
   'admin.layout.cond.sidebar': '2/3カラムのページで表示',
   'admin.layout.cond.aside': '3カラムのページで表示',
   'admin.widgets.board.deleteWidget': 'このウィジェットを削除',
@@ -999,7 +1000,9 @@ export const ja: Partial<MessageCatalog> = {
   'admin.comments.approve': '承認',
   'admin.comments.delete': '削除',
   'admin.comments.approveSuccess': 'コメントを承認しました。',
+  'admin.comments.approveError': 'コメントを承認できませんでした。',
   'admin.comments.deleteSuccess': 'コメントを削除しました。',
+  'admin.comments.deleteError': 'コメントを削除できませんでした。',
   'admin.comments.deleteConfirmTitle': 'コメントを削除しますか？',
   'admin.comments.deleteConfirmDescription':
     '{{name}} のコメントを削除しますか？この操作は元に戻せません。',
