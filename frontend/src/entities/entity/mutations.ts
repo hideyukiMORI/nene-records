@@ -1,4 +1,9 @@
-import { useMutation, useQueryClient, type UseMutationResult } from '@tanstack/react-query'
+import {
+  useMutation,
+  useQueryClient,
+  type QueryClient,
+  type UseMutationResult,
+} from '@tanstack/react-query'
 import { apiClient, AppError } from '@/shared/api/client'
 import type {
   EntityDto,
@@ -25,6 +30,19 @@ import type {
 } from './model'
 import { entityKeys } from './query-keys'
 
+// The cross-type public feeds (latest / search / by-tag / by-date-range) live
+// under entityKeys.all but OUTSIDE lists(), so the type-scoped list invalidation
+// never touches them. Any entity write must refresh them too, or public previews
+// (latest list, search, tag/date archives) stay stale until staleTime elapses.
+const PUBLIC_FEED_SEGMENTS = new Set(['latest', 'search', 'by-tag', 'by-date-range'])
+
+function invalidatePublicFeeds(queryClient: QueryClient): Promise<void> {
+  return queryClient.invalidateQueries({
+    queryKey: entityKeys.all,
+    predicate: (query) => PUBLIC_FEED_SEGMENTS.has(query.queryKey[1] as string),
+  })
+}
+
 export function useCreateEntity(): UseMutationResult<Entity, AppError, CreateEntityInput> {
   const queryClient = useQueryClient()
 
@@ -34,18 +52,21 @@ export function useCreateEntity(): UseMutationResult<Entity, AppError, CreateEnt
       return mapEntityDtoToModel(dto)
     },
     onSuccess: async (_data, variables) => {
-      await queryClient.invalidateQueries({
-        queryKey: entityKeys.lists(),
-        predicate: (query) => {
-          const params = query.queryKey[2]
-          return (
-            typeof params === 'object' &&
-            params !== null &&
-            'entityTypeId' in params &&
-            params.entityTypeId === variables.entityTypeId
-          )
-        },
-      })
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: entityKeys.lists(),
+          predicate: (query) => {
+            const params = query.queryKey[2]
+            return (
+              typeof params === 'object' &&
+              params !== null &&
+              'entityTypeId' in params &&
+              params.entityTypeId === variables.entityTypeId
+            )
+          },
+        }),
+        invalidatePublicFeeds(queryClient),
+      ])
     },
   })
 }
@@ -63,7 +84,10 @@ export function useUpdateEntity(): UseMutationResult<Entity, AppError, UpdateEnt
     },
     onSuccess: async (data) => {
       queryClient.setQueryData(entityKeys.detail(data.id), data)
-      await queryClient.invalidateQueries({ queryKey: entityKeys.lists() })
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: entityKeys.lists() }),
+        invalidatePublicFeeds(queryClient),
+      ])
     },
   })
 }
@@ -80,18 +104,21 @@ export function useDeleteEntity(): UseMutationResult<
       await apiClient.delete(`/api/v1/entities/${String(id)}`)
     },
     onSuccess: async (_data, variables) => {
-      await queryClient.invalidateQueries({
-        queryKey: entityKeys.lists(),
-        predicate: (query) => {
-          const params = query.queryKey[2]
-          return (
-            typeof params === 'object' &&
-            params !== null &&
-            'entityTypeId' in params &&
-            params.entityTypeId === variables.entityTypeId
-          )
-        },
-      })
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: entityKeys.lists(),
+          predicate: (query) => {
+            const params = query.queryKey[2]
+            return (
+              typeof params === 'object' &&
+              params !== null &&
+              'entityTypeId' in params &&
+              params.entityTypeId === variables.entityTypeId
+            )
+          },
+        }),
+        invalidatePublicFeeds(queryClient),
+      ])
     },
   })
 }
@@ -113,7 +140,10 @@ export function useScheduleEntity(): UseMutationResult<
     },
     onSuccess: async (_data, variables) => {
       queryClient.removeQueries({ queryKey: entityKeys.detail(toEntityId(variables.id)) })
-      await queryClient.invalidateQueries({ queryKey: entityKeys.lists() })
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: entityKeys.lists() }),
+        invalidatePublicFeeds(queryClient),
+      ])
     },
   })
 }
@@ -127,7 +157,10 @@ export function useUnscheduleEntity(): UseMutationResult<void, AppError, { id: E
     },
     onSuccess: async (_data, variables) => {
       queryClient.removeQueries({ queryKey: entityKeys.detail(variables.id) })
-      await queryClient.invalidateQueries({ queryKey: entityKeys.lists() })
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: entityKeys.lists() }),
+        invalidatePublicFeeds(queryClient),
+      ])
     },
   })
 }
