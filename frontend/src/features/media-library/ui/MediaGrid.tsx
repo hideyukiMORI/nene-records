@@ -1,5 +1,6 @@
 import type { Media } from '@/entities/media'
 import { useTranslation } from '@/shared/i18n'
+import { formatBytes } from '@/shared/lib/format-bytes'
 import { Button, Card, EmptyState, ErrorState, LoadingState, ResponsiveImage } from '@/shared/ui'
 import { IconCopy, IconImage } from '@/shared/ui/icons/Icons'
 
@@ -13,12 +14,6 @@ export interface MediaGridProps {
   onCopy: (media: Media) => void
   onUpdateAlt: (media: Media, altText: string) => void
   onDelete: (media: Media) => void
-}
-
-function formatBytes(bytes: number): string {
-  if (bytes < 1024) return `${String(bytes)} B`
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
 function isImageMime(mimeType: string): boolean {

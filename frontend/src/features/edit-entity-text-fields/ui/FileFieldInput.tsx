@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import { useUploadMedia } from '@/entities/media'
 import { useTranslation } from '@/shared/i18n'
+import { formatBytes } from '@/shared/lib/format-bytes'
 import { Button, Stack, Text } from '@/shared/ui'
 
 interface FileFieldInputProps {
@@ -9,12 +10,6 @@ interface FileFieldInputProps {
   value: string
   disabled: boolean
   onChange: (value: string) => void
-}
-
-function formatBytes(bytes: number): string {
-  if (bytes < 1024) return `${String(bytes)} B`
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
 function FileIcon({ mimeType }: { mimeType: string }) {

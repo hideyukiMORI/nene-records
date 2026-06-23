@@ -12,6 +12,7 @@ import {
 import { PageContentContext } from '@/features/render-widgets'
 import { useTranslation } from '@/shared/i18n'
 import { findEntityTypeBySlug } from '@/shared/lib/find-entity-type-by-slug'
+import { formatPublishedDate } from '@/shared/lib/format-published-date'
 import { isMarkdownBodyField } from '@/shared/lib/is-markdown-body-field'
 import { type PublicLayoutKey, resolveLayout } from '@/shared/lib/resolve-layout'
 import {
@@ -31,17 +32,6 @@ import { PublicSiteShell } from './PublicSiteShell'
 import { usePublicSite, type PublicSite } from './public-site-context'
 
 // ── Presentation helpers ──────────────────────────────────────────────────────
-
-function formatPublishedDate(iso: string | null): string {
-  if (iso === null || iso === '') {
-    return ''
-  }
-  const date = new Date(iso)
-  if (Number.isNaN(date.getTime())) {
-    return ''
-  }
-  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
-}
 
 function humanizeSlug(slug: string | null | undefined): string {
   if (slug == null || slug.trim() === '') {
