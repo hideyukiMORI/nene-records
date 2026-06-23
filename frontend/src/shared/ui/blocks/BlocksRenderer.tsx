@@ -1,8 +1,8 @@
+import { useTranslation } from '@/shared/i18n'
 import {
   isSafeHref,
   parseBlocksDocument,
   type Block,
-  type CalloutKind,
   type ChartBlockData,
   type ColumnsBlockData,
   type GalleryBlockData,
@@ -40,6 +40,7 @@ export function BlocksRenderer({ documentJson }: BlocksRendererProps) {
 }
 
 function ConsumerBlock({ block }: { block: Block }) {
+  const { t } = useTranslation()
   switch (block.type) {
     case 'text':
       if (block.data.markdown.trim() === '') {
@@ -58,7 +59,7 @@ function ConsumerBlock({ block }: { block: Block }) {
       return (
         <aside className="callout" data-callout-kind={block.data.kind} role="note">
           <div className="callout__body">
-            <span className="sr-only">{CALLOUT_SR_PREFIX[block.data.kind]}</span>
+            <span className="sr-only">{t(`public.blocks.callout.${block.data.kind}`)}</span>
             {title !== undefined && title.trim() !== '' ? (
               <p className="callout__title">{title}</p>
             ) : null}
@@ -129,6 +130,7 @@ function ConsumerGroup({ data }: { data: GroupBlockData }) {
  * library, no JS) with the data also projected as an sr-only summary + table (C4).
  */
 function ConsumerChart({ data }: { data: ChartBlockData }) {
+  const { t } = useTranslation()
   const series = data.series
   if (series.length < 2) {
     return null
@@ -236,8 +238,8 @@ function ConsumerChart({ data }: { data: ChartBlockData }) {
         <caption>{title ?? ''}</caption>
         <thead>
           <tr>
-            <th scope="col">ラベル</th>
-            <th scope="col">値</th>
+            <th scope="col">{t('public.blocks.chart.label')}</th>
+            <th scope="col">{t('public.blocks.chart.value')}</th>
           </tr>
         </thead>
         <tbody>
@@ -357,15 +359,4 @@ function renderEmphasis(text: string) {
   return text
     .split('*')
     .map((part, index) => (index % 2 === 1 ? <em key={index}>{part}</em> : part))
-}
-
-/**
- * Screen-reader-only kind prefix (C4 SEO/a11y projection). Japanese to match the
- * current single-locale consumer site; consumer i18n is a separate effort.
- */
-const CALLOUT_SR_PREFIX: Record<CalloutKind, string> = {
-  info: '情報: ',
-  warn: '警告: ',
-  ok: '成功: ',
-  danger: 'エラー: ',
 }

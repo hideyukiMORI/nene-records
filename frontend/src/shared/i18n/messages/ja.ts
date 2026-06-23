@@ -31,6 +31,9 @@ export const ja: Partial<MessageCatalog> = {
 
   'common.dialog.close': 'ダイアログを閉じる',
 
+  'common.toast.dismiss': '閉じる',
+  'common.toast.region': '通知',
+
   // ── Admin nav ────────────────────────────────────────────────────────────
   'admin.nav.home': 'ホーム',
   'admin.nav.entityTypes': 'コンテンツタイプ',
@@ -1026,6 +1029,12 @@ export const ja: Partial<MessageCatalog> = {
   'public.comments.form.submitting': '送信中…',
   'public.comments.form.success': 'コメントを送信しました。承認後に表示されます。',
   'public.comments.form.error': 'コメントを送信できませんでした。もう一度お試しください。',
+  'public.blocks.callout.info': '情報: ',
+  'public.blocks.callout.warn': '警告: ',
+  'public.blocks.callout.ok': '成功: ',
+  'public.blocks.callout.danger': 'エラー: ',
+  'public.blocks.chart.label': 'ラベル',
+  'public.blocks.chart.value': '値',
 
   // ── Superadmin · System settings ──
   'admin.superSettings.pageTitle': 'システム設定',

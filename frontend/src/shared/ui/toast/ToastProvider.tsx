@@ -1,4 +1,5 @@
 import { useCallback, useRef, useState } from 'react'
+import { useTranslation } from '@/shared/i18n'
 import { ToastContext } from './toast-context'
 import type { Toast, ToastType } from './toast-context'
 
@@ -62,6 +63,7 @@ const TYPE_STYLES: Record<
 }
 
 function ToastItem({ toast, onDismiss }: { toast: Toast; onDismiss: (id: number) => void }) {
+  const { t } = useTranslation()
   const styles = TYPE_STYLES[toast.type]
   return (
     <div
@@ -80,7 +82,7 @@ function ToastItem({ toast, onDismiss }: { toast: Toast; onDismiss: (id: number)
         onClick={() => {
           onDismiss(toast.id)
         }}
-        aria-label="閉じる"
+        aria-label={t('common.toast.dismiss')}
         className="ml-1 shrink-0 text-text-muted transition-colors hover:text-text-primary"
       >
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
@@ -104,6 +106,7 @@ const FADE_MS = 300
 let nextId = 1
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {
+  const { t } = useTranslation()
   const [toasts, setToasts] = useState<Toast[]>([])
   const timersRef = useRef<Map<number, ReturnType<typeof setTimeout>>>(new Map())
 
@@ -132,7 +135,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       {children}
       {/* ── Toast container (top-right) ── */}
       <div
-        aria-label="通知"
+        aria-label={t('common.toast.region')}
         className="pointer-events-none fixed right-4 top-4 z-50 flex flex-col gap-2"
         style={{ minWidth: '18rem', maxWidth: '22rem' }}
       >
