@@ -220,6 +220,7 @@ export const en = {
     'Build a named menu on the Menus tab, then place it here as a Menu widget.',
   'admin.menus.toast.created': 'Menu created.',
   'admin.menus.toast.deleted': 'Menu deleted.',
+  'admin.menus.toast.error': 'Could not save the menu change.',
   'admin.layout.cond.sidebar': 'Shows on 2/3-column pages',
   'admin.layout.cond.aside': 'Shows on 3-column pages',
   'admin.widgets.board.deleteWidget': 'Delete this widget',
@@ -995,7 +996,9 @@ export const en = {
   'admin.comments.approve': 'Approve',
   'admin.comments.delete': 'Delete',
   'admin.comments.approveSuccess': 'Comment approved.',
+  'admin.comments.approveError': 'Could not approve the comment.',
   'admin.comments.deleteSuccess': 'Comment deleted.',
+  'admin.comments.deleteError': 'Could not delete the comment.',
   'admin.comments.deleteConfirmTitle': 'Delete comment?',
   'admin.comments.deleteConfirmDescription': 'Delete comment by {{name}}? This cannot be undone.',
 

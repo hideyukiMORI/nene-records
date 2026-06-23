@@ -17,6 +17,19 @@ import { useCreateWidget, useWidgetList } from '@/entities/widget'
 import { useTranslation } from '@/shared/i18n'
 import { useToast } from '@/shared/ui'
 
+/** Prefer the server's validation message over the generic fallback. */
+function serverMessage(error: unknown, fallback: string): string {
+  if (typeof error === 'object' && error !== null) {
+    const e = error as {
+      errors?: ReadonlyArray<{ message?: string }>
+      detail?: string
+      title?: string
+    }
+    return e.errors?.[0]?.message ?? e.detail ?? e.title ?? fallback
+  }
+  return fallback
+}
+
 /**
  * Menu management (master–detail): named menus on the left, the selected menu's
  * link items on the right. Items belong to a menu via `menuId`. A menu is shown
@@ -40,6 +53,13 @@ export function useManageMenusPage() {
 
   const [selectedId, setSelectedId] = useState<number | null>(null)
 
+  const reportError = useCallback(
+    (error: unknown) => {
+      showToast(serverMessage(error, t('admin.menus.toast.error')), 'error')
+    },
+    [showToast, t],
+  )
+
   const menus = useMemo(() => menusQuery.data?.items ?? [], [menusQuery.data?.items])
   const allItems = useMemo(() => itemsQuery.data?.items ?? [], [itemsQuery.data?.items])
   const widgets = useMemo(() => widgetsQuery.data?.items ?? [], [widgetsQuery.data?.items])
@@ -62,63 +82,87 @@ export function useManageMenusPage() {
 
   const addMenu = useCallback(
     async (name: string) => {
-      const menu = await createMenu.mutateAsync({ name })
-      setSelectedId(menu.id)
-      showToast(t('admin.menus.toast.created'))
+      try {
+        const menu = await createMenu.mutateAsync({ name })
+        setSelectedId(menu.id)
+        showToast(t('admin.menus.toast.created'))
+      } catch (error) {
+        reportError(error)
+      }
     },
-    [createMenu, showToast, t],
+    [createMenu, showToast, t, reportError],
   )
 
   const renameMenu = useCallback(
     async (name: string) => {
       if (activeMenu === null) return
-      await updateMenu.mutateAsync({ id: activeMenu.id, input: { name } })
+      try {
+        await updateMenu.mutateAsync({ id: activeMenu.id, input: { name } })
+      } catch (error) {
+        reportError(error)
+      }
     },
-    [activeMenu, updateMenu],
+    [activeMenu, updateMenu, reportError],
   )
 
   const removeMenu = useCallback(async () => {
     if (activeMenu === null) return
-    await deleteMenu.mutateAsync(activeMenu.id)
-    setSelectedId(null)
-    showToast(t('admin.menus.toast.deleted'))
-  }, [activeMenu, deleteMenu, showToast, t])
+    try {
+      await deleteMenu.mutateAsync(activeMenu.id)
+      setSelectedId(null)
+      showToast(t('admin.menus.toast.deleted'))
+    } catch (error) {
+      reportError(error)
+    }
+  }, [activeMenu, deleteMenu, showToast, t, reportError])
 
   const addItem = useCallback(
     async (label: string, url: string) => {
       if (activeMenu === null) return
       const last = activeItems[activeItems.length - 1]
       const nextOrder = last !== undefined ? last.displayOrder + 1 : 0
-      await createItem.mutateAsync({
-        label,
-        url: url.trim() === '' ? '/' : url,
-        menuId: activeMenu.id,
-        displayOrder: nextOrder,
-      })
+      try {
+        await createItem.mutateAsync({
+          label,
+          url: url.trim() === '' ? '/' : url,
+          menuId: activeMenu.id,
+          displayOrder: nextOrder,
+        })
+      } catch (error) {
+        reportError(error)
+      }
     },
-    [activeMenu, activeItems, createItem],
+    [activeMenu, activeItems, createItem, reportError],
   )
 
   const editItem = useCallback(
     async (item: NavigationItem, label: string, url: string) => {
-      await updateItem.mutateAsync({
-        id: item.id,
-        input: {
-          label,
-          url,
-          menuId: item.menuId,
-          displayOrder: item.displayOrder,
-        },
-      })
+      try {
+        await updateItem.mutateAsync({
+          id: item.id,
+          input: {
+            label,
+            url,
+            menuId: item.menuId,
+            displayOrder: item.displayOrder,
+          },
+        })
+      } catch (error) {
+        reportError(error)
+      }
     },
-    [updateItem],
+    [updateItem, reportError],
   )
 
   const removeItem = useCallback(
     async (id: number) => {
-      await deleteItem.mutateAsync(id)
+      try {
+        await deleteItem.mutateAsync(id)
+      } catch (error) {
+        reportError(error)
+      }
     },
-    [deleteItem],
+    [deleteItem, reportError],
   )
 
   // Reorder by swapping display_order with the adjacent item.
@@ -129,42 +173,50 @@ export function useManageMenusPage() {
       const a = activeItems[index]
       const b = activeItems[target]
       if (a === undefined || b === undefined) return
-      await Promise.all([
-        updateItem.mutateAsync({
-          id: a.id,
-          input: {
-            label: a.label,
-            url: a.url,
-            menuId: a.menuId,
-            displayOrder: b.displayOrder,
-          },
-        }),
-        updateItem.mutateAsync({
-          id: b.id,
-          input: {
-            label: b.label,
-            url: b.url,
-            menuId: b.menuId,
-            displayOrder: a.displayOrder,
-          },
-        }),
-      ])
+      try {
+        await Promise.all([
+          updateItem.mutateAsync({
+            id: a.id,
+            input: {
+              label: a.label,
+              url: a.url,
+              menuId: a.menuId,
+              displayOrder: b.displayOrder,
+            },
+          }),
+          updateItem.mutateAsync({
+            id: b.id,
+            input: {
+              label: b.label,
+              url: b.url,
+              menuId: b.menuId,
+              displayOrder: a.displayOrder,
+            },
+          }),
+        ])
+      } catch (error) {
+        reportError(error)
+      }
     },
-    [activeItems, updateItem],
+    [activeItems, updateItem, reportError],
   )
 
   // Create a sidebar menu widget for this menu (the "place in a region" action).
   const placeMenu = useCallback(
     async (menuId: number) => {
-      await createWidget.mutateAsync({
-        widgetType: 'menu',
-        region: 'sidebar',
-        displayOrder: 0,
-        title: null,
-        settings: { menuId },
-      })
+      try {
+        await createWidget.mutateAsync({
+          widgetType: 'menu',
+          region: 'sidebar',
+          displayOrder: 0,
+          title: null,
+          settings: { menuId },
+        })
+      } catch (error) {
+        reportError(error)
+      }
     },
-    [createWidget],
+    [createWidget, reportError],
   )
 
   return {
