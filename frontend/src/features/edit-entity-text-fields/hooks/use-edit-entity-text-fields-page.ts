@@ -37,7 +37,7 @@ import {
   useCreateBlocksField,
   useUpdateBlocksField,
   type BlocksField,
-} from '@/entities/block'
+} from '@/entities/blocks-field'
 
 const EDITABLE_DATA_TYPES: FieldDataType[] = FIELD_DATA_TYPES.filter(
   (dataType) => dataType !== 'relation',

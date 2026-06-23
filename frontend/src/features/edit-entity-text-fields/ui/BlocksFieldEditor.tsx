@@ -186,9 +186,7 @@ export function BlocksFieldEditor({
     }
     event.preventDefault()
     const index = computeBlockDropIndex(boardRef.current, event.clientY)
-    if (payload.kind === 'move') {
-      reorder(payload.id, index)
-    }
+    reorder(payload.id, index)
     clearBlockDragPayload()
     setDropIndex(null)
   }

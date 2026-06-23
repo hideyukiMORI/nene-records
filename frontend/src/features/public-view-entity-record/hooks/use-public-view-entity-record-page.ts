@@ -12,7 +12,7 @@ import { useDateTimeFieldList } from '@/entities/datetime-field'
 import { useEnumFieldList } from '@/entities/enum-field'
 import { useIntFieldList } from '@/entities/int-field'
 import { useTextFieldList } from '@/entities/text-field'
-import { useBlocksFieldList } from '@/entities/block'
+import { useBlocksFieldList } from '@/entities/blocks-field'
 import { formatFieldDisplayValue } from '@/shared/lib/format-field-display-value'
 import type { ContentRegion } from '@/shared/lib/resolve-layout'
 
