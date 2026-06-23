@@ -79,7 +79,10 @@ export function useEntityStatusPanel(
         entityTypeId: entity.entityTypeId,
         slug: slugInput !== '' ? slugInput : null,
         status: nextStatus,
-        // Preserve layout: the update endpoint is full-replace.
+        // The update endpoint is full-replace: omitted fields are nulled, so
+        // every call must echo back the fields it does not intend to change.
+        metaTitle: entity.metaTitle,
+        metaDescription: entity.metaDescription,
         layout: entity.layout,
       })
     } catch (e) {
@@ -94,6 +97,9 @@ export function useEntityStatusPanel(
         entityTypeId: entity.entityTypeId,
         slug: slugInput !== '' ? slugInput : null,
         status: entity.status,
+        // Full-replace endpoint: preserve SEO meta and layout we are not editing.
+        metaTitle: entity.metaTitle,
+        metaDescription: entity.metaDescription,
         layout: entity.layout,
       })
       showToast(t('admin.entityStatus.slugSaved'), 'success')
