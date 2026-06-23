@@ -18,6 +18,7 @@ const SAMPLE_POSTS = ['Midnight Drift EP', 'Glass Harbor', 'Neon Tide', 'Slow St
 const SAMPLE_TAGS = ['House', 'Techno', 'Ambient', 'Dub', 'Lo-fi']
 
 function MiniWidget({ w, menus, horizontal }: { w: Widget; menus: Menu[]; horizontal: boolean }) {
+  const { t } = useTranslation()
   const inner = (): ReactNode => {
     switch (w.widgetType) {
       case 'menu': {
@@ -50,7 +51,7 @@ function MiniWidget({ w, menus, horizontal }: { w: Widget; menus: Menu[]; horizo
           <div className="rounded-sm border border-border px-inline-sm py-stack-xs text-caption text-text-muted">
             {typeof w.settings['placeholder'] === 'string' && w.settings['placeholder'] !== ''
               ? w.settings['placeholder']
-              : '検索…'}
+              : t('public.search.placeholder')}
           </div>
         )
       case 'tag-cloud':
@@ -80,7 +81,7 @@ function MiniWidget({ w, menus, horizontal }: { w: Widget; menus: Menu[]; horizo
       case 'toc':
         return (
           <ul className="flex flex-col gap-stack-xs">
-            {['概要', 'トラックリスト', 'クレジット'].map((tg) => (
+            {['Overview', 'Tracklist', 'Credits'].map((tg) => (
               <li key={tg} className="text-caption text-accent">
                 {tg}
               </li>

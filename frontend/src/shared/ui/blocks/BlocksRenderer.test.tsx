@@ -4,6 +4,9 @@ import { renderWithProviders } from '@tests/render/render-with-providers'
 import { BlocksRenderer } from './BlocksRenderer'
 
 afterEach(cleanup)
+afterEach(() => {
+  localStorage.removeItem('nene-locale')
+})
 
 describe('BlocksRenderer', () => {
   it('renders text and callout blocks', () => {
@@ -180,5 +183,43 @@ describe('BlocksRenderer', () => {
 
     expect(container.querySelector('.spacer')?.getAttribute('data-spacer-size')).toBe('lg')
     expect(container.querySelector('hr.divider')).not.toBeNull()
+  })
+
+  it('localizes the callout screen-reader prefix by locale', () => {
+    const doc = JSON.stringify([{ id: 'c', type: 'callout', data: { kind: 'danger', body: 'x' } }])
+
+    localStorage.setItem('nene-locale', 'ja')
+    const { container: ja } = renderWithProviders(<BlocksRenderer documentJson={doc} />)
+    expect(ja.querySelector('.callout .sr-only')?.textContent).toBe('エラー: ')
+    cleanup()
+
+    localStorage.setItem('nene-locale', 'en')
+    const { container: en } = renderWithProviders(<BlocksRenderer documentJson={doc} />)
+    expect(en.querySelector('.callout .sr-only')?.textContent).toBe('Error: ')
+  })
+
+  it('localizes the chart data-table headers (ja)', () => {
+    localStorage.setItem('nene-locale', 'ja')
+    const doc = JSON.stringify([
+      {
+        id: 'k',
+        type: 'chart',
+        data: {
+          chartType: 'bar',
+          title: 'M',
+          series: [
+            { label: 'a', value: 1 },
+            { label: 'b', value: 2 },
+          ],
+          summary: 's',
+        },
+      },
+    ])
+
+    const { container } = renderWithProviders(<BlocksRenderer documentJson={doc} />)
+    const headers = Array.from(container.querySelectorAll('.chart__table thead th')).map(
+      (th) => th.textContent,
+    )
+    expect(headers).toEqual(['ラベル', '値'])
   })
 })

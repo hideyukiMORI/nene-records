@@ -20,7 +20,7 @@ const TOOLBAR_ACTIONS: ToolbarAction[] = [
     label: 'Bold',
     icon: 'B',
     action: (v, s, e) => {
-      const sel = v.slice(s, e) || 'テキスト'
+      const sel = v.slice(s, e) || 'text'
       return { text: v.slice(0, s) + `**${sel}**` + v.slice(e), cursor: s + sel.length + 4 }
     },
   },
@@ -28,7 +28,7 @@ const TOOLBAR_ACTIONS: ToolbarAction[] = [
     label: 'Italic',
     icon: 'I',
     action: (v, s, e) => {
-      const sel = v.slice(s, e) || 'テキスト'
+      const sel = v.slice(s, e) || 'text'
       return { text: v.slice(0, s) + `*${sel}*` + v.slice(e), cursor: s + sel.length + 2 }
     },
   },
@@ -84,7 +84,7 @@ const TOOLBAR_ACTIONS: ToolbarAction[] = [
     label: 'Link',
     icon: '🔗',
     action: (v, s, e) => {
-      const sel = v.slice(s, e) || 'リンクテキスト'
+      const sel = v.slice(s, e) || 'link text'
       const snippet = `[${sel}](url)`
       return { text: v.slice(0, s) + snippet + v.slice(e), cursor: s + sel.length + 3 }
     },

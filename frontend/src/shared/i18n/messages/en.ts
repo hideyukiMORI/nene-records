@@ -38,6 +38,9 @@ export const en = {
 
   'common.dialog.close': 'Close dialog',
 
+  'common.toast.dismiss': 'Dismiss',
+  'common.toast.region': 'Notifications',
+
   // ── Admin nav ────────────────────────────────────────────────────────────
   'admin.nav.home': 'Home',
   'admin.nav.entityTypes': 'Content types',
@@ -1078,6 +1081,12 @@ export const en = {
   'public.comments.form.submitting': 'Submitting…',
   'public.comments.form.success': 'Your comment has been submitted and is awaiting moderation.',
   'public.comments.form.error': 'Could not submit comment. Please try again.',
+  'public.blocks.callout.info': 'Info: ',
+  'public.blocks.callout.warn': 'Warning: ',
+  'public.blocks.callout.ok': 'Success: ',
+  'public.blocks.callout.danger': 'Error: ',
+  'public.blocks.chart.label': 'Label',
+  'public.blocks.chart.value': 'Value',
 
   // ── Superadmin · System settings ──
   'admin.superSettings.pageTitle': 'System settings',
