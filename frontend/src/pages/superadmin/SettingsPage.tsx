@@ -1,33 +1,35 @@
 import { useState } from 'react'
 import { useSystemConfig, useUpdateSystemConfig } from '@/entities/system-config'
 import type { TenantResolutionMode } from '@/entities/system-config'
+import { type MessageKey, useTranslation } from '@/shared/i18n'
 import { Button, Card, Input, PageHeader, Stack, Text } from '@/shared/ui'
 import { useToast } from '@/shared/ui'
 
-const MODES: { value: TenantResolutionMode; label: string; description: string }[] = [
+const MODES: { value: TenantResolutionMode; labelKey: MessageKey; descKey: MessageKey }[] = [
   {
     value: 'single',
-    label: 'シングルテナント（固定 org）',
-    description: 'すべてのリクエストを特定の組織に固定する。単一組織の運用に最適。',
+    labelKey: 'admin.superSettings.mode.single.label',
+    descKey: 'admin.superSettings.mode.single.desc',
   },
   {
     value: 'subdomain',
-    label: 'サブドメイン方式',
-    description: 'acme.example.com のようにサブドメインで組織を判定する。本番 SaaS 向け。',
+    labelKey: 'admin.superSettings.mode.subdomain.label',
+    descKey: 'admin.superSettings.mode.subdomain.desc',
   },
   {
     value: 'path',
-    label: 'パスプレフィックス方式',
-    description: '/org/acme/... のように URL パスで組織を判定する。DNS 設定不要でシンプル。',
+    labelKey: 'admin.superSettings.mode.path.label',
+    descKey: 'admin.superSettings.mode.path.desc',
   },
 ]
 
 export function SettingsPage() {
+  const { t } = useTranslation()
   const { showToast } = useToast()
   const { data, isLoading } = useSystemConfig()
   const update = useUpdateSystemConfig()
 
-  // undefined = 未編集 → loaded data にフォールバック（useEffect 不要）
+  // undefined = unedited → fall back to loaded data (no useEffect needed)
   const [mode, setMode] = useState<TenantResolutionMode | undefined>(undefined)
   const [orgSlug, setOrgSlug] = useState<string | undefined>(undefined)
   const [baseDomain, setBaseDomain] = useState<string | undefined>(undefined)
@@ -46,33 +48,33 @@ export function SettingsPage() {
       },
       {
         onSuccess: () => {
-          showToast('設定を保存しました。', 'success')
+          showToast(t('admin.superSettings.toast.saved'), 'success')
         },
         onError: () => {
-          showToast('保存に失敗しました。', 'error')
+          showToast(t('admin.superSettings.toast.error'), 'error')
         },
       },
     )
   }
 
   if (isLoading) {
-    return <Text muted>Loading…</Text>
+    return <Text muted>{t('admin.superSettings.loading')}</Text>
   }
 
   return (
     <Stack gap="lg">
       <PageHeader
-        title="システム設定"
-        description="テナント解決方式など、システム全体の設定を管理します。"
+        title={t('admin.superSettings.pageTitle')}
+        description={t('admin.superSettings.pageDesc')}
       />
 
       <form onSubmit={handleSubmit}>
         <Card padding="none" className="p-6">
           <Text as="h2" variant="heading-sm">
-            テナント解決方式
+            {t('admin.superSettings.resolutionTitle')}
           </Text>
           <Text muted className="mt-1 text-sm">
-            リクエストがどの組織に属するかを判定する方法を選択します。
+            {t('admin.superSettings.resolutionDesc')}
           </Text>
 
           <Stack gap="sm" className="mt-5">
@@ -102,22 +104,21 @@ export function SettingsPage() {
                     htmlFor={`mode-${m.value}`}
                     className="cursor-pointer text-sm font-medium text-text-primary"
                   >
-                    {m.label}
+                    {t(m.labelKey)}
                   </label>
-                  <p className="mt-0.5 text-xs text-text-muted">{m.description}</p>
+                  <p className="mt-0.5 text-xs text-text-muted">{t(m.descKey)}</p>
                 </div>
               </div>
             ))}
           </Stack>
 
-          {/* モード別の補助入力 */}
           {currentMode === 'single' && (
             <div className="mt-5">
               <label
                 htmlFor="tenant-org-slug"
                 className="mb-1 block text-sm font-medium text-text-primary"
               >
-                組織スラッグ
+                {t('admin.superSettings.orgSlugLabel')}
               </label>
               <Input
                 id="tenant-org-slug"
@@ -128,9 +129,7 @@ export function SettingsPage() {
                 placeholder="my-org"
                 className="max-w-xs"
               />
-              <p className="mt-1 text-xs text-text-muted">
-                すべてのリクエストをこのスラッグの組織に紐付けます。
-              </p>
+              <p className="mt-1 text-xs text-text-muted">{t('admin.superSettings.orgSlugHelp')}</p>
             </div>
           )}
 
@@ -140,7 +139,7 @@ export function SettingsPage() {
                 htmlFor="tenant-base-domain"
                 className="mb-1 block text-sm font-medium text-text-primary"
               >
-                ベースドメイン
+                {t('admin.superSettings.baseDomainLabel')}
               </label>
               <Input
                 id="tenant-base-domain"
@@ -152,50 +151,50 @@ export function SettingsPage() {
                 className="max-w-xs"
               />
               <p className="mt-1 text-xs text-text-muted">
-                例: <code className="font-mono">example.com</code> → リクエストの{' '}
-                <code className="font-mono">acme.example.com</code> から{' '}
-                <code className="font-mono">acme</code> を抽出します。
+                {t('admin.superSettings.baseDomainHelp')}
               </p>
             </div>
           )}
 
           {currentMode === 'path' && (
             <div className="mt-5 rounded-md bg-surface p-3 text-xs text-text-muted">
-              URL の先頭パスセグメントを組織スラッグとして使用します。
-              <br />
-              例: <code className="font-mono">/acme/api/v1/entities</code> →{' '}
-              <code className="font-mono">acme</code>
+              {t('admin.superSettings.pathHelp')}
             </div>
           )}
 
           <div className="mt-6">
             <Button type="submit" variant="primary" disabled={update.isPending}>
-              {update.isPending ? '保存中…' : '設定を保存'}
+              {update.isPending ? t('admin.superSettings.saving') : t('admin.superSettings.save')}
             </Button>
           </div>
         </Card>
       </form>
 
-      {/* 現在の DB 保存済み設定 */}
       {data !== undefined && (
         <Card padding="none" className="p-6">
           <Text as="h2" variant="heading-sm">
-            現在の設定（DB 保存値）
+            {t('admin.superSettings.currentTitle')}
           </Text>
           <dl className="mt-3 space-y-2 text-sm">
             <div className="flex gap-3">
-              <dt className="w-44 shrink-0 text-text-muted">解決方式</dt>
+              <dt className="w-44 shrink-0 text-text-muted">
+                {t('admin.superSettings.currentResolution')}
+              </dt>
               <dd className="font-mono text-text-primary">{data.tenantResolutionMode}</dd>
             </div>
             {data.tenantOrgSlug !== '' && (
               <div className="flex gap-3">
-                <dt className="w-44 shrink-0 text-text-muted">組織スラッグ</dt>
+                <dt className="w-44 shrink-0 text-text-muted">
+                  {t('admin.superSettings.orgSlugLabel')}
+                </dt>
                 <dd className="font-mono text-text-primary">{data.tenantOrgSlug}</dd>
               </div>
             )}
             {data.tenantResolutionMode === 'subdomain' && (
               <div className="flex gap-3">
-                <dt className="w-44 shrink-0 text-text-muted">ベースドメイン</dt>
+                <dt className="w-44 shrink-0 text-text-muted">
+                  {t('admin.superSettings.baseDomainLabel')}
+                </dt>
                 <dd className="font-mono text-text-primary">{data.tenantBaseDomain}</dd>
               </div>
             )}

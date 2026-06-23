@@ -1026,4 +1026,34 @@ export const ja: Partial<MessageCatalog> = {
   'public.comments.form.submitting': '送信中…',
   'public.comments.form.success': 'コメントを送信しました。承認後に表示されます。',
   'public.comments.form.error': 'コメントを送信できませんでした。もう一度お試しください。',
+
+  // ── Superadmin · System settings ──
+  'admin.superSettings.pageTitle': 'システム設定',
+  'admin.superSettings.pageDesc': 'テナント解決方式など、システム全体の設定を管理します。',
+  'admin.superSettings.loading': '読み込み中…',
+  'admin.superSettings.resolutionTitle': 'テナント解決方式',
+  'admin.superSettings.resolutionDesc':
+    'リクエストがどの組織に属するかを判定する方法を選択します。',
+  'admin.superSettings.mode.single.label': 'シングルテナント（固定 org）',
+  'admin.superSettings.mode.single.desc':
+    'すべてのリクエストを特定の組織に固定する。単一組織の運用に最適。',
+  'admin.superSettings.mode.subdomain.label': 'サブドメイン方式',
+  'admin.superSettings.mode.subdomain.desc':
+    'acme.example.com のようにサブドメインで組織を判定する。本番 SaaS 向け。',
+  'admin.superSettings.mode.path.label': 'パスプレフィックス方式',
+  'admin.superSettings.mode.path.desc':
+    '/org/acme/... のように URL パスで組織を判定する。DNS 設定不要でシンプル。',
+  'admin.superSettings.orgSlugLabel': '組織スラッグ',
+  'admin.superSettings.orgSlugHelp': 'すべてのリクエストをこのスラッグの組織に紐付けます。',
+  'admin.superSettings.baseDomainLabel': 'ベースドメイン',
+  'admin.superSettings.baseDomainHelp':
+    '例: example.com → リクエストの acme.example.com から acme を抽出します。',
+  'admin.superSettings.pathHelp':
+    'URL の先頭パスセグメントを組織スラッグとして使用します。例: /acme/api/v1/entities → acme',
+  'admin.superSettings.saving': '保存中…',
+  'admin.superSettings.save': '設定を保存',
+  'admin.superSettings.toast.saved': '設定を保存しました。',
+  'admin.superSettings.toast.error': '保存に失敗しました。',
+  'admin.superSettings.currentTitle': '現在の設定（DB 保存値）',
+  'admin.superSettings.currentResolution': '解決方式',
 }
