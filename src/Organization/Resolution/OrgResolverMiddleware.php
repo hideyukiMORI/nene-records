@@ -16,9 +16,10 @@ use Psr\Http\Server\RequestHandlerInterface;
  * Resolves the current organization from the request and stores its ID
  * in a RequestScopedHolder for downstream repositories to read.
  *
- * Bypass paths (superadmin org management, health, auth) skip resolution
- * and pass through with org ID unset. Repositories on those routes must
- * not call $orgId->get().
+ * Bypass paths (superadmin org management, health, auth) skip resolution but
+ * still seed the holder with 0 — the no-org sentinel (access_logs.organization_id
+ * is NOT NULL DEFAULT 0) — so downstream request-scoped readers such as the
+ * access-log writer don't fault on these org-agnostic routes.
  *
  * Resolution order:
  *  1. strategy->resolve() → slug or custom domain identifier
@@ -56,9 +57,13 @@ final readonly class OrgResolverMiddleware implements MiddlewareInterface
     {
         $path = $request->getUri()->getPath();
 
-        // Bypass: superadmin / health / auth routes don't need org context
+        // Bypass: superadmin / health / auth routes don't need org context, but
+        // downstream request-scoped readers (e.g. the access-log writer) still read
+        // the holder — seed it with 0 (the no-org sentinel) so they don't fault.
         foreach (self::BYPASS_PREFIXES as $prefix) {
             if (str_starts_with($path, $prefix)) {
+                $this->orgId->set(0);
+
                 return $handler->handle($request);
             }
         }
