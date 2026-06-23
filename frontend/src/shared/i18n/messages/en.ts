@@ -37,6 +37,7 @@ export const en = {
   'common.error.serverError': 'A server error occurred. Please try again later.',
 
   'common.dialog.close': 'Close dialog',
+  'common.listSeparator': ', ',
 
   'common.toast.dismiss': 'Dismiss',
   'common.toast.region': 'Notifications',

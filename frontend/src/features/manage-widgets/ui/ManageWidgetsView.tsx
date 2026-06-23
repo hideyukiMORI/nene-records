@@ -144,7 +144,9 @@ export function ManageWidgetsView({ page }: ManageWidgetsViewProps) {
           <Text as="span" variant="caption">
             {t('admin.layoutCfg.hiddenWarning', {
               count: String(hiddenCount),
-              regions: hiddenRegions.map((r) => t(`admin.region.${r}`)).join('・'),
+              regions: hiddenRegions
+                .map((r) => t(`admin.region.${r}`))
+                .join(t('common.listSeparator')),
             })}
           </Text>
           <Button
