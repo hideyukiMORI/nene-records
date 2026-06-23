@@ -30,6 +30,7 @@ export const ja: Partial<MessageCatalog> = {
   'common.error.serverError': 'サーバーエラーが発生しました。後でもう一度お試しください。',
 
   'common.dialog.close': 'ダイアログを閉じる',
+  'common.listSeparator': '・',
 
   'common.toast.dismiss': '閉じる',
   'common.toast.region': '通知',

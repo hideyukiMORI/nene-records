@@ -77,6 +77,28 @@ const importZones = [
   },
 ]
 
+const noArbitraryTailwindValues = {
+  selector: 'JSXAttribute[name.name="className"] Literal[value=/\\[.*\\]/]',
+  message: 'Tailwind arbitrary values are forbidden outside shared/ui/theme.',
+}
+
+// Recurrence guards from the #507 audit remediation. Both currently have zero
+// violations; they stop the migrated patterns from creeping back.
+//  - WS-08: raw Tailwind palette colours must be semantic theme tokens.
+//  - WS-10/WS-11: user-facing Japanese must go through i18n (features/pages only).
+const noRawTailwindPalette = {
+  selector:
+    'Literal[value=/\\b(?:bg|text|border|ring|fill|stroke|from|via|to|divide|outline|decoration|shadow|caret|accent)-(?:red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose|slate|gray|zinc|neutral|stone)-\\d{2,3}\\b/]',
+  message:
+    'Raw Tailwind palette colours are forbidden — use semantic theme tokens (text-danger, bg-success-weak, text-warning, bg-scrim, …) from src/shared/ui/theme/themes/default.css @theme.',
+}
+
+const noHardcodedJapanese = {
+  selector: 'Literal[value=/[\\u3040-\\u30FF\\u3400-\\u9FFF]/]',
+  message:
+    'Hardcoded Japanese string in a feature/page — route user-facing text through useTranslation()/t(). Non-translatable native endonyms may use an inline eslint-disable with a reason.',
+}
+
 export default tseslint.config(
   {
     ignores: [
@@ -117,12 +139,20 @@ export default tseslint.config(
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
       ...jsxA11y.configs.recommended.rules,
       'import/no-restricted-paths': ['error', { zones: importZones }],
+      'no-restricted-syntax': ['error', noArbitraryTailwindValues, noRawTailwindPalette],
+    },
+  },
+  {
+    // Feature/page components must use semantic tokens + i18n (audit #507 recurrence
+    // guards). Tests and stories are exempt: JA assertions / demo content are fine.
+    files: ['src/features/**/*.{ts,tsx}', 'src/pages/**/*.{ts,tsx}'],
+    ignores: ['**/*.test.{ts,tsx}', '**/*.stories.{ts,tsx}'],
+    rules: {
       'no-restricted-syntax': [
         'error',
-        {
-          selector: 'JSXAttribute[name.name="className"] Literal[value=/\\[.*\\]/]',
-          message: 'Tailwind arbitrary values are forbidden outside shared/ui/theme.',
-        },
+        noArbitraryTailwindValues,
+        noRawTailwindPalette,
+        noHardcodedJapanese,
       ],
     },
   },

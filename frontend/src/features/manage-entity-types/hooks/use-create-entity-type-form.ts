@@ -53,8 +53,10 @@ export function formValuesToLabels(values: EditEntityTypeFormValues): Record<str
 
 /** Locale-field mapping used to render label inputs in the edit form. */
 export const EDIT_LABEL_FIELDS = [
+  // eslint-disable-next-line no-restricted-syntax -- native language endonym, never translated
   { fieldName: 'labelJa' as const, localeId: 'ja', nativeLabel: '日本語 (ja)' },
   { fieldName: 'labelFr' as const, localeId: 'fr', nativeLabel: 'Français (fr)' },
+  // eslint-disable-next-line no-restricted-syntax -- native language endonym, never translated
   { fieldName: 'labelZhHans' as const, localeId: 'zh-Hans', nativeLabel: '中文（简体）(zh-Hans)' },
   { fieldName: 'labelPtBr' as const, localeId: 'pt-BR', nativeLabel: 'Português (Brasil) (pt-BR)' },
   { fieldName: 'labelDe' as const, localeId: 'de', nativeLabel: 'Deutsch (de)' },
