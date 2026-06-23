@@ -1,6 +1,7 @@
 import { useQuery, type UseQueryResult } from '@tanstack/react-query'
 import { apiClient, type AppError } from '@/shared/api/client'
 import type { ThemeListDto } from './api-types'
+import { themeKeys } from './query-keys'
 
 /**
  * Public list of runtime (data-driven) themes. The public site applies the
@@ -8,7 +9,7 @@ import type { ThemeListDto } from './api-types'
  */
 export function usePublicThemes(): UseQueryResult<ThemeListDto, AppError> {
   return useQuery({
-    queryKey: ['themes', 'public'],
+    queryKey: themeKeys.publicList(),
     queryFn: async ({ signal }) => apiClient.get<ThemeListDto>('/api/v1/public/themes', signal),
   })
 }
@@ -16,7 +17,7 @@ export function usePublicThemes(): UseQueryResult<ThemeListDto, AppError> {
 /** Admin list of runtime themes (auth) — for the theme picker / management. */
 export function useThemes(): UseQueryResult<ThemeListDto, AppError> {
   return useQuery({
-    queryKey: ['themes', 'admin'],
+    queryKey: themeKeys.adminList(),
     queryFn: async ({ signal }) => apiClient.get<ThemeListDto>('/api/v1/themes', signal),
   })
 }
