@@ -18,6 +18,36 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [react(), tailwindcss()],
+    build: {
+      rollupOptions: {
+        output: {
+          // Split long-lived vendor code out of the app entry so the initial
+          // chunk holds app code only (smaller entry + better long-term caching).
+          manualChunks(id: string) {
+            if (!id.includes('node_modules')) {
+              return undefined
+            }
+            if (id.includes('@tanstack')) {
+              return 'vendor-query'
+            }
+            if (id.includes('react-router') || id.includes('/history/')) {
+              return 'vendor-router'
+            }
+            if (
+              id.includes('/react-dom/') ||
+              id.includes('/react/') ||
+              id.includes('/scheduler/')
+            ) {
+              return 'vendor-react'
+            }
+            if (id.includes('dompurify') || id.includes('marked') || id.includes('micromark')) {
+              return 'vendor-markdown'
+            }
+            return 'vendor'
+          },
+        },
+      },
+    },
     resolve: {
       alias: {
         '@': path.resolve(__dirname, './src'),
