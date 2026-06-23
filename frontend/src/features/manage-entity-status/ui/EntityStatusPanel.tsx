@@ -157,6 +157,7 @@ export function EntityStatusPanel({
         <div className="flex items-center gap-inline-sm rounded-md border border-border bg-surface p-3">
           <input
             type="datetime-local"
+            aria-label={t('admin.entityStatus.scheduledAtLabel')}
             value={scheduledAtInput}
             onChange={(e) => {
               onScheduledAtChange(e.target.value)

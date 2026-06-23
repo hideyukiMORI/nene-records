@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import type { CreateWebhookInput, WebhookEvent } from '@/entities/webhook'
 import { WEBHOOK_EVENTS } from '@/entities/webhook'
 import { useTranslation } from '@/shared/i18n'
@@ -22,6 +22,7 @@ export function WebhookForm({
   onCancel,
 }: WebhookFormProps) {
   const { t } = useTranslation()
+  const fieldId = useId()
   const [url, setUrl] = useState(defaultValues?.url ?? '')
   const [events, setEvents] = useState<WebhookEvent[]>(defaultValues?.events ?? ['entity.created'])
   const [entityTypeId, setEntityTypeId] = useState<string>(
@@ -50,11 +51,14 @@ export function WebhookForm({
       <Stack gap="md">
         {/* URL */}
         <div className="flex flex-col gap-stack-xs">
-          <label htmlFor="wh-url" className="font-sans text-body font-medium text-text-primary">
+          <label
+            htmlFor={`${fieldId}-url`}
+            className="font-sans text-body font-medium text-text-primary"
+          >
             {t('admin.webhooks.form.urlLabel')}
           </label>
           <input
-            id="wh-url"
+            id={`${fieldId}-url`}
             type="url"
             value={url}
             disabled={isSubmitting}
@@ -96,13 +100,13 @@ export function WebhookForm({
         {/* Entity type ID (optional) */}
         <div className="flex flex-col gap-stack-xs">
           <label
-            htmlFor="wh-entity-type"
+            htmlFor={`${fieldId}-entity-type`}
             className="font-sans text-body font-medium text-text-primary"
           >
             {t('admin.webhooks.form.entityTypeIdLabel')}
           </label>
           <input
-            id="wh-entity-type"
+            id={`${fieldId}-entity-type`}
             type="number"
             value={entityTypeId}
             disabled={isSubmitting}
@@ -117,11 +121,14 @@ export function WebhookForm({
 
         {/* Secret (optional) */}
         <div className="flex flex-col gap-stack-xs">
-          <label htmlFor="wh-secret" className="font-sans text-body font-medium text-text-primary">
+          <label
+            htmlFor={`${fieldId}-secret`}
+            className="font-sans text-body font-medium text-text-primary"
+          >
             {t('admin.webhooks.form.secretLabel')}
           </label>
           <input
-            id="wh-secret"
+            id={`${fieldId}-secret`}
             type="text"
             value={secret}
             disabled={isSubmitting}
