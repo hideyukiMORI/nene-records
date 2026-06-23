@@ -1,8 +1,6 @@
-import { useState } from 'react'
-import { type Media } from '@/entities/media'
+import { type ReactElement } from 'react'
 import { type MessageKey, useTranslation } from '@/shared/i18n'
-import { Button, Input, ResponsiveImage, Select, Stack } from '@/shared/ui'
-import { IconChevronDown, IconChevronUp, IconX } from '@/shared/ui/icons/Icons'
+import { Button, Input, Stack } from '@/shared/ui'
 import {
   CALLOUT_KINDS,
   CHART_TYPES,
@@ -12,57 +10,31 @@ import {
   MAX_COLUMN_CHILDREN,
   MAX_GROUP_CHILDREN,
   SPACER_SIZES,
-  createBlock,
-  validateBlock,
   type Block,
-  type BlockType,
+  type BlockData,
   type BlockValidationCode,
-  type CalloutBlockData,
   type CalloutKind,
-  type ChartBlockData,
   type ChartType,
   type ColumnsBlockData,
-  type DividerBlockData,
-  type GalleryBlockData,
-  type GalleryItem,
   type GalleryLayout,
-  type GroupBlockData,
   type GroupTone,
-  type HeroBlockData,
-  type HeroMedia,
   type HeroVariant,
-  type LeafBlock,
-  type SeriesPoint,
-  type SpacerBlockData,
   type SpacerSize,
-  type TextBlockData,
 } from '@/shared/lib/blocks-document'
-import { BLOCK_CATALOG, blockCatalogEntry } from './block-catalog'
 import { BlockMarkdownInput } from './BlockMarkdownInput'
-import { MediaSelectorModal } from './MediaSelectorModal'
-
-type BlockDataChange =
-  | TextBlockData
-  | CalloutBlockData
-  | HeroBlockData
-  | GalleryBlockData
-  | ChartBlockData
-  | GroupBlockData
-  | ColumnsBlockData
-  | SpacerBlockData
-  | DividerBlockData
-
-/** Leaf block types a container (group / columns) may hold (no nesting; depth 2). */
-const GROUP_CHILD_CATALOG = BLOCK_CATALOG.filter(
-  (entry) => entry.type !== 'group' && entry.type !== 'columns',
-)
+import { EnumSelect } from './inspectors/EnumSelect'
+import { FieldError } from './inspectors/FieldError'
+import { GalleryItemsField } from './inspectors/GalleryItemsField'
+import { GroupChildrenField } from './inspectors/GroupChildrenField'
+import { HeroMediaField } from './inspectors/HeroMediaField'
+import { SeriesField } from './inspectors/SeriesField'
 
 interface BlockInspectorProps {
   block: Block
   errorCode: BlockValidationCode | null
   disabled: boolean
   idPrefix: string
-  onChange: (data: BlockDataChange) => void
+  onChange: (data: BlockData) => void
 }
 
 const KIND_LABEL_KEY: Record<CalloutKind, MessageKey> = {
@@ -100,918 +72,386 @@ const SPACER_SIZE_LABEL_KEY: Record<SpacerSize, MessageKey> = {
   lg: 'admin.blocks.spacerSize.lg',
 }
 
-/** Settings form for the selected block (text / callout / hero / gallery). */
+/**
+ * Settings form for the selected block. Exhaustive `switch` on `block.type` — the
+ * `ReactElement` return annotation makes an unhandled block type a compile error,
+ * so adding a block type can't silently fall through to the hero form.
+ */
 export function BlockInspector({
   block,
   errorCode,
   disabled,
   idPrefix,
   onChange,
-}: BlockInspectorProps) {
+}: BlockInspectorProps): ReactElement {
   const { t } = useTranslation()
 
-  if (block.type === 'text') {
-    return (
-      <BlockMarkdownInput
-        id={`${idPrefix}-markdown`}
-        label={t('admin.blocks.field.body')}
-        value={block.data.markdown}
-        disabled={disabled}
-        error={errorCode === 'markdown-required' ? t('admin.blocks.error.bodyRequired') : undefined}
-        onChange={(markdown) => {
-          onChange({ markdown })
-        }}
-      />
-    )
-  }
-
-  if (block.type === 'callout') {
-    const data = block.data
-    return (
-      <Stack gap="sm">
-        <Select
-          id={`${idPrefix}-kind`}
-          label={t('admin.blocks.field.kind')}
-          value={data.kind}
-          disabled={disabled}
-          onChange={(event) => {
-            onChange({ ...data, kind: event.target.value as CalloutKind })
-          }}
-        >
-          {CALLOUT_KINDS.map((kind) => (
-            <option key={kind} value={kind}>
-              {t(KIND_LABEL_KEY[kind])}
-            </option>
-          ))}
-        </Select>
-        <Input
-          id={`${idPrefix}-title`}
-          label={t('admin.blocks.field.title')}
-          value={data.title ?? ''}
-          disabled={disabled}
-          autoComplete="off"
-          onChange={(event) => {
-            onChange({ ...data, title: event.target.value })
-          }}
-        />
+  switch (block.type) {
+    case 'text':
+      return (
         <BlockMarkdownInput
-          id={`${idPrefix}-body`}
+          id={`${idPrefix}-markdown`}
           label={t('admin.blocks.field.body')}
-          value={data.body}
-          disabled={disabled}
-          error={errorCode === 'body-required' ? t('admin.blocks.error.bodyRequired') : undefined}
-          onChange={(body) => {
-            onChange({ ...data, body })
-          }}
-        />
-      </Stack>
-    )
-  }
-
-  if (block.type === 'gallery') {
-    const data = block.data
-    return (
-      <Stack gap="sm">
-        <Select
-          id={`${idPrefix}-layout`}
-          label={t('admin.blocks.field.layout')}
-          value={data.layout}
-          disabled={disabled}
-          onChange={(event) => {
-            onChange({ ...data, layout: event.target.value as GalleryLayout })
-          }}
-        >
-          {GALLERY_LAYOUTS.map((layout) => (
-            <option key={layout} value={layout}>
-              {t(LAYOUT_LABEL_KEY[layout])}
-            </option>
-          ))}
-        </Select>
-        <GalleryItemsField
-          idPrefix={idPrefix}
-          items={data.items}
-          disabled={disabled}
-          error={errorCode === 'items-required' ? t('admin.blocks.error.itemsRequired') : undefined}
-          onChange={(items) => {
-            onChange({ ...data, items })
-          }}
-        />
-      </Stack>
-    )
-  }
-
-  if (block.type === 'chart') {
-    const data = block.data
-    return (
-      <Stack gap="sm">
-        <Select
-          id={`${idPrefix}-chart-type`}
-          label={t('admin.blocks.field.chartType')}
-          value={data.chartType}
-          disabled={disabled}
-          onChange={(event) => {
-            onChange({ ...data, chartType: event.target.value as ChartType })
-          }}
-        >
-          {CHART_TYPES.map((chartType) => (
-            <option key={chartType} value={chartType}>
-              {t(CHART_TYPE_LABEL_KEY[chartType])}
-            </option>
-          ))}
-        </Select>
-        <Input
-          id={`${idPrefix}-chart-title`}
-          label={t('admin.blocks.field.title')}
-          value={data.title ?? ''}
-          disabled={disabled}
-          autoComplete="off"
-          onChange={(event) => {
-            onChange({ ...data, title: event.target.value })
-          }}
-        />
-        <SeriesField
-          idPrefix={idPrefix}
-          series={data.series}
+          value={block.data.markdown}
           disabled={disabled}
           error={
-            errorCode === 'series-required' ? t('admin.blocks.error.seriesRequired') : undefined
+            errorCode === 'markdown-required' ? t('admin.blocks.error.bodyRequired') : undefined
           }
-          onChange={(series) => {
-            onChange({ ...data, series })
+          onChange={(markdown) => {
+            onChange({ markdown })
           }}
         />
-        <Input
-          id={`${idPrefix}-chart-summary`}
-          label={t('admin.blocks.field.summary')}
-          value={data.summary}
-          disabled={disabled}
-          autoComplete="off"
-          error={
-            errorCode === 'summary-required' ? t('admin.blocks.error.summaryRequired') : undefined
-          }
-          onChange={(event) => {
-            onChange({ ...data, summary: event.target.value })
-          }}
-        />
-      </Stack>
-    )
-  }
+      )
 
-  if (block.type === 'group') {
-    const data = block.data
-    return (
-      <Stack gap="sm">
-        <Select
-          id={`${idPrefix}-group-tone`}
-          label={t('admin.blocks.field.tone')}
-          value={data.tone}
-          disabled={disabled}
-          onChange={(event) => {
-            onChange({ ...data, tone: event.target.value as GroupTone })
-          }}
-        >
-          {GROUP_TONES.map((tone) => (
-            <option key={tone} value={tone}>
-              {t(GROUP_TONE_LABEL_KEY[tone])}
-            </option>
-          ))}
-        </Select>
-        <GroupChildrenField
-          idPrefix={idPrefix}
-          items={data.children}
-          disabled={disabled}
-          maxItems={MAX_GROUP_CHILDREN}
-          error={
-            errorCode === 'children-required'
-              ? t('admin.blocks.error.childrenRequired')
-              : errorCode === 'children-invalid'
-                ? t('admin.blocks.error.childrenInvalid')
-                : undefined
-          }
-          onChange={(children) => {
-            onChange({ ...data, children })
-          }}
-        />
-      </Stack>
-    )
-  }
-
-  if (block.type === 'columns') {
-    const data = block.data
-    const setColumns = (columns: ColumnsBlockData['columns']) => {
-      onChange({ ...data, columns })
-    }
-    return (
-      <Stack gap="sm">
-        <div className="flex items-center gap-inline-sm">
-          <span className="flex-1 font-sans text-caption font-medium text-text-primary">
-            {t('admin.blocks.columns.count', { count: String(data.columns.length) })}
-          </span>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            disabled={disabled || data.columns.length <= 2}
-            onClick={() => {
-              setColumns(data.columns.slice(0, -1))
-            }}
-          >
-            {t('admin.blocks.columns.remove')}
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            disabled={disabled || data.columns.length >= 4}
-            onClick={() => {
-              setColumns([...data.columns, { children: [] }])
-            }}
-          >
-            {t('admin.blocks.columns.add')}
-          </Button>
-        </div>
-        {errorCode === 'children-required' || errorCode === 'children-invalid' ? (
-          <span role="alert" className="font-sans text-caption text-danger">
-            {errorCode === 'children-required'
-              ? t('admin.blocks.error.childrenRequired')
-              : t('admin.blocks.error.childrenInvalid')}
-          </span>
-        ) : null}
-        {data.columns.map((column, columnIndex) => (
-          <div
-            key={columnIndex}
-            className="flex flex-col gap-stack-xs rounded-md border border-border p-inline-sm"
-          >
-            <span className="font-sans text-caption font-medium text-text-muted">
-              {t('admin.blocks.columns.label', { n: String(columnIndex + 1) })}
-            </span>
-            <GroupChildrenField
-              idPrefix={`${idPrefix}-col${String(columnIndex)}`}
-              items={column.children}
-              disabled={disabled}
-              maxItems={MAX_COLUMN_CHILDREN}
-              onChange={(children) => {
-                setColumns(data.columns.map((col, i) => (i === columnIndex ? { children } : col)))
-              }}
-            />
-          </div>
-        ))}
-      </Stack>
-    )
-  }
-
-  if (block.type === 'spacer') {
-    const data = block.data
-    return (
-      <Select
-        id={`${idPrefix}-spacer-size`}
-        label={t('admin.blocks.field.spacerSize')}
-        value={data.size}
-        disabled={disabled}
-        onChange={(event) => {
-          onChange({ size: event.target.value as SpacerSize })
-        }}
-      >
-        {SPACER_SIZES.map((size) => (
-          <option key={size} value={size}>
-            {t(SPACER_SIZE_LABEL_KEY[size])}
-          </option>
-        ))}
-      </Select>
-    )
-  }
-
-  if (block.type === 'divider') {
-    return (
-      <span className="font-sans text-caption text-text-muted">
-        {t('admin.blocks.divider.hint')}
-      </span>
-    )
-  }
-
-  const data = block.data
-  return (
-    <Stack gap="sm">
-      <Select
-        id={`${idPrefix}-variant`}
-        label={t('admin.blocks.field.variant')}
-        value={data.variant}
-        disabled={disabled}
-        onChange={(event) => {
-          onChange({ ...data, variant: event.target.value as HeroVariant })
-        }}
-      >
-        {HERO_VARIANTS.map((variant) => (
-          <option key={variant} value={variant}>
-            {t(VARIANT_LABEL_KEY[variant])}
-          </option>
-        ))}
-      </Select>
-      <Input
-        id={`${idPrefix}-kicker`}
-        label={t('admin.blocks.field.kicker')}
-        value={data.kicker ?? ''}
-        disabled={disabled}
-        autoComplete="off"
-        onChange={(event) => {
-          onChange({ ...data, kicker: event.target.value })
-        }}
-      />
-      <Input
-        id={`${idPrefix}-heading`}
-        label={t('admin.blocks.field.heading')}
-        value={data.heading}
-        disabled={disabled}
-        autoComplete="off"
-        error={
-          errorCode === 'heading-required' ? t('admin.blocks.error.headingRequired') : undefined
-        }
-        onChange={(event) => {
-          onChange({ ...data, heading: event.target.value })
-        }}
-      />
-      <Input
-        id={`${idPrefix}-lead`}
-        label={t('admin.blocks.field.lead')}
-        value={data.lead ?? ''}
-        disabled={disabled}
-        autoComplete="off"
-        onChange={(event) => {
-          onChange({ ...data, lead: event.target.value })
-        }}
-      />
-      <Input
-        id={`${idPrefix}-cta-label`}
-        label={t('admin.blocks.field.ctaLabel')}
-        value={data.ctaLabel ?? ''}
-        disabled={disabled}
-        autoComplete="off"
-        onChange={(event) => {
-          onChange({ ...data, ctaLabel: event.target.value })
-        }}
-      />
-      <Input
-        id={`${idPrefix}-cta-url`}
-        label={t('admin.blocks.field.ctaUrl')}
-        value={data.ctaUrl ?? ''}
-        disabled={disabled}
-        autoComplete="off"
-        onChange={(event) => {
-          onChange({ ...data, ctaUrl: event.target.value })
-        }}
-      />
-      <Input
-        id={`${idPrefix}-ghost-label`}
-        label={t('admin.blocks.field.ghostLabel')}
-        value={data.ghostLabel ?? ''}
-        disabled={disabled}
-        autoComplete="off"
-        onChange={(event) => {
-          onChange({ ...data, ghostLabel: event.target.value })
-        }}
-      />
-      <Input
-        id={`${idPrefix}-ghost-url`}
-        label={t('admin.blocks.field.ghostUrl')}
-        value={data.ghostUrl ?? ''}
-        disabled={disabled}
-        autoComplete="off"
-        onChange={(event) => {
-          onChange({ ...data, ghostUrl: event.target.value })
-        }}
-      />
-      <HeroMediaField
-        idPrefix={idPrefix}
-        media={data.media}
-        disabled={disabled}
-        onChange={(media) => {
-          if (media === undefined) {
-            const next = { ...data }
-            delete next.media
-            onChange(next)
-            return
-          }
-          onChange({ ...data, media })
-        }}
-      />
-    </Stack>
-  )
-}
-
-interface HeroMediaFieldProps {
-  idPrefix: string
-  media: HeroMedia | undefined
-  disabled: boolean
-  onChange: (media: HeroMedia | undefined) => void
-}
-
-/** Library image picker + alt text for the hero art (#486 S3). */
-function HeroMediaField({ idPrefix, media, disabled, onChange }: HeroMediaFieldProps) {
-  const { t } = useTranslation()
-  const [pickerOpen, setPickerOpen] = useState(false)
-
-  const handleSelect = (item: Media) => {
-    onChange({
-      mediaId: String(item.id),
-      url: item.url,
-      ...(item.altText !== null && item.altText !== '' ? { alt: item.altText } : {}),
-    })
-    setPickerOpen(false)
-  }
-
-  return (
-    <div className="flex flex-col gap-stack-xs">
-      <span className="font-sans text-caption font-medium text-text-primary">
-        {t('admin.blocks.field.image')}
-      </span>
-      <div className="flex items-center gap-inline-sm">
-        {media !== undefined ? (
-          <ResponsiveImage
-            src={media.url}
-            alt={media.alt ?? ''}
-            sizes="96px"
-            className="h-16 w-24 rounded border border-border object-cover"
-          />
-        ) : (
-          <span className="font-sans text-caption text-text-muted">
-            {t('admin.blocks.media.none')}
-          </span>
-        )}
-        <Button
-          variant="secondary"
-          size="sm"
-          disabled={disabled}
-          onClick={() => {
-            setPickerOpen(true)
-          }}
-        >
-          {media !== undefined ? t('admin.blocks.media.change') : t('admin.blocks.media.select')}
-        </Button>
-        {media !== undefined ? (
-          <Button
-            variant="ghost"
-            size="sm"
+    case 'callout': {
+      const data = block.data
+      return (
+        <Stack gap="sm">
+          <EnumSelect
+            id={`${idPrefix}-kind`}
+            label={t('admin.blocks.field.kind')}
+            value={data.kind}
+            options={CALLOUT_KINDS}
+            labelKeys={KIND_LABEL_KEY}
             disabled={disabled}
-            onClick={() => {
-              onChange(undefined)
-            }}
-          >
-            {t('admin.blocks.media.remove')}
-          </Button>
-        ) : null}
-      </div>
-      {media !== undefined ? (
-        <Input
-          id={`${idPrefix}-media-alt`}
-          label={t('admin.blocks.media.alt')}
-          value={media.alt ?? ''}
-          disabled={disabled}
-          autoComplete="off"
-          onChange={(event) => {
-            onChange({ ...media, alt: event.target.value })
-          }}
-        />
-      ) : null}
-      {pickerOpen ? (
-        <MediaSelectorModal
-          currentMediaId={media?.mediaId ?? null}
-          onSelect={handleSelect}
-          onClose={() => {
-            setPickerOpen(false)
-          }}
-        />
-      ) : null}
-    </div>
-  )
-}
-
-interface GalleryItemsFieldProps {
-  idPrefix: string
-  items: GalleryItem[]
-  disabled: boolean
-  error?: string | undefined
-  onChange: (items: GalleryItem[]) => void
-}
-
-/** Repeater of gallery slides — each a library image + required alt (C4) + caption (#486 S4). */
-function GalleryItemsField({ idPrefix, items, disabled, error, onChange }: GalleryItemsFieldProps) {
-  const { t } = useTranslation()
-  // null = closed, -1 = adding a new slide, >= 0 = replacing slide i's image
-  const [pickFor, setPickFor] = useState<number | null>(null)
-
-  const update = (index: number, patch: Partial<GalleryItem>) => {
-    onChange(items.map((item, i) => (i === index ? { ...item, ...patch } : item)))
-  }
-  const move = (index: number, direction: -1 | 1) => {
-    const target = index + direction
-    if (target < 0 || target >= items.length) {
-      return
-    }
-    const next = items.slice()
-    const [moved] = next.splice(index, 1)
-    if (moved === undefined) {
-      return
-    }
-    next.splice(target, 0, moved)
-    onChange(next)
-  }
-  const remove = (index: number) => {
-    onChange(items.filter((_, i) => i !== index))
-  }
-  const handleSelect = (media: Media) => {
-    if (pickFor === -1) {
-      onChange([...items, { mediaId: String(media.id), url: media.url, alt: media.altText ?? '' }])
-    } else if (pickFor !== null) {
-      update(pickFor, { mediaId: String(media.id), url: media.url })
-    }
-    setPickFor(null)
-  }
-
-  return (
-    <div className="flex flex-col gap-stack-sm">
-      <span className="font-sans text-caption font-medium text-text-primary">
-        {t('admin.blocks.field.images')}
-      </span>
-      {error !== undefined ? (
-        <span role="alert" className="font-sans text-caption text-danger">
-          {error}
-        </span>
-      ) : null}
-      {items.map((item, index) => (
-        <div
-          key={`${item.mediaId}-${String(index)}`}
-          className="flex flex-col gap-stack-xs rounded-md border border-border p-inline-sm"
-        >
-          <div className="flex items-center gap-inline-sm">
-            <ResponsiveImage
-              src={item.url}
-              alt={item.alt}
-              sizes="80px"
-              className="h-12 w-16 rounded border border-border object-cover"
-            />
-            <Button
-              variant="secondary"
-              size="sm"
-              disabled={disabled}
-              onClick={() => {
-                setPickFor(index)
-              }}
-            >
-              {t('admin.blocks.media.change')}
-            </Button>
-            <span className="flex-1" />
-            <button
-              type="button"
-              className="rounded p-1 text-text-muted hover:text-text-primary disabled:opacity-40"
-              title={t('admin.blocks.moveUp')}
-              disabled={disabled || index === 0}
-              onClick={() => {
-                move(index, -1)
-              }}
-            >
-              <IconChevronUp size={15} />
-            </button>
-            <button
-              type="button"
-              className="rounded p-1 text-text-muted hover:text-text-primary disabled:opacity-40"
-              title={t('admin.blocks.moveDown')}
-              disabled={disabled || index === items.length - 1}
-              onClick={() => {
-                move(index, 1)
-              }}
-            >
-              <IconChevronDown size={15} />
-            </button>
-            <button
-              type="button"
-              className="rounded p-1 text-text-muted hover:text-danger disabled:opacity-40"
-              title={t('common.actions.delete')}
-              disabled={disabled}
-              onClick={() => {
-                remove(index)
-              }}
-            >
-              <IconX size={15} />
-            </button>
-          </div>
-          <Input
-            id={`${idPrefix}-item-${String(index)}-alt`}
-            label={t('admin.blocks.media.alt')}
-            value={item.alt}
-            disabled={disabled}
-            autoComplete="off"
-            error={item.alt.trim() === '' ? t('admin.blocks.error.altRequired') : undefined}
-            onChange={(event) => {
-              update(index, { alt: event.target.value })
+            onChange={(kind) => {
+              onChange({ ...data, kind })
             }}
           />
           <Input
-            id={`${idPrefix}-item-${String(index)}-caption`}
-            label={t('admin.blocks.media.caption')}
-            value={item.caption ?? ''}
+            id={`${idPrefix}-title`}
+            label={t('admin.blocks.field.title')}
+            value={data.title ?? ''}
             disabled={disabled}
             autoComplete="off"
             onChange={(event) => {
-              update(index, { caption: event.target.value })
+              onChange({ ...data, title: event.target.value })
             }}
           />
-        </div>
-      ))}
-      <div>
-        <Button
-          variant="secondary"
-          size="sm"
-          disabled={disabled}
-          onClick={() => {
-            setPickFor(-1)
-          }}
-        >
-          {t('admin.blocks.media.addImage')}
-        </Button>
-      </div>
-      {pickFor !== null ? (
-        <MediaSelectorModal
-          currentMediaId={pickFor >= 0 ? (items[pickFor]?.mediaId ?? null) : null}
-          onSelect={handleSelect}
-          onClose={() => {
-            setPickFor(null)
-          }}
-        />
-      ) : null}
-    </div>
-  )
-}
-
-interface SeriesFieldProps {
-  idPrefix: string
-  series: SeriesPoint[]
-  disabled: boolean
-  error?: string | undefined
-  onChange: (series: SeriesPoint[]) => void
-}
-
-/** Repeater of chart data points — label + numeric value (#486 S5). */
-function SeriesField({ idPrefix, series, disabled, error, onChange }: SeriesFieldProps) {
-  const { t } = useTranslation()
-
-  const update = (index: number, patch: Partial<SeriesPoint>) => {
-    onChange(series.map((point, i) => (i === index ? { ...point, ...patch } : point)))
-  }
-  const move = (index: number, direction: -1 | 1) => {
-    const target = index + direction
-    if (target < 0 || target >= series.length) {
-      return
-    }
-    const next = series.slice()
-    const [moved] = next.splice(index, 1)
-    if (moved === undefined) {
-      return
-    }
-    next.splice(target, 0, moved)
-    onChange(next)
-  }
-  const remove = (index: number) => {
-    onChange(series.filter((_, i) => i !== index))
-  }
-
-  return (
-    <div className="flex flex-col gap-stack-xs">
-      <span className="font-sans text-caption font-medium text-text-primary">
-        {t('admin.blocks.field.series')}
-      </span>
-      {error !== undefined ? (
-        <span role="alert" className="font-sans text-caption text-danger">
-          {error}
-        </span>
-      ) : null}
-      {series.map((point, index) => (
-        <div key={index} className="flex items-end gap-inline-sm">
-          <div className="flex-1">
-            <Input
-              id={`${idPrefix}-series-${String(index)}-label`}
-              label={t('admin.blocks.series.label')}
-              value={point.label}
-              disabled={disabled}
-              autoComplete="off"
-              error={point.label.trim() === '' ? t('admin.blocks.error.labelRequired') : undefined}
-              onChange={(event) => {
-                update(index, { label: event.target.value })
-              }}
-            />
-          </div>
-          <div className="w-24">
-            <Input
-              id={`${idPrefix}-series-${String(index)}-value`}
-              label={t('admin.blocks.series.value')}
-              type="number"
-              value={String(point.value)}
-              disabled={disabled}
-              onChange={(event) => {
-                const next = Number(event.target.value)
-                update(index, { value: Number.isFinite(next) ? next : 0 })
-              }}
-            />
-          </div>
-          <button
-            type="button"
-            className="rounded p-1 text-text-muted hover:text-text-primary disabled:opacity-40"
-            title={t('admin.blocks.moveUp')}
-            disabled={disabled || index === 0}
-            onClick={() => {
-              move(index, -1)
-            }}
-          >
-            <IconChevronUp size={15} />
-          </button>
-          <button
-            type="button"
-            className="rounded p-1 text-text-muted hover:text-text-primary disabled:opacity-40"
-            title={t('admin.blocks.moveDown')}
-            disabled={disabled || index === series.length - 1}
-            onClick={() => {
-              move(index, 1)
-            }}
-          >
-            <IconChevronDown size={15} />
-          </button>
-          <button
-            type="button"
-            className="rounded p-1 text-text-muted hover:text-danger disabled:opacity-40"
-            title={t('common.actions.delete')}
+          <BlockMarkdownInput
+            id={`${idPrefix}-body`}
+            label={t('admin.blocks.field.body')}
+            value={data.body}
             disabled={disabled}
-            onClick={() => {
-              remove(index)
+            error={errorCode === 'body-required' ? t('admin.blocks.error.bodyRequired') : undefined}
+            onChange={(body) => {
+              onChange({ ...data, body })
             }}
-          >
-            <IconX size={15} />
-          </button>
-        </div>
-      ))}
-      <div>
-        <Button
-          variant="secondary"
-          size="sm"
-          disabled={disabled}
-          onClick={() => {
-            onChange([...series, { label: '', value: 0 }])
-          }}
-        >
-          {t('admin.blocks.series.add')}
-        </Button>
-      </div>
-    </div>
-  )
-}
-
-interface GroupChildrenFieldProps {
-  idPrefix: string
-  items: LeafBlock[]
-  disabled: boolean
-  error?: string | undefined
-  /** Max children (mirrors the server cap); the add palette disables at the limit. */
-  maxItems: number
-  onChange: (items: LeafBlock[]) => void
-}
-
-/**
- * Sub-editor for a group's child blocks (#491 WS2): a leaf-only palette + a
- * reorderable list where each child expands to its own BlockInspector. Children
- * are leaf blocks, so the recursion terminates at one level (depth 2).
- */
-function GroupChildrenField({
-  idPrefix,
-  items,
-  disabled,
-  error,
-  maxItems,
-  onChange,
-}: GroupChildrenFieldProps) {
-  const { t } = useTranslation()
-  const [openIndex, setOpenIndex] = useState<number | null>(null)
-  const atCapacity = items.length >= maxItems
-
-  const add = (type: BlockType) => {
-    onChange([...items, createBlock(type) as LeafBlock])
-    setOpenIndex(items.length)
-  }
-  const update = (index: number, data: BlockDataChange) => {
-    onChange(items.map((item, i) => (i === index ? ({ ...item, data } as LeafBlock) : item)))
-  }
-  const move = (index: number, direction: -1 | 1) => {
-    const target = index + direction
-    if (target < 0 || target >= items.length) {
-      return
+          />
+        </Stack>
+      )
     }
-    const next = items.slice()
-    const [moved] = next.splice(index, 1)
-    if (moved === undefined) {
-      return
-    }
-    next.splice(target, 0, moved)
-    onChange(next)
-    setOpenIndex(null)
-  }
-  const remove = (index: number) => {
-    onChange(items.filter((_, i) => i !== index))
-    setOpenIndex(null)
-  }
 
-  return (
-    <div className="flex flex-col gap-stack-sm">
-      <span className="font-sans text-caption font-medium text-text-primary">
-        {t('admin.blocks.field.children')}
-      </span>
-      {error !== undefined ? (
-        <span role="alert" className="font-sans text-caption text-danger">
-          {error}
-        </span>
-      ) : null}
-      <div className="flex flex-wrap gap-inline-sm">
-        {GROUP_CHILD_CATALOG.map((entry) => (
-          <Button
-            key={entry.type}
-            type="button"
-            variant="ghost"
-            size="sm"
-            disabled={disabled || atCapacity}
-            onClick={() => {
-              add(entry.type)
+    case 'gallery': {
+      const data = block.data
+      return (
+        <Stack gap="sm">
+          <EnumSelect
+            id={`${idPrefix}-layout`}
+            label={t('admin.blocks.field.layout')}
+            value={data.layout}
+            options={GALLERY_LAYOUTS}
+            labelKeys={LAYOUT_LABEL_KEY}
+            disabled={disabled}
+            onChange={(layout) => {
+              onChange({ ...data, layout })
             }}
-          >
-            {t('admin.blocks.add', { type: t(entry.labelKey) })}
-          </Button>
-        ))}
-      </div>
-      {items.map((item, index) => (
-        <div
-          key={item.id}
-          className="flex flex-col gap-stack-xs rounded-md border border-border p-inline-sm"
-        >
+          />
+          <GalleryItemsField
+            idPrefix={idPrefix}
+            items={data.items}
+            disabled={disabled}
+            error={
+              errorCode === 'items-required' ? t('admin.blocks.error.itemsRequired') : undefined
+            }
+            onChange={(items) => {
+              onChange({ ...data, items })
+            }}
+          />
+        </Stack>
+      )
+    }
+
+    case 'chart': {
+      const data = block.data
+      return (
+        <Stack gap="sm">
+          <EnumSelect
+            id={`${idPrefix}-chart-type`}
+            label={t('admin.blocks.field.chartType')}
+            value={data.chartType}
+            options={CHART_TYPES}
+            labelKeys={CHART_TYPE_LABEL_KEY}
+            disabled={disabled}
+            onChange={(chartType) => {
+              onChange({ ...data, chartType })
+            }}
+          />
+          <Input
+            id={`${idPrefix}-chart-title`}
+            label={t('admin.blocks.field.title')}
+            value={data.title ?? ''}
+            disabled={disabled}
+            autoComplete="off"
+            onChange={(event) => {
+              onChange({ ...data, title: event.target.value })
+            }}
+          />
+          <SeriesField
+            idPrefix={idPrefix}
+            series={data.series}
+            disabled={disabled}
+            error={
+              errorCode === 'series-required' ? t('admin.blocks.error.seriesRequired') : undefined
+            }
+            onChange={(series) => {
+              onChange({ ...data, series })
+            }}
+          />
+          <Input
+            id={`${idPrefix}-chart-summary`}
+            label={t('admin.blocks.field.summary')}
+            value={data.summary}
+            disabled={disabled}
+            autoComplete="off"
+            error={
+              errorCode === 'summary-required' ? t('admin.blocks.error.summaryRequired') : undefined
+            }
+            onChange={(event) => {
+              onChange({ ...data, summary: event.target.value })
+            }}
+          />
+        </Stack>
+      )
+    }
+
+    case 'group': {
+      const data = block.data
+      return (
+        <Stack gap="sm">
+          <EnumSelect
+            id={`${idPrefix}-group-tone`}
+            label={t('admin.blocks.field.tone')}
+            value={data.tone}
+            options={GROUP_TONES}
+            labelKeys={GROUP_TONE_LABEL_KEY}
+            disabled={disabled}
+            onChange={(tone) => {
+              onChange({ ...data, tone })
+            }}
+          />
+          <GroupChildrenField
+            idPrefix={idPrefix}
+            items={data.children}
+            disabled={disabled}
+            maxItems={MAX_GROUP_CHILDREN}
+            error={
+              errorCode === 'children-required'
+                ? t('admin.blocks.error.childrenRequired')
+                : errorCode === 'children-invalid'
+                  ? t('admin.blocks.error.childrenInvalid')
+                  : undefined
+            }
+            onChange={(children) => {
+              onChange({ ...data, children })
+            }}
+          />
+        </Stack>
+      )
+    }
+
+    case 'columns': {
+      const data = block.data
+      const setColumns = (columns: ColumnsBlockData['columns']) => {
+        onChange({ ...data, columns })
+      }
+      return (
+        <Stack gap="sm">
           <div className="flex items-center gap-inline-sm">
             <span className="flex-1 font-sans text-caption font-medium text-text-primary">
-              {t(blockCatalogEntry(item.type).labelKey)}
+              {t('admin.blocks.columns.count', { count: String(data.columns.length) })}
             </span>
             <Button
               type="button"
               variant="ghost"
               size="sm"
-              disabled={disabled || index === 0}
-              title={t('admin.blocks.moveUp')}
+              disabled={disabled || data.columns.length <= 2}
               onClick={() => {
-                move(index, -1)
+                setColumns(data.columns.slice(0, -1))
               }}
             >
-              <IconChevronUp size={15} />
+              {t('admin.blocks.columns.remove')}
             </Button>
             <Button
               type="button"
               variant="ghost"
               size="sm"
-              disabled={disabled || index === items.length - 1}
-              title={t('admin.blocks.moveDown')}
+              disabled={disabled || data.columns.length >= 4}
               onClick={() => {
-                move(index, 1)
+                setColumns([...data.columns, { children: [] }])
               }}
             >
-              <IconChevronDown size={15} />
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              disabled={disabled}
-              onClick={() => {
-                setOpenIndex(openIndex === index ? null : index)
-              }}
-            >
-              {openIndex === index ? t('admin.blocks.childCollapse') : t('admin.blocks.childEdit')}
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              disabled={disabled}
-              title={t('common.actions.remove')}
-              onClick={() => {
-                remove(index)
-              }}
-            >
-              <IconX size={15} />
+              {t('admin.blocks.columns.add')}
             </Button>
           </div>
-          {openIndex === index ? (
-            <BlockInspector
-              block={item}
-              errorCode={validateBlock(item)}
-              disabled={disabled}
-              idPrefix={`${idPrefix}-c${String(index)}`}
-              onChange={(data) => {
-                update(index, data)
-              }}
-            />
+          {errorCode === 'children-required' || errorCode === 'children-invalid' ? (
+            <FieldError>
+              {errorCode === 'children-required'
+                ? t('admin.blocks.error.childrenRequired')
+                : t('admin.blocks.error.childrenInvalid')}
+            </FieldError>
           ) : null}
-        </div>
-      ))}
-    </div>
-  )
+          {data.columns.map((column, columnIndex) => (
+            <div
+              key={columnIndex}
+              className="flex flex-col gap-stack-xs rounded-md border border-border p-inline-sm"
+            >
+              <span className="font-sans text-caption font-medium text-text-muted">
+                {t('admin.blocks.columns.label', { n: String(columnIndex + 1) })}
+              </span>
+              <GroupChildrenField
+                idPrefix={`${idPrefix}-col${String(columnIndex)}`}
+                items={column.children}
+                disabled={disabled}
+                maxItems={MAX_COLUMN_CHILDREN}
+                onChange={(children) => {
+                  setColumns(data.columns.map((col, i) => (i === columnIndex ? { children } : col)))
+                }}
+              />
+            </div>
+          ))}
+        </Stack>
+      )
+    }
+
+    case 'spacer': {
+      const data = block.data
+      return (
+        <EnumSelect
+          id={`${idPrefix}-spacer-size`}
+          label={t('admin.blocks.field.spacerSize')}
+          value={data.size}
+          options={SPACER_SIZES}
+          labelKeys={SPACER_SIZE_LABEL_KEY}
+          disabled={disabled}
+          onChange={(size) => {
+            onChange({ size })
+          }}
+        />
+      )
+    }
+
+    case 'divider':
+      return (
+        <span className="font-sans text-caption text-text-muted">
+          {t('admin.blocks.divider.hint')}
+        </span>
+      )
+
+    case 'hero': {
+      const data = block.data
+      return (
+        <Stack gap="sm">
+          <EnumSelect
+            id={`${idPrefix}-variant`}
+            label={t('admin.blocks.field.variant')}
+            value={data.variant}
+            options={HERO_VARIANTS}
+            labelKeys={VARIANT_LABEL_KEY}
+            disabled={disabled}
+            onChange={(variant) => {
+              onChange({ ...data, variant })
+            }}
+          />
+          <Input
+            id={`${idPrefix}-kicker`}
+            label={t('admin.blocks.field.kicker')}
+            value={data.kicker ?? ''}
+            disabled={disabled}
+            autoComplete="off"
+            onChange={(event) => {
+              onChange({ ...data, kicker: event.target.value })
+            }}
+          />
+          <Input
+            id={`${idPrefix}-heading`}
+            label={t('admin.blocks.field.heading')}
+            value={data.heading}
+            disabled={disabled}
+            autoComplete="off"
+            error={
+              errorCode === 'heading-required' ? t('admin.blocks.error.headingRequired') : undefined
+            }
+            onChange={(event) => {
+              onChange({ ...data, heading: event.target.value })
+            }}
+          />
+          <Input
+            id={`${idPrefix}-lead`}
+            label={t('admin.blocks.field.lead')}
+            value={data.lead ?? ''}
+            disabled={disabled}
+            autoComplete="off"
+            onChange={(event) => {
+              onChange({ ...data, lead: event.target.value })
+            }}
+          />
+          <Input
+            id={`${idPrefix}-cta-label`}
+            label={t('admin.blocks.field.ctaLabel')}
+            value={data.ctaLabel ?? ''}
+            disabled={disabled}
+            autoComplete="off"
+            onChange={(event) => {
+              onChange({ ...data, ctaLabel: event.target.value })
+            }}
+          />
+          <Input
+            id={`${idPrefix}-cta-url`}
+            label={t('admin.blocks.field.ctaUrl')}
+            value={data.ctaUrl ?? ''}
+            disabled={disabled}
+            autoComplete="off"
+            onChange={(event) => {
+              onChange({ ...data, ctaUrl: event.target.value })
+            }}
+          />
+          <Input
+            id={`${idPrefix}-ghost-label`}
+            label={t('admin.blocks.field.ghostLabel')}
+            value={data.ghostLabel ?? ''}
+            disabled={disabled}
+            autoComplete="off"
+            onChange={(event) => {
+              onChange({ ...data, ghostLabel: event.target.value })
+            }}
+          />
+          <Input
+            id={`${idPrefix}-ghost-url`}
+            label={t('admin.blocks.field.ghostUrl')}
+            value={data.ghostUrl ?? ''}
+            disabled={disabled}
+            autoComplete="off"
+            onChange={(event) => {
+              onChange({ ...data, ghostUrl: event.target.value })
+            }}
+          />
+          <HeroMediaField
+            idPrefix={idPrefix}
+            media={data.media}
+            disabled={disabled}
+            onChange={(media) => {
+              if (media === undefined) {
+                const next = { ...data }
+                delete next.media
+                onChange(next)
+                return
+              }
+              onChange({ ...data, media })
+            }}
+          />
+        </Stack>
+      )
+    }
+  }
 }

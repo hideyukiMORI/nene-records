@@ -37,7 +37,7 @@ import {
   useCreateBlocksField,
   useUpdateBlocksField,
   type BlocksField,
-} from '@/entities/block'
+} from '@/entities/blocks-field'
 
 const EDITABLE_DATA_TYPES: FieldDataType[] = FIELD_DATA_TYPES.filter(
   (dataType) => dataType !== 'relation',
@@ -85,6 +85,23 @@ function datetimeLocalToIso(local: string): string {
   }
 
   return date.toISOString()
+}
+
+/**
+ * Create-or-update a single field row: run `update` with the existing row's id
+ * when one exists, otherwise `create`. Collapses the per-type create/update
+ * branch that each field type repeated in {@link saveTextFields}.
+ */
+async function upsert<Id>(
+  existing: { id: Id } | undefined,
+  update: (id: Id) => Promise<unknown>,
+  create: () => Promise<unknown>,
+): Promise<void> {
+  if (existing !== undefined) {
+    await update(existing.id)
+  } else {
+    await create()
+  }
 }
 
 export function useEditEntityTextFieldsPage(entityTypeId: number, entityId: number) {
@@ -230,73 +247,77 @@ export function useEditEntityTextFieldsPage(entityTypeId: number, entityId: numb
           case 'bundle':
           case 'image': {
             const existing = textFieldsForLocale.find((item) => item.fieldKey === fieldDef.fieldKey)
-
-            if (existing !== undefined) {
-              await updateTextMutation.mutateAsync({
-                id: existing.id,
-                input: { fieldKey: fieldDef.fieldKey, value: rawValue, locale: selectedLocale },
-              })
-            } else {
-              await createTextMutation.mutateAsync({
-                entityId,
-                fieldKey: fieldDef.fieldKey,
-                value: rawValue,
-                locale: selectedLocale,
-              })
-            }
+            await upsert(
+              existing,
+              (id) =>
+                updateTextMutation.mutateAsync({
+                  id,
+                  input: { fieldKey: fieldDef.fieldKey, value: rawValue, locale: selectedLocale },
+                }),
+              () =>
+                createTextMutation.mutateAsync({
+                  entityId,
+                  fieldKey: fieldDef.fieldKey,
+                  value: rawValue,
+                  locale: selectedLocale,
+                }),
+            )
             break
           }
           case 'int': {
             const intValue = parseIntFieldValue(rawValue)
             const existing = intFieldsForEntity.find((item) => item.fieldKey === fieldDef.fieldKey)
-
-            if (existing !== undefined) {
-              await updateIntMutation.mutateAsync({
-                id: existing.id,
-                input: { fieldKey: fieldDef.fieldKey, value: intValue },
-              })
-            } else {
-              await createIntMutation.mutateAsync({
-                entityId,
-                fieldKey: fieldDef.fieldKey,
-                value: intValue,
-              })
-            }
+            await upsert(
+              existing,
+              (id) =>
+                updateIntMutation.mutateAsync({
+                  id,
+                  input: { fieldKey: fieldDef.fieldKey, value: intValue },
+                }),
+              () =>
+                createIntMutation.mutateAsync({
+                  entityId,
+                  fieldKey: fieldDef.fieldKey,
+                  value: intValue,
+                }),
+            )
             break
           }
           case 'enum': {
             const existing = enumFieldsForEntity.find((item) => item.fieldKey === fieldDef.fieldKey)
-
-            if (existing !== undefined) {
-              await updateEnumMutation.mutateAsync({
-                id: existing.id,
-                input: { fieldKey: fieldDef.fieldKey, value: rawValue },
-              })
-            } else {
-              await createEnumMutation.mutateAsync({
-                entityId,
-                fieldKey: fieldDef.fieldKey,
-                value: rawValue,
-              })
-            }
+            await upsert(
+              existing,
+              (id) =>
+                updateEnumMutation.mutateAsync({
+                  id,
+                  input: { fieldKey: fieldDef.fieldKey, value: rawValue },
+                }),
+              () =>
+                createEnumMutation.mutateAsync({
+                  entityId,
+                  fieldKey: fieldDef.fieldKey,
+                  value: rawValue,
+                }),
+            )
             break
           }
           case 'bool': {
             const boolValue = parseBoolFieldValue(rawValue)
             const existing = boolFieldsForEntity.find((item) => item.fieldKey === fieldDef.fieldKey)
-
-            if (existing !== undefined) {
-              await updateBoolMutation.mutateAsync({
-                id: existing.id,
-                input: { fieldKey: fieldDef.fieldKey, value: boolValue },
-              })
-            } else {
-              await createBoolMutation.mutateAsync({
-                entityId,
-                fieldKey: fieldDef.fieldKey,
-                value: boolValue,
-              })
-            }
+            await upsert(
+              existing,
+              (id) =>
+                updateBoolMutation.mutateAsync({
+                  id,
+                  input: { fieldKey: fieldDef.fieldKey, value: boolValue },
+                }),
+              () =>
+                createBoolMutation.mutateAsync({
+                  entityId,
+                  fieldKey: fieldDef.fieldKey,
+                  value: boolValue,
+                }),
+            )
             break
           }
           case 'datetime': {
@@ -304,19 +325,20 @@ export function useEditEntityTextFieldsPage(entityTypeId: number, entityId: numb
             const existing = dateTimeFieldsForEntity.find(
               (item) => item.fieldKey === fieldDef.fieldKey,
             )
-
-            if (existing !== undefined) {
-              await updateDateTimeMutation.mutateAsync({
-                id: existing.id,
-                input: { fieldKey: fieldDef.fieldKey, value: isoValue },
-              })
-            } else {
-              await createDateTimeMutation.mutateAsync({
-                entityId,
-                fieldKey: fieldDef.fieldKey,
-                value: isoValue,
-              })
-            }
+            await upsert(
+              existing,
+              (id) =>
+                updateDateTimeMutation.mutateAsync({
+                  id,
+                  input: { fieldKey: fieldDef.fieldKey, value: isoValue },
+                }),
+              () =>
+                createDateTimeMutation.mutateAsync({
+                  entityId,
+                  fieldKey: fieldDef.fieldKey,
+                  value: isoValue,
+                }),
+            )
             break
           }
           case 'blocks': {
@@ -325,20 +347,24 @@ export function useEditEntityTextFieldsPage(entityTypeId: number, entityId: numb
             const existing = blocksFieldsForLocale.find(
               (item) => item.fieldKey === fieldDef.fieldKey,
             )
-
-            if (existing !== undefined) {
-              await updateBlocksMutation.mutateAsync({
-                id: existing.id,
-                input: { fieldKey: fieldDef.fieldKey, value: normalized, locale: selectedLocale },
-              })
-            } else if (normalized !== '[]') {
-              await createBlocksMutation.mutateAsync({
-                entityId,
-                fieldKey: fieldDef.fieldKey,
-                value: normalized,
-                locale: selectedLocale,
-              })
-            }
+            await upsert(
+              existing,
+              (id) =>
+                updateBlocksMutation.mutateAsync({
+                  id,
+                  input: { fieldKey: fieldDef.fieldKey, value: normalized, locale: selectedLocale },
+                }),
+              // a brand-new blocks field with an empty document needs no row yet
+              () =>
+                normalized === '[]'
+                  ? Promise.resolve()
+                  : createBlocksMutation.mutateAsync({
+                      entityId,
+                      fieldKey: fieldDef.fieldKey,
+                      value: normalized,
+                      locale: selectedLocale,
+                    }),
+            )
             break
           }
         }
@@ -369,34 +395,40 @@ export function useEditEntityTextFieldsPage(entityTypeId: number, entityId: numb
     ],
   )
 
-  const isLoading =
-    entityQuery.isLoading ||
-    fieldDefQuery.isLoading ||
-    textFieldQuery.isLoading ||
-    intFieldQuery.isLoading ||
-    enumFieldQuery.isLoading ||
-    boolFieldQuery.isLoading ||
-    dateTimeFieldQuery.isLoading ||
-    blocksFieldQuery.isLoading
-  const isError =
-    entityQuery.isError ||
-    fieldDefQuery.isError ||
-    textFieldQuery.isError ||
-    intFieldQuery.isError ||
-    enumFieldQuery.isError ||
-    boolFieldQuery.isError ||
-    dateTimeFieldQuery.isError ||
-    blocksFieldQuery.isError
-  const errorTitle =
-    entityQuery.error?.title ??
-    fieldDefQuery.error?.title ??
-    textFieldQuery.error?.title ??
-    intFieldQuery.error?.title ??
-    enumFieldQuery.error?.title ??
-    boolFieldQuery.error?.title ??
-    dateTimeFieldQuery.error?.title ??
-    blocksFieldQuery.error?.title ??
-    null
+  // All loaded queries / fired mutations, aggregated uniformly instead of by a
+  // long ||/?? chain that had to be extended for every new field type.
+  const queries = [
+    entityQuery,
+    fieldDefQuery,
+    textFieldQuery,
+    intFieldQuery,
+    enumFieldQuery,
+    boolFieldQuery,
+    dateTimeFieldQuery,
+    blocksFieldQuery,
+  ]
+  const mutations = [
+    createTextMutation,
+    updateTextMutation,
+    createIntMutation,
+    updateIntMutation,
+    createEnumMutation,
+    updateEnumMutation,
+    createBoolMutation,
+    updateBoolMutation,
+    createDateTimeMutation,
+    updateDateTimeMutation,
+    createBlocksMutation,
+    updateBlocksMutation,
+  ]
+  const firstTitle = (errors: readonly ({ title: string } | null)[]): string | null =>
+    errors.find((error) => error !== null)?.title ?? null
+
+  const isLoading = queries.some((query) => query.isLoading)
+  const isError = queries.some((query) => query.isError)
+  const errorTitle = firstTitle(queries.map((query) => query.error))
+  const isSaving = mutations.some((mutation) => mutation.isPending)
+  const saveErrorTitle = firstTitle(mutations.map((mutation) => mutation.error))
 
   return {
     entity: entityQuery.data ?? null,
@@ -409,44 +441,10 @@ export function useEditEntityTextFieldsPage(entityTypeId: number, entityId: numb
     isError,
     errorTitle,
     refetch: async () => {
-      await Promise.all([
-        entityQuery.refetch(),
-        fieldDefQuery.refetch(),
-        textFieldQuery.refetch(),
-        intFieldQuery.refetch(),
-        enumFieldQuery.refetch(),
-        boolFieldQuery.refetch(),
-        dateTimeFieldQuery.refetch(),
-        blocksFieldQuery.refetch(),
-      ])
+      await Promise.all(queries.map((query) => query.refetch()))
     },
     saveTextFields,
-    isSaving:
-      createTextMutation.isPending ||
-      updateTextMutation.isPending ||
-      createIntMutation.isPending ||
-      updateIntMutation.isPending ||
-      createEnumMutation.isPending ||
-      updateEnumMutation.isPending ||
-      createBoolMutation.isPending ||
-      updateBoolMutation.isPending ||
-      createDateTimeMutation.isPending ||
-      updateDateTimeMutation.isPending ||
-      createBlocksMutation.isPending ||
-      updateBlocksMutation.isPending,
-    saveErrorTitle:
-      createTextMutation.error?.title ??
-      updateTextMutation.error?.title ??
-      createIntMutation.error?.title ??
-      updateIntMutation.error?.title ??
-      createEnumMutation.error?.title ??
-      updateEnumMutation.error?.title ??
-      createBoolMutation.error?.title ??
-      updateBoolMutation.error?.title ??
-      createDateTimeMutation.error?.title ??
-      updateDateTimeMutation.error?.title ??
-      createBlocksMutation.error?.title ??
-      updateBlocksMutation.error?.title ??
-      null,
+    isSaving,
+    saveErrorTitle,
   }
 }

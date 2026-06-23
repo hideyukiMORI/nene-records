@@ -20,17 +20,10 @@ import {
   serializeBlocksDocument,
   validateBlock,
   type Block,
+  type BlockData,
   type BlockType,
-  type CalloutBlockData,
-  type ChartBlockData,
-  type ColumnsBlockData,
-  type DividerBlockData,
-  type GalleryBlockData,
-  type GroupBlockData,
-  type HeroBlockData,
-  type SpacerBlockData,
-  type TextBlockData,
 } from '@/shared/lib/blocks-document'
+import { moveItem, reorderItem } from '@/shared/lib/move-item'
 import { BLOCK_CATALOG, blockCatalogEntry } from './block-catalog'
 import {
   clearBlockDragPayload,
@@ -39,6 +32,7 @@ import {
   setBlockDragPayload,
 } from './block-dnd'
 import { BlockInspector } from './BlockInspector'
+import { RepeaterIconButton } from './inspectors/RepeaterIconButton'
 
 export interface BlocksFieldEditorProps {
   id: string
@@ -153,74 +147,28 @@ export function BlocksFieldEditor({
   }
 
   const moveBlock = (index: number, direction: -1 | 1) => {
-    const target = index + direction
-    if (target < 0 || target >= blocks.length) {
-      return
+    const next = moveItem(blocks, index, direction)
+    if (next !== null) {
+      emit(next)
     }
-    const next = blocks.slice()
-    const [moved] = next.splice(index, 1)
-    if (moved === undefined) {
-      return
-    }
-    next.splice(target, 0, moved)
-    emit(next)
   }
 
   const reorder = (fromId: string, toIndex: number) => {
-    const fromIndex = blocks.findIndex((block) => block.id === fromId)
-    if (fromIndex === -1) {
-      return
+    const next = reorderItem(
+      blocks,
+      blocks.findIndex((block) => block.id === fromId),
+      toIndex,
+    )
+    if (next !== null) {
+      emit(next)
     }
-    const next = blocks.slice()
-    const [moved] = next.splice(fromIndex, 1)
-    if (moved === undefined) {
-      return
-    }
-    const adjusted = toIndex > fromIndex ? toIndex - 1 : toIndex
-    next.splice(adjusted, 0, moved)
-    emit(next)
   }
 
-  const updateData = (
-    blockId: string,
-    data:
-      | TextBlockData
-      | CalloutBlockData
-      | HeroBlockData
-      | GalleryBlockData
-      | ChartBlockData
-      | GroupBlockData
-      | ColumnsBlockData
-      | SpacerBlockData
-      | DividerBlockData,
-  ) => {
-    emit(
-      blocks.map((block): Block => {
-        if (block.id !== blockId) {
-          return block
-        }
-        switch (block.type) {
-          case 'text':
-            return { ...block, data: data as TextBlockData }
-          case 'callout':
-            return { ...block, data: data as CalloutBlockData }
-          case 'hero':
-            return { ...block, data: data as HeroBlockData }
-          case 'gallery':
-            return { ...block, data: data as GalleryBlockData }
-          case 'chart':
-            return { ...block, data: data as ChartBlockData }
-          case 'group':
-            return { ...block, data: data as GroupBlockData }
-          case 'columns':
-            return { ...block, data: data as ColumnsBlockData }
-          case 'spacer':
-            return { ...block, data: data as SpacerBlockData }
-          case 'divider':
-            return { ...block, data: data as DividerBlockData }
-        }
-      }),
-    )
+  const updateData = (blockId: string, data: BlockData) => {
+    // `data` is the inspector's matching variant for this block; narrowing the
+    // pair per type would just re-cast, so apply it directly (the inspector only
+    // emits the data shape for the block it was given).
+    emit(blocks.map((block) => (block.id === blockId ? ({ ...block, data } as Block) : block)))
   }
 
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
@@ -238,9 +186,7 @@ export function BlocksFieldEditor({
     }
     event.preventDefault()
     const index = computeBlockDropIndex(boardRef.current, event.clientY)
-    if (payload.kind === 'move') {
-      reorder(payload.id, index)
-    }
+    reorder(payload.id, index)
     clearBlockDragPayload()
     setDropIndex(null)
   }
@@ -339,9 +285,7 @@ export function BlocksFieldEditor({
                       </span>
                     ) : null}
                     <span className="flex items-center gap-inline-xs">
-                      <button
-                        type="button"
-                        className="rounded p-1 text-text-muted hover:text-text-primary disabled:opacity-40"
+                      <RepeaterIconButton
                         title={t('admin.blocks.moveUp')}
                         disabled={disabled || index === 0}
                         onClick={() => {
@@ -349,10 +293,8 @@ export function BlocksFieldEditor({
                         }}
                       >
                         <IconChevronUp size={15} />
-                      </button>
-                      <button
-                        type="button"
-                        className="rounded p-1 text-text-muted hover:text-text-primary disabled:opacity-40"
+                      </RepeaterIconButton>
+                      <RepeaterIconButton
                         title={t('admin.blocks.moveDown')}
                         disabled={disabled || index === blocks.length - 1}
                         onClick={() => {
@@ -360,10 +302,9 @@ export function BlocksFieldEditor({
                         }}
                       >
                         <IconChevronDown size={15} />
-                      </button>
-                      <button
-                        type="button"
-                        className="rounded p-1 text-text-muted hover:text-danger disabled:opacity-40"
+                      </RepeaterIconButton>
+                      <RepeaterIconButton
+                        danger
                         title={t('common.actions.delete')}
                         disabled={disabled}
                         onClick={() => {
@@ -371,7 +312,7 @@ export function BlocksFieldEditor({
                         }}
                       >
                         <IconX size={15} />
-                      </button>
+                      </RepeaterIconButton>
                     </span>
                   </div>
                 </Card>

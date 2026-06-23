@@ -145,10 +145,16 @@ export function EditEntityTextFieldsView({
         )}
       </Stack>
 
+      {/*
+        Stable key per entity + locale: switching locale remounts the form (discarding
+        that locale's unsaved draft, as before). Within a locale, React Hook Form's
+        `values` + `keepDirtyValues` syncs server data without remounting, so a background
+        refetch no longer wipes in-progress edits (the old JSON.stringify key did).
+      */}
       <EntityTextFieldsForm
-        key={`${selectedLocale ?? 'default'}-${JSON.stringify(initialValues)}`}
+        key={`${String(entity.id)}-${selectedLocale ?? 'default'}`}
         fieldDefs={textFieldDefs}
-        defaultValues={initialValues}
+        values={initialValues}
         isSubmitting={isSaving}
         serverErrorTitle={saveErrorTitle}
         onSubmit={handleSave}

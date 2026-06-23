@@ -8,7 +8,7 @@ import { AppShell } from '@/pages/layout/AppShell'
 import { LoginPage } from '@/pages/login/LoginPage'
 import { NotFoundPage } from '@/pages/not-found/NotFoundPage'
 import { SuperadminShell } from '@/pages/superadmin/SuperadminShell'
-import { RequireAuth } from '@/shared/auth/RequireAuth'
+import { RequireAuth } from '@/app/RequireAuth'
 
 // Lazy: per-route code splitting for the content pages (named exports → default).
 const named = <T,>(loader: () => Promise<Record<string, T>>, name: string) =>

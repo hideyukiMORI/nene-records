@@ -1,8 +1,6 @@
 import { useTranslation } from '@/shared/i18n'
+import { Textarea } from '@/shared/ui'
 import { parseBundleDocument, serializeBundleDocument } from '@/shared/lib/bundle-document'
-
-const TEXTAREA_CLASS =
-  'rounded-sm border border-border bg-surface-raised px-inline-sm py-stack-xs text-caption text-text-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent'
 
 export interface BundleFieldEditorProps {
   id: string
@@ -45,29 +43,30 @@ export function BundleFieldEditor({
       >
         {t('admin.bundle.htmlLabel')}
       </label>
-      <textarea
+      <Textarea
         id={`${id}-html`}
         rows={16}
+        size="sm"
+        mono
         disabled={disabled}
         value={doc.html}
         onChange={(event) => {
           patch({ html: event.target.value })
         }}
-        className={`${TEXTAREA_CLASS} font-mono`}
       />
 
       <label htmlFor={`${id}-seo`} className="font-sans text-caption font-medium text-text-primary">
         {t('admin.bundle.seoLabel')}
       </label>
-      <textarea
+      <Textarea
         id={`${id}-seo`}
         rows={6}
+        size="sm"
         disabled={disabled}
         value={doc.seoText}
         onChange={(event) => {
           patch({ seoText: event.target.value })
         }}
-        className={`${TEXTAREA_CLASS} font-sans`}
       />
       <span className="font-sans text-caption text-text-muted">{t('admin.bundle.seoHint')}</span>
     </div>

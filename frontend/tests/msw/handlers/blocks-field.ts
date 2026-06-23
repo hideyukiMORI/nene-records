@@ -12,6 +12,21 @@ interface BlocksFieldRecord {
 let nextId = 1
 let items: BlocksFieldRecord[] = []
 
+export function resetBlocksFieldStore(): void {
+  nextId = 1
+  items = []
+}
+
+export function seedBlocksFields(seed: Omit<BlocksFieldRecord, 'is_deleted'>[]): void {
+  items = seed.map((item) => ({ ...item, is_deleted: false }))
+  nextId = Math.max(0, ...seed.map((item) => item.id)) + 1
+}
+
+/** Test peek into the blocks-field records (assert create vs update outcomes). */
+export function blocksFieldStoreSnapshot(): readonly BlocksFieldRecord[] {
+  return [...items]
+}
+
 export const blocksFieldHandlers = [
   http.get('/api/v1/blocks-fields', ({ request }) => {
     const url = new URL(request.url)

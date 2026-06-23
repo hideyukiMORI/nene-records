@@ -13,6 +13,8 @@ export interface TextareaProps {
   rows?: number
   /** Render the value in the mono face (Markdown / code bodies). */
   mono?: boolean
+  /** `md` (default) is the standard form field; `sm` is denser (compact admin editors). */
+  size?: 'sm' | 'md'
   className?: string
   'aria-label'?: string
 }
@@ -34,12 +36,17 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function 
     placeholder,
     rows = 4,
     mono = false,
+    size = 'md',
     className,
     'aria-label': ariaLabel,
   },
   ref,
 ) {
   const errorId = error !== undefined ? `${id}-error` : undefined
+  const padding = size === 'sm' ? 'px-inline-sm py-stack-xs' : 'px-inline-md py-stack-sm'
+  // `md` keeps the original sizing (mono → caption, sans → body); `sm` is always caption.
+  const fontFamily = mono ? 'font-mono' : 'font-sans'
+  const fontSize = !mono && size === 'md' ? 'text-body' : 'text-caption'
 
   const textarea = (
     <textarea
@@ -56,8 +63,8 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function 
       aria-invalid={error !== undefined}
       aria-describedby={errorId}
       className={[
-        'rounded-sm border border-border bg-surface-raised px-inline-md py-stack-sm text-text-primary shadow-sm',
-        mono ? 'font-mono text-caption' : 'font-sans text-body',
+        `rounded-sm border border-border bg-surface-raised ${padding} text-text-primary shadow-sm`,
+        `${fontFamily} ${fontSize}`,
         'focus-visible:outline-none focus-visible:shadow-focus disabled:cursor-not-allowed disabled:opacity-50',
         error !== undefined ? 'border-danger' : '',
         className,

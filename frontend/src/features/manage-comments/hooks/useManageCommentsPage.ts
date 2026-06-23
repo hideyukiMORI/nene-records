@@ -32,6 +32,9 @@ export function useManageCommentsPage(): ManageCommentsPageState {
       onSuccess: () => {
         showToast(t('admin.comments.approveSuccess'), 'success')
       },
+      onError: () => {
+        showToast(t('admin.comments.approveError'), 'error')
+      },
     })
   }
 
@@ -42,6 +45,9 @@ export function useManageCommentsPage(): ManageCommentsPageState {
     deleteComment.mutate(id, {
       onSuccess: () => {
         showToast(t('admin.comments.deleteSuccess'), 'success')
+      },
+      onError: () => {
+        showToast(t('admin.comments.deleteError'), 'error')
       },
     })
   }

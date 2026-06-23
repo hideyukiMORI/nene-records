@@ -33,4 +33,26 @@ describe('SanitizedHtml', () => {
     const { container } = render(<SanitizedHtml html="   " />)
     expect(container).toBeEmptyDOMElement()
   })
+
+  it('strips javascript: URLs from links', () => {
+    const { container } = render(<SanitizedHtml html={'<a href="javascript:alert(1)">x</a>'} />)
+    expect(container.innerHTML.toLowerCase()).not.toContain('javascript:')
+  })
+
+  it('forbids global <style> blocks while keeping the rest', () => {
+    const { container } = render(
+      <SanitizedHtml html={'<style>body{color:red}</style><p>kept</p>'} />,
+    )
+    expect(container.querySelector('style')).toBeNull()
+    expect(container.querySelector('p')?.textContent).toBe('kept')
+  })
+
+  it('strips new-tab target from author links (no reverse-tabnabbing surface)', () => {
+    const { container } = render(
+      <SanitizedHtml html={'<a href="https://example.com" target="_blank">x</a>'} />,
+    )
+    const a = container.querySelector('a')
+    expect(a?.getAttribute('href')).toBe('https://example.com')
+    expect(a?.getAttribute('target')).toBeNull()
+  })
 })
