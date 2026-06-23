@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { usePublicLatestEntities } from '@/entities/entity'
 import { useEntityTypeList } from '@/entities/entity-type'
+import { formatPublishedDate } from '@/shared/lib/format-published-date'
 import { resolvePermalink } from '@/shared/lib/resolve-permalink'
 
 /** A single article in the "Latest records" feed. */
@@ -44,17 +45,6 @@ function humanizeSlug(slug: string | null): string {
     .filter((part) => part !== '')
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(' ')
-}
-
-function formatPublishedDate(iso: string | null): string {
-  if (iso === null || iso === '') {
-    return ''
-  }
-  const date = new Date(iso)
-  if (Number.isNaN(date.getTime())) {
-    return ''
-  }
-  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
 }
 
 /**

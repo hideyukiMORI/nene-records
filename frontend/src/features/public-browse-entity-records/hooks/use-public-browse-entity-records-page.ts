@@ -3,6 +3,7 @@ import { defaultEntityListParams, useEntityList } from '@/entities/entity'
 import { useEntityTypeList } from '@/entities/entity-type'
 import { defaultTextFieldListParamsForEntityType, useTextFieldList } from '@/entities/text-field'
 import { findEntityTypeBySlug } from '@/shared/lib/find-entity-type-by-slug'
+import { formatPublishedDate } from '@/shared/lib/format-published-date'
 import { getRecordDisplayLabel } from '@/shared/lib/get-record-display-label'
 import { resolvePermalink } from '@/shared/lib/resolve-permalink'
 import { PUBLIC_BROWSE_PAGE_SIZE } from '../lib/public-browse-pagination'
@@ -21,17 +22,6 @@ export interface PublicBrowseType {
   slug: string
   name: string
   href: string
-}
-
-function formatPublishedDate(iso: string | null): string {
-  if (iso === null || iso === '') {
-    return ''
-  }
-  const date = new Date(iso)
-  if (Number.isNaN(date.getTime())) {
-    return ''
-  }
-  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
 }
 
 export function usePublicBrowseEntityRecordsPage(entityTypeSlug: string, offset: number) {
