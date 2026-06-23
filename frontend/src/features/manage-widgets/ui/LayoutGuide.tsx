@@ -1,27 +1,20 @@
 import { useState, type ReactNode } from 'react'
 import { useTranslation } from '@/shared/i18n'
 import type { MessageKey } from '@/shared/i18n'
-import { Button, Stack, Text } from '@/shared/ui'
+import { Button, Modal, Stack, Text } from '@/shared/ui'
 import { RelationshipDiagram } from './RelationshipDiagram'
 
 function Overlay({ onClose, children }: { onClose: () => void; children: ReactNode }) {
   const { t } = useTranslation()
   return (
-    <div className="fixed inset-0 z-modal flex items-center justify-center p-inline-md">
-      <button
-        type="button"
-        aria-label={t('common.dialog.close')}
-        className="absolute inset-0 bg-surface-overlay/80"
-        onClick={onClose}
-      />
-      <div
-        role="dialog"
-        aria-modal="true"
-        className="relative w-full max-w-xl rounded-md border border-border bg-surface-raised p-inline-lg shadow-lg"
-      >
-        {children}
-      </div>
-    </div>
+    <Modal
+      onClose={onClose}
+      closeLabel={t('common.dialog.close')}
+      className="p-inline-md"
+      panelClassName="max-w-xl shadow-lg"
+    >
+      {children}
+    </Modal>
   )
 }
 

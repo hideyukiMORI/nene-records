@@ -32,6 +32,7 @@ import {
   setBlockDragPayload,
 } from './block-dnd'
 import { BlockInspector } from './BlockInspector'
+import { RepeaterIconButton } from './inspectors/RepeaterIconButton'
 
 export interface BlocksFieldEditorProps {
   id: string
@@ -286,9 +287,7 @@ export function BlocksFieldEditor({
                       </span>
                     ) : null}
                     <span className="flex items-center gap-inline-xs">
-                      <button
-                        type="button"
-                        className="rounded p-1 text-text-muted hover:text-text-primary disabled:opacity-40"
+                      <RepeaterIconButton
                         title={t('admin.blocks.moveUp')}
                         disabled={disabled || index === 0}
                         onClick={() => {
@@ -296,10 +295,8 @@ export function BlocksFieldEditor({
                         }}
                       >
                         <IconChevronUp size={15} />
-                      </button>
-                      <button
-                        type="button"
-                        className="rounded p-1 text-text-muted hover:text-text-primary disabled:opacity-40"
+                      </RepeaterIconButton>
+                      <RepeaterIconButton
                         title={t('admin.blocks.moveDown')}
                         disabled={disabled || index === blocks.length - 1}
                         onClick={() => {
@@ -307,10 +304,9 @@ export function BlocksFieldEditor({
                         }}
                       >
                         <IconChevronDown size={15} />
-                      </button>
-                      <button
-                        type="button"
-                        className="rounded p-1 text-text-muted hover:text-danger disabled:opacity-40"
+                      </RepeaterIconButton>
+                      <RepeaterIconButton
+                        danger
                         title={t('common.actions.delete')}
                         disabled={disabled}
                         onClick={() => {
@@ -318,7 +314,7 @@ export function BlocksFieldEditor({
                         }}
                       >
                         <IconX size={15} />
-                      </button>
+                      </RepeaterIconButton>
                     </span>
                   </div>
                 </Card>

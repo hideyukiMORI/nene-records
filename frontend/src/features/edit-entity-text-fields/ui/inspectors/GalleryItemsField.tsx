@@ -6,6 +6,8 @@ import { IconChevronDown, IconChevronUp, IconX } from '@/shared/ui/icons/Icons'
 import { type GalleryItem } from '@/shared/lib/blocks-document'
 import { moveItem } from '@/shared/lib/move-item'
 import { MediaSelectorModal } from '../MediaSelectorModal'
+import { FieldError } from './FieldError'
+import { RepeaterIconButton } from './RepeaterIconButton'
 
 interface GalleryItemsFieldProps {
   idPrefix: string
@@ -53,11 +55,7 @@ export function GalleryItemsField({
       <span className="font-sans text-caption font-medium text-text-primary">
         {t('admin.blocks.field.images')}
       </span>
-      {error !== undefined ? (
-        <span role="alert" className="font-sans text-caption text-danger">
-          {error}
-        </span>
-      ) : null}
+      {error !== undefined ? <FieldError>{error}</FieldError> : null}
       {items.map((item, index) => (
         <div
           key={`${item.mediaId}-${String(index)}`}
@@ -81,9 +79,7 @@ export function GalleryItemsField({
               {t('admin.blocks.media.change')}
             </Button>
             <span className="flex-1" />
-            <button
-              type="button"
-              className="rounded p-1 text-text-muted hover:text-text-primary disabled:opacity-40"
+            <RepeaterIconButton
               title={t('admin.blocks.moveUp')}
               disabled={disabled || index === 0}
               onClick={() => {
@@ -91,10 +87,8 @@ export function GalleryItemsField({
               }}
             >
               <IconChevronUp size={15} />
-            </button>
-            <button
-              type="button"
-              className="rounded p-1 text-text-muted hover:text-text-primary disabled:opacity-40"
+            </RepeaterIconButton>
+            <RepeaterIconButton
               title={t('admin.blocks.moveDown')}
               disabled={disabled || index === items.length - 1}
               onClick={() => {
@@ -102,10 +96,9 @@ export function GalleryItemsField({
               }}
             >
               <IconChevronDown size={15} />
-            </button>
-            <button
-              type="button"
-              className="rounded p-1 text-text-muted hover:text-danger disabled:opacity-40"
+            </RepeaterIconButton>
+            <RepeaterIconButton
+              danger
               title={t('common.actions.delete')}
               disabled={disabled}
               onClick={() => {
@@ -113,7 +106,7 @@ export function GalleryItemsField({
               }}
             >
               <IconX size={15} />
-            </button>
+            </RepeaterIconButton>
           </div>
           <Input
             id={`${idPrefix}-item-${String(index)}-alt`}
