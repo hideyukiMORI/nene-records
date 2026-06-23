@@ -47,6 +47,14 @@ const importZones = [
     target: './src/shared/ui',
     from: './src/entities',
   },
+  // shared/theme is pure token/design infra — it must never reach up into entities.
+  // (shared/api and shared/lib still hold a few load-bearing entity deps — the
+  // API client's auth store and the public-record domain helpers/bootstrap seed —
+  // whose relocation is tracked separately, so they are not zoned here yet.)
+  {
+    target: './src/shared/theme',
+    from: './src/entities',
+  },
   {
     target: './src/shared/ui',
     from: './src/features',
