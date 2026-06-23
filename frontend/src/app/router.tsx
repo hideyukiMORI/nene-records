@@ -33,7 +33,7 @@ import { OrganizationsPage } from '@/pages/superadmin/OrganizationsPage'
 import { OrganizationDetailPage } from '@/pages/superadmin/OrganizationDetailPage'
 import { SettingsPage } from '@/pages/superadmin/SettingsPage'
 import { DataMigrationPage } from '@/pages/superadmin/DataMigrationPage'
-import { RequireAuth } from '@/shared/auth/RequireAuth'
+import { RequireAuth } from '@/app/RequireAuth'
 
 function AdminShell() {
   return (
