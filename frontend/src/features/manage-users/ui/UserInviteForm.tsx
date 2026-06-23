@@ -67,7 +67,7 @@ export function UserInviteForm({
           <option value="admin">{t('admin.users.role.admin')}</option>
         </Select>
         {serverErrorTitle !== null ? (
-          <Text muted className="text-red-500">
+          <Text muted className="text-danger">
             {serverErrorTitle}
           </Text>
         ) : null}

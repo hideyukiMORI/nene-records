@@ -47,12 +47,12 @@ const TYPE_STYLES: Record<
 > = {
   success: {
     container: 'bg-surface-raised border border-border text-text-primary shadow-lg',
-    icon: 'text-green-500',
+    icon: 'text-success',
     iconNode: <IconCheck />,
   },
   error: {
-    container: 'bg-surface-raised border border-red-500/40 text-text-primary shadow-lg',
-    icon: 'text-red-400',
+    container: 'bg-surface-raised border border-danger/40 text-text-primary shadow-lg',
+    icon: 'text-danger',
     iconNode: <IconAlertCircle />,
   },
   info: {

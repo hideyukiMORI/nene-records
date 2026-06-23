@@ -116,7 +116,7 @@ export function ManageWebhooksView({
                     <span
                       className={`inline-block rounded px-1.5 py-0.5 font-sans text-caption font-medium ${
                         webhook.isActive
-                          ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                          ? 'bg-success/15 text-success'
                           : 'bg-surface text-text-muted'
                       }`}
                     >

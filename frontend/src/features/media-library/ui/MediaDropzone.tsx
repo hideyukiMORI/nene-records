@@ -78,7 +78,7 @@ export function MediaDropzone({ isUploading, uploadErrorTitle, onUpload }: Media
         onChange={handleFileChange}
       />
       {uploadErrorTitle !== null ? (
-        <Text muted className="mt-2 text-red-500">
+        <Text muted className="mt-2 text-danger">
           {uploadErrorTitle}
         </Text>
       ) : null}
