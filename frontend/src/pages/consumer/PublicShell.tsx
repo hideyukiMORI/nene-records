@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { Suspense, useEffect, useMemo } from 'react'
 import './consumer-theme.css'
 import './public-fonts'
 import { Outlet, ScrollRestoration } from 'react-router-dom'
@@ -153,7 +153,9 @@ export function PublicShell() {
   return (
     <>
       <ScrollRestoration />
-      <Outlet context={site} />
+      <Suspense fallback={null}>
+        <Outlet context={site} />
+      </Suspense>
     </>
   )
 }
