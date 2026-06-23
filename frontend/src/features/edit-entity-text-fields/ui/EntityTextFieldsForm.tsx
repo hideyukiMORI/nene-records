@@ -1,7 +1,7 @@
 import { Controller, useForm, type ControllerRenderProps } from 'react-hook-form'
 import type { FieldDataType, FieldDef } from '@/entities/field-def'
 import { useTranslation } from '@/shared/i18n'
-import { Button, Card, EmptyState, Input, Stack, Text } from '@/shared/ui'
+import { Button, Card, EmptyState, Input, Stack, Text, Textarea } from '@/shared/ui'
 import { BlocksFieldEditor } from './BlocksFieldEditor'
 import { BundleFieldEditor } from './BundleFieldEditor'
 import { FileFieldInput } from './FileFieldInput'
@@ -117,14 +117,15 @@ export function EntityTextFieldsForm({
             <label htmlFor={fieldId} className="font-sans text-body font-medium text-text-primary">
               {label}
             </label>
-            <textarea
+            <Textarea
               id={fieldId}
               rows={10}
+              size="sm"
+              mono
               disabled={isSubmitting}
               value={value}
               onChange={field.onChange}
               onBlur={field.onBlur}
-              className="rounded-sm border border-border bg-surface-raised px-inline-sm py-stack-xs font-mono text-caption text-text-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
             />
             <span className="font-sans text-caption text-text-muted">
               {t('admin.fieldDefs.html.hint')}
