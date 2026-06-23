@@ -682,6 +682,7 @@ export const ja: Partial<MessageCatalog> = {
 
   // ── Entity status panel ───────────────────────────────────────────────────
   'admin.entityStatus.panelTitle': '公開ステータス',
+  'admin.entityStatus.scheduledAtLabel': '公開予約日時',
   'admin.entityStatus.slugLabel': 'スラッグ',
   'admin.entityStatus.slugPlaceholder': '例: hello-world',
   'admin.entityStatus.saveSlug': 'スラッグを保存',

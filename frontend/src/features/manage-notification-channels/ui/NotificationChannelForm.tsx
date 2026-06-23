@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import type {
   CreateNotificationChannelInput,
   NotificationChannel,
@@ -95,6 +95,7 @@ export function NotificationChannelForm({
   onCancel,
 }: NotificationChannelFormProps) {
   const { t } = useTranslation()
+  const enabledId = useId()
   const isEdit = defaultValues !== undefined
 
   const [channelType, setChannelType] = useState<NotificationChannelType>(
@@ -251,7 +252,7 @@ export function NotificationChannelForm({
 
         <div className="flex items-center gap-2">
           <input
-            id="is-enabled"
+            id={enabledId}
             type="checkbox"
             checked={isEnabled}
             onChange={(e) => {
@@ -259,7 +260,7 @@ export function NotificationChannelForm({
             }}
             className="h-4 w-4 rounded border-border text-accent"
           />
-          <label htmlFor="is-enabled" className="font-sans text-sm text-text">
+          <label htmlFor={enabledId} className="font-sans text-sm text-text">
             {t('admin.notifications.form.isEnabledLabel')}
           </label>
         </div>

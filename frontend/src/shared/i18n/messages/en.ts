@@ -683,6 +683,7 @@ export const en = {
 
   // ── Entity status panel ───────────────────────────────────────────────────
   'admin.entityStatus.panelTitle': 'Publish status',
+  'admin.entityStatus.scheduledAtLabel': 'Scheduled publish date and time',
   'admin.entityStatus.slugLabel': 'Slug',
   'admin.entityStatus.slugPlaceholder': 'e.g. hello-world',
   'admin.entityStatus.saveSlug': 'Save slug',
