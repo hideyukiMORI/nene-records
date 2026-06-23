@@ -15,42 +15,25 @@ import {
   createBlock,
   validateBlock,
   type Block,
+  type BlockData,
   type BlockType,
   type BlockValidationCode,
-  type CalloutBlockData,
   type CalloutKind,
-  type ChartBlockData,
   type ChartType,
   type ColumnsBlockData,
-  type DividerBlockData,
-  type GalleryBlockData,
   type GalleryItem,
   type GalleryLayout,
-  type GroupBlockData,
   type GroupTone,
-  type HeroBlockData,
   type HeroMedia,
   type HeroVariant,
   type LeafBlock,
   type SeriesPoint,
-  type SpacerBlockData,
   type SpacerSize,
-  type TextBlockData,
 } from '@/shared/lib/blocks-document'
+import { moveItem } from '@/shared/lib/move-item'
 import { BLOCK_CATALOG, blockCatalogEntry } from './block-catalog'
 import { BlockMarkdownInput } from './BlockMarkdownInput'
 import { MediaSelectorModal } from './MediaSelectorModal'
-
-type BlockDataChange =
-  | TextBlockData
-  | CalloutBlockData
-  | HeroBlockData
-  | GalleryBlockData
-  | ChartBlockData
-  | GroupBlockData
-  | ColumnsBlockData
-  | SpacerBlockData
-  | DividerBlockData
 
 /** Leaf block types a container (group / columns) may hold (no nesting; depth 2). */
 const GROUP_CHILD_CATALOG = BLOCK_CATALOG.filter(
@@ -62,7 +45,7 @@ interface BlockInspectorProps {
   errorCode: BlockValidationCode | null
   disabled: boolean
   idPrefix: string
-  onChange: (data: BlockDataChange) => void
+  onChange: (data: BlockData) => void
 }
 
 const KIND_LABEL_KEY: Record<CalloutKind, MessageKey> = {
@@ -603,17 +586,10 @@ function GalleryItemsField({ idPrefix, items, disabled, error, onChange }: Galle
     onChange(items.map((item, i) => (i === index ? { ...item, ...patch } : item)))
   }
   const move = (index: number, direction: -1 | 1) => {
-    const target = index + direction
-    if (target < 0 || target >= items.length) {
-      return
+    const next = moveItem(items, index, direction)
+    if (next !== null) {
+      onChange(next)
     }
-    const next = items.slice()
-    const [moved] = next.splice(index, 1)
-    if (moved === undefined) {
-      return
-    }
-    next.splice(target, 0, moved)
-    onChange(next)
   }
   const remove = (index: number) => {
     onChange(items.filter((_, i) => i !== index))
@@ -758,17 +734,10 @@ function SeriesField({ idPrefix, series, disabled, error, onChange }: SeriesFiel
     onChange(series.map((point, i) => (i === index ? { ...point, ...patch } : point)))
   }
   const move = (index: number, direction: -1 | 1) => {
-    const target = index + direction
-    if (target < 0 || target >= series.length) {
-      return
+    const next = moveItem(series, index, direction)
+    if (next !== null) {
+      onChange(next)
     }
-    const next = series.slice()
-    const [moved] = next.splice(index, 1)
-    if (moved === undefined) {
-      return
-    }
-    next.splice(target, 0, moved)
-    onChange(next)
   }
   const remove = (index: number) => {
     onChange(series.filter((_, i) => i !== index))
@@ -894,22 +863,15 @@ function GroupChildrenField({
     onChange([...items, createBlock(type) as LeafBlock])
     setOpenIndex(items.length)
   }
-  const update = (index: number, data: BlockDataChange) => {
+  const update = (index: number, data: BlockData) => {
     onChange(items.map((item, i) => (i === index ? ({ ...item, data } as LeafBlock) : item)))
   }
   const move = (index: number, direction: -1 | 1) => {
-    const target = index + direction
-    if (target < 0 || target >= items.length) {
-      return
+    const next = moveItem(items, index, direction)
+    if (next !== null) {
+      onChange(next)
+      setOpenIndex(null)
     }
-    const next = items.slice()
-    const [moved] = next.splice(index, 1)
-    if (moved === undefined) {
-      return
-    }
-    next.splice(target, 0, moved)
-    onChange(next)
-    setOpenIndex(null)
   }
   const remove = (index: number) => {
     onChange(items.filter((_, i) => i !== index))

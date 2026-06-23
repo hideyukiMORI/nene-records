@@ -9,6 +9,7 @@ import {
   type EntityTypeId,
 } from '@/entities/entity-type'
 import { useCreateFieldDef, type FieldDataType } from '@/entities/field-def'
+import { moveItem } from '@/shared/lib/move-item'
 import {
   formValuesToLabels,
   type CreateEntityTypeFormValues,
@@ -132,20 +133,10 @@ export function useManageEntityTypesPage() {
   const moveEntityType = useCallback(
     async (id: EntityTypeId, direction: 'up' | 'down') => {
       const ids = (listQuery.data?.items ?? []).map((item) => item.id)
-      const from = ids.indexOf(id)
-      if (from === -1) {
+      const next = moveItem(ids, ids.indexOf(id), direction === 'up' ? -1 : 1)
+      if (next === null) {
         return
       }
-      const to = direction === 'up' ? from - 1 : from + 1
-      if (to < 0 || to >= ids.length) {
-        return
-      }
-      const next = [...ids]
-      const [removed] = next.splice(from, 1)
-      if (removed === undefined) {
-        return
-      }
-      next.splice(to, 0, removed)
       await reorderMutation.mutateAsync(next)
     },
     [listQuery.data, reorderMutation],

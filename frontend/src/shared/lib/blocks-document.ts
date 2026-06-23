@@ -146,6 +146,13 @@ export type Block =
   | { id: string; type: 'group'; data: GroupBlockData }
   | { id: string; type: 'columns'; data: ColumnsBlockData }
 
+/**
+ * The `data` payload of any block — the union of every block's data shape.
+ * Derived from {@link Block} so adding a block type updates this automatically;
+ * the editor uses it for the inspector's `onChange` and the board's update.
+ */
+export type BlockData = Block['data']
+
 export type BlockValidationCode =
   | 'markdown-required'
   | 'body-required'
