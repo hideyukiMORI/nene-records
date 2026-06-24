@@ -47,7 +47,15 @@ final readonly class UrlRedirectResolver
             return $response;
         }
 
-        $target = $this->redirects->findTargetBySource($path);
+        // Best-effort layer: the redirect map is org-scoped, so on requests where no
+        // organization was resolved (e.g. /admin and other non-tenant SPA paths) the
+        // org holder is unset and the lookup throws. A failed lookup must never break
+        // the request — fall through so the SPA shell fallback can serve it.
+        try {
+            $target = $this->redirects->findTargetBySource($path);
+        } catch (\Throwable) {
+            return $response;
+        }
 
         if ($target === null || $target === $path) {
             return $response;
