@@ -246,6 +246,10 @@ final class PublicRecordHttpTest extends TestCase
         // Canonical/og still point at the same real permalink.
         self::assertStringContainsString('<link rel="canonical" href="https://example.test/article/10" />', $html);
         self::assertStringContainsString('id="nene-records-public-record-bootstrap"', $html);
+        // SPA-aware CSP: inline styles (runtime theme) + data: fonts are allowed.
+        $csp = $response->getHeaderLine('Content-Security-Policy');
+        self::assertStringContainsString("style-src 'self' 'unsafe-inline'", $csp);
+        self::assertStringContainsString("font-src 'self' data:", $csp);
     }
 
     public function testRealPermalinkReturns404ForUnknownId(): void

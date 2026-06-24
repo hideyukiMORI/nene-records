@@ -43,6 +43,10 @@ final class SpaShellFallbackTest extends TestCase
         self::assertSame(200, $result->getStatusCode());
         self::assertStringContainsString('text/html', $result->getHeaderLine('Content-Type'));
         self::assertStringContainsString('<div id="root">', (string) $result->getBody());
+        // SPA-aware CSP so the shell's inline styles / data: fonts are not blocked.
+        $csp = $result->getHeaderLine('Content-Security-Policy');
+        self::assertStringContainsString("style-src 'self' 'unsafe-inline'", $csp);
+        self::assertStringContainsString("font-src 'self' data:", $csp);
     }
 
     public function testServesShellForBrowsePath(): void
