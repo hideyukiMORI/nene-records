@@ -19,6 +19,7 @@ use NeNeRecords\FieldDef\FieldDef;
 use NeNeRecords\FieldDef\FieldDefRepositoryInterface;
 use NeNeRecords\IntField\IntField;
 use NeNeRecords\IntField\IntFieldRepositoryInterface;
+use NeNeRecords\Media\MediaDerivativeUrl;
 use NeNeRecords\PublicRecord\GetPublicRecordViewOutput;
 use NeNeRecords\PublicRecord\PublicFieldDisplayFormatter;
 use NeNeRecords\PublicRecord\PublicPermalinkResolver;
@@ -179,6 +180,18 @@ final readonly class GetPreviewRecordViewUseCase implements GetPreviewRecordView
             $entity->publishedAt,
         );
 
+        $ogImagePath = null;
+        foreach ($displayFields as $field) {
+            if ($field->dataType !== 'image') {
+                continue;
+            }
+            $candidate = MediaDerivativeUrl::forPreset($field->displayValue, 'og');
+            if ($candidate !== null) {
+                $ogImagePath = $candidate;
+                break;
+            }
+        }
+
         return new GetPublicRecordViewOutput(
             entityTypeSlug: $entityTypeSlug,
             entityTypeName: $entityType->name,
@@ -187,6 +200,7 @@ final readonly class GetPreviewRecordViewUseCase implements GetPreviewRecordView
             pageTitle: $pageTitle,
             metaDescription: $entity->metaDescription ?? '',
             canonicalPath: $canonicalPath,
+            ogImagePath: $ogImagePath,
             publishedAtIso: $entity->publishedAt?->format(\DateTimeInterface::ATOM),
             updatedAtIso: $entity->updatedAt?->format(\DateTimeInterface::ATOM),
             bootstrap: $bootstrap,

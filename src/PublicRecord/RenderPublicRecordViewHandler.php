@@ -40,7 +40,16 @@ final readonly class RenderPublicRecordViewHandler
 
         // Canonical / og:url point at the user-facing permalink (not this /view/ twin).
         $uri = $request->getUri();
-        $canonicalUrl = $uri->getScheme() . '://' . $uri->getAuthority() . $output->canonicalPath;
+        $baseUrl = $uri->getScheme() . '://' . $uri->getAuthority();
+        $canonicalUrl = $baseUrl . $output->canonicalPath;
+
+        // og:image / twitter:image — absolutize the entity's social-card derivative.
+        $ogImageUrl = null;
+        if ($output->ogImagePath !== null) {
+            $ogImageUrl = str_starts_with($output->ogImagePath, 'http')
+                ? $output->ogImagePath
+                : $baseUrl . $output->ogImagePath;
+        }
 
         // Prefer the per-entity meta description, falling back to the site default.
         $metaDescription = $output->metaDescription !== ''
@@ -67,6 +76,7 @@ final readonly class RenderPublicRecordViewHandler
             'siteName' => $siteSettings['site_name'],
             'metaDescription' => $metaDescription,
             'canonicalUrl' => $canonicalUrl,
+            'ogImageUrl' => $ogImageUrl,
             'publishedAtIso' => $output->publishedAtIso,
             'updatedAtIso' => $output->updatedAtIso,
             'bootstrapJson' => $bootstrapJson,
