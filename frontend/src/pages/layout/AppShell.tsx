@@ -410,6 +410,15 @@ export function AppShell() {
                           rail={rail}
                         />
                       </li>
+                      <li>
+                        <NavItem
+                          to="/admin/import"
+                          icon={<IconFileText size={16} />}
+                          label={t('admin.nav.import')}
+                          onClick={closeSidebar}
+                          rail={rail}
+                        />
+                      </li>
                     </ul>
                   ) : null}
                 </div>

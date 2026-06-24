@@ -14,6 +14,7 @@ import { intFieldHandlers } from './handlers/int-field'
 import { tagHandlers } from './handlers/tag'
 import { textFieldHandlers } from './handlers/text-field'
 import { userHandlers } from './handlers/user'
+import { wxrImportHandlers } from './handlers/wxr-import'
 
 export const mswServer = setupServer(
   ...authHandlers,
@@ -31,4 +32,5 @@ export const mswServer = setupServer(
   ...tagHandlers,
   ...userHandlers,
   ...commentHandlers,
+  ...wxrImportHandlers,
 )

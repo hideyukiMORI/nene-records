@@ -26,6 +26,7 @@ const MediaPage = named(() => import('@/pages/media/MediaPage'), 'MediaPage')
 const WebhooksPage = named(() => import('@/pages/webhooks/WebhooksPage'), 'WebhooksPage')
 const NotificationChannelsPage = named(() => import('@/pages/notifications/NotificationChannelsPage'), 'NotificationChannelsPage') // prettier-ignore
 const SiteSettingsPage = named(() => import('@/pages/settings/SiteSettingsPage'), 'SiteSettingsPage') // prettier-ignore
+const ImportPage = named(() => import('@/pages/import/ImportPage'), 'ImportPage')
 const UsersPage = named(() => import('@/pages/users/UsersPage'), 'UsersPage')
 const UserEditPage = named(() => import('@/pages/users/UserEditPage'), 'UserEditPage')
 const FieldDefsPage = named(() => import('@/pages/field-defs/FieldDefsPage'), 'FieldDefsPage')
@@ -101,6 +102,7 @@ const router = createBrowserRouter([
       { path: 'webhooks', element: <WebhooksPage /> },
       { path: 'notifications', element: <NotificationChannelsPage /> },
       { path: 'settings', element: <SiteSettingsPage /> },
+      { path: 'import', element: <ImportPage /> },
       { path: 'users', element: <UsersPage /> },
       { path: 'users/:id', element: <UserEditPage /> },
       { path: 'entity-types/:entityTypeSlug/fields', element: <FieldDefsPage /> },
