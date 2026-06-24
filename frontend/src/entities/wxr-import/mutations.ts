@@ -1,46 +1,14 @@
 import { useMutation, type UseMutationResult } from '@tanstack/react-query'
 import { apiClient, AppError } from '@/shared/api/client'
+import type { components } from '@/shared/api/schema.gen'
 
-/** A single item the import would create (preview). */
-export interface WxrPlannedItem {
-  title: string
-  slug: string
-  entity_type: string
-  status: string
-  tags: string[]
-}
-
-export interface WxrSkippedItem {
-  title: string
-  reason: string
-}
-
+// Types are derived from the OpenAPI contract (docs/openapi/openapi.yaml) via codegen.
+export type WxrPlannedItem = components['schemas']['WxrPlannedItem']
+export type WxrSkippedItem = components['schemas']['WxrSkippedItem']
 /** Dry-run preview returned by POST /api/v1/migration/wxr (dry_run=true). */
-export interface WxrImportPlanDto {
-  mode: 'preview'
-  planned_count: number
-  skipped_count: number
-  counts_by_entity_type: Record<string, number>
-  counts_by_status: Record<string, number>
-  tags: string[]
-  warnings: string[]
-  planned: WxrPlannedItem[]
-  skipped: WxrSkippedItem[]
-}
-
+export type WxrImportPlanDto = components['schemas']['WxrImportPlanResponse']
 /** Result returned when executed (dry_run=false). */
-export interface WxrImportResultDto {
-  mode: 'import'
-  created_entities: number
-  skipped_existing: number
-  tags_ensured: number
-  tag_links: number
-  redirects_created: number
-  media_imported: number
-  media_skipped: number
-  skipped: WxrSkippedItem[]
-  warnings: string[]
-}
+export type WxrImportResultDto = components['schemas']['WxrImportResultResponse']
 
 const ENDPOINT = '/api/v1/migration/wxr'
 
