@@ -6,6 +6,7 @@ namespace NeNeRecords\WxrImport;
 
 use DateTimeImmutable;
 use NeNeRecords\Entity\Entity;
+use NeNeRecords\Entity\EntityListCriteria;
 use NeNeRecords\Entity\EntityRepositoryInterface;
 use NeNeRecords\Entity\EntityStatus;
 use NeNeRecords\EntityTag\EntityTagRepositoryInterface;
@@ -27,10 +28,11 @@ use NeNeRecords\UrlRedirect\UrlRedirectRepositoryInterface;
  *
  * - Idempotent: an item whose slug already exists for its type is skipped, so
  *   re-running the same import does not duplicate.
- * - Target type/fields are ensured (created if missing); `title` is text, `body`
- *   is html so imported WordPress content renders sanitized. A pre-existing
- *   markdown `body` is reused as-is (HTML stored verbatim; renders via the
- *   markdown HTML passthrough).
+ * - Imported content is HTML, so it is written to an html-typed field (see
+ *   {@see resolveContentField}): a fresh type's `body` is created/promoted to
+ *   html; a type that already has native (e.g. markdown) content keeps it and the
+ *   import lands in a dedicated `wp_content` html field. Either way the content
+ *   renders faithfully (sanitized) on SSR and SPA rather than being stripped.
  * - 301 redirect map (S3): each item's original WordPress URL path is recorded
  *   as a redirect to the new permalink, preserving SEO equity after migration.
  * - Media (S4): a caller-supplied old→new media URL map rewrites `<img src>`
@@ -62,8 +64,12 @@ final class WxrImportExecutor
 
         /** @var array<string, EntityType> $typeBySlug */
         $typeBySlug = [];
+        /** @var array<string, string> $contentFieldBySlug */
+        $contentFieldBySlug = [];
         /** @var array<string, int> $tagIdBySlug */
         $tagIdBySlug = [];
+        /** @var list<string> $warnings */
+        $warnings = [];
 
         $created = 0;
         $skippedExisting = 0;
@@ -76,6 +82,9 @@ final class WxrImportExecutor
             if ($typeId === null) {
                 continue; // resolveType always sets the id; guard satisfies the analyser
             }
+
+            $contentField = $contentFieldBySlug[$item->entityTypeSlug]
+                ??= $this->resolveContentField($typeId, $type->slug, $warnings);
 
             if ($this->entities->findBySlug($item->slug, $typeId) !== null) {
                 ++$skippedExisting;
@@ -92,9 +101,11 @@ final class WxrImportExecutor
                 publishedAt: $publishedAt,
             ));
 
+            // Imported WordPress content is HTML — write it to an html-typed field
+            // so it renders faithfully (sanitized) on both SSR and SPA.
             $body = $mediaUrlMap === [] ? $item->contentHtml : strtr($item->contentHtml, $mediaUrlMap);
             $this->textFields->save(new TextField(entityId: $entityId, fieldKey: 'title', value: $item->title));
-            $this->textFields->save(new TextField(entityId: $entityId, fieldKey: 'body', value: $body));
+            $this->textFields->save(new TextField(entityId: $entityId, fieldKey: $contentField, value: $body));
 
             foreach ($item->tagSlugs as $tagSlug) {
                 $tagId = $tagIdBySlug[$tagSlug] ??= $this->ensureTag($tagSlug, $tagNames[$tagSlug] ?? $tagSlug);
@@ -118,7 +129,7 @@ final class WxrImportExecutor
             tagLinks: $tagLinks,
             redirectsCreated: $redirectsCreated,
             skippedItems: $plan->skippedItems,
-            warnings: $plan->warnings,
+            warnings: [...$plan->warnings, ...$warnings],
         );
     }
 
@@ -135,9 +146,57 @@ final class WxrImportExecutor
         }
 
         $this->ensureFieldDef($typeId, 'title', 'text');
-        $this->ensureFieldDef($typeId, 'body', 'html');
 
         return $type;
+    }
+
+    /**
+     * Resolve the html-typed field that imported WordPress content is written to,
+     * so it renders faithfully (sanitized) instead of being stripped by a markdown
+     * field. Returns the field key to write the content into.
+     *
+     * - `body` is html or absent → use (create) `body` as html.
+     * - `body` exists as non-html but the type has no entities yet (a fresh
+     *   migration target) → promote `body` to html (safe — no values to break).
+     * - `body` is non-html and the type already has native content → write to a
+     *   dedicated `wp_content` html field so existing markdown authoring is intact.
+     *
+     * @param list<string> $warnings accumulates operator-visible notes (by reference)
+     */
+    private function resolveContentField(int $typeId, string $typeSlug, array &$warnings): string
+    {
+        $body = $this->fieldDefs->findByEntityTypeIdAndFieldKey($typeId, 'body');
+
+        if ($body === null) {
+            $this->fieldDefs->save(new FieldDef(entityTypeId: $typeId, fieldKey: 'body', dataType: 'html'));
+
+            return 'body';
+        }
+
+        if ($body->dataType === 'html') {
+            return 'body';
+        }
+
+        if ($this->entities->countByCriteria(new EntityListCriteria(entityTypeId: $typeId)) === 0) {
+            $this->fieldDefs->update(new FieldDef(
+                entityTypeId: $body->entityTypeId,
+                fieldKey: $body->fieldKey,
+                dataType: 'html',
+                id: $body->id,
+                targetEntityTypeId: $body->targetEntityTypeId,
+                cardinality: $body->cardinality,
+                region: $body->region,
+                displayOrder: $body->displayOrder,
+            ));
+            $warnings[] = "「{$typeSlug}」の body フィールドを html 型へ昇格しました（取込コンテンツは HTML のため）。";
+
+            return 'body';
+        }
+
+        $this->ensureFieldDef($typeId, 'wp_content', 'html');
+        $warnings[] = "「{$typeSlug}」は既存の body が html 型でないため、取込本文を wp_content フィールドへ格納しました。";
+
+        return 'wp_content';
     }
 
     private function ensureFieldDef(int $typeId, string $fieldKey, string $dataType): void
