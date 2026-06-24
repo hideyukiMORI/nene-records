@@ -1,6 +1,6 @@
 # Current Work
 
-Last updated: 2026-06-21
+Last updated: 2026-06-24
 
 ## 状態サマリー
 
@@ -36,31 +36,40 @@ Last updated: 2026-06-21
 
 **M16 — 公開サイトのテーマシステム（Epic #367・コア）: 完了（2026-06-20）**
 
-最新の検証基準: PHPUnit 764 tests / 2172 assertions / PHPStan level 8（1114 files）/
-CS-Fixer / OpenAPI / MCP（83 tools）＋ Playwright E2E 157 tests ＋
-`npm run check`（type-check / lint / prettier / test / validate:themes / knip / storybook）全グリーン。
+**ポストM16 — リッチページ／ブロック・型チェック是正・i18n 6言語化: 完了（2026-06-22〜24）**
+（#486 型付き投稿ブロック / #489 型チェック実稼働化（tsc 1197→0）/ #390 ハイブリッドテーマ engine /
+#530 管理画面6言語化。詳細は下記「ポストM16」セクション。リッチページ #491 / Custom Page 厳格契約 #311 /
+フロント全体監査 #507 は一部進行中。）
+
+最新の検証基準（2026-06-24 実測）: PHPUnit 846 tests / 2305 assertions / PHPStan level 8（1156 files）/
+CS-Fixer / OpenAPI / MCP（69 tools）＋ Playwright E2E 220 tests（20 files）＋
+`npm run check`（type-check / lint / prettier / test 367（75 files）/ validate:themes / knip / storybook）全グリーン。
 
 ---
 
 ## 進行中エピック（現在のフロンティア）
 
 > 直近の作業文脈は新しいハンドオフが正本:
+> `docs/todo/handoff-2026-06-23-rich-pages-blocks.md`（リッチページ／ブロック・最新）/
 > `docs/todo/handoff-2026-06-17-public-theme-system.md`（テーマシステム）/
 > `docs/todo/handoff-2026-06-19-mcp-connector.md`（MCP コネクタ）。
 
-現在の主戦線は **公開サイトのテーマ作り込み（#362 / #367 系）**。コア（runtime テーマ・
-カスタマイザ・スタイルフラグエンジン・MCP bridge）は M16 で完了し、残りは以下の派生フェーズ。
+現在の主戦線は **リッチページ化／Custom Page 厳格契約（#491 / #311）** と
+**フロントエンド全体監査の remediation（#507）**、加えて **公開サイトのテーマ作り込み（#362 / #367 系）の派生フェーズ**。
+テーマのコア（runtime テーマ・カスタマイザ・スタイルフラグエンジン・MCP bridge）は M16＋#390 で完了済み。
 
 | Issue | 内容 | 状態 |
 | --- | --- | --- |
-| #390 | テーマを「JSONプリセット＋汎用エンジン（スタイルフラグ）」へ — ハイブリッド | 進行中（全6フラグ base CSS・カスタマイザ UI・validator 実装済み。残: ClaudeCode による JSON テーマ量産） |
-| #372 | テーマ カスタマイザ（トークン上書きノブ）Phase 2 | 残: 画像ノブ（logo/hero・メディア #299 連携）、ライブプレビュー（iframe） |
-| #371 | モーション/インタラクション能力レイヤ Phase 1.5 | 未着手（hero バリアント / scroll-reveal / View Transitions） |
+| #491 | リッチページ化 epic（ブロックを本文の主役に／レイアウトブロック／bundle 完全カスタム） | 進行中（WS1–WS3 S3a–S3d 済・残: S3e=ClaudeDesign 連携＋scoped creds＋JSON-LD） |
+| #311 | Custom Page（sandboxed iframe + 二重表現SEO + ClaudeDesign 連携）厳格契約 | 進行中（S3a–S3d 済・S3e 残。#491 と一体） |
+| #507 | フロントエンド全体監査の remediation（18 WS + セキュリティ + lint 強化） | 進行中（#508–531 マージ済み・残: WS-04/05/14/15/18・ENT-7 等＝要 API/プロダクト判断） |
+| #372 | テーマ カスタマイザ（トークン上書きノブ）Phase 2 | 進行中（残: 画像ノブ logo/hero・メディア #299 連携、ライブプレビュー iframe） |
+| #371 | モーション/インタラクション能力レイヤ Phase 1.5 | 進行中（基盤＋scroll-reveal #477・header sticky-shrink #479・hero split/gradient #481 済。残: View Transitions 等） |
 | #373 | ClaudeDesign「MD→テーマ」量産パイプライン＋バリデータ Phase 3 | 未着手 |
-| #362 | 公開サイトのテーマ/見た目の作り込み（design-first / ダークモード対応）epic | 進行中（上記を束ねる） |
-| #311 | Custom Page（sandboxed iframe + 二重表現SEO + ClaudeDesign 連携）厳格契約 | 設計 issue（オープン） |
-| #402 | トップフィードの列数フラグ（feedColumns） | オープン（#403/#404 で初期実装済み・残点検あり） |
-| #435 | ClaudeDesign 向け MCP 実践ガイド（ドキュメント） | オープン（PR #436） |
+| #362 | 公開サイトのテーマ/見た目の作り込み（design-first / ダークモード対応）epic | 進行中（上記テーマ系を束ねる） |
+
+> 完了化されたフロンティア: **#390**（ハイブリッドテーマ engine・**クローズ**）/ **#402**（feedColumns・**クローズ**）/
+> **#435**（ClaudeDesign 向け MCP 実践ガイド・**クローズ**）。
 
 ### 完了済みエピック（旧「進行中」）
 
@@ -70,6 +79,26 @@ CS-Fixer / OpenAPI / MCP（83 tools）＋ Playwright E2E 157 tests ＋
   `menus.location`（テーマ表示場所）は方針どおり存置。
 - **#352 外観 › レイアウトビルダー: 完了** — スライス1〜5（#353〜#358）＋ページ別 cfg・公開接続（#360/#361/#408）まで全マージ。
   `layout_config` 設定（`20260617000001_add_layout_config_setting`）で永続化済み。
+
+---
+
+## ポストM16 — リッチページ／ブロック・型チェック是正・i18n（2026-06-22〜24）
+
+M16 後に main へマージした作業。正本は `docs/todo/handoff-2026-06-23-rich-pages-blocks.md`。
+
+| Issue | PR | 状態 | Summary |
+| --- | --- | --- | --- |
+| #486 | #487 / #488 | 完了 | 型付き投稿ブロック EPIC。本文ブロック5種 `text/callout/hero/gallery/chart` ＋ ホーム hero。第一者描画（任意 JS 無し）/ サーバ検証（信頼境界）/ sr-only SEO 投影 / URL allowlist。 |
+| #489 | #490 | 完了 | フロント型チェック是正。root tsconfig が src を1ファイルも検査していなかったのを `tsc -p tsconfig.app.json --noEmit` に修正し、隠れていた tsc エラー **1197→0**。以後 CI が型を実検査。 |
+| #491 | #492–#499 | 進行中 | リッチページ化 EPIC。WS1=コンテンツタイプ スターター（blank/article/rich_page/custom_page）、WS2=レイアウトブロック `group/columns/spacer/divider`（深さ2・leaf-only）、WS3=dual-SEO bundle（`{html,seoText}`・seoText 必須）/ full-bleed custom レイアウト / `text_fields.value` を LONGTEXT 化。**残: S3e**（ClaudeDesign 連携＋scoped creds＋JSON-LD）。 |
+| #311 | #496–#499 | 進行中 | Custom Page 厳格契約（#491 WS3 と一体）。S3a–S3d 済・S3e 残。 |
+| #501 | #502–#514 | 完了 | ブロック関連フロントの構造リファクタ（規約整合・重複排除・god 分割・UI 共通化）。 |
+| #390 | #394 / #401 | 完了 | テーマを「JSON プリセット＋汎用エンジン（スタイルフラグ）」へ — ハイブリッド。全6フラグ base CSS・カスタマイザ UI・validator 実装済み（EPIC クローズ）。 |
+| #507 | #508–#531 | 進行中 | フロントエンド全体監査の remediation（18 WS）。i18n（6言語化 #530/#531 含む）/ フォーム a11y（useId）/ 状態色のセマンティックトークン化 / formatter 集約 / theme query-key factory 化 / vendor 分割（620→209kB）等。残: WS-04/05/14/15/18・ENT-7（要 API/プロダクト/アーキ判断）。 |
+| #530 | #531 | 完了 | 管理画面を6言語（en/ja/de/fr/pt-BR/zh-Hans）全980キーで完備。`locales.test` を5ロケール完全性＋プレースホルダ整合へ拡張。 |
+| #528 | #529 | 完了 | auth/superadmin 等の bypass ルートで access-log が orgId 未設定により ERROR を出していたのを是正（bypass 分岐で `orgId.set(0)`）。 |
+
+**既知の後始末（handoff §4.2）:** フィールド `region`（sidebar/aside）はレコードで未配線のデッドコード（配線 or 撤去の判断保留）/ bundle の low 項目（divider 厳格検証・公開ページのサーバ CSP backstop 等）/ エディタのライブプレビュー（任意）。
 
 ---
 
@@ -94,8 +123,8 @@ CS-Fixer / OpenAPI / MCP（83 tools）＋ Playwright E2E 157 tests ＋
 | テーマ保存/詳細 | #454 / #460 / #462 | feat: 「テーマとして保存」/ 詳細モーダル＋明示適用 / 未保存変更ガード |
 | reserved keys 同期 | #458 | fix: RESERVED_KEYS を全ビルトイン id に同期 |
 
-**残（派生フェーズ・進行中）:** #390（JSON テーマ量産）/ #372（画像ノブ・ライブプレビュー）/
-#371（モーション層）/ #373（MD→テーマ パイプライン）。詳細は上記「進行中エピック」。
+**残（派生フェーズ・進行中）:** #372（画像ノブ・ライブプレビュー）/ #371（モーション層・残 View Transitions 等）/
+#373（MD→テーマ パイプライン）。#390（ハイブリッド engine）はクローズ済み。詳細は上記「進行中エピック」。
 
 ---
 
