@@ -71,10 +71,12 @@ final class PublicRecordHttpTest extends TestCase
         $fieldDefs = new InMemoryFieldDefRepository([
             new FieldDef(entityTypeId: 1, fieldKey: 'title', dataType: 'text', id: 1),
             new FieldDef(entityTypeId: 1, fieldKey: 'body', dataType: 'text', id: 2),
+            new FieldDef(entityTypeId: 1, fieldKey: 'hero', dataType: 'image', id: 3),
         ]);
         $textFields = new InMemoryTextFieldRepository([
             new TextField(entityId: 10, fieldKey: 'title', value: 'Hello world', id: 1),
             new TextField(entityId: 10, fieldKey: 'body', value: "## Sample\n\n**bold** line", id: 2),
+            new TextField(entityId: 10, fieldKey: 'hero', value: '/media/2026/06/hero.png', id: 3),
         ], $entities);
 
         $publicSettings = new ListPublicSettingsUseCase(new InMemorySettingRepository(), new InMemoryMediaRepository());
@@ -196,9 +198,12 @@ final class PublicRecordHttpTest extends TestCase
         self::assertStringContainsString('property="og:title" content="Hello world"', $html);
         self::assertStringContainsString('property="og:description" content="A short summary."', $html);
         self::assertStringContainsString('property="og:site_name" content="NeNe Records"', $html);
-        // Twitter Card
-        self::assertStringContainsString('name="twitter:card" content="summary"', $html);
+        // Twitter Card — large image because the record has an image field
+        self::assertStringContainsString('name="twitter:card" content="summary_large_image"', $html);
         self::assertStringContainsString('name="twitter:title" content="Hello world"', $html);
+        // og:image / twitter:image resolve the image field to the `og` derivative (absolute)
+        self::assertStringContainsString('property="og:image" content="https://example.test/media/og/2026/06/hero.png"', $html);
+        self::assertStringContainsString('name="twitter:image" content="https://example.test/media/og/2026/06/hero.png"', $html);
         // Per-entity meta description (not the site default)
         self::assertStringContainsString('<meta name="description" content="A short summary." />', $html);
         // JSON-LD structured data
@@ -207,6 +212,7 @@ final class PublicRecordHttpTest extends TestCase
         self::assertStringContainsString('"headline":"Hello world"', $html);
         self::assertStringContainsString('"datePublished":"2026-01-15T00:00:00+00:00"', $html);
         self::assertStringContainsString('"dateModified":"2026-02-20T00:00:00+00:00"', $html);
+        self::assertStringContainsString('"image":"https://example.test/media/og/2026/06/hero.png"', $html);
     }
 
     /** @return array<string, mixed> */

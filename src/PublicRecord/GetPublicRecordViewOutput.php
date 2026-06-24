@@ -18,6 +18,7 @@ final readonly class GetPublicRecordViewOutput
         public string $pageTitle,
         public string $metaDescription,
         public string $canonicalPath,
+        public ?string $ogImagePath,
         public ?string $publishedAtIso,
         public ?string $updatedAtIso,
         public array $bootstrap,

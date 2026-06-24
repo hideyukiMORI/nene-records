@@ -17,6 +17,9 @@ final class MediaImagePresets
         'sm' => 320,
         'md' => 640,
         'lg' => 1280,
+        // Social card width (og:image / twitter:image). Aspect is preserved
+        // (width-constrained), which social platforms crop/letterbox as needed.
+        'og' => 1200,
     ];
 
     public static function isValid(string $name): bool

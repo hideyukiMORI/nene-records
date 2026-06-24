@@ -19,6 +19,7 @@ use NeNeRecords\FieldDef\FieldDef;
 use NeNeRecords\FieldDef\FieldDefRepositoryInterface;
 use NeNeRecords\IntField\IntField;
 use NeNeRecords\IntField\IntFieldRepositoryInterface;
+use NeNeRecords\Media\MediaDerivativeUrl;
 use NeNeRecords\Setting\ListPublicSettingsUseCaseInterface;
 use NeNeRecords\Setting\SettingEntry;
 use NeNeRecords\Setting\SettingHttpMapper;
@@ -170,6 +171,8 @@ final readonly class GetPublicRecordViewUseCase implements GetPublicRecordViewUs
             $entity->publishedAt,
         );
 
+        $ogImagePath = $this->resolveOgImagePath($displayFields);
+
         return new GetPublicRecordViewOutput(
             entityTypeSlug: $input->entityTypeSlug,
             entityTypeName: $entityType->name,
@@ -178,11 +181,35 @@ final readonly class GetPublicRecordViewUseCase implements GetPublicRecordViewUs
             pageTitle: $pageTitle,
             metaDescription: $entity->metaDescription ?? '',
             canonicalPath: $canonicalPath,
+            ogImagePath: $ogImagePath,
             publishedAtIso: $entity->publishedAt?->format(\DateTimeInterface::ATOM),
             updatedAtIso: $entity->updatedAt?->format(\DateTimeInterface::ATOM),
             bootstrap: $bootstrap,
             displayFields: $displayFields,
         );
+    }
+
+    /**
+     * Pick the first image field whose value resolves to a media derivative,
+     * for use as the og:image / twitter:image social card. Null if none.
+     *
+     * @param list<PublicRecordViewDisplayField> $displayFields
+     */
+    private function resolveOgImagePath(array $displayFields): ?string
+    {
+        foreach ($displayFields as $field) {
+            if ($field->dataType !== 'image') {
+                continue;
+            }
+
+            $candidate = MediaDerivativeUrl::forPreset($field->displayValue, 'og');
+
+            if ($candidate !== null) {
+                return $candidate;
+            }
+        }
+
+        return null;
     }
 
     /**

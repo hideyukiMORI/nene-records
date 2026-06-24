@@ -16,11 +16,17 @@
     <?php endif; ?>
     <meta property="og:site_name" content="<?= $e($siteName) ?>" />
     <meta property="og:url" content="<?= $e($canonicalUrl) ?>" />
+    <?php if ($ogImageUrl !== null): ?>
+      <meta property="og:image" content="<?= $e($ogImageUrl) ?>" />
+    <?php endif; ?>
 
-    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:card" content="<?= $ogImageUrl !== null ? 'summary_large_image' : 'summary' ?>" />
     <meta name="twitter:title" content="<?= $e($pageTitle) ?>" />
     <?php if ($metaDescription !== ''): ?>
       <meta name="twitter:description" content="<?= $e($metaDescription) ?>" />
+    <?php endif; ?>
+    <?php if ($ogImageUrl !== null): ?>
+      <meta name="twitter:image" content="<?= $e($ogImageUrl) ?>" />
     <?php endif; ?>
 
     <?php
@@ -40,6 +46,9 @@
       }
       if ($updatedAtIso !== null) {
           $jsonLd['dateModified'] = $updatedAtIso;
+      }
+      if ($ogImageUrl !== null) {
+          $jsonLd['image'] = $ogImageUrl;
       }
     ?>
     <script type="application/ld+json"><?= json_encode($jsonLd, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?></script>
