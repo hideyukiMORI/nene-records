@@ -164,6 +164,7 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
                     $html = $container->get(HtmlResponseFactory::class);
                     $config = $container->get(AppConfig::class);
                     $projectRoot = $container->get(RuntimeServiceProvider::PROJECT_ROOT);
+                    $responseFactory = $container->get(ResponseFactoryInterface::class);
 
                     if (!$useCase instanceof GetPublicRecordViewUseCaseInterface) {
                         throw new LogicException('GetPublicRecordView use case service is invalid.');
@@ -185,7 +186,11 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
                         throw new LogicException('Project root service is invalid.');
                     }
 
-                    return new RenderPublicRecordViewHandler($useCase, $publicSettings, $html, $config, $projectRoot);
+                    if (!$responseFactory instanceof ResponseFactoryInterface) {
+                        throw new LogicException('Response factory service is invalid.');
+                    }
+
+                    return new RenderPublicRecordViewHandler($useCase, $publicSettings, $html, $config, $projectRoot, $responseFactory);
                 },
             )
             ->set(
