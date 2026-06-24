@@ -58,6 +58,7 @@ use NeNeRecords\FieldDef\FieldDefRouteRegistrar;
 use NeNeRecords\FieldDef\FieldDefServiceProvider;
 use NeNeRecords\FieldDef\FieldKeyNotRegisteredExceptionHandler;
 use NeNeRecords\FieldDef\FieldTypeMismatchExceptionHandler;
+use NeNeRecords\Http\SingleOriginServiceProvider;
 use NeNeRecords\IntField\IntFieldNotFoundExceptionHandler;
 use NeNeRecords\IntField\IntFieldRouteRegistrar;
 use NeNeRecords\IntField\IntFieldServiceProvider;
@@ -182,7 +183,8 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
             ->addProvider(new OrgExportServiceProvider())
             ->addProvider(new ThemeServiceProvider())
             ->addProvider(new WxrImportServiceProvider())
-            ->addProvider(new UrlRedirectServiceProvider());
+            ->addProvider(new UrlRedirectServiceProvider())
+            ->addProvider(new SingleOriginServiceProvider());
 
         $builder
             ->set(
