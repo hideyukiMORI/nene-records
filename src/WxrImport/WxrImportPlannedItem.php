@@ -14,6 +14,8 @@ final readonly class WxrImportPlannedItem
         public string $entityTypeSlug, // 'posts' | 'pages'
         public string $status,         // 'published' | 'draft' | 'scheduled'
         public array $tagSlugs,
+        public string $contentHtml = '',
+        public ?string $publishedAtIso = null,
     ) {
     }
 }
