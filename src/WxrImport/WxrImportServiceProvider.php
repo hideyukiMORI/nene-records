@@ -15,6 +15,7 @@ use NeNeRecords\EntityType\EntityTypeRepositoryInterface;
 use NeNeRecords\FieldDef\FieldDefRepositoryInterface;
 use NeNeRecords\Tag\TagRepositoryInterface;
 use NeNeRecords\TextField\TextFieldRepositoryInterface;
+use NeNeRecords\UrlRedirect\UrlRedirectRepositoryInterface;
 use Psr\Container\ContainerInterface;
 
 final readonly class WxrImportServiceProvider implements ServiceProviderInterface
@@ -31,6 +32,7 @@ final readonly class WxrImportServiceProvider implements ServiceProviderInterfac
                     $textFields = $c->get(TextFieldRepositoryInterface::class);
                     $tags = $c->get(TagRepositoryInterface::class);
                     $entityTags = $c->get(EntityTagRepositoryInterface::class);
+                    $redirects = $c->get(UrlRedirectRepositoryInterface::class);
 
                     if (!$entityTypes instanceof EntityTypeRepositoryInterface) {
                         throw new LogicException('Entity type repository service is invalid.');
@@ -50,8 +52,19 @@ final readonly class WxrImportServiceProvider implements ServiceProviderInterfac
                     if (!$entityTags instanceof EntityTagRepositoryInterface) {
                         throw new LogicException('Entity tag repository service is invalid.');
                     }
+                    if (!$redirects instanceof UrlRedirectRepositoryInterface) {
+                        throw new LogicException('URL redirect repository service is invalid.');
+                    }
 
-                    return new WxrImportExecutor($entityTypes, $fieldDefs, $entities, $textFields, $tags, $entityTags);
+                    return new WxrImportExecutor(
+                        $entityTypes,
+                        $fieldDefs,
+                        $entities,
+                        $textFields,
+                        $tags,
+                        $entityTags,
+                        $redirects,
+                    );
                 },
             )
             ->set(

@@ -103,6 +103,7 @@ function ResultCard({ result }: { result: WxrImportResultDto }) {
           <Stat label={t('admin.import.wxr.skippedExisting')} value={result.skipped_existing} />
           <Stat label={t('admin.import.wxr.tagsEnsured')} value={result.tags_ensured} />
           <Stat label={t('admin.import.wxr.tagLinks')} value={result.tag_links} />
+          <Stat label={t('admin.import.wxr.redirects')} value={result.redirects_created} />
         </div>
         <Text muted>{t('admin.import.wxr.done')}</Text>
       </Stack>

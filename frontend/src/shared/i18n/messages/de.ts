@@ -371,7 +371,7 @@ export const de: Partial<MessageCatalog> = {
   'admin.import.pageDescription': 'Bestehende Inhalte in diese Organisation übernehmen.',
   'admin.import.wxr.title': 'WordPress-Import (WXR)',
   'admin.import.wxr.description':
-    'Laden Sie einen WordPress-WXR-Export (.xml) hoch. Sehen Sie eine Vorschau und führen Sie den Import dann aus. Beiträge und Seiten werden zu Inhalten, Kategorien und Schlagwörter zu Tags. Medien, Weiterleitungen und Kommentare werden noch nicht importiert.',
+    'Laden Sie einen WordPress-WXR-Export (.xml) hoch. Sehen Sie eine Vorschau und führen Sie den Import dann aus. Beiträge und Seiten werden zu Inhalten, Kategorien und Schlagwörter zu Tags; alte URLs werden per 301 auf die neuen Permalinks weitergeleitet. Medien und Kommentare werden noch nicht importiert.',
   'admin.import.wxr.fileLabel': 'WXR-Datei (.xml)',
   'admin.import.wxr.preview': 'Vorschau',
   'admin.import.wxr.previewing': 'Vorschau läuft…',
@@ -387,6 +387,7 @@ export const de: Partial<MessageCatalog> = {
   'admin.import.wxr.skippedExisting': 'Bereits vorhanden',
   'admin.import.wxr.tagsEnsured': 'Tags',
   'admin.import.wxr.tagLinks': 'Tag-Verknüpfungen',
+  'admin.import.wxr.redirects': 'Weiterleitungen',
   'admin.import.wxr.done': 'Import abgeschlossen.',
   'admin.nav.settings': 'Einstellungen',
   'admin.nav.appearance': 'Darstellung',

@@ -354,7 +354,7 @@ export const zhHans: Partial<MessageCatalog> = {
   'admin.import.pageDescription': '将现有内容导入此组织。',
   'admin.import.wxr.title': 'WordPress 导入 (WXR)',
   'admin.import.wxr.description':
-    '上传 WordPress WXR 导出文件 (.xml)。可先预览将导入的内容，再执行导入。文章和页面成为内容记录，分类和标签成为标签。媒体、重定向和评论暂不导入。',
+    '上传 WordPress WXR 导出文件 (.xml)。可先预览将导入的内容，再执行导入。文章和页面成为内容记录，分类和标签成为标签，旧 URL 会 301 重定向到新的固定链接。媒体和评论暂不导入。',
   'admin.import.wxr.fileLabel': 'WXR 文件 (.xml)',
   'admin.import.wxr.preview': '预览',
   'admin.import.wxr.previewing': '预览中…',
@@ -370,6 +370,7 @@ export const zhHans: Partial<MessageCatalog> = {
   'admin.import.wxr.skippedExisting': '已存在',
   'admin.import.wxr.tagsEnsured': '标签',
   'admin.import.wxr.tagLinks': '标签关联',
+  'admin.import.wxr.redirects': '重定向',
   'admin.import.wxr.done': '导入完成。',
   'admin.nav.settings': '设置',
   'admin.nav.appearance': '外观',

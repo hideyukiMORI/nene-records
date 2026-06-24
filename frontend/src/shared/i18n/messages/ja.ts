@@ -362,7 +362,7 @@ export const ja: Partial<MessageCatalog> = {
   'admin.import.pageDescription': '既存コンテンツをこの組織に取り込みます。',
   'admin.import.wxr.title': 'WordPress インポート (WXR)',
   'admin.import.wxr.description':
-    'WordPress の WXR エクスポート (.xml) をアップロードします。取り込み内容をプレビューしてから実行できます。投稿・固定ページはコンテンツに、カテゴリー・タグはタグになります。メディア・リダイレクト・コメントは未対応です。',
+    'WordPress の WXR エクスポート (.xml) をアップロードします。取り込み内容をプレビューしてから実行できます。投稿・固定ページはコンテンツに、カテゴリー・タグはタグになり、旧URLは新permalinkへ301リダイレクトされます。メディア・コメントは未対応です。',
   'admin.import.wxr.fileLabel': 'WXR ファイル (.xml)',
   'admin.import.wxr.preview': 'プレビュー',
   'admin.import.wxr.previewing': 'プレビュー中…',
@@ -378,6 +378,7 @@ export const ja: Partial<MessageCatalog> = {
   'admin.import.wxr.skippedExisting': '既存スキップ',
   'admin.import.wxr.tagsEnsured': 'タグ',
   'admin.import.wxr.tagLinks': 'タグ紐付け',
+  'admin.import.wxr.redirects': 'リダイレクト',
   'admin.import.wxr.done': 'インポートが完了しました。',
   'admin.nav.settings': '設定',
   'admin.nav.appearance': '外観',

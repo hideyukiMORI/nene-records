@@ -11,6 +11,7 @@ use NeNeRecords\Tests\EntityType\InMemoryEntityTypeRepository;
 use NeNeRecords\Tests\FieldDef\InMemoryFieldDefRepository;
 use NeNeRecords\Tests\Tag\InMemoryTagRepository;
 use NeNeRecords\Tests\TextField\InMemoryTextFieldRepository;
+use NeNeRecords\Tests\UrlRedirect\InMemoryUrlRedirectRepository;
 use NeNeRecords\WxrImport\WxrDocument;
 use NeNeRecords\WxrImport\WxrImportExecutor;
 use NeNeRecords\WxrImport\WxrImportResult;
@@ -25,6 +26,7 @@ final class WxrImportExecutorTest extends TestCase
     private InMemoryTextFieldRepository $textFields;
     private InMemoryTagRepository $tags;
     private InMemoryEntityTagRepository $entityTags;
+    private InMemoryUrlRedirectRepository $redirects;
     private WxrImportExecutor $executor;
 
     protected function setUp(): void
@@ -36,6 +38,7 @@ final class WxrImportExecutorTest extends TestCase
         $this->textFields = new InMemoryTextFieldRepository([], $this->entities);
         $this->tags = new InMemoryTagRepository([]);
         $this->entityTags = new InMemoryEntityTagRepository();
+        $this->redirects = new InMemoryUrlRedirectRepository();
         $this->executor = new WxrImportExecutor(
             $this->entityTypes,
             $this->fieldDefs,
@@ -43,6 +46,7 @@ final class WxrImportExecutorTest extends TestCase
             $this->textFields,
             $this->tags,
             $this->entityTags,
+            $this->redirects,
         );
     }
 
@@ -128,5 +132,24 @@ final class WxrImportExecutorTest extends TestCase
         self::assertSame(0, $second->createdEntities);
         self::assertSame(4, $second->skippedExisting);
         self::assertSame(0, $second->tagLinks); // already attached
+    }
+
+    public function testRecordsRedirectMapFromOriginalUrls(): void
+    {
+        $result = $this->executor->execute($this->document());
+
+        // hello-world + about carry <link>; draft/no-slug do not; attachment is skipped.
+        self::assertSame(2, $result->redirectsCreated);
+
+        $posts = $this->entityTypes->findBySlug('posts');
+        self::assertNotNull($posts?->id);
+        $hello = $this->entities->findBySlug('hello-world', $posts->id);
+        self::assertNotNull($hello?->id);
+
+        $map = $this->redirects->all();
+        // old WP URL path (trailing slash stripped) → new permalink (default /{type}/{id})
+        self::assertArrayHasKey('/2024/01/hello-world', $map);
+        self::assertSame('/posts/' . (string) $hello->id, $map['/2024/01/hello-world']);
+        self::assertArrayHasKey('/about', $map);
     }
 }

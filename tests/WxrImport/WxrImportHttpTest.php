@@ -13,6 +13,7 @@ use NeNeRecords\Tests\EntityType\InMemoryEntityTypeRepository;
 use NeNeRecords\Tests\FieldDef\InMemoryFieldDefRepository;
 use NeNeRecords\Tests\Tag\InMemoryTagRepository;
 use NeNeRecords\Tests\TextField\InMemoryTextFieldRepository;
+use NeNeRecords\Tests\UrlRedirect\InMemoryUrlRedirectRepository;
 use NeNeRecords\WxrImport\WxrImportExecutor;
 use NeNeRecords\WxrImport\WxrImportHttpHandler;
 use NeNeRecords\WxrImport\WxrImportRouteRegistrar;
@@ -42,6 +43,7 @@ final class WxrImportHttpTest extends TestCase
             new InMemoryTextFieldRepository([], $this->entities),
             new InMemoryTagRepository([]),
             new InMemoryEntityTagRepository(),
+            new InMemoryUrlRedirectRepository(),
         );
         $handler = new WxrImportHttpHandler(
             $executor,
