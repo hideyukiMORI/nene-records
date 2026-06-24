@@ -3,7 +3,11 @@ import { cleanup, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { FieldDefsPage } from '@/pages/field-defs/FieldDefsPage'
-import { resetFieldDefStore, seedFieldDefs } from '@tests/msw/handlers/field-def'
+import {
+  findFieldDefForEntityType,
+  resetFieldDefStore,
+  seedFieldDefs,
+} from '@tests/msw/handlers/field-def'
 import { resetEntityTypeStore, seedEntityTypes } from '@tests/msw/handlers/entity-type'
 import { mswServer } from '@tests/msw/server'
 import { renderWithProviders } from '@tests/render/render-with-providers'
@@ -65,6 +69,56 @@ describe('FieldDefsPage', () => {
     await waitFor(() => {
       expect(screen.getByText('title')).toBeInTheDocument()
     })
+  })
+
+  it('configures a relation field with a target content type and cardinality', async () => {
+    seedEntityTypes([
+      { id: 1, name: 'Article', slug: 'article' },
+      { id: 2, name: 'Author', slug: 'author' },
+    ])
+    const user = userEvent.setup()
+    renderFieldDefsPage()
+
+    await waitFor(() => {
+      expect(screen.getByRole('heading', { name: 'Article' })).toBeInTheDocument()
+    })
+
+    const form = getAddFieldForm()
+    // Relation controls only appear once the data type is set to "relation".
+    expect(within(form).queryByLabelText('Target content type')).not.toBeInTheDocument()
+    await user.selectOptions(within(form).getByLabelText('Data type'), 'relation')
+    await user.selectOptions(within(form).getByLabelText('Target content type'), '2')
+    await user.selectOptions(within(form).getByLabelText('Cardinality'), 'many')
+    await user.type(within(form).getByLabelText('Field key'), 'author')
+    await user.click(within(form).getByRole('button', { name: 'Add field' }))
+
+    await waitFor(() => {
+      expect(screen.getByText('author')).toBeInTheDocument()
+    })
+
+    const record = findFieldDefForEntityType(1, 'author')
+    expect(record?.target_entity_type_id).toBe(2)
+    expect(record?.cardinality).toBe('many')
+  })
+
+  it('requires a target content type for relation fields', async () => {
+    seedEntityTypes([{ id: 1, name: 'Article', slug: 'article' }])
+    const user = userEvent.setup()
+    renderFieldDefsPage()
+
+    await waitFor(() => {
+      expect(screen.getByRole('heading', { name: 'Article' })).toBeInTheDocument()
+    })
+
+    const form = getAddFieldForm()
+    await user.selectOptions(within(form).getByLabelText('Data type'), 'relation')
+    await user.type(within(form).getByLabelText('Field key'), 'author')
+    await user.click(within(form).getByRole('button', { name: 'Add field' }))
+
+    expect(
+      await screen.findByText('Select a target content type for relation fields'),
+    ).toBeInTheDocument()
+    expect(findFieldDefForEntityType(1, 'author')).toBeUndefined()
   })
 
   it('shows validation errors for invalid field key', async () => {
