@@ -7,8 +7,26 @@ import {
   useUpdateFieldDef,
   type FieldDef,
   type FieldDefId,
+  type RelationCardinality,
 } from '@/entities/field-def'
 import type { CreateFieldDefFormValues } from './use-create-field-def-form'
+
+/**
+ * Relation-only payload, spread into the create/update input. Empty for
+ * non-relation fields so `target_entity_type_id` / `cardinality` are omitted.
+ */
+function relationInput(
+  values: CreateFieldDefFormValues,
+): { targetEntityTypeId: number; cardinality: RelationCardinality } | Record<string, never> {
+  if (values.dataType !== 'relation' || values.targetEntityTypeId === undefined) {
+    return {}
+  }
+
+  return {
+    targetEntityTypeId: values.targetEntityTypeId,
+    cardinality: values.cardinality ?? 'one',
+  }
+}
 
 export function useManageFieldDefsPage(entityTypeId: number) {
   const listParams = defaultFieldDefListParams(entityTypeId)
@@ -27,6 +45,7 @@ export function useManageFieldDefsPage(entityTypeId: number) {
         dataType: values.dataType,
         region: values.region === 'main' ? null : values.region,
         displayOrder: values.displayOrder,
+        ...relationInput(values),
       })
     },
     [createMutation, entityTypeId],
@@ -54,6 +73,7 @@ export function useManageFieldDefsPage(entityTypeId: number) {
           dataType: values.dataType,
           region: values.region === 'main' ? null : values.region,
           displayOrder: values.displayOrder,
+          ...relationInput(values),
         },
       })
       setEditTarget(null)

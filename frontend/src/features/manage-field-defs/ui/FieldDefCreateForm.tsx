@@ -7,6 +7,7 @@ import {
   type CreateFieldDefFormValues,
   useCreateFieldDefForm,
 } from '../hooks/use-create-field-def-form'
+import { RelationFieldControls } from './RelationFieldControls'
 
 const DATA_TYPE_LABEL_KEYS: Record<FieldDataType, MessageKey> = {
   text: 'admin.fieldDefs.dataType.text',
@@ -53,6 +54,8 @@ export function FieldDefCreateForm({
             dataType: values.dataType,
             region: values.region,
             displayOrder: values.displayOrder,
+            targetEntityTypeId: values.targetEntityTypeId,
+            cardinality: values.cardinality,
           })
         })(event)
       }}
@@ -108,6 +111,12 @@ export function FieldDefCreateForm({
               ) : null}
             </div>
           )}
+        />
+        <RelationFieldControls
+          control={control}
+          isSubmitting={isSubmitting}
+          idPrefix="field-def"
+          targetError={errors.targetEntityTypeId?.message}
         />
         <Controller
           name="region"
