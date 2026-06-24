@@ -42,6 +42,10 @@ services:
       # without outbound mail configured boots cleanly instead of fataling on "".
       MAIL_DSN: ${MAIL_DSN:-null://null}
       MAIL_FROM: ${MAIL_FROM:-noreply@example.com}
+      # Single-org tenant resolution: the app resolves the organization from this
+      # slug, which MUST match the install org slug (app:install default "default").
+      # Without it every org-scoped request is org-not-resolved 404. See docs/deployment.md.
+      ORG_SLUG: ${ORG_SLUG:-default}
     ports:
       - "${NENE_RECORDS_PROD_PORT:-8080}:80"
     healthcheck:
