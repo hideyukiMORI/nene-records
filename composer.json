@@ -40,6 +40,10 @@
         "migrations:status": "phinx status -c phinx.php",
         "migrations:migrate": "phinx migrate -c phinx.php",
         "migrations:rollback": "phinx rollback -c phinx.php",
+        "app:install": [
+            "@migrations:migrate",
+            "php tools/install.php"
+        ],
         "check": [
             "@test",
             "@analyse",
