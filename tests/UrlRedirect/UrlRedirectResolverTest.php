@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace NeNeRecords\Tests\UrlRedirect;
 
+use NeNeRecords\UrlRedirect\UrlRedirectRepositoryInterface;
 use NeNeRecords\UrlRedirect\UrlRedirectResolver;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use RuntimeException;
 
 final class UrlRedirectResolverTest extends TestCase
 {
@@ -78,6 +80,28 @@ final class UrlRedirectResolverTest extends TestCase
     {
         $request = $this->factory->createServerRequest('POST', 'https://site.test/2024/01/hello-world');
         $response = $this->resolver->apply($request, $this->notFound());
+
+        self::assertSame(404, $response->getStatusCode());
+    }
+
+    public function testFallsThroughWhenLookupThrows(): void
+    {
+        // No org resolved (e.g. /admin) → the org-scoped repo's holder is unset and
+        // findTargetBySource throws. The resolver must swallow it and return the
+        // original 404 so the SPA shell fallback can serve the request.
+        $throwing = new class () implements UrlRedirectRepositoryInterface {
+            public function findTargetBySource(string $sourcePath): ?string
+            {
+                throw new RuntimeException('RequestScopedHolder::get() called before set()');
+            }
+
+            public function save(string $sourcePath, string $targetPath): void
+            {
+            }
+        };
+        $resolver = new UrlRedirectResolver($throwing, $this->factory);
+
+        $response = $resolver->apply($this->get('/admin'), $this->notFound());
 
         self::assertSame(404, $response->getStatusCode());
     }
