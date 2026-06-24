@@ -66,7 +66,15 @@ final class WxrImportPlanner
                 $tagSet[$tag] = true;
             }
 
-            $planned[] = new WxrImportPlannedItem($item->title, $slug, $entityType, $status, $tags);
+            $planned[] = new WxrImportPlannedItem(
+                $item->title,
+                $slug,
+                $entityType,
+                $status,
+                $tags,
+                $item->contentHtml,
+                $item->publishedAtIso,
+            );
             $countsByType[$entityType] = ($countsByType[$entityType] ?? 0) + 1;
             $countsByStatus[$status] = ($countsByStatus[$status] ?? 0) + 1;
         }
