@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace NeNeRecords\Tests\WxrImport;
 
+use NeNeRecords\Entity\Entity;
 use NeNeRecords\Entity\EntityStatus;
+use NeNeRecords\EntityType\EntityType;
+use NeNeRecords\FieldDef\FieldDef;
 use NeNeRecords\Tests\Entity\InMemoryEntityRepository;
 use NeNeRecords\Tests\EntityTag\InMemoryEntityTagRepository;
 use NeNeRecords\Tests\EntityType\InMemoryEntityTypeRepository;
@@ -132,6 +135,80 @@ final class WxrImportExecutorTest extends TestCase
         self::assertSame(0, $second->createdEntities);
         self::assertSame(4, $second->skippedExisting);
         self::assertSame(0, $second->tagLinks); // already attached
+    }
+
+    public function testPromotesEmptyMarkdownBodyToHtml(): void
+    {
+        // A type seeded with a markdown `body` but no entities yet (fresh target).
+        $entityTypes = new InMemoryEntityTypeRepository([new EntityType(name: 'Posts', slug: 'posts', id: 1)]);
+        $fieldDefs = new InMemoryFieldDefRepository([
+            new FieldDef(entityTypeId: 1, fieldKey: 'body', dataType: 'markdown', id: 1),
+        ]);
+        $entities = new InMemoryEntityRepository([]);
+        $textFields = new InMemoryTextFieldRepository([], $entities);
+        $executor = new WxrImportExecutor(
+            $entityTypes,
+            $fieldDefs,
+            $entities,
+            $textFields,
+            new InMemoryTagRepository([]),
+            new InMemoryEntityTagRepository(),
+            new InMemoryUrlRedirectRepository(),
+        );
+
+        $result = $executor->execute($this->document());
+
+        // body promoted markdown → html (safe: no values existed).
+        self::assertSame('html', $fieldDefs->findByEntityTypeIdAndFieldKey(1, 'body')?->dataType);
+        // content written to body and faithful.
+        $hello = $entities->findBySlug('hello-world', 1);
+        self::assertNotNull($hello?->id);
+        self::assertStringContainsString('<strong>world</strong>', $this->bodyValue($textFields, $hello->id, 'body'));
+        self::assertNotEmpty(array_filter($result->warnings, static fn (string $w): bool => str_contains($w, '昇格')));
+    }
+
+    public function testWritesToDedicatedFieldWhenTypeHasNativeContent(): void
+    {
+        // A type with a markdown `body` that already holds native content.
+        $entityTypes = new InMemoryEntityTypeRepository([new EntityType(name: 'Posts', slug: 'posts', id: 1)]);
+        $fieldDefs = new InMemoryFieldDefRepository([
+            new FieldDef(entityTypeId: 1, fieldKey: 'body', dataType: 'markdown', id: 1),
+        ]);
+        $entities = new InMemoryEntityRepository([
+            new Entity(id: 5, entityTypeId: 1, slug: 'native-post', status: EntityStatus::Published),
+        ]);
+        $textFields = new InMemoryTextFieldRepository([], $entities);
+        $executor = new WxrImportExecutor(
+            $entityTypes,
+            $fieldDefs,
+            $entities,
+            $textFields,
+            new InMemoryTagRepository([]),
+            new InMemoryEntityTagRepository(),
+            new InMemoryUrlRedirectRepository(),
+        );
+
+        $result = $executor->execute($this->document());
+
+        // Existing markdown body left intact; import lands in a dedicated html field.
+        self::assertSame('markdown', $fieldDefs->findByEntityTypeIdAndFieldKey(1, 'body')?->dataType);
+        self::assertSame('html', $fieldDefs->findByEntityTypeIdAndFieldKey(1, 'wp_content')?->dataType);
+        $hello = $entities->findBySlug('hello-world', 1);
+        self::assertNotNull($hello?->id);
+        self::assertStringContainsString('<strong>world</strong>', $this->bodyValue($textFields, $hello->id, 'wp_content'));
+        self::assertSame('', $this->bodyValue($textFields, $hello->id, 'body'));
+        self::assertNotEmpty(array_filter($result->warnings, static fn (string $w): bool => str_contains($w, 'wp_content')));
+    }
+
+    private function bodyValue(InMemoryTextFieldRepository $textFields, int $entityId, string $fieldKey): string
+    {
+        foreach ($textFields->findByEntityId($entityId, 100, 0) as $tf) {
+            if ($tf->fieldKey === $fieldKey) {
+                return $tf->value;
+            }
+        }
+
+        return '';
     }
 
     public function testRewritesBodyImageUrlsFromMediaMap(): void
