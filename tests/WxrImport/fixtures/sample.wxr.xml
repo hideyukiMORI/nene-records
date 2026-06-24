@@ -33,6 +33,14 @@
       <wp:post_type><![CDATA[post]]></wp:post_type>
       <category domain="category" nicename="news"><![CDATA[News]]></category>
       <category domain="post_tag" nicename="php"><![CDATA[PHP]]></category>
+      <wp:postmeta>
+        <wp:meta_key><![CDATA[_yoast_wpseo_title]]></wp:meta_key>
+        <wp:meta_value><![CDATA[Hello World — Custom SEO Title]]></wp:meta_value>
+      </wp:postmeta>
+      <wp:postmeta>
+        <wp:meta_key><![CDATA[_yoast_wpseo_metadesc]]></wp:meta_key>
+        <wp:meta_value><![CDATA[A friendly greeting, search-optimized.]]></wp:meta_value>
+      </wp:postmeta>
     </item>
     <item>
       <title>About</title>
@@ -44,6 +52,10 @@
       <wp:post_name><![CDATA[about]]></wp:post_name>
       <wp:status><![CDATA[publish]]></wp:status>
       <wp:post_type><![CDATA[page]]></wp:post_type>
+      <wp:postmeta>
+        <wp:meta_key><![CDATA[_yoast_wpseo_title]]></wp:meta_key>
+        <wp:meta_value><![CDATA[%%title%% %%sep%% %%sitename%%]]></wp:meta_value>
+      </wp:postmeta>
     </item>
     <item>
       <title>Draft Post</title>

@@ -99,6 +99,8 @@ final class WxrImportExecutor
                 slug: $item->slug,
                 status: EntityStatus::from($item->status),
                 publishedAt: $publishedAt,
+                metaTitle: $item->metaTitle,
+                metaDescription: $item->metaDescription,
             ));
 
             // Imported WordPress content is HTML — write it to an html-typed field

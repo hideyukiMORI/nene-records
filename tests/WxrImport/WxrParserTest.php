@@ -50,6 +50,9 @@ final class WxrParserTest extends TestCase
         // WP local date → ISO-8601.
         self::assertNotNull($hello->publishedAtIso);
         self::assertStringStartsWith('2024-01-15T10:00:00', $hello->publishedAtIso);
+        // postmeta (SEO plugin fields) parsed as key → value.
+        self::assertSame('Hello World — Custom SEO Title', $hello->postMeta['_yoast_wpseo_title'] ?? null);
+        self::assertSame('A friendly greeting, search-optimized.', $hello->postMeta['_yoast_wpseo_metadesc'] ?? null);
     }
 
     public function testItemWithoutSlugYieldsNull(): void
