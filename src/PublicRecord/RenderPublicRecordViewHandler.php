@@ -19,6 +19,7 @@ final readonly class RenderPublicRecordViewHandler
         private ListPublicSettingsUseCaseInterface $publicSettings,
         private HtmlResponseFactory $html,
         private AppConfig $config,
+        private string $projectRoot,
     ) {
     }
 
@@ -80,6 +81,26 @@ final readonly class RenderPublicRecordViewHandler
             $viteUrl = 'http://localhost:5173';
         }
 
+        // Single-origin SPA mount: in dev, load the Vite dev client; in prod,
+        // resolve the built entry assets so the SSR shell hydrates into the SPA.
+        // Falls back to crawlable-SSR-only when no build is present.
+        $spaMode = 'none';
+        $spaJs = null;
+        $spaCss = [];
+        $spaPreload = [];
+
+        if ($this->config->debug) {
+            $spaMode = 'dev';
+        } else {
+            $entry = ViteManifest::resolveEntry($this->projectRoot . '/frontend/dist/.vite/manifest.json');
+            if ($entry !== null) {
+                $spaMode = 'prod';
+                $spaJs = $entry['js'];
+                $spaCss = $entry['css'];
+                $spaPreload = $entry['preload'];
+            }
+        }
+
         return $this->html->create('public/record-detail.php', [
             'pageTitle' => $output->pageTitle,
             'entityTypeSlug' => $output->entityTypeSlug,
@@ -93,8 +114,11 @@ final readonly class RenderPublicRecordViewHandler
             'publishedAtIso' => $output->publishedAtIso,
             'updatedAtIso' => $output->updatedAtIso,
             'bootstrapJson' => $bootstrapJson,
-            'includeViteClient' => $this->config->debug,
+            'spaMode' => $spaMode,
             'viteUrl' => rtrim($viteUrl, '/'),
+            'spaJs' => $spaJs,
+            'spaCss' => $spaCss,
+            'spaPreload' => $spaPreload,
             'renderMarkdown' => static fn (string $markdown): string => PublicMarkdownRenderer::toSafeHtml($markdown),
             // A bundle's crawlable twin (#311): render its seoText markdown server-side
             // (the sandboxed iframe itself is SPA-only / invisible to crawlers).

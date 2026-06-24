@@ -19,6 +19,9 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react(), tailwindcss()],
     build: {
+      // Emit dist/.vite/manifest.json so the PHP single-origin SSR can resolve
+      // the hashed entry JS/CSS and mount the built SPA on server-rendered pages.
+      manifest: true,
       rollupOptions: {
         output: {
           // Split long-lived vendor code out of the app entry so the initial

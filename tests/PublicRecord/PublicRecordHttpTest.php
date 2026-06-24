@@ -54,7 +54,11 @@ final class PublicRecordHttpTest extends TestCase
 
         $this->factory = new Psr17Factory();
         $this->projectRoot = dirname(__DIR__, 2);
+        $this->application = $this->buildApplication(true, $this->projectRoot);
+    }
 
+    private function buildApplication(bool $debug, string $projectRoot): RequestHandlerInterface
+    {
         $entityTypes = new InMemoryEntityTypeRepository([
             new EntityType(name: 'Article', slug: 'article', id: 1),
         ]);
@@ -97,11 +101,11 @@ final class PublicRecordHttpTest extends TestCase
 
         $jsonResponse = new JsonResponseFactory($this->factory, $this->factory);
         $problemDetails = new ProblemDetailsResponseFactory($this->factory, $this->factory);
-        $renderer = new NativePhpViewRenderer($this->projectRoot . '/templates');
+        $renderer = new NativePhpViewRenderer(dirname(__DIR__, 2) . '/templates');
         $htmlResponse = new HtmlResponseFactory($this->factory, $this->factory, $renderer);
         $config = new AppConfig(
             environment: AppEnvironment::Test,
-            debug: true,
+            debug: $debug,
             name: 'NeNe Records',
             database: new DatabaseConfig(
                 url: null,
@@ -117,14 +121,14 @@ final class PublicRecordHttpTest extends TestCase
             machineApiKey: null,
         );
 
-        $renderHandler = new RenderPublicRecordViewHandler($useCase, $publicSettings, $htmlResponse, $config);
+        $renderHandler = new RenderPublicRecordViewHandler($useCase, $publicSettings, $htmlResponse, $config, $projectRoot);
         $registrar = new PublicRecordRouteRegistrar(
             new GetPublicRecordViewHandler($useCase, $jsonResponse, $this->factory),
             $renderHandler,
             new RenderPublicPermalinkHandler($entityTypes, $renderHandler),
         );
 
-        $this->application = (new RuntimeApplicationFactory(
+        return (new RuntimeApplicationFactory(
             $this->factory,
             $this->factory,
             domainExceptionHandlers: [
@@ -250,6 +254,44 @@ final class PublicRecordHttpTest extends TestCase
         );
 
         self::assertSame(404, $response->getStatusCode());
+    }
+
+    public function testDevModeWrapsSsrContentInRootAndLoadsViteClient(): void
+    {
+        // Default app is debug=true → SSR content lives inside #root and the SPA
+        // mounts via the Vite dev client (createRoot replaces the SSR fallback).
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/article/10'),
+        );
+        $html = (string) $response->getBody();
+
+        self::assertStringContainsString('<div id="root">', $html);
+        self::assertStringContainsString('<h1>Hello world</h1>', $html);
+        self::assertStringContainsString('/@vite/client', $html);
+        self::assertStringContainsString('/src/main.tsx', $html);
+    }
+
+    public function testProdModeMountsBuiltSpaFromManifest(): void
+    {
+        // Prod build (debug=false) with a fixture Vite manifest → SSR shell + built
+        // SPA entry/css/modulepreload; no Vite dev client.
+        $app = $this->buildApplication(false, __DIR__ . '/fixtures/spa-build');
+        $response = $app->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/article/10'),
+        );
+        $html = (string) $response->getBody();
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertStringContainsString('<div id="root">', $html);
+        self::assertStringContainsString('<h1>Hello world</h1>', $html);
+        // Built entry + stylesheets + preload resolved from the manifest graph.
+        self::assertStringContainsString('<script type="module" crossorigin src="/assets/index-ABC.js">', $html);
+        self::assertStringContainsString('<link rel="stylesheet" crossorigin href="/assets/index-ABC.css" />', $html);
+        self::assertStringContainsString('<link rel="stylesheet" crossorigin href="/assets/vendor-XYZ.css" />', $html);
+        self::assertStringContainsString('<link rel="modulepreload" crossorigin href="/assets/vendor-XYZ.js" />', $html);
+        // No dev client in prod.
+        self::assertStringNotContainsString('/@vite/client', $html);
+        self::assertStringNotContainsString('/src/main.tsx', $html);
     }
 
     /** @return array<string, mixed> */
