@@ -105,6 +105,7 @@ final class PublicCacheHttpTest extends TestCase
             ),
             dirname(__DIR__, 2),
             $this->factory,
+            new \NeNeRecords\PublicRecord\PublicHtmlSanitizer(),
         );
         $publicRecordRegistrar = new PublicRecordRouteRegistrar(
             new GetPublicRecordViewHandler($useCase, $jsonResponse, $this->factory),

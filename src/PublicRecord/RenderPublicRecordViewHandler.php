@@ -23,6 +23,7 @@ final readonly class RenderPublicRecordViewHandler
         private AppConfig $config,
         private string $projectRoot,
         private ResponseFactoryInterface $responseFactory,
+        private PublicHtmlSanitizer $htmlSanitizer,
     ) {
     }
 
@@ -133,6 +134,9 @@ final readonly class RenderPublicRecordViewHandler
             'spaCss' => $spaCss,
             'spaPreload' => $spaPreload,
             'renderMarkdown' => static fn (string $markdown): string => PublicMarkdownRenderer::toSafeHtml($markdown),
+            // html-typed fields (e.g. WXR-imported content): sanitize server-side so the
+            // crawlable SSR shows the same trusted markup the SPA renders via DOMPurify.
+            'renderHtml' => fn (string $rawHtml): string => $this->htmlSanitizer->sanitize($rawHtml),
             // A bundle's crawlable twin (#311): render its seoText markdown server-side
             // (the sandboxed iframe itself is SPA-only / invisible to crawlers).
             'renderBundleSeo' => static fn (string $raw): string => PublicMarkdownRenderer::toSafeHtml(BundleDocumentValidator::seoTextOf($raw)),

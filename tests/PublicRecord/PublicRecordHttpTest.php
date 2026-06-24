@@ -20,6 +20,7 @@ use NeNeRecords\FieldDef\FieldDef;
 use NeNeRecords\PublicRecord\GetPublicRecordViewHandler;
 use NeNeRecords\PublicRecord\GetPublicRecordViewUseCase;
 use NeNeRecords\PublicRecord\PublicEntityTypeNotFoundExceptionHandler;
+use NeNeRecords\PublicRecord\PublicHtmlSanitizer;
 use NeNeRecords\PublicRecord\PublicRecordNotFoundExceptionHandler;
 use NeNeRecords\PublicRecord\PublicRecordRouteRegistrar;
 use NeNeRecords\PublicRecord\RenderPublicPermalinkHandler;
@@ -77,11 +78,18 @@ final class PublicRecordHttpTest extends TestCase
             new FieldDef(entityTypeId: 1, fieldKey: 'title', dataType: 'text', id: 1),
             new FieldDef(entityTypeId: 1, fieldKey: 'body', dataType: 'text', id: 2),
             new FieldDef(entityTypeId: 1, fieldKey: 'hero', dataType: 'image', id: 3),
+            new FieldDef(entityTypeId: 1, fieldKey: 'richbody', dataType: 'html', id: 4),
         ]);
         $textFields = new InMemoryTextFieldRepository([
             new TextField(entityId: 10, fieldKey: 'title', value: 'Hello world', id: 1),
             new TextField(entityId: 10, fieldKey: 'body', value: "## Sample\n\n**bold** line", id: 2),
             new TextField(entityId: 10, fieldKey: 'hero', value: '/media/2026/06/hero.png', id: 3),
+            new TextField(
+                entityId: 10,
+                fieldKey: 'richbody',
+                value: '<p>imported <strong>kept</strong></p><img src="/media/imported/x.jpg" alt="p" /><script>alert(1)</script>',
+                id: 4,
+            ),
         ], $entities);
 
         $publicSettings = new ListPublicSettingsUseCase(new InMemorySettingRepository(), new InMemoryMediaRepository());
@@ -121,7 +129,7 @@ final class PublicRecordHttpTest extends TestCase
             machineApiKey: null,
         );
 
-        $renderHandler = new RenderPublicRecordViewHandler($useCase, $publicSettings, $htmlResponse, $config, $projectRoot, $this->factory);
+        $renderHandler = new RenderPublicRecordViewHandler($useCase, $publicSettings, $htmlResponse, $config, $projectRoot, $this->factory, new PublicHtmlSanitizer());
         $registrar = new PublicRecordRouteRegistrar(
             new GetPublicRecordViewHandler($useCase, $jsonResponse, $this->factory),
             $renderHandler,
@@ -165,6 +173,32 @@ final class PublicRecordHttpTest extends TestCase
         );
 
         self::assertSame(404, $response->getStatusCode());
+    }
+
+    public function testRenderPublicRecordViewSanitizesHtmlFieldsServerSide(): void
+    {
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/article/10'),
+        );
+        $html = (string) $response->getBody();
+
+        self::assertSame(200, $response->getStatusCode());
+
+        // Inspect only the rendered <article> (the crawler-visible content), not the
+        // hydration bootstrap JSON below it (which carries the raw value as inert,
+        // hex-escaped data for the SPA to sanitize via DOMPurify).
+        $start = strpos($html, '<article>');
+        $end = strpos($html, '</article>');
+        self::assertNotFalse($start);
+        self::assertNotFalse($end);
+        $article = substr($html, $start, $end - $start);
+
+        // html-typed field: rich markup + images survive in the crawlable SSR…
+        self::assertStringContainsString('<strong>kept</strong>', $article);
+        self::assertStringContainsString('/media/imported/x.jpg', $article);
+        // …but scripts/handlers are stripped server-side (no arbitrary JS in the article).
+        self::assertStringNotContainsString('<script', $article);
+        self::assertStringNotContainsString('alert(1)', $article);
     }
 
     public function testRenderPublicRecordViewReturnsHtmlWithBootstrapAndArticleContent(): void

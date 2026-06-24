@@ -190,7 +190,15 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
                         throw new LogicException('Response factory service is invalid.');
                     }
 
-                    return new RenderPublicRecordViewHandler($useCase, $publicSettings, $html, $config, $projectRoot, $responseFactory);
+                    return new RenderPublicRecordViewHandler(
+                        $useCase,
+                        $publicSettings,
+                        $html,
+                        $config,
+                        $projectRoot,
+                        $responseFactory,
+                        new PublicHtmlSanitizer(),
+                    );
                 },
             )
             ->set(
