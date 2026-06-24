@@ -13,6 +13,7 @@ use NeNeRecords\Entity\EntityRepositoryInterface;
 use NeNeRecords\EntityTag\EntityTagRepositoryInterface;
 use NeNeRecords\EntityType\EntityTypeRepositoryInterface;
 use NeNeRecords\FieldDef\FieldDefRepositoryInterface;
+use NeNeRecords\Media\UploadMediaUseCaseInterface;
 use NeNeRecords\Tag\TagRepositoryInterface;
 use NeNeRecords\TextField\TextFieldRepositoryInterface;
 use NeNeRecords\UrlRedirect\UrlRedirectRepositoryInterface;
@@ -68,14 +69,30 @@ final readonly class WxrImportServiceProvider implements ServiceProviderInterfac
                 },
             )
             ->set(
+                WxrMediaImporter::class,
+                static function (ContainerInterface $c): WxrMediaImporter {
+                    $upload = $c->get(UploadMediaUseCaseInterface::class);
+
+                    if (!$upload instanceof UploadMediaUseCaseInterface) {
+                        throw new LogicException('Upload media use case service is invalid.');
+                    }
+
+                    return new WxrMediaImporter(new HttpWxrMediaFetcher(), $upload);
+                },
+            )
+            ->set(
                 WxrImportHttpHandler::class,
                 static function (ContainerInterface $c): WxrImportHttpHandler {
                     $executor = $c->get(WxrImportExecutor::class);
+                    $mediaImporter = $c->get(WxrMediaImporter::class);
                     $json = $c->get(JsonResponseFactory::class);
                     $problemDetails = $c->get(ProblemDetailsResponseFactory::class);
 
                     if (!$executor instanceof WxrImportExecutor) {
                         throw new LogicException('WXR import executor service is invalid.');
+                    }
+                    if (!$mediaImporter instanceof WxrMediaImporter) {
+                        throw new LogicException('WXR media importer service is invalid.');
                     }
                     if (!$json instanceof JsonResponseFactory) {
                         throw new LogicException('JSON response factory service is invalid.');
@@ -84,7 +101,7 @@ final readonly class WxrImportServiceProvider implements ServiceProviderInterfac
                         throw new LogicException('Problem details response factory service is invalid.');
                     }
 
-                    return new WxrImportHttpHandler($executor, $json, $problemDetails);
+                    return new WxrImportHttpHandler($executor, $mediaImporter, $json, $problemDetails);
                 },
             )
             ->set(

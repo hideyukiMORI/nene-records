@@ -104,6 +104,7 @@ final class WxrParser
             originalLink: trim((string) $item->link) ?: null,
             categorySlugs: array_values(array_unique($categorySlugs)),
             tagSlugs: array_values(array_unique($tagSlugs)),
+            attachmentUrl: trim((string) $wp->attachment_url) ?: null,
         );
     }
 

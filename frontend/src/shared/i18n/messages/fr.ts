@@ -388,6 +388,7 @@ export const fr: Partial<MessageCatalog> = {
   'admin.import.wxr.tagsEnsured': 'Tags',
   'admin.import.wxr.tagLinks': 'Liens de tags',
   'admin.import.wxr.redirects': 'Redirections',
+  'admin.import.wxr.media': 'Médias',
   'admin.import.wxr.done': 'Import terminé.',
   'admin.nav.settings': 'Paramètres',
   'admin.nav.appearance': 'Apparence',

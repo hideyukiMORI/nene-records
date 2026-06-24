@@ -53,6 +53,8 @@ export const wxrImportHandlers = [
         tags_ensured: 2,
         tag_links: 2,
         redirects_created: 2,
+        media_imported: 1,
+        media_skipped: 0,
         skipped: [{ title: 'image.jpg', reason: '未対応の post_type: attachment' }],
         warnings: [],
       },
