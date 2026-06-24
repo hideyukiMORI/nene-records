@@ -371,6 +371,7 @@ export const zhHans: Partial<MessageCatalog> = {
   'admin.import.wxr.tagsEnsured': '标签',
   'admin.import.wxr.tagLinks': '标签关联',
   'admin.import.wxr.redirects': '重定向',
+  'admin.import.wxr.media': '媒体',
   'admin.import.wxr.done': '导入完成。',
   'admin.nav.settings': '设置',
   'admin.nav.appearance': '外观',

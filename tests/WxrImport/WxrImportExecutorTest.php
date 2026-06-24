@@ -134,6 +134,27 @@ final class WxrImportExecutorTest extends TestCase
         self::assertSame(0, $second->tagLinks); // already attached
     }
 
+    public function testRewritesBodyImageUrlsFromMediaMap(): void
+    {
+        $oldUrl = 'https://old.example.com/wp-content/uploads/2024/01/image.jpg';
+        $this->executor->execute($this->document(), [$oldUrl => '/media/imported/image.jpg']);
+
+        $posts = $this->entityTypes->findBySlug('posts');
+        self::assertNotNull($posts?->id);
+        $hello = $this->entities->findBySlug('hello-world', $posts->id);
+        self::assertNotNull($hello?->id);
+
+        $body = '';
+        foreach ($this->textFields->findByEntityId($hello->id, 100, 0) as $tf) {
+            if ($tf->fieldKey === 'body') {
+                $body = $tf->value;
+            }
+        }
+
+        self::assertStringContainsString('/media/imported/image.jpg', $body);
+        self::assertStringNotContainsString('old.example.com', $body);
+    }
+
     public function testRecordsRedirectMapFromOriginalUrls(): void
     {
         $result = $this->executor->execute($this->document());

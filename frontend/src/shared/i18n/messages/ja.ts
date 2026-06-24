@@ -379,6 +379,7 @@ export const ja: Partial<MessageCatalog> = {
   'admin.import.wxr.tagsEnsured': 'タグ',
   'admin.import.wxr.tagLinks': 'タグ紐付け',
   'admin.import.wxr.redirects': 'リダイレクト',
+  'admin.import.wxr.media': 'メディア',
   'admin.import.wxr.done': 'インポートが完了しました。',
   'admin.nav.settings': '設定',
   'admin.nav.appearance': '外観',

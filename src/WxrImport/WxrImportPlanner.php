@@ -42,7 +42,12 @@ final class WxrImportPlanner
 
             $entityType = self::POST_TYPE_MAP[$item->postType] ?? null;
             if ($entityType === null) {
-                $skipped[] = new WxrImportSkippedItem($label, "未対応の post_type: {$item->postType}");
+                // Attachments are not entities; they are imported into the media
+                // library on execute (and body image URLs are rewritten).
+                $reason = $item->postType === 'attachment'
+                    ? '添付ファイル（実行時にメディアとして取り込み）'
+                    : "未対応の post_type: {$item->postType}";
+                $skipped[] = new WxrImportSkippedItem($label, $reason);
                 continue;
             }
 

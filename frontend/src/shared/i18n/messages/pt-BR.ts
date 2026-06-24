@@ -386,6 +386,7 @@ export const ptBR: Partial<MessageCatalog> = {
   'admin.import.wxr.tagsEnsured': 'Tags',
   'admin.import.wxr.tagLinks': 'Vínculos de tags',
   'admin.import.wxr.redirects': 'Redirecionamentos',
+  'admin.import.wxr.media': 'Mídia',
   'admin.import.wxr.done': 'Importação concluída.',
   'admin.nav.settings': 'Configurações',
   'admin.nav.appearance': 'Aparência',

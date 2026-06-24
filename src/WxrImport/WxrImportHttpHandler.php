@@ -23,6 +23,7 @@ final readonly class WxrImportHttpHandler implements RequestHandlerInterface
 {
     public function __construct(
         private WxrImportExecutor $executor,
+        private WxrMediaImporter $mediaImporter,
         private JsonResponseFactory $json,
         private ProblemDetailsResponseFactory $problemDetails,
     ) {
@@ -63,7 +64,12 @@ final readonly class WxrImportHttpHandler implements RequestHandlerInterface
             return $this->json->create($this->planToArray((new WxrImportPlanner())->plan($document)));
         }
 
-        return $this->json->create($this->resultToArray($this->executor->execute($document)), 201);
+        // Import attachments first so the entity importer can rewrite body image
+        // URLs from the old WordPress media to the new media library.
+        $media = $this->mediaImporter->importAttachments($document);
+        $result = $this->executor->execute($document, $media->urlMap);
+
+        return $this->json->create($this->resultToArray($result, $media), 201);
     }
 
     /** @return array<string, mixed> */
@@ -92,7 +98,7 @@ final readonly class WxrImportHttpHandler implements RequestHandlerInterface
     }
 
     /** @return array<string, mixed> */
-    private function resultToArray(WxrImportResult $result): array
+    private function resultToArray(WxrImportResult $result, WxrMediaImportResult $media): array
     {
         return [
             'mode' => 'import',
@@ -101,6 +107,8 @@ final readonly class WxrImportHttpHandler implements RequestHandlerInterface
             'tags_ensured' => $result->tagsEnsured,
             'tag_links' => $result->tagLinks,
             'redirects_created' => $result->redirectsCreated,
+            'media_imported' => $media->imported,
+            'media_skipped' => $media->skipped,
             'skipped' => array_map(static fn (WxrImportSkippedItem $s): array => [
                 'title' => $s->title,
                 'reason' => $s->reason,

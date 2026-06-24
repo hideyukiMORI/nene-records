@@ -25,10 +25,10 @@ final class WxrImportPlannerTest extends TestCase
 
         // hello-world(post), about(page), draft-post(post), no-slug(post) = 4 planned.
         self::assertCount(4, $plan->plannedItems);
-        // attachment skipped.
+        // attachment not an entity; imported into the media library on execute.
         self::assertCount(1, $plan->skippedItems);
         self::assertSame('image.jpg', $plan->skippedItems[0]->title);
-        self::assertStringContainsString('attachment', $plan->skippedItems[0]->reason);
+        self::assertStringContainsString('メディア', $plan->skippedItems[0]->reason);
 
         self::assertSame(['posts' => 3, 'pages' => 1], $plan->countsByEntityType);
         self::assertSame(['published' => 3, 'draft' => 1], $plan->countsByStatus);

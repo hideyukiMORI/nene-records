@@ -24,7 +24,7 @@
       <title>Hello World</title>
       <link>https://old.example.com/2024/01/hello-world/</link>
       <dc:creator><![CDATA[admin]]></dc:creator>
-      <content:encoded><![CDATA[<p>Hello <strong>world</strong>.</p>]]></content:encoded>
+      <content:encoded><![CDATA[<p>Hello <strong>world</strong>.</p><img src="https://old.example.com/wp-content/uploads/2024/01/image.jpg" alt="pic" />]]></content:encoded>
       <excerpt:encoded><![CDATA[A greeting.]]></excerpt:encoded>
       <wp:post_id>10</wp:post_id>
       <wp:post_date><![CDATA[2024-01-15 10:00:00]]></wp:post_date>
@@ -64,6 +64,7 @@
       <wp:post_name><![CDATA[image-jpg]]></wp:post_name>
       <wp:status><![CDATA[inherit]]></wp:status>
       <wp:post_type><![CDATA[attachment]]></wp:post_type>
+      <wp:attachment_url><![CDATA[https://old.example.com/wp-content/uploads/2024/01/image.jpg]]></wp:attachment_url>
     </item>
     <item>
       <title>No Slug Here</title>

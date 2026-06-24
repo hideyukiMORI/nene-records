@@ -33,8 +33,10 @@ use NeNeRecords\UrlRedirect\UrlRedirectRepositoryInterface;
  *   markdown HTML passthrough).
  * - 301 redirect map (S3): each item's original WordPress URL path is recorded
  *   as a redirect to the new permalink, preserving SEO equity after migration.
+ * - Media (S4): a caller-supplied old→new media URL map rewrites `<img src>`
+ *   references in the body so imported content points at the new media library.
  *
- * Out of scope (later slices): media attachments, postmeta.
+ * Out of scope (later slices): postmeta.
  */
 final class WxrImportExecutor
 {
@@ -49,7 +51,11 @@ final class WxrImportExecutor
     ) {
     }
 
-    public function execute(WxrDocument $document): WxrImportResult
+    /**
+     * @param array<string, string> $mediaUrlMap original attachment URL → new media URL,
+     *                                            used to rewrite `<img src>` in body content
+     */
+    public function execute(WxrDocument $document, array $mediaUrlMap = []): WxrImportResult
     {
         $plan = (new WxrImportPlanner())->plan($document);
         $tagNames = $this->termNameMap($document);
@@ -86,8 +92,9 @@ final class WxrImportExecutor
                 publishedAt: $publishedAt,
             ));
 
+            $body = $mediaUrlMap === [] ? $item->contentHtml : strtr($item->contentHtml, $mediaUrlMap);
             $this->textFields->save(new TextField(entityId: $entityId, fieldKey: 'title', value: $item->title));
-            $this->textFields->save(new TextField(entityId: $entityId, fieldKey: 'body', value: $item->contentHtml));
+            $this->textFields->save(new TextField(entityId: $entityId, fieldKey: 'body', value: $body));
 
             foreach ($item->tagSlugs as $tagSlug) {
                 $tagId = $tagIdBySlug[$tagSlug] ??= $this->ensureTag($tagSlug, $tagNames[$tagSlug] ?? $tagSlug);

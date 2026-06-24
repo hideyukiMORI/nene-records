@@ -387,6 +387,7 @@ export const en = {
   'admin.import.wxr.tagsEnsured': 'Tags',
   'admin.import.wxr.tagLinks': 'Tag links',
   'admin.import.wxr.redirects': 'Redirects',
+  'admin.import.wxr.media': 'Media',
   'admin.import.wxr.done': 'Import complete.',
   'admin.nav.settings': 'Settings',
   'admin.nav.appearance': 'Appearance',

@@ -17,6 +17,8 @@ use NeNeRecords\Tests\UrlRedirect\InMemoryUrlRedirectRepository;
 use NeNeRecords\WxrImport\WxrImportExecutor;
 use NeNeRecords\WxrImport\WxrImportHttpHandler;
 use NeNeRecords\WxrImport\WxrImportRouteRegistrar;
+use NeNeRecords\WxrImport\WxrMediaFetchResult;
+use NeNeRecords\WxrImport\WxrMediaImporter;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
@@ -29,6 +31,7 @@ final class WxrImportHttpTest extends TestCase
     private RequestHandlerInterface $application;
     private InMemoryEntityRepository $entities;
     private InMemoryEntityTypeRepository $entityTypes;
+    private InMemoryTextFieldRepository $textFields;
 
     protected function setUp(): void
     {
@@ -36,17 +39,29 @@ final class WxrImportHttpTest extends TestCase
         $this->factory = new Psr17Factory();
         $this->entityTypes = new InMemoryEntityTypeRepository([]);
         $this->entities = new InMemoryEntityRepository([]);
+        $this->textFields = new InMemoryTextFieldRepository([], $this->entities);
         $executor = new WxrImportExecutor(
             $this->entityTypes,
             new InMemoryFieldDefRepository([]),
             $this->entities,
-            new InMemoryTextFieldRepository([], $this->entities),
+            $this->textFields,
             new InMemoryTagRepository([]),
             new InMemoryEntityTagRepository(),
             new InMemoryUrlRedirectRepository(),
         );
+        $mediaImporter = new WxrMediaImporter(
+            new FakeWxrMediaFetcher([
+                'https://old.example.com/wp-content/uploads/2024/01/image.jpg' => new WxrMediaFetchResult(
+                    'binary-bytes',
+                    'image/jpeg',
+                    'image.jpg',
+                ),
+            ]),
+            new FakeUploadMediaUseCase(),
+        );
         $handler = new WxrImportHttpHandler(
             $executor,
+            $mediaImporter,
             new JsonResponseFactory($this->factory, $this->factory),
             new ProblemDetailsResponseFactory($this->factory, $this->factory),
         );
@@ -104,11 +119,23 @@ final class WxrImportHttpTest extends TestCase
         self::assertSame('import', $payload['mode']);
         self::assertSame(4, $payload['created_entities']);
         self::assertSame(2, $payload['tags_ensured']);
+        self::assertSame(2, $payload['redirects_created']);
+        self::assertSame(1, $payload['media_imported']); // image.jpg fetched + stored
+        self::assertSame(0, $payload['media_skipped']);
 
-        // Entities actually created.
+        // Entities actually created; body image URL rewritten to the new media URL.
         $posts = $this->entityTypes->findBySlug('posts');
         self::assertNotNull($posts?->id);
-        self::assertNotNull($this->entities->findBySlug('hello-world', $posts->id));
+        $hello = $this->entities->findBySlug('hello-world', $posts->id);
+        self::assertNotNull($hello?->id);
+
+        $body = '';
+        foreach ($this->textFields->findByEntityId($hello->id, 100, 0) as $tf) {
+            if ($tf->fieldKey === 'body') {
+                $body = $tf->value;
+            }
+        }
+        self::assertStringContainsString('/media/imported/image.jpg', $body);
     }
 
     public function testReturns422WhenFileMissing(): void

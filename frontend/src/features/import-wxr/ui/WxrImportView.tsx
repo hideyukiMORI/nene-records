@@ -104,6 +104,7 @@ function ResultCard({ result }: { result: WxrImportResultDto }) {
           <Stat label={t('admin.import.wxr.tagsEnsured')} value={result.tags_ensured} />
           <Stat label={t('admin.import.wxr.tagLinks')} value={result.tag_links} />
           <Stat label={t('admin.import.wxr.redirects')} value={result.redirects_created} />
+          <Stat label={t('admin.import.wxr.media')} value={result.media_imported} />
         </div>
         <Text muted>{t('admin.import.wxr.done')}</Text>
       </Stack>

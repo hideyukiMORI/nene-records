@@ -27,6 +27,7 @@ final readonly class WxrItem
         public ?string $originalLink,
         public array $categorySlugs,
         public array $tagSlugs,
+        public ?string $attachmentUrl = null, // wp:attachment_url (post_type=attachment)
     ) {
     }
 }
