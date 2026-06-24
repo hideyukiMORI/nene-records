@@ -7,6 +7,42 @@
       <meta name="description" content="<?= $e($metaDescription) ?>" />
     <?php endif; ?>
     <title><?= $e($pageTitle) ?> — <?= $e($siteName) ?></title>
+    <link rel="canonical" href="<?= $e($canonicalUrl) ?>" />
+
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="<?= $e($pageTitle) ?>" />
+    <?php if ($metaDescription !== ''): ?>
+      <meta property="og:description" content="<?= $e($metaDescription) ?>" />
+    <?php endif; ?>
+    <meta property="og:site_name" content="<?= $e($siteName) ?>" />
+    <meta property="og:url" content="<?= $e($canonicalUrl) ?>" />
+
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="<?= $e($pageTitle) ?>" />
+    <?php if ($metaDescription !== ''): ?>
+      <meta name="twitter:description" content="<?= $e($metaDescription) ?>" />
+    <?php endif; ?>
+
+    <?php
+      $jsonLd = [
+          '@context' => 'https://schema.org',
+          '@type' => 'BlogPosting',
+          'headline' => $pageTitle,
+          'url' => $canonicalUrl,
+          'mainEntityOfPage' => $canonicalUrl,
+          'publisher' => ['@type' => 'Organization', 'name' => $siteName],
+      ];
+      if ($metaDescription !== '') {
+          $jsonLd['description'] = $metaDescription;
+      }
+      if ($publishedAtIso !== null) {
+          $jsonLd['datePublished'] = $publishedAtIso;
+      }
+      if ($updatedAtIso !== null) {
+          $jsonLd['dateModified'] = $updatedAtIso;
+      }
+    ?>
+    <script type="application/ld+json"><?= json_encode($jsonLd, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?></script>
     <style>
       .markdown-body { display: flex; flex-direction: column; gap: 0.75rem; line-height: 1.6; }
       .markdown-body :is(h1, h2, h3, h4) { font-weight: 600; line-height: 1.3; }
