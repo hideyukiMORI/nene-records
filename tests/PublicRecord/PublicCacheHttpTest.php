@@ -90,21 +90,24 @@ final class PublicCacheHttpTest extends TestCase
         $jsonResponse = new JsonResponseFactory($this->factory, $this->factory);
         $problemDetails = new ProblemDetailsResponseFactory($this->factory, $this->factory);
 
+        // RenderPublicRecordViewHandler is not exercised by these cache tests, but is
+        // needed to wire the registrar (and the permalink handler delegates to it).
+        $renderHandler = new \NeNeRecords\PublicRecord\RenderPublicRecordViewHandler(
+            $useCase,
+            $publicSettings,
+            new \Nene2\View\HtmlResponseFactory($this->factory, $this->factory, new \Nene2\View\NativePhpViewRenderer(dirname(__DIR__, 2) . '/templates')),
+            new \Nene2\Config\AppConfig(
+                environment: \Nene2\Config\AppEnvironment::Test,
+                debug: true,
+                name: 'Test',
+                database: new \Nene2\Config\DatabaseConfig(null, 'test', 'sqlite', '', 1, ':memory:', '', '', ''),
+                machineApiKey: null,
+            ),
+        );
         $publicRecordRegistrar = new PublicRecordRouteRegistrar(
             new GetPublicRecordViewHandler($useCase, $jsonResponse, $this->factory),
-            // RenderPublicRecordViewHandler is not needed for these tests; use a no-op placeholder via the JSON handler
-            new \NeNeRecords\PublicRecord\RenderPublicRecordViewHandler(
-                $useCase,
-                $publicSettings,
-                new \Nene2\View\HtmlResponseFactory($this->factory, $this->factory, new \Nene2\View\NativePhpViewRenderer(dirname(__DIR__, 2) . '/templates')),
-                new \Nene2\Config\AppConfig(
-                    environment: \Nene2\Config\AppEnvironment::Test,
-                    debug: true,
-                    name: 'Test',
-                    database: new \Nene2\Config\DatabaseConfig(null, 'test', 'sqlite', '', 1, ':memory:', '', '', ''),
-                    machineApiKey: null,
-                ),
-            ),
+            $renderHandler,
+            new \NeNeRecords\PublicRecord\RenderPublicPermalinkHandler($entityTypes, $renderHandler),
         );
 
         $settingRegistrar = new SettingRouteRegistrar(

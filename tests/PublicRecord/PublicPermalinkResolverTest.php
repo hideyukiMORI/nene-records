@@ -61,4 +61,39 @@ final class PublicPermalinkResolverTest extends TestCase
             ),
         );
     }
+
+    public function testExtractEntityKeyResolvesIdForDefaultPattern(): void
+    {
+        self::assertSame(
+            ['entityId' => 42, 'entitySlug' => null],
+            PublicPermalinkResolver::extractEntityKey('/{type}/{id}', '42'),
+        );
+        // null pattern falls back to the default (id) pattern.
+        self::assertSame(
+            ['entityId' => 42, 'entitySlug' => null],
+            PublicPermalinkResolver::extractEntityKey(null, '42'),
+        );
+    }
+
+    public function testExtractEntityKeyResolvesSlugForSlugPatterns(): void
+    {
+        self::assertSame(
+            ['entityId' => null, 'entitySlug' => 'my-article'],
+            PublicPermalinkResolver::extractEntityKey('/{type}/{slug}', 'my-article'),
+        );
+        // Date pattern → last segment is the slug.
+        self::assertSame(
+            ['entityId' => null, 'entitySlug' => 'my-article'],
+            PublicPermalinkResolver::extractEntityKey('/{type}/{year}/{month}/{slug}', '2026/06/my-article'),
+        );
+    }
+
+    public function testExtractEntityKeyFallsBackToSlugForNonNumericIdPattern(): void
+    {
+        // Pattern expects an id but the segment isn't numeric → treat as slug.
+        self::assertSame(
+            ['entityId' => null, 'entitySlug' => 'not-a-number'],
+            PublicPermalinkResolver::extractEntityKey('/{type}/{id}', 'not-a-number'),
+        );
+    }
 }

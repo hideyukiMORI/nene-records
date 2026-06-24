@@ -54,15 +54,25 @@ final readonly class GetPublicRecordViewUseCase implements GetPublicRecordViewUs
             throw new PublicEntityTypeNotFoundException($input->entityTypeSlug);
         }
 
-        $entity = $this->entities->findBySlug($input->entitySlug, $entityType->id);
+        // Resolve by numeric id (id-style permalinks) or by slug. findBySlug already
+        // scopes to the type; for findById we verify the type explicitly below.
+        $entity = $input->entityId !== null
+            ? $this->entities->findById($input->entityId)
+            : ($input->entitySlug !== null
+                ? $this->entities->findBySlug($input->entitySlug, $entityType->id)
+                : null);
 
         if (
             $entity === null
             || $entity->id === null
+            || $entity->entityTypeId !== $entityType->id
             || $entity->isDeleted
             || $entity->status !== EntityStatus::Published
         ) {
-            throw new PublicRecordNotFoundException($input->entityTypeSlug, $input->entitySlug);
+            throw new PublicRecordNotFoundException(
+                $input->entityTypeSlug,
+                $input->entitySlug ?? (string) ($input->entityId ?? 'unknown'),
+            );
         }
 
         $entityTypeId = $entityType->id;
@@ -177,7 +187,7 @@ final readonly class GetPublicRecordViewUseCase implements GetPublicRecordViewUs
             entityTypeSlug: $input->entityTypeSlug,
             entityTypeName: $entityType->name,
             entityId: $entityId,
-            entitySlug: $input->entitySlug,
+            entitySlug: $entity->slug ?? (string) $entityId,
             pageTitle: $pageTitle,
             metaDescription: $entity->metaDescription ?? '',
             canonicalPath: $canonicalPath,

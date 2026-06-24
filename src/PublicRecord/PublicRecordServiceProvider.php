@@ -184,6 +184,23 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
                 },
             )
             ->set(
+                RenderPublicPermalinkHandler::class,
+                static function (ContainerInterface $container): RenderPublicPermalinkHandler {
+                    $entityTypes = $container->get(EntityTypeRepositoryInterface::class);
+                    $viewRenderer = $container->get(RenderPublicRecordViewHandler::class);
+
+                    if (!$entityTypes instanceof EntityTypeRepositoryInterface) {
+                        throw new LogicException('Entity type repository service is invalid.');
+                    }
+
+                    if (!$viewRenderer instanceof RenderPublicRecordViewHandler) {
+                        throw new LogicException('RenderPublicRecordView handler service is invalid.');
+                    }
+
+                    return new RenderPublicPermalinkHandler($entityTypes, $viewRenderer);
+                },
+            )
+            ->set(
                 PublicEntityTypeNotFoundExceptionHandler::class,
                 static function (ContainerInterface $container): PublicEntityTypeNotFoundExceptionHandler {
                     $problemDetails = $container->get(ProblemDetailsResponseFactory::class);
@@ -212,6 +229,7 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
                 static function (ContainerInterface $container): PublicRecordRouteRegistrar {
                     $getHandler = $container->get(GetPublicRecordViewHandler::class);
                     $renderHandler = $container->get(RenderPublicRecordViewHandler::class);
+                    $permalinkHandler = $container->get(RenderPublicPermalinkHandler::class);
 
                     if (!$getHandler instanceof GetPublicRecordViewHandler) {
                         throw new LogicException('GetPublicRecordView handler service is invalid.');
@@ -221,7 +239,11 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
                         throw new LogicException('RenderPublicRecordView handler service is invalid.');
                     }
 
-                    return new PublicRecordRouteRegistrar($getHandler, $renderHandler);
+                    if (!$permalinkHandler instanceof RenderPublicPermalinkHandler) {
+                        throw new LogicException('RenderPublicPermalink handler service is invalid.');
+                    }
+
+                    return new PublicRecordRouteRegistrar($getHandler, $renderHandler, $permalinkHandler);
                 },
             );
     }
