@@ -92,6 +92,11 @@
               </ul>
             <?php endif; ?>
           </section>
+        <?php elseif ($field->dataType === 'html'): ?>
+          <section>
+            <h2><?= $e($field->fieldKey) ?></h2>
+            <div class="markdown-body"><?= $renderHtml($field->displayValue) ?></div>
+          </section>
         <?php elseif ($field->fieldKey === 'body'): ?>
           <section>
             <h2><?= $e($field->fieldKey) ?></h2>
