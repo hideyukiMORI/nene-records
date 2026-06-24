@@ -1,0 +1,81 @@
+# Production stack: the single-origin PHP app + MySQL (+ cron). No dev tooling
+# (phpMyAdmin / Mailpit / Vite). Reuses the same image as dev (docker/php/Dockerfile)
+# with production env + OPcache tuning — phinx (migrations) is a dev dependency,
+# so dev packages are intentionally kept; a slimmed --no-dev image is a future step.
+#
+# Usage:
+#   1. npm ci --prefix frontend && npm run build --prefix frontend
+#   2. set the required secrets in .env (NENE2_LOCAL_JWT_SECRET, DB_PASSWORD,
+#      MYSQL_ROOT_PASSWORD) — see .env.example / docs/deployment.md
+#   3. docker compose -f compose.prod.yaml up -d --build
+#   4. NENE_INSTALL_ADMIN_EMAIL=... NENE_INSTALL_ADMIN_PASSWORD=... \
+#        docker compose -f compose.prod.yaml exec -T app composer app:install
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      # Fixed for production — not interpolated, so a stray dev .env (Compose
+      # auto-loads .env) can never accidentally enable debug here.
+      APP_ENV: production
+      APP_DEBUG: "false"
+      APP_NAME: ${APP_NAME:-NeNe Records}
+      NENE2_MACHINE_API_KEY: ${NENE2_MACHINE_API_KEY:-}
+      NENE2_LOCAL_JWT_SECRET: ${NENE2_LOCAL_JWT_SECRET:?set a strong JWT secret in .env}
+      PROBLEM_DETAILS_BASE_URL: ${PROBLEM_DETAILS_BASE_URL:-https://nene-records.dev/problems/}
+      DB_ENV: ${DB_ENV:-production}
+      DB_ADAPTER: mysql
+      DB_HOST: ${DB_HOST:-mysql}
+      DB_PORT: ${DB_PORT:-3306}
+      DB_NAME: ${DB_NAME:-nene_records}
+      DB_USER: ${DB_USER:-nene_records}
+      DB_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+      DB_CHARSET: utf8mb4
+      MAIL_DSN: ${MAIL_DSN:-}
+      MAIL_FROM: ${MAIL_FROM:-noreply@example.com}
+    ports:
+      - "${NENE_RECORDS_PROD_PORT:-8080}:80"
+    volumes:
+      - .:/var/www/html
+      - ../NENE2:/var/www/NENE2:ro
+      - ./docker/php/opcache-prod.ini:/usr/local/etc/php/conf.d/zz-opcache-prod.ini:ro
+      - composer-cache:/root/.composer/cache
+    command: ["/bin/sh", "/var/www/html/docker/app/entrypoint.sh"]
+
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_NAME:-nene_records}
+      MYSQL_USER: ${DB_USER:-nene_records}
+      MYSQL_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?set MYSQL_ROOT_PASSWORD in .env}
+    volumes:
+      - mysql-prod-data:/var/lib/mysql
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "mysqladmin ping -h localhost -u$${MYSQL_USER} -p$${MYSQL_PASSWORD} --silent",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  cron:
+    image: alpine:3.21
+    restart: unless-stopped
+    depends_on:
+      - app
+    volumes:
+      - ./docker/cron/crontab:/etc/crontabs/root:ro
+    command: crond -f -l 6
+
+volumes:
+  mysql-prod-data:
+  composer-cache:

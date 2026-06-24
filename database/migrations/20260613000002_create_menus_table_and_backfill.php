@@ -28,7 +28,7 @@ final class CreateMenusTableAndBackfill extends AbstractMigration
             ->create();
 
         $this->table('navigation_items')
-            ->addColumn('menu_id', 'integer', ['null' => true, 'default' => null, 'after' => 'organization_id'])
+            ->addColumn('menu_id', 'integer', ['null' => true, 'default' => null])
             ->addIndex(['menu_id'])
             ->update();
 
@@ -43,6 +43,13 @@ final class CreateMenusTableAndBackfill extends AbstractMigration
 
     private function backfillMenus(): void
     {
+        // organization_id is added to navigation_items by a later-versioned migration;
+        // on a fresh (version-ordered) DB it does not exist yet and there are no nav
+        // items to backfill — skip to stay forward-reference-free.
+        if (!$this->table('navigation_items')->hasColumn('organization_id')) {
+            return;
+        }
+
         $now = date('Y-m-d H:i:s');
         $labels = ['header' => 'Header', 'footer' => 'Footer', 'side' => 'Side'];
         $connection = $this->getAdapter()->getConnection();

@@ -9,8 +9,15 @@ final class AddDisplayOrderToEntityTypes extends AbstractMigration
     public function up(): void
     {
         $this->table('entity_types')
-            ->addColumn('display_order', 'integer', ['null' => false, 'default' => 0, 'after' => 'is_pinned'])
+            ->addColumn('display_order', 'integer', ['null' => false, 'default' => 0])
             ->update();
+
+        // organization_id is added by a later-versioned migration; on a fresh
+        // (version-ordered) DB it does not exist yet and entity_types is empty, so
+        // the per-org backfill is a no-op — skip it to stay forward-reference-free.
+        if (!$this->table('entity_types')->hasColumn('organization_id')) {
+            return;
+        }
 
         // Backfill so the current (id-ascending) order is preserved per organization.
         $pdo = $this->getAdapter()->getConnection();
