@@ -85,6 +85,38 @@ database (verified end-to-end). The build requires the nene2 checkout adjacent t
 this repo (`../NENE2`). Set the public host port with `NENE_RECORDS_PROD_PORT`
 (default 8080) and front it with TLS/reverse proxy.
 
+## Operations
+
+**Health.** The `app` service has a Docker `healthcheck` that polls its own
+`/health` route, so `restart: unless-stopped` can recover a hung process and
+dependents wait for readiness. Check it with `docker compose -f compose.prod.yaml ps`
+(the app shows `(healthy)`).
+
+**Logs.** Apache access + error logs stream to the container's stdout/stderr (the
+`php:apache` base image wires them there), so `docker compose -f compose.prod.yaml
+logs -f app` follows live traffic. The app additionally records structured access
+entries to the database (`access_log` table).
+
+**Backups.** Dump the database to a timestamped, gzipped file (keeps the newest 14):
+
+```bash
+bash scripts/backup-db.sh                 # → ./backups/nene_records-YYYYmmdd-HHMMSS.sql.gz
+# schedule it from the host crontab, e.g. nightly at 03:15:
+#   15 3 * * * cd /path/to/deploy && BACKUP_DIR=/var/backups/records bash scripts/backup-db.sh >> /var/log/records-backup.log 2>&1
+```
+
+Restore a dump:
+
+```bash
+gunzip < backups/nene_records-XXXXXXXX-XXXXXX.sql.gz \
+  | docker compose -f compose.prod.yaml exec -T mysql \
+      sh -c 'exec mysql -u"$MYSQL_USER" -p"$MYSQL_PASSWORD" "$MYSQL_DATABASE"'
+```
+
+The script reads credentials from the running db container's own environment, so no
+secrets are passed on the command line. Override `COMPOSE_FILE` / `DB_SERVICE` when
+the stack uses different names (e.g. a Caddy-fronted deploy with `DB_SERVICE=db`).
+
 ## Not yet productized (tracked follow-ups)
 
 - Pushing the built image to a registry + an orchestrated (multi-host / rolling)
