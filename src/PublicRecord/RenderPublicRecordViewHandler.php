@@ -8,6 +8,7 @@ use Nene2\Config\AppConfig;
 use Nene2\Routing\Router;
 use Nene2\View\HtmlResponseFactory;
 use NeNeRecords\BundleField\BundleDocumentValidator;
+use NeNeRecords\Http\PublicHtmlCsp;
 use NeNeRecords\Setting\ListPublicSettingsUseCaseInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -135,7 +136,7 @@ final readonly class RenderPublicRecordViewHandler
             // A bundle's crawlable twin (#311): render its seoText markdown server-side
             // (the sandboxed iframe itself is SPA-only / invisible to crawlers).
             'renderBundleSeo' => static fn (string $raw): string => PublicMarkdownRenderer::toSafeHtml(BundleDocumentValidator::seoTextOf($raw)),
-        ]);
+        ])->withHeader('Content-Security-Policy', PublicHtmlCsp::POLICY);
     }
 
     /** @return array{site_name: string, default_meta_description: string} */

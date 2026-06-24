@@ -57,6 +57,7 @@ final readonly class SpaShellFallback
 
         return $this->responseFactory->createResponse(200)
             ->withHeader('Content-Type', 'text/html; charset=utf-8')
+            ->withHeader('Content-Security-Policy', PublicHtmlCsp::POLICY)
             ->withBody($this->streamFactory->createStream($html));
     }
 }
