@@ -58,8 +58,31 @@ WordPress migration (WXR import → posts/pages/tags, 301 redirect map for old
 URLs, media, SEO meta) is available in the admin UI under **データ移行**
 (`/admin/import`).
 
+## Production stack (`compose.prod.yaml`)
+
+A standalone production stack — the single-origin PHP app + MySQL + cron, with
+`APP_ENV=production`, `APP_DEBUG=false` (both fixed, immune to a stray dev `.env`)
+and OPcache tuned for immutable code (`docker/php/opcache-prod.ini`). No dev
+tooling (phpMyAdmin / Mailpit / Vite).
+
+```bash
+# 1. build the frontend (host)
+npm ci --prefix frontend && npm run build --prefix frontend
+# 2. set required secrets in .env: NENE2_LOCAL_JWT_SECRET, DB_PASSWORD, MYSQL_ROOT_PASSWORD
+# 3. start
+docker compose -f compose.prod.yaml up -d --build
+# 4. first-run onboarding (idempotent)
+NENE_INSTALL_ADMIN_EMAIL=admin@example.com NENE_INSTALL_ADMIN_PASSWORD='change-me' \
+  docker compose -f compose.prod.yaml exec -T app composer app:install
+```
+
+The app entrypoint runs `migrations:migrate` on start; the migration set applies
+cleanly on a fresh MySQL database (verified end-to-end). Set the public host port
+with `NENE_RECORDS_PROD_PORT` (default 8080) and front it with TLS/reverse proxy.
+
 ## Not yet productized (tracked follow-ups)
 
-- A dedicated production `compose` profile and a multi-stage `Dockerfile`
-  (frontend build + `composer install --no-dev` + opcache) — today the committed
-  stack is the dev stack.
+- A multi-stage `Dockerfile` baking a slim `composer install --no-dev` image for
+  registry-based deploys. (Today both dev and prod build from the same
+  `docker/php/Dockerfile`; `--no-dev` is blocked because phinx — used for
+  migrations — is a dev dependency.)
