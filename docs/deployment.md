@@ -62,27 +62,33 @@ URLs, media, SEO meta) is available in the admin UI under **データ移行**
 
 A standalone production stack — the single-origin PHP app + MySQL + cron, with
 `APP_ENV=production`, `APP_DEBUG=false` (both fixed, immune to a stray dev `.env`)
-and OPcache tuned for immutable code (`docker/php/opcache-prod.ini`). No dev
-tooling (phpMyAdmin / Mailpit / Vite).
+and OPcache tuned for immutable code. No dev tooling (phpMyAdmin / Mailpit / Vite).
+
+The app is a **self-contained immutable image** (`docker/php/Dockerfile.prod`,
+multi-stage): the SPA/SSR assets are built in-image, PHP deps are installed
+`--no-dev`, and code + vendor + dist are baked (no runtime bind-mounts, no manual
+frontend build). nene2 (a sibling path repo) is injected via the `nene2` named
+build context, so the build never needs the parent directory.
 
 ```bash
-# 1. build the frontend (host)
-npm ci --prefix frontend && npm run build --prefix frontend
-# 2. set required secrets in .env: NENE2_LOCAL_JWT_SECRET, DB_PASSWORD, MYSQL_ROOT_PASSWORD
-# 3. start
+# 1. set required secrets in .env: NENE2_LOCAL_JWT_SECRET, DB_PASSWORD, MYSQL_ROOT_PASSWORD
+# 2. build + start (frontend is built inside the image)
 docker compose -f compose.prod.yaml up -d --build
-# 4. first-run onboarding (idempotent)
+# 3. first-run onboarding (idempotent)
 NENE_INSTALL_ADMIN_EMAIL=admin@example.com NENE_INSTALL_ADMIN_PASSWORD='change-me' \
   docker compose -f compose.prod.yaml exec -T app composer app:install
 ```
 
-The app entrypoint runs `migrations:migrate` on start; the migration set applies
-cleanly on a fresh MySQL database (verified end-to-end). Set the public host port
-with `NENE_RECORDS_PROD_PORT` (default 8080) and front it with TLS/reverse proxy.
+The image entrypoint (`docker/app/entrypoint.prod.sh`) waits for the DB and runs
+`migrations:migrate` on start; the migration set applies cleanly on a fresh MySQL
+database (verified end-to-end). The build requires the nene2 checkout adjacent to
+this repo (`../NENE2`). Set the public host port with `NENE_RECORDS_PROD_PORT`
+(default 8080) and front it with TLS/reverse proxy.
 
 ## Not yet productized (tracked follow-ups)
 
-- A multi-stage `Dockerfile` baking a slim `composer install --no-dev` image for
-  registry-based deploys. (Today both dev and prod build from the same
-  `docker/php/Dockerfile`; `--no-dev` is blocked because phinx — used for
-  migrations — is a dev dependency.)
+- Pushing the built image to a registry + an orchestrated (multi-host / rolling)
+  deploy. The `compose.prod.yaml` build is single-host; the `Dockerfile.prod`
+  image is registry-pushable, but a published `nene2` package (instead of the
+  sibling path repo) would remove the adjacent-`../NENE2` build requirement.
+- TLS termination / reverse proxy config (deployment-environment specific).

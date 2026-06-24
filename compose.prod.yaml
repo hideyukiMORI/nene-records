@@ -1,20 +1,22 @@
 # Production stack: the single-origin PHP app + MySQL (+ cron). No dev tooling
-# (phpMyAdmin / Mailpit / Vite). Reuses the same image as dev (docker/php/Dockerfile)
-# with production env + OPcache tuning — phinx (migrations) is a dev dependency,
-# so dev packages are intentionally kept; a slimmed --no-dev image is a future step.
+# (phpMyAdmin / Mailpit / Vite). The app is a self-contained immutable image
+# (docker/php/Dockerfile.prod): SPA/SSR assets built in-image, deps installed
+# --no-dev, code + vendor + dist baked (no runtime bind-mounts). nene2 (a sibling
+# path repo) is injected via the `nene2` named build context — no parent context.
 #
 # Usage:
-#   1. npm ci --prefix frontend && npm run build --prefix frontend
-#   2. set the required secrets in .env (NENE2_LOCAL_JWT_SECRET, DB_PASSWORD,
+#   1. set required secrets in .env (NENE2_LOCAL_JWT_SECRET, DB_PASSWORD,
 #      MYSQL_ROOT_PASSWORD) — see .env.example / docs/deployment.md
-#   3. docker compose -f compose.prod.yaml up -d --build
-#   4. NENE_INSTALL_ADMIN_EMAIL=... NENE_INSTALL_ADMIN_PASSWORD=... \
+#   2. docker compose -f compose.prod.yaml up -d --build
+#   3. NENE_INSTALL_ADMIN_EMAIL=... NENE_INSTALL_ADMIN_PASSWORD=... \
 #        docker compose -f compose.prod.yaml exec -T app composer app:install
 services:
   app:
     build:
       context: .
-      dockerfile: docker/php/Dockerfile
+      dockerfile: docker/php/Dockerfile.prod
+      additional_contexts:
+        nene2: ../NENE2
     restart: unless-stopped
     depends_on:
       mysql:
@@ -40,12 +42,8 @@ services:
       MAIL_FROM: ${MAIL_FROM:-noreply@example.com}
     ports:
       - "${NENE_RECORDS_PROD_PORT:-8080}:80"
-    volumes:
-      - .:/var/www/html
-      - ../NENE2:/var/www/NENE2:ro
-      - ./docker/php/opcache-prod.ini:/usr/local/etc/php/conf.d/zz-opcache-prod.ini:ro
-      - composer-cache:/root/.composer/cache
-    command: ["/bin/sh", "/var/www/html/docker/app/entrypoint.sh"]
+    # No volumes: code, vendor and built assets are baked into the image.
+    # No command: the image CMD is docker/app/entrypoint.prod.sh (migrate + serve).
 
   mysql:
     image: mysql:8.4
@@ -78,4 +76,3 @@ services:
 
 volumes:
   mysql-prod-data:
-  composer-cache:

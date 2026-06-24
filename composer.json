@@ -8,6 +8,7 @@
         "async-aws/s3": "^3.3",
         "hideyukimori/nene2": "@dev",
         "league/commonmark": "^2.7",
+        "robmorgan/phinx": "^0.16.11",
         "symfony/html-sanitizer": "^8.1",
         "symfony/http-client": "^8.1",
         "symfony/mailer": "^8.0"
@@ -59,7 +60,6 @@
         "friendsofphp/php-cs-fixer": "^3.95",
         "phpstan/phpstan": "^2.1",
         "phpunit/phpunit": "^13.1",
-        "robmorgan/phinx": "^0.16.11",
         "symfony/yaml": "^8.0"
     }
 }
