@@ -16,7 +16,9 @@ final readonly class WxrImportPlannedItem
         public array $tagSlugs,
         public string $contentHtml = '',
         public ?string $publishedAtIso = null,
-        public ?string $originalLink = null, // WordPress <link> — source for the 301 map
+        public ?string $originalLink = null,    // WordPress <link> — source for the 301 map
+        public ?string $metaTitle = null,       // SEO title from Yoast/RankMath/AIOSEO postmeta
+        public ?string $metaDescription = null, // SEO meta description from the same
     ) {
     }
 }

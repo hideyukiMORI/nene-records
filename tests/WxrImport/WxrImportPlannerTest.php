@@ -54,6 +54,23 @@ final class WxrImportPlannerTest extends TestCase
         self::assertContains('php', $plan->tagSlugs);
     }
 
+    public function testExtractsSeoMetaFromPostmetaAndSkipsTemplates(): void
+    {
+        $plan = $this->plan();
+        $bySlug = [];
+        foreach ($plan->plannedItems as $item) {
+            $bySlug[$item->slug] = $item;
+        }
+
+        // hello-world has custom Yoast title/description → imported.
+        self::assertSame('Hello World — Custom SEO Title', $bySlug['hello-world']->metaTitle);
+        self::assertSame('A friendly greeting, search-optimized.', $bySlug['hello-world']->metaDescription);
+
+        // about's Yoast title is an unexpanded template (%%title%% …) → ignored.
+        self::assertNull($bySlug['about']->metaTitle);
+        self::assertNull($bySlug['about']->metaDescription);
+    }
+
     public function testDerivesSlugFromTitleWithWarning(): void
     {
         $plan = $this->plan();

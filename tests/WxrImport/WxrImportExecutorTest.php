@@ -108,6 +108,19 @@ final class WxrImportExecutorTest extends TestCase
         self::assertTrue($this->entityTags->isAttached($hello->id, $news->id));
     }
 
+    public function testAppliesImportedSeoMetaToEntity(): void
+    {
+        $this->executor->execute($this->document());
+
+        $posts = $this->entityTypes->findBySlug('posts');
+        self::assertNotNull($posts?->id);
+        $hello = $this->entities->findBySlug('hello-world', $posts->id);
+        self::assertNotNull($hello);
+
+        self::assertSame('Hello World — Custom SEO Title', $hello->metaTitle);
+        self::assertSame('A friendly greeting, search-optimized.', $hello->metaDescription);
+    }
+
     public function testDraftStatusMappedAndPageImportedIntoPagesType(): void
     {
         $this->executor->execute($this->document());

@@ -146,7 +146,10 @@ final readonly class GetPublicRecordViewUseCase implements GetPublicRecordViewUs
             $relationsByFieldKey,
         );
 
-        $pageTitle = $this->resolvePageTitle($textFieldRows, $entityId);
+        // The SEO title override (entity.meta_title, e.g. imported from Yoast) wins
+        // for <title>/og:title; otherwise fall back to the record's title field.
+        $metaTitle = trim($entity->metaTitle ?? '');
+        $pageTitle = $metaTitle !== '' ? $metaTitle : $this->resolvePageTitle($textFieldRows, $entityId);
 
         $bootstrap = PublicRecordViewHttpMapper::toBootstrap(
             entityTypeSlug: $input->entityTypeSlug,

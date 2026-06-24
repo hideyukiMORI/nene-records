@@ -76,6 +76,15 @@ final class WxrParser
         $slug = trim((string) $wp->post_name);
         $publishedAt = $this->normalizeDate(trim((string) $wp->post_date));
 
+        $postMeta = [];
+        foreach ($wp->postmeta as $meta) {
+            $metaChildren = $meta->children('wp', true);
+            $key = trim((string) $metaChildren->meta_key);
+            if ($key !== '') {
+                $postMeta[$key] = (string) $metaChildren->meta_value;
+            }
+        }
+
         $categorySlugs = [];
         $tagSlugs = [];
         foreach ($item->category as $category) {
@@ -105,6 +114,7 @@ final class WxrParser
             categorySlugs: array_values(array_unique($categorySlugs)),
             tagSlugs: array_values(array_unique($tagSlugs)),
             attachmentUrl: trim((string) $wp->attachment_url) ?: null,
+            postMeta: $postMeta,
         );
     }
 

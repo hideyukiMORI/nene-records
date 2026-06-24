@@ -28,6 +28,12 @@ final class WxrImportPlanner
         'future' => 'scheduled',
     ];
 
+    /** SEO title postmeta keys, in precedence order (Yoast → RankMath → AIOSEO). */
+    private const SEO_TITLE_KEYS = ['_yoast_wpseo_title', 'rank_math_title', '_aioseo_title', '_aioseop_title'];
+
+    /** SEO meta-description postmeta keys, same precedence. */
+    private const SEO_DESCRIPTION_KEYS = ['_yoast_wpseo_metadesc', 'rank_math_description', '_aioseo_description', '_aioseop_description'];
+
     public function plan(WxrDocument $document): WxrImportPlan
     {
         $planned = [];
@@ -80,6 +86,8 @@ final class WxrImportPlanner
                 $item->contentHtml,
                 $item->publishedAtIso,
                 $item->originalLink,
+                self::seoValue($item->postMeta, self::SEO_TITLE_KEYS),
+                self::seoValue($item->postMeta, self::SEO_DESCRIPTION_KEYS),
             );
             $countsByType[$entityType] = ($countsByType[$entityType] ?? 0) + 1;
             $countsByStatus[$status] = ($countsByStatus[$status] ?? 0) + 1;
@@ -93,6 +101,31 @@ final class WxrImportPlanner
             countsByEntityType: $countsByType,
             countsByStatus: $countsByStatus,
         );
+    }
+
+    /**
+     * First non-empty SEO value among the given postmeta keys, ignoring
+     * unexpanded plugin templates (e.g. Yoast `%%title%%`, RankMath `%title%`)
+     * which would render as literal garbage — those fall back to NeNe defaults.
+     *
+     * @param array<string, string> $postMeta
+     * @param list<string>          $keys
+     */
+    private static function seoValue(array $postMeta, array $keys): ?string
+    {
+        foreach ($keys as $key) {
+            $value = trim($postMeta[$key] ?? '');
+            if ($value !== '' && !self::looksLikeTemplate($value)) {
+                return $value;
+            }
+        }
+
+        return null;
+    }
+
+    private static function looksLikeTemplate(string $value): bool
+    {
+        return str_contains($value, '%%') || preg_match('/%[a-z][a-z0-9_]*%/i', $value) === 1;
     }
 
     private static function slugify(string $title): string

@@ -12,8 +12,9 @@ namespace NeNeRecords\WxrImport;
 final readonly class WxrItem
 {
     /**
-     * @param list<string> $categorySlugs WP category nicenames assigned to this item
-     * @param list<string> $tagSlugs      WP post_tag slugs assigned to this item
+     * @param list<string>          $categorySlugs WP category nicenames assigned to this item
+     * @param list<string>          $tagSlugs      WP post_tag slugs assigned to this item
+     * @param array<string, string> $postMeta      wp:postmeta key → value (SEO plugin fields, etc.)
      */
     public function __construct(
         public ?int $wpPostId,
@@ -28,6 +29,7 @@ final readonly class WxrItem
         public array $categorySlugs,
         public array $tagSlugs,
         public ?string $attachmentUrl = null, // wp:attachment_url (post_type=attachment)
+        public array $postMeta = [],
     ) {
     }
 }
