@@ -1,0 +1,53 @@
+# syntax=docker/dockerfile:1
+#
+# Production image: a single self-contained, immutable artifact — the SPA/SSR
+# assets are built in-image, PHP deps are installed --no-dev, and the app code +
+# vendor + dist are baked (no runtime bind-mounts). nene2 is a sibling path
+# repository, injected via the `nene2` named build context (compose.prod.yaml sets
+# `additional_contexts: { nene2: ../NENE2 }`) so the build never needs the parent
+# directory as its context.
+
+# ── Stage 1: build the SPA + crawlable-SSR assets ──
+FROM node:22-alpine AS frontend
+WORKDIR /app/frontend
+# .npmrc carries legacy-peer-deps=true (matches CI); npm ci needs it for a clean install.
+COPY frontend/package.json frontend/package-lock.json frontend/.npmrc ./
+RUN npm ci
+COPY frontend/ ./
+RUN npm run build
+
+# ── Stage 2: PHP runtime (single-origin Apache) ──
+FROM php:8.4-apache AS runtime
+
+ENV COMPOSER_ALLOW_SUPERUSER=1
+COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends git unzip libicu-dev libsqlite3-dev \
+        libjpeg-dev libpng-dev libwebp-dev libavif-dev libfreetype-dev \
+    && docker-php-ext-configure gd --with-jpeg --with-webp --with-avif --with-freetype \
+    && docker-php-ext-install pdo_mysql pdo_sqlite intl gd opcache \
+    && rm -rf /var/lib/apt/lists/* \
+    && a2enmod rewrite headers \
+    && printf '<Directory /var/www/html/public_html>\n    AllowOverride All\n    Require all granted\n</Directory>\n\n# Single-origin: serve the built SPA assets (Vite /assets/*) directly.\nAlias /assets /var/www/html/frontend/dist/assets\n<Directory /var/www/html/frontend/dist/assets>\n    Require all granted\n</Directory>\n' > /etc/apache2/conf-available/nene-records.conf \
+    && a2enconf nene-records \
+    && sed -ri -e 's!/var/www/html!/var/www/html/public_html!g' /etc/apache2/sites-available/*.conf \
+    && sed -ri -e 's!/var/www/!/var/www/html/public_html!g' /etc/apache2/apache2.conf
+
+# Production OPcache tuning (baked).
+COPY docker/php/opcache-prod.ini /usr/local/etc/php/conf.d/zz-opcache-prod.ini
+
+WORKDIR /var/www/html
+
+# nene2 sibling path-repo → where composer.json's "../NENE2" expects it.
+COPY --from=nene2 . /var/www/NENE2
+
+# Install prod deps first (cached unless composer.json/lock change), then bake the
+# app code and the built frontend, then generate an authoritative classmap.
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --no-interaction --prefer-dist --no-scripts --no-autoloader
+COPY . /var/www/html
+COPY --from=frontend /app/frontend/dist /var/www/html/frontend/dist
+RUN composer dump-autoload --no-dev --optimize --classmap-authoritative
+
+CMD ["/bin/sh", "/var/www/html/docker/app/entrypoint.prod.sh"]
