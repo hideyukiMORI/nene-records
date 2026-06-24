@@ -104,6 +104,7 @@ final class PublicCacheHttpTest extends TestCase
                 machineApiKey: null,
             ),
             dirname(__DIR__, 2),
+            $this->factory,
         );
         $publicRecordRegistrar = new PublicRecordRouteRegistrar(
             new GetPublicRecordViewHandler($useCase, $jsonResponse, $this->factory),

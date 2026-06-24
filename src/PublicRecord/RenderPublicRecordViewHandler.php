@@ -9,6 +9,7 @@ use Nene2\Routing\Router;
 use Nene2\View\HtmlResponseFactory;
 use NeNeRecords\BundleField\BundleDocumentValidator;
 use NeNeRecords\Setting\ListPublicSettingsUseCaseInterface;
+use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -20,9 +21,15 @@ final readonly class RenderPublicRecordViewHandler
         private HtmlResponseFactory $html,
         private AppConfig $config,
         private string $projectRoot,
+        private ResponseFactoryInterface $responseFactory,
     ) {
     }
 
+    /**
+     * Legacy `/view/{type}/{entitySlug}` twin → 301 to the canonical permalink.
+     * The crawlable SSR now lives at the real permalink; this keeps one canonical
+     * URL and avoids a duplicate-content twin.
+     */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $parameters = $request->getAttribute(Router::PARAMETERS_ATTRIBUTE, []);
@@ -36,7 +43,12 @@ final readonly class RenderPublicRecordViewHandler
             );
         }
 
-        return $this->renderEntity($typeSlug, $entitySlug, null, $request);
+        // Resolve to the canonical permalink (also 404s via the use case if missing).
+        $output = $this->useCase->execute(new GetPublicRecordViewInput($typeSlug, $entitySlug));
+        $uri = $request->getUri();
+        $location = $uri->getScheme() . '://' . $uri->getAuthority() . $output->canonicalPath;
+
+        return $this->responseFactory->createResponse(301)->withHeader('Location', $location);
     }
 
     /**

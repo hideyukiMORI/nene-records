@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Nene2\Http\ResponseEmitter;
 use NeNeRecords\Http\RuntimeContainerFactory;
+use NeNeRecords\Http\SpaShellFallback;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7Server\ServerRequestCreator;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -24,6 +25,14 @@ $request = $serverRequestCreator->fromGlobals();
 $application = $container->get(RequestHandlerInterface::class);
 assert($application instanceof RequestHandlerInterface);
 $response = $application->handle($request);
+
+// Single-origin: serve the built SPA shell for unmatched GET HTML navigations
+// (admin/login/search/tag/browse, etc.) so the client router takes over.
+$response = (new SpaShellFallback(
+    dirname(__DIR__) . '/frontend/dist/index.html',
+    $psr17Factory,
+    $psr17Factory,
+))->apply($request, $response);
 
 $emitter = $container->get(ResponseEmitter::class);
 assert($emitter instanceof ResponseEmitter);

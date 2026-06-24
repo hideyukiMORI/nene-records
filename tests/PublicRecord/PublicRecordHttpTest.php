@@ -121,7 +121,7 @@ final class PublicRecordHttpTest extends TestCase
             machineApiKey: null,
         );
 
-        $renderHandler = new RenderPublicRecordViewHandler($useCase, $publicSettings, $htmlResponse, $config, $projectRoot);
+        $renderHandler = new RenderPublicRecordViewHandler($useCase, $publicSettings, $htmlResponse, $config, $projectRoot, $this->factory);
         $registrar = new PublicRecordRouteRegistrar(
             new GetPublicRecordViewHandler($useCase, $jsonResponse, $this->factory),
             $renderHandler,
@@ -172,7 +172,7 @@ final class PublicRecordHttpTest extends TestCase
         $response = $this->application->handle(
             $this->factory->createServerRequest(
                 'GET',
-                'https://example.test/view/article/hello-world',
+                'https://example.test/article/10',
             ),
         );
         $html = (string) $response->getBody();
@@ -191,7 +191,7 @@ final class PublicRecordHttpTest extends TestCase
         $response = $this->application->handle(
             $this->factory->createServerRequest(
                 'GET',
-                'https://example.test/view/article/hello-world',
+                'https://example.test/article/10',
             ),
         );
         $html = (string) $response->getBody();
@@ -220,6 +220,16 @@ final class PublicRecordHttpTest extends TestCase
         self::assertStringContainsString('"datePublished":"2026-01-15T00:00:00+00:00"', $html);
         self::assertStringContainsString('"dateModified":"2026-02-20T00:00:00+00:00"', $html);
         self::assertStringContainsString('"image":"https://example.test/media/og/2026/06/hero.png"', $html);
+    }
+
+    public function testViewUrlRedirectsToCanonicalPermalink(): void
+    {
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/view/article/hello-world'),
+        );
+
+        self::assertSame(301, $response->getStatusCode());
+        self::assertSame('https://example.test/article/10', $response->getHeaderLine('Location'));
     }
 
     public function testRealPermalinkServesCrawlableHtmlByIdPattern(): void
