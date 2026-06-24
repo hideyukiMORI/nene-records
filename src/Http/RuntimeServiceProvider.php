@@ -307,15 +307,18 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
                     }
                     /** @var RequestScopedHolder<int> $orgIdHolder */
 
-                    // DB の system_config から解決モードを読む（env フォールバック付き）
+                    // DB の system_config から解決モードを読む（env フォールバック付き）。
+                    // system_config は migration で tenant_* を空文字 '' で seed するため、`??`
+                    // だと空文字（非 null）が env フォールバックを覆い隠す。`?:` で「空なら env」
+                    // とし、単一org デプロイ（ORG_SLUG 指定）が確実に解決できるようにする。
                     $sysConfig      = $container->get(SystemConfigRepositoryInterface::class);
                     $resolvedMode   = 'single';
                     $resolvedSlug   = (string) (getenv('ORG_SLUG') ?: '');
                     $resolvedDomain = (string) (getenv('BASE_DOMAIN') ?: 'localhost');
                     if ($sysConfig instanceof SystemConfigRepositoryInterface) {
-                        $resolvedMode   = $sysConfig->get('tenant_resolution_mode') ?? (string) (getenv('TENANT_RESOLUTION') ?: 'single');
-                        $resolvedSlug   = $sysConfig->get('tenant_org_slug') ?? $resolvedSlug;
-                        $resolvedDomain = $sysConfig->get('tenant_base_domain') ?? $resolvedDomain;
+                        $resolvedMode   = $sysConfig->get('tenant_resolution_mode') ?: (string) (getenv('TENANT_RESOLUTION') ?: 'single');
+                        $resolvedSlug   = $sysConfig->get('tenant_org_slug') ?: $resolvedSlug;
+                        $resolvedDomain = $sysConfig->get('tenant_base_domain') ?: $resolvedDomain;
                     }
 
                     $strategy = match ($resolvedMode) {

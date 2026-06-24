@@ -85,6 +85,12 @@ database (verified end-to-end). The build requires the nene2 checkout adjacent t
 this repo (`../NENE2`). Set the public host port with `NENE_RECORDS_PROD_PORT`
 (default 8080) and front it with TLS/reverse proxy.
 
+**Single-org resolution.** A single-tenant deploy resolves its organization from
+`ORG_SLUG`, which must match the install org slug (`app:install` default `default`).
+The stack defaults `ORG_SLUG=default`; if you install with a custom slug, set
+`ORG_SLUG` to match, otherwise every org-scoped request returns `org-not-resolved`
+404. (Alternatively set `tenant_org_slug` via the system-config API.)
+
 ## Operations
 
 **Health.** The `app` service has a Docker `healthcheck` that polls its own
