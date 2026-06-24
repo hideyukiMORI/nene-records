@@ -38,6 +38,15 @@ final readonly class RenderPublicRecordViewHandler
         $output = $this->useCase->execute(new GetPublicRecordViewInput($typeSlug, $entitySlug));
         $siteSettings = $this->resolveSiteSettings();
 
+        // Canonical / og:url point at the user-facing permalink (not this /view/ twin).
+        $uri = $request->getUri();
+        $canonicalUrl = $uri->getScheme() . '://' . $uri->getAuthority() . $output->canonicalPath;
+
+        // Prefer the per-entity meta description, falling back to the site default.
+        $metaDescription = $output->metaDescription !== ''
+            ? $output->metaDescription
+            : $siteSettings['default_meta_description'];
+
         $bootstrapJson = json_encode(
             $output->bootstrap,
             JSON_THROW_ON_ERROR | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE,
@@ -56,7 +65,10 @@ final readonly class RenderPublicRecordViewHandler
             'entityId' => $output->entityId,
             'displayFields' => $output->displayFields,
             'siteName' => $siteSettings['site_name'],
-            'metaDescription' => $siteSettings['default_meta_description'],
+            'metaDescription' => $metaDescription,
+            'canonicalUrl' => $canonicalUrl,
+            'publishedAtIso' => $output->publishedAtIso,
+            'updatedAtIso' => $output->updatedAtIso,
             'bootstrapJson' => $bootstrapJson,
             'includeViteClient' => $this->config->debug,
             'viteUrl' => rtrim($viteUrl, '/'),

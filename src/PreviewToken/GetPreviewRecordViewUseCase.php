@@ -21,6 +21,7 @@ use NeNeRecords\IntField\IntField;
 use NeNeRecords\IntField\IntFieldRepositoryInterface;
 use NeNeRecords\PublicRecord\GetPublicRecordViewOutput;
 use NeNeRecords\PublicRecord\PublicFieldDisplayFormatter;
+use NeNeRecords\PublicRecord\PublicPermalinkResolver;
 use NeNeRecords\PublicRecord\PublicRecordViewDisplayField;
 use NeNeRecords\PublicRecord\PublicRecordViewHttpMapper;
 use NeNeRecords\Setting\ListPublicSettingsUseCaseInterface;
@@ -170,12 +171,24 @@ final readonly class GetPreviewRecordViewUseCase implements GetPreviewRecordView
             ),
         ];
 
+        $canonicalPath = PublicPermalinkResolver::resolve(
+            $entityType->permalinkPattern,
+            $entityTypeSlug,
+            $entity->slug,
+            $entityId,
+            $entity->publishedAt,
+        );
+
         return new GetPublicRecordViewOutput(
             entityTypeSlug: $entityTypeSlug,
             entityTypeName: $entityType->name,
             entityId: $entityId,
             entitySlug: $entitySlug,
             pageTitle: $pageTitle,
+            metaDescription: $entity->metaDescription ?? '',
+            canonicalPath: $canonicalPath,
+            publishedAtIso: $entity->publishedAt?->format(\DateTimeInterface::ATOM),
+            updatedAtIso: $entity->updatedAt?->format(\DateTimeInterface::ATOM),
             bootstrap: $bootstrap,
             displayFields: $displayFields,
         );

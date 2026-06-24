@@ -16,6 +16,10 @@ final readonly class GetPublicRecordViewOutput
         public int $entityId,
         public string $entitySlug,
         public string $pageTitle,
+        public string $metaDescription,
+        public string $canonicalPath,
+        public ?string $publishedAtIso,
+        public ?string $updatedAtIso,
         public array $bootstrap,
         public array $displayFields,
     ) {

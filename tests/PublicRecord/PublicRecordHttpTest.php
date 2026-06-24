@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NeNeRecords\Tests\PublicRecord;
 
+use DateTimeImmutable;
 use Nene2\Config\AppConfig;
 use Nene2\Config\AppEnvironment;
 use Nene2\Config\DatabaseConfig;
@@ -57,7 +58,15 @@ final class PublicRecordHttpTest extends TestCase
             new EntityType(name: 'Article', slug: 'article', id: 1),
         ]);
         $entities = new InMemoryEntityRepository([
-            new Entity(id: 10, entityTypeId: 1, slug: 'hello-world', status: EntityStatus::Published),
+            new Entity(
+                id: 10,
+                entityTypeId: 1,
+                slug: 'hello-world',
+                status: EntityStatus::Published,
+                publishedAt: new DateTimeImmutable('2026-01-15T00:00:00+00:00'),
+                updatedAt: new DateTimeImmutable('2026-02-20T00:00:00+00:00'),
+                metaDescription: 'A short summary.',
+            ),
         ]);
         $fieldDefs = new InMemoryFieldDefRepository([
             new FieldDef(entityTypeId: 1, fieldKey: 'title', dataType: 'text', id: 1),
@@ -166,6 +175,38 @@ final class PublicRecordHttpTest extends TestCase
         self::assertStringContainsString('"entityTypeSlug":"article"', $html);
         self::assertStringContainsString('<h2>Sample</h2>', $html);
         self::assertStringContainsString('<strong>bold</strong>', $html);
+    }
+
+    public function testRenderPublicRecordViewIncludesSeoHeadTags(): void
+    {
+        $response = $this->application->handle(
+            $this->factory->createServerRequest(
+                'GET',
+                'https://example.test/view/article/hello-world',
+            ),
+        );
+        $html = (string) $response->getBody();
+
+        self::assertSame(200, $response->getStatusCode());
+        // Canonical / og:url point at the user-facing permalink (default /{type}/{id}), not /view/.
+        self::assertStringContainsString('<link rel="canonical" href="https://example.test/article/10" />', $html);
+        self::assertStringContainsString('content="https://example.test/article/10"', $html);
+        // Open Graph
+        self::assertStringContainsString('property="og:type" content="article"', $html);
+        self::assertStringContainsString('property="og:title" content="Hello world"', $html);
+        self::assertStringContainsString('property="og:description" content="A short summary."', $html);
+        self::assertStringContainsString('property="og:site_name" content="NeNe Records"', $html);
+        // Twitter Card
+        self::assertStringContainsString('name="twitter:card" content="summary"', $html);
+        self::assertStringContainsString('name="twitter:title" content="Hello world"', $html);
+        // Per-entity meta description (not the site default)
+        self::assertStringContainsString('<meta name="description" content="A short summary." />', $html);
+        // JSON-LD structured data
+        self::assertStringContainsString('application/ld+json', $html);
+        self::assertStringContainsString('"@type":"BlogPosting"', $html);
+        self::assertStringContainsString('"headline":"Hello world"', $html);
+        self::assertStringContainsString('"datePublished":"2026-01-15T00:00:00+00:00"', $html);
+        self::assertStringContainsString('"dateModified":"2026-02-20T00:00:00+00:00"', $html);
     }
 
     /** @return array<string, mixed> */

@@ -162,12 +162,24 @@ final readonly class GetPublicRecordViewUseCase implements GetPublicRecordViewUs
             ),
         ];
 
+        $canonicalPath = PublicPermalinkResolver::resolve(
+            $entityType->permalinkPattern,
+            $input->entityTypeSlug,
+            $entity->slug,
+            $entityId,
+            $entity->publishedAt,
+        );
+
         return new GetPublicRecordViewOutput(
             entityTypeSlug: $input->entityTypeSlug,
             entityTypeName: $entityType->name,
             entityId: $entityId,
             entitySlug: $input->entitySlug,
             pageTitle: $pageTitle,
+            metaDescription: $entity->metaDescription ?? '',
+            canonicalPath: $canonicalPath,
+            publishedAtIso: $entity->publishedAt?->format(\DateTimeInterface::ATOM),
+            updatedAtIso: $entity->updatedAt?->format(\DateTimeInterface::ATOM),
             bootstrap: $bootstrap,
             displayFields: $displayFields,
         );
