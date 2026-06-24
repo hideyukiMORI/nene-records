@@ -370,7 +370,7 @@ export const en = {
   'admin.import.pageDescription': 'Bring existing content into this organization.',
   'admin.import.wxr.title': 'WordPress import (WXR)',
   'admin.import.wxr.description':
-    'Upload a WordPress WXR export (.xml). Preview what would be imported, then run the import. Posts and pages become content records; categories and tags become tags. Media, redirects, and comments are not yet imported.',
+    'Upload a WordPress WXR export (.xml). Preview what would be imported, then run the import. Posts and pages become content records; categories and tags become tags; old URLs get 301 redirects to the new permalinks. Media and comments are not yet imported.',
   'admin.import.wxr.fileLabel': 'WXR file (.xml)',
   'admin.import.wxr.preview': 'Preview',
   'admin.import.wxr.previewing': 'Previewing…',
@@ -386,6 +386,7 @@ export const en = {
   'admin.import.wxr.skippedExisting': 'Already existed',
   'admin.import.wxr.tagsEnsured': 'Tags',
   'admin.import.wxr.tagLinks': 'Tag links',
+  'admin.import.wxr.redirects': 'Redirects',
   'admin.import.wxr.done': 'Import complete.',
   'admin.nav.settings': 'Settings',
   'admin.nav.appearance': 'Appearance',

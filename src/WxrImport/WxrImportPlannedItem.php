@@ -16,6 +16,7 @@ final readonly class WxrImportPlannedItem
         public array $tagSlugs,
         public string $contentHtml = '',
         public ?string $publishedAtIso = null,
+        public ?string $originalLink = null, // WordPress <link> — source for the 301 map
     ) {
     }
 }

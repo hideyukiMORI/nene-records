@@ -105,6 +105,7 @@ use NeNeRecords\TextField\TextFieldServiceProvider;
 use NeNeRecords\Theme\ThemeNotFoundExceptionHandler;
 use NeNeRecords\Theme\ThemeRouteRegistrar;
 use NeNeRecords\Theme\ThemeServiceProvider;
+use NeNeRecords\UrlRedirect\UrlRedirectServiceProvider;
 use NeNeRecords\User\CannotDeleteSelfExceptionHandler;
 use NeNeRecords\User\EmailVerificationTokenExceptionHandler;
 use NeNeRecords\User\InvalidCurrentPasswordExceptionHandler;
@@ -180,7 +181,8 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
             ->addProvider(new DataMigrationServiceProvider())
             ->addProvider(new OrgExportServiceProvider())
             ->addProvider(new ThemeServiceProvider())
-            ->addProvider(new WxrImportServiceProvider());
+            ->addProvider(new WxrImportServiceProvider())
+            ->addProvider(new UrlRedirectServiceProvider());
 
         $builder
             ->set(

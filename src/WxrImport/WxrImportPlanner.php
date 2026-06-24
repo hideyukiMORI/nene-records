@@ -74,6 +74,7 @@ final class WxrImportPlanner
                 $tags,
                 $item->contentHtml,
                 $item->publishedAtIso,
+                $item->originalLink,
             );
             $countsByType[$entityType] = ($countsByType[$entityType] ?? 0) + 1;
             $countsByStatus[$status] = ($countsByStatus[$status] ?? 0) + 1;

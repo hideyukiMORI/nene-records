@@ -369,7 +369,7 @@ export const ptBR: Partial<MessageCatalog> = {
   'admin.import.pageDescription': 'Traga conteúdo existente para esta organização.',
   'admin.import.wxr.title': 'Importação do WordPress (WXR)',
   'admin.import.wxr.description':
-    'Envie uma exportação WXR do WordPress (.xml). Visualize o que seria importado e então execute a importação. Posts e páginas viram conteúdo; categorias e tags viram tags. Mídia, redirecionamentos e comentários ainda não são importados.',
+    'Envie uma exportação WXR do WordPress (.xml). Visualize o que seria importado e então execute a importação. Posts e páginas viram conteúdo; categorias e tags viram tags; URLs antigas recebem redirecionamentos 301 para os novos permalinks. Mídia e comentários ainda não são importados.',
   'admin.import.wxr.fileLabel': 'Arquivo WXR (.xml)',
   'admin.import.wxr.preview': 'Pré-visualizar',
   'admin.import.wxr.previewing': 'Pré-visualizando…',
@@ -385,6 +385,7 @@ export const ptBR: Partial<MessageCatalog> = {
   'admin.import.wxr.skippedExisting': 'Já existentes',
   'admin.import.wxr.tagsEnsured': 'Tags',
   'admin.import.wxr.tagLinks': 'Vínculos de tags',
+  'admin.import.wxr.redirects': 'Redirecionamentos',
   'admin.import.wxr.done': 'Importação concluída.',
   'admin.nav.settings': 'Configurações',
   'admin.nav.appearance': 'Aparência',

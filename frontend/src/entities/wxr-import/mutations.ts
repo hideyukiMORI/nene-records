@@ -35,6 +35,7 @@ export interface WxrImportResultDto {
   skipped_existing: number
   tags_ensured: number
   tag_links: number
+  redirects_created: number
   skipped: WxrSkippedItem[]
   warnings: string[]
 }

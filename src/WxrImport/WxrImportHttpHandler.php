@@ -100,6 +100,7 @@ final readonly class WxrImportHttpHandler implements RequestHandlerInterface
             'skipped_existing' => $result->skippedExisting,
             'tags_ensured' => $result->tagsEnsured,
             'tag_links' => $result->tagLinks,
+            'redirects_created' => $result->redirectsCreated,
             'skipped' => array_map(static fn (WxrImportSkippedItem $s): array => [
                 'title' => $s->title,
                 'reason' => $s->reason,
