@@ -38,7 +38,9 @@ services:
       DB_USER: ${DB_USER:-nene_records}
       DB_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
       DB_CHARSET: utf8mb4
-      MAIL_DSN: ${MAIL_DSN:-}
+      # Symfony Mailer requires a scheme; default to the null transport so a deploy
+      # without outbound mail configured boots cleanly instead of fataling on "".
+      MAIL_DSN: ${MAIL_DSN:-null://null}
       MAIL_FROM: ${MAIL_FROM:-noreply@example.com}
     ports:
       - "${NENE_RECORDS_PROD_PORT:-8080}:80"
