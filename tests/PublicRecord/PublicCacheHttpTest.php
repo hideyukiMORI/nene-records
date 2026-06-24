@@ -103,6 +103,7 @@ final class PublicCacheHttpTest extends TestCase
                 database: new \Nene2\Config\DatabaseConfig(null, 'test', 'sqlite', '', 1, ':memory:', '', '', ''),
                 machineApiKey: null,
             ),
+            dirname(__DIR__, 2),
         );
         $publicRecordRegistrar = new PublicRecordRouteRegistrar(
             new GetPublicRecordViewHandler($useCase, $jsonResponse, $this->factory),

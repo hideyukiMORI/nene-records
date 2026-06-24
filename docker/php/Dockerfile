@@ -11,7 +11,7 @@ RUN apt-get update \
     && docker-php-ext-install pdo_mysql pdo_sqlite intl gd \
     && rm -rf /var/lib/apt/lists/* \
     && a2enmod rewrite headers \
-    && printf '<Directory /var/www/html/public_html>\n    AllowOverride All\n    Require all granted\n</Directory>\n' > /etc/apache2/conf-available/nene-records.conf \
+    && printf '<Directory /var/www/html/public_html>\n    AllowOverride All\n    Require all granted\n</Directory>\n\n# Single-origin: serve the built SPA assets (Vite /assets/*) directly from the\n# frontend build so the PHP-rendered pages can mount the production SPA.\nAlias /assets /var/www/html/frontend/dist/assets\n<Directory /var/www/html/frontend/dist/assets>\n    Require all granted\n</Directory>\n' > /etc/apache2/conf-available/nene-records.conf \
     && a2enconf nene-records \
     && sed -ri -e 's!/var/www/html!/var/www/html/public_html!g' /etc/apache2/sites-available/*.conf \
     && sed -ri -e 's!/var/www/!/var/www/html/public_html!g' /etc/apache2/apache2.conf

@@ -163,6 +163,7 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
                     $publicSettings = $container->get(ListPublicSettingsUseCaseInterface::class);
                     $html = $container->get(HtmlResponseFactory::class);
                     $config = $container->get(AppConfig::class);
+                    $projectRoot = $container->get(RuntimeServiceProvider::PROJECT_ROOT);
 
                     if (!$useCase instanceof GetPublicRecordViewUseCaseInterface) {
                         throw new LogicException('GetPublicRecordView use case service is invalid.');
@@ -180,7 +181,11 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
                         throw new LogicException('Application config service is invalid.');
                     }
 
-                    return new RenderPublicRecordViewHandler($useCase, $publicSettings, $html, $config);
+                    if (!is_string($projectRoot)) {
+                        throw new LogicException('Project root service is invalid.');
+                    }
+
+                    return new RenderPublicRecordViewHandler($useCase, $publicSettings, $html, $config, $projectRoot);
                 },
             )
             ->set(

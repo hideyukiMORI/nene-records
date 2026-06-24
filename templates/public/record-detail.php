@@ -61,11 +61,18 @@
       .markdown-body ul, .markdown-body ol { margin: 0; padding-left: 1.25rem; }
       .markdown-body blockquote { margin: 0; padding-left: 0.75rem; border-left: 3px solid #d1d5db; color: #6b7280; }
     </style>
-    <?php if ($includeViteClient): ?>
+    <?php if ($spaMode === 'prod'): ?>
+      <?php foreach ($spaCss as $href): ?>
+      <link rel="stylesheet" crossorigin href="<?= $e($href) ?>" />
+      <?php endforeach; ?>
+    <?php elseif ($spaMode === 'dev'): ?>
       <script type="module" src="<?= $e($viteUrl) ?>/@vite/client"></script>
     <?php endif; ?>
   </head>
   <body>
+    <!-- SSR content lives inside #root: crawlers / no-JS read it; the SPA
+         (createRoot().render) replaces it with the interactive app on mount. -->
+    <div id="root">
     <header>
       <p><a href="/view/<?= $e($entityTypeSlug) ?>">← <?= $e($entityTypeName) ?></a></p>
       <h1><?= $e($pageTitle) ?></h1>
@@ -102,13 +109,18 @@
         <?php endif; ?>
       <?php endforeach; ?>
     </article>
+    </div>
     <script
       id="nene-records-public-record-bootstrap"
       type="application/json"
     ><?= $bootstrapJson ?></script>
-    <?php if ($includeViteClient): ?>
-      <div id="root"></div>
+    <?php if ($spaMode === 'dev'): ?>
       <script type="module" src="<?= $e($viteUrl) ?>/src/main.tsx"></script>
+    <?php elseif ($spaMode === 'prod' && $spaJs !== null): ?>
+      <?php foreach ($spaPreload as $href): ?>
+      <link rel="modulepreload" crossorigin href="<?= $e($href) ?>" />
+      <?php endforeach; ?>
+      <script type="module" crossorigin src="<?= $e($spaJs) ?>"></script>
     <?php endif; ?>
   </body>
 </html>

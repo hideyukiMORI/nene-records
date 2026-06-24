@@ -1,0 +1,12 @@
+{
+  "_vendor-XYZ.js": {
+    "file": "assets/vendor-XYZ.js",
+    "css": ["assets/vendor-XYZ.css"]
+  },
+  "index.html": {
+    "file": "assets/index-ABC.js",
+    "isEntry": true,
+    "css": ["assets/index-ABC.css"],
+    "imports": ["_vendor-XYZ.js"]
+  }
+}
