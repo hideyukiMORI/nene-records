@@ -4008,13 +4008,13 @@ paths:
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/WxrImportPlanResponse'
         '201':
           description: Import executed.
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/WxrImportResultResponse'
         '422':
           $ref: '#/components/responses/ValidationFailed'
         '500':
@@ -4327,6 +4327,113 @@ components:
                 detail: An unexpected error occurred.
                 instance: /api/v1/entity-types
   schemas:
+    WxrPlannedItem:
+      type: object
+      required: [title, slug, entity_type, status, tags]
+      properties:
+        title:
+          type: string
+        slug:
+          type: string
+        entity_type:
+          type: string
+        status:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+    WxrSkippedItem:
+      type: object
+      required: [title, reason]
+      properties:
+        title:
+          type: string
+        reason:
+          type: string
+    WxrImportPlanResponse:
+      type: object
+      required:
+        - mode
+        - planned_count
+        - skipped_count
+        - counts_by_entity_type
+        - counts_by_status
+        - tags
+        - warnings
+        - planned
+        - skipped
+      properties:
+        mode:
+          type: string
+          enum: [preview]
+        planned_count:
+          type: integer
+        skipped_count:
+          type: integer
+        counts_by_entity_type:
+          type: object
+          additionalProperties:
+            type: integer
+        counts_by_status:
+          type: object
+          additionalProperties:
+            type: integer
+        tags:
+          type: array
+          items:
+            type: string
+        warnings:
+          type: array
+          items:
+            type: string
+        planned:
+          type: array
+          items:
+            $ref: '#/components/schemas/WxrPlannedItem'
+        skipped:
+          type: array
+          items:
+            $ref: '#/components/schemas/WxrSkippedItem'
+    WxrImportResultResponse:
+      type: object
+      required:
+        - mode
+        - created_entities
+        - skipped_existing
+        - tags_ensured
+        - tag_links
+        - redirects_created
+        - media_imported
+        - media_skipped
+        - skipped
+        - warnings
+      properties:
+        mode:
+          type: string
+          enum: [import]
+        created_entities:
+          type: integer
+        skipped_existing:
+          type: integer
+        tags_ensured:
+          type: integer
+        tag_links:
+          type: integer
+        redirects_created:
+          type: integer
+        media_imported:
+          type: integer
+        media_skipped:
+          type: integer
+        skipped:
+          type: array
+          items:
+            $ref: '#/components/schemas/WxrSkippedItem'
+        warnings:
+          type: array
+          items:
+            type: string
     UserResponse:
       type: object
       required:

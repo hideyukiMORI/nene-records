@@ -1704,10 +1704,70 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/migration/wxr": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Import a WordPress WXR export
+         * @description Admin-only. Accepts a multipart/form-data WordPress WXR (.xml) export. With dry_run=true (default) returns a preview plan (what would be imported/skipped) without writing; with dry_run=false executes the import into the active organization (idempotent by slug). Out of scope: media attachments, 301 redirect map, postmeta.
+         */
+        post: operations["importWxr"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        WxrPlannedItem: {
+            title: string;
+            slug: string;
+            entity_type: string;
+            status: string;
+            tags: string[];
+        };
+        WxrSkippedItem: {
+            title: string;
+            reason: string;
+        };
+        WxrImportPlanResponse: {
+            /** @enum {string} */
+            mode: "preview";
+            planned_count: number;
+            skipped_count: number;
+            counts_by_entity_type: {
+                [key: string]: number;
+            };
+            counts_by_status: {
+                [key: string]: number;
+            };
+            tags: string[];
+            warnings: string[];
+            planned: components["schemas"]["WxrPlannedItem"][];
+            skipped: components["schemas"]["WxrSkippedItem"][];
+        };
+        WxrImportResultResponse: {
+            /** @enum {string} */
+            mode: "import";
+            created_entities: number;
+            skipped_existing: number;
+            tags_ensured: number;
+            tag_links: number;
+            redirects_created: number;
+            media_imported: number;
+            media_skipped: number;
+            skipped: components["schemas"]["WxrSkippedItem"][];
+            warnings: string[];
+        };
         UserResponse: {
             id: number;
             /** Format: email */
@@ -6774,6 +6834,53 @@ export interface operations {
             409: components["responses"]["Conflict"];
             410: components["responses"]["Gone"];
             422: components["responses"]["ValidationFailed"];
+        };
+    };
+    importWxr: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /**
+                     * Format: binary
+                     * @description WordPress WXR export XML.
+                     */
+                    file: string;
+                    /**
+                     * @description true = preview only; false = execute import.
+                     * @default true
+                     * @enum {string}
+                     */
+                    dry_run?: "true" | "false";
+                };
+            };
+        };
+        responses: {
+            /** @description Dry-run import plan (preview). */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WxrImportPlanResponse"];
+                };
+            };
+            /** @description Import executed. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WxrImportResultResponse"];
+                };
+            };
+            422: components["responses"]["ValidationFailed"];
+            500: components["responses"]["InternalServerError"];
         };
     };
 }
