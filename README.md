@@ -16,17 +16,21 @@ NeNe Records lets you define entity types and typed fields from the admin fronte
 - **Readable**: explicit schema registry, typed value tables, OpenAPI contracts
 - **Secure**: auth and validation at the API boundary; MCP tools never touch the database directly
 - **Replaceable layers**: swap the API runtime, admin UI, or consumer views independently
-- **AI-native**: 60+ MCP tools expose every API operation to AI clients
+- **AI-native**: 130+ MCP tools expose every API operation to AI clients
 - **Multi-tenant**: organization-scoped data with superadmin / admin / editor roles and JWT org_id enforcement
 
 ## Quick Start
 
 ```bash
+# NeNe Records uses the NENE2 framework as a sibling checkout (../NENE2), wired in
+# via Composer's path repository — clone both side by side:
+git clone https://github.com/hideyukiMORI/NENE2.git
 git clone https://github.com/hideyukiMORI/nene-records.git
 cd nene-records
 cp .env.example .env
 docker compose up --build -d
-# Admin UI → http://localhost:8080
+# API + health → http://localhost:18082/health
+# Admin UI (dev): in another shell run `npm run dev --prefix frontend` → http://localhost:18084
 ```
 
 Default credentials (local only):
@@ -47,12 +51,12 @@ AI clients (MCP)        ──┘
 - **Backend**: PHP 8.4, NENE2 framework, Clean Architecture (Use Cases / Repositories)
 - **Frontend**: React 19, TypeScript, Vite, TailwindCSS v4, React Query
 - **API contract**: OpenAPI 3.1 ([`docs/openapi/openapi.yaml`](./docs/openapi/openapi.yaml))
-- **MCP**: 60+ tools auto-generated from OpenAPI
+- **MCP**: 130+ tools auto-generated from OpenAPI
 - **Multi-tenancy**: organization-scoped data isolation; `OrgResolverMiddleware` + JWT `org_id` claim
 
 ## Current Status
 
-All milestones M1 – M9 are complete. See [`docs/todo/current.md`](./docs/todo/current.md) and [`docs/roadmap.md`](./docs/roadmap.md) for future direction.
+Milestones M1 – M15 are complete (admin platform). Active work — single-origin crawlable SSR, WordPress (WXR) migration, and production deployment — is tracked in [`docs/todo/current.md`](./docs/todo/current.md); see [`docs/roadmap.md`](./docs/roadmap.md) for direction.
 
 | Area | State |
 | --- | --- |
@@ -64,10 +68,10 @@ All milestones M1 – M9 are complete. See [`docs/todo/current.md`](./docs/todo/
 | Publish workflow | `draft` / `published` / `archived` / `scheduled` + `published_at` |
 | Media | upload, library list/delete, image + file field types |
 | Comments | submission, moderation API, public comment UI, admin comment management |
-| Public consumer | `/view/{type}/{slug}`, Markdown body, site settings, navigation |
+| Public consumer | crawlable single-origin SSR at real permalinks (`/posts/{id}`, `{slug}`), OGP/JSON-LD, 301 redirect map, WordPress (WXR) import |
 | OpenAPI | 3.1 contract, validated on every CI run |
-| MCP tools | 60+ tools auto-generated from OpenAPI |
-| CI | Backend (545 PHPUnit tests / PHPStan level 8 / CS-Fixer / OpenAPI / MCP) + Frontend (ESLint / TypeScript / Vitest) + Playwright 157 E2E tests |
+| MCP tools | 130+ tools auto-generated from OpenAPI |
+| CI | Backend (940 PHPUnit tests / PHPStan level 8 / CS-Fixer / OpenAPI / MCP) + Frontend (ESLint / TypeScript / Vitest) + Playwright 220 E2E tests |
 
 ## Contributing
 
