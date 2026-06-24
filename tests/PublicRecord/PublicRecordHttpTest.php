@@ -22,6 +22,7 @@ use NeNeRecords\PublicRecord\GetPublicRecordViewUseCase;
 use NeNeRecords\PublicRecord\PublicEntityTypeNotFoundExceptionHandler;
 use NeNeRecords\PublicRecord\PublicRecordNotFoundExceptionHandler;
 use NeNeRecords\PublicRecord\PublicRecordRouteRegistrar;
+use NeNeRecords\PublicRecord\RenderPublicPermalinkHandler;
 use NeNeRecords\PublicRecord\RenderPublicRecordViewHandler;
 use NeNeRecords\Setting\ListPublicSettingsUseCase;
 use NeNeRecords\Tests\BoolField\InMemoryBoolFieldRepository;
@@ -116,9 +117,11 @@ final class PublicRecordHttpTest extends TestCase
             machineApiKey: null,
         );
 
+        $renderHandler = new RenderPublicRecordViewHandler($useCase, $publicSettings, $htmlResponse, $config);
         $registrar = new PublicRecordRouteRegistrar(
             new GetPublicRecordViewHandler($useCase, $jsonResponse, $this->factory),
-            new RenderPublicRecordViewHandler($useCase, $publicSettings, $htmlResponse, $config),
+            $renderHandler,
+            new RenderPublicPermalinkHandler($entityTypes, $renderHandler),
         );
 
         $this->application = (new RuntimeApplicationFactory(
@@ -213,6 +216,40 @@ final class PublicRecordHttpTest extends TestCase
         self::assertStringContainsString('"datePublished":"2026-01-15T00:00:00+00:00"', $html);
         self::assertStringContainsString('"dateModified":"2026-02-20T00:00:00+00:00"', $html);
         self::assertStringContainsString('"image":"https://example.test/media/og/2026/06/hero.png"', $html);
+    }
+
+    public function testRealPermalinkServesCrawlableHtmlByIdPattern(): void
+    {
+        // The "article" type uses the default pattern /{type}/{id}, so /article/10 is the permalink.
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/article/10'),
+        );
+        $html = (string) $response->getBody();
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertStringContainsString('text/html', $response->getHeaderLine('Content-Type'));
+        self::assertStringContainsString('<h1>Hello world</h1>', $html);
+        // Canonical/og still point at the same real permalink.
+        self::assertStringContainsString('<link rel="canonical" href="https://example.test/article/10" />', $html);
+        self::assertStringContainsString('id="nene-records-public-record-bootstrap"', $html);
+    }
+
+    public function testRealPermalinkReturns404ForUnknownId(): void
+    {
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/article/999'),
+        );
+
+        self::assertSame(404, $response->getStatusCode());
+    }
+
+    public function testRealPermalinkReturns404ForUnknownType(): void
+    {
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/missing/10'),
+        );
+
+        self::assertSame(404, $response->getStatusCode());
     }
 
     /** @return array<string, mixed> */

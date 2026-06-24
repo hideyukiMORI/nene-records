@@ -51,4 +51,29 @@ final readonly class PublicPermalinkResolver
             '{day}' => $day,
         ]);
     }
+
+    /**
+     * Reverse-resolve a permalink's trailing path (everything after the type slug)
+     * into the entity lookup key. Mirrors the frontend `extractEntityKeyFromSplat`:
+     * an id pattern (`{id}` without `{slug}`) resolves the last numeric segment as
+     * an id; otherwise the last path segment is the slug.
+     *
+     * @return array{entityId: int|null, entitySlug: string|null}
+     */
+    public static function extractEntityKey(?string $pattern, string $splat): array
+    {
+        $pat = ($pattern === null || $pattern === '') ? self::DEFAULT_PATTERN : $pattern;
+
+        $segments = array_values(array_filter(
+            explode('/', $splat),
+            static fn (string $segment): bool => $segment !== '',
+        ));
+        $last = $segments === [] ? $splat : $segments[count($segments) - 1];
+
+        if (str_contains($pat, '{id}') && !str_contains($pat, '{slug}') && ctype_digit($last)) {
+            return ['entityId' => (int) $last, 'entitySlug' => null];
+        }
+
+        return ['entityId' => null, 'entitySlug' => $last];
+    }
 }

@@ -8,7 +8,8 @@ final readonly class GetPublicRecordViewInput
 {
     public function __construct(
         public string $entityTypeSlug,
-        public string $entitySlug,
+        public ?string $entitySlug = null,
+        public ?int $entityId = null,
     ) {
     }
 }

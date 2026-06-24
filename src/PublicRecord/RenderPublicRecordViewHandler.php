@@ -35,7 +35,20 @@ final readonly class RenderPublicRecordViewHandler
             );
         }
 
-        $output = $this->useCase->execute(new GetPublicRecordViewInput($typeSlug, $entitySlug));
+        return $this->renderEntity($typeSlug, $entitySlug, null, $request);
+    }
+
+    /**
+     * Render the crawlable record HTML for a resolved entity (by slug or id).
+     * Shared by the `/view/` route and the real-permalink route.
+     */
+    public function renderEntity(
+        string $typeSlug,
+        ?string $entitySlug,
+        ?int $entityId,
+        ServerRequestInterface $request,
+    ): ResponseInterface {
+        $output = $this->useCase->execute(new GetPublicRecordViewInput($typeSlug, $entitySlug, $entityId));
         $siteSettings = $this->resolveSiteSettings();
 
         // Canonical / og:url point at the user-facing permalink (not this /view/ twin).
