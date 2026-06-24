@@ -123,6 +123,8 @@ use NeNeRecords\Webhook\WebhookServiceProvider;
 use NeNeRecords\Widget\WidgetNotFoundExceptionHandler;
 use NeNeRecords\Widget\WidgetRouteRegistrar;
 use NeNeRecords\Widget\WidgetServiceProvider;
+use NeNeRecords\WxrImport\WxrImportRouteRegistrar;
+use NeNeRecords\WxrImport\WxrImportServiceProvider;
 use Psr\Container\ContainerInterface;
 
 final readonly class ApplicationServiceProvider implements ServiceProviderInterface
@@ -177,7 +179,8 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
             ->addProvider(new SystemConfigServiceProvider())
             ->addProvider(new DataMigrationServiceProvider())
             ->addProvider(new OrgExportServiceProvider())
-            ->addProvider(new ThemeServiceProvider());
+            ->addProvider(new ThemeServiceProvider())
+            ->addProvider(new WxrImportServiceProvider());
 
         $builder
             ->set(
@@ -216,6 +219,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $dataMigration = $container->get(DataMigrationRouteRegistrar::class);
                     $orgExport     = $container->get(OrgExportRouteRegistrar::class);
                     $theme = $container->get('nene-records.route_registrar.theme');
+                    $wxrImport = $container->get('nene-records.route_registrar.wxr_import');
 
                     if (
                         !$entityType instanceof EntityTypeRouteRegistrar
@@ -251,6 +255,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         || !$dataMigration instanceof DataMigrationRouteRegistrar
                         || !$orgExport instanceof OrgExportRouteRegistrar
                         || !$theme instanceof ThemeRouteRegistrar
+                        || !$wxrImport instanceof WxrImportRouteRegistrar
                     ) {
                         throw new LogicException('Route registrar service is invalid.');
                     }
@@ -289,6 +294,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $dataMigration,
                         $orgExport,
                         $theme,
+                        $wxrImport,
                     ];
                 },
             )

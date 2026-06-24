@@ -3977,6 +3977,48 @@ paths:
           $ref: '#/components/responses/Gone'
         '422':
           $ref: '#/components/responses/ValidationFailed'
+  /api/v1/migration/wxr:
+    post:
+      tags:
+        - Migration
+      summary: Import a WordPress WXR export
+      description: "Admin-only. Accepts a multipart/form-data WordPress WXR (.xml) export. With dry_run=true (default) returns a preview plan (what would be imported/skipped) without writing; with dry_run=false executes the import into the active organization (idempotent by slug). Out of scope: media attachments, 301 redirect map, postmeta."
+      operationId: importWxr
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: WordPress WXR export XML.
+                dry_run:
+                  type: string
+                  enum: ['true', 'false']
+                  default: 'true'
+                  description: 'true = preview only; false = execute import.'
+      responses:
+        '200':
+          description: Dry-run import plan (preview).
+          content:
+            application/json:
+              schema:
+                type: object
+        '201':
+          description: Import executed.
+          content:
+            application/json:
+              schema:
+                type: object
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 components:
   parameters:
     IdPath:
