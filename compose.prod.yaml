@@ -44,6 +44,20 @@ services:
       MAIL_FROM: ${MAIL_FROM:-noreply@example.com}
     ports:
       - "${NENE_RECORDS_PROD_PORT:-8080}:80"
+    healthcheck:
+      # PHP one-liner (no extra packages): the /health route must answer with "ok".
+      # Lets restart:unless-stopped detect a hung app and gates dependents on readiness.
+      test:
+        [
+          "CMD",
+          "php",
+          "-r",
+          "exit((($$c=@file_get_contents('http://127.0.0.1/health'))!==false&&str_contains($$c,'ok'))?0:1);",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
     # No volumes: code, vendor and built assets are baked into the image.
     # No command: the image CMD is docker/app/entrypoint.prod.sh (migrate + serve).
 
