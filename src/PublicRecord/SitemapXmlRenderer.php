@@ -35,6 +35,26 @@ final class SitemapXmlRenderer
         return $xml . '</urlset>' . "\n";
     }
 
+    /**
+     * Render a `<sitemapindex>` pointing at child sitemaps. Each path is joined to
+     * the base URL (e.g. `/sitemap.xml?page=2`).
+     *
+     * @param list<string> $childPaths
+     */
+    public static function renderIndex(string $baseUrl, array $childPaths): string
+    {
+        $base = rtrim($baseUrl, '/');
+
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+        $xml .= '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+
+        foreach ($childPaths as $path) {
+            $xml .= '  <sitemap><loc>' . self::escape($base . $path) . '</loc></sitemap>' . "\n";
+        }
+
+        return $xml . '</sitemapindex>' . "\n";
+    }
+
     private static function escape(string $value): string
     {
         return htmlspecialchars($value, ENT_XML1 | ENT_QUOTES, 'UTF-8');
