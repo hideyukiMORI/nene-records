@@ -1172,6 +1172,10 @@ export const fr: Partial<MessageCatalog> = {
   'admin.superSettings.currentTitle': 'Paramètres actuels (enregistrés en BDD)',
   'admin.superSettings.currentResolution': 'Mode de résolution',
 
+  // ── Admin · settings · analytics consent default ──────────────────────────
+  'admin.settings.consentDefault.denied': 'Refusé (valeur par défaut sûre pour l’UE)',
+  'admin.settings.consentDefault.granted': 'Autorisé',
+
   // ── Public · cookie consent ───────────────────────────────────────────────
   'public.consent.label': 'Consentement aux cookies',
   'public.consent.message':

@@ -1112,6 +1112,10 @@ export const zhHans: Partial<MessageCatalog> = {
   'admin.superSettings.currentTitle': '当前设置（已保存于数据库）',
   'admin.superSettings.currentResolution': '解析模式',
 
+  // ── Admin · settings · analytics consent default ──────────────────────────
+  'admin.settings.consentDefault.denied': '拒绝（欧盟安全默认）',
+  'admin.settings.consentDefault.granted': '允许',
+
   // ── Public · cookie consent ───────────────────────────────────────────────
   'public.consent.label': 'Cookie 同意',
   'public.consent.message': '我们使用 Cookie 来统计网站访问量。是否允许启用分析？',

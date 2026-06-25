@@ -105,6 +105,61 @@ function MediaSettingField({ item, isSaving, canManageSettings, onSave }: MediaS
   )
 }
 
+// ── Consent-default setting field (denied / granted dropdown) ────────────────
+
+interface ConsentDefaultFieldProps {
+  item: SettingItem
+  isSaving: boolean
+  canManageSettings: boolean
+  onSave: (settingKey: string, value: string) => Promise<void>
+}
+
+/**
+ * `analytics_consent_default` is a fixed two-value choice (Consent Mode v2). A
+ * select avoids free-text typos; the backend normalizes anything unexpected to
+ * `denied`, but the dropdown makes the EU-safe default explicit.
+ */
+function ConsentDefaultField({
+  item,
+  isSaving,
+  canManageSettings,
+  onSave,
+}: ConsentDefaultFieldProps) {
+  const { t } = useTranslation()
+  const initial = item.value === 'granted' ? 'granted' : 'denied'
+  const [value, setValue] = useState(initial)
+  const dirty = value !== initial
+
+  return (
+    <div className="flex items-center gap-stack-sm">
+      <select
+        id={`setting-${item.settingKey}`}
+        value={value}
+        disabled={isSaving || !canManageSettings}
+        onChange={(e) => {
+          setValue(e.target.value)
+        }}
+        className={`flex-1 ${inputClass}`}
+      >
+        <option value="denied">{t('admin.settings.consentDefault.denied')}</option>
+        <option value="granted">{t('admin.settings.consentDefault.granted')}</option>
+      </select>
+      {canManageSettings ? (
+        <Button
+          variant="secondary"
+          size="sm"
+          disabled={isSaving || !dirty}
+          onClick={() => {
+            void onSave(item.settingKey, value)
+          }}
+        >
+          {isSaving ? t('admin.settings.saving') : t('admin.settings.save')}
+        </Button>
+      ) : null}
+    </div>
+  )
+}
+
 // ── Setting card (local form state only) ─────────────────────────────────────
 
 interface SettingCardProps {
@@ -192,6 +247,13 @@ function SettingCard({
             </div>
           ) : null}
         </div>
+      ) : item.settingKey === 'analytics_consent_default' ? (
+        <ConsentDefaultField
+          item={item}
+          isSaving={isSaving}
+          canManageSettings={canManageSettings}
+          onSave={onSave}
+        />
       ) : (
         <div className="flex items-center gap-stack-sm">
           <input

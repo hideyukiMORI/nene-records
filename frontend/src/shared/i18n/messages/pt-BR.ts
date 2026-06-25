@@ -1160,6 +1160,10 @@ export const ptBR: Partial<MessageCatalog> = {
   'admin.superSettings.currentTitle': 'Configurações atuais (salvas no BD)',
   'admin.superSettings.currentResolution': 'Modo de resolução',
 
+  // ── Admin · settings · analytics consent default ──────────────────────────
+  'admin.settings.consentDefault.denied': 'Negado (padrão seguro na UE)',
+  'admin.settings.consentDefault.granted': 'Concedido',
+
   // ── Public · cookie consent ───────────────────────────────────────────────
   'public.consent.label': 'Consentimento de cookies',
   'public.consent.message':
