@@ -41,8 +41,10 @@ final readonly class RenderSitemapHandler
     {
         $uri = $request->getUri();
         // The renderer joins paths onto this; folding the base path in keeps every
-        // <loc> / child-sitemap URL under the sub-directory install (#zip-install).
-        $baseUrl = $uri->getScheme() . '://' . $uri->getAuthority() . $this->basePath;
+        // <loc> / child-sitemap URL under the sub-directory install (#zip-install)
+        // and the per-request tenant prefix in directory mode (nene2.base_prefix).
+        $baseUrl = $uri->getScheme() . '://' . $uri->getAuthority()
+            . $this->basePath . (string) $request->getAttribute('nene2.base_prefix', '');
 
         // Global list = home page (1) + every published record.
         $totalUrls = 1 + $this->useCase->count();

@@ -26,9 +26,10 @@ final readonly class RenderRobotsHandler
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $uri = $request->getUri();
-        $sitemapUrl = $uri->getScheme() . '://' . $uri->getAuthority() . $this->basePath . '/sitemap.xml';
+        $base = $this->basePath . (string) $request->getAttribute('nene2.base_prefix', '');
+        $sitemapUrl = $uri->getScheme() . '://' . $uri->getAuthority() . $base . '/sitemap.xml';
 
-        $body = RobotsTxtRenderer::render($sitemapUrl, $this->basePath);
+        $body = RobotsTxtRenderer::render($sitemapUrl, $base);
 
         return $this->responseFactory->createResponse(200)
             ->withHeader('Content-Type', 'text/plain; charset=UTF-8')

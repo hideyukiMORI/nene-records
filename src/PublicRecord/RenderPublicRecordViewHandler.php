@@ -33,6 +33,16 @@ final readonly class RenderPublicRecordViewHandler
     }
 
     /**
+     * The base every generated URL is prefixed with: the fixed install prefix
+     * plus the per-request tenant prefix in directory mode (`/org1`), set by
+     * OrgResolverMiddleware on `nene2.base_prefix`. '' = root single-tenant.
+     */
+    private function effectiveBase(ServerRequestInterface $request): string
+    {
+        return $this->basePath . (string) $request->getAttribute('nene2.base_prefix', '');
+    }
+
+    /**
      * Legacy `/view/{type}/{entitySlug}` twin → 301 to the canonical permalink.
      * The crawlable SSR now lives at the real permalink; this keeps one canonical
      * URL and avoids a duplicate-content twin.
@@ -54,7 +64,7 @@ final readonly class RenderPublicRecordViewHandler
         $output = $this->useCase->execute(new GetPublicRecordViewInput($typeSlug, $entitySlug));
         $uri = $request->getUri();
         $location = $uri->getScheme() . '://' . $uri->getAuthority()
-            . BasePath::prefix($this->basePath, $output->canonicalPath);
+            . BasePath::prefix($this->effectiveBase($request), $output->canonicalPath);
 
         return $this->responseFactory->createResponse(301)->withHeader('Location', $location);
     }
@@ -89,7 +99,8 @@ final readonly class RenderPublicRecordViewHandler
         // hreflang alternates advertise every locale variant (#540).
         $uri = $request->getUri();
         $baseUrl = $uri->getScheme() . '://' . $uri->getAuthority();
-        $permalinkUrl = $baseUrl . BasePath::prefix($this->basePath, $output->canonicalPath);
+        $effectiveBase = $this->effectiveBase($request);
+        $permalinkUrl = $baseUrl . BasePath::prefix($effectiveBase, $output->canonicalPath);
         $canonicalUrl = $locale !== null ? $permalinkUrl . '?lang=' . $locale : $permalinkUrl;
         $htmlLang = $locale ?? PublicLocale::DEFAULT_LANG;
         $alternateLinks = [['hreflang' => 'x-default', 'href' => $permalinkUrl]];
@@ -102,7 +113,7 @@ final readonly class RenderPublicRecordViewHandler
         if ($output->ogImagePath !== null) {
             $ogImageUrl = str_starts_with($output->ogImagePath, 'http')
                 ? $output->ogImagePath
-                : $baseUrl . BasePath::prefix($this->basePath, $output->ogImagePath);
+                : $baseUrl . BasePath::prefix($effectiveBase, $output->ogImagePath);
         }
 
         // Prefer the per-entity meta description, falling back to the site default.
@@ -152,7 +163,7 @@ final readonly class RenderPublicRecordViewHandler
             'analyticsHead' => $analyticsHead,
             'htmlLang' => $htmlLang,
             'alternateLinks' => $alternateLinks,
-            'basePath' => $this->basePath,
+            'basePath' => $effectiveBase,
             'canonicalUrl' => $canonicalUrl,
             'ogImageUrl' => $ogImageUrl,
             'publishedAtIso' => $output->publishedAtIso,

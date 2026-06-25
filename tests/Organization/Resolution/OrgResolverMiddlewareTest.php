@@ -6,8 +6,10 @@ namespace NeNeRecords\Tests\Organization\Resolution;
 
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\RequestScopedHolder;
+use NeNeRecords\Organization\Organization;
 use NeNeRecords\Organization\Resolution\OrgResolutionStrategyInterface;
 use NeNeRecords\Organization\Resolution\OrgResolverMiddleware;
+use NeNeRecords\Organization\Resolution\PathPrefixResolutionStrategy;
 use NeNeRecords\Tests\Organization\InMemoryOrganizationRepository;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use PHPUnit\Framework\TestCase;
@@ -57,5 +59,53 @@ final class OrgResolverMiddlewareTest extends TestCase
 
         self::assertSame(200, $response->getStatusCode());
         self::assertSame(0, $orgId->get());
+    }
+
+    /**
+     * Directory / path mode: the tenant's leading path segment is stripped before
+     * routing (downstream sees /posts/1) and re-exposed on nene2.base_prefix so
+     * public URL generation can re-add it. #536 base-path S-path.
+     */
+    public function testPathModeStripsPrefixAndExposesBasePrefix(): void
+    {
+        $factory = new Psr17Factory();
+        /** @var RequestScopedHolder<int> $orgId */
+        $orgId = new RequestScopedHolder();
+        $repository = new InMemoryOrganizationRepository();
+        $repository->save(new Organization('My Shop', 'myshop', 'free', true));
+
+        $middleware = new OrgResolverMiddleware(
+            $orgId,
+            $repository,
+            new ProblemDetailsResponseFactory($factory, $factory),
+            new PathPrefixResolutionStrategy(),
+        );
+
+        $capture = new class ($factory) implements RequestHandlerInterface {
+            public ?ServerRequestInterface $seen = null;
+
+            public function __construct(private readonly Psr17Factory $factory)
+            {
+            }
+
+            public function handle(ServerRequestInterface $request): ResponseInterface
+            {
+                $this->seen = $request;
+
+                return $this->factory->createResponse(200);
+            }
+        };
+
+        $middleware->process(
+            $factory->createServerRequest('GET', 'https://example.test/myshop/posts/1'),
+            $capture,
+        );
+
+        self::assertNotNull($capture->seen);
+        // Tenant segment stripped for routing…
+        self::assertSame('/posts/1', $capture->seen->getUri()->getPath());
+        // …and re-exposed for URL generation, alongside the resolved org.
+        self::assertSame('/myshop', $capture->seen->getAttribute('nene2.base_prefix'));
+        self::assertSame('myshop', $capture->seen->getAttribute('nene2.org.slug'));
     }
 }
