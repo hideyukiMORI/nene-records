@@ -18,15 +18,17 @@ final readonly class RenderRobotsHandler
     public function __construct(
         private ResponseFactoryInterface $responseFactory,
         private StreamFactoryInterface $streamFactory,
+        /** Sub-directory install prefix (`APP_BASE_PATH`); '' = served at root. */
+        private string $basePath = '',
     ) {
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $uri = $request->getUri();
-        $sitemapUrl = $uri->getScheme() . '://' . $uri->getAuthority() . '/sitemap.xml';
+        $sitemapUrl = $uri->getScheme() . '://' . $uri->getAuthority() . $this->basePath . '/sitemap.xml';
 
-        $body = RobotsTxtRenderer::render($sitemapUrl);
+        $body = RobotsTxtRenderer::render($sitemapUrl, $this->basePath);
 
         return $this->responseFactory->createResponse(200)
             ->withHeader('Content-Type', 'text/plain; charset=UTF-8')

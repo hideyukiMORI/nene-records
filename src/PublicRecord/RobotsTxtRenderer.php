@@ -21,12 +21,12 @@ final class RobotsTxtRenderer
     {
     }
 
-    public static function render(string $sitemapUrl): string
+    public static function render(string $sitemapUrl, string $basePath = ''): string
     {
         $lines = ['User-agent: *'];
 
         foreach (self::DISALLOW as $path) {
-            $lines[] = 'Disallow: ' . $path;
+            $lines[] = 'Disallow: ' . $basePath . $path;
         }
 
         $lines[] = '';

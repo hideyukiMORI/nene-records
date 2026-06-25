@@ -48,7 +48,11 @@ final readonly class UrlRedirectServiceProvider implements ServiceProviderInterf
                         throw new LogicException('Response factory service is invalid.');
                     }
 
-                    return new UrlRedirectResolver($redirects, $responseFactory);
+                    return new UrlRedirectResolver(
+                        $redirects,
+                        $responseFactory,
+                        \NeNeRecords\Http\BasePath::fromEnv(),
+                    );
                 },
             );
     }
