@@ -257,6 +257,20 @@
   border-radius: var(--radius-full);
   background: var(--color-surface-raised);
 }
+/* Public language switcher (#540 S2). */
+.nene-public .langsw {
+  font: inherit;
+  font-size: var(--text-meta);
+  color: var(--color-text-primary);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  padding: 5px 10px;
+  cursor: pointer;
+}
+.nene-public .langsw:hover {
+  border-color: var(--color-border-strong);
+}
 .nene-public .themesw__btn {
   width: 30px;
   height: 28px;

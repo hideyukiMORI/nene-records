@@ -1,8 +1,9 @@
-import { type ReactNode, useMemo, useRef, useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { type ReactNode, useEffect, useMemo, useRef, useState } from 'react'
+import { Link, useLocation, useSearchParams } from 'react-router-dom'
 import { useEntityTypeList } from '@/entities/entity-type'
 import { usePublicWidgets } from '@/entities/widget'
 import { SiteWidgets } from '@/features/render-widgets'
+import { LOCALES, SUPPORTED_LOCALE_IDS, type SupportedLocale, useTranslation } from '@/shared/i18n'
 import { hasCta, hasTopbarContent, safeHref } from '@/shared/lib/header-config'
 import { useHeaderShrink } from '@/shared/lib/motion/use-header-shrink'
 import { useScrollReveal } from '@/shared/lib/motion/use-scroll-reveal'
@@ -73,6 +74,37 @@ function ThemeSwitch({ mode, onMode }: { mode: ThemeMode; onMode: (mode: ThemeMo
         </button>
       ))}
     </div>
+  )
+}
+
+/**
+ * Public language switcher (#540 S2). Sets the i18n locale (UI + locale-resolved
+ * listing titles react instantly) and mirrors the choice to `?lang=` so the URL
+ * is shareable / crawlable and the SSR detail serves that locale on reload.
+ */
+function LanguageSwitch() {
+  const { t, locale, setLocale } = useTranslation()
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  return (
+    <select
+      className="langsw"
+      aria-label={t('public.nav.language')}
+      value={locale}
+      onChange={(event) => {
+        const next = event.target.value as SupportedLocale
+        setLocale(next)
+        const params = new URLSearchParams(searchParams)
+        params.set('lang', next)
+        setSearchParams(params)
+      }}
+    >
+      {SUPPORTED_LOCALE_IDS.map((id) => (
+        <option key={id} value={id}>
+          {LOCALES[id].label}
+        </option>
+      ))}
+    </select>
   )
 }
 
@@ -152,6 +184,21 @@ export function PublicSiteShell({
 }: PublicSiteShellProps) {
   const { mode, resolvedTheme, setMode } = useConsumerTheme(site.activeTheme)
   const [drawerOpen, setDrawerOpen] = useState(false)
+
+  // Adopt a shared/crawled `?lang=` as the UI locale so the page (UI strings +
+  // locale-resolved listing titles) matches the URL the visitor arrived on (#540).
+  const { locale: uiLocale, setLocale: setUiLocale } = useTranslation()
+  const [searchParams] = useSearchParams()
+  const langParam = searchParams.get('lang')
+  useEffect(() => {
+    if (
+      langParam !== null &&
+      SUPPORTED_LOCALE_IDS.includes(langParam as SupportedLocale) &&
+      langParam !== uiLocale
+    ) {
+      setUiLocale(langParam as SupportedLocale)
+    }
+  }, [langParam, uiLocale, setUiLocale])
 
   // Live theme preview (#538 ②): when embedded in the admin customizer's iframe,
   // apply the draft override CSS + flag attrs it posts instead of saved settings.
@@ -246,6 +293,7 @@ export function PublicSiteShell({
             <Link className="iconbtn hd__search" to="/search" aria-label="Search" title="Search">
               <IconSearch size={18} />
             </Link>
+            <LanguageSwitch />
             <ThemeSwitch mode={mode} onMode={setMode} />
             <button
               type="button"
@@ -353,7 +401,8 @@ export function PublicSiteShell({
               {link.label}
             </Link>
           ))}
-          <div style={{ marginTop: 'auto' }}>
+          <div style={{ marginTop: 'auto' }} className="flex flex-col gap-stack-sm">
+            <LanguageSwitch />
             <ThemeSwitch mode={mode} onMode={setMode} />
           </div>
         </div>

@@ -324,6 +324,7 @@ export const fr: Partial<MessageCatalog> = {
   // ── Public View i18n (WS-10): browse / home / nav / records / relation ──
   'public.nav.allRecords': 'Toutes les fiches',
   'public.nav.backToLatest': 'Retour aux plus récentes',
+  'public.nav.language': 'Langue',
   'public.browse.subRange': '{{total}} fiches · affichage de {{start}} à {{end}}',
   'public.browse.recordCount.one': '{{count}} fiche',
   'public.browse.recordCount.other': '{{count}} fiches',

@@ -323,6 +323,7 @@ export const en = {
   // ── Public View i18n (WS-10): browse / home / nav / records / relation ──
   'public.nav.allRecords': 'All records',
   'public.nav.backToLatest': 'Back to latest',
+  'public.nav.language': 'Language',
   'public.browse.subRange': '{{total}} records · showing {{start}}–{{end}}',
   'public.browse.recordCount.one': '{{count}} record',
   'public.browse.recordCount.other': '{{count}} records',
