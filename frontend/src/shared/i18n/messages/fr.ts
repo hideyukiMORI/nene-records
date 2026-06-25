@@ -420,6 +420,23 @@ export const fr: Partial<MessageCatalog> = {
   'admin.auth.signingIn': 'Connexion…',
   'admin.auth.invalidCredentials': 'E-mail ou mot de passe incorrect',
 
+  'admin.signup.appTitle': 'Créer votre site',
+  'admin.signup.subtitle': 'Lancez votre site NeNe Records en quelques secondes.',
+  'admin.signup.orgNameLabel': 'Nom du site',
+  'admin.signup.slugLabel': 'Sous-domaine',
+  'admin.signup.slugPlaceholder': 'votre-site',
+  'admin.signup.slugHint': 'Votre site sera accessible sur {{url}}',
+  'admin.signup.emailLabel': 'E-mail',
+  'admin.signup.passwordLabel': 'Mot de passe',
+  'admin.signup.submit': 'Créer le site',
+  'admin.signup.submitting': 'Création…',
+  'admin.signup.errorTaken': 'Ce sous-domaine ou cet e-mail est déjà pris.',
+  'admin.signup.errorGeneric':
+    'Impossible de créer votre site. Vérifiez vos informations et réessayez.',
+  'admin.signup.successTitle': 'Votre site est prêt !',
+  'admin.signup.successBody': 'Connectez-vous pour commencer à construire {{url}}.',
+  'admin.signup.goToLogin': 'Aller à votre site',
+
   // ── Forbidden page ───────────────────────────────────────────────────────
   'admin.forbidden.title': 'Accès refusé',
   'admin.forbidden.description':

@@ -1,3 +1,5 @@
+import type { components } from '@/shared/api/schema.gen'
+
 export interface LoginRequestDto {
   email: string
   password: string
@@ -9,3 +11,6 @@ export interface LoginResponseDto {
   email: string
   role: string
 }
+
+export type SignupRequestDto = components['schemas']['SignupRequest']
+export type SignupResponseDto = components['schemas']['SignupResponse']

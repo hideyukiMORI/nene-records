@@ -418,6 +418,23 @@ export const ptBR: Partial<MessageCatalog> = {
   'admin.auth.signingIn': 'Entrando…',
   'admin.auth.invalidCredentials': 'E-mail ou senha incorretos',
 
+  'admin.signup.appTitle': 'Crie seu site',
+  'admin.signup.subtitle': 'Comece seu site NeNe Records em segundos.',
+  'admin.signup.orgNameLabel': 'Nome do site',
+  'admin.signup.slugLabel': 'Subdomínio',
+  'admin.signup.slugPlaceholder': 'seu-site',
+  'admin.signup.slugHint': 'Seu site ficará em {{url}}',
+  'admin.signup.emailLabel': 'E-mail',
+  'admin.signup.passwordLabel': 'Senha',
+  'admin.signup.submit': 'Criar site',
+  'admin.signup.submitting': 'Criando…',
+  'admin.signup.errorTaken': 'Esse subdomínio ou e-mail já está em uso.',
+  'admin.signup.errorGeneric':
+    'Não foi possível criar seu site. Verifique seus dados e tente novamente.',
+  'admin.signup.successTitle': 'Seu site está pronto!',
+  'admin.signup.successBody': 'Entre para começar a construir {{url}}.',
+  'admin.signup.goToLogin': 'Ir para seu site',
+
   // ── Forbidden page ───────────────────────────────────────────────────────
   'admin.forbidden.title': 'Acesso negado',
   'admin.forbidden.description':

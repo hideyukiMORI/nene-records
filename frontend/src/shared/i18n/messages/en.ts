@@ -419,6 +419,24 @@ export const en = {
   'admin.auth.signingIn': 'Signing in…',
   'admin.auth.invalidCredentials': 'Invalid email or password',
 
+  // ── Public signup (subdomain SaaS) ───────────────────────────────────────
+  'admin.signup.appTitle': 'Create your site',
+  'admin.signup.subtitle': 'Start your NeNe Records site in seconds.',
+  'admin.signup.orgNameLabel': 'Site name',
+  'admin.signup.slugLabel': 'Subdomain',
+  'admin.signup.slugPlaceholder': 'your-site',
+  'admin.signup.slugHint': 'Your site will live at {{url}}',
+  'admin.signup.emailLabel': 'Email',
+  'admin.signup.passwordLabel': 'Password',
+  'admin.signup.submit': 'Create site',
+  'admin.signup.submitting': 'Creating…',
+  'admin.signup.errorTaken': 'That subdomain or email is already taken.',
+  'admin.signup.errorGeneric':
+    'Could not create your site. Please check your details and try again.',
+  'admin.signup.successTitle': 'Your site is ready!',
+  'admin.signup.successBody': 'Sign in to start building {{url}}.',
+  'admin.signup.goToLogin': 'Go to your site',
+
   // ── Forbidden page ───────────────────────────────────────────────────────
   'admin.forbidden.title': 'Access denied',
   'admin.forbidden.description':
