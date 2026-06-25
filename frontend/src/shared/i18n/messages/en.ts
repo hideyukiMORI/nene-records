@@ -1147,6 +1147,12 @@ export const en = {
   'admin.superSettings.toast.error': 'Could not save settings.',
   'admin.superSettings.currentTitle': 'Current settings (saved in DB)',
   'admin.superSettings.currentResolution': 'Resolution mode',
+
+  // ── Public · cookie consent ───────────────────────────────────────────────
+  'public.consent.label': 'Cookie consent',
+  'public.consent.message': 'We use cookies to measure site traffic. May we enable analytics?',
+  'public.consent.accept': 'Allow',
+  'public.consent.decline': 'Decline',
 } as const
 
 /**

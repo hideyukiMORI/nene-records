@@ -1159,4 +1159,11 @@ export const ptBR: Partial<MessageCatalog> = {
   'admin.superSettings.toast.error': 'Não foi possível salvar as configurações.',
   'admin.superSettings.currentTitle': 'Configurações atuais (salvas no BD)',
   'admin.superSettings.currentResolution': 'Modo de resolução',
+
+  // ── Public · cookie consent ───────────────────────────────────────────────
+  'public.consent.label': 'Consentimento de cookies',
+  'public.consent.message':
+    'Usamos cookies para medir o tráfego do site. Podemos ativar a análise?',
+  'public.consent.accept': 'Permitir',
+  'public.consent.decline': 'Recusar',
 }
