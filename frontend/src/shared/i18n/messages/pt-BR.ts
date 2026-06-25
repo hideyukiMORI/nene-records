@@ -616,6 +616,9 @@ export const ptBR: Partial<MessageCatalog> = {
 
   // ── Blocks editor (#486) ──────────────────────────────────────────────────
   'admin.blocks.add': 'Adicionar {{type}}',
+  'admin.blocks.preview.title': 'Prévia',
+  'admin.blocks.preview.show': 'Mostrar prévia',
+  'admin.blocks.preview.hide': 'Ocultar prévia',
   'admin.blocks.empty.title': 'Nenhum bloco ainda',
   'admin.blocks.empty.description': 'Adicione um bloco acima para começar a compor o corpo.',
   'admin.blocks.type.text': 'Texto',

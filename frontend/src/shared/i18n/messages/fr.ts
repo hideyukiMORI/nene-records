@@ -622,6 +622,9 @@ export const fr: Partial<MessageCatalog> = {
 
   // ── Blocks editor (#486) ──────────────────────────────────────────────────
   'admin.blocks.add': 'Ajouter {{type}}',
+  'admin.blocks.preview.title': 'Aperçu',
+  'admin.blocks.preview.show': 'Afficher l’aperçu',
+  'admin.blocks.preview.hide': 'Masquer l’aperçu',
   'admin.blocks.empty.title': 'Aucun bloc pour le moment',
   'admin.blocks.empty.description': 'Ajoutez un bloc ci-dessus pour commencer à composer le corps.',
   'admin.blocks.type.text': 'Texte',

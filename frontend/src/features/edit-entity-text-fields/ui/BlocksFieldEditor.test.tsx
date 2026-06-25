@@ -46,6 +46,28 @@ describe('BlocksFieldEditor', () => {
     expect(screen.getByText('Callout')).toBeInTheDocument()
   })
 
+  it('toggles a live preview rendered through BlocksRenderer', async () => {
+    const user = userEvent.setup()
+    const doc = JSON.stringify([
+      { id: 'b1', type: 'callout', data: { kind: 'ok', title: 'Nice', body: 'Done' } },
+    ])
+    renderWithProviders(<Harness initial={doc} />)
+
+    // Hidden by default — no public-scoped render in the DOM.
+    expect(document.querySelector('.nene-public .blocks')).toBeNull()
+
+    await user.click(screen.getByRole('button', { name: 'Show preview' }))
+    expect(document.querySelector('.nene-public .blocks')).not.toBeNull()
+
+    await user.click(screen.getByRole('button', { name: 'Hide preview' }))
+    expect(document.querySelector('.nene-public .blocks')).toBeNull()
+  })
+
+  it('hides the preview toggle when there are no blocks', () => {
+    renderWithProviders(<Harness />)
+    expect(screen.queryByRole('button', { name: 'Show preview' })).not.toBeInTheDocument()
+  })
+
   it('limits the palette to allowedTypes', () => {
     renderWithProviders(
       <BlocksFieldEditor

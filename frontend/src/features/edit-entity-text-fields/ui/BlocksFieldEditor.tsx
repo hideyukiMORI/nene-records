@@ -32,6 +32,7 @@ import {
   setBlockDragPayload,
 } from './block-dnd'
 import { BlockInspector } from './BlockInspector'
+import { BlocksPreview } from './BlocksPreview'
 import { RepeaterIconButton } from './inspectors/RepeaterIconButton'
 
 export interface BlocksFieldEditorProps {
@@ -125,6 +126,7 @@ export function BlocksFieldEditor({
   const blocks = useMemo(() => parseBlocksDocument(value), [value])
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [dropIndex, setDropIndex] = useState<number | null>(null)
+  const [showPreview, setShowPreview] = useState(false)
   const boardRef = useRef<HTMLDivElement>(null)
 
   const selected = blocks.find((block) => block.id === selectedId) ?? null
@@ -200,9 +202,22 @@ export function BlocksFieldEditor({
 
   return (
     <div className="flex flex-col gap-stack-sm">
-      <Text as="span" variant="caption" className="font-medium text-text-primary">
-        {label}
-      </Text>
+      <div className="flex items-center justify-between gap-inline-md">
+        <Text as="span" variant="caption" className="font-medium text-text-primary">
+          {label}
+        </Text>
+        {blocks.length > 0 ? (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              setShowPreview((shown) => !shown)
+            }}
+          >
+            {showPreview ? t('admin.blocks.preview.hide') : t('admin.blocks.preview.show')}
+          </Button>
+        ) : null}
+      </div>
 
       <div className="flex flex-wrap gap-inline-sm">
         {palette.map((entry) => (
@@ -350,6 +365,17 @@ export function BlocksFieldEditor({
                 updateData(selected.id, data)
               }}
             />
+          </Stack>
+        </Card>
+      ) : null}
+
+      {showPreview && blocks.length > 0 ? (
+        <Card padding="md">
+          <Stack gap="sm">
+            <Text as="span" variant="caption" muted>
+              {t('admin.blocks.preview.title')}
+            </Text>
+            <BlocksPreview documentJson={value} />
           </Stack>
         </Card>
       ) : null}

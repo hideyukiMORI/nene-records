@@ -608,6 +608,9 @@ export const de: Partial<MessageCatalog> = {
   'admin.markdownEditor.empty': 'Nichts zum Vorschauen.',
   // ── Blocks editor (#486) ──────────────────────────────────────────────────
   'admin.blocks.add': '{{type}} hinzufügen',
+  'admin.blocks.preview.title': 'Vorschau',
+  'admin.blocks.preview.show': 'Vorschau anzeigen',
+  'admin.blocks.preview.hide': 'Vorschau ausblenden',
   'admin.blocks.empty.title': 'Noch keine Blöcke',
   'admin.blocks.empty.description': 'Fügen Sie oben einen Block hinzu, um den Inhalt zu gestalten.',
   'admin.blocks.type.text': 'Text',
