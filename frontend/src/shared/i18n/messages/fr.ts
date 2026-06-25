@@ -289,6 +289,10 @@ export const fr: Partial<MessageCatalog> = {
   'public.dateArchive.dayTitle': 'Archive : {{day}}/{{month}}/{{year}}',
   'public.dateArchive.monthTitle': 'Archive : {{month}}/{{year}}',
   'public.dateArchive.loading': 'Chargement…',
+  'public.landing.heading': 'Créez votre site avec NeNe Records',
+  'public.landing.subheading':
+    'Un CMS natif IA. Lancez un site en quelques secondes — contenu flexible et typé, sans configuration.',
+  'public.landing.cta': 'Créer votre site',
   'public.dateArchive.subCount.one': '{{count}} fiche publiée durant cette période.',
   'public.dateArchive.subCount.other': '{{count}} fiches publiées durant cette période.',
   'public.dateArchive.error.title': 'Impossible de charger cette archive',

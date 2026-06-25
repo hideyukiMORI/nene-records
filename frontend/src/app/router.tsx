@@ -6,9 +6,11 @@ import { getBasePath } from '@/shared/lib/base-path'
 import { PublicShell } from '@/pages/consumer/PublicShell'
 import { ForbiddenPage } from '@/pages/forbidden/ForbiddenPage'
 import { AppShell } from '@/pages/layout/AppShell'
+import { LandingPage } from '@/pages/landing/LandingPage'
 import { LoginPage } from '@/pages/login/LoginPage'
 import { SignupPage } from '@/pages/signup/SignupPage'
 import { NotFoundPage } from '@/pages/not-found/NotFoundPage'
+import { isApex } from '@/shared/lib/apex'
 import { SuperadminShell } from '@/pages/superadmin/SuperadminShell'
 import { RequireAuth } from '@/app/RequireAuth'
 
@@ -44,6 +46,12 @@ const PublicTagArchivePage = named(() => import('@/pages/consumer/PublicTagArchi
 const PublicDateArchivePage = named(() => import('@/pages/consumer/PublicDateArchivePage'), 'PublicDateArchivePage') // prettier-ignore
 const PublicBrowsePage = named(() => import('@/pages/consumer/PublicBrowsePage'), 'PublicBrowsePage') // prettier-ignore
 const PublicRecordDetailPage = named(() => import('@/pages/consumer/PublicRecordDetailPage'), 'PublicRecordDetailPage') // prettier-ignore
+
+// Public root: the tenant-less apex shows the SaaS landing; a tenant subdomain
+// shows its own index. The server flags the apex via <meta name="nene:apex">.
+function PublicHome() {
+  return isApex() ? <LandingPage /> : <PublicIndexPage />
+}
 
 function AdminShell() {
   return (
@@ -140,7 +148,7 @@ const router = createBrowserRouter(
       element: <PublicShell />,
       errorElement: <NotFoundPage />,
       children: [
-        { index: true, element: <PublicIndexPage /> },
+        { index: true, element: <PublicHome /> },
         // Static routes before `:entityTypeSlug` so they are not treated as types.
         { path: 'search', element: <PublicSearchPage /> },
         { path: 'tag/:tagSlug', element: <PublicTagArchivePage /> },
