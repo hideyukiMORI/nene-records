@@ -402,6 +402,22 @@ export const zhHans: Partial<MessageCatalog> = {
   'admin.auth.signingIn': '登录中…',
   'admin.auth.invalidCredentials': '邮箱或密码错误',
 
+  'admin.signup.appTitle': '创建你的站点',
+  'admin.signup.subtitle': '几秒钟即可开通你的 NeNe Records 站点。',
+  'admin.signup.orgNameLabel': '站点名称',
+  'admin.signup.slugLabel': '子域名',
+  'admin.signup.slugPlaceholder': 'your-site',
+  'admin.signup.slugHint': '你的站点地址将是 {{url}}',
+  'admin.signup.emailLabel': '邮箱',
+  'admin.signup.passwordLabel': '密码',
+  'admin.signup.submit': '创建站点',
+  'admin.signup.submitting': '创建中…',
+  'admin.signup.errorTaken': '该子域名或邮箱已被占用。',
+  'admin.signup.errorGeneric': '无法创建站点。请检查信息后重试。',
+  'admin.signup.successTitle': '你的站点已就绪！',
+  'admin.signup.successBody': '登录即可开始构建 {{url}}。',
+  'admin.signup.goToLogin': '前往你的站点',
+
   // ── Forbidden page ───────────────────────────────────────────────────────
   'admin.forbidden.title': '访问被拒绝',
   'admin.forbidden.description': '您已登录，但您的账户没有执行此操作的权限。',

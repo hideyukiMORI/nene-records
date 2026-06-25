@@ -418,6 +418,23 @@ export const de: Partial<MessageCatalog> = {
   'admin.auth.signIn': 'Anmelden',
   'admin.auth.signingIn': 'Anmeldung…',
   'admin.auth.invalidCredentials': 'E-Mail oder Passwort falsch',
+
+  'admin.signup.appTitle': 'Website erstellen',
+  'admin.signup.subtitle': 'Starte deine NeNe-Records-Website in Sekunden.',
+  'admin.signup.orgNameLabel': 'Website-Name',
+  'admin.signup.slugLabel': 'Subdomain',
+  'admin.signup.slugPlaceholder': 'deine-seite',
+  'admin.signup.slugHint': 'Deine Website liegt unter {{url}}',
+  'admin.signup.emailLabel': 'E-Mail',
+  'admin.signup.passwordLabel': 'Passwort',
+  'admin.signup.submit': 'Website erstellen',
+  'admin.signup.submitting': 'Wird erstellt …',
+  'admin.signup.errorTaken': 'Diese Subdomain oder E-Mail ist bereits vergeben.',
+  'admin.signup.errorGeneric':
+    'Website konnte nicht erstellt werden. Bitte überprüfe deine Angaben.',
+  'admin.signup.successTitle': 'Deine Website ist bereit!',
+  'admin.signup.successBody': 'Melde dich an, um {{url}} aufzubauen.',
+  'admin.signup.goToLogin': 'Zu deiner Website',
   // ── Forbidden page ───────────────────────────────────────────────────────
   'admin.forbidden.title': 'Zugriff verweigert',
   'admin.forbidden.description':

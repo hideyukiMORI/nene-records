@@ -411,6 +411,24 @@ export const ja: Partial<MessageCatalog> = {
   'admin.auth.signingIn': 'サインイン中…',
   'admin.auth.invalidCredentials': 'メールアドレスまたはパスワードが正しくありません',
 
+  // ── 公開サインアップ（サブドメイン SaaS） ───────────────────────────────────
+  'admin.signup.appTitle': 'サイトを作成',
+  'admin.signup.subtitle': 'NeNe Records のサイトを数秒で開設できます。',
+  'admin.signup.orgNameLabel': 'サイト名',
+  'admin.signup.slugLabel': 'サブドメイン',
+  'admin.signup.slugPlaceholder': 'your-site',
+  'admin.signup.slugHint': 'サイトの URL は {{url}} になります',
+  'admin.signup.emailLabel': 'メールアドレス',
+  'admin.signup.passwordLabel': 'パスワード',
+  'admin.signup.submit': 'サイトを作成',
+  'admin.signup.submitting': '作成中…',
+  'admin.signup.errorTaken': 'そのサブドメインまたはメールアドレスは既に使われています。',
+  'admin.signup.errorGeneric':
+    'サイトを作成できませんでした。入力内容を確認して再度お試しください。',
+  'admin.signup.successTitle': 'サイトの準備ができました！',
+  'admin.signup.successBody': '{{url}} にサインインして作成を始めましょう。',
+  'admin.signup.goToLogin': 'サイトへ移動',
+
   // ── Forbidden ────────────────────────────────────────────────────────────
   'admin.forbidden.title': 'アクセス拒否',
   'admin.forbidden.description':

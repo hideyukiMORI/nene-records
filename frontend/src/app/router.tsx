@@ -7,6 +7,7 @@ import { PublicShell } from '@/pages/consumer/PublicShell'
 import { ForbiddenPage } from '@/pages/forbidden/ForbiddenPage'
 import { AppShell } from '@/pages/layout/AppShell'
 import { LoginPage } from '@/pages/login/LoginPage'
+import { SignupPage } from '@/pages/signup/SignupPage'
 import { NotFoundPage } from '@/pages/not-found/NotFoundPage'
 import { SuperadminShell } from '@/pages/superadmin/SuperadminShell'
 import { RequireAuth } from '@/app/RequireAuth'
@@ -65,6 +66,11 @@ const router = createBrowserRouter(
     {
       path: '/login',
       element: <LoginPage />,
+    },
+    {
+      // Public self-serve signup (subdomain SaaS apex).
+      path: '/signup',
+      element: <SignupPage />,
     },
     {
       path: '/admin/accept-invite',
