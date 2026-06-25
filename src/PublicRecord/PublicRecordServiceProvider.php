@@ -282,12 +282,30 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
                 },
             )
             ->set(
+                RenderRobotsHandler::class,
+                static function (ContainerInterface $container): RenderRobotsHandler {
+                    $responseFactory = $container->get(ResponseFactoryInterface::class);
+                    $streamFactory = $container->get(StreamFactoryInterface::class);
+
+                    if (!$responseFactory instanceof ResponseFactoryInterface) {
+                        throw new LogicException('Response factory service is invalid.');
+                    }
+
+                    if (!$streamFactory instanceof StreamFactoryInterface) {
+                        throw new LogicException('Stream factory service is invalid.');
+                    }
+
+                    return new RenderRobotsHandler($responseFactory, $streamFactory);
+                },
+            )
+            ->set(
                 'nene-records.route_registrar.public_record',
                 static function (ContainerInterface $container): PublicRecordRouteRegistrar {
                     $getHandler = $container->get(GetPublicRecordViewHandler::class);
                     $renderHandler = $container->get(RenderPublicRecordViewHandler::class);
                     $permalinkHandler = $container->get(RenderPublicPermalinkHandler::class);
                     $sitemapHandler = $container->get(RenderSitemapHandler::class);
+                    $robotsHandler = $container->get(RenderRobotsHandler::class);
 
                     if (!$getHandler instanceof GetPublicRecordViewHandler) {
                         throw new LogicException('GetPublicRecordView handler service is invalid.');
@@ -305,11 +323,16 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
                         throw new LogicException('RenderSitemap handler service is invalid.');
                     }
 
+                    if (!$robotsHandler instanceof RenderRobotsHandler) {
+                        throw new LogicException('RenderRobots handler service is invalid.');
+                    }
+
                     return new PublicRecordRouteRegistrar(
                         $getHandler,
                         $renderHandler,
                         $permalinkHandler,
                         $sitemapHandler,
+                        $robotsHandler,
                     );
                 },
             );
