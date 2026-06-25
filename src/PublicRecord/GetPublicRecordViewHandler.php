@@ -35,7 +35,10 @@ final readonly class GetPublicRecordViewHandler
             );
         }
 
-        $output = $this->useCase->execute(new GetPublicRecordViewInput($typeSlug, $entitySlug));
+        $langParam = $request->getQueryParams()['lang'] ?? null;
+        $locale = PublicLocale::resolve(is_string($langParam) ? $langParam : null);
+
+        $output = $this->useCase->execute(new GetPublicRecordViewInput($typeSlug, $entitySlug, null, $locale));
 
         $etag = '"' . md5(json_encode($output->bootstrap, JSON_THROW_ON_ERROR)) . '"';
 

@@ -85,7 +85,7 @@ final readonly class GetPublicRecordViewUseCase implements GetPublicRecordViewUs
         )));
 
         $textFieldRows = (in_array('text', $dataTypes, true) || in_array('markdown', $dataTypes, true) || in_array('html', $dataTypes, true) || in_array('bundle', $dataTypes, true) || in_array('image', $dataTypes, true) || in_array('file', $dataTypes, true))
-            ? $this->textFields->findByEntityId($entityId, self::FIELD_VALUE_LIMIT, 0)
+            ? $this->resolveLocaleRows($this->textFields->findByEntityId($entityId, self::FIELD_VALUE_LIMIT, 0), $input->locale)
             : [];
         $intFieldRows = in_array('int', $dataTypes, true)
             ? $this->intFields->findByEntityId($entityId, self::FIELD_VALUE_LIMIT, 0)
@@ -348,6 +348,60 @@ final readonly class GetPublicRecordViewUseCase implements GetPublicRecordViewUs
         }
 
         return 'Record #' . $entityId;
+    }
+
+    /**
+     * Negotiate text-field rows down to one per field key for the requested
+     * locale (#540): prefer the requested locale, then the locale-agnostic (null)
+     * row, then the first available. Resolving here keeps the SSR display fields,
+     * the SPA bootstrap and the page title all consistent for the served locale.
+     *
+     * @param list<TextField> $rows
+     * @return list<TextField>
+     */
+    private function resolveLocaleRows(array $rows, ?string $locale): array
+    {
+        $byKey = [];
+        $order = [];
+
+        foreach ($rows as $row) {
+            if (!array_key_exists($row->fieldKey, $byKey)) {
+                $byKey[$row->fieldKey] = [];
+                $order[] = $row->fieldKey;
+            }
+            $byKey[$row->fieldKey][] = $row;
+        }
+
+        $resolved = [];
+
+        foreach ($order as $fieldKey) {
+            $candidates = $byKey[$fieldKey];
+            $pick = null;
+
+            if ($locale !== null) {
+                $pick = $this->firstWhere($candidates, static fn (TextField $r): bool => $r->locale === $locale);
+            }
+
+            $pick ??= $this->firstWhere($candidates, static fn (TextField $r): bool => $r->locale === null);
+            $resolved[] = $pick ?? $candidates[0];
+        }
+
+        return $resolved;
+    }
+
+    /**
+     * @param list<TextField> $rows
+     * @param callable(TextField): bool $predicate
+     */
+    private function firstWhere(array $rows, callable $predicate): ?TextField
+    {
+        foreach ($rows as $row) {
+            if ($predicate($row)) {
+                return $row;
+            }
+        }
+
+        return null;
     }
 
     /** @param list<TextField> $rows */

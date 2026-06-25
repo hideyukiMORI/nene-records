@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ja">
+<html lang="<?= $e($htmlLang) ?>">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -10,6 +10,10 @@
     <?php endif; ?>
     <title><?= $e($pageTitle) ?> — <?= $e($siteName) ?></title>
     <link rel="canonical" href="<?= $e($canonicalUrl) ?>" />
+    <?php /* hreflang alternates for the public content locales (#540). */ ?>
+    <?php foreach ($alternateLinks as $alt): ?>
+      <link rel="alternate" hreflang="<?= $e($alt['hreflang']) ?>" href="<?= $e($alt['href']) ?>" />
+    <?php endforeach; ?>
 
     <meta property="og:type" content="article" />
     <meta property="og:title" content="<?= $e($pageTitle) ?>" />
