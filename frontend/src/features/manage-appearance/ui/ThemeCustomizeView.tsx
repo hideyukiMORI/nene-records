@@ -14,6 +14,8 @@ import {
   type KnobOption,
 } from '@/shared/lib/theme-customization'
 import { Button, Card, ConfirmDialog, Input, Stack, Text, Textarea } from '@/shared/ui'
+import { THEME_PREVIEW_PARAM } from '@/shared/lib/theme-preview-protocol'
+import { useThemePreviewSender } from '../hooks/useThemePreviewSender'
 import type { ThemeCustomizePageState } from '../hooks/useThemeCustomizePage'
 
 function Field({ label, children }: { label: string; children: ReactNode }) {
@@ -110,6 +112,10 @@ export function ThemeCustomizeView({
   const [newName, setNewName] = useState('')
   const [newDescription, setNewDescription] = useState('')
 
+  // Live preview (#538 ②): an embedded public page the draft is pushed to.
+  const [showPreview, setShowPreview] = useState(false)
+  const { iframeRef } = useThemePreviewSender(themeId, draft)
+
   const closeSaveAs = () => {
     setSaveAsOpen(false)
     setNewName('')
@@ -119,9 +125,34 @@ export function ThemeCustomizeView({
   return (
     <Card padding="none" className="p-stack-md">
       <Stack gap="md">
-        <Text muted variant="caption">
-          {t('admin.themeCustomize.intro', { theme: themeId })}
-        </Text>
+        <div className="flex items-center justify-between gap-inline-md">
+          <Text muted variant="caption">
+            {t('admin.themeCustomize.intro', { theme: themeId })}
+          </Text>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              setShowPreview((shown) => !shown)
+            }}
+          >
+            {showPreview
+              ? t('admin.themeCustomize.preview.hide')
+              : t('admin.themeCustomize.preview.show')}
+          </Button>
+        </div>
+
+        {/* Live preview: the draft is pushed into this public page via postMessage
+            (see useThemePreviewSender / useThemePreviewBridge). */}
+        {showPreview ? (
+          <iframe
+            ref={iframeRef}
+            src={`/search?${THEME_PREVIEW_PARAM}=1`}
+            title={t('admin.themeCustomize.preview.title')}
+            className="w-full rounded-md border border-border"
+            style={{ height: 480 }}
+          />
+        ) : null}
 
         {/* Basics — the essentials a non-engineer reaches for first. */}
         <Stack gap="sm">

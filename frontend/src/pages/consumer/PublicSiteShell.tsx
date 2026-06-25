@@ -14,6 +14,7 @@ import type { HeaderCta, HeaderTopbar } from '@/shared/lib/header-config'
 import { useConsumerMotion } from './use-consumer-motion'
 import type { PublicSite } from './public-site-context'
 import { type ThemeMode, useConsumerTheme } from './use-consumer-theme'
+import { useThemePreviewBridge } from './use-theme-preview-bridge'
 
 /** Repeating content blocks that scroll-reveal targets (#371 S1). */
 const REVEAL_SELECTOR = '.card, .typecard, .section__head, .article__head'
@@ -152,12 +153,19 @@ export function PublicSiteShell({
   const { mode, resolvedTheme, setMode } = useConsumerTheme(site.activeTheme)
   const [drawerOpen, setDrawerOpen] = useState(false)
 
+  // Live theme preview (#538 ②): when embedded in the admin customizer's iframe,
+  // apply the draft override CSS + flag attrs it posts instead of saved settings.
+  const themePreview = useThemePreviewBridge()
+  const previewState = themePreview.isPreview ? themePreview.preview : null
+  const overrideCss = previewState !== null ? previewState.overrideCss : site.themeOverrideCss
+  const flagAttrs = previewState !== null ? previewState.flagAttrs : site.themeFlagAttrs
+
   // Motion capability layer (#371): the theme declares `data-motion-reveal`;
   // first-party JS implements scroll-reveal, gated by prefers-reduced-motion.
   const mainRef = useRef<HTMLElement>(null)
   const sentinelRef = useRef<HTMLDivElement>(null)
   const { pathname } = useLocation()
-  const motion = useConsumerMotion(site.themeFlagAttrs)
+  const motion = useConsumerMotion(flagAttrs)
   useScrollReveal({
     containerRef: mainRef,
     enabled: motion.reveal !== 'off',
@@ -207,14 +215,14 @@ export function PublicSiteShell({
       className="nene-public"
       data-theme={resolvedTheme}
       data-theme-mode={mode}
-      {...site.themeFlagAttrs}
+      {...flagAttrs}
       data-shrunk={headerShrunk ? '' : undefined}
     >
       {/* Zero-height marker at the page top; when it scrolls away the sticky
           header compacts (motionHeader='shrink'). See use-header-shrink. */}
       <div ref={sentinelRef} className="motion-sentinel" aria-hidden="true" />
       {site.runtimeThemeCss !== '' ? <style>{site.runtimeThemeCss}</style> : null}
-      {site.themeOverrideCss !== '' ? <style>{site.themeOverrideCss}</style> : null}
+      {overrideCss !== '' ? <style>{overrideCss}</style> : null}
       {hasTopbarContent(site.headerConfig.topbar) ? (
         <HeaderTopbarRow topbar={site.headerConfig.topbar} />
       ) : null}
