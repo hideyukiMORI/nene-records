@@ -1152,4 +1152,11 @@ export const ja: Partial<MessageCatalog> = {
   'admin.superSettings.toast.error': '保存に失敗しました。',
   'admin.superSettings.currentTitle': '現在の設定（DB 保存値）',
   'admin.superSettings.currentResolution': '解決方式',
+
+  // ── Public · cookie consent ───────────────────────────────────────────────
+  'public.consent.label': 'Cookie の同意',
+  'public.consent.message':
+    'サイトのアクセス解析のために Cookie を使用します。解析を有効にしてもよろしいですか？',
+  'public.consent.accept': '許可する',
+  'public.consent.decline': '拒否する',
 }

@@ -1111,4 +1111,10 @@ export const zhHans: Partial<MessageCatalog> = {
   'admin.superSettings.toast.error': '无法保存设置。',
   'admin.superSettings.currentTitle': '当前设置（已保存于数据库）',
   'admin.superSettings.currentResolution': '解析模式',
+
+  // ── Public · cookie consent ───────────────────────────────────────────────
+  'public.consent.label': 'Cookie 同意',
+  'public.consent.message': '我们使用 Cookie 来统计网站访问量。是否允许启用分析？',
+  'public.consent.accept': '允许',
+  'public.consent.decline': '拒绝',
 }

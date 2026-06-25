@@ -1140,4 +1140,11 @@ export const de: Partial<MessageCatalog> = {
   'admin.superSettings.toast.error': 'Einstellungen konnten nicht gespeichert werden.',
   'admin.superSettings.currentTitle': 'Aktuelle Einstellungen (in DB gespeichert)',
   'admin.superSettings.currentResolution': 'Auflösungsmodus',
+
+  // ── Public · cookie consent ───────────────────────────────────────────────
+  'public.consent.label': 'Cookie-Einwilligung',
+  'public.consent.message':
+    'Wir verwenden Cookies, um die Zugriffe zu messen. Dürfen wir die Analyse aktivieren?',
+  'public.consent.accept': 'Zulassen',
+  'public.consent.decline': 'Ablehnen',
 }

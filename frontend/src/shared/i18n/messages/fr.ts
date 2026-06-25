@@ -1171,4 +1171,11 @@ export const fr: Partial<MessageCatalog> = {
   'admin.superSettings.toast.error': "Impossible d'enregistrer les paramètres.",
   'admin.superSettings.currentTitle': 'Paramètres actuels (enregistrés en BDD)',
   'admin.superSettings.currentResolution': 'Mode de résolution',
+
+  // ── Public · cookie consent ───────────────────────────────────────────────
+  'public.consent.label': 'Consentement aux cookies',
+  'public.consent.message':
+    'Nous utilisons des cookies pour mesurer l’audience du site. Pouvons-nous activer les statistiques ?',
+  'public.consent.accept': 'Autoriser',
+  'public.consent.decline': 'Refuser',
 }

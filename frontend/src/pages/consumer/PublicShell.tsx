@@ -2,10 +2,13 @@ import { Suspense, useEffect, useMemo } from 'react'
 import './consumer-theme.css'
 import './public-fonts'
 import { Outlet, ScrollRestoration } from 'react-router-dom'
+import { ConsentBanner } from '@/features/consent-banner'
 import { usePublicNavigationItems } from '@/entities/navigation-item'
 import { publicSettingsToMap, usePublicSettings } from '@/entities/setting'
 import { usePublicThemes } from '@/entities/theme'
 import { parseHeaderConfig } from '@/shared/lib/header-config'
+import { useAnalyticsPageView } from '@/shared/lib/use-analytics-page-view'
+import { resolveWebAnalytics } from '@/shared/lib/web-analytics'
 import { parseLayoutConfig } from '@/shared/lib/layout-config'
 import {
   buildThemeStylesheet,
@@ -58,6 +61,11 @@ export function PublicShell() {
     () => publicSettingsToMap(publicSettingsQuery.data?.items ?? []),
     [publicSettingsQuery.data?.items],
   )
+
+  // GA4 / GTM (PR-A1 injects the loader + consent default server-side). Here the
+  // SPA reports client-side navigations and offers the consent prompt.
+  const analytics = useMemo(() => resolveWebAnalytics(settings), [settings])
+  useAnalyticsPageView(analytics)
 
   // Apply the last-known theme synchronously on first paint, then reconcile with
   // the fetched setting — avoids a default→saved theme flash (FOUC) while the
@@ -156,6 +164,7 @@ export function PublicShell() {
       <Suspense fallback={null}>
         <Outlet context={site} />
       </Suspense>
+      <ConsentBanner config={analytics} />
     </>
   )
 }
