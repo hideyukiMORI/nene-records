@@ -10,6 +10,7 @@ use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
+use NeNeRecords\SystemConfig\SystemConfigRepositoryInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 
@@ -250,6 +251,42 @@ final readonly class OrganizationServiceProvider implements ServiceProviderInter
                     }
 
                     return new OrganizationRouteRegistrar($list, $get, $create, $update, $delete);
+                },
+            )
+            // ── On-demand TLS gate (subdomain SaaS) ─────────────────────────────
+            ->set(
+                TlsCheckHandler::class,
+                static function (ContainerInterface $c): TlsCheckHandler {
+                    $repo            = $c->get(OrganizationRepositoryInterface::class);
+                    $responseFactory = $c->get(ResponseFactoryInterface::class);
+                    $sysConfig       = $c->get(SystemConfigRepositoryInterface::class);
+
+                    if (!$repo instanceof OrganizationRepositoryInterface) {
+                        throw new LogicException('OrganizationRepositoryInterface is invalid.');
+                    }
+
+                    if (!$responseFactory instanceof ResponseFactoryInterface) {
+                        throw new LogicException('ResponseFactoryInterface is invalid.');
+                    }
+
+                    // Same source as OrgResolverMiddleware's subdomain strategy.
+                    $baseDomain = (string) (getenv('BASE_DOMAIN') ?: 'localhost');
+                    if ($sysConfig instanceof SystemConfigRepositoryInterface) {
+                        $baseDomain = $sysConfig->get('tenant_base_domain') ?: $baseDomain;
+                    }
+
+                    return new TlsCheckHandler($repo, $responseFactory, $baseDomain);
+                },
+            )
+            ->set(
+                TlsCheckRouteRegistrar::class,
+                static function (ContainerInterface $c): TlsCheckRouteRegistrar {
+                    $handler = $c->get(TlsCheckHandler::class);
+                    if (!$handler instanceof TlsCheckHandler) {
+                        throw new LogicException('TlsCheckHandler service is invalid.');
+                    }
+
+                    return new TlsCheckRouteRegistrar($handler);
                 },
             );
     }

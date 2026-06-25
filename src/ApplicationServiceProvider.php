@@ -81,6 +81,7 @@ use NeNeRecords\Organization\OrganizationNotFoundExceptionHandler;
 use NeNeRecords\Organization\OrganizationRouteRegistrar;
 use NeNeRecords\Organization\OrganizationServiceProvider;
 use NeNeRecords\Organization\OrganizationSlugConflictExceptionHandler;
+use NeNeRecords\Organization\TlsCheckRouteRegistrar;
 use NeNeRecords\OrgExport\OrgExportRouteRegistrar;
 use NeNeRecords\OrgExport\OrgExportServiceProvider;
 use NeNeRecords\PreviewToken\PreviewTokenNotFoundExceptionHandler;
@@ -219,6 +220,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $notification = $container->get(NotificationRouteRegistrar::class);
                     $comment = $container->get(CommentRouteRegistrar::class);
                     $organization = $container->get(OrganizationRouteRegistrar::class);
+                    $tlsCheck = $container->get(TlsCheckRouteRegistrar::class);
                     $systemConfig = $container->get(SystemConfigRouteRegistrar::class);
                     $dataMigration = $container->get(DataMigrationRouteRegistrar::class);
                     $orgExport     = $container->get(OrgExportRouteRegistrar::class);
@@ -255,6 +257,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         || !$notification instanceof NotificationRouteRegistrar
                         || !$comment instanceof CommentRouteRegistrar
                         || !$organization instanceof OrganizationRouteRegistrar
+                        || !$tlsCheck instanceof TlsCheckRouteRegistrar
                         || !$systemConfig instanceof SystemConfigRouteRegistrar
                         || !$dataMigration instanceof DataMigrationRouteRegistrar
                         || !$orgExport instanceof OrgExportRouteRegistrar
@@ -294,6 +297,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $notification,
                         $comment,
                         $organization,
+                        $tlsCheck,
                         $systemConfig,
                         $dataMigration,
                         $orgExport,
