@@ -588,6 +588,9 @@ export const zhHans: Partial<MessageCatalog> = {
 
   // ── Blocks editor (#486) ──────────────────────────────────────────────────
   'admin.blocks.add': '添加{{type}}',
+  'admin.blocks.preview.title': '预览',
+  'admin.blocks.preview.show': '显示预览',
+  'admin.blocks.preview.hide': '隐藏预览',
   'admin.blocks.empty.title': '还没有区块',
   'admin.blocks.empty.description': '在上方添加一个区块以开始撰写正文。',
   'admin.blocks.type.text': '文本',

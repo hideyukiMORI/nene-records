@@ -613,6 +613,9 @@ export const en = {
 
   // ── Blocks editor (#486) ──────────────────────────────────────────────────
   'admin.blocks.add': 'Add {{type}}',
+  'admin.blocks.preview.title': 'Preview',
+  'admin.blocks.preview.show': 'Show preview',
+  'admin.blocks.preview.hide': 'Hide preview',
   'admin.blocks.empty.title': 'No blocks yet',
   'admin.blocks.empty.description': 'Add a block above to start composing the body.',
   'admin.blocks.type.text': 'Text',

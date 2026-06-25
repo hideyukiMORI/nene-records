@@ -610,6 +610,9 @@ export const ja: Partial<MessageCatalog> = {
 
   // ── Blocks editor (#486) ──────────────────────────────────────────────────
   'admin.blocks.add': '{{type}}を追加',
+  'admin.blocks.preview.title': 'プレビュー',
+  'admin.blocks.preview.show': 'プレビューを表示',
+  'admin.blocks.preview.hide': 'プレビューを隠す',
   'admin.blocks.empty.title': 'ブロックがありません',
   'admin.blocks.empty.description': '上のボタンからブロックを追加して本文を組み立てましょう。',
   'admin.blocks.type.text': 'テキスト',
