@@ -12,6 +12,7 @@ use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RequestScopedHolder;
 use NeNeRecords\EntityType\EntityTypeRepositoryInterface;
+use NeNeRecords\Organization\OrganizationIterator;
 use NeNeRecords\Setting\SettingRepositoryInterface;
 use NeNeRecords\TextField\TextFieldRepositoryInterface;
 use NeNeRecords\Webhook\WebhookDispatcherInterface;
@@ -353,6 +354,7 @@ final readonly class EntityServiceProvider implements ServiceProviderInterface
                 static function (ContainerInterface $c): ProcessScheduledPublishHandler {
                     $useCase = $c->get(ProcessScheduledPublishUseCaseInterface::class);
                     $response = $c->get(JsonResponseFactory::class);
+                    $organizations = $c->get(OrganizationIterator::class);
 
                     if (!$useCase instanceof ProcessScheduledPublishUseCaseInterface) {
                         throw new LogicException('ProcessScheduledPublish use case service is invalid.');
@@ -362,7 +364,11 @@ final readonly class EntityServiceProvider implements ServiceProviderInterface
                         throw new LogicException('JSON response factory service is invalid.');
                     }
 
-                    return new ProcessScheduledPublishHandler($useCase, $response);
+                    if (!$organizations instanceof OrganizationIterator) {
+                        throw new LogicException('OrganizationIterator service is invalid.');
+                    }
+
+                    return new ProcessScheduledPublishHandler($useCase, $response, $organizations);
                 },
             )
             ->set(

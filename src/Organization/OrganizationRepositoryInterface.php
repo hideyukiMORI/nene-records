@@ -15,6 +15,14 @@ interface OrganizationRepositoryInterface
     /** @return list<Organization> */
     public function findAll(int $limit, int $offset): array;
 
+    /**
+     * Every active organization — for org-agnostic batch work (e.g. the
+     * multi-tenant scheduled-publish cron iterating each tenant).
+     *
+     * @return list<Organization>
+     */
+    public function findAllActive(): array;
+
     public function count(): int;
 
     /** @throws OrganizationSlugConflictException */

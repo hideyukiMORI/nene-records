@@ -39,6 +39,10 @@ final readonly class OrgResolverMiddleware implements MiddlewareInterface
         '/health',
         '/internal/tls-check',
         '/api/v1/public/signup',
+        // Cron batch jobs run org-agnostically (all tenants), so they carry no
+        // tenant host — bypass resolution instead of 404ing in subdomain mode.
+        '/api/v1/entities/process-scheduled',
+        '/api/v1/webhooks/process-deliveries',
         '/api/v1/organizations',
         '/api/v1/superadmin/',
         '/api/v1/auth/',
