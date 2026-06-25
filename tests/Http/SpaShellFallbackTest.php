@@ -4,11 +4,17 @@ declare(strict_types=1);
 
 namespace NeNeRecords\Tests\Http;
 
+use NeNeRecords\Http\PublicHtmlCsp;
 use NeNeRecords\Http\SpaShellFallback;
+use NeNeRecords\Setting\ListPublicSettingsOutput;
+use NeNeRecords\Setting\ListPublicSettingsUseCaseInterface;
+use NeNeRecords\Setting\SettingDef;
+use NeNeRecords\Setting\SettingEntry;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use RuntimeException;
 
 final class SpaShellFallbackTest extends TestCase
 {
@@ -97,5 +103,88 @@ final class SpaShellFallbackTest extends TestCase
         $result = $fallback->apply($this->request('GET', '/admin/users'), $this->notFound());
 
         self::assertSame(404, $result->getStatusCode());
+    }
+
+    public function testNoAnalyticsWhenNoSettingsUseCase(): void
+    {
+        // Default construction (no settings) keeps the strict baseline policy.
+        $result = $this->fallback->apply($this->request('GET', '/posts'), $this->notFound());
+
+        self::assertSame(PublicHtmlCsp::POLICY, $result->getHeaderLine('Content-Security-Policy'));
+        self::assertStringNotContainsString('googletagmanager', (string) $result->getBody());
+    }
+
+    public function testInjectsAnalyticsOnPublicPathWhenConfigured(): void
+    {
+        $fallback = $this->fallbackWith(['analytics_ga4_id' => 'G-XYZ987']);
+        $result = $fallback->apply($this->request('GET', '/posts'), $this->notFound());
+
+        $body = (string) $result->getBody();
+        $csp = $result->getHeaderLine('Content-Security-Policy');
+
+        self::assertSame(200, $result->getStatusCode());
+        self::assertStringContainsString('gtag/js?id=G-XYZ987', $body);
+        self::assertStringContainsString('googletagmanager', $csp);
+
+        // The injected script's nonce must match the one in the CSP header.
+        preg_match('/nonce="([0-9a-f]{32})"/', $body, $bodyNonce);
+        $nonce = $bodyNonce[1] ?? '';
+        self::assertNotSame('', $nonce);
+        self::assertStringContainsString("'nonce-{$nonce}'", $csp);
+    }
+
+    public function testSkipsAnalyticsOnAdminPath(): void
+    {
+        $fallback = $this->fallbackWith(['analytics_ga4_id' => 'G-XYZ987']);
+        $result = $fallback->apply($this->request('GET', '/admin/users'), $this->notFound());
+
+        self::assertSame(200, $result->getStatusCode());
+        self::assertStringNotContainsString('googletagmanager', (string) $result->getBody());
+        self::assertStringNotContainsString('googletagmanager', $result->getHeaderLine('Content-Security-Policy'));
+    }
+
+    public function testBestEffortWhenSettingsResolutionThrows(): void
+    {
+        $throwing = new class () implements ListPublicSettingsUseCaseInterface {
+            public function execute(): ListPublicSettingsOutput
+            {
+                throw new RuntimeException('no org resolved');
+            }
+        };
+        $fallback = new SpaShellFallback($this->shellPath, $this->factory, $this->factory, $throwing);
+
+        $result = $fallback->apply($this->request('GET', '/posts'), $this->notFound());
+
+        // A failed lookup must never break the shell — serve it with the strict policy.
+        self::assertSame(200, $result->getStatusCode());
+        self::assertStringContainsString('<div id="root">', (string) $result->getBody());
+        self::assertStringNotContainsString('googletagmanager', (string) $result->getBody());
+    }
+
+    /** @param array<string, string> $settings */
+    private function fallbackWith(array $settings): SpaShellFallback
+    {
+        $entries = [];
+        foreach ($settings as $key => $value) {
+            $entries[] = new SettingEntry(
+                new SettingDef($key, 'text', '', true, $key, 1),
+                $value,
+                null,
+            );
+        }
+
+        $useCase = new class ($entries) implements ListPublicSettingsUseCaseInterface {
+            /** @param list<SettingEntry> $entries */
+            public function __construct(private array $entries)
+            {
+            }
+
+            public function execute(): ListPublicSettingsOutput
+            {
+                return new ListPublicSettingsOutput($this->entries);
+            }
+        };
+
+        return new SpaShellFallback($this->shellPath, $this->factory, $this->factory, $useCase);
     }
 }

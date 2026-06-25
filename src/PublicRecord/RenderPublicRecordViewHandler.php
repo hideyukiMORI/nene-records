@@ -9,6 +9,8 @@ use Nene2\Routing\Router;
 use Nene2\View\HtmlResponseFactory;
 use NeNeRecords\BundleField\BundleDocumentValidator;
 use NeNeRecords\Http\PublicHtmlCsp;
+use NeNeRecords\Http\WebAnalyticsConfig;
+use NeNeRecords\Http\WebAnalyticsHeadSnippet;
 use NeNeRecords\Setting\ListPublicSettingsUseCaseInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -64,7 +66,14 @@ final readonly class RenderPublicRecordViewHandler
         ServerRequestInterface $request,
     ): ResponseInterface {
         $output = $this->useCase->execute(new GetPublicRecordViewInput($typeSlug, $entitySlug, $entityId));
-        $siteSettings = $this->resolveSiteSettings();
+        $settings = $this->publicSettingsMap();
+        $siteName = $settings['site_name'] ?? 'NeNe Records';
+        $defaultMetaDescription = $settings['default_meta_description'] ?? '';
+
+        // GA4 / GTM + Consent Mode v2 — emitted only when the org configured a tag id.
+        $analytics = WebAnalyticsConfig::fromSettings($settings);
+        $analyticsNonce = $analytics->isEnabled() ? bin2hex(random_bytes(16)) : '';
+        $analyticsHead = WebAnalyticsHeadSnippet::render($analytics, $analyticsNonce);
 
         // Canonical / og:url point at the user-facing permalink (not this /view/ twin).
         $uri = $request->getUri();
@@ -82,7 +91,7 @@ final readonly class RenderPublicRecordViewHandler
         // Prefer the per-entity meta description, falling back to the site default.
         $metaDescription = $output->metaDescription !== ''
             ? $output->metaDescription
-            : $siteSettings['default_meta_description'];
+            : $defaultMetaDescription;
 
         $bootstrapJson = json_encode(
             $output->bootstrap,
@@ -121,8 +130,9 @@ final readonly class RenderPublicRecordViewHandler
             'entityTypeName' => $output->entityTypeName,
             'entityId' => $output->entityId,
             'displayFields' => $output->displayFields,
-            'siteName' => $siteSettings['site_name'],
+            'siteName' => $siteName,
             'metaDescription' => $metaDescription,
+            'analyticsHead' => $analyticsHead,
             'canonicalUrl' => $canonicalUrl,
             'ogImageUrl' => $ogImageUrl,
             'publishedAtIso' => $output->publishedAtIso,
@@ -140,23 +150,26 @@ final readonly class RenderPublicRecordViewHandler
             // A bundle's crawlable twin (#311): render its seoText markdown server-side
             // (the sandboxed iframe itself is SPA-only / invisible to crawlers).
             'renderBundleSeo' => static fn (string $raw): string => PublicMarkdownRenderer::toSafeHtml(BundleDocumentValidator::seoTextOf($raw)),
-        ])->withHeader('Content-Security-Policy', PublicHtmlCsp::POLICY);
+        ])->withHeader(
+            'Content-Security-Policy',
+            PublicHtmlCsp::build($analytics, $analyticsNonce !== '' ? $analyticsNonce : null),
+        );
     }
 
-    /** @return array{site_name: string, default_meta_description: string} */
-    private function resolveSiteSettings(): array
+    /**
+     * All public settings flattened to a `settingKey => effectiveValue` map
+     * (site chrome + analytics ids all read from one query).
+     *
+     * @return array<string, string>
+     */
+    private function publicSettingsMap(): array
     {
-        $settings = [
-            'site_name' => 'NeNe Records',
-            'default_meta_description' => '',
-        ];
+        $map = [];
 
         foreach ($this->publicSettings->execute()->items as $entry) {
-            if (array_key_exists($entry->def->settingKey, $settings)) {
-                $settings[$entry->def->settingKey] = $entry->effectiveValue;
-            }
+            $map[$entry->def->settingKey] = $entry->effectiveValue;
         }
 
-        return $settings;
+        return $map;
     }
 }

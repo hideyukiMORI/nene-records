@@ -7,6 +7,7 @@ namespace NeNeRecords\Http;
 use LogicException;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
+use NeNeRecords\Setting\ListPublicSettingsUseCaseInterface;
 use NeNeRecords\UrlRedirect\UrlRedirectResolver;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -29,6 +30,7 @@ final readonly class SingleOriginServiceProvider implements ServiceProviderInter
                     $projectRoot = $c->get(RuntimeServiceProvider::PROJECT_ROOT);
                     $responseFactory = $c->get(ResponseFactoryInterface::class);
                     $streamFactory = $c->get(StreamFactoryInterface::class);
+                    $publicSettings = $c->get(ListPublicSettingsUseCaseInterface::class);
 
                     if (!is_string($projectRoot) || $projectRoot === '') {
                         throw new LogicException('Project root is not configured.');
@@ -39,11 +41,15 @@ final readonly class SingleOriginServiceProvider implements ServiceProviderInter
                     if (!$streamFactory instanceof StreamFactoryInterface) {
                         throw new LogicException('Stream factory service is invalid.');
                     }
+                    if (!$publicSettings instanceof ListPublicSettingsUseCaseInterface) {
+                        throw new LogicException('Public settings use case service is invalid.');
+                    }
 
                     return new SpaShellFallback(
                         $projectRoot . '/frontend/dist/index.html',
                         $responseFactory,
                         $streamFactory,
+                        $publicSettings,
                     );
                 },
             )

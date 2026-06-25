@@ -58,7 +58,8 @@ final class PublicRecordHttpTest extends TestCase
         $this->application = $this->buildApplication(true, $this->projectRoot);
     }
 
-    private function buildApplication(bool $debug, string $projectRoot): RequestHandlerInterface
+    /** @param list<\NeNeRecords\Setting\SettingDef> $settingDefs */
+    private function buildApplication(bool $debug, string $projectRoot, array $settingDefs = []): RequestHandlerInterface
     {
         $entityTypes = new InMemoryEntityTypeRepository([
             new EntityType(name: 'Article', slug: 'article', id: 1),
@@ -92,7 +93,7 @@ final class PublicRecordHttpTest extends TestCase
             ),
         ], $entities);
 
-        $publicSettings = new ListPublicSettingsUseCase(new InMemorySettingRepository(), new InMemoryMediaRepository());
+        $publicSettings = new ListPublicSettingsUseCase(new InMemorySettingRepository($settingDefs), new InMemoryMediaRepository());
 
         $useCase = new GetPublicRecordViewUseCase(
             $entityTypes,
@@ -284,6 +285,43 @@ final class PublicRecordHttpTest extends TestCase
         $csp = $response->getHeaderLine('Content-Security-Policy');
         self::assertStringContainsString("style-src 'self' 'unsafe-inline'", $csp);
         self::assertStringContainsString("font-src 'self' data:", $csp);
+    }
+
+    public function testSsrInjectsAnalyticsWhenConfigured(): void
+    {
+        // A public GA4 setting whose effective value is a valid measurement id.
+        $app = $this->buildApplication(true, $this->projectRoot, [
+            new \NeNeRecords\Setting\SettingDef('analytics_ga4_id', 'text', 'G-SSRTEST1', true, 'GA4'),
+            new \NeNeRecords\Setting\SettingDef('analytics_consent_default', 'text', 'denied', true, 'Consent'),
+        ]);
+
+        $response = $app->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/article/10'),
+        );
+        $html = (string) $response->getBody();
+        $csp = $response->getHeaderLine('Content-Security-Policy');
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertStringContainsString('gtag/js?id=G-SSRTEST1', $html);
+        self::assertStringContainsString("'analytics_storage':'denied'", $html);
+        self::assertStringContainsString('https://www.googletagmanager.com', $csp);
+
+        // CSP nonce must match the nonce on the injected script.
+        preg_match('/nonce="([0-9a-f]{32})"/', $html, $m);
+        $nonce = $m[1] ?? '';
+        self::assertNotSame('', $nonce);
+        self::assertStringContainsString("'nonce-{$nonce}'", $csp);
+    }
+
+    public function testSsrKeepsStrictCspWhenAnalyticsDisabled(): void
+    {
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/article/10'),
+        );
+        $csp = $response->getHeaderLine('Content-Security-Policy');
+
+        self::assertStringNotContainsString('googletagmanager', $csp);
+        self::assertStringNotContainsString('googletagmanager', (string) $response->getBody());
     }
 
     public function testRealPermalinkReturns404ForUnknownId(): void
