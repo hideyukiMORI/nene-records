@@ -44,6 +44,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/public/signup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Public self-serve tenant signup
+         * @description Provisions a new tenant (organization + admin user, default content types auto-seeded) and signs the admin straight in, setting the session as an HttpOnly `nene_session` cookie. Open endpoint (no authentication, no tenant context). The slug becomes the tenant subdomain `{slug}.<base-domain>`.
+         */
+        post: operations["publicSignup"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -2422,6 +2442,24 @@ export interface components {
             email: string;
             role: string;
         };
+        SignupRequest: {
+            organization_name: string;
+            /** @description Tenant subdomain label (3–30 lowercase letters, numbers or hyphens). */
+            slug: string;
+            /** Format: email */
+            email: string;
+            password: string;
+        };
+        SignupResponse: {
+            token: string;
+            /** Format: date-time */
+            expires_at: string;
+            slug: string;
+            org_id: number;
+            /** Format: email */
+            email: string;
+            role: string;
+        };
         WidgetResponse: {
             id: number;
             /** @enum {string} */
@@ -3013,6 +3051,50 @@ export interface operations {
                 };
                 content?: never;
             };
+        };
+    };
+    publicSignup: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                /**
+                 * @example {
+                 *       "organization_name": "My Shop",
+                 *       "slug": "my-shop",
+                 *       "email": "owner@example.com",
+                 *       "password": "a-strong-password"
+                 *     }
+                 */
+                "application/json": components["schemas"]["SignupRequest"];
+            };
+        };
+        responses: {
+            /** @description Tenant provisioned and admin signed in. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                     *       "expires_at": "2026-06-27T00:00:00Z",
+                     *       "slug": "my-shop",
+                     *       "org_id": 42,
+                     *       "email": "owner@example.com",
+                     *       "role": "admin"
+                     *     }
+                     */
+                    "application/json": components["schemas"]["SignupResponse"];
+                };
+            };
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["ValidationFailed"];
         };
     };
     getHealth: {
