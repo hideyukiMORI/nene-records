@@ -123,6 +123,30 @@ final class SpaShellFallbackTest extends TestCase
         self::assertStringNotContainsString('__BASE_PATH__', $body);
     }
 
+    public function testServesShellForHtmlHomeOverFrameworkJson(): void
+    {
+        // The NENE2 framework answers `/` with 200 JSON; a browser must still get
+        // the SPA shell (public home / SaaS landing).
+        $frameworkJson = $this->factory->createResponse(200)
+            ->withHeader('Content-Type', 'application/json');
+
+        $result = $this->fallback->apply($this->request('GET', '/'), $frameworkJson);
+
+        self::assertSame(200, $result->getStatusCode());
+        self::assertStringContainsString('text/html', $result->getHeaderLine('Content-Type'));
+        self::assertStringContainsString('<div id="root">', (string) $result->getBody());
+    }
+
+    public function testLeavesJsonHomeForApiClients(): void
+    {
+        // No text/html Accept → the framework JSON passes through untouched.
+        $frameworkJson = $this->factory->createResponse(200);
+
+        $result = $this->fallback->apply($this->request('GET', '/', 'application/json'), $frameworkJson);
+
+        self::assertSame('', (string) $result->getBody());
+    }
+
     public function testInjectsApexFlagOnBaseDomainOnly(): void
     {
         $fallback = new SpaShellFallback($this->shellPath, $this->factory, $this->factory, null, '', 'nene-records.com');

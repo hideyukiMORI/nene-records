@@ -44,19 +44,26 @@ final readonly class SpaShellFallback
 
     public function apply(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
-        if ($response->getStatusCode() !== 404) {
-            return $response;
-        }
-
-        if (strtoupper($request->getMethod()) !== 'GET') {
-            return $response;
-        }
-
-        if (!str_contains($request->getHeaderLine('Accept'), 'text/html')) {
-            return $response;
-        }
-
+        $isGet = strtoupper($request->getMethod()) === 'GET';
+        $wantsHtml = str_contains($request->getHeaderLine('Accept'), 'text/html');
         $path = $request->getUri()->getPath();
+
+        // The home `/` is the NENE2 framework-info JSON for API clients, but a
+        // browser there wants the public site / SaaS landing — serve the SPA shell
+        // for `/` + text/html even though the framework answered 200 (not 404).
+        $isHtmlHome = $isGet && $wantsHtml && $path === '/';
+
+        if ($response->getStatusCode() !== 404 && !$isHtmlHome) {
+            return $response;
+        }
+
+        if (!$isGet) {
+            return $response;
+        }
+
+        if (!$wantsHtml) {
+            return $response;
+        }
 
         if (preg_match(self::PASSTHROUGH, $path) === 1) {
             return $response;
