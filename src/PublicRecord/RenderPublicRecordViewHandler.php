@@ -65,7 +65,12 @@ final readonly class RenderPublicRecordViewHandler
         ?int $entityId,
         ServerRequestInterface $request,
     ): ResponseInterface {
-        $output = $this->useCase->execute(new GetPublicRecordViewInput($typeSlug, $entitySlug, $entityId));
+        $langParam = $request->getQueryParams()['lang'] ?? null;
+        $locale = PublicLocale::resolve(is_string($langParam) ? $langParam : null);
+
+        $output = $this->useCase->execute(
+            new GetPublicRecordViewInput($typeSlug, $entitySlug, $entityId, $locale),
+        );
         $settings = $this->publicSettingsMap();
         $siteName = $settings['site_name'] ?? 'NeNe Records';
         $defaultMetaDescription = $settings['default_meta_description'] ?? '';
@@ -76,9 +81,17 @@ final readonly class RenderPublicRecordViewHandler
         $analyticsHead = WebAnalyticsHeadSnippet::render($analytics, $analyticsNonce);
 
         // Canonical / og:url point at the user-facing permalink (not this /view/ twin).
+        // For a negotiated locale the canonical self-references with `?lang=`, and
+        // hreflang alternates advertise every locale variant (#540).
         $uri = $request->getUri();
         $baseUrl = $uri->getScheme() . '://' . $uri->getAuthority();
-        $canonicalUrl = $baseUrl . $output->canonicalPath;
+        $permalinkUrl = $baseUrl . $output->canonicalPath;
+        $canonicalUrl = $locale !== null ? $permalinkUrl . '?lang=' . $locale : $permalinkUrl;
+        $htmlLang = $locale ?? PublicLocale::DEFAULT_LANG;
+        $alternateLinks = [['hreflang' => 'x-default', 'href' => $permalinkUrl]];
+        foreach (PublicLocale::SUPPORTED as $supported) {
+            $alternateLinks[] = ['hreflang' => $supported, 'href' => $permalinkUrl . '?lang=' . $supported];
+        }
 
         // og:image / twitter:image — absolutize the entity's social-card derivative.
         $ogImageUrl = null;
@@ -133,6 +146,8 @@ final readonly class RenderPublicRecordViewHandler
             'siteName' => $siteName,
             'metaDescription' => $metaDescription,
             'analyticsHead' => $analyticsHead,
+            'htmlLang' => $htmlLang,
+            'alternateLinks' => $alternateLinks,
             'canonicalUrl' => $canonicalUrl,
             'ogImageUrl' => $ogImageUrl,
             'publishedAtIso' => $output->publishedAtIso,

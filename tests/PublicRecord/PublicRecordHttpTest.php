@@ -94,6 +94,8 @@ final class PublicRecordHttpTest extends TestCase
                 value: '<p>imported <strong>kept</strong></p><img src="/media/imported/x.jpg" alt="p" /><script>alert(1)</script>',
                 id: 4,
             ),
+            // German title variant for the content-locale negotiation tests (#540).
+            new TextField(entityId: 10, fieldKey: 'title', value: 'Hallo Welt', id: 5, locale: 'de'),
         ], $entities);
 
         $publicSettings = new ListPublicSettingsUseCase(new InMemorySettingRepository($settingDefs), new InMemoryMediaRepository());
@@ -365,6 +367,40 @@ final class PublicRecordHttpTest extends TestCase
         self::assertStringContainsString('User-agent: *', $body);
         self::assertStringContainsString('Disallow: /admin', $body);
         self::assertStringContainsString('Sitemap: https://example.test/sitemap.xml', $body);
+    }
+
+    public function testSsrNegotiatesContentLocaleAndEmitsHreflang(): void
+    {
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/article/10?lang=de'),
+        );
+        $html = (string) $response->getBody();
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertStringContainsString('<html lang="de">', $html);
+        self::assertStringContainsString('Hallo Welt', $html); // German title row served
+        self::assertStringNotContainsString('<h1>Hello world</h1>', $html); // base title not used
+        // Self-referencing canonical + hreflang alternates.
+        self::assertStringContainsString(
+            '<link rel="canonical" href="https://example.test/article/10?lang=de" />',
+            $html,
+        );
+        self::assertStringContainsString('hreflang="de"', $html);
+        self::assertStringContainsString('hreflang="x-default"', $html);
+    }
+
+    public function testSsrFallsBackToBaseLocaleWithoutLangParam(): void
+    {
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/article/10'),
+        );
+        $html = (string) $response->getBody();
+
+        self::assertStringContainsString('<html lang="ja">', $html); // default lang
+        self::assertStringContainsString('<h1>Hello world</h1>', $html); // base (null-locale) title
+        self::assertStringNotContainsString('Hallo Welt', $html);
+        // hreflang alternates are advertised even on the base page.
+        self::assertStringContainsString('hreflang="de"', $html);
     }
 
     public function testRealPermalinkReturns404ForUnknownId(): void
