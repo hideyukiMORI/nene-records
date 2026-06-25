@@ -322,6 +322,7 @@ export const ptBR: Partial<MessageCatalog> = {
   // ── Public View i18n (WS-10): browse / home / nav / records / relation ──
   'public.nav.allRecords': 'Todos os registros',
   'public.nav.backToLatest': 'Voltar aos mais recentes',
+  'public.nav.language': 'Idioma',
   'public.browse.subRange': '{{total}} registros · exibindo {{start}}–{{end}}',
   'public.browse.recordCount.one': '{{count}} registro',
   'public.browse.recordCount.other': '{{count}} registros',

@@ -3,6 +3,7 @@ import { defaultEntityListParams, useEntityList } from '@/entities/entity'
 import { useEntityRelationList } from '@/entities/entity-relation'
 import type { RelationFieldDef } from '@/entities/field-def'
 import { defaultTextFieldListParamsForEntityType, useTextFieldList } from '@/entities/text-field'
+import { useTranslation } from '@/shared/i18n'
 import { getRecordDisplayLabel } from '@/shared/lib/get-record-display-label'
 import { resolvePermalink } from '@/shared/lib/resolve-permalink'
 
@@ -18,6 +19,7 @@ export function usePublicRelationFieldDisplay(
   entityTypeSlugById: Record<number, string>,
   entityTypePatternById: Record<number, string | null | undefined>,
 ) {
+  const { locale } = useTranslation()
   const relationQuery = useEntityRelationList(entityId, fieldDef.fieldKey)
 
   // Load text fields for label generation
@@ -52,6 +54,7 @@ export function usePublicRelationFieldDisplay(
           relation.targetEntityId,
           textFields,
           `Record #${String(relation.targetEntityId)}`,
+          locale,
         ),
         href: resolvePermalink(targetPattern, {
           typeSlug: targetSlug,
@@ -68,6 +71,7 @@ export function usePublicRelationFieldDisplay(
     relationQuery.data?.items,
     targetEntityListQuery.data?.items,
     textFieldQuery.data?.items,
+    locale,
   ])
 
   const isLoading =

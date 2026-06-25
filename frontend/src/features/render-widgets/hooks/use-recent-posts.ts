@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { defaultEntityListParams, useEntityList } from '@/entities/entity'
 import { useEntityTypeList } from '@/entities/entity-type'
 import { defaultTextFieldListParamsForEntityType, useTextFieldList } from '@/entities/text-field'
+import { useTranslation } from '@/shared/i18n'
 import { findEntityTypeBySlug } from '@/shared/lib/find-entity-type-by-slug'
 import { getRecordDisplayLabel } from '@/shared/lib/get-record-display-label'
 import { resolvePermalink } from '@/shared/lib/resolve-permalink'
@@ -18,6 +19,7 @@ export interface RecentPostItem {
 
 /** Recent published records of a type, newest first, resolved to label + URL. */
 export function useRecentPosts(entityTypeSlug: string, limit: number) {
+  const { locale } = useTranslation()
   const entityTypeQuery = useEntityTypeList()
   const entityType = useMemo(
     () => findEntityTypeBySlug(entityTypeQuery.data?.items ?? [], entityTypeSlug),
@@ -55,7 +57,7 @@ export function useRecentPosts(entityTypeSlug: string, limit: number) {
       const id = Number(entity.id)
       return {
         id,
-        label: getRecordDisplayLabel(id, textFields, `Record #${String(id)}`),
+        label: getRecordDisplayLabel(id, textFields, `Record #${String(id)}`, locale),
         publicUrl: resolvePermalink(pattern, {
           typeSlug: entityTypeSlug,
           entitySlug: entity.slug ?? null,
@@ -72,6 +74,7 @@ export function useRecentPosts(entityTypeSlug: string, limit: number) {
     entityType?.permalinkPattern,
     entityTypeSlug,
     limit,
+    locale,
   ])
 
   return {

@@ -13,7 +13,7 @@ export interface PublicEntityResultGroupProps {
 
 /** One entity type's results, with titles resolved from its text fields. */
 export function PublicEntityResultGroup({ entityType, entities }: PublicEntityResultGroupProps) {
-  const { t } = useTranslation()
+  const { t, locale } = useTranslation()
   const entityTypeId = Number(entityType.id)
   const textFieldQuery = useTextFieldList(defaultTextFieldListParamsForEntityType(entityTypeId), {
     enabled: entityTypeId > 0,
@@ -46,6 +46,7 @@ export function PublicEntityResultGroup({ entityType, entities }: PublicEntityRe
                       id,
                       textFields,
                       t('public.results.recordFallback', { id }),
+                      locale,
                     )}
                   </Link>
                 </h3>

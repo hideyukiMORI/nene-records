@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { defaultEntityListParams, useEntityList } from '@/entities/entity'
 import { useEntityTypeList } from '@/entities/entity-type'
 import { defaultTextFieldListParamsForEntityType, useTextFieldList } from '@/entities/text-field'
+import { useTranslation } from '@/shared/i18n'
 import { findEntityTypeBySlug } from '@/shared/lib/find-entity-type-by-slug'
 import { formatPublishedDate } from '@/shared/lib/format-published-date'
 import { getRecordDisplayLabel } from '@/shared/lib/get-record-display-label'
@@ -25,6 +26,7 @@ export interface PublicBrowseType {
 }
 
 export function usePublicBrowseEntityRecordsPage(entityTypeSlug: string, offset: number) {
+  const { locale } = useTranslation()
   const entityTypeQuery = useEntityTypeList()
   const entityType = useMemo(
     () => findEntityTypeBySlug(entityTypeQuery.data?.items ?? [], entityTypeSlug),
@@ -55,7 +57,7 @@ export function usePublicBrowseEntityRecordsPage(entityTypeSlug: string, offset:
       const id = Number(entity.id)
       return {
         id,
-        label: getRecordDisplayLabel(id, textFields, `Record #${String(id)}`),
+        label: getRecordDisplayLabel(id, textFields, `Record #${String(id)}`, locale),
         publicUrl: resolvePermalink(pattern, {
           typeSlug: entityTypeSlug,
           entitySlug: entity.slug ?? null,
@@ -70,6 +72,7 @@ export function usePublicBrowseEntityRecordsPage(entityTypeSlug: string, offset:
     textFieldQuery.data?.items,
     entityType?.permalinkPattern,
     entityTypeSlug,
+    locale,
   ])
 
   const entityTypes = useMemo(

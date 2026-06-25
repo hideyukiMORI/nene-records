@@ -307,6 +307,7 @@ export const zhHans: Partial<MessageCatalog> = {
   // ── Public View i18n (WS-10): browse / home / nav / records / relation ──
   'public.nav.allRecords': '所有记录',
   'public.nav.backToLatest': '返回最新',
+  'public.nav.language': '语言',
   'public.browse.subRange': '共 {{total}} 条记录 · 显示 {{start}}–{{end}}',
   'public.browse.recordCount.one': '{{count}} 条记录',
   'public.browse.recordCount.other': '{{count}} 条记录',
