@@ -443,7 +443,7 @@ export const ptBR: Partial<MessageCatalog> = {
   'admin.verifySignup.success': 'Seu e-mail foi verificado. Obrigado!',
   'admin.verifySignup.failed': 'Este link é inválido ou expirou.',
   'admin.verifySignup.missing': 'Nenhum token de verificação foi fornecido.',
-  'admin.verifySignup.goToAdmin': 'Ir para o admin',
+  'admin.verifySignup.goToLogin': 'Entrar no seu site',
   'admin.emailBanner.unverified':
     'Verifique seu e-mail — use o link que enviamos para confirmar seu endereço.',
 

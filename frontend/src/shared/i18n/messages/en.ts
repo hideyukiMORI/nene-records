@@ -445,7 +445,7 @@ export const en = {
   'admin.verifySignup.success': 'Your email is verified. Thanks!',
   'admin.verifySignup.failed': 'This link is invalid or has expired.',
   'admin.verifySignup.missing': 'No verification token was provided.',
-  'admin.verifySignup.goToAdmin': 'Go to admin',
+  'admin.verifySignup.goToLogin': 'Sign in to your site',
   'admin.emailBanner.unverified':
     'Please verify your email — check the link we sent to confirm your address.',
 

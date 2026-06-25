@@ -33,8 +33,8 @@ final readonly class ConfirmEmailHandler
             throw new ValidationException([new ValidationError('token', 'Token is required.', 'required')]);
         }
 
-        $this->useCase->execute($token);
+        $slug = $this->useCase->execute($token);
 
-        return $this->response->create(['verified' => true], 200);
+        return $this->response->create(['verified' => true, 'slug' => $slug], 200);
     }
 }

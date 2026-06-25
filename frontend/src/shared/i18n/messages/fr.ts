@@ -445,7 +445,7 @@ export const fr: Partial<MessageCatalog> = {
   'admin.verifySignup.success': 'Votre e-mail est vérifié. Merci !',
   'admin.verifySignup.failed': 'Ce lien est invalide ou a expiré.',
   'admin.verifySignup.missing': "Aucun jeton de vérification n'a été fourni.",
-  'admin.verifySignup.goToAdmin': "Aller à l'administration",
+  'admin.verifySignup.goToLogin': 'Se connecter à votre site',
   'admin.emailBanner.unverified':
     'Veuillez vérifier votre e-mail — utilisez le lien que nous vous avons envoyé.',
 

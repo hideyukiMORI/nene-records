@@ -19,15 +19,24 @@ export function useSignup(): UseMutationResult<SignupResponseDto, AppError, Sign
   })
 }
 
+interface ConfirmEmailResult {
+  /** The verified admin's tenant slug, for directing them to their own login. */
+  slug: string | null
+}
+
 /** Confirm a signup email from its token; clears the unverified banner locally. */
-export function useConfirmEmail(): UseMutationResult<void, AppError, string> {
+export function useConfirmEmail(): UseMutationResult<ConfirmEmailResult, AppError, string> {
   return useMutation({
     mutationFn: async (token) => {
-      await apiClient.post('/api/v1/auth/confirm-email', { token })
+      const res = await apiClient.post<{ verified: boolean; slug: string | null }>(
+        '/api/v1/auth/confirm-email',
+        { token },
+      )
       const session = authStore.getSession()
       if (session !== null) {
         authStore.setSession({ ...session, emailVerified: true })
       }
+      return { slug: res.slug }
     },
   })
 }

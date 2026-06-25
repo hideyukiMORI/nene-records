@@ -437,7 +437,7 @@ export const ja: Partial<MessageCatalog> = {
   'admin.verifySignup.success': 'メールアドレスを確認しました。ありがとうございます！',
   'admin.verifySignup.failed': 'このリンクは無効か、有効期限が切れています。',
   'admin.verifySignup.missing': '確認トークンがありません。',
-  'admin.verifySignup.goToAdmin': '管理画面へ',
+  'admin.verifySignup.goToLogin': 'サイトにログイン',
   'admin.emailBanner.unverified':
     'メールアドレスが未確認です。送信されたメールのリンクから確認してください。',
 

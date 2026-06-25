@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace NeNeRecords\Tests\Signup;
 
 use Nene2\Http\SecureTokenHelper;
+use NeNeRecords\Organization\Organization;
 use NeNeRecords\Signup\ConfirmEmailUseCase;
+use NeNeRecords\Tests\Organization\InMemoryOrganizationRepository;
 use NeNeRecords\Tests\User\InMemoryUserRepository;
 use NeNeRecords\User\CreateUserInput;
 use NeNeRecords\User\CreateUserUseCase;
@@ -14,35 +16,39 @@ use PHPUnit\Framework\TestCase;
 
 final class ConfirmEmailUseCaseTest extends TestCase
 {
-    private function repoWithPendingUser(int $expiresInSeconds): InMemoryUserRepository
-    {
-        $users = new InMemoryUserRepository([]);
-        (new CreateUserUseCase($users))->execute(new CreateUserInput('a@b.test', 'secret-password', 'admin', 1));
-        $user = $users->findByEmail('a@b.test');
-        self::assertNotNull($user);
-
-        [$raw, $hash] = $this->token;
-        $users->storeEmailVerification($user->id, 'a@b.test', $hash, time() + $expiresInSeconds);
-
-        return $users;
-    }
-
+    private InMemoryUserRepository $users;
+    private InMemoryOrganizationRepository $orgs;
     /** @var array{0: string, 1: string} */
     private array $token;
+    private int $orgId;
 
     protected function setUp(): void
     {
         parent::setUp();
         $this->token = SecureTokenHelper::generateWithHash();
+        $this->orgs = new InMemoryOrganizationRepository();
+        $this->orgId = $this->orgs->save(new Organization('My Org', 'myorg', 'free', true));
     }
 
-    public function testConfirmsValidToken(): void
+    private function withPendingUser(int $expiresInSeconds): ConfirmEmailUseCase
     {
-        $users = $this->repoWithPendingUser(3600);
+        $this->users = new InMemoryUserRepository([]);
+        (new CreateUserUseCase($this->users))->execute(
+            new CreateUserInput('a@b.test', 'secret-password', 'admin', $this->orgId),
+        );
+        $user = $this->users->findByEmail('a@b.test');
+        self::assertNotNull($user);
+        $this->users->storeEmailVerification($user->id, 'a@b.test', $this->token[1], time() + $expiresInSeconds);
 
-        (new ConfirmEmailUseCase($users))->execute($this->token[0]);
+        return new ConfirmEmailUseCase($this->users, $this->orgs);
+    }
 
-        $user = $users->findByEmail('a@b.test');
+    public function testConfirmsValidTokenAndReturnsSlug(): void
+    {
+        $slug = $this->withPendingUser(3600)->execute($this->token[0]);
+
+        self::assertSame('myorg', $slug);
+        $user = $this->users->findByEmail('a@b.test');
         self::assertNotNull($user);
         self::assertNotNull($user->emailVerifiedAt);
         self::assertNull($user->emailVerificationTokenHash); // token cleared
@@ -50,17 +56,17 @@ final class ConfirmEmailUseCaseTest extends TestCase
 
     public function testRejectsInvalidToken(): void
     {
-        $users = $this->repoWithPendingUser(3600);
+        $useCase = $this->withPendingUser(3600);
 
         $this->expectException(EmailVerificationTokenException::class);
-        (new ConfirmEmailUseCase($users))->execute('not-a-real-token');
+        $useCase->execute('not-a-real-token');
     }
 
     public function testRejectsExpiredToken(): void
     {
-        $users = $this->repoWithPendingUser(-10); // already expired
+        $useCase = $this->withPendingUser(-10); // already expired
 
         $this->expectException(EmailVerificationTokenException::class);
-        (new ConfirmEmailUseCase($users))->execute($this->token[0]);
+        $useCase->execute($this->token[0]);
     }
 }

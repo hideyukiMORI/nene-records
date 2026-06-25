@@ -444,7 +444,7 @@ export const de: Partial<MessageCatalog> = {
   'admin.verifySignup.success': 'Deine E-Mail ist bestätigt. Danke!',
   'admin.verifySignup.failed': 'Dieser Link ist ungültig oder abgelaufen.',
   'admin.verifySignup.missing': 'Es wurde kein Bestätigungstoken übergeben.',
-  'admin.verifySignup.goToAdmin': 'Zum Adminbereich',
+  'admin.verifySignup.goToLogin': 'Bei deiner Website anmelden',
   'admin.emailBanner.unverified':
     'Bitte bestätige deine E-Mail — nutze den Link, den wir dir gesendet haben.',
   // ── Forbidden page ───────────────────────────────────────────────────────

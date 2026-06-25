@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 import { useConfirmEmail } from '@/entities/auth'
 import { useTranslation } from '@/shared/i18n'
 import { Button, Card, NeneMark, Stack, Text } from '@/shared/ui'
@@ -13,9 +13,16 @@ export function VerifyEmailSignupPage() {
   const [params] = useSearchParams()
   const token = params.get('token') ?? ''
   const confirm = useConfirmEmail()
-  const navigate = useNavigate()
   const { t } = useTranslation()
   const fired = useRef(false)
+
+  // Verification is served from the apex; send the admin to their own subdomain
+  // (slug.<this-host>) to sign in, since the session cookie is host-only per tenant.
+  const slug = confirm.data?.slug ?? null
+  const tenantLoginUrl =
+    slug !== null && typeof window !== 'undefined'
+      ? `https://${slug}.${window.location.hostname}/login`
+      : null
 
   useEffect(() => {
     if (fired.current || token === '') return
@@ -47,15 +54,15 @@ export function VerifyEmailSignupPage() {
             </Text>
             <Text muted>{body}</Text>
           </Stack>
-          {confirm.isSuccess && (
+          {confirm.isSuccess && tenantLoginUrl !== null && (
             <Button
               type="button"
               className="w-full"
               onClick={() => {
-                void navigate('/admin')
+                window.location.href = tenantLoginUrl
               }}
             >
-              {t('admin.verifySignup.goToAdmin')}
+              {t('admin.verifySignup.goToLogin')}
             </Button>
           )}
         </Stack>
