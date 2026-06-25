@@ -425,7 +425,7 @@ export const zhHans: Partial<MessageCatalog> = {
   'admin.verifySignup.success': '邮箱已验证，谢谢！',
   'admin.verifySignup.failed': '此链接无效或已过期。',
   'admin.verifySignup.missing': '未提供验证令牌。',
-  'admin.verifySignup.goToAdmin': '前往管理后台',
+  'admin.verifySignup.goToLogin': '登录你的站点',
   'admin.emailBanner.unverified': '请验证你的邮箱——点击我们发送的链接以确认你的邮箱地址。',
 
   // ── Forbidden page ───────────────────────────────────────────────────────

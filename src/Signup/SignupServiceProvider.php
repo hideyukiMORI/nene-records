@@ -14,6 +14,7 @@ use NeNeRecords\Auth\LoginUseCase;
 use NeNeRecords\Auth\UserRepositoryInterface;
 use NeNeRecords\Mail\MailerInterface;
 use NeNeRecords\Organization\CreateOrganizationUseCaseInterface;
+use NeNeRecords\Organization\OrganizationRepositoryInterface;
 use NeNeRecords\User\CreateUserUseCaseInterface;
 use Psr\Container\ContainerInterface;
 
@@ -81,11 +82,15 @@ final readonly class SignupServiceProvider implements ServiceProviderInterface
                 ConfirmEmailUseCase::class,
                 static function (ContainerInterface $c): ConfirmEmailUseCase {
                     $users = $c->get(UserRepositoryInterface::class);
+                    $orgs  = $c->get(OrganizationRepositoryInterface::class);
                     if (!$users instanceof UserRepositoryInterface) {
                         throw new LogicException('UserRepositoryInterface is invalid.');
                     }
+                    if (!$orgs instanceof OrganizationRepositoryInterface) {
+                        throw new LogicException('OrganizationRepositoryInterface is invalid.');
+                    }
 
-                    return new ConfirmEmailUseCase($users);
+                    return new ConfirmEmailUseCase($users, $orgs);
                 },
             )
             ->set(
