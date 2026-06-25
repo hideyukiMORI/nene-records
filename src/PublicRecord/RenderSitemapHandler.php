@@ -31,6 +31,8 @@ final readonly class RenderSitemapHandler
         private ResponseFactoryInterface $responseFactory,
         private StreamFactoryInterface $streamFactory,
         ?int $chunkSize = null,
+        /** Sub-directory install prefix (`APP_BASE_PATH`); '' = served at root. */
+        private string $basePath = '',
     ) {
         $this->chunkSize = $chunkSize !== null && $chunkSize > 0 ? $chunkSize : self::DEFAULT_CHUNK_SIZE;
     }
@@ -38,7 +40,9 @@ final readonly class RenderSitemapHandler
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $uri = $request->getUri();
-        $baseUrl = $uri->getScheme() . '://' . $uri->getAuthority();
+        // The renderer joins paths onto this; folding the base path in keeps every
+        // <loc> / child-sitemap URL under the sub-directory install (#zip-install).
+        $baseUrl = $uri->getScheme() . '://' . $uri->getAuthority() . $this->basePath;
 
         // Global list = home page (1) + every published record.
         $totalUrls = 1 + $this->useCase->count();

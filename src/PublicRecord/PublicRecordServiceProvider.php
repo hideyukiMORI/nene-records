@@ -198,6 +198,7 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
                         $projectRoot,
                         $responseFactory,
                         new PublicHtmlSanitizer(),
+                        \NeNeRecords\Http\BasePath::fromEnv(),
                     );
                 },
             )
@@ -278,7 +279,13 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
                         throw new LogicException('Stream factory service is invalid.');
                     }
 
-                    return new RenderSitemapHandler($useCase, $responseFactory, $streamFactory);
+                    return new RenderSitemapHandler(
+                        $useCase,
+                        $responseFactory,
+                        $streamFactory,
+                        null,
+                        \NeNeRecords\Http\BasePath::fromEnv(),
+                    );
                 },
             )
             ->set(
@@ -295,7 +302,11 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
                         throw new LogicException('Stream factory service is invalid.');
                     }
 
-                    return new RenderRobotsHandler($responseFactory, $streamFactory);
+                    return new RenderRobotsHandler(
+                        $responseFactory,
+                        $streamFactory,
+                        \NeNeRecords\Http\BasePath::fromEnv(),
+                    );
                 },
             )
             ->set(

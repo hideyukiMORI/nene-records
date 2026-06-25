@@ -24,6 +24,8 @@ final readonly class UrlRedirectResolver
     public function __construct(
         private UrlRedirectRepositoryInterface $redirects,
         private ResponseFactoryInterface $responseFactory,
+        /** Sub-directory install prefix (`APP_BASE_PATH`); '' = served at root. */
+        private string $basePath = '',
     ) {
     }
 
@@ -61,7 +63,9 @@ final readonly class UrlRedirectResolver
             return $response;
         }
 
-        return $this->responseFactory->createResponse(301)->withHeader('Location', $target);
+        $location = $this->basePath === '' ? $target : $this->basePath . $target;
+
+        return $this->responseFactory->createResponse(301)->withHeader('Location', $location);
     }
 
     /** Strip a single trailing slash so "/a/b/" and "/a/b" map to one source. */

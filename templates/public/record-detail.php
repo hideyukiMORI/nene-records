@@ -69,7 +69,7 @@
     </style>
     <?php if ($spaMode === 'prod'): ?>
       <?php foreach ($spaCss as $href): ?>
-      <link rel="stylesheet" crossorigin href="<?= $e($href) ?>" />
+      <link rel="stylesheet" crossorigin href="<?= $e($basePath . $href) ?>" />
       <?php endforeach; ?>
     <?php elseif ($spaMode === 'dev'): ?>
       <script type="module" src="<?= $e($viteUrl) ?>/@vite/client"></script>
@@ -80,7 +80,7 @@
          (createRoot().render) replaces it with the interactive app on mount. -->
     <div id="root">
     <header>
-      <p><a href="/view/<?= $e($entityTypeSlug) ?>">← <?= $e($entityTypeName) ?></a></p>
+      <p><a href="<?= $e($basePath) ?>/view/<?= $e($entityTypeSlug) ?>">← <?= $e($entityTypeName) ?></a></p>
       <h1><?= $e($pageTitle) ?></h1>
     </header>
     <article>
@@ -93,7 +93,7 @@
             <?php else: ?>
               <ul>
                 <?php foreach ($field->relationLinks as $link): ?>
-                  <li><a href="<?= $e($link['href']) ?>"><?= $e($link['label']) ?></a></li>
+                  <li><a href="<?= $e($basePath . $link['href']) ?>"><?= $e($link['label']) ?></a></li>
                 <?php endforeach; ?>
               </ul>
             <?php endif; ?>
@@ -129,9 +129,9 @@
       <script type="module" src="<?= $e($viteUrl) ?>/src/main.tsx"></script>
     <?php elseif ($spaMode === 'prod' && $spaJs !== null): ?>
       <?php foreach ($spaPreload as $href): ?>
-      <link rel="modulepreload" crossorigin href="<?= $e($href) ?>" />
+      <link rel="modulepreload" crossorigin href="<?= $e($basePath . $href) ?>" />
       <?php endforeach; ?>
-      <script type="module" crossorigin src="<?= $e($spaJs) ?>"></script>
+      <script type="module" crossorigin src="<?= $e($basePath . $spaJs) ?>"></script>
     <?php endif; ?>
   </body>
 </html>

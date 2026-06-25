@@ -8,6 +8,7 @@ use Nene2\Config\AppConfig;
 use Nene2\Routing\Router;
 use Nene2\View\HtmlResponseFactory;
 use NeNeRecords\BundleField\BundleDocumentValidator;
+use NeNeRecords\Http\BasePath;
 use NeNeRecords\Http\PublicHtmlCsp;
 use NeNeRecords\Http\WebAnalyticsConfig;
 use NeNeRecords\Http\WebAnalyticsHeadSnippet;
@@ -26,6 +27,8 @@ final readonly class RenderPublicRecordViewHandler
         private string $projectRoot,
         private ResponseFactoryInterface $responseFactory,
         private PublicHtmlSanitizer $htmlSanitizer,
+        /** Sub-directory install prefix (`APP_BASE_PATH`); '' = served at root. */
+        private string $basePath = '',
     ) {
     }
 
@@ -50,7 +53,8 @@ final readonly class RenderPublicRecordViewHandler
         // Resolve to the canonical permalink (also 404s via the use case if missing).
         $output = $this->useCase->execute(new GetPublicRecordViewInput($typeSlug, $entitySlug));
         $uri = $request->getUri();
-        $location = $uri->getScheme() . '://' . $uri->getAuthority() . $output->canonicalPath;
+        $location = $uri->getScheme() . '://' . $uri->getAuthority()
+            . BasePath::prefix($this->basePath, $output->canonicalPath);
 
         return $this->responseFactory->createResponse(301)->withHeader('Location', $location);
     }
@@ -85,7 +89,7 @@ final readonly class RenderPublicRecordViewHandler
         // hreflang alternates advertise every locale variant (#540).
         $uri = $request->getUri();
         $baseUrl = $uri->getScheme() . '://' . $uri->getAuthority();
-        $permalinkUrl = $baseUrl . $output->canonicalPath;
+        $permalinkUrl = $baseUrl . BasePath::prefix($this->basePath, $output->canonicalPath);
         $canonicalUrl = $locale !== null ? $permalinkUrl . '?lang=' . $locale : $permalinkUrl;
         $htmlLang = $locale ?? PublicLocale::DEFAULT_LANG;
         $alternateLinks = [['hreflang' => 'x-default', 'href' => $permalinkUrl]];
@@ -98,7 +102,7 @@ final readonly class RenderPublicRecordViewHandler
         if ($output->ogImagePath !== null) {
             $ogImageUrl = str_starts_with($output->ogImagePath, 'http')
                 ? $output->ogImagePath
-                : $baseUrl . $output->ogImagePath;
+                : $baseUrl . BasePath::prefix($this->basePath, $output->ogImagePath);
         }
 
         // Prefer the per-entity meta description, falling back to the site default.
@@ -148,6 +152,7 @@ final readonly class RenderPublicRecordViewHandler
             'analyticsHead' => $analyticsHead,
             'htmlLang' => $htmlLang,
             'alternateLinks' => $alternateLinks,
+            'basePath' => $this->basePath,
             'canonicalUrl' => $canonicalUrl,
             'ogImageUrl' => $ogImageUrl,
             'publishedAtIso' => $output->publishedAtIso,

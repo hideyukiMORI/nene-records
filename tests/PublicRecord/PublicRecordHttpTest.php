@@ -62,8 +62,12 @@ final class PublicRecordHttpTest extends TestCase
     }
 
     /** @param list<\NeNeRecords\Setting\SettingDef> $settingDefs */
-    private function buildApplication(bool $debug, string $projectRoot, array $settingDefs = []): RequestHandlerInterface
-    {
+    private function buildApplication(
+        bool $debug,
+        string $projectRoot,
+        array $settingDefs = [],
+        string $basePath = '',
+    ): RequestHandlerInterface {
         $entityTypes = new InMemoryEntityTypeRepository([
             new EntityType(name: 'Article', slug: 'article', id: 1),
         ]);
@@ -135,7 +139,7 @@ final class PublicRecordHttpTest extends TestCase
             machineApiKey: null,
         );
 
-        $renderHandler = new RenderPublicRecordViewHandler($useCase, $publicSettings, $htmlResponse, $config, $projectRoot, $this->factory, new PublicHtmlSanitizer());
+        $renderHandler = new RenderPublicRecordViewHandler($useCase, $publicSettings, $htmlResponse, $config, $projectRoot, $this->factory, new PublicHtmlSanitizer(), $basePath);
         $registrar = new PublicRecordRouteRegistrar(
             new GetPublicRecordViewHandler($useCase, $jsonResponse, $this->factory),
             $renderHandler,
@@ -144,8 +148,10 @@ final class PublicRecordHttpTest extends TestCase
                 new GenerateSitemapUseCase($entityTypes, $entities),
                 $this->factory,
                 $this->factory,
+                null,
+                $basePath,
             ),
-            new RenderRobotsHandler($this->factory, $this->factory),
+            new RenderRobotsHandler($this->factory, $this->factory, $basePath),
         );
 
         return (new RuntimeApplicationFactory(
@@ -353,6 +359,43 @@ final class PublicRecordHttpTest extends TestCase
         self::assertStringContainsString('<loc>https://example.test/article/10</loc>', $xml);
         // updatedAt → lastmod (W3C datetime).
         self::assertStringContainsString('<lastmod>2026-02-20', $xml);
+    }
+
+    public function testBasePathPrefixesPublicUrls(): void
+    {
+        // App served from a sub-directory (APP_BASE_PATH=/blog).
+        $app = $this->buildApplication(true, $this->projectRoot, [], '/blog');
+
+        $detail = (string) $app->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/article/10'),
+        )->getBody();
+        self::assertStringContainsString(
+            '<link rel="canonical" href="https://example.test/blog/article/10" />',
+            $detail,
+        );
+        self::assertStringContainsString('hreflang="de" href="https://example.test/blog/article/10?lang=de"', $detail);
+        self::assertStringContainsString('href="/blog/view/article"', $detail); // back link prefixed
+
+        // /view/ → 301 to the base-prefixed canonical.
+        $redirect = $app->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/view/article/hello-world'),
+        );
+        self::assertSame(301, $redirect->getStatusCode());
+        self::assertSame('https://example.test/blog/article/10', $redirect->getHeaderLine('Location'));
+
+        // Sitemap <loc> under the sub-directory.
+        $sitemap = (string) $app->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/sitemap.xml'),
+        )->getBody();
+        self::assertStringContainsString('<loc>https://example.test/blog/article/10</loc>', $sitemap);
+        self::assertStringContainsString('<loc>https://example.test/blog/</loc>', $sitemap);
+
+        // robots.txt Disallow + Sitemap pointer under the sub-directory.
+        $robots = (string) $app->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/robots.txt'),
+        )->getBody();
+        self::assertStringContainsString('Disallow: /blog/admin', $robots);
+        self::assertStringContainsString('Sitemap: https://example.test/blog/sitemap.xml', $robots);
     }
 
     public function testRobotsTxtServesDirectivesAndSitemapPointer(): void
