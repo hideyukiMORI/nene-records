@@ -243,11 +243,51 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
                 },
             )
             ->set(
+                GenerateSitemapUseCaseInterface::class,
+                static function (ContainerInterface $container): GenerateSitemapUseCaseInterface {
+                    $entityTypes = $container->get(EntityTypeRepositoryInterface::class);
+                    $entities = $container->get(EntityRepositoryInterface::class);
+
+                    if (!$entityTypes instanceof EntityTypeRepositoryInterface) {
+                        throw new LogicException('Entity type repository service is invalid.');
+                    }
+
+                    if (!$entities instanceof EntityRepositoryInterface) {
+                        throw new LogicException('Entity repository service is invalid.');
+                    }
+
+                    return new GenerateSitemapUseCase($entityTypes, $entities);
+                },
+            )
+            ->set(
+                RenderSitemapHandler::class,
+                static function (ContainerInterface $container): RenderSitemapHandler {
+                    $useCase = $container->get(GenerateSitemapUseCaseInterface::class);
+                    $responseFactory = $container->get(ResponseFactoryInterface::class);
+                    $streamFactory = $container->get(StreamFactoryInterface::class);
+
+                    if (!$useCase instanceof GenerateSitemapUseCaseInterface) {
+                        throw new LogicException('GenerateSitemap use case service is invalid.');
+                    }
+
+                    if (!$responseFactory instanceof ResponseFactoryInterface) {
+                        throw new LogicException('Response factory service is invalid.');
+                    }
+
+                    if (!$streamFactory instanceof StreamFactoryInterface) {
+                        throw new LogicException('Stream factory service is invalid.');
+                    }
+
+                    return new RenderSitemapHandler($useCase, $responseFactory, $streamFactory);
+                },
+            )
+            ->set(
                 'nene-records.route_registrar.public_record',
                 static function (ContainerInterface $container): PublicRecordRouteRegistrar {
                     $getHandler = $container->get(GetPublicRecordViewHandler::class);
                     $renderHandler = $container->get(RenderPublicRecordViewHandler::class);
                     $permalinkHandler = $container->get(RenderPublicPermalinkHandler::class);
+                    $sitemapHandler = $container->get(RenderSitemapHandler::class);
 
                     if (!$getHandler instanceof GetPublicRecordViewHandler) {
                         throw new LogicException('GetPublicRecordView handler service is invalid.');
@@ -261,7 +301,16 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
                         throw new LogicException('RenderPublicPermalink handler service is invalid.');
                     }
 
-                    return new PublicRecordRouteRegistrar($getHandler, $renderHandler, $permalinkHandler);
+                    if (!$sitemapHandler instanceof RenderSitemapHandler) {
+                        throw new LogicException('RenderSitemap handler service is invalid.');
+                    }
+
+                    return new PublicRecordRouteRegistrar(
+                        $getHandler,
+                        $renderHandler,
+                        $permalinkHandler,
+                        $sitemapHandler,
+                    );
                 },
             );
     }

@@ -13,6 +13,7 @@ final readonly class PublicRecordRouteRegistrar
         private GetPublicRecordViewHandler $getPublicRecordViewHandler,
         private RenderPublicRecordViewHandler $renderPublicRecordViewHandler,
         private RenderPublicPermalinkHandler $renderPublicPermalinkHandler,
+        private RenderSitemapHandler $renderSitemapHandler,
     ) {
     }
 
@@ -21,10 +22,18 @@ final readonly class PublicRecordRouteRegistrar
         $getPublicRecordViewHandler = $this->getPublicRecordViewHandler;
         $renderPublicRecordViewHandler = $this->renderPublicRecordViewHandler;
         $renderPublicPermalinkHandler = $this->renderPublicPermalinkHandler;
+        $renderSitemapHandler = $this->renderSitemapHandler;
 
         $router->get(
             '/api/v1/public/entity-types/{slug}/records/{entitySlug}',
             static fn (ServerRequestInterface $request) => $getPublicRecordViewHandler->handle($request),
+        );
+
+        // Per-org XML sitemap. A registered route returns 200, so the 301 / SPA-shell
+        // fallback layers (which act only on 404) never intercept it.
+        $router->get(
+            '/sitemap.xml',
+            static fn (ServerRequestInterface $request) => $renderSitemapHandler->handle($request),
         );
 
         $router->get(
