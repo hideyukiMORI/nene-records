@@ -19,6 +19,19 @@ export function useSignup(): UseMutationResult<SignupResponseDto, AppError, Sign
   })
 }
 
+/** Confirm a signup email from its token; clears the unverified banner locally. */
+export function useConfirmEmail(): UseMutationResult<void, AppError, string> {
+  return useMutation({
+    mutationFn: async (token) => {
+      await apiClient.post('/api/v1/auth/confirm-email', { token })
+      const session = authStore.getSession()
+      if (session !== null) {
+        authStore.setSession({ ...session, emailVerified: true })
+      }
+    },
+  })
+}
+
 export function useLogin(): UseMutationResult<AuthSession, AppError, LoginRequestDto> {
   const queryClient = useQueryClient()
   return useMutation({
@@ -30,6 +43,7 @@ export function useLogin(): UseMutationResult<AuthSession, AppError, LoginReques
         expiresAt: dto.expires_at,
         email: dto.email,
         role: dto.role,
+        emailVerified: dto.email_verified,
       }
       authStore.setSession(session)
       return session

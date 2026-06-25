@@ -533,6 +533,14 @@ export function AppShell() {
               <IconBell size={16} />
             </button>
           </div>
+          {session?.emailVerified === false && (
+            <div
+              role="status"
+              className="border-b border-warn bg-warn/10 px-4 py-2.5 text-caption font-medium text-text-primary sm:px-6"
+            >
+              {t('admin.emailBanner.unverified')}
+            </div>
+          )}
           <div className="px-4 py-6 sm:px-6 sm:py-8">
             <Suspense fallback={null}>
               <Outlet />

@@ -16,12 +16,16 @@ final readonly class PublicSignupRouteRegistrar
 {
     public function __construct(
         private PublicSignupHandler $handler,
+        private ConfirmEmailHandler $confirmEmail,
     ) {
     }
 
     public function __invoke(Router $router): void
     {
         $handler = $this->handler;
+        $confirm = $this->confirmEmail;
         $router->post('/api/v1/public/signup', static fn (ServerRequestInterface $r) => $handler->handle($r));
+        // Public (always-open /api/v1/auth/) email-verification confirm.
+        $router->post('/api/v1/auth/confirm-email', static fn (ServerRequestInterface $r) => $confirm->handle($r));
     }
 }

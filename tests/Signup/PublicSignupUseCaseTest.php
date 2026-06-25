@@ -11,6 +11,7 @@ use NeNeRecords\Organization\CreateOrganizationUseCase;
 use NeNeRecords\Organization\OrganizationSlugConflictException;
 use NeNeRecords\Signup\PublicSignupInput;
 use NeNeRecords\Signup\PublicSignupUseCase;
+use NeNeRecords\Tests\Mail\RecordingMailer;
 use NeNeRecords\Tests\Organization\InMemoryOrganizationRepository;
 use NeNeRecords\Tests\Organization\RecordingDefaultContentTypeSeeder;
 use NeNeRecords\Tests\User\InMemoryUserRepository;
@@ -22,12 +23,14 @@ final class PublicSignupUseCaseTest extends TestCase
     private InMemoryOrganizationRepository $orgs;
     private InMemoryUserRepository $users;
     private RecordingDefaultContentTypeSeeder $seeder;
+    private RecordingMailer $mailer;
 
     private function useCase(): PublicSignupUseCase
     {
         $this->orgs = new InMemoryOrganizationRepository();
         $this->users = new InMemoryUserRepository([]);
         $this->seeder = new RecordingDefaultContentTypeSeeder();
+        $this->mailer = new RecordingMailer();
 
         $tokenIssuer = new class () implements TokenIssuerInterface {
             /** @param array<string, mixed> $claims */
@@ -45,6 +48,8 @@ final class PublicSignupUseCaseTest extends TestCase
             new CreateUserUseCase($this->users),
             new LoginUseCase($this->users, $tokenIssuer),
             $holder,
+            $this->users,
+            $this->mailer,
         );
     }
 
@@ -71,6 +76,14 @@ final class PublicSignupUseCaseTest extends TestCase
         self::assertSame('my-shop', $output->slug);
         self::assertSame('admin', $output->role);
         self::assertSame($org->id, $output->organizationId);
+
+        // … and a verification email was queued to the new admin (unverified).
+        self::assertCount(1, $this->mailer->sent);
+        self::assertSame('owner@shop.test', $this->mailer->sent[0]->to);
+        self::assertStringContainsString('/verify-email?token=', $this->mailer->sent[0]->htmlBody);
+        $admin = $this->users->findByEmail('owner@shop.test');
+        self::assertNotNull($admin);
+        self::assertNull($admin->emailVerifiedAt); // starts unverified
     }
 
     public function testDuplicateSlugIsRejected(): void

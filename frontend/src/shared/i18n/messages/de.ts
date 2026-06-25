@@ -439,6 +439,14 @@ export const de: Partial<MessageCatalog> = {
   'admin.signup.successTitle': 'Deine Website ist bereit!',
   'admin.signup.successBody': 'Melde dich an, um {{url}} aufzubauen.',
   'admin.signup.goToLogin': 'Zu deiner Website',
+  'admin.verifySignup.title': 'E-Mail bestätigen',
+  'admin.verifySignup.pending': 'Wird bestätigt …',
+  'admin.verifySignup.success': 'Deine E-Mail ist bestätigt. Danke!',
+  'admin.verifySignup.failed': 'Dieser Link ist ungültig oder abgelaufen.',
+  'admin.verifySignup.missing': 'Es wurde kein Bestätigungstoken übergeben.',
+  'admin.verifySignup.goToAdmin': 'Zum Adminbereich',
+  'admin.emailBanner.unverified':
+    'Bitte bestätige deine E-Mail — nutze den Link, den wir dir gesendet haben.',
   // ── Forbidden page ───────────────────────────────────────────────────────
   'admin.forbidden.title': 'Zugriff verweigert',
   'admin.forbidden.description':

@@ -14,6 +14,7 @@ final readonly class PdoUserRepository implements UserRepositoryInterface
         password_reset_token_hash, password_reset_expires_at,
         pending_email, email_verification_token_hash,
         UNIX_TIMESTAMP(email_verification_expires_at) AS email_verification_expires_at,
+        UNIX_TIMESTAMP(email_verified_at) AS email_verified_at,
         UNIX_TIMESTAMP(created_at) AS created_at,
         UNIX_TIMESTAMP(updated_at) AS updated_at
     ';
@@ -245,6 +246,19 @@ final readonly class PdoUserRepository implements UserRepositoryInterface
         );
     }
 
+    public function markEmailVerified(int $id): void
+    {
+        // Confirm the address and clear the one-time token in one step.
+        $this->query->execute(
+            'UPDATE users
+                SET email_verified_at = NOW(),
+                    pending_email = NULL, email_verification_token_hash = NULL, email_verification_expires_at = NULL,
+                    updated_at = NOW()
+                WHERE id = ?',
+            [$id],
+        );
+    }
+
     public function delete(int $id): void
     {
         $this->query->execute('DELETE FROM users WHERE id = ?', [$id]);
@@ -278,6 +292,7 @@ final readonly class PdoUserRepository implements UserRepositoryInterface
             pendingEmail: isset($row['pending_email']) ? (string) $row['pending_email'] : null,
             emailVerificationTokenHash: isset($row['email_verification_token_hash']) ? (string) $row['email_verification_token_hash'] : null,
             emailVerificationExpiresAt: isset($row['email_verification_expires_at']) ? (int) $row['email_verification_expires_at'] : null,
+            emailVerifiedAt: isset($row['email_verified_at']) ? (int) $row['email_verified_at'] : null,
             createdAt: isset($row['created_at']) ? (int) $row['created_at'] : null,
             updatedAt: isset($row['updated_at']) ? (int) $row['updated_at'] : null,
         );

@@ -21,6 +21,8 @@ final readonly class User
         public ?string $pendingEmail = null,
         public ?string $emailVerificationTokenHash = null,
         public ?int $emailVerificationExpiresAt = null,
+        /** When the address was confirmed; null = unverified (self-serve signup). */
+        public ?int $emailVerifiedAt = null,
         public ?int $createdAt = null,
         public ?int $updatedAt = null,
     ) {

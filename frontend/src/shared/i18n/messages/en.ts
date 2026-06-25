@@ -440,6 +440,14 @@ export const en = {
   'admin.signup.successTitle': 'Your site is ready!',
   'admin.signup.successBody': 'Sign in to start building {{url}}.',
   'admin.signup.goToLogin': 'Go to your site',
+  'admin.verifySignup.title': 'Verify your email',
+  'admin.verifySignup.pending': 'Verifying…',
+  'admin.verifySignup.success': 'Your email is verified. Thanks!',
+  'admin.verifySignup.failed': 'This link is invalid or has expired.',
+  'admin.verifySignup.missing': 'No verification token was provided.',
+  'admin.verifySignup.goToAdmin': 'Go to admin',
+  'admin.emailBanner.unverified':
+    'Please verify your email — check the link we sent to confirm your address.',
 
   // ── Forbidden page ───────────────────────────────────────────────────────
   'admin.forbidden.title': 'Access denied',

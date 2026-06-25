@@ -420,6 +420,13 @@ export const zhHans: Partial<MessageCatalog> = {
   'admin.signup.successTitle': '你的站点已就绪！',
   'admin.signup.successBody': '登录即可开始构建 {{url}}。',
   'admin.signup.goToLogin': '前往你的站点',
+  'admin.verifySignup.title': '验证你的邮箱',
+  'admin.verifySignup.pending': '正在验证…',
+  'admin.verifySignup.success': '邮箱已验证，谢谢！',
+  'admin.verifySignup.failed': '此链接无效或已过期。',
+  'admin.verifySignup.missing': '未提供验证令牌。',
+  'admin.verifySignup.goToAdmin': '前往管理后台',
+  'admin.emailBanner.unverified': '请验证你的邮箱——点击我们发送的链接以确认你的邮箱地址。',
 
   // ── Forbidden page ───────────────────────────────────────────────────────
   'admin.forbidden.title': '访问被拒绝',

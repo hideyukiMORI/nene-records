@@ -10,6 +10,7 @@ export interface LoginResponseDto {
   expires_at: string
   email: string
   role: string
+  email_verified: boolean
 }
 
 export type SignupRequestDto = components['schemas']['SignupRequest']

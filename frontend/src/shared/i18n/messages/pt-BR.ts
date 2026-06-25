@@ -438,6 +438,14 @@ export const ptBR: Partial<MessageCatalog> = {
   'admin.signup.successTitle': 'Seu site está pronto!',
   'admin.signup.successBody': 'Entre para começar a construir {{url}}.',
   'admin.signup.goToLogin': 'Ir para seu site',
+  'admin.verifySignup.title': 'Verifique seu e-mail',
+  'admin.verifySignup.pending': 'Verificando…',
+  'admin.verifySignup.success': 'Seu e-mail foi verificado. Obrigado!',
+  'admin.verifySignup.failed': 'Este link é inválido ou expirou.',
+  'admin.verifySignup.missing': 'Nenhum token de verificação foi fornecido.',
+  'admin.verifySignup.goToAdmin': 'Ir para o admin',
+  'admin.emailBanner.unverified':
+    'Verifique seu e-mail — use o link que enviamos para confirmar seu endereço.',
 
   // ── Forbidden page ───────────────────────────────────────────────────────
   'admin.forbidden.title': 'Acesso negado',

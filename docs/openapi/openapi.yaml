@@ -6154,6 +6154,7 @@ components:
         - expires_at
         - email
         - role
+        - email_verified
       properties:
         token:
           type: string
@@ -6167,6 +6168,8 @@ components:
         role:
           type: string
           minLength: 1
+        email_verified:
+          type: boolean
       additionalProperties: false
     SignupRequest:
       type: object

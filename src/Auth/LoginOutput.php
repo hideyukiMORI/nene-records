@@ -12,6 +12,7 @@ final readonly class LoginOutput
         public string $email,
         public string $role,
         public ?int $orgId = null,
+        public bool $emailVerified = true,
     ) {
     }
 }
