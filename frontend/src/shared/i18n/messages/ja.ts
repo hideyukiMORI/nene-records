@@ -1153,6 +1153,10 @@ export const ja: Partial<MessageCatalog> = {
   'admin.superSettings.currentTitle': '現在の設定（DB 保存値）',
   'admin.superSettings.currentResolution': '解決方式',
 
+  // ── Admin · settings · analytics consent default ──────────────────────────
+  'admin.settings.consentDefault.denied': '拒否（EU 安全側の既定）',
+  'admin.settings.consentDefault.granted': '許可',
+
   // ── Public · cookie consent ───────────────────────────────────────────────
   'public.consent.label': 'Cookie の同意',
   'public.consent.message':

@@ -1141,6 +1141,10 @@ export const de: Partial<MessageCatalog> = {
   'admin.superSettings.currentTitle': 'Aktuelle Einstellungen (in DB gespeichert)',
   'admin.superSettings.currentResolution': 'Auflösungsmodus',
 
+  // ── Admin · settings · analytics consent default ──────────────────────────
+  'admin.settings.consentDefault.denied': 'Abgelehnt (EU-sicherer Standard)',
+  'admin.settings.consentDefault.granted': 'Zugelassen',
+
   // ── Public · cookie consent ───────────────────────────────────────────────
   'public.consent.label': 'Cookie-Einwilligung',
   'public.consent.message':
