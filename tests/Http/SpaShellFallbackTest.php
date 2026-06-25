@@ -105,6 +105,26 @@ final class SpaShellFallbackTest extends TestCase
         self::assertSame(404, $result->getStatusCode());
     }
 
+    public function testInjectsRuntimeBasePathAtRoot(): void
+    {
+        $result = $this->fallback->apply($this->request('GET', '/admin/users'), $this->notFound());
+        $body = (string) $result->getBody();
+
+        // Root: base href unchanged, global exposed as empty.
+        self::assertStringContainsString('<base href="/" />', $body);
+        self::assertStringContainsString('window.__BASE_PATH__ = "";', $body);
+    }
+
+    public function testRepointsBaseHrefAndBasePathUnderSubdirectory(): void
+    {
+        $fallback = new SpaShellFallback($this->shellPath, $this->factory, $this->factory, null, '/blog');
+        $body = (string) $fallback->apply($this->request('GET', '/admin/users'), $this->notFound())->getBody();
+
+        self::assertStringContainsString('<base href="/blog/" />', $body);
+        self::assertStringContainsString('window.__BASE_PATH__ = "/blog";', $body);
+        self::assertStringNotContainsString('<base href="/" />', $body);
+    }
+
     public function testNoAnalyticsWhenNoSettingsUseCase(): void
     {
         // Default construction (no settings) keeps the strict baseline policy.

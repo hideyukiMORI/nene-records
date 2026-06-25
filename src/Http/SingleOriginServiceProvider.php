@@ -50,6 +50,7 @@ final readonly class SingleOriginServiceProvider implements ServiceProviderInter
                         $responseFactory,
                         $streamFactory,
                         $publicSettings,
+                        BasePath::fromEnv(),
                     );
                 },
             )

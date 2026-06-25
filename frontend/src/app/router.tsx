@@ -1,5 +1,6 @@
 import { lazy, Suspense, type ComponentType } from 'react'
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
+import { getBasePath } from '@/shared/lib/base-path'
 // Eager: route frame + entry/error pages (needed immediately; the shells render
 // the Suspense fallback while a lazy content page chunk loads).
 import { PublicShell } from '@/pages/consumer/PublicShell'
@@ -59,96 +60,101 @@ function SuperadminGuard() {
   )
 }
 
-const router = createBrowserRouter([
-  {
-    path: '/login',
-    element: <LoginPage />,
-  },
-  {
-    path: '/admin/accept-invite',
-    element: <AcceptInvitePage />,
-  },
-  {
-    path: '/admin/reset-password',
-    element: <ResetPasswordPage />,
-  },
-  {
-    path: '/admin/verify-email',
-    element: <VerifyEmailPage />,
-  },
-  {
-    path: '/forbidden',
-    element: (
-      <RequireAuth>
-        <ForbiddenPage />
-      </RequireAuth>
-    ),
-  },
-  {
-    path: '/admin',
-    element: <AdminShell />,
-    errorElement: <NotFoundPage />,
-    children: [
-      { index: true, element: <HomePage /> },
-      { path: 'entity-types', element: <EntityTypesPage /> },
-      { path: 'tags', element: <TagsPage /> },
-      { path: 'comments', element: <CommentsPage /> },
-      // Appearance › Layout builder (tabs: layout / menus). Old routes redirect.
-      { path: 'appearance', element: <Navigate to="/admin/appearance/layout" replace /> },
-      { path: 'appearance/:tab', element: <AppearanceLayoutPage /> },
-      { path: 'navigation', element: <Navigate to="/admin/appearance/menus" replace /> },
-      { path: 'widgets', element: <Navigate to="/admin/appearance/layout" replace /> },
-      { path: 'media', element: <MediaPage /> },
-      { path: 'webhooks', element: <WebhooksPage /> },
-      { path: 'notifications', element: <NotificationChannelsPage /> },
-      { path: 'settings', element: <SiteSettingsPage /> },
-      { path: 'import', element: <ImportPage /> },
-      { path: 'users', element: <UsersPage /> },
-      { path: 'users/:id', element: <UserEditPage /> },
-      { path: 'entity-types/:entityTypeSlug/fields', element: <FieldDefsPage /> },
-      // Legacy long-form routes kept for schema management links
-      { path: 'entity-types/:entityTypeSlug/entities', element: <EntityRecordsPage /> },
-      { path: 'entity-types/:entityTypeSlug/entities/:entityId', element: <EntityRecordPage /> },
-      // Short-form catch-all: /admin/:slug and /admin/:slug/:entityId
-      // Must be last — specific routes above take priority
-      { path: ':entityTypeSlug', element: <EntityRecordsPage /> },
-      { path: ':entityTypeSlug/:entityId', element: <EntityRecordPage /> },
-    ],
-  },
-  {
-    path: '/superadmin',
-    element: <SuperadminGuard />,
-    errorElement: <NotFoundPage />,
-    children: [
-      { index: true, element: <OrganizationsPage /> },
-      { path: 'organizations', element: <OrganizationsPage /> },
-      { path: 'organizations/:id', element: <OrganizationDetailPage /> },
-      { path: 'data-migration', element: <DataMigrationPage /> },
-      { path: 'settings', element: <SettingsPage /> },
-    ],
-  },
-  {
-    path: '/',
-    element: <PublicShell />,
-    errorElement: <NotFoundPage />,
-    children: [
-      { index: true, element: <PublicIndexPage /> },
-      // Static routes before `:entityTypeSlug` so they are not treated as types.
-      { path: 'search', element: <PublicSearchPage /> },
-      { path: 'tag/:tagSlug', element: <PublicTagArchivePage /> },
-      { path: 'archive/:year/:month', element: <PublicDateArchivePage /> },
-      { path: 'archive/:year/:month/:day', element: <PublicDateArchivePage /> },
-      { path: ':entityTypeSlug', element: <PublicBrowsePage /> },
-      // Wildcard captures any permalink pattern after the entity type slug
-      // e.g. /posts/42, /posts/my-article, /posts/2024/01/my-article
-      { path: ':entityTypeSlug/*', element: <PublicRecordDetailPage /> },
-    ],
-  },
-  {
-    path: '*',
-    element: <NotFoundPage />,
-  },
-])
+const router = createBrowserRouter(
+  [
+    {
+      path: '/login',
+      element: <LoginPage />,
+    },
+    {
+      path: '/admin/accept-invite',
+      element: <AcceptInvitePage />,
+    },
+    {
+      path: '/admin/reset-password',
+      element: <ResetPasswordPage />,
+    },
+    {
+      path: '/admin/verify-email',
+      element: <VerifyEmailPage />,
+    },
+    {
+      path: '/forbidden',
+      element: (
+        <RequireAuth>
+          <ForbiddenPage />
+        </RequireAuth>
+      ),
+    },
+    {
+      path: '/admin',
+      element: <AdminShell />,
+      errorElement: <NotFoundPage />,
+      children: [
+        { index: true, element: <HomePage /> },
+        { path: 'entity-types', element: <EntityTypesPage /> },
+        { path: 'tags', element: <TagsPage /> },
+        { path: 'comments', element: <CommentsPage /> },
+        // Appearance › Layout builder (tabs: layout / menus). Old routes redirect.
+        { path: 'appearance', element: <Navigate to="/admin/appearance/layout" replace /> },
+        { path: 'appearance/:tab', element: <AppearanceLayoutPage /> },
+        { path: 'navigation', element: <Navigate to="/admin/appearance/menus" replace /> },
+        { path: 'widgets', element: <Navigate to="/admin/appearance/layout" replace /> },
+        { path: 'media', element: <MediaPage /> },
+        { path: 'webhooks', element: <WebhooksPage /> },
+        { path: 'notifications', element: <NotificationChannelsPage /> },
+        { path: 'settings', element: <SiteSettingsPage /> },
+        { path: 'import', element: <ImportPage /> },
+        { path: 'users', element: <UsersPage /> },
+        { path: 'users/:id', element: <UserEditPage /> },
+        { path: 'entity-types/:entityTypeSlug/fields', element: <FieldDefsPage /> },
+        // Legacy long-form routes kept for schema management links
+        { path: 'entity-types/:entityTypeSlug/entities', element: <EntityRecordsPage /> },
+        { path: 'entity-types/:entityTypeSlug/entities/:entityId', element: <EntityRecordPage /> },
+        // Short-form catch-all: /admin/:slug and /admin/:slug/:entityId
+        // Must be last — specific routes above take priority
+        { path: ':entityTypeSlug', element: <EntityRecordsPage /> },
+        { path: ':entityTypeSlug/:entityId', element: <EntityRecordPage /> },
+      ],
+    },
+    {
+      path: '/superadmin',
+      element: <SuperadminGuard />,
+      errorElement: <NotFoundPage />,
+      children: [
+        { index: true, element: <OrganizationsPage /> },
+        { path: 'organizations', element: <OrganizationsPage /> },
+        { path: 'organizations/:id', element: <OrganizationDetailPage /> },
+        { path: 'data-migration', element: <DataMigrationPage /> },
+        { path: 'settings', element: <SettingsPage /> },
+      ],
+    },
+    {
+      path: '/',
+      element: <PublicShell />,
+      errorElement: <NotFoundPage />,
+      children: [
+        { index: true, element: <PublicIndexPage /> },
+        // Static routes before `:entityTypeSlug` so they are not treated as types.
+        { path: 'search', element: <PublicSearchPage /> },
+        { path: 'tag/:tagSlug', element: <PublicTagArchivePage /> },
+        { path: 'archive/:year/:month', element: <PublicDateArchivePage /> },
+        { path: 'archive/:year/:month/:day', element: <PublicDateArchivePage /> },
+        { path: ':entityTypeSlug', element: <PublicBrowsePage /> },
+        // Wildcard captures any permalink pattern after the entity type slug
+        // e.g. /posts/42, /posts/my-article, /posts/2024/01/my-article
+        { path: ':entityTypeSlug/*', element: <PublicRecordDetailPage /> },
+      ],
+    },
+    {
+      path: '*',
+      element: <NotFoundPage />,
+    },
+    // Sub-directory install (#zip-install S2): when served from `/blog/`, the
+    // server injects `window.__BASE_PATH__` and the router strips that prefix.
+  ],
+  { basename: getBasePath() || '/' },
+)
 
 export function AppRouter() {
   // Top-level boundary for lazy routes that sit outside a shell (the auth pages);
