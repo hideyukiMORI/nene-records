@@ -49,6 +49,11 @@ final class InMemoryOrganizationRepository implements OrganizationRepositoryInte
         return array_slice(array_values($this->store), $offset, $limit);
     }
 
+    public function findAllActive(): array
+    {
+        return array_values(array_filter($this->store, static fn (Organization $o): bool => $o->isActive));
+    }
+
     public function count(): int
     {
         return count($this->store);

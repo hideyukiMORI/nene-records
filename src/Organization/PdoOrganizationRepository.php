@@ -57,6 +57,16 @@ final readonly class PdoOrganizationRepository implements OrganizationRepository
         return array_map(fn (array $row) => $this->mapRow($row), $rows);
     }
 
+    public function findAllActive(): array
+    {
+        $rows = $this->query->fetchAll(
+            'SELECT ' . self::COLUMNS . ' FROM organizations WHERE is_active = 1 ORDER BY id ASC',
+            [],
+        );
+
+        return array_map(fn (array $row) => $this->mapRow($row), $rows);
+    }
+
     public function count(): int
     {
         $row = $this->query->fetchOne('SELECT COUNT(*) AS cnt FROM organizations', []);

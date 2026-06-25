@@ -10,6 +10,8 @@ use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
+use Nene2\Http\RequestScopedHolder;
+use NeNeRecords\ApplicationServiceProvider;
 use NeNeRecords\SystemConfig\SystemConfigRepositoryInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -287,6 +289,25 @@ final readonly class OrganizationServiceProvider implements ServiceProviderInter
                     }
 
                     return new TlsCheckRouteRegistrar($handler);
+                },
+            )
+            // ── Multi-tenant batch iteration (cron jobs) ────────────────────────
+            ->set(
+                OrganizationIterator::class,
+                static function (ContainerInterface $c): OrganizationIterator {
+                    $repo = $c->get(OrganizationRepositoryInterface::class);
+                    $orgHolder = $c->get(ApplicationServiceProvider::ORG_ID_HOLDER);
+
+                    if (!$repo instanceof OrganizationRepositoryInterface) {
+                        throw new LogicException('OrganizationRepositoryInterface is invalid.');
+                    }
+
+                    if (!$orgHolder instanceof RequestScopedHolder) {
+                        throw new LogicException('Org ID holder service is invalid.');
+                    }
+
+                    /** @var RequestScopedHolder<int> $orgHolder */
+                    return new OrganizationIterator($repo, $orgHolder);
                 },
             );
     }
