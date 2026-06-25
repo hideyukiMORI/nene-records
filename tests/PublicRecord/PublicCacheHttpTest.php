@@ -116,6 +116,7 @@ final class PublicCacheHttpTest extends TestCase
                 $this->factory,
                 $this->factory,
             ),
+            new \NeNeRecords\PublicRecord\RenderRobotsHandler($this->factory, $this->factory),
         );
 
         $settingRegistrar = new SettingRouteRegistrar(

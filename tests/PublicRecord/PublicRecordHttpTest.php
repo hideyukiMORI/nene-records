@@ -26,6 +26,7 @@ use NeNeRecords\PublicRecord\PublicRecordNotFoundExceptionHandler;
 use NeNeRecords\PublicRecord\PublicRecordRouteRegistrar;
 use NeNeRecords\PublicRecord\RenderPublicPermalinkHandler;
 use NeNeRecords\PublicRecord\RenderPublicRecordViewHandler;
+use NeNeRecords\PublicRecord\RenderRobotsHandler;
 use NeNeRecords\PublicRecord\RenderSitemapHandler;
 use NeNeRecords\Setting\ListPublicSettingsUseCase;
 use NeNeRecords\Tests\BoolField\InMemoryBoolFieldRepository;
@@ -142,6 +143,7 @@ final class PublicRecordHttpTest extends TestCase
                 $this->factory,
                 $this->factory,
             ),
+            new RenderRobotsHandler($this->factory, $this->factory),
         );
 
         return (new RuntimeApplicationFactory(
@@ -349,6 +351,20 @@ final class PublicRecordHttpTest extends TestCase
         self::assertStringContainsString('<loc>https://example.test/article/10</loc>', $xml);
         // updatedAt → lastmod (W3C datetime).
         self::assertStringContainsString('<lastmod>2026-02-20', $xml);
+    }
+
+    public function testRobotsTxtServesDirectivesAndSitemapPointer(): void
+    {
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/robots.txt'),
+        );
+        $body = (string) $response->getBody();
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertStringContainsString('text/plain', $response->getHeaderLine('Content-Type'));
+        self::assertStringContainsString('User-agent: *', $body);
+        self::assertStringContainsString('Disallow: /admin', $body);
+        self::assertStringContainsString('Sitemap: https://example.test/sitemap.xml', $body);
     }
 
     public function testRealPermalinkReturns404ForUnknownId(): void

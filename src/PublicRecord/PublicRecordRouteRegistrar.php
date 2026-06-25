@@ -14,6 +14,7 @@ final readonly class PublicRecordRouteRegistrar
         private RenderPublicRecordViewHandler $renderPublicRecordViewHandler,
         private RenderPublicPermalinkHandler $renderPublicPermalinkHandler,
         private RenderSitemapHandler $renderSitemapHandler,
+        private RenderRobotsHandler $renderRobotsHandler,
     ) {
     }
 
@@ -23,6 +24,7 @@ final readonly class PublicRecordRouteRegistrar
         $renderPublicRecordViewHandler = $this->renderPublicRecordViewHandler;
         $renderPublicPermalinkHandler = $this->renderPublicPermalinkHandler;
         $renderSitemapHandler = $this->renderSitemapHandler;
+        $renderRobotsHandler = $this->renderRobotsHandler;
 
         $router->get(
             '/api/v1/public/entity-types/{slug}/records/{entitySlug}',
@@ -34,6 +36,11 @@ final readonly class PublicRecordRouteRegistrar
         $router->get(
             '/sitemap.xml',
             static fn (ServerRequestInterface $request) => $renderSitemapHandler->handle($request),
+        );
+
+        $router->get(
+            '/robots.txt',
+            static fn (ServerRequestInterface $request) => $renderRobotsHandler->handle($request),
         );
 
         $router->get(
