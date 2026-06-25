@@ -12,7 +12,7 @@ use Psr\Http\Message\ServerRequestInterface;
  * Configure BASE_DOMAIN=nene-records.com in .env.
  * Requests to the bare base domain (no subdomain) return null.
  */
-final readonly class SubdomainResolutionStrategy implements OrgResolutionStrategyInterface
+final readonly class SubdomainResolutionStrategy implements OrgResolutionStrategyInterface, ApexAwareStrategyInterface
 {
     public function __construct(
         private string $baseDomain,
@@ -21,12 +21,7 @@ final readonly class SubdomainResolutionStrategy implements OrgResolutionStrateg
 
     public function resolve(ServerRequestInterface $request): ?string
     {
-        $host = $request->getUri()->getHost();
-
-        // Strip port if present
-        if (str_contains($host, ':')) {
-            $host = explode(':', $host)[0];
-        }
+        $host = $this->host($request);
 
         $baseParts = explode('.', $this->baseDomain);
         $hostParts = explode('.', $host);
@@ -43,5 +38,17 @@ final readonly class SubdomainResolutionStrategy implements OrgResolutionStrateg
         }
 
         return $hostParts[0]; // e.g. "org1"
+    }
+
+    public function isApex(ServerRequestInterface $request): bool
+    {
+        return $this->host($request) === $this->baseDomain;
+    }
+
+    private function host(ServerRequestInterface $request): string
+    {
+        $host = $request->getUri()->getHost();
+
+        return str_contains($host, ':') ? explode(':', $host)[0] : $host;
     }
 }
