@@ -94,6 +94,46 @@ paths:
       responses:
         '204':
           description: Session cookie cleared.
+  /api/v1/public/signup:
+    post:
+      tags:
+        - Signup
+      summary: Public self-serve tenant signup
+      description: >-
+        Provisions a new tenant (organization + admin user, default content types
+        auto-seeded) and signs the admin straight in, setting the session as an
+        HttpOnly `nene_session` cookie. Open endpoint (no authentication, no tenant
+        context). The slug becomes the tenant subdomain `{slug}.<base-domain>`.
+      operationId: publicSignup
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignupRequest'
+            example:
+              organization_name: My Shop
+              slug: my-shop
+              email: owner@example.com
+              password: a-strong-password
+      responses:
+        '201':
+          description: Tenant provisioned and admin signed in.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignupResponse'
+              example:
+                token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                expires_at: '2026-06-27T00:00:00Z'
+                slug: my-shop
+                org_id: 42
+                email: owner@example.com
+                role: admin
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
   /health:
     get:
       tags:
@@ -6121,6 +6161,57 @@ components:
         expires_at:
           type: string
           format: date-time
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          minLength: 1
+      additionalProperties: false
+    SignupRequest:
+      type: object
+      required:
+        - organization_name
+        - slug
+        - email
+        - password
+      properties:
+        organization_name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        slug:
+          type: string
+          description: Tenant subdomain label (3–30 lowercase letters, numbers or hyphens).
+          pattern: '^[a-z0-9](?:[a-z0-9-]{1,28}[a-z0-9])$'
+        email:
+          type: string
+          format: email
+          minLength: 1
+        password:
+          type: string
+          minLength: 8
+      additionalProperties: false
+    SignupResponse:
+      type: object
+      required:
+        - token
+        - expires_at
+        - slug
+        - org_id
+        - email
+        - role
+      properties:
+        token:
+          type: string
+          minLength: 1
+        expires_at:
+          type: string
+          format: date-time
+        slug:
+          type: string
+        org_id:
+          type: integer
         email:
           type: string
           format: email

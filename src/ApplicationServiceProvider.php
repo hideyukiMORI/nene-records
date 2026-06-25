@@ -95,6 +95,8 @@ use NeNeRecords\Setting\SettingKeyNotFoundExceptionHandler;
 use NeNeRecords\Setting\SettingRouteRegistrar;
 use NeNeRecords\Setting\SettingServiceProvider;
 use NeNeRecords\Setting\SettingValueInvalidExceptionHandler;
+use NeNeRecords\Signup\PublicSignupRouteRegistrar;
+use NeNeRecords\Signup\SignupServiceProvider;
 use NeNeRecords\SystemConfig\SystemConfigRouteRegistrar;
 use NeNeRecords\SystemConfig\SystemConfigServiceProvider;
 use NeNeRecords\Tag\TagNotFoundExceptionHandler;
@@ -179,6 +181,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
             ->addProvider(new NotificationServiceProvider())
             ->addProvider(new CommentServiceProvider())
             ->addProvider(new OrganizationServiceProvider())
+            ->addProvider(new SignupServiceProvider())
             ->addProvider(new SystemConfigServiceProvider())
             ->addProvider(new DataMigrationServiceProvider())
             ->addProvider(new OrgExportServiceProvider())
@@ -221,6 +224,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $comment = $container->get(CommentRouteRegistrar::class);
                     $organization = $container->get(OrganizationRouteRegistrar::class);
                     $tlsCheck = $container->get(TlsCheckRouteRegistrar::class);
+                    $signup = $container->get(PublicSignupRouteRegistrar::class);
                     $systemConfig = $container->get(SystemConfigRouteRegistrar::class);
                     $dataMigration = $container->get(DataMigrationRouteRegistrar::class);
                     $orgExport     = $container->get(OrgExportRouteRegistrar::class);
@@ -258,6 +262,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         || !$comment instanceof CommentRouteRegistrar
                         || !$organization instanceof OrganizationRouteRegistrar
                         || !$tlsCheck instanceof TlsCheckRouteRegistrar
+                        || !$signup instanceof PublicSignupRouteRegistrar
                         || !$systemConfig instanceof SystemConfigRouteRegistrar
                         || !$dataMigration instanceof DataMigrationRouteRegistrar
                         || !$orgExport instanceof OrgExportRouteRegistrar
@@ -298,6 +303,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $comment,
                         $organization,
                         $tlsCheck,
+                        $signup,
                         $systemConfig,
                         $dataMigration,
                         $orgExport,
