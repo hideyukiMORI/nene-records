@@ -289,6 +289,10 @@ export const en = {
   'public.dateArchive.dayTitle': 'Archive: {{year}}/{{month}}/{{day}}',
   'public.dateArchive.monthTitle': 'Archive: {{year}}/{{month}}',
   'public.dateArchive.loading': 'Loading…',
+  'public.landing.heading': 'Build your site with NeNe Records',
+  'public.landing.subheading':
+    'An AI-native CMS. Spin up a site in seconds — flexible, typed content with no setup.',
+  'public.landing.cta': 'Create your site',
   'public.dateArchive.subCount.one': '{{count}} record published in this period.',
   'public.dateArchive.subCount.other': '{{count}} records published in this period.',
   'public.dateArchive.error.title': 'Could not load this archive',

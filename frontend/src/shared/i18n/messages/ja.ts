@@ -281,6 +281,10 @@ export const ja: Partial<MessageCatalog> = {
   'public.dateArchive.dayTitle': 'アーカイブ: {{year}}年{{month}}月{{day}}日',
   'public.dateArchive.monthTitle': 'アーカイブ: {{year}}年{{month}}月',
   'public.dateArchive.loading': '読み込み中…',
+  'public.landing.heading': 'NeNe Records で、あなたのサイトを。',
+  'public.landing.subheading':
+    'AI ネイティブな CMS。設定なしで、柔軟で型付きのコンテンツサイトを数秒で。',
+  'public.landing.cta': 'サイトを作る',
   'public.dateArchive.subCount.one': 'この期間に公開された記事 {{count}} 件',
   'public.dateArchive.subCount.other': 'この期間に公開された記事 {{count}} 件',
   'public.dateArchive.error.title': 'このアーカイブを読み込めませんでした',

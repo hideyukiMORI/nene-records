@@ -123,6 +123,28 @@ final class SpaShellFallbackTest extends TestCase
         self::assertStringNotContainsString('__BASE_PATH__', $body);
     }
 
+    public function testInjectsApexFlagOnBaseDomainOnly(): void
+    {
+        $fallback = new SpaShellFallback($this->shellPath, $this->factory, $this->factory, null, '', 'nene-records.com');
+
+        $apex = $this->factory
+            ->createServerRequest('GET', 'https://nene-records.com/')
+            ->withHeader('Accept', 'text/html');
+        self::assertStringContainsString(
+            '<meta name="nene:apex" content="1" />',
+            (string) $fallback->apply($apex, $this->notFound())->getBody(),
+        );
+
+        // A tenant subdomain is NOT the apex.
+        $tenant = $this->factory
+            ->createServerRequest('GET', 'https://shop.nene-records.com/')
+            ->withHeader('Accept', 'text/html');
+        self::assertStringNotContainsString(
+            'nene:apex',
+            (string) $fallback->apply($tenant, $this->notFound())->getBody(),
+        );
+    }
+
     public function testNoAnalyticsWhenNoSettingsUseCase(): void
     {
         // Default construction (no settings) keeps the strict baseline policy.

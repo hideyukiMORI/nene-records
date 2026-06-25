@@ -37,6 +37,8 @@ final readonly class SpaShellFallback
         private ?ListPublicSettingsUseCaseInterface $publicSettings = null,
         /** Sub-directory install prefix (`APP_BASE_PATH`); '' = served at root. */
         private string $basePath = '',
+        /** Subdomain SaaS base domain; the bare host is the tenant-less apex. */
+        private string $baseDomain = '',
     ) {
     }
 
@@ -71,6 +73,7 @@ final readonly class SpaShellFallback
         }
 
         $html = $this->injectBasePath($html, $request);
+        $html = $this->injectApexFlag($html, $request);
 
         $analytics = $this->resolveAnalytics($path);
         $nonce = $analytics->isEnabled() ? bin2hex(random_bytes(16)) : '';
@@ -141,5 +144,29 @@ final readonly class SpaShellFallback
         }
 
         return str_replace('<base href="/"', '<base href="' . $base . '/"', $html);
+    }
+
+    /**
+     * Flag the tenant-less apex (bare base domain) so the SPA renders the global
+     * landing instead of a tenant home. Computed from host + base domain here (the
+     * pipeline's `nene2.apex` attribute does not reach this edge layer). CSP-safe:
+     * a meta, not an inline script.
+     */
+    private function injectApexFlag(string $html, ServerRequestInterface $request): string
+    {
+        if ($this->baseDomain === '') {
+            return $html;
+        }
+
+        $host = $request->getUri()->getHost();
+        if (str_contains($host, ':')) {
+            $host = explode(':', $host)[0];
+        }
+
+        if ($host !== $this->baseDomain) {
+            return $html;
+        }
+
+        return $this->injectIntoHead($html, '<meta name="nene:apex" content="1" />');
     }
 }

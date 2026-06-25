@@ -287,6 +287,10 @@ export const ptBR: Partial<MessageCatalog> = {
   'public.dateArchive.dayTitle': 'Arquivo: {{day}}/{{month}}/{{year}}',
   'public.dateArchive.monthTitle': 'Arquivo: {{month}}/{{year}}',
   'public.dateArchive.loading': 'Carregando…',
+  'public.landing.heading': 'Crie seu site com o NeNe Records',
+  'public.landing.subheading':
+    'Um CMS nativo de IA. Crie um site em segundos — conteúdo flexível e tipado, sem configuração.',
+  'public.landing.cta': 'Criar seu site',
   'public.dateArchive.subCount.one': '{{count}} registro publicado neste período.',
   'public.dateArchive.subCount.other': '{{count}} registros publicados neste período.',
   'public.dateArchive.error.title': 'Não foi possível carregar este arquivo',

@@ -8,6 +8,7 @@ use LogicException;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use NeNeRecords\Setting\ListPublicSettingsUseCaseInterface;
+use NeNeRecords\SystemConfig\SystemConfigRepositoryInterface;
 use NeNeRecords\UrlRedirect\UrlRedirectResolver;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -32,6 +33,16 @@ final readonly class SingleOriginServiceProvider implements ServiceProviderInter
                     $streamFactory = $c->get(StreamFactoryInterface::class);
                     $publicSettings = $c->get(ListPublicSettingsUseCaseInterface::class);
 
+                    // Same source as the subdomain resolution strategy.
+                    $baseDomain = (string) (getenv('BASE_DOMAIN') ?: '');
+                    $sysConfig = $c->get(SystemConfigRepositoryInterface::class);
+                    if ($sysConfig instanceof SystemConfigRepositoryInterface) {
+                        $baseDomain = $sysConfig->get('tenant_base_domain') ?: $baseDomain;
+                    }
+                    if ($baseDomain === 'localhost') {
+                        $baseDomain = '';
+                    }
+
                     if (!is_string($projectRoot) || $projectRoot === '') {
                         throw new LogicException('Project root is not configured.');
                     }
@@ -51,6 +62,7 @@ final readonly class SingleOriginServiceProvider implements ServiceProviderInter
                         $streamFactory,
                         $publicSettings,
                         BasePath::fromEnv(),
+                        $baseDomain,
                     );
                 },
             )
