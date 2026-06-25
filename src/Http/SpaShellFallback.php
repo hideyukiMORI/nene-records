@@ -125,21 +125,17 @@ final readonly class SpaShellFallback
     }
 
     /**
-     * Make the built shell base-path-aware (#zip-install S2): repoint its
-     * `<base href="/">` to the install sub-directory (which anchors the shell's
-     * relative asset URLs) and expose the base to the SPA router / API client via
-     * `window.__BASE_PATH__`. A no-op for assets at root; the global is always set.
+     * Repoint the built shell's `<base href="/">` to the install sub-directory
+     * (#zip-install S2). The `<base>` anchors the shell's relative asset URLs and
+     * is what the SPA reads to derive the router basename / API prefix — no inline
+     * script, so the strict public CSP stays intact. A no-op at root.
      */
     private function injectBasePath(string $html): string
     {
-        if ($this->basePath !== '') {
-            $html = str_replace('<base href="/"', '<base href="' . $this->basePath . '/"', $html);
+        if ($this->basePath === '') {
+            return $html;
         }
 
-        $script = '<script>window.__BASE_PATH__ = '
-            . json_encode($this->basePath, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES)
-            . ';</script>';
-
-        return $this->injectIntoHead($html, $script);
+        return str_replace('<base href="/"', '<base href="' . $this->basePath . '/"', $html);
     }
 }

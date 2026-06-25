@@ -1,23 +1,31 @@
 /**
  * Runtime base path (#zip-install S2). The app can be served from a sub-directory
- * (e.g. `https://example.com/blog/`); the server injects `window.__BASE_PATH__`
- * (from `APP_BASE_PATH`) into the HTML, and the SPA reads it here to set the
- * router basename and prefix API requests. Default `''` = served at root.
+ * (e.g. `https://example.com/blog/`); the server emits a `<base href="{base}/">`
+ * (which also anchors the SPA's relative asset URLs), and the SPA derives the base
+ * from it here to set the router basename and prefix API requests.
  *
- * Asset loading is handled separately by the injected `<base href>` + Vite's
- * relative `base` — this value is only for router/navigation and fetch URLs.
+ * Reading the `<base>` element — rather than an injected inline script — keeps the
+ * strict public CSP (`default-src 'self'`, no `script-src 'unsafe-inline'`) intact.
+ * Default `''` = served at root.
  */
-declare global {
-  interface Window {
-    __BASE_PATH__?: string
-  }
-}
 
-/** The configured base path (`''` or `/segment`) from `window.__BASE_PATH__`. */
+/** The configured base path (`''` or `/segment`), derived from `<base href>`. */
 export function getBasePath(): string {
-  const raw = typeof window !== 'undefined' ? window.__BASE_PATH__ : undefined
+  if (typeof document === 'undefined') {
+    return ''
+  }
 
-  return normalizeBasePath(typeof raw === 'string' ? raw : '')
+  const href = document.querySelector('base')?.getAttribute('href')
+
+  if (href === null || href === undefined) {
+    return ''
+  }
+
+  try {
+    return normalizeBasePath(new URL(href, window.location.origin).pathname)
+  } catch {
+    return ''
+  }
 }
 
 /** `''` (root) or `/segment` (leading slash, no trailing slash). */
