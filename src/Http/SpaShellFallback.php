@@ -70,7 +70,7 @@ final readonly class SpaShellFallback
             return $response;
         }
 
-        $html = $this->injectBasePath($html);
+        $html = $this->injectBasePath($html, $request);
 
         $analytics = $this->resolveAnalytics($path);
         $nonce = $analytics->isEnabled() ? bin2hex(random_bytes(16)) : '';
@@ -130,12 +130,16 @@ final readonly class SpaShellFallback
      * is what the SPA reads to derive the router basename / API prefix — no inline
      * script, so the strict public CSP stays intact. A no-op at root.
      */
-    private function injectBasePath(string $html): string
+    private function injectBasePath(string $html, ServerRequestInterface $request): string
     {
-        if ($this->basePath === '') {
+        // Fixed install prefix + per-request tenant prefix (directory mode), so the
+        // <base href> anchors assets and the SPA derives its router/API base.
+        $base = $this->basePath . (string) $request->getAttribute('nene2.base_prefix', '');
+
+        if ($base === '') {
             return $html;
         }
 
-        return str_replace('<base href="/"', '<base href="' . $this->basePath . '/"', $html);
+        return str_replace('<base href="/"', '<base href="' . $base . '/"', $html);
     }
 }

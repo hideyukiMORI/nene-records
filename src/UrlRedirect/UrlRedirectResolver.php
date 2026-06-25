@@ -63,7 +63,10 @@ final readonly class UrlRedirectResolver
             return $response;
         }
 
-        $location = $this->basePath === '' ? $target : $this->basePath . $target;
+        // Re-add the install prefix + per-request tenant prefix (directory mode)
+        // that OrgResolverMiddleware stripped, so the 301 stays under the tenant.
+        $base = $this->basePath . (string) $request->getAttribute('nene2.base_prefix', '');
+        $location = $base === '' ? $target : $base . $target;
 
         return $this->responseFactory->createResponse(301)->withHeader('Location', $location);
     }

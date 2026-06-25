@@ -14,7 +14,7 @@ use Psr\Http\Message\ServerRequestInterface;
  *
  * Best for shared-host deployments where wildcard subdomains are not available.
  */
-final readonly class PathPrefixResolutionStrategy implements OrgResolutionStrategyInterface
+final readonly class PathPrefixResolutionStrategy implements OrgResolutionStrategyInterface, UriPrefixStrippingStrategyInterface
 {
     /** @var list<string> Paths that skip org resolution (superadmin, health, auth). */
     private const BYPASS_PREFIXES = [
@@ -38,5 +38,12 @@ final readonly class PathPrefixResolutionStrategy implements OrgResolutionStrate
         $candidate = $parts[0];
 
         return $candidate !== '' ? $candidate : null;
+    }
+
+    public function basePrefix(ServerRequestInterface $request): string
+    {
+        $slug = $this->resolve($request);
+
+        return $slug === null ? '' : '/' . $slug;
     }
 }

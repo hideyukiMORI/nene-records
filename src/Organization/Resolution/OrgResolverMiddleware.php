@@ -107,9 +107,25 @@ final readonly class OrgResolverMiddleware implements MiddlewareInterface
 
         $this->orgId->set($org->id ?? 0);
 
-        return $handler->handle(
-            $request->withAttribute('nene2.org.id', $org->id)
-                     ->withAttribute('nene2.org.slug', $org->slug),
-        );
+        // Directory / path mode: strip the tenant's leading path segment so the
+        // router sees `/posts/1`, and expose it on `nene2.base_prefix` so public
+        // URL generation re-adds it (canonical / sitemap / <base href>). Other
+        // strategies (subdomain / env / custom domain) carry an empty prefix.
+        $basePrefix = $this->strategy instanceof UriPrefixStrippingStrategyInterface
+            ? $this->strategy->basePrefix($request)
+            : '';
+
+        $request = $request
+            ->withAttribute('nene2.org.id', $org->id)
+            ->withAttribute('nene2.org.slug', $org->slug)
+            ->withAttribute('nene2.base_prefix', $basePrefix);
+
+        if ($basePrefix !== '') {
+            $uri = $request->getUri();
+            $stripped = substr($uri->getPath(), strlen($basePrefix));
+            $request = $request->withUri($uri->withPath($stripped === '' ? '/' : $stripped));
+        }
+
+        return $handler->handle($request);
     }
 }

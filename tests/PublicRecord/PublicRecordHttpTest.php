@@ -398,6 +398,30 @@ final class PublicRecordHttpTest extends TestCase
         self::assertStringContainsString('Sitemap: https://example.test/blog/sitemap.xml', $robots);
     }
 
+    public function testDirectoryModeTenantPrefixComposesIntoPublicUrls(): void
+    {
+        // Directory (path) mode: OrgResolverMiddleware exposes the stripped tenant
+        // prefix on nene2.base_prefix; URL generation re-adds it (composes with the
+        // fixed install base too — here APP_BASE_PATH=/blog + tenant /myshop).
+        $app = $this->buildApplication(true, $this->projectRoot, [], '/blog');
+        $request = $this->factory
+            ->createServerRequest('GET', 'https://example.test/article/10')
+            ->withAttribute('nene2.base_prefix', '/myshop');
+
+        $detail = (string) $app->handle($request)->getBody();
+        self::assertStringContainsString(
+            '<link rel="canonical" href="https://example.test/blog/myshop/article/10" />',
+            $detail,
+        );
+        self::assertStringContainsString('href="/blog/myshop/view/article"', $detail);
+
+        $sitemapReq = $this->factory
+            ->createServerRequest('GET', 'https://example.test/sitemap.xml')
+            ->withAttribute('nene2.base_prefix', '/myshop');
+        $sitemap = (string) $app->handle($sitemapReq)->getBody();
+        self::assertStringContainsString('<loc>https://example.test/blog/myshop/article/10</loc>', $sitemap);
+    }
+
     public function testRobotsTxtServesDirectivesAndSitemapPointer(): void
     {
         $response = $this->application->handle(
