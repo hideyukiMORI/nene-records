@@ -105,24 +105,22 @@ final class SpaShellFallbackTest extends TestCase
         self::assertSame(404, $result->getStatusCode());
     }
 
-    public function testInjectsRuntimeBasePathAtRoot(): void
+    public function testKeepsBaseHrefAtRoot(): void
     {
         $result = $this->fallback->apply($this->request('GET', '/admin/users'), $this->notFound());
-        $body = (string) $result->getBody();
 
-        // Root: base href unchanged, global exposed as empty.
-        self::assertStringContainsString('<base href="/" />', $body);
-        self::assertStringContainsString('window.__BASE_PATH__ = "";', $body);
+        self::assertStringContainsString('<base href="/" />', (string) $result->getBody());
     }
 
-    public function testRepointsBaseHrefAndBasePathUnderSubdirectory(): void
+    public function testRepointsBaseHrefUnderSubdirectory(): void
     {
         $fallback = new SpaShellFallback($this->shellPath, $this->factory, $this->factory, null, '/blog');
         $body = (string) $fallback->apply($this->request('GET', '/admin/users'), $this->notFound())->getBody();
 
+        // The SPA derives its base from <base href> — no inline script (CSP-safe).
         self::assertStringContainsString('<base href="/blog/" />', $body);
-        self::assertStringContainsString('window.__BASE_PATH__ = "/blog";', $body);
         self::assertStringNotContainsString('<base href="/" />', $body);
+        self::assertStringNotContainsString('__BASE_PATH__', $body);
     }
 
     public function testNoAnalyticsWhenNoSettingsUseCase(): void
