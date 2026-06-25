@@ -10,6 +10,7 @@ use NeNeRecords\Organization\Organization;
 use NeNeRecords\Organization\Resolution\OrgResolutionStrategyInterface;
 use NeNeRecords\Organization\Resolution\OrgResolverMiddleware;
 use NeNeRecords\Organization\Resolution\PathPrefixResolutionStrategy;
+use NeNeRecords\Organization\Resolution\SubdomainResolutionStrategy;
 use NeNeRecords\Tests\Organization\InMemoryOrganizationRepository;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use PHPUnit\Framework\TestCase;
@@ -107,5 +108,78 @@ final class OrgResolverMiddlewareTest extends TestCase
         // …and re-exposed for URL generation, alongside the resolved org.
         self::assertSame('/myshop', $capture->seen->getAttribute('nene2.base_prefix'));
         self::assertSame('myshop', $capture->seen->getAttribute('nene2.org.slug'));
+    }
+
+    /**
+     * Subdomain SaaS apex (host === base domain) carries no tenant but must serve
+     * the global landing / signup surface, not 404. #536 subdomain-saas ②.
+     */
+    public function testSubdomainApexServesGlobalSurfaceAsNoTenant(): void
+    {
+        $factory = new Psr17Factory();
+        /** @var RequestScopedHolder<int> $orgId */
+        $orgId = new RequestScopedHolder();
+
+        $middleware = new OrgResolverMiddleware(
+            $orgId,
+            new InMemoryOrganizationRepository(),
+            new ProblemDetailsResponseFactory($factory, $factory),
+            new SubdomainResolutionStrategy('nene-records.com'),
+        );
+
+        $capture = new class ($factory) implements RequestHandlerInterface {
+            public ?ServerRequestInterface $seen = null;
+
+            public function __construct(private readonly Psr17Factory $factory)
+            {
+            }
+
+            public function handle(ServerRequestInterface $request): ResponseInterface
+            {
+                $this->seen = $request;
+
+                return $this->factory->createResponse(200);
+            }
+        };
+
+        $response = $middleware->process(
+            $factory->createServerRequest('GET', 'https://nene-records.com/'),
+            $capture,
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame(0, $orgId->get()); // no-tenant sentinel
+        self::assertNotNull($capture->seen);
+        self::assertTrue($capture->seen->getAttribute('nene2.apex'));
+    }
+
+    public function testSubdomainUnknownTenantStill404s(): void
+    {
+        $factory = new Psr17Factory();
+        /** @var RequestScopedHolder<int> $orgId */
+        $orgId = new RequestScopedHolder();
+
+        $middleware = new OrgResolverMiddleware(
+            $orgId,
+            new InMemoryOrganizationRepository(), // empty → "nope" not found
+            new ProblemDetailsResponseFactory($factory, $factory),
+            new SubdomainResolutionStrategy('nene-records.com'),
+        );
+
+        $response = $middleware->process(
+            $factory->createServerRequest('GET', 'https://nope.nene-records.com/'),
+            new readonly class ($factory) implements RequestHandlerInterface {
+                public function __construct(private Psr17Factory $factory)
+                {
+                }
+
+                public function handle(ServerRequestInterface $request): ResponseInterface
+                {
+                    return $this->factory->createResponse(200);
+                }
+            },
+        );
+
+        self::assertSame(404, $response->getStatusCode());
     }
 }

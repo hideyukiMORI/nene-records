@@ -73,6 +73,15 @@ final readonly class OrgResolverMiddleware implements MiddlewareInterface
 
         // Strategy returned null (e.g. EnvResolutionStrategy with no ORG_SLUG set)
         if ($identifier === null) {
+            // Subdomain SaaS apex (host === base domain): no tenant, but serve the
+            // global landing / signup surface instead of 404. Non-apex unresolved
+            // hosts still fall through to the error below.
+            if ($this->strategy instanceof ApexAwareStrategyInterface && $this->strategy->isApex($request)) {
+                $this->orgId->set(0);
+
+                return $handler->handle($request->withAttribute('nene2.apex', true));
+            }
+
             return $this->problemDetails->create(
                 $request,
                 'org-not-resolved',
