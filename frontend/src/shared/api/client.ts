@@ -1,6 +1,7 @@
 import { authStore } from '@/entities/auth/model'
 import { env } from '@/shared/config/env'
 import { AppError, parseProblemDetails } from '@/shared/api/errors'
+import { withBasePath } from '@/shared/lib/base-path'
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
 
@@ -21,10 +22,10 @@ interface RequestOptions {
 function handleErrorResponse(response: Response, path: string): void {
   if (response.status === 401 && !path.includes('/auth/login')) {
     authStore.clearSession()
-    window.location.href = '/login'
+    window.location.href = withBasePath('/login')
   }
   if (response.status === 403) {
-    window.location.href = '/forbidden'
+    window.location.href = withBasePath('/forbidden')
   }
 }
 
@@ -75,7 +76,7 @@ export const apiClient = {
   },
   async upload<T>(path: string, formData: FormData): Promise<T> {
     const base = env.apiBaseUrl.replace(/\/$/, '')
-    const url = `${base}${path}`
+    const url = `${base}${withBasePath(path)}`
 
     const response = await fetch(url, {
       method: 'POST',

@@ -35,6 +35,8 @@ final readonly class SpaShellFallback
         private ResponseFactoryInterface $responseFactory,
         private StreamFactoryInterface $streamFactory,
         private ?ListPublicSettingsUseCaseInterface $publicSettings = null,
+        /** Sub-directory install prefix (`APP_BASE_PATH`); '' = served at root. */
+        private string $basePath = '',
     ) {
     }
 
@@ -67,6 +69,8 @@ final readonly class SpaShellFallback
         if ($html === false) {
             return $response;
         }
+
+        $html = $this->injectBasePath($html);
 
         $analytics = $this->resolveAnalytics($path);
         $nonce = $analytics->isEnabled() ? bin2hex(random_bytes(16)) : '';
@@ -118,5 +122,24 @@ final readonly class SpaShellFallback
         }
 
         return substr($html, 0, $pos) . $snippet . substr($html, $pos);
+    }
+
+    /**
+     * Make the built shell base-path-aware (#zip-install S2): repoint its
+     * `<base href="/">` to the install sub-directory (which anchors the shell's
+     * relative asset URLs) and expose the base to the SPA router / API client via
+     * `window.__BASE_PATH__`. A no-op for assets at root; the global is always set.
+     */
+    private function injectBasePath(string $html): string
+    {
+        if ($this->basePath !== '') {
+            $html = str_replace('<base href="/"', '<base href="' . $this->basePath . '/"', $html);
+        }
+
+        $script = '<script>window.__BASE_PATH__ = '
+            . json_encode($this->basePath, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES)
+            . ';</script>';
+
+        return $this->injectIntoHead($html, $script);
     }
 }

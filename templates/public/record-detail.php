@@ -3,6 +3,8 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <?php /* Runtime base path for the SPA router / API client (#zip-install S2). */ ?>
+    <script>window.__BASE_PATH__ = <?= json_encode($basePath, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES) ?>;</script>
     <?php /* GA4 / GTM + Consent Mode v2 — pre-built, nonce'd, '' when analytics is off. */ ?>
     <?= $analyticsHead ?>
     <?php if ($metaDescription !== ''): ?>

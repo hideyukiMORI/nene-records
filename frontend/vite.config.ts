@@ -17,6 +17,10 @@ export default defineConfig(({ mode }) => {
   const frontendPort = parseInt(projectEnv['NENE_RECORDS_FRONTEND_PORT'] ?? '18084', 10)
 
   return {
+    // Relative asset URLs so the built SPA works from any sub-directory at
+    // runtime (#zip-install S2). The injected `<base href>` anchors them to the
+    // configured base path; internal chunk imports resolve next to the entry.
+    base: './',
     plugins: [react(), tailwindcss()],
     build: {
       // Emit dist/.vite/manifest.json so the PHP single-origin SSR can resolve

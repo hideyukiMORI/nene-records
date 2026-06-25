@@ -2,11 +2,15 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" href="/assets/favicon/favicon.svg" type="image/svg+xml" />
-    <link rel="icon" href="/assets/favicon/favicon-32.png" sizes="32x32" />
-    <link rel="icon" href="/assets/favicon/favicon-16.png" sizes="16x16" />
-    <link rel="apple-touch-icon" href="/assets/favicon/apple-touch-icon.png" />
-    <link rel="manifest" href="/assets/favicon/site.webmanifest" />
+    <!-- Anchors all relative URLs (assets) to the install dir. Served at root in
+         dev; the prod SPA-shell rewrites this to the configured base path so the
+         app works from a sub-directory (#zip-install S2). -->
+    <base href="/" />
+    <link rel="icon" href="assets/favicon/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="assets/favicon/favicon-32.png" sizes="32x32" />
+    <link rel="icon" href="assets/favicon/favicon-16.png" sizes="16x16" />
+    <link rel="apple-touch-icon" href="assets/favicon/apple-touch-icon.png" />
+    <link rel="manifest" href="assets/favicon/site.webmanifest" />
     <meta name="theme-color" content="#C77DFF" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>NeNe Records Admin</title>
