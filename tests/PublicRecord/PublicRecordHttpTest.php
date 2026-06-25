@@ -17,6 +17,7 @@ use NeNeRecords\Entity\Entity;
 use NeNeRecords\Entity\EntityStatus;
 use NeNeRecords\EntityType\EntityType;
 use NeNeRecords\FieldDef\FieldDef;
+use NeNeRecords\PublicRecord\GenerateSitemapUseCase;
 use NeNeRecords\PublicRecord\GetPublicRecordViewHandler;
 use NeNeRecords\PublicRecord\GetPublicRecordViewUseCase;
 use NeNeRecords\PublicRecord\PublicEntityTypeNotFoundExceptionHandler;
@@ -25,6 +26,7 @@ use NeNeRecords\PublicRecord\PublicRecordNotFoundExceptionHandler;
 use NeNeRecords\PublicRecord\PublicRecordRouteRegistrar;
 use NeNeRecords\PublicRecord\RenderPublicPermalinkHandler;
 use NeNeRecords\PublicRecord\RenderPublicRecordViewHandler;
+use NeNeRecords\PublicRecord\RenderSitemapHandler;
 use NeNeRecords\Setting\ListPublicSettingsUseCase;
 use NeNeRecords\Tests\BoolField\InMemoryBoolFieldRepository;
 use NeNeRecords\Tests\DateTimeField\InMemoryDateTimeFieldRepository;
@@ -135,6 +137,11 @@ final class PublicRecordHttpTest extends TestCase
             new GetPublicRecordViewHandler($useCase, $jsonResponse, $this->factory),
             $renderHandler,
             new RenderPublicPermalinkHandler($entityTypes, $renderHandler),
+            new RenderSitemapHandler(
+                new GenerateSitemapUseCase($entityTypes, $entities),
+                $this->factory,
+                $this->factory,
+            ),
         );
 
         return (new RuntimeApplicationFactory(
@@ -322,6 +329,26 @@ final class PublicRecordHttpTest extends TestCase
 
         self::assertStringNotContainsString('googletagmanager', $csp);
         self::assertStringNotContainsString('googletagmanager', (string) $response->getBody());
+    }
+
+    public function testSitemapXmlListsHomeAndPublishedRecords(): void
+    {
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/sitemap.xml'),
+        );
+        $xml = (string) $response->getBody();
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertStringContainsString('application/xml', $response->getHeaderLine('Content-Type'));
+        self::assertStringContainsString(
+            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+            $xml,
+        );
+        self::assertStringContainsString('<loc>https://example.test/</loc>', $xml);
+        // The published article resolves through the default /{type}/{id} permalink.
+        self::assertStringContainsString('<loc>https://example.test/article/10</loc>', $xml);
+        // updatedAt → lastmod (W3C datetime).
+        self::assertStringContainsString('<lastmod>2026-02-20', $xml);
     }
 
     public function testRealPermalinkReturns404ForUnknownId(): void
