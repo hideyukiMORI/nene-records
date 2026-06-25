@@ -42,4 +42,17 @@ final class SitemapXmlRendererTest extends TestCase
         self::assertStringContainsString('/posts/a&amp;b&lt;c', $xml);
         self::assertStringNotContainsString('a&b<c', $xml);
     }
+
+    public function testRenderIndexListsChildSitemaps(): void
+    {
+        $xml = SitemapXmlRenderer::renderIndex('https://x.test', [
+            '/sitemap.xml?page=1',
+            '/sitemap.xml?page=2',
+        ]);
+
+        self::assertStringContainsString('<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">', $xml);
+        self::assertStringContainsString('<sitemap><loc>https://x.test/sitemap.xml?page=1</loc></sitemap>', $xml);
+        self::assertStringContainsString('<sitemap><loc>https://x.test/sitemap.xml?page=2</loc></sitemap>', $xml);
+        self::assertStringContainsString('</sitemapindex>', $xml);
+    }
 }

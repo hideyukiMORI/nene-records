@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 
 final class GenerateSitemapUseCaseTest extends TestCase
 {
-    public function testEnumeratesOnlyPublishedRecordsAcrossTypes(): void
+    private function useCase(): GenerateSitemapUseCase
     {
         $types = new InMemoryEntityTypeRepository([
             new EntityType(name: 'Posts', slug: 'posts', id: 1, permalinkPattern: '/{type}/{slug}'),
@@ -40,45 +40,47 @@ final class GenerateSitemapUseCaseTest extends TestCase
             ),
         ]);
 
-        $urls = (new GenerateSitemapUseCase($types, $entities))->execute();
-        $paths = array_map(static fn ($u) => $u->path, $urls);
+        return new GenerateSitemapUseCase($types, $entities);
+    }
 
-        self::assertContains('/posts/hello', $paths);
-        self::assertContains('/pages/20', $paths); // default pattern uses id
-        self::assertNotContains('/posts/draft', $paths); // draft excluded
-        self::assertCount(2, $urls);
+    public function testCountsOnlyPublishedRecords(): void
+    {
+        self::assertSame(2, $this->useCase()->count());
+    }
+
+    public function testPageResolvesPermalinksInGlobalOrderAndExcludesDrafts(): void
+    {
+        $paths = array_map(static fn ($u) => $u->path, $this->useCase()->page(0, 100));
+
+        self::assertSame(['/posts/hello', '/pages/20'], $paths); // types in order; default uses id
+    }
+
+    public function testPageSlicesTheWindowAcrossTypes(): void
+    {
+        $useCase = $this->useCase();
+
+        self::assertSame(['/posts/hello'], array_map(static fn ($u) => $u->path, $useCase->page(0, 1)));
+        self::assertSame(['/pages/20'], array_map(static fn ($u) => $u->path, $useCase->page(1, 1)));
+        self::assertSame([], $useCase->page(2, 1)); // past the end
     }
 
     public function testLastmodPrefersUpdatedThenPublished(): void
     {
-        $types = new InMemoryEntityTypeRepository([
-            new EntityType(name: 'Posts', slug: 'posts', id: 1, permalinkPattern: '/{type}/{id}'),
-        ]);
-        $entities = new InMemoryEntityRepository([
-            new Entity(
-                id: 1,
-                entityTypeId: 1,
-                status: EntityStatus::Published,
-                publishedAt: new DateTimeImmutable('2026-01-01T00:00:00+00:00'),
-                updatedAt: new DateTimeImmutable('2026-05-05T12:00:00+00:00'),
-            ),
-        ]);
+        $urls = $this->useCase()->page(0, 100);
 
-        $urls = (new GenerateSitemapUseCase($types, $entities))->execute();
-
-        self::assertCount(1, $urls);
-        self::assertSame('2026-05-05T12:00:00+00:00', $urls[0]->lastmod);
+        self::assertSame('2026-02-20T09:00:00+00:00', $urls[0]->lastmod); // updatedAt wins
+        self::assertSame('2026-03-01T00:00:00+00:00', $urls[1]->lastmod); // falls back to publishedAt
     }
 
     public function testEmptyWhenNoPublishedRecords(): void
     {
-        $types = new InMemoryEntityTypeRepository([
-            new EntityType(name: 'Posts', slug: 'posts', id: 1),
-        ]);
+        $types = new InMemoryEntityTypeRepository([new EntityType(name: 'Posts', slug: 'posts', id: 1)]);
         $entities = new InMemoryEntityRepository([
             new Entity(id: 1, entityTypeId: 1, status: EntityStatus::Draft),
         ]);
+        $useCase = new GenerateSitemapUseCase($types, $entities);
 
-        self::assertSame([], (new GenerateSitemapUseCase($types, $entities))->execute());
+        self::assertSame(0, $useCase->count());
+        self::assertSame([], $useCase->page(0, 100));
     }
 }
