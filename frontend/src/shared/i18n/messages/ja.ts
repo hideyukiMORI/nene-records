@@ -432,6 +432,14 @@ export const ja: Partial<MessageCatalog> = {
   'admin.signup.successTitle': 'サイトの準備ができました！',
   'admin.signup.successBody': '{{url}} にサインインして作成を始めましょう。',
   'admin.signup.goToLogin': 'サイトへ移動',
+  'admin.verifySignup.title': 'メールアドレスの確認',
+  'admin.verifySignup.pending': '確認しています…',
+  'admin.verifySignup.success': 'メールアドレスを確認しました。ありがとうございます！',
+  'admin.verifySignup.failed': 'このリンクは無効か、有効期限が切れています。',
+  'admin.verifySignup.missing': '確認トークンがありません。',
+  'admin.verifySignup.goToAdmin': '管理画面へ',
+  'admin.emailBanner.unverified':
+    'メールアドレスが未確認です。送信されたメールのリンクから確認してください。',
 
   // ── Forbidden ────────────────────────────────────────────────────────────
   'admin.forbidden.title': 'アクセス拒否',

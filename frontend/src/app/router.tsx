@@ -9,6 +9,7 @@ import { AppShell } from '@/pages/layout/AppShell'
 import { LandingPage } from '@/pages/landing/LandingPage'
 import { LoginPage } from '@/pages/login/LoginPage'
 import { SignupPage } from '@/pages/signup/SignupPage'
+import { VerifyEmailSignupPage } from '@/pages/verify-email-signup/VerifyEmailSignupPage'
 import { NotFoundPage } from '@/pages/not-found/NotFoundPage'
 import { isApex } from '@/shared/lib/apex'
 import { SuperadminShell } from '@/pages/superadmin/SuperadminShell'
@@ -79,6 +80,11 @@ const router = createBrowserRouter(
       // Public self-serve signup (subdomain SaaS apex).
       path: '/signup',
       element: <SignupPage />,
+    },
+    {
+      // Public signup email-verification link target.
+      path: '/verify-email',
+      element: <VerifyEmailSignupPage />,
     },
     {
       path: '/admin/accept-invite',

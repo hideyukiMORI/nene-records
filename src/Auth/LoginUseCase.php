@@ -50,6 +50,7 @@ final readonly class LoginUseCase
             email: $user->email,
             role: $role->value,
             orgId: $orgId,
+            emailVerified: $user->emailVerifiedAt !== null,
         );
     }
 }

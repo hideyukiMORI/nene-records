@@ -50,11 +50,12 @@ final readonly class LoginHandler
         $cookie = SessionCookie::build($output->token, $maxAge, SessionCookie::isSecureRequest($request));
 
         return $this->response->create([
-            'token'      => $output->token,
-            'expires_at' => (new DateTimeImmutable('@' . $output->expiresAt))->format(DateTimeInterface::ATOM),
-            'email'      => $output->email,
-            'role'       => $output->role,
-            'org_id'     => $output->orgId,
+            'token'          => $output->token,
+            'expires_at'     => (new DateTimeImmutable('@' . $output->expiresAt))->format(DateTimeInterface::ATOM),
+            'email'          => $output->email,
+            'role'           => $output->role,
+            'org_id'         => $output->orgId,
+            'email_verified' => $output->emailVerified,
         ], 200, ['Set-Cookie' => $cookie]);
     }
 }

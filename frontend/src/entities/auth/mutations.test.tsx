@@ -45,7 +45,12 @@ describe('auth mutations clear the org-scoped query cache', () => {
   it('useLogin wipes any data cached before the session starts', async () => {
     mswServer.use(
       http.post('/api/v1/auth/login', () =>
-        HttpResponse.json({ expires_at: null, email: 'a@b.co', role: 'admin' }),
+        HttpResponse.json({
+          expires_at: null,
+          email: 'a@b.co',
+          role: 'admin',
+          email_verified: true,
+        }),
       ),
     )
     const queryClient = freshClient()

@@ -440,6 +440,14 @@ export const fr: Partial<MessageCatalog> = {
   'admin.signup.successTitle': 'Votre site est prêt !',
   'admin.signup.successBody': 'Connectez-vous pour commencer à construire {{url}}.',
   'admin.signup.goToLogin': 'Aller à votre site',
+  'admin.verifySignup.title': 'Vérifiez votre e-mail',
+  'admin.verifySignup.pending': 'Vérification…',
+  'admin.verifySignup.success': 'Votre e-mail est vérifié. Merci !',
+  'admin.verifySignup.failed': 'Ce lien est invalide ou a expiré.',
+  'admin.verifySignup.missing': "Aucun jeton de vérification n'a été fourni.",
+  'admin.verifySignup.goToAdmin': "Aller à l'administration",
+  'admin.emailBanner.unverified':
+    'Veuillez vérifier votre e-mail — utilisez le lien que nous vous avons envoyé.',
 
   // ── Forbidden page ───────────────────────────────────────────────────────
   'admin.forbidden.title': 'Accès refusé',

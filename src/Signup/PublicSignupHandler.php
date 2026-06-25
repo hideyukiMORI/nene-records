@@ -73,12 +73,18 @@ final readonly class PublicSignupHandler
             throw new ValidationException($errors);
         }
 
+        // The verification link points back at the host the signup came from
+        // (the apex), where /verify-email confirms via the global token endpoint.
+        $uri = $request->getUri();
+        $verifyUrlBase = $uri->getScheme() . '://' . $uri->getAuthority();
+
         // Slug / email uniqueness raise domain exceptions (→ 409) past this point.
         $output = $this->useCase->execute(new PublicSignupInput(
             organizationName: $name,
             slug: $slug,
             email: $email,
             password: $password,
+            verifyUrlBase: $verifyUrlBase,
         ));
 
         $cookie = SessionCookie::build(

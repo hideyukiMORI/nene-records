@@ -56,6 +56,9 @@ interface UserRepositoryInterface
 
     public function clearEmailVerification(int $id): void;
 
+    /** Mark the address confirmed (self-serve signup) and clear the token. */
+    public function markEmailVerified(int $id): void;
+
     public function delete(int $id): void;
 
     public function countByRole(string $role): int;

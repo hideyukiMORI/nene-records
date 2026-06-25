@@ -11,6 +11,8 @@ use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RequestScopedHolder;
 use NeNeRecords\ApplicationServiceProvider;
 use NeNeRecords\Auth\LoginUseCase;
+use NeNeRecords\Auth\UserRepositoryInterface;
+use NeNeRecords\Mail\MailerInterface;
 use NeNeRecords\Organization\CreateOrganizationUseCaseInterface;
 use NeNeRecords\User\CreateUserUseCaseInterface;
 use Psr\Container\ContainerInterface;
@@ -27,6 +29,8 @@ final readonly class SignupServiceProvider implements ServiceProviderInterface
                     $createUser = $c->get(CreateUserUseCaseInterface::class);
                     $login      = $c->get(LoginUseCase::class);
                     $orgHolder  = $c->get(ApplicationServiceProvider::ORG_ID_HOLDER);
+                    $users      = $c->get(UserRepositoryInterface::class);
+                    $mailer     = $c->get(MailerInterface::class);
 
                     if (!$createOrg instanceof CreateOrganizationUseCaseInterface) {
                         throw new LogicException('CreateOrganizationUseCaseInterface is invalid.');
@@ -44,8 +48,16 @@ final readonly class SignupServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Org ID holder service is invalid.');
                     }
 
+                    if (!$users instanceof UserRepositoryInterface) {
+                        throw new LogicException('UserRepositoryInterface is invalid.');
+                    }
+
+                    if (!$mailer instanceof MailerInterface) {
+                        throw new LogicException('MailerInterface is invalid.');
+                    }
+
                     /** @var RequestScopedHolder<int> $orgHolder */
-                    return new PublicSignupUseCase($createOrg, $createUser, $login, $orgHolder);
+                    return new PublicSignupUseCase($createOrg, $createUser, $login, $orgHolder, $users, $mailer);
                 },
             )
             ->set(
@@ -66,15 +78,45 @@ final readonly class SignupServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(
+                ConfirmEmailUseCase::class,
+                static function (ContainerInterface $c): ConfirmEmailUseCase {
+                    $users = $c->get(UserRepositoryInterface::class);
+                    if (!$users instanceof UserRepositoryInterface) {
+                        throw new LogicException('UserRepositoryInterface is invalid.');
+                    }
+
+                    return new ConfirmEmailUseCase($users);
+                },
+            )
+            ->set(
+                ConfirmEmailHandler::class,
+                static function (ContainerInterface $c): ConfirmEmailHandler {
+                    $useCase = $c->get(ConfirmEmailUseCase::class);
+                    $json    = $c->get(JsonResponseFactory::class);
+                    if (!$useCase instanceof ConfirmEmailUseCase) {
+                        throw new LogicException('ConfirmEmailUseCase is invalid.');
+                    }
+                    if (!$json instanceof JsonResponseFactory) {
+                        throw new LogicException('JsonResponseFactory is invalid.');
+                    }
+
+                    return new ConfirmEmailHandler($useCase, $json);
+                },
+            )
+            ->set(
                 PublicSignupRouteRegistrar::class,
                 static function (ContainerInterface $c): PublicSignupRouteRegistrar {
                     $handler = $c->get(PublicSignupHandler::class);
+                    $confirm = $c->get(ConfirmEmailHandler::class);
 
                     if (!$handler instanceof PublicSignupHandler) {
                         throw new LogicException('PublicSignupHandler is invalid.');
                     }
+                    if (!$confirm instanceof ConfirmEmailHandler) {
+                        throw new LogicException('ConfirmEmailHandler is invalid.');
+                    }
 
-                    return new PublicSignupRouteRegistrar($handler);
+                    return new PublicSignupRouteRegistrar($handler, $confirm);
                 },
             );
     }

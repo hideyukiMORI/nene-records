@@ -2441,6 +2441,7 @@ export interface components {
             /** Format: email */
             email: string;
             role: string;
+            email_verified: boolean;
         };
         SignupRequest: {
             organization_name: string;

@@ -5,6 +5,7 @@ export function seedAdminSession(): void {
     expiresAt: new Date(Date.now() + 86_400_000).toISOString(),
     email: 'admin@example.com',
     role: 'admin',
+    emailVerified: true,
   })
 }
 
@@ -13,6 +14,7 @@ export function seedEditorSession(): void {
     expiresAt: new Date(Date.now() + 86_400_000).toISOString(),
     email: 'editor@example.com',
     role: 'editor',
+    emailVerified: true,
   })
 }
 

@@ -11,6 +11,8 @@ final readonly class PublicSignupInput
         public string $slug,
         public string $email,
         public string $password,
+        /** Origin for the verification link, e.g. `https://nene-records.com`. */
+        public string $verifyUrlBase = '',
     ) {
     }
 }

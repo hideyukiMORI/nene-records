@@ -7,6 +7,8 @@ export interface AuthSession {
   expiresAt: string
   email: string
   role: string
+  /** False when the admin's email is not yet confirmed (self-serve signup). */
+  emailVerified: boolean
 }
 
 const STORAGE_KEY = 'nene_records_session'
