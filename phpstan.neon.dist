@@ -8,4 +8,8 @@ parameters:
     # Standalone host-probe: deliberately inspects PHP_VERSION / extension_loaded
     # of the *target* host, which PHPStan would constant-fold against the dev env.
     - tools/hosting-precheck.php
+    # One-off soak/ops importer: boots the app via RuntimeContainerFactory and
+    # resolves services dynamically (container->get returns mixed); not in the
+    # request path and validated by running, so exclude from static analysis.
+    - tools/soak-import-aozora.php
   tmpDir: .phpstan.cache
