@@ -851,6 +851,16 @@ export const de: Partial<MessageCatalog> = {
   'admin.entityStatus.updateError': 'Status konnte nicht aktualisiert werden.',
   'admin.entityStatus.slugError':
     'Bezeichner konnte nicht gespeichert werden. Er wird möglicherweise bereits von einem anderen Datensatz verwendet.',
+  'admin.entityStatus.showAdvanced': 'Erweitert: eigene URL',
+  'admin.entityStatus.hideAdvanced': 'Erweitert ausblenden',
+  'admin.entityStatus.permalinkLabel': 'Benutzerdefinierter Permalink',
+  'admin.entityStatus.permalinkHelp':
+    'Optional. Ein fester URL-Pfad für diesen Datensatz (z. B. /company/about/team). Leer lassen, um die Standard-URL zu verwenden.',
+  'admin.entityStatus.permalinkPlaceholder': 'z. B. /company/about/team',
+  'admin.entityStatus.savePermalink': 'Permalink speichern',
+  'admin.entityStatus.permalinkSaved': 'Permalink gespeichert.',
+  'admin.entityStatus.permalinkError':
+    'Permalink konnte nicht gespeichert werden. Er wird möglicherweise bereits verwendet oder nutzt ein reserviertes Präfix.',
   'admin.entityStatus.status.draft': 'Entwurf',
   'admin.entityStatus.status.published': 'Veröffentlicht',
   'admin.entityStatus.status.archived': 'Archiviert',

@@ -82,6 +82,36 @@ final class InMemoryEntityRepository implements EntityRepositoryInterface
         return null;
     }
 
+    public function findByPermalink(string $permalink): ?Entity
+    {
+        foreach ($this->entities as $entity) {
+            if ($entity->isDeleted) {
+                continue;
+            }
+
+            if ($entity->permalink !== null && $entity->permalink === $permalink) {
+                return $entity;
+            }
+        }
+
+        return null;
+    }
+
+    public function existsByPermalink(string $permalink, ?int $excludeId = null): bool
+    {
+        foreach ($this->entities as $entity) {
+            if ($entity->permalink !== null && $entity->permalink === $permalink) {
+                if ($excludeId !== null && $entity->id === $excludeId) {
+                    continue;
+                }
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public function existsBySlug(string $slug, int $entityTypeId, ?int $excludeId = null): bool
     {
         foreach ($this->entities as $entity) {
@@ -269,6 +299,7 @@ final class InMemoryEntityRepository implements EntityRepositoryInterface
             id: $id,
             entityTypeId: $entity->entityTypeId,
             slug: $entity->slug,
+            permalink: $entity->permalink,
             status: $entity->status,
             publishedAt: $entity->publishedAt,
             metaTitle: $entity->metaTitle,

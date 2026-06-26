@@ -16,6 +16,8 @@ use Psr\Http\Message\ServerRequestInterface;
 
 final readonly class UpdateEntityHandler
 {
+    use ParsesPermalinkField;
+
     public function __construct(
         private UpdateEntityUseCaseInterface $useCase,
         private JsonResponseFactory $response,
@@ -77,6 +79,9 @@ final readonly class UpdateEntityHandler
             $errors[] = new ValidationError('meta_description', 'Custom layout pages require a meta description before publishing.', 'required');
         }
 
+        // permalink: optional custom canonical path; null/empty = use the type pattern.
+        $permalink = $this->parsePermalinkField($body['permalink'] ?? null, $errors);
+
         if ($errors !== []) {
             throw new ValidationException($errors);
         }
@@ -92,12 +97,14 @@ final readonly class UpdateEntityHandler
             metaDescription: $metaDescription,
             scheduledAt: $scheduledAt,
             layout: $layout,
+            permalink: $permalink,
         ));
 
         return $this->response->create([
             'id' => $output->id,
             'entity_type_id' => $output->entityTypeId,
             'slug' => $output->slug,
+            'permalink' => $output->permalink,
             'status' => $output->status,
             'published_at' => $output->publishedAtIso,
             'scheduled_at' => $output->scheduledAtIso,

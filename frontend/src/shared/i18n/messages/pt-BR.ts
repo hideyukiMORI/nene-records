@@ -863,6 +863,16 @@ export const ptBR: Partial<MessageCatalog> = {
   'admin.entityStatus.updateError': 'Falha ao atualizar o status.',
   'admin.entityStatus.slugError':
     'Falha ao salvar o slug. Ele pode já estar em uso por outro registro.',
+  'admin.entityStatus.showAdvanced': 'Avançado: URL personalizada',
+  'admin.entityStatus.hideAdvanced': 'Ocultar avançado',
+  'admin.entityStatus.permalinkLabel': 'Permalink personalizado',
+  'admin.entityStatus.permalinkHelp':
+    'Opcional. Um caminho de URL fixo para este registro (ex.: /company/about/team). Deixe em branco para usar a URL padrão.',
+  'admin.entityStatus.permalinkPlaceholder': 'ex.: /company/about/team',
+  'admin.entityStatus.savePermalink': 'Salvar permalink',
+  'admin.entityStatus.permalinkSaved': 'Permalink salvo.',
+  'admin.entityStatus.permalinkError':
+    'Falha ao salvar o permalink. Ele pode já estar em uso ou usar um prefixo reservado.',
   'admin.entityStatus.status.draft': 'Rascunho',
   'admin.entityStatus.status.published': 'Publicado',
   'admin.entityStatus.status.archived': 'Arquivado',

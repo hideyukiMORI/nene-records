@@ -183,7 +183,8 @@ final readonly class GetPreviewRecordViewUseCase implements GetPreviewRecordView
         );
         $bootstrap['chapterNav'] = ChapterNavBuilder::toBootstrapArray($chapterNav);
 
-        $canonicalPath = PublicPermalinkResolver::resolve(
+        $canonicalPath = PublicPermalinkResolver::canonicalPath(
+            $entity->permalink,
             $entityType->permalinkPattern,
             $entityTypeSlug,
             $entity->slug,

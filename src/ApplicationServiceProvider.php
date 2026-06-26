@@ -33,6 +33,7 @@ use NeNeRecords\DateTimeField\DateTimeFieldRouteRegistrar;
 use NeNeRecords\DateTimeField\DateTimeFieldServiceProvider;
 use NeNeRecords\Entitlement\EntitlementServiceProvider;
 use NeNeRecords\Entitlement\FeatureNotEntitledExceptionHandler;
+use NeNeRecords\Entity\DuplicateEntityPermalinkExceptionHandler;
 use NeNeRecords\Entity\DuplicateEntitySlugExceptionHandler;
 use NeNeRecords\Entity\EntityNotFoundExceptionHandler;
 use NeNeRecords\Entity\EntityRouteRegistrar;
@@ -346,6 +347,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $fieldDefConflict = $container->get(FieldDefConflictExceptionHandler::class);
                     $entityNotFound = $container->get(EntityNotFoundExceptionHandler::class);
                     $duplicateEntitySlug = $container->get(DuplicateEntitySlugExceptionHandler::class);
+                    $duplicateEntityPermalink = $container->get(DuplicateEntityPermalinkExceptionHandler::class);
                     $textFieldNotFound = $container->get(TextFieldNotFoundExceptionHandler::class);
                     $blocksFieldNotFound = $container->get(BlocksFieldNotFoundExceptionHandler::class);
                     $intFieldNotFound = $container->get(IntFieldNotFoundExceptionHandler::class);
@@ -398,6 +400,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $fieldDefConflict,
                         $entityNotFound,
                         $duplicateEntitySlug,
+                        $duplicateEntityPermalink,
                         $textFieldNotFound,
                         $blocksFieldNotFound,
                         $intFieldNotFound,
@@ -455,6 +458,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $fieldDefConflict,
                         $entityNotFound,
                         $duplicateEntitySlug,
+                        $duplicateEntityPermalink,
                         $textFieldNotFound,
                         $blocksFieldNotFound,
                         $intFieldNotFound,

@@ -858,6 +858,16 @@ export const ja: Partial<MessageCatalog> = {
   'admin.entityStatus.updateError': 'ステータスの更新に失敗しました。',
   'admin.entityStatus.slugError':
     'スラッグの保存に失敗しました。既に別のレコードで使用されている可能性があります。',
+  'admin.entityStatus.showAdvanced': '詳細設定：カスタムURL',
+  'admin.entityStatus.hideAdvanced': '詳細設定を隠す',
+  'admin.entityStatus.permalinkLabel': 'カスタムパーマリンク',
+  'admin.entityStatus.permalinkHelp':
+    '任意。このレコード専用の固定URLパス（例：/company/about/team）。空欄の場合は既定のURLを使用します。',
+  'admin.entityStatus.permalinkPlaceholder': '例：/company/about/team',
+  'admin.entityStatus.savePermalink': 'パーマリンクを保存',
+  'admin.entityStatus.permalinkSaved': 'パーマリンクを保存しました。',
+  'admin.entityStatus.permalinkError':
+    'パーマリンクの保存に失敗しました。既に使用されているか、予約済みの接頭辞の可能性があります。',
   'admin.entityStatus.status.draft': '下書き',
   'admin.entityStatus.status.published': '公開済み',
   'admin.entityStatus.status.archived': 'アーカイブ済み',

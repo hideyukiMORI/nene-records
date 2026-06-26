@@ -67,14 +67,30 @@ final readonly class SingleOriginServiceProvider implements ServiceProviderInter
                 },
             )
             ->set(
+                CustomPermalinkResolver::class,
+                static function (ContainerInterface $c): CustomPermalinkResolver {
+                    $renderer = $c->get(PublicPermalinkRendererInterface::class);
+
+                    if (!$renderer instanceof PublicPermalinkRendererInterface) {
+                        throw new LogicException('Public permalink renderer service is invalid.');
+                    }
+
+                    return new CustomPermalinkResolver($renderer);
+                },
+            )
+            ->set(
                 SingleOriginKernel::class,
                 static function (ContainerInterface $c): SingleOriginKernel {
                     $application = $c->get(RequestHandlerInterface::class);
+                    $customPermalink = $c->get(CustomPermalinkResolver::class);
                     $redirects = $c->get(UrlRedirectResolver::class);
                     $shell = $c->get(SpaShellFallback::class);
 
                     if (!$application instanceof RequestHandlerInterface) {
                         throw new LogicException('Application request handler service is invalid.');
+                    }
+                    if (!$customPermalink instanceof CustomPermalinkResolver) {
+                        throw new LogicException('Custom permalink resolver service is invalid.');
                     }
                     if (!$redirects instanceof UrlRedirectResolver) {
                         throw new LogicException('URL redirect resolver service is invalid.');
@@ -83,7 +99,7 @@ final readonly class SingleOriginServiceProvider implements ServiceProviderInter
                         throw new LogicException('SPA shell fallback service is invalid.');
                     }
 
-                    return new SingleOriginKernel($application, $redirects, $shell);
+                    return new SingleOriginKernel($application, $customPermalink, $redirects, $shell);
                 },
             );
     }

@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import type { EntityStatus } from '@/entities/entity'
 import { useTranslation } from '@/shared/i18n'
 import type { MessageKey } from '@/shared/i18n'
@@ -23,6 +24,7 @@ export function EntityStatusPanel({
   entity,
   entityTypeSlug,
   slugInput,
+  permalinkInput,
   showScheduleForm,
   scheduledAtInput,
   previewUrl,
@@ -30,18 +32,23 @@ export function EntityStatusPanel({
   isPending,
   layout,
   onSlugInputChange,
+  onPermalinkInputChange,
   onScheduledAtChange,
   onToggleScheduleForm,
   onCancelScheduleForm,
   onChangeStatus,
   onChangeLayout,
   onSaveSlug,
+  onSavePermalink,
   onSchedulePublish,
   onCancelSchedule,
   onGeneratePreview,
   onRevokePreview,
 }: EntityStatusPanelState) {
   const { t } = useTranslation()
+  // Custom permalink is an advanced, opt-in field — hidden by default so
+  // non-technical authors never see it (#651).
+  const [showAdvanced, setShowAdvanced] = useState(permalinkInput !== '')
 
   const currentStatus = entity.status
   const publicUrl =
@@ -98,6 +105,47 @@ export function EntityStatusPanel({
           >
             {publicUrl}
           </a>
+        )}
+      </Stack>
+
+      <Stack gap="xs">
+        <button
+          type="button"
+          onClick={() => {
+            setShowAdvanced((value) => !value)
+          }}
+          aria-expanded={showAdvanced}
+          aria-controls="entity-permalink-field"
+          className="self-start text-sm text-accent underline hover:text-accent-hover"
+        >
+          {showAdvanced
+            ? t('admin.entityStatus.hideAdvanced')
+            : t('admin.entityStatus.showAdvanced')}
+        </button>
+        {showAdvanced && (
+          <div id="entity-permalink-field">
+            <Stack gap="xs">
+              <label htmlFor="entity-permalink" className="text-sm font-medium text-text-primary">
+                {t('admin.entityStatus.permalinkLabel')}
+              </label>
+              <Text as="span" muted>
+                {t('admin.entityStatus.permalinkHelp')}
+              </Text>
+              <div className="flex items-center gap-inline-sm">
+                <Input
+                  id="entity-permalink"
+                  value={permalinkInput}
+                  onChange={(e) => {
+                    onPermalinkInputChange(e.target.value)
+                  }}
+                  placeholder={t('admin.entityStatus.permalinkPlaceholder')}
+                />
+                <Button variant="secondary" size="sm" onClick={onSavePermalink}>
+                  {t('admin.entityStatus.savePermalink')}
+                </Button>
+              </div>
+            </Stack>
+          </div>
         )}
       </Stack>
 

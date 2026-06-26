@@ -32,6 +32,7 @@ final readonly class GetEntityByIdHandler
             'id' => $output->id,
             'entity_type_id' => $output->entityTypeId,
             'slug' => $output->slug,
+            'permalink' => $output->permalink,
             'status' => $output->status,
             'published_at' => $output->publishedAtIso,
             'scheduled_at' => $output->scheduledAtIso,

@@ -25,7 +25,7 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
     {
         $row = $this->query->fetchOne(
             <<<'SQL'
-                SELECT id, entity_type_id, slug, layout, status, published_at, scheduled_at, is_deleted, created_at, updated_at, deleted_at, meta_title, meta_description
+                SELECT id, entity_type_id, slug, permalink, layout, status, published_at, scheduled_at, is_deleted, created_at, updated_at, deleted_at, meta_title, meta_description
                 FROM entities
                 WHERE id = ? AND organization_id = ? AND is_deleted = 0
                 SQL,
@@ -43,7 +43,7 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
     {
         $row = $this->query->fetchOne(
             <<<'SQL'
-                SELECT id, entity_type_id, slug, layout, status, published_at, scheduled_at, is_deleted, created_at, updated_at, deleted_at, meta_title, meta_description
+                SELECT id, entity_type_id, slug, permalink, layout, status, published_at, scheduled_at, is_deleted, created_at, updated_at, deleted_at, meta_title, meta_description
                 FROM entities
                 WHERE slug = ? AND entity_type_id = ? AND organization_id = ? AND is_deleted = 0
                 SQL,
@@ -55,6 +55,44 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
         }
 
         return $this->mapRow($row);
+    }
+
+    public function findByPermalink(string $permalink): ?Entity
+    {
+        $row = $this->query->fetchOne(
+            <<<'SQL'
+                SELECT id, entity_type_id, slug, permalink, layout, status, published_at, scheduled_at, is_deleted, created_at, updated_at, deleted_at, meta_title, meta_description
+                FROM entities
+                WHERE permalink = ? AND organization_id = ? AND is_deleted = 0
+                SQL,
+            [$permalink, $this->orgId->get()],
+        );
+
+        if ($row === null) {
+            return null;
+        }
+
+        return $this->mapRow($row);
+    }
+
+    public function existsByPermalink(string $permalink, ?int $excludeId = null): bool
+    {
+        // No is_deleted filter: the unique index spans every row, so the pre-check
+        // must too, otherwise a soft-deleted twin would slip past here and surface
+        // as a raw constraint 500 instead of a clean conflict.
+        if ($excludeId !== null) {
+            $row = $this->query->fetchOne(
+                'SELECT id FROM entities WHERE permalink = ? AND organization_id = ? AND id != ?',
+                [$permalink, $this->orgId->get(), $excludeId],
+            );
+        } else {
+            $row = $this->query->fetchOne(
+                'SELECT id FROM entities WHERE permalink = ? AND organization_id = ?',
+                [$permalink, $this->orgId->get()],
+            );
+        }
+
+        return $row !== null;
     }
 
     public function existsBySlug(string $slug, int $entityTypeId, ?int $excludeId = null): bool
@@ -104,7 +142,7 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
 
         $rows = $this->query->fetchAll(
             <<<SQL
-                SELECT e.id, e.entity_type_id, e.slug, e.layout, e.status, e.published_at, e.scheduled_at, e.is_deleted, e.created_at, e.updated_at, e.deleted_at, e.meta_title, e.meta_description
+                SELECT e.id, e.entity_type_id, e.slug, e.permalink, e.layout, e.status, e.published_at, e.scheduled_at, e.is_deleted, e.created_at, e.updated_at, e.deleted_at, e.meta_title, e.meta_description
                 FROM entities e
                 {$titleJoin}
                 WHERE {$where}
@@ -245,8 +283,8 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
         $now = date('Y-m-d H:i:s');
 
         $this->query->execute(
-            'INSERT INTO entities (organization_id, entity_type_id, slug, layout, status, published_at, scheduled_at, created_at, updated_at, meta_title, meta_description) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            [$this->orgId->get(), $entity->entityTypeId, $entity->slug, $entity->layout, $entity->status->value, $publishedAt, $scheduledAt, $now, $now, $entity->metaTitle, $entity->metaDescription],
+            'INSERT INTO entities (organization_id, entity_type_id, slug, permalink, layout, status, published_at, scheduled_at, created_at, updated_at, meta_title, meta_description) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [$this->orgId->get(), $entity->entityTypeId, $entity->slug, $entity->permalink, $entity->layout, $entity->status->value, $publishedAt, $scheduledAt, $now, $now, $entity->metaTitle, $entity->metaDescription],
         );
 
         $id = $this->query->lastInsertId();
@@ -276,10 +314,10 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
         $this->query->execute(
             <<<'SQL'
                 UPDATE entities
-                SET entity_type_id = ?, slug = ?, layout = ?, status = ?, published_at = ?, scheduled_at = ?, updated_at = ?, meta_title = ?, meta_description = ?
+                SET entity_type_id = ?, slug = ?, permalink = ?, layout = ?, status = ?, published_at = ?, scheduled_at = ?, updated_at = ?, meta_title = ?, meta_description = ?
                 WHERE id = ? AND organization_id = ? AND is_deleted = 0
                 SQL,
-            [$entity->entityTypeId, $entity->slug, $entity->layout, $entity->status->value, $publishedAt, $scheduledAt, $now, $entity->metaTitle, $entity->metaDescription, $id, $this->orgId->get()],
+            [$entity->entityTypeId, $entity->slug, $entity->permalink, $entity->layout, $entity->status->value, $publishedAt, $scheduledAt, $now, $entity->metaTitle, $entity->metaDescription, $id, $this->orgId->get()],
         );
 
         $this->query->execute(
@@ -349,7 +387,7 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
     {
         $rows = $this->query->fetchAll(
             <<<'SQL'
-                SELECT id, entity_type_id, slug, layout, status, published_at, scheduled_at, is_deleted, created_at, updated_at, deleted_at, meta_title, meta_description
+                SELECT id, entity_type_id, slug, permalink, layout, status, published_at, scheduled_at, is_deleted, created_at, updated_at, deleted_at, meta_title, meta_description
                 FROM entities
                 WHERE status = 'scheduled' AND scheduled_at <= CURRENT_TIMESTAMP AND organization_id = ? AND is_deleted = 0
                 SQL,
@@ -363,7 +401,7 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
     {
         $rows = $this->query->fetchAll(
             <<<SQL
-                SELECT id, entity_type_id, slug, layout, status, published_at, scheduled_at, is_deleted, created_at, updated_at, deleted_at, meta_title, meta_description
+                SELECT id, entity_type_id, slug, permalink, layout, status, published_at, scheduled_at, is_deleted, created_at, updated_at, deleted_at, meta_title, meta_description
                 FROM entities
                 WHERE status = 'published' AND organization_id = ? AND is_deleted = 0
                 ORDER BY published_at DESC
@@ -436,6 +474,9 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
         $slugRaw = $row['slug'] ?? null;
         $slug = ($slugRaw !== null && $slugRaw !== '') ? (string) $slugRaw : null;
 
+        $permalinkRaw = $row['permalink'] ?? null;
+        $permalink = ($permalinkRaw !== null && $permalinkRaw !== '') ? (string) $permalinkRaw : null;
+
         $layoutRaw = $row['layout'] ?? null;
         $layout = ($layoutRaw !== null && $layoutRaw !== '') ? (string) $layoutRaw : null;
 
@@ -449,6 +490,7 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
             id: (int) $row['id'],
             entityTypeId: (int) $row['entity_type_id'],
             slug: $slug,
+            permalink: $permalink,
             status: EntityStatus::from((string) ($row['status'] ?? EntityStatus::Draft->value)),
             publishedAt: $publishedAt,
             isDeleted: (bool) (int) $row['is_deleted'],

@@ -10,7 +10,13 @@ interface EntityRepositoryInterface
 
     public function findBySlug(string $slug, int $entityTypeId): ?Entity;
 
+    /** Resolve a record by its custom permalink path (org-scoped), or null (#651). */
+    public function findByPermalink(string $permalink): ?Entity;
+
     public function existsBySlug(string $slug, int $entityTypeId, ?int $excludeId = null): bool;
+
+    /** True when another record in the org already owns this custom permalink (#651). */
+    public function existsByPermalink(string $permalink, ?int $excludeId = null): bool;
 
     /** Returns true if any ACTIVE (non-soft-deleted) entity belongs to this entity type. */
     public function existsActiveByEntityTypeId(int $entityTypeId): bool;

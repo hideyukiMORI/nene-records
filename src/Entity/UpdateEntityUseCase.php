@@ -9,6 +9,8 @@ use DateTimeInterface;
 use LogicException;
 use NeNeRecords\EntityType\EntityTypeNotFoundException;
 use NeNeRecords\EntityType\EntityTypeRepositoryInterface;
+use NeNeRecords\PublicRecord\PublicPermalinkResolver;
+use NeNeRecords\UrlRedirect\UrlRedirectRepositoryInterface;
 use NeNeRecords\Webhook\WebhookDispatcherInterface;
 
 final readonly class UpdateEntityUseCase implements UpdateEntityUseCaseInterface
@@ -17,6 +19,8 @@ final readonly class UpdateEntityUseCase implements UpdateEntityUseCaseInterface
         private EntityRepositoryInterface $entities,
         private EntityTypeRepositoryInterface $entityTypes,
         private ?WebhookDispatcherInterface $webhooks = null,
+        /** Records a 301 from the old canonical path when the permalink changes (#651). */
+        private ?UrlRedirectRepositoryInterface $redirects = null,
     ) {
     }
 
@@ -34,7 +38,9 @@ final readonly class UpdateEntityUseCase implements UpdateEntityUseCaseInterface
             throw new LogicException('Loaded entity missing id.');
         }
 
-        if ($this->entityTypes->findById($input->entityTypeId) === null) {
+        $entityType = $this->entityTypes->findById($input->entityTypeId);
+
+        if ($entityType === null) {
             throw new EntityTypeNotFoundException($input->entityTypeId);
         }
 
@@ -42,6 +48,14 @@ final readonly class UpdateEntityUseCase implements UpdateEntityUseCaseInterface
 
         if ($slug !== null && $this->entities->existsBySlug($slug, $input->entityTypeId, $entityId)) {
             throw new DuplicateEntitySlugException($slug);
+        }
+
+        // The handler has already normalized/validated the permalink; treat empty as
+        // "no custom permalink". Uniqueness is org-wide (#651), excluding self.
+        $permalink = ($input->permalink !== null && $input->permalink !== '') ? $input->permalink : null;
+
+        if ($permalink !== null && $this->entities->existsByPermalink($permalink, $entityId)) {
+            throw new DuplicateEntityPermalinkException($permalink);
         }
 
         // Auto-set published_at when transitioning to published for the first time.
@@ -57,6 +71,7 @@ final readonly class UpdateEntityUseCase implements UpdateEntityUseCaseInterface
             id: $entityId,
             entityTypeId: $input->entityTypeId,
             slug: $slug,
+            permalink: $permalink,
             status: $input->status,
             publishedAt: $publishedAt,
             isDeleted: $existing->isDeleted,
@@ -68,6 +83,33 @@ final readonly class UpdateEntityUseCase implements UpdateEntityUseCaseInterface
         );
 
         $this->entities->update($updated);
+
+        // When the custom permalink is set, changed, or removed, record a 301 from
+        // the record's OLD canonical path to its NEW one, reusing the existing
+        // url_redirects mechanism (#651). Set/remove also covers the type-pattern
+        // path, so the old URL keeps its SEO equity.
+        if ($existing->permalink !== $permalink) {
+            $oldCanonical = PublicPermalinkResolver::canonicalPath(
+                $existing->permalink,
+                $entityType->permalinkPattern,
+                $entityType->slug,
+                $existing->slug,
+                $entityId,
+                $existing->publishedAt,
+            );
+            $newCanonical = PublicPermalinkResolver::canonicalPath(
+                $permalink,
+                $entityType->permalinkPattern,
+                $entityType->slug,
+                $slug,
+                $entityId,
+                $publishedAt,
+            );
+
+            if ($oldCanonical !== $newCanonical) {
+                $this->redirects?->save($oldCanonical, $newCanonical);
+            }
+        }
 
         $this->webhooks?->dispatch('entity.updated', $input->entityTypeId, $entityId);
 
@@ -83,6 +125,7 @@ final readonly class UpdateEntityUseCase implements UpdateEntityUseCaseInterface
             metaDescription: $input->metaDescription,
             scheduledAtIso: $scheduledAt?->format(DateTimeInterface::ATOM),
             layout: $input->layout,
+            permalink: $permalink,
         );
     }
 

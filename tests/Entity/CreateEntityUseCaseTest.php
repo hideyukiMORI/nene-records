@@ -6,12 +6,48 @@ namespace NeNeRecords\Tests\Entity;
 
 use NeNeRecords\Entity\CreateEntityInput;
 use NeNeRecords\Entity\CreateEntityUseCase;
+use NeNeRecords\Entity\DuplicateEntityPermalinkException;
+use NeNeRecords\Entity\Entity;
 use NeNeRecords\EntityType\EntityType;
 use NeNeRecords\Tests\EntityType\InMemoryEntityTypeRepository;
 use PHPUnit\Framework\TestCase;
 
 final class CreateEntityUseCaseTest extends TestCase
 {
+    public function testPersistsCustomPermalink(): void
+    {
+        $entityTypes = new InMemoryEntityTypeRepository([]);
+        $typeId = $entityTypes->save(new EntityType(name: 'Page', slug: 'page'));
+
+        $entities = new InMemoryEntityRepository([]);
+        $useCase = new CreateEntityUseCase($entities, $entityTypes);
+
+        $output = $useCase->execute(new CreateEntityInput(
+            entityTypeId: $typeId,
+            permalink: '/company/about/team',
+        ));
+
+        self::assertSame('/company/about/team', $output->permalink);
+        self::assertSame('/company/about/team', $entities->findById($output->id)?->permalink);
+    }
+
+    public function testRejectsDuplicatePermalink(): void
+    {
+        $entityTypes = new InMemoryEntityTypeRepository([]);
+        $typeId = $entityTypes->save(new EntityType(name: 'Page', slug: 'page'));
+
+        $entities = new InMemoryEntityRepository([
+            new Entity(id: 1, entityTypeId: $typeId, permalink: '/company/about/team'),
+        ]);
+        $useCase = new CreateEntityUseCase($entities, $entityTypes);
+
+        $this->expectException(DuplicateEntityPermalinkException::class);
+        $useCase->execute(new CreateEntityInput(
+            entityTypeId: $typeId,
+            permalink: '/company/about/team',
+        ));
+    }
+
     public function testReturnsOutputWithNewId(): void
     {
         $entityTypes = new InMemoryEntityTypeRepository([]);
