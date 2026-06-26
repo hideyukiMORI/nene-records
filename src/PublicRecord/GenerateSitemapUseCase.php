@@ -90,7 +90,8 @@ final readonly class GenerateSitemapUseCase implements GenerateSitemapUseCaseInt
                 }
 
                 $urls[] = new SitemapUrl(
-                    PublicPermalinkResolver::resolve(
+                    PublicPermalinkResolver::canonicalPath(
+                        $entity->permalink,
                         $type->permalinkPattern,
                         $type->slug,
                         $entity->slug,

@@ -15,6 +15,7 @@ final readonly class CreateEntityOutput
         public bool $isDeleted,
         public ?string $deletedAtIso,
         public ?string $layout = null,
+        public ?string $permalink = null,
     ) {
     }
 }

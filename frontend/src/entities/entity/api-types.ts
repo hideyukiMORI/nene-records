@@ -6,6 +6,8 @@ export interface EntityDto {
   id: number
   entity_type_id: number
   slug: string | null
+  /** Custom canonical URL path overriding the type pattern; null = use the pattern. */
+  permalink: string | null
   layout: LayoutDto | null
   status: EntityStatusDto
   published_at: string | null
@@ -30,6 +32,7 @@ export interface EntityListDto {
 export interface CreateEntityDto {
   entity_type_id: number
   slug?: string | null
+  permalink?: string | null
   status?: EntityStatusDto
   layout?: LayoutDto | null
 }
@@ -37,6 +40,7 @@ export interface CreateEntityDto {
 export interface UpdateEntityDto {
   entity_type_id: number
   slug?: string | null
+  permalink?: string | null
   status: EntityStatusDto
   published_at?: string | null
   scheduled_at?: string | null

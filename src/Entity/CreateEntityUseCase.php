@@ -29,10 +29,19 @@ final readonly class CreateEntityUseCase implements CreateEntityUseCaseInterface
             throw new DuplicateEntitySlugException($slug);
         }
 
+        // The handler has already normalized/validated the permalink; treat empty as
+        // "no custom permalink". Uniqueness is org-wide (#651), mirroring slug.
+        $permalink = ($input->permalink !== null && $input->permalink !== '') ? $input->permalink : null;
+
+        if ($permalink !== null && $this->entities->existsByPermalink($permalink)) {
+            throw new DuplicateEntityPermalinkException($permalink);
+        }
+
         $id = $this->entities->save(new Entity(
             id: null,
             entityTypeId: $input->entityTypeId,
             slug: $slug,
+            permalink: $permalink,
             status: $input->status,
             layout: $input->layout,
         ));
@@ -48,6 +57,7 @@ final readonly class CreateEntityUseCase implements CreateEntityUseCaseInterface
             isDeleted: false,
             deletedAtIso: null,
             layout: $input->layout,
+            permalink: $permalink,
         );
     }
 

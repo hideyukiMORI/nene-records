@@ -25,6 +25,7 @@ export function mapEntityDtoToModel(dto: EntityDto): Entity {
     id: toEntityId(dto.id),
     entityTypeId: dto.entity_type_id,
     slug: dto.slug,
+    permalink: dto.permalink ?? null,
     layout: dto.layout ?? null,
     status: dto.status,
     publishedAt: dto.published_at,
@@ -62,6 +63,7 @@ export function mapCreateInputToDto(input: CreateEntityInput): CreateEntityDto {
   return {
     entity_type_id: input.entityTypeId,
     ...(input.slug !== undefined ? { slug: input.slug } : {}),
+    ...(input.permalink !== undefined ? { permalink: input.permalink } : {}),
     ...(input.status !== undefined ? { status: input.status } : {}),
     ...(input.layout !== undefined ? { layout: input.layout } : {}),
   }
@@ -71,6 +73,7 @@ export function mapUpdateInputToDto(input: UpdateEntityInput): UpdateEntityDto {
   return {
     entity_type_id: input.entityTypeId,
     ...(input.slug !== undefined ? { slug: input.slug } : {}),
+    ...(input.permalink !== undefined ? { permalink: input.permalink } : {}),
     status: input.status,
     ...(input.publishedAt !== undefined ? { published_at: input.publishedAt } : {}),
     ...(input.metaTitle !== undefined ? { meta_title: input.metaTitle } : {}),

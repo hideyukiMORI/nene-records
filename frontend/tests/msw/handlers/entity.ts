@@ -9,6 +9,7 @@ interface EntityRecord {
   id: number
   entity_type_id: number
   slug: string | null
+  permalink: string | null
   status: EntityStatusDto
   published_at: string | null
   is_deleted: boolean
@@ -30,6 +31,7 @@ export function seedEntities(
     id: number
     entity_type_id: number
     slug?: string | null
+    permalink?: string | null
     status?: EntityStatusDto
     published_at?: string | null
     is_deleted: boolean
@@ -41,6 +43,7 @@ export function seedEntities(
   items = seed.map((item) => ({
     ...item,
     slug: item.slug ?? null,
+    permalink: item.permalink ?? null,
     status: item.status ?? 'draft',
     published_at: item.published_at ?? null,
     created_at: item.created_at ?? null,
@@ -197,6 +200,7 @@ export const entityHandlers = [
     const body = (await request.json()) as {
       entity_type_id?: number
       slug?: string | null
+      permalink?: string | null
       status?: EntityStatusDto
     }
 
@@ -218,6 +222,7 @@ export const entityHandlers = [
       id: nextId++,
       entity_type_id: body.entity_type_id,
       slug: body.slug ?? null,
+      permalink: body.permalink ?? null,
       status: body.status ?? 'draft',
       published_at: null,
       is_deleted: false,
@@ -234,6 +239,7 @@ export const entityHandlers = [
     const body = (await request.json()) as {
       entity_type_id?: number
       slug?: string | null
+      permalink?: string | null
       status?: EntityStatusDto
       published_at?: string | null
     }
@@ -267,6 +273,7 @@ export const entityHandlers = [
       ...existing,
       entity_type_id: body.entity_type_id ?? existing.entity_type_id,
       slug: body.slug !== undefined ? body.slug : existing.slug,
+      permalink: body.permalink !== undefined ? body.permalink : existing.permalink,
       status: newStatus,
       published_at: newPublishedAt,
       updated_at: new Date().toISOString(),

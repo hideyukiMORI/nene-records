@@ -19,6 +19,7 @@ use NeNeRecords\EntityRelation\EntityRelationRepositoryInterface;
 use NeNeRecords\EntityType\EntityTypeRepositoryInterface;
 use NeNeRecords\EnumField\EnumFieldRepositoryInterface;
 use NeNeRecords\FieldDef\FieldDefRepositoryInterface;
+use NeNeRecords\Http\PublicPermalinkRendererInterface;
 use NeNeRecords\Http\RuntimeServiceProvider;
 use NeNeRecords\IntField\IntFieldRepositoryInterface;
 use NeNeRecords\Setting\ListPublicSettingsUseCaseInterface;
@@ -203,10 +204,15 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
                 },
             )
             ->set(
-                RenderPublicPermalinkHandler::class,
-                static function (ContainerInterface $container): RenderPublicPermalinkHandler {
+                RenderCustomPermalinkHandler::class,
+                static function (ContainerInterface $container): RenderCustomPermalinkHandler {
+                    $entities = $container->get(EntityRepositoryInterface::class);
                     $entityTypes = $container->get(EntityTypeRepositoryInterface::class);
                     $viewRenderer = $container->get(RenderPublicRecordViewHandler::class);
+
+                    if (!$entities instanceof EntityRepositoryInterface) {
+                        throw new LogicException('Entity repository service is invalid.');
+                    }
 
                     if (!$entityTypes instanceof EntityTypeRepositoryInterface) {
                         throw new LogicException('Entity type repository service is invalid.');
@@ -216,7 +222,41 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
                         throw new LogicException('RenderPublicRecordView handler service is invalid.');
                     }
 
-                    return new RenderPublicPermalinkHandler($entityTypes, $viewRenderer);
+                    return new RenderCustomPermalinkHandler($entities, $entityTypes, $viewRenderer);
+                },
+            )
+            ->set(
+                PublicPermalinkRendererInterface::class,
+                static function (ContainerInterface $container): PublicPermalinkRendererInterface {
+                    $renderer = $container->get(RenderCustomPermalinkHandler::class);
+
+                    if (!$renderer instanceof RenderCustomPermalinkHandler) {
+                        throw new LogicException('RenderCustomPermalink handler service is invalid.');
+                    }
+
+                    return $renderer;
+                },
+            )
+            ->set(
+                RenderPublicPermalinkHandler::class,
+                static function (ContainerInterface $container): RenderPublicPermalinkHandler {
+                    $entityTypes = $container->get(EntityTypeRepositoryInterface::class);
+                    $viewRenderer = $container->get(RenderPublicRecordViewHandler::class);
+                    $customPermalink = $container->get(PublicPermalinkRendererInterface::class);
+
+                    if (!$entityTypes instanceof EntityTypeRepositoryInterface) {
+                        throw new LogicException('Entity type repository service is invalid.');
+                    }
+
+                    if (!$viewRenderer instanceof RenderPublicRecordViewHandler) {
+                        throw new LogicException('RenderPublicRecordView handler service is invalid.');
+                    }
+
+                    if (!$customPermalink instanceof PublicPermalinkRendererInterface) {
+                        throw new LogicException('Public permalink renderer service is invalid.');
+                    }
+
+                    return new RenderPublicPermalinkHandler($entityTypes, $viewRenderer, $customPermalink);
                 },
             )
             ->set(

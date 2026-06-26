@@ -11,6 +11,7 @@ function makeEntity(overrides: Partial<Entity> = {}): Entity {
     id: toEntityId(7),
     entityTypeId: 1,
     slug: 'hello',
+    permalink: null,
     layout: null,
     status: 'draft',
     publishedAt: null,
@@ -96,5 +97,41 @@ describe('useEntityStatusPanel — preserves SEO meta on full-replace update', (
       meta_title: 'SEO Title',
       meta_description: 'SEO Description',
     })
+  })
+
+  it('onSavePermalink sends the custom permalink while preserving slug + meta (#651)', async () => {
+    const bodies = captureUpdates()
+    const { result } = renderHookWithProviders(() =>
+      useEntityStatusPanel(makeEntity({ permalink: '/company/about/team' })),
+    )
+
+    act(() => {
+      result.current.onSavePermalink()
+    })
+
+    await waitFor(() => {
+      expect(bodies).toHaveLength(1)
+    })
+    expect(bodies[0]).toMatchObject({
+      permalink: '/company/about/team',
+      slug: 'hello',
+      meta_title: 'SEO Title',
+    })
+  })
+
+  it('onChangeStatus echoes the existing permalink so a status change does not clear it (#651)', async () => {
+    const bodies = captureUpdates()
+    const { result } = renderHookWithProviders(() =>
+      useEntityStatusPanel(makeEntity({ permalink: '/company/about/team' })),
+    )
+
+    act(() => {
+      result.current.onChangeStatus('published')
+    })
+
+    await waitFor(() => {
+      expect(bodies).toHaveLength(1)
+    })
+    expect(bodies[0]).toMatchObject({ permalink: '/company/about/team' })
   })
 })

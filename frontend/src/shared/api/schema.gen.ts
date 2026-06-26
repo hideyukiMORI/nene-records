@@ -2050,6 +2050,8 @@ export interface components {
             /** Format: int64 */
             entity_type_id: number;
             slug: string | null;
+            /** @description Per-record custom canonical URL path overriding the entity type's permalink pattern (e.g. "/company/about/team"); null = use the pattern. */
+            permalink: string | null;
             /**
              * @description Per-entity layout override. Null = inherit the type's default_layout.
              * @enum {string|null}
@@ -2076,6 +2078,8 @@ export interface components {
             /** Format: int64 */
             entity_type_id: number;
             slug?: string;
+            /** @description Custom canonical URL path ("/"-separated lowercase slug segments, e.g. "/company/about/team"). Null/omitted = use the entity type's pattern. */
+            permalink?: string | null;
             status?: components["schemas"]["EntityStatus"];
             /**
              * @description Per-entity layout override. Null/omitted = inherit the type's default_layout.
@@ -2087,6 +2091,8 @@ export interface components {
             /** Format: int64 */
             entity_type_id: number;
             slug?: string;
+            /** @description Custom canonical URL path ("/"-separated lowercase slug segments, e.g. "/company/about/team"). Null/omitted = use the entity type's pattern. */
+            permalink?: string | null;
             status?: components["schemas"]["EntityStatus"];
             /** Format: date-time */
             published_at?: string | null;

@@ -14,6 +14,8 @@ use Psr\Http\Message\ServerRequestInterface;
 
 final readonly class CreateEntityHandler
 {
+    use ParsesPermalinkField;
+
     public function __construct(
         private CreateEntityUseCaseInterface $useCase,
         private JsonResponseFactory $response,
@@ -48,6 +50,9 @@ final readonly class CreateEntityHandler
             $errors[] = new ValidationError('layout', 'Unknown layout.', 'invalid');
         }
 
+        // permalink: optional custom canonical path; null/empty = use the type pattern.
+        $permalink = $this->parsePermalinkField($body['permalink'] ?? null, $errors);
+
         if ($errors !== []) {
             throw new ValidationException($errors);
         }
@@ -58,6 +63,7 @@ final readonly class CreateEntityHandler
             slug: $slug,
             status: $status,
             layout: $layout,
+            permalink: $permalink,
         ));
 
         return $this->response->create(
@@ -65,6 +71,7 @@ final readonly class CreateEntityHandler
                 'id' => $output->id,
                 'entity_type_id' => $output->entityTypeId,
                 'slug' => $output->slug,
+                'permalink' => $output->permalink,
                 'status' => $output->status,
                 'published_at' => $output->publishedAtIso,
                 'is_deleted' => $output->isDeleted,

@@ -12,6 +12,8 @@ final readonly class Entity
         public ?int $id,
         public int $entityTypeId,
         public ?string $slug = null,
+        /** Custom canonical URL path (e.g. "/company/about/team"); null = use the type pattern (#651). */
+        public ?string $permalink = null,
         public EntityStatus $status = EntityStatus::Draft,
         public ?DateTimeImmutable $publishedAt = null,
         public bool $isDeleted = false,

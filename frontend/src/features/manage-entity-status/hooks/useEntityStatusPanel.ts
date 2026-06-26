@@ -28,6 +28,8 @@ export interface EntityStatusPanelState {
   entity: Entity
   entityTypeSlug?: string | undefined
   slugInput: string
+  /** Advanced, opt-in custom permalink draft (#651); '' = use the type pattern. */
+  permalinkInput: string
   layout: PublicLayoutKey | null
   showScheduleForm: boolean
   scheduledAtInput: string
@@ -35,12 +37,14 @@ export interface EntityStatusPanelState {
   previewExpires: string | null
   isPending: boolean
   onSlugInputChange: (value: string) => void
+  onPermalinkInputChange: (value: string) => void
   onScheduledAtChange: (value: string) => void
   onToggleScheduleForm: () => void
   onCancelScheduleForm: () => void
   onChangeStatus: (nextStatus: EntityStatus) => void
   onChangeLayout: (nextLayout: PublicLayoutKey | null) => void
   onSaveSlug: () => void
+  onSavePermalink: () => void
   onSchedulePublish: () => void
   onCancelSchedule: () => void
   onGeneratePreview: () => void
@@ -60,6 +64,7 @@ export function useEntityStatusPanel(
   const revokePreviewMutation = useRevokePreviewToken()
 
   const [slugInput, setSlugInput] = useState(entity.slug ?? '')
+  const [permalinkInput, setPermalinkInput] = useState(entity.permalink ?? '')
   const [showScheduleForm, setShowScheduleForm] = useState(false)
   const [scheduledAtInput, setScheduledAtInput] = useState('')
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
@@ -78,6 +83,7 @@ export function useEntityStatusPanel(
         id: Number(entity.id),
         entityTypeId: entity.entityTypeId,
         slug: slugInput !== '' ? slugInput : null,
+        permalink: permalinkInput !== '' ? permalinkInput : null,
         status: nextStatus,
         // The update endpoint is full-replace: omitted fields are nulled, so
         // every call must echo back the fields it does not intend to change.
@@ -96,6 +102,7 @@ export function useEntityStatusPanel(
         id: Number(entity.id),
         entityTypeId: entity.entityTypeId,
         slug: slugInput !== '' ? slugInput : null,
+        permalink: permalinkInput !== '' ? permalinkInput : null,
         status: entity.status,
         // Full-replace endpoint: preserve SEO meta and layout we are not editing.
         metaTitle: entity.metaTitle,
@@ -108,12 +115,33 @@ export function useEntityStatusPanel(
     }
   }
 
+  const onSavePermalink = async () => {
+    try {
+      await updateMutation.mutateAsync({
+        id: Number(entity.id),
+        entityTypeId: entity.entityTypeId,
+        slug: slugInput !== '' ? slugInput : null,
+        permalink: permalinkInput !== '' ? permalinkInput : null,
+        status: entity.status,
+        // Full-replace endpoint: preserve SEO meta and layout we are not editing.
+        metaTitle: entity.metaTitle,
+        metaDescription: entity.metaDescription,
+        layout: entity.layout,
+      })
+      showToast(t('admin.entityStatus.permalinkSaved'), 'success')
+    } catch (e) {
+      // Surface the server's conflict / validation message (e.g. reserved prefix).
+      showToast(serverMessage(e, t('admin.entityStatus.permalinkError')), 'error')
+    }
+  }
+
   const onChangeLayout = async (nextLayout: PublicLayoutKey | null) => {
     try {
       await updateMutation.mutateAsync({
         id: Number(entity.id),
         entityTypeId: entity.entityTypeId,
         slug: slugInput !== '' ? slugInput : null,
+        permalink: permalinkInput !== '' ? permalinkInput : null,
         status: entity.status,
         metaTitle: entity.metaTitle,
         metaDescription: entity.metaDescription,
@@ -171,6 +199,7 @@ export function useEntityStatusPanel(
     entity,
     entityTypeSlug,
     slugInput,
+    permalinkInput,
     layout: entity.layout,
     showScheduleForm,
     scheduledAtInput,
@@ -178,6 +207,7 @@ export function useEntityStatusPanel(
     previewExpires,
     isPending,
     onSlugInputChange: setSlugInput,
+    onPermalinkInputChange: setPermalinkInput,
     onScheduledAtChange: setScheduledAtInput,
     onToggleScheduleForm: () => {
       setShowScheduleForm((prev) => !prev)
@@ -194,6 +224,9 @@ export function useEntityStatusPanel(
     },
     onSaveSlug: () => {
       void onSaveSlug()
+    },
+    onSavePermalink: () => {
+      void onSavePermalink()
     },
     onSchedulePublish: () => {
       void onSchedulePublish()

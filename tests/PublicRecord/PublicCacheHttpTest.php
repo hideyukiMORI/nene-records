@@ -110,7 +110,11 @@ final class PublicCacheHttpTest extends TestCase
         $publicRecordRegistrar = new PublicRecordRouteRegistrar(
             new GetPublicRecordViewHandler($useCase, $jsonResponse, $this->factory),
             $renderHandler,
-            new \NeNeRecords\PublicRecord\RenderPublicPermalinkHandler($entityTypes, $renderHandler),
+            new \NeNeRecords\PublicRecord\RenderPublicPermalinkHandler(
+                $entityTypes,
+                $renderHandler,
+                new \NeNeRecords\PublicRecord\RenderCustomPermalinkHandler($entities, $entityTypes, $renderHandler),
+            ),
             new \NeNeRecords\PublicRecord\RenderSitemapHandler(
                 new \NeNeRecords\PublicRecord\GenerateSitemapUseCase($entityTypes, $entities),
                 $this->factory,

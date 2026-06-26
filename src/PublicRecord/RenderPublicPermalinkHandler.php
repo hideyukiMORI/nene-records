@@ -6,6 +6,7 @@ namespace NeNeRecords\PublicRecord;
 
 use Nene2\Routing\Router;
 use NeNeRecords\EntityType\EntityTypeRepositoryInterface;
+use NeNeRecords\Http\PublicPermalinkRendererInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -17,6 +18,10 @@ use Psr\Http\Message\ServerRequestInterface;
  * The route patterns capture the path as `p0..pN` (max-param so any more-specific
  * route always wins the router's param-count sort). `p0` is the entity-type slug;
  * the remaining segments are reverse-resolved against the type's permalink pattern.
+ *
+ * Precedence (#651): a per-record custom permalink is consulted FIRST, so when a
+ * record's stored permalink equals the full request path it is served even if the
+ * path also looks like a `/{type}/{slug|id}` route — custom permalink wins.
  */
 final readonly class RenderPublicPermalinkHandler
 {
@@ -25,6 +30,7 @@ final readonly class RenderPublicPermalinkHandler
     public function __construct(
         private EntityTypeRepositoryInterface $entityTypes,
         private RenderPublicRecordViewHandler $viewRenderer,
+        private PublicPermalinkRendererInterface $customPermalink,
     ) {
     }
 
@@ -39,6 +45,12 @@ final readonly class RenderPublicPermalinkHandler
             if ($value !== '') {
                 $segments[] = $value;
             }
+        }
+
+        // Custom permalink wins over the type-based interpretation of the same path.
+        $custom = $this->customPermalink->renderByPermalink('/' . implode('/', $segments), $request);
+        if ($custom !== null) {
+            return $custom;
         }
 
         $typeSlug = $segments[0] ?? '';

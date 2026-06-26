@@ -15,6 +15,7 @@ use NeNeRecords\EntityType\EntityTypeRepositoryInterface;
 use NeNeRecords\Organization\OrganizationIterator;
 use NeNeRecords\Setting\SettingRepositoryInterface;
 use NeNeRecords\TextField\TextFieldRepositoryInterface;
+use NeNeRecords\UrlRedirect\UrlRedirectRepositoryInterface;
 use NeNeRecords\Webhook\WebhookDispatcherInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -193,6 +194,7 @@ final readonly class EntityServiceProvider implements ServiceProviderInterface
                     $entities = $c->get(EntityRepositoryInterface::class);
                     $entityTypes = $c->get(EntityTypeRepositoryInterface::class);
                     $webhooks = $c->get(WebhookDispatcherInterface::class);
+                    $redirects = $c->get(UrlRedirectRepositoryInterface::class);
 
                     if (!$entities instanceof EntityRepositoryInterface) {
                         throw new LogicException('Entity repository service is invalid.');
@@ -206,7 +208,11 @@ final readonly class EntityServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Webhook dispatcher service is invalid.');
                     }
 
-                    return new UpdateEntityUseCase($entities, $entityTypes, $webhooks);
+                    if (!$redirects instanceof UrlRedirectRepositoryInterface) {
+                        throw new LogicException('URL redirect repository service is invalid.');
+                    }
+
+                    return new UpdateEntityUseCase($entities, $entityTypes, $webhooks, $redirects);
                 },
             )
             ->set(
@@ -236,6 +242,18 @@ final readonly class EntityServiceProvider implements ServiceProviderInterface
                     }
 
                     return new DuplicateEntitySlugExceptionHandler($problemDetails);
+                },
+            )
+            ->set(
+                DuplicateEntityPermalinkExceptionHandler::class,
+                static function (ContainerInterface $c): DuplicateEntityPermalinkExceptionHandler {
+                    $problemDetails = $c->get(ProblemDetailsResponseFactory::class);
+
+                    if (!$problemDetails instanceof ProblemDetailsResponseFactory) {
+                        throw new LogicException('Problem details response factory service is invalid.');
+                    }
+
+                    return new DuplicateEntityPermalinkExceptionHandler($problemDetails);
                 },
             )
             ->set(

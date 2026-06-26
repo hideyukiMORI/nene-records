@@ -871,6 +871,16 @@ export const fr: Partial<MessageCatalog> = {
   'admin.entityStatus.updateError': 'Échec de la mise à jour du statut.',
   'admin.entityStatus.slugError':
     "Échec de l'enregistrement de l'identifiant. Il est peut-être déjà utilisé par une autre fiche.",
+  'admin.entityStatus.showAdvanced': 'Avancé : URL personnalisée',
+  'admin.entityStatus.hideAdvanced': 'Masquer les options avancées',
+  'admin.entityStatus.permalinkLabel': 'Permalien personnalisé',
+  'admin.entityStatus.permalinkHelp':
+    'Facultatif. Un chemin d’URL fixe pour cette fiche (par ex. /company/about/team). Laisser vide pour utiliser l’URL par défaut.',
+  'admin.entityStatus.permalinkPlaceholder': 'par ex. /company/about/team',
+  'admin.entityStatus.savePermalink': 'Enregistrer le permalien',
+  'admin.entityStatus.permalinkSaved': 'Permalien enregistré.',
+  'admin.entityStatus.permalinkError':
+    'Échec de l’enregistrement du permalien. Il est peut-être déjà utilisé ou utilise un préfixe réservé.',
   'admin.entityStatus.status.draft': 'Brouillon',
   'admin.entityStatus.status.published': 'Publié',
   'admin.entityStatus.status.archived': 'Archivé',

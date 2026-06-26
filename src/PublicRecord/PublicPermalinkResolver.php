@@ -20,6 +20,29 @@ final readonly class PublicPermalinkResolver
 {
     public const DEFAULT_PATTERN = '/{type}/{id}';
 
+    /**
+     * The record's canonical public path: its per-record custom permalink verbatim
+     * when set (#651), else the entity type's pattern via {@see self::resolve()}.
+     *
+     * Single source of truth for every place that builds a record's canonical /
+     * og:url / sitemap URL, so a custom permalink overrides the type pattern
+     * consistently across the SSR head, the bootstrap and the sitemap.
+     */
+    public static function canonicalPath(
+        ?string $customPermalink,
+        ?string $pattern,
+        string $typeSlug,
+        ?string $entitySlug,
+        int $entityId,
+        ?DateTimeImmutable $publishedAt,
+    ): string {
+        if ($customPermalink !== null && $customPermalink !== '') {
+            return $customPermalink;
+        }
+
+        return self::resolve($pattern, $typeSlug, $entitySlug, $entityId, $publishedAt);
+    }
+
     public static function resolve(
         ?string $pattern,
         string $typeSlug,

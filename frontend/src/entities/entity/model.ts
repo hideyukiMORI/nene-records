@@ -7,6 +7,8 @@ export interface Entity {
   id: EntityId
   entityTypeId: number
   slug: string | null
+  /** Custom canonical URL path overriding the type pattern; null = use the pattern. */
+  permalink: string | null
   /** Per-entity layout override; null = inherit the type's default layout. */
   layout: PublicLayoutKey | null
   status: EntityStatus
@@ -32,6 +34,7 @@ export interface EntityList {
 export interface CreateEntityInput {
   entityTypeId: number
   slug?: string | null
+  permalink?: string | null
   status?: EntityStatus
   layout?: PublicLayoutKey | null
 }
@@ -40,6 +43,7 @@ export interface UpdateEntityInput {
   id: number
   entityTypeId: number
   slug?: string | null
+  permalink?: string | null
   status: EntityStatus
   publishedAt?: string | null
   scheduledAt?: string | null

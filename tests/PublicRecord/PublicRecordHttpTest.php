@@ -24,6 +24,7 @@ use NeNeRecords\PublicRecord\PublicEntityTypeNotFoundExceptionHandler;
 use NeNeRecords\PublicRecord\PublicHtmlSanitizer;
 use NeNeRecords\PublicRecord\PublicRecordNotFoundExceptionHandler;
 use NeNeRecords\PublicRecord\PublicRecordRouteRegistrar;
+use NeNeRecords\PublicRecord\RenderCustomPermalinkHandler;
 use NeNeRecords\PublicRecord\RenderPublicPermalinkHandler;
 use NeNeRecords\PublicRecord\RenderPublicRecordViewHandler;
 use NeNeRecords\PublicRecord\RenderRobotsHandler;
@@ -67,28 +68,25 @@ final class PublicRecordHttpTest extends TestCase
         string $projectRoot,
         array $settingDefs = [],
         string $basePath = '',
+        ?string $entity10Permalink = null,
+        bool $withCollision = false,
     ): RequestHandlerInterface {
         $entityTypes = new InMemoryEntityTypeRepository([
             new EntityType(name: 'Article', slug: 'article', id: 1),
         ]);
-        $entities = new InMemoryEntityRepository([
+        $entityRecords = [
             new Entity(
                 id: 10,
                 entityTypeId: 1,
                 slug: 'hello-world',
+                permalink: $entity10Permalink,
                 status: EntityStatus::Published,
                 publishedAt: new DateTimeImmutable('2026-01-15T00:00:00+00:00'),
                 updatedAt: new DateTimeImmutable('2026-02-20T00:00:00+00:00'),
                 metaDescription: 'A short summary.',
             ),
-        ]);
-        $fieldDefs = new InMemoryFieldDefRepository([
-            new FieldDef(entityTypeId: 1, fieldKey: 'title', dataType: 'text', id: 1),
-            new FieldDef(entityTypeId: 1, fieldKey: 'body', dataType: 'text', id: 2),
-            new FieldDef(entityTypeId: 1, fieldKey: 'hero', dataType: 'image', id: 3),
-            new FieldDef(entityTypeId: 1, fieldKey: 'richbody', dataType: 'html', id: 4),
-        ]);
-        $textFields = new InMemoryTextFieldRepository([
+        ];
+        $textFieldRecords = [
             new TextField(entityId: 10, fieldKey: 'title', value: 'Hello world', id: 1),
             new TextField(entityId: 10, fieldKey: 'body', value: "## Sample\n\n**bold** line", id: 2),
             new TextField(entityId: 10, fieldKey: 'hero', value: '/media/2026/06/hero.png', id: 3),
@@ -100,7 +98,30 @@ final class PublicRecordHttpTest extends TestCase
             ),
             // German title variant for the content-locale negotiation tests (#540).
             new TextField(entityId: 10, fieldKey: 'title', value: 'Hallo Welt', id: 5, locale: 'de'),
-        ], $entities);
+        ];
+
+        // A second published record whose CUSTOM permalink collides with record 10's
+        // type-based id path (/article/10), to assert custom-permalink precedence (#651).
+        if ($withCollision) {
+            $entityRecords[] = new Entity(
+                id: 11,
+                entityTypeId: 1,
+                slug: 'winner',
+                permalink: '/article/10',
+                status: EntityStatus::Published,
+                publishedAt: new DateTimeImmutable('2026-03-01T00:00:00+00:00'),
+            );
+            $textFieldRecords[] = new TextField(entityId: 11, fieldKey: 'title', value: 'Collision Winner', id: 6);
+        }
+
+        $entities = new InMemoryEntityRepository($entityRecords);
+        $fieldDefs = new InMemoryFieldDefRepository([
+            new FieldDef(entityTypeId: 1, fieldKey: 'title', dataType: 'text', id: 1),
+            new FieldDef(entityTypeId: 1, fieldKey: 'body', dataType: 'text', id: 2),
+            new FieldDef(entityTypeId: 1, fieldKey: 'hero', dataType: 'image', id: 3),
+            new FieldDef(entityTypeId: 1, fieldKey: 'richbody', dataType: 'html', id: 4),
+        ]);
+        $textFields = new InMemoryTextFieldRepository($textFieldRecords, $entities);
 
         $publicSettings = new ListPublicSettingsUseCase(new InMemorySettingRepository($settingDefs), new InMemoryMediaRepository());
 
@@ -140,10 +161,11 @@ final class PublicRecordHttpTest extends TestCase
         );
 
         $renderHandler = new RenderPublicRecordViewHandler($useCase, $publicSettings, $htmlResponse, $config, $projectRoot, $this->factory, new PublicHtmlSanitizer(), $basePath);
+        $customPermalink = new RenderCustomPermalinkHandler($entities, $entityTypes, $renderHandler);
         $registrar = new PublicRecordRouteRegistrar(
             new GetPublicRecordViewHandler($useCase, $jsonResponse, $this->factory),
             $renderHandler,
-            new RenderPublicPermalinkHandler($entityTypes, $renderHandler),
+            new RenderPublicPermalinkHandler($entityTypes, $renderHandler, $customPermalink),
             new RenderSitemapHandler(
                 new GenerateSitemapUseCase($entityTypes, $entities),
                 $this->factory,
@@ -486,6 +508,73 @@ final class PublicRecordHttpTest extends TestCase
         );
 
         self::assertSame(404, $response->getStatusCode());
+    }
+
+    public function testCustomPermalinkResolvesViaCatchAllRoute(): void
+    {
+        // Record 10 carries a custom permalink whose first segment ("company") is not
+        // an entity type, so type-based resolution would 404 — the custom-permalink
+        // lookup in the catch-all handler resolves it instead (#651).
+        $app = $this->buildApplication(true, $this->projectRoot, [], '', '/company/about');
+
+        $response = $app->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/company/about'),
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertStringContainsString('<h1>Hello world</h1>', (string) $response->getBody());
+    }
+
+    public function testCustomPermalinkIsCanonicalAndTypeRouteStillServes(): void
+    {
+        // Output resolution: with a custom permalink set, the type-based URL still
+        // serves the record but the canonical/og:url point at the custom permalink.
+        $app = $this->buildApplication(true, $this->projectRoot, [], '', '/company/about');
+
+        $response = $app->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/article/10'),
+        );
+        $html = (string) $response->getBody();
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertStringContainsString('<h1>Hello world</h1>', $html);
+        self::assertStringContainsString(
+            '<link rel="canonical" href="https://example.test/company/about" />',
+            $html,
+        );
+        self::assertStringContainsString('content="https://example.test/company/about"', $html);
+    }
+
+    public function testCustomPermalinkWinsOverCollidingTypeRoute(): void
+    {
+        // Record 11's custom permalink "/article/10" collides with record 10's
+        // type-based id path. The conscious precedence is: custom permalink wins.
+        $app = $this->buildApplication(true, $this->projectRoot, [], '', null, true);
+
+        $response = $app->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/article/10'),
+        );
+        $html = (string) $response->getBody();
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertStringContainsString('<h1>Collision Winner</h1>', $html);
+        self::assertStringNotContainsString('<h1>Hello world</h1>', $html);
+    }
+
+    public function testTypeRouteUnchangedForRecordsWithoutPermalink(): void
+    {
+        // No-permalink record keeps the existing type/id behaviour (no regression).
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/article/10'),
+        );
+        $html = (string) $response->getBody();
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertStringContainsString('<h1>Hello world</h1>', $html);
+        self::assertStringContainsString(
+            '<link rel="canonical" href="https://example.test/article/10" />',
+            $html,
+        );
     }
 
     public function testDevModeWrapsSsrContentInRootAndLoadsViteClient(): void

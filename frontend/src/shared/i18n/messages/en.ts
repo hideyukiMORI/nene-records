@@ -859,6 +859,16 @@ export const en = {
   'admin.entityStatus.publishedAt': 'Published {{date}}',
   'admin.entityStatus.updateError': 'Failed to update status.',
   'admin.entityStatus.slugError': 'Failed to save slug. It may already be used by another record.',
+  'admin.entityStatus.showAdvanced': 'Advanced: custom URL',
+  'admin.entityStatus.hideAdvanced': 'Hide advanced',
+  'admin.entityStatus.permalinkLabel': 'Custom permalink',
+  'admin.entityStatus.permalinkHelp':
+    'Optional. A fixed URL path for this record (e.g. /company/about/team). Leave empty to use the default URL.',
+  'admin.entityStatus.permalinkPlaceholder': 'e.g. /company/about/team',
+  'admin.entityStatus.savePermalink': 'Save permalink',
+  'admin.entityStatus.permalinkSaved': 'Permalink saved.',
+  'admin.entityStatus.permalinkError':
+    'Failed to save permalink. It may already be used or use a reserved prefix.',
   'admin.entityStatus.status.draft': 'Draft',
   'admin.entityStatus.status.published': 'Published',
   'admin.entityStatus.status.archived': 'Archived',

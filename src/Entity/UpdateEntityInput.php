@@ -18,6 +18,8 @@ final readonly class UpdateEntityInput
         public ?string $metaDescription = null,
         public ?DateTimeImmutable $scheduledAt = null,
         public ?string $layout = null,
+        /** Normalized custom permalink, or null to use the type pattern (#651). */
+        public ?string $permalink = null,
     ) {
     }
 }

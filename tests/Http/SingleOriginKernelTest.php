@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace NeNeRecords\Tests\Http;
 
+use NeNeRecords\Http\CustomPermalinkResolver;
+use NeNeRecords\Http\PublicPermalinkRendererInterface;
 use NeNeRecords\Http\SingleOriginKernel;
 use NeNeRecords\Http\SpaShellFallback;
 use NeNeRecords\Tests\UrlRedirect\InMemoryUrlRedirectRepository;
@@ -57,13 +59,25 @@ final class SingleOriginKernelTest extends TestCase
         };
     }
 
-    private function kernel(RequestHandlerInterface $app): SingleOriginKernel
+    private function kernel(RequestHandlerInterface $app, ?CustomPermalinkResolver $customPermalink = null): SingleOriginKernel
     {
         return new SingleOriginKernel(
             $app,
+            $customPermalink ?? new CustomPermalinkResolver($this->nullPermalinkRenderer()),
             new UrlRedirectResolver($this->redirects, $this->factory),
             new SpaShellFallback($this->shellPath, $this->factory, $this->factory),
         );
+    }
+
+    /** A renderer that never matches — the default for tests not exercising permalinks. */
+    private function nullPermalinkRenderer(): PublicPermalinkRendererInterface
+    {
+        return new class () implements PublicPermalinkRendererInterface {
+            public function renderByPermalink(string $path, ServerRequestInterface $request): ?ResponseInterface
+            {
+                return null;
+            }
+        };
     }
 
     public function testPassesThroughNon404Responses(): void
@@ -110,5 +124,66 @@ final class SingleOriginKernelTest extends TestCase
         $response = $this->kernel($this->appReturning(404))->handle($request);
 
         self::assertSame(404, $response->getStatusCode());
+    }
+
+    public function testCustomPermalinkResolvesDeepPathOn404(): void
+    {
+        // A 3-segment custom permalink matches no fixed-arity catch-all route, so the
+        // app 404s; the custom-permalink edge layer then serves the record (#651).
+        $factory = $this->factory;
+        $renderer = new class ($factory) implements PublicPermalinkRendererInterface {
+            public function __construct(private Psr17Factory $factory)
+            {
+            }
+
+            public function renderByPermalink(string $path, ServerRequestInterface $request): ?ResponseInterface
+            {
+                return $path === '/company/about/team'
+                    ? $this->factory->createResponse(200)->withHeader('X-Resolved', 'custom-permalink')
+                    : null;
+            }
+        };
+
+        $response = $this->kernel($this->appReturning(404), new CustomPermalinkResolver($renderer))
+            ->handle($this->factory->createServerRequest('GET', 'https://site.test/company/about/team'));
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('custom-permalink', $response->getHeaderLine('X-Resolved'));
+    }
+
+    public function testCustomPermalinkTakesPrecedenceOverRedirectOn404(): void
+    {
+        // A live record at the path wins over a stale 301 whose source equals it.
+        $this->redirects->save('/company/about/team', '/somewhere-else');
+        $factory = $this->factory;
+        $renderer = new class ($factory) implements PublicPermalinkRendererInterface {
+            public function __construct(private Psr17Factory $factory)
+            {
+            }
+
+            public function renderByPermalink(string $path, ServerRequestInterface $request): ?ResponseInterface
+            {
+                return $path === '/company/about/team' ? $this->factory->createResponse(200) : null;
+            }
+        };
+
+        $response = $this->kernel($this->appReturning(404), new CustomPermalinkResolver($renderer))
+            ->handle($this->factory->createServerRequest('GET', 'https://site.test/company/about/team'));
+
+        self::assertSame(200, $response->getStatusCode());
+    }
+
+    public function testCustomPermalinkLayerFallsThroughToShellWhenNoMatch(): void
+    {
+        // No record claims the path → the layer passes through to the SPA shell, so
+        // ordinary client routes are never hijacked.
+        $request = $this->factory
+            ->createServerRequest('GET', 'https://site.test/admin/dashboard')
+            ->withHeader('Accept', 'text/html');
+
+        $response = $this->kernel($this->appReturning(404))->handle($request);
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertStringContainsString('id="root"', (string) $response->getBody());
     }
 }

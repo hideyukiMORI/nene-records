@@ -10,6 +10,28 @@ use PHPUnit\Framework\TestCase;
 
 final class PublicPermalinkResolverTest extends TestCase
 {
+    public function testCanonicalPathUsesCustomPermalinkVerbatimWhenSet(): void
+    {
+        // A non-empty custom permalink overrides the type pattern entirely (#651).
+        self::assertSame(
+            '/company/about/team',
+            PublicPermalinkResolver::canonicalPath('/company/about/team', '/{type}/{slug}', 'posts', 'my-article', 42, null),
+        );
+    }
+
+    public function testCanonicalPathFallsBackToPatternWhenPermalinkAbsent(): void
+    {
+        self::assertSame(
+            '/posts/my-article',
+            PublicPermalinkResolver::canonicalPath(null, '/{type}/{slug}', 'posts', 'my-article', 42, null),
+        );
+        // Empty string is treated as "no custom permalink" → default pattern.
+        self::assertSame(
+            '/posts/42',
+            PublicPermalinkResolver::canonicalPath('', null, 'posts', null, 42, null),
+        );
+    }
+
     public function testNullPatternFallsBackToDefaultTypeId(): void
     {
         self::assertSame(
