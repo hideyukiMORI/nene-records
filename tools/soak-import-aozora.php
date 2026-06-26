@@ -40,12 +40,16 @@ declare(strict_types=1);
  *   --email= --password=   admin login for http mode (or env NENE_INSTALL_ADMIN_*)
  *   --org=slug             tenant slug for direct mode (default env ORG_SLUG or "aozora")
  *   --person=000148        Aozora person id to import (default 000148 = 夏目漱石)
+ *   --work=752,789         restrict to these workIds (comma-separated; default all)
  *   --limit=N              max works (0 = all; default 8)
  *   --type-slug=work       target entity-type slug (default "work")
  *   --type-name=作品        target entity-type display name (default "作品")
  *   --body-type=markdown   field type for the body (markdown|html|text; default markdown)
  *   --delay=0.7            seconds between HTTP API calls in http mode (default 0.7 ⇒ ~1.4 req/s)
  *   --dry                  fetch + parse + report only; create nothing
+ *   --chapters             split works with >= 2 detected 見出し chapters into a 目次
+ *                          (index) record + one record per chapter (series/chapter_no/
+ *                          chapter_total + slug permalinks); single-record otherwise
  */
 
 // Autoload is only required for --mode=direct. Load it when present so the script
@@ -65,10 +69,14 @@ use NeNeRecords\Entity\UpdateEntityUseCaseInterface;
 use NeNeRecords\EntityType\CreateEntityTypeInput;
 use NeNeRecords\EntityType\CreateEntityTypeUseCaseInterface;
 use NeNeRecords\EntityType\EntityTypeRepositoryInterface;
+use NeNeRecords\EntityType\UpdateEntityTypeInput;
+use NeNeRecords\EntityType\UpdateEntityTypeUseCaseInterface;
 use NeNeRecords\FieldDef\CreateFieldDefInput;
 use NeNeRecords\FieldDef\CreateFieldDefUseCaseInterface;
 use NeNeRecords\FieldDef\FieldDefRepositoryInterface;
 use NeNeRecords\Http\RuntimeContainerFactory;
+use NeNeRecords\IntField\CreateIntFieldInput;
+use NeNeRecords\IntField\CreateIntFieldUseCaseInterface;
 use NeNeRecords\Organization\OrganizationRepositoryInterface;
 use NeNeRecords\TextField\CreateTextFieldInput;
 use NeNeRecords\TextField\CreateTextFieldUseCaseInterface;
@@ -78,11 +86,91 @@ use NeNeRecords\TextField\CreateTextFieldUseCaseInterface;
 final class AozoraParser
 {
     /**
+     * A 大/中/小見出し heading annotation. Aozora marks chapter titles like
+     * `［＃５字下げ］一［＃「一」は中見出し］` — the reliable signal is this
+     * annotation, NOT the bare word 見出し (which also occurs in prose).
+     */
+    private const HEADING_RE = '/［＃「[^」]*」は(?:大|中|小)見出し］/u';
+
+    /** Bare numeric chapter labels (CJK or arabic) → rendered as 第{label}章. */
+    private const NUMERAL_RE = '/^[0-9０-９一二三四五六七八九十百千〇零]+$/u';
+
+    /**
      * Convert a raw Shift_JIS Aozora .txt into clean (title, author, body, stats).
      *
      * @return array{title:string,author:string,body:string,paragraphs:int,chars:int}
      */
     public static function parse(string $rawShiftJis): array
+    {
+        $region = self::region($rawShiftJis);
+        $body = self::joinParas($region['lines']);
+
+        return [
+            'title' => $region['title'],
+            'author' => $region['author'],
+            'body' => $body,
+            'paragraphs' => $body === '' ? 0 : count(explode("\n\n", $body)),
+            'chars' => mb_strlen($body, 'UTF-8'),
+        ];
+    }
+
+    /**
+     * Split a work into chapters at 大/中/小見出し headings. The text before the
+     * first heading is the work intro (for the 目次 record). Each chapter keeps
+     * its visible heading label (e.g. "一", "十一") and its own body.
+     *
+     * @return array{title:string,author:string,intro:string,chapters:list<array{label:string,body:string,chars:int}>}
+     */
+    public static function parseChapters(string $rawShiftJis): array
+    {
+        $region = self::region($rawShiftJis);
+        $lines = $region['lines'];
+
+        $headings = [];
+        foreach ($lines as $i => $line) {
+            if (preg_match(self::HEADING_RE, $line) === 1) {
+                $headings[] = $i;
+            }
+        }
+
+        $firstHeading = $headings === [] ? count($lines) : $headings[0];
+        $intro = self::joinParas(array_slice($lines, 0, $firstHeading));
+
+        $chapters = [];
+        $count = count($headings);
+        for ($k = 0; $k < $count; $k++) {
+            $start = $headings[$k];
+            $end = $k + 1 < $count ? $headings[$k + 1] : count($lines);
+            $label = trim(self::stripInline($lines[$start]));
+            $body = self::joinParas(array_slice($lines, $start + 1, $end - $start - 1));
+            $chapters[] = [
+                'label' => $label,
+                'body' => $body,
+                'chars' => mb_strlen($body, 'UTF-8'),
+            ];
+        }
+
+        return [
+            'title' => $region['title'],
+            'author' => $region['author'],
+            'intro' => $intro,
+            'chapters' => $chapters,
+        ];
+    }
+
+    /** True when a heading label is a bare numeral that reads well as 第{label}章. */
+    public static function isNumeralLabel(string $label): bool
+    {
+        return $label !== '' && preg_match(self::NUMERAL_RE, $label) === 1;
+    }
+
+    /**
+     * Extract title/author and the body region (raw lines, annotations intact so
+     * chapter headings remain detectable). Shared by parse() and parseChapters().
+     *
+     * @return array{title:string,author:string,lines:list<string>}
+     */
+    private static function region(string $rawShiftJis): array
     {
         $utf8 = mb_convert_encoding($rawShiftJis, 'UTF-8', 'SJIS-win');
         $utf8 = str_replace(["\r\n", "\r"], "\n", $utf8);
@@ -120,22 +208,30 @@ final class AozoraParser
             }
         }
 
+        return [
+            'title' => $title,
+            'author' => $author,
+            'lines' => array_values(array_slice($lines, $bodyStart, $bodyEnd - $bodyStart)),
+        ];
+    }
+
+    /**
+     * Strip annotations + ruby per line, drop blanks, join paragraphs with a
+     * blank line (markdown paragraph break).
+     *
+     * @param list<string> $lines
+     */
+    private static function joinParas(array $lines): string
+    {
         $paras = [];
-        foreach (array_slice($lines, $bodyStart, $bodyEnd - $bodyStart) as $l) {
+        foreach ($lines as $l) {
             $c = trim(self::stripInline($l));
             if ($c !== '') {
                 $paras[] = $c;
             }
         }
-        $body = implode("\n\n", $paras);
 
-        return [
-            'title' => $title,
-            'author' => $author,
-            'body' => $body,
-            'paragraphs' => count($paras),
-            'chars' => mb_strlen($body, 'UTF-8'),
-        ];
+        return implode("\n\n", $paras);
     }
 
     /** Strip annotations ［＃…］ / ※［＃…］, ruby readings 《…》, and ruby markers ｜. */
@@ -261,6 +357,11 @@ interface ImportBackend
 
     public function setTextField(int $entityId, string $fieldKey, string $value): void;
 
+    public function setIntField(int $entityId, string $fieldKey, int $value): void;
+
+    /** Ensure the entity type uses the given permalink pattern (idempotent). */
+    public function ensurePermalinkPattern(int $typeId, string $name, string $slug, string $pattern): void;
+
     public function publish(int $entityId, int $typeId, string $slug, string $metaTitle, string $metaDescription): void;
 
     public function apiCallCount(): int;
@@ -373,6 +474,36 @@ final class HttpBackend implements ImportBackend
         ]);
     }
 
+    public function setIntField(int $entityId, string $fieldKey, int $value): void
+    {
+        $this->ok('POST', '/api/v1/int-fields', [
+            'entity_id' => $entityId,
+            'field_key' => $fieldKey,
+            'value' => $value,
+        ]);
+    }
+
+    public function ensurePermalinkPattern(int $typeId, string $name, string $slug, string $pattern): void
+    {
+        $list = $this->ok('GET', '/api/v1/entity-types?limit=100&offset=0');
+        $current = null;
+        foreach ($list['items'] ?? [] as $it) {
+            if ((int) ($it['id'] ?? 0) === $typeId) {
+                $current = $it['permalink_pattern'] ?? null;
+                break;
+            }
+        }
+        if ($current === $pattern) {
+            return;
+        }
+        $this->ok('PUT', "/api/v1/entity-types/{$typeId}", [
+            'name' => $name,
+            'slug' => $slug,
+            'is_pinned' => true,
+            'permalink_pattern' => $pattern,
+        ]);
+    }
+
     public function publish(int $entityId, int $typeId, string $slug, string $metaTitle, string $metaDescription): void
     {
         $this->ok('PUT', "/api/v1/entities/{$entityId}", [
@@ -446,9 +577,11 @@ final class HttpBackend implements ImportBackend
 final class DirectBackend implements ImportBackend
 {
     private CreateEntityTypeUseCaseInterface $createType;
+    private UpdateEntityTypeUseCaseInterface $updateType;
     private CreateFieldDefUseCaseInterface $createFieldDef;
     private CreateEntityUseCaseInterface $createEntity;
     private CreateTextFieldUseCaseInterface $createText;
+    private CreateIntFieldUseCaseInterface $createInt;
     private UpdateEntityUseCaseInterface $updateEntity;
     private EntityTypeRepositoryInterface $types;
     private EntityRepositoryInterface $entities;
@@ -467,9 +600,11 @@ final class DirectBackend implements ImportBackend
         $holder->set($org->id);
 
         $this->createType = $container->get(CreateEntityTypeUseCaseInterface::class);
+        $this->updateType = $container->get(UpdateEntityTypeUseCaseInterface::class);
         $this->createFieldDef = $container->get(CreateFieldDefUseCaseInterface::class);
         $this->createEntity = $container->get(CreateEntityUseCaseInterface::class);
         $this->createText = $container->get(CreateTextFieldUseCaseInterface::class);
+        $this->createInt = $container->get(CreateIntFieldUseCaseInterface::class);
         $this->updateEntity = $container->get(UpdateEntityUseCaseInterface::class);
         $this->types = $container->get(EntityTypeRepositoryInterface::class);
         $this->entities = $container->get(EntityRepositoryInterface::class);
@@ -511,6 +646,26 @@ final class DirectBackend implements ImportBackend
         $this->createText->execute(new CreateTextFieldInput($entityId, $fieldKey, $value));
     }
 
+    public function setIntField(int $entityId, string $fieldKey, int $value): void
+    {
+        $this->createInt->execute(new CreateIntFieldInput($entityId, $fieldKey, $value));
+    }
+
+    public function ensurePermalinkPattern(int $typeId, string $name, string $slug, string $pattern): void
+    {
+        $type = $this->types->findById($typeId);
+        if ($type === null || $type->permalinkPattern === $pattern) {
+            return;
+        }
+        $this->updateType->execute(new UpdateEntityTypeInput(
+            id: $typeId,
+            name: $name,
+            slug: $slug,
+            isPinned: true,
+            permalinkPattern: $pattern,
+        ));
+    }
+
     public function publish(int $entityId, int $typeId, string $slug, string $metaTitle, string $metaDescription): void
     {
         $this->updateEntity->execute(new UpdateEntityInput(
@@ -541,6 +696,9 @@ final class Importer
         private readonly string $typeName,
         private readonly string $bodyType,
         private readonly bool $dry,
+        private readonly bool $chapters = false,
+        /** @var list<string> Restrict to these workIds (empty = all). */
+        private readonly array $workFilter = [],
     ) {
     }
 
@@ -548,6 +706,13 @@ final class Importer
     {
         $works = AozoraSource::listWorks($this->person);
         fprintf(STDERR, "Found %d works for person %s.\n", count($works), $this->person);
+        if ($this->workFilter !== []) {
+            $works = array_values(array_filter(
+                $works,
+                fn (array $w): bool => in_array($w['workId'], $this->workFilter, true),
+            ));
+            fprintf(STDERR, "Filtered to %d work(s): %s\n", count($works), implode(',', $this->workFilter));
+        }
         if ($limit > 0) {
             $works = array_slice($works, 0, $limit);
         }
@@ -558,10 +723,18 @@ final class Importer
             $this->backend->ensureFieldDef($typeId, 'title', 'text');
             $this->backend->ensureFieldDef($typeId, 'author', 'text');
             $this->backend->ensureFieldDef($typeId, 'body', $this->bodyType);
-            fprintf(STDERR, "Entity type '%s' (#%d) ready with fields title/author/body.\n", $this->typeSlug, $typeId);
+            if ($this->chapters) {
+                // Chapter records carry the work slug + position; a slug permalink
+                // lets the derived chapter nav resolve sibling URLs with no fetch.
+                $this->backend->ensureFieldDef($typeId, 'series', 'text');
+                $this->backend->ensureFieldDef($typeId, 'chapter_no', 'int');
+                $this->backend->ensureFieldDef($typeId, 'chapter_total', 'int');
+                $this->backend->ensurePermalinkPattern($typeId, $this->typeName, $this->typeSlug, '/{type}/{slug}');
+            }
+            fprintf(STDERR, "Entity type '%s' (#%d) ready with fields title/author/body%s.\n", $this->typeSlug, $typeId, $this->chapters ? '/series/chapter_no/chapter_total (slug permalinks)' : '');
         }
 
-        $created = $skipped = $failed = 0;
+        $created = $skipped = $failed = $records = 0;
         $t0 = microtime(true);
         printf("%-14s %-26s %8s %8s %8s %8s  %s\n", 'workId', 'title', 'chars', 'fetchms', 'writems', 'status', 'slug');
 
@@ -572,6 +745,8 @@ final class Importer
             $fetchMs = $writeMs = 0.0;
             $status = 'ok';
             try {
+                // Idempotent at the work level: once the work slug (single record,
+                // or the 目次/index record in chapter mode) exists, skip the work.
                 if (!$this->dry && $this->backend->findEntityIdBySlug($slug, $typeId) !== null) {
                     $skipped++;
                     $status = 'skip';
@@ -581,14 +756,41 @@ final class Importer
 
                 $fs = microtime(true);
                 $raw = AozoraSource::fetchRawText($this->person, $w['base']);
-                $parsed = AozoraParser::parse($raw);
                 $fetchMs = (microtime(true) - $fs) * 1000;
+
+                // Chapter split: a work with >= 2 detected 見出し headings becomes a
+                // 目次 record + one record per chapter; otherwise single-record.
+                if ($this->chapters) {
+                    $pc = AozoraParser::parseChapters($raw);
+                    if (count($pc['chapters']) >= 2) {
+                        $title = $pc['title'];
+                        $n = count($pc['chapters']);
+                        $chars = (int) array_sum(array_map(static fn (array $c): int => $c['chars'], $pc['chapters']));
+
+                        if ($this->dry) {
+                            printf("%-14s %-26s %8d %8.0f %8s %8s  %s\n", $w['workId'], self::clip($title), $chars, $fetchMs, '-', 'dry/' . $n . 'ch', $slug);
+                            $created++;
+                            $records += $n + 1;
+                            continue;
+                        }
+
+                        $ws = microtime(true);
+                        $records += $this->writeChapteredWork($typeId, $slug, $pc);
+                        $writeMs = (microtime(true) - $ws) * 1000;
+                        $created++;
+                        printf("%-14s %-26s %8d %8.0f %8.0f %8s  %s\n", $w['workId'], self::clip($title), $chars, $fetchMs, $writeMs, 'split/' . $n . 'ch', $slug);
+                        continue;
+                    }
+                }
+
+                $parsed = AozoraParser::parse($raw);
                 $title = $parsed['title'];
                 $chars = $parsed['chars'];
 
                 if ($this->dry) {
                     printf("%-14s %-26s %8d %8.0f %8s %8s  %s\n", $w['workId'], self::clip($title), $chars, $fetchMs, '-', 'dry', $slug);
                     $created++;
+                    $records++;
                     continue;
                 }
 
@@ -602,6 +804,7 @@ final class Importer
                 $writeMs = (microtime(true) - $ws) * 1000;
 
                 $created++;
+                $records++;
                 printf("%-14s %-26s %8d %8.0f %8.0f %8s  %s\n", $w['workId'], self::clip($title), $chars, $fetchMs, $writeMs, $status, $slug);
             } catch (Throwable $e) {
                 $failed++;
@@ -613,14 +816,105 @@ final class Importer
 
         $elapsed = microtime(true) - $t0;
         printf(
-            "\nDone in %.1fs — created=%d skipped=%d failed=%d ; API calls=%d (%.2f req/s)\n",
+            "\nDone in %.1fs — works created=%d skipped=%d failed=%d ; records written=%d ; API calls=%d (%.2f req/s)\n",
             $elapsed,
             $created,
             $skipped,
             $failed,
+            $records,
             $this->backend->apiCallCount(),
             $this->backend->apiCallCount() > 0 ? $this->backend->apiCallCount() / max($elapsed, 0.001) : 0.0,
         );
+    }
+
+    /**
+     * Write a multi-chapter work: a 目次 (index) record listing every chapter,
+     * plus one published record per chapter carrying series/chapter_no/chapter_total.
+     * Idempotent per record.
+     *
+     * @param array{title:string,author:string,intro:string,chapters:list<array{label:string,body:string,chars:int}>} $pc
+     * @return int number of records actually written (0..N+1)
+     */
+    private function writeChapteredWork(int $typeId, string $workSlug, array $pc): int
+    {
+        $workTitle = $pc['title'];
+        $author = $pc['author'];
+        $chapters = $pc['chapters'];
+        $total = count($chapters);
+
+        // 目次 body = work intro + an ordered, linked chapter list.
+        $links = [];
+        foreach ($chapters as $k => $ch) {
+            $no = $k + 1;
+            $chapterSlug = sprintf('%s-%d', $workSlug, $no);
+            $title = $this->chapterTitle($workTitle, $ch['label'], $no);
+            $links[] = sprintf('%d. [%s](/%s/%s)', $no, $title, $this->typeSlug, $chapterSlug);
+        }
+        $intro = $pc['intro'] !== '' ? $pc['intro'] . "\n\n" : '';
+        $indexBody = trim($intro . "## 目次\n\n" . implode("\n", $links));
+
+        $written = $this->ensureRecord(
+            $typeId,
+            $workSlug,
+            ['title' => $workTitle, 'author' => $author, 'body' => $indexBody],
+            [],
+            $workTitle,
+            sprintf('%s — 全%d章', $workTitle, $total),
+        );
+
+        foreach ($chapters as $k => $ch) {
+            $no = $k + 1;
+            $chapterSlug = sprintf('%s-%d', $workSlug, $no);
+            $title = $this->chapterTitle($workTitle, $ch['label'], $no);
+            $excerpt = mb_substr(str_replace("\n", ' ', $ch['body']), 0, 140, 'UTF-8');
+            $written += $this->ensureRecord(
+                $typeId,
+                $chapterSlug,
+                ['title' => $title, 'author' => $author, 'body' => $ch['body'], 'series' => $workSlug],
+                ['chapter_no' => $no, 'chapter_total' => $total],
+                $title,
+                $excerpt,
+            );
+        }
+
+        return $written;
+    }
+
+    /**
+     * Create + publish one record, idempotently (skip if its slug already exists).
+     *
+     * @param array<string, string> $texts
+     * @param array<string, int>    $ints
+     * @return int 1 if written, 0 if skipped
+     */
+    private function ensureRecord(int $typeId, string $slug, array $texts, array $ints, string $metaTitle, string $metaDescription): int
+    {
+        if ($this->backend->findEntityIdBySlug($slug, $typeId) !== null) {
+            return 0;
+        }
+        $entityId = $this->backend->createEntity($typeId, $slug);
+        foreach ($texts as $key => $value) {
+            $this->backend->setTextField($entityId, $key, $value);
+        }
+        foreach ($ints as $key => $value) {
+            $this->backend->setIntField($entityId, $key, $value);
+        }
+        $this->backend->publish($entityId, $typeId, $slug, $metaTitle, $metaDescription);
+
+        return 1;
+    }
+
+    /** Build a chapter record title, e.g. "坊っちゃん 第三章" (numeral) or "坊っちゃん 出発" (named). */
+    private function chapterTitle(string $workTitle, string $label, int $no): string
+    {
+        if ($label === '') {
+            return sprintf('%s 第%d章', $workTitle, $no);
+        }
+        if (AozoraParser::isNumeralLabel($label)) {
+            return sprintf('%s 第%s章', $workTitle, $label);
+        }
+
+        return sprintf('%s %s', $workTitle, $label);
     }
 
     private static function clip(string $s): string
@@ -631,9 +925,15 @@ final class Importer
 
 /* ============================== main ============================== */
 
+// Allow this file to be required (e.g. by a test/validation harness) without
+// running the importer: only execute the CLI flow when invoked directly.
+if ((realpath((string) ($_SERVER['SCRIPT_FILENAME'] ?? '')) ?: '') !== __FILE__) {
+    return;
+}
+
 $opts = getopt('', [
     'mode::', 'base::', 'email::', 'password::', 'org::', 'person::',
-    'limit::', 'type-slug::', 'type-name::', 'body-type::', 'delay::', 'dry',
+    'limit::', 'type-slug::', 'type-name::', 'body-type::', 'delay::', 'dry', 'chapters', 'work::',
 ]);
 
 $mode = (string) ($opts['mode'] ?? 'http');
@@ -643,6 +943,10 @@ $typeSlug = (string) ($opts['type-slug'] ?? 'work');
 $typeName = (string) ($opts['type-name'] ?? '作品');
 $bodyType = (string) ($opts['body-type'] ?? 'markdown');
 $dry = array_key_exists('dry', $opts);
+$chapters = array_key_exists('chapters', $opts);
+$workFilter = isset($opts['work']) && (string) $opts['work'] !== ''
+    ? array_values(array_filter(array_map('trim', explode(',', (string) $opts['work']))))
+    : [];
 
 try {
     if ($dry) {
@@ -671,6 +975,14 @@ try {
             {
             }
 
+            public function setIntField(int $entityId, string $fieldKey, int $value): void
+            {
+            }
+
+            public function ensurePermalinkPattern(int $typeId, string $name, string $slug, string $pattern): void
+            {
+            }
+
             public function publish(int $entityId, int $typeId, string $slug, string $metaTitle, string $metaDescription): void
             {
             }
@@ -695,7 +1007,7 @@ try {
         $backend = $http;
     }
 
-    (new Importer($backend, $person, $typeSlug, $typeName, $bodyType, $dry))->run($limit);
+    (new Importer($backend, $person, $typeSlug, $typeName, $bodyType, $dry, $chapters, $workFilter))->run($limit);
 } catch (Throwable $e) {
     fwrite(STDERR, 'IMPORT FAILED: ' . $e->getMessage() . "\n");
     exit(1);

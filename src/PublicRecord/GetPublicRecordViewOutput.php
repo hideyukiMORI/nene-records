@@ -23,6 +23,7 @@ final readonly class GetPublicRecordViewOutput
         public ?string $updatedAtIso,
         public array $bootstrap,
         public array $displayFields,
+        public ?PublicRecordChapterNav $chapterNav = null,
     ) {
     }
 }

@@ -6202,6 +6202,7 @@ components:
         - entityRelations
         - relationTextFieldsByEntityTypeId
         - publicSettings
+        - chapterNav
       properties:
         entityTypeSlug:
           type: string
@@ -6238,6 +6239,41 @@ components:
             $ref: '#/components/schemas/TextFieldListResponse'
         publicSettings:
           $ref: '#/components/schemas/PublicSettingListResponse'
+        chapterNav:
+          description: 'Derived chapter navigation when this record is one chapter of a multi-chapter work; null otherwise.'
+          anyOf:
+            - $ref: '#/components/schemas/PublicRecordChapterNav'
+            - type: 'null'
+      additionalProperties: false
+    PublicRecordChapterNav:
+      type: object
+      required:
+        - indexUrl
+        - prevUrl
+        - nextUrl
+        - chapterNo
+        - chapterTotal
+      properties:
+        indexUrl:
+          type: string
+          minLength: 1
+          description: 'URL of the work''s 目次 (index) record — the canonical front door.'
+        prevUrl:
+          type:
+            - string
+            - 'null'
+          description: 'URL of the previous chapter, or null on the first chapter.'
+        nextUrl:
+          type:
+            - string
+            - 'null'
+          description: 'URL of the next chapter, or null on the last chapter.'
+        chapterNo:
+          type: integer
+          minimum: 1
+        chapterTotal:
+          type: integer
+          minimum: 1
       additionalProperties: false
     PublicRecordRelationQuery:
       type: object

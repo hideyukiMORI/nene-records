@@ -6,5 +6,6 @@ export type {
   PublicRelationFieldRow,
   PublicScalarFieldDisplay,
 } from './hooks/use-public-view-entity-record-page'
+export { ChapterNav } from './ui/ChapterNav'
 export { PublicRecordDetailView } from './ui/PublicRecordDetailView'
 export { PublicRecordRegionGrid } from './ui/PublicRecordRegionGrid'

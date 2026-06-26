@@ -5,6 +5,7 @@ interface EntityTypeRecord {
   name: string
   slug: string
   is_pinned: boolean
+  permalink_pattern?: string | null
 }
 
 let nextId = 1
@@ -16,7 +17,13 @@ export function resetEntityTypeStore(): void {
 }
 
 export function seedEntityTypes(
-  seed: { id: number; name: string; slug: string; is_pinned?: boolean }[],
+  seed: {
+    id: number
+    name: string
+    slug: string
+    is_pinned?: boolean
+    permalink_pattern?: string | null
+  }[],
 ): void {
   items = seed.map((item) => ({ ...item, is_pinned: item.is_pinned ?? false }))
   nextId = Math.max(0, ...seed.map((item) => item.id)) + 1

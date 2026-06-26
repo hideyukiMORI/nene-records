@@ -1348,6 +1348,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/themes/{key}/activate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Activate a theme
+         * @description Makes a theme live for the calling organization. Verifies the key resolves to a built-in theme id or an existing runtime theme, then sets the `active_theme` setting. Returns 404 if no such theme exists.
+         */
+        post: operations["activateTheme"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/public/menus": {
         parameters: {
             query?: never;
@@ -2461,6 +2481,18 @@ export interface components {
                 [key: string]: components["schemas"]["TextFieldListResponse"];
             };
             publicSettings: components["schemas"]["PublicSettingListResponse"];
+            /** @description Derived chapter navigation when this record is one chapter of a multi-chapter work; null otherwise. */
+            chapterNav: components["schemas"]["PublicRecordChapterNav"] | null;
+        };
+        PublicRecordChapterNav: {
+            /** @description URL of the work's 目次 (index) record — the canonical front door. */
+            indexUrl: string;
+            /** @description URL of the previous chapter, or null on the first chapter. */
+            prevUrl: string | null;
+            /** @description URL of the next chapter, or null on the last chapter. */
+            nextUrl: string | null;
+            chapterNo: number;
+            chapterTotal: number;
         };
         PublicRecordRelationQuery: {
             fieldKey: string;
@@ -6234,6 +6266,34 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    activateTheme: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Theme key (built-in id or runtime theme key). */
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The theme is now active. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        active_theme: string;
+                    };
+                };
             };
             401: components["responses"]["Unauthorized"];
             404: components["responses"]["NotFound"];
