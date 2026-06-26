@@ -12,6 +12,7 @@ use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RequestScopedHolder;
 use NeNeRecords\ApplicationServiceProvider;
+use NeNeRecords\Entitlement\EntitlementResolverInterface;
 use NeNeRecords\SystemConfig\SystemConfigRepositoryInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -91,12 +92,17 @@ final readonly class OrganizationServiceProvider implements ServiceProviderInter
                 UpdateOrganizationUseCaseInterface::class,
                 static function (ContainerInterface $c): UpdateOrganizationUseCaseInterface {
                     $repo = $c->get(OrganizationRepositoryInterface::class);
+                    $entitlements = $c->get(EntitlementResolverInterface::class);
 
                     if (!$repo instanceof OrganizationRepositoryInterface) {
                         throw new LogicException('Organization repository service is invalid.');
                     }
 
-                    return new UpdateOrganizationUseCase($repo);
+                    if (!$entitlements instanceof EntitlementResolverInterface) {
+                        throw new LogicException('Entitlement resolver service is invalid.');
+                    }
+
+                    return new UpdateOrganizationUseCase($repo, $entitlements);
                 },
             )
             ->set(

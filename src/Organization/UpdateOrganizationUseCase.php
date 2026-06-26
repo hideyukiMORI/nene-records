@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace NeNeRecords\Organization;
 
+use NeNeRecords\Entitlement\EntitlementResolverInterface;
+use NeNeRecords\Entitlement\FeatureNotEntitledException;
+
 final readonly class UpdateOrganizationUseCase implements UpdateOrganizationUseCaseInterface
 {
     public function __construct(
         private OrganizationRepositoryInterface $organizations,
+        private EntitlementResolverInterface $entitlements,
     ) {
     }
 
@@ -25,6 +29,20 @@ final readonly class UpdateOrganizationUseCase implements UpdateOrganizationUseC
         $isActive     = $input->isActive ?? $org->isActive;
         $externalId   = $input->updateExternalId ? $input->externalId : $org->externalId;
         $customDomain = $input->updateCustomDomain ? $input->customDomain : $org->customDomain;
+
+        // Custom domain is a plan-gated feature. Enforce only when assigning a new,
+        // non-empty domain — a downgrade never breaks an org that already has one
+        // (existing data is preserved; only new assignments are gated). With the
+        // default UnlimitedEntitlementResolver this is a no-op.
+        if (
+            $input->updateCustomDomain
+            && $customDomain !== null
+            && $customDomain !== ''
+            && $customDomain !== $org->customDomain
+            && !$this->entitlements->for($input->id)->customDomainAllowed
+        ) {
+            throw new FeatureNotEntitledException('custom domain');
+        }
 
         if ($slug !== $org->slug) {
             $existing = $this->organizations->findBySlug($slug);

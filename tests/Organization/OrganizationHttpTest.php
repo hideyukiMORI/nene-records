@@ -7,6 +7,7 @@ namespace NeNeRecords\Tests\Organization;
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RuntimeApplicationFactory;
+use NeNeRecords\Entitlement\UnlimitedEntitlementResolver;
 use NeNeRecords\Organization\CreateOrganizationHandler;
 use NeNeRecords\Organization\CreateOrganizationUseCase;
 use NeNeRecords\Organization\DeleteOrganizationHandler;
@@ -45,7 +46,7 @@ final class OrganizationHttpTest extends TestCase
             new ListOrganizationsHandler(new ListOrganizationsUseCase($this->repository), $jsonResponse),
             new GetOrganizationByIdHandler(new GetOrganizationByIdUseCase($this->repository), $jsonResponse),
             new CreateOrganizationHandler(new CreateOrganizationUseCase($this->repository, new RecordingDefaultContentTypeSeeder()), $jsonResponse),
-            new UpdateOrganizationHandler(new UpdateOrganizationUseCase($this->repository), $jsonResponse),
+            new UpdateOrganizationHandler(new UpdateOrganizationUseCase($this->repository, new UnlimitedEntitlementResolver()), $jsonResponse),
             new DeleteOrganizationHandler(new DeleteOrganizationUseCase($this->repository), $this->factory),
         );
 

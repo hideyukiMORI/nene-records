@@ -29,6 +29,8 @@ use NeNeRecords\DataMigration\DataMigrationServiceProvider;
 use NeNeRecords\DateTimeField\DateTimeFieldNotFoundExceptionHandler;
 use NeNeRecords\DateTimeField\DateTimeFieldRouteRegistrar;
 use NeNeRecords\DateTimeField\DateTimeFieldServiceProvider;
+use NeNeRecords\Entitlement\EntitlementServiceProvider;
+use NeNeRecords\Entitlement\FeatureNotEntitledExceptionHandler;
 use NeNeRecords\Entity\DuplicateEntitySlugExceptionHandler;
 use NeNeRecords\Entity\EntityNotFoundExceptionHandler;
 use NeNeRecords\Entity\EntityRouteRegistrar;
@@ -180,6 +182,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
             ->addProvider(new UserInviteServiceProvider())
             ->addProvider(new NotificationServiceProvider())
             ->addProvider(new CommentServiceProvider())
+            ->addProvider(new EntitlementServiceProvider())
             ->addProvider(new OrganizationServiceProvider())
             ->addProvider(new SignupServiceProvider())
             ->addProvider(new SystemConfigServiceProvider())
@@ -362,6 +365,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $commentNotFound = $container->get(CommentNotFoundExceptionHandler::class);
                     $organizationNotFound = $container->get(OrganizationNotFoundExceptionHandler::class);
                     $organizationSlugConflict = $container->get(OrganizationSlugConflictExceptionHandler::class);
+                    $featureNotEntitled = $container->get(FeatureNotEntitledExceptionHandler::class);
                     $notificationChannelNotFound = $container->get(NotificationChannelNotFoundExceptionHandler::class);
                     $themeNotFound = $container->get(ThemeNotFoundExceptionHandler::class);
 
@@ -413,6 +417,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $commentNotFound,
                         $organizationNotFound,
                         $organizationSlugConflict,
+                        $featureNotEntitled,
                         $notificationChannelNotFound,
                         $themeNotFound,
                     ] as $handler) {
@@ -469,6 +474,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $commentNotFound,
                         $organizationNotFound,
                         $organizationSlugConflict,
+                        $featureNotEntitled,
                         $notificationChannelNotFound,
                         $themeNotFound,
                     ];
