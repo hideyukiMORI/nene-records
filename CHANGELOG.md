@@ -6,6 +6,73 @@ NeNe Records does not yet follow Semantic Versioning — entries are grouped by 
 
 ---
 
+## [ポスト #536 — UX/SEO/SSR・WordPress 移行・本番配備・subdomain SaaS] — 2026-06-24 〜 2026-06-26
+
+> WordPress 比較×6ペルソナ討論を起点に公開 SEO/SSR を最優先化し、最大の残壁「非技術者の入口」を
+> **subdomain 型マルチテナント SaaS の本番稼働（https://nene-records.com）**まで到達。Issue/PR の詳細内訳は
+> `docs/todo/current.md`「ポスト #536」セクション、再開手順は `docs/handoff-2026-06-25.md` §A を正本とする。
+
+### Added
+- **公開 SEO/SSR 統合（Epic #537）** — SSR head に OGP/Twitter/canonical/JSON-LD（#544）、OG 画像を派生エンジンで自動生成し og:image 充填（#547/#548）、実 permalink でクローラブル SSR（#549）、単一オリジンで本番 SPA をマウント（#553）、`/view`→canonical 301＋SPA シェルフォールバック（#554）。方式＝PHP 前段＋SPA シェル。
+- **WordPress 移行（WXR インポート、Epic #539）** — パーサ＋計画プレビュー（#561）、実行インポート（冪等、#562）、HTTP エンドポイント（#563）、管理画面 UI（#564）、301 リダイレクトマップ（#565）、メディア添付取込＋本文 URL 差替（#566）、Yoast/RankMath/AIOSEO の SEO メタ取込（#572）。
+- **計測（GA4/GTM＋Consent Mode v2）** — nonce 付き head・CSP 条件緩和のバックエンド核（#583）、SPA ルート page_view＋同意バナー（#584）、同意既定のドロップダウン化（#589）。既定は analytics OFF（厳格 CSP）。
+- **SEO 周辺** — `sitemap.xml`（正規 permalink・5 万 URL 上限、#585）、`robots.txt`（#587）、大規模時のインデックス分割（#588）。
+- **WYSIWYG ライブプレビュー（Epic #538）** — ブロック編集（#590）とテーマカスタマイザ iframe（postMessage、#591）。
+- **公開サイト多言語化（Epic #540）** — ロケール交渉＋hreflang（#592）、言語スイッチャ＋一覧のロケール解決（#593）。
+- **relation フィールドのスキーマ UI**（#542/#550）。
+- **本番配備・オンボーディング** — ワンコマンド初回導入（組織+admin、#573）、本番スタック＋fresh-DB migration P0 修正（#574）、多段 `Dockerfile.prod`（#575）、本番運用 3 点 healthcheck/backup/logs（#579）。
+- **サブディレクトリ設置の base path 基盤** — バックエンド URL 前置（`APP_BASE_PATH`、#595）、フロント・ランタイム base（#596）、ディレクトリ方式マルチテナントの公開 SEO 配線（#599）。
+- **subdomain マルチテナント SaaS（本番 cutover）** — on-demand TLS の ask エンドポイント（#600）、apex をグローバル面として通す（#601）、公開セルフサーブ signup（BE #602 / FE #603）、apex デフォルト・プロモ LP（#604）、cron を全テナント対応（#605）、`/`+html→SPA シェル（#606）、メール認証ソフトゲート（#608）、確認後にテナントログインへ案内（#609）。本番＝https://nene-records.com、`records.nene-suite.com`→301。
+
+### Changed
+- 単一オリジンの fallback を PSR-15 `SingleOriginKernel` に集約（#568）。WXR 応答を OpenAPI 名前付きスキーマで型付け（#569）。
+- 公開 HTML レスポンスの CSP を SPA 対応へ緩和（厳格性は維持、#557/#558）。ランタイム base を `<base href>` 由来に統一し CSP ブロックを解消（#597）。
+- README を実態へ整合（NENE2 sibling-clone 明記、#580）。
+- 検証基準（2026-06-26 実測）: PHPUnit **1038 tests / 2887 assertions**、PHPStan level 8（1250 files・エラー 0）、MCP **69 tools**、frontend vitest **418 tests（84 files）**、Playwright E2E 220 tests（20 files）。
+
+### Fixed
+- org 未解決パスで `UrlRedirectResolver` が落ちる本番バグを best-effort 化（#577）。
+- 本番 compose の `MAIL_DSN` 空既定で全リクエストが 500 になる問題を null transport 既定で解消（#578）。
+- 単一 org デプロイの org-not-resolved（`system_config` 空 seed × `ORG_SLUG` フォールバック、`??`→`?:`、#582）。
+- SSR で html 型をサーバ側サニタイズ（#570）、WXR 取込本文を必ず html 型フィールドへ格納（#571）、メール送信の env キーを `MAIL_FROM_ADDRESS` に是正（#607）。
+
+### Security
+- WXR メディア取得の SSRF を遮断し内部アドレスへの到達を拒否（#567）。
+- 計測の inline スクリプトは `'unsafe-inline'` でなく per-response nonce で許可（既存スクリプト厳格性を維持、#583）。
+
+### Docs
+- 市場ペルソナ討論 第 1〜6 回の議事録＋本番デプロイ実機検証レポート（#535/#546/#552/#556/#560/#576/#581/#594/#598/#610）。
+
+---
+
+## [ポストM16 — リッチページ／ブロック・型チェック是正・i18n 6言語化] — 2026-06-20 〜 2026-06-24
+
+> M16 後 main へマージした作業。Issue/PR の詳細内訳は `docs/todo/current.md`「ポストM16」セクションを正本とする。
+
+### Added
+- **型付き投稿ブロック（Epic #486）** — blocks フィールド型のバックエンド基盤（#487）＋本文ブロック 5 種 `text/callout/hero/gallery/chart`＋ホーム hero（#488）。第一者描画（任意 JS 無し）/ サーバ検証 / sr-only SEO 投影 / URL allowlist。
+- **リッチページ化（Epic #491 / Custom Page #311）** — コンテンツタイプのスターター項目（Rich page=blocks 本文、#492）、レイアウトブロック `group/columns/spacer/divider`（#493/#494/#495）、dual-SEO bundle（#496）、`text_fields.value` を LONGTEXT 化（#498）、full-bleed custom レイアウト（#497）、Custom page スターター（#499）。
+- **モーション/インタラクション層（#371）** — 能力レイヤ基盤＋scroll-reveal（#477/#478）、ヘッダー sticky-shrink（#479/#480）、hero バリアント split/gradient（#481/#482）。
+- **テーマカスタマイザ（#372）** — 見出し/モノスペースフォントのノブ（#476）、ヒーローのコンテンツ編集 UI（#485）。
+
+### Changed
+- **フロントエンド全体監査の remediation（Epic #507・#508–#531）** — 管理画面 6 言語化（en/ja/de/fr/pt-BR/zh-Hans、#530/#531）、フォーム a11y（useId）、状態色のセマンティックトークン化、公開フォーマッタ集約、theme query-key の factory 化、vendor 分割で初期チャンク 620→209kB、毎キーストローク PUT のローカルドラフト化ほか。
+- **ブロック関連フロントの構造リファクタ（#501・#502–#514）** — 規約整合・重複排除・god 分割・UI 共通化（Modal/Textarea/IconButton 等）。
+
+### Fixed
+- 型チェックが no-op だった問題を是正し隠れていた tsc エラー 1197→0（#489/#490）。
+- タグ slug の一意制約を `(organization_id, slug)` 複合へ是正（#464/#465）。
+- bypass ルートで access-log が orgId 未設定により ERROR を出していたのを解消（#528/#529）。
+- Webhook 配信ワーカーを cron に配線し cron トリガー API を公開（#466/#467）。
+
+### Security
+- アップロード SVG の深サニタイズ＋配信ハードニングで stored XSS 経路を遮断（#474/#475）。
+
+### Docs
+- ClaudeDesign 向け MCP 実践ガイド（#435/#436）。current.md のドキュメントドリフト解消（#468/#469・#532/#533）。
+
+---
+
 ## [M11–M16 サマリー] — 2026-05-28 〜 2026-06-20
 
 > このまとめは CHANGELOG が M10 で停止していたドリフトの補填（#468）。各マイルストーンの
