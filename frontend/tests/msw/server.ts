@@ -1,4 +1,5 @@
 import { setupServer } from 'msw/node'
+import { accountHandlers } from './handlers/account'
 import { authHandlers } from './handlers/auth'
 import { blocksFieldHandlers } from './handlers/blocks-field'
 import { boolFieldHandlers } from './handlers/bool-field'
@@ -17,6 +18,7 @@ import { userHandlers } from './handlers/user'
 import { wxrImportHandlers } from './handlers/wxr-import'
 
 export const mswServer = setupServer(
+  ...accountHandlers,
   ...authHandlers,
   ...entityTypeHandlers,
   ...entityHandlers,

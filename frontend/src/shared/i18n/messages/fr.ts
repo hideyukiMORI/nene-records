@@ -38,6 +38,26 @@ export const fr: Partial<MessageCatalog> = {
 
   // ── Admin nav ────────────────────────────────────────────────────────────
   'admin.nav.home': 'Accueil',
+  'admin.nav.account': 'Compte',
+  // ── Account ──
+  'admin.account.title': 'Compte',
+  'admin.account.description': 'Votre offre, vos limites et votre utilisation.',
+  'admin.account.loading': 'Chargement…',
+  'admin.account.error': 'Impossible de charger votre compte.',
+  'admin.account.planHeading': 'Offre',
+  'admin.account.currentPlan': 'Offre actuelle : {{plan}}',
+  'admin.account.upgradeHint':
+    'Besoin d’une offre supérieure ? Contactez-nous pour la mise à niveau.',
+  'admin.account.usageHeading': 'Utilisation',
+  'admin.account.recordsUsage': 'Enregistrements : {{used}} / {{limit}}',
+  'admin.account.limitsHeading': 'Limites',
+  'admin.account.customDomainLabel': 'Domaine personnalisé',
+  'admin.account.allowed': 'Disponible',
+  'admin.account.notAllowed': 'Non disponible dans cette offre',
+  'admin.account.maxRecordsLabel': 'Enregistrements max.',
+  'admin.account.maxStorageLabel': 'Stockage max.',
+  'admin.account.maxAdminUsersLabel': 'Utilisateurs admin max.',
+  'admin.account.unlimited': 'Illimité',
   'admin.nav.entityTypes': 'Types de contenu',
   'admin.nav.tags': 'Étiquettes',
   'admin.nav.navigation': 'Menus',
