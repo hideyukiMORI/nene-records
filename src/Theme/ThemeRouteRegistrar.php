@@ -15,6 +15,7 @@ final readonly class ThemeRouteRegistrar
         private CreateThemeHandler $createHandler,
         private UpdateThemeHandler $updateHandler,
         private DeleteThemeHandler $deleteHandler,
+        private ActivateThemeHandler $activateHandler,
         private ListPublicThemesHandler $listPublicHandler,
         private PreviewThemeHandler $previewHandler,
         private ThemeAuthoringGuideHandler $authoringGuideHandler,
@@ -29,6 +30,7 @@ final readonly class ThemeRouteRegistrar
         $create = $this->createHandler;
         $update = $this->updateHandler;
         $delete = $this->deleteHandler;
+        $activate = $this->activateHandler;
         $listPublic = $this->listPublicHandler;
         $preview = $this->previewHandler;
         $authoringGuide = $this->authoringGuideHandler;
@@ -69,6 +71,11 @@ final readonly class ThemeRouteRegistrar
         $router->delete(
             '/api/v1/themes/{key}',
             static fn (ServerRequestInterface $request) => $delete->handle($request),
+        );
+        // Make a theme live for the org (verifies existence, then sets active_theme).
+        $router->post(
+            '/api/v1/themes/{key}/activate',
+            static fn (ServerRequestInterface $request) => $activate->handle($request),
         );
         // Public read (open via ALWAYS_OPEN_PREFIXES /api/v1/public/) — the
         // public site applies a runtime active theme from this.

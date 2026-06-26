@@ -11,7 +11,7 @@
 2. token/flag を編集する。
 3. **`previewTheme` でコントラスト/落ちる値を確認 → 直す（ループ）。**
 4. OK になったら `createTheme`（新規）/ `updateTheme`（改訂）で確定。
-5. 公開反映は管理者が `active_theme` を選んだ時（再ビルド不要）。
+5. 公開するなら **`activateTheme`**（テーマ存在を検証して `active_theme` を設定・再ビルド不要）。管理者が管理画面で選んでもよい。
 
 **鉄則: `previewTheme` を通さずに commit しない。**
 
@@ -31,6 +31,7 @@
 | `createTheme` | write | 新規登録 | manifest |
 | `updateTheme` | write | 改訂（manifest 置換） | `key` ＋ manifest |
 | `deleteTheme` | destructive | 削除 | `key` |
+| `activateTheme` | write | **公開（存在検証→`active_theme` 設定）** | `key` |
 
 > `key` = テーマの id（`manifest.id`）。`previewTheme`/`createTheme` の入力は**manifest そのもの**（フィールドを直接トップレベルに渡す）。`updateTheme` は `key`（パス）＋ manifest。
 

@@ -1515,6 +1515,33 @@
             "responseSchemaRef": null
         },
         {
+            "name": "activateTheme",
+            "title": "Activate Theme",
+            "description": "Make a theme live for the organization. Verifies the key is a built-in id or an existing runtime theme, then sets active_theme. Call after createTheme to publish what you made.",
+            "safety": "write",
+            "source": {
+                "type": "openapi",
+                "operationId": "activateTheme",
+                "method": "POST",
+                "path": "/api/v1/themes/{key}/activate"
+            },
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "pattern": "^[a-z][a-z0-9-]{1,40}$",
+                        "description": "Theme key (built-in id or runtime theme key)."
+                    }
+                },
+                "required": [
+                    "key"
+                ],
+                "additionalProperties": false
+            },
+            "responseSchemaRef": null
+        },
+        {
             "name": "listTextFields",
             "title": "List Text Fields",
             "description": "List text field values with optional entity or entity type filters.",

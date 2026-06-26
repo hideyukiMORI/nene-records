@@ -3334,6 +3334,45 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /api/v1/themes/{key}/activate:
+    post:
+      tags:
+        - Themes
+      summary: Activate a theme
+      description: >-
+        Makes a theme live for the calling organization. Verifies the key
+        resolves to a built-in theme id or an existing runtime theme, then sets
+        the `active_theme` setting. Returns 404 if no such theme exists.
+      operationId: activateTheme
+      parameters:
+        - name: key
+          in: path
+          required: true
+          description: Theme key (built-in id or runtime theme key).
+          schema:
+            type: string
+            pattern: '^[a-z][a-z0-9-]{1,40}$'
+      responses:
+        '200':
+          description: The theme is now active.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [active_theme]
+                properties:
+                  active_theme:
+                    type: string
+              examples:
+                ok:
+                  value:
+                    active_theme: aurora
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /api/v1/public/menus:
     get:
       tags:

@@ -110,6 +110,12 @@ final class ThemeManifestValidator
         ];
     }
 
+    /** Whether $id is a built-in (static) theme — activatable, but reserved against runtime registration. */
+    public static function isBuiltin(string $id): bool
+    {
+        return in_array($id, self::RESERVED_KEYS, true);
+    }
+
     /**
      * @param array<string, mixed> $manifest
      *
