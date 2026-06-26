@@ -54,6 +54,7 @@ use NeNeRecords\EntityType\EntityTypeSlugConflictExceptionHandler;
 use NeNeRecords\EnumField\EnumFieldNotFoundExceptionHandler;
 use NeNeRecords\EnumField\EnumFieldRouteRegistrar;
 use NeNeRecords\EnumField\EnumFieldServiceProvider;
+use NeNeRecords\Extension\ModuleRegistry;
 use NeNeRecords\FieldDef\FieldDefConflictExceptionHandler;
 use NeNeRecords\FieldDef\FieldDefNotFoundExceptionHandler;
 use NeNeRecords\FieldDef\FieldDefRouteRegistrar;
@@ -193,6 +194,12 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
             ->addProvider(new UrlRedirectServiceProvider())
             ->addProvider(new SingleOriginServiceProvider());
 
+        // Optional/private modules (ADR 0005): compose on top of core if present.
+        // Absent (fresh git clone) → nothing added; core stays plain OSS.
+        foreach ((new ModuleRegistry())->modules() as $module) {
+            $builder->addProvider($module);
+        }
+
         $builder
             ->set(
                 self::ROUTE_REGISTRARS,
@@ -275,7 +282,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         throw new LogicException('Route registrar service is invalid.');
                     }
 
-                    return [
+                    $registrars = [
                         $auth,
                         $entityType,
                         $entityArchive,
@@ -313,6 +320,14 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $theme,
                         $wxrImport,
                     ];
+
+                    foreach ((new ModuleRegistry())->modules() as $module) {
+                        foreach ($module->routeRegistrars($container) as $registrar) {
+                            $registrars[] = $registrar;
+                        }
+                    }
+
+                    return $registrars;
                 },
             )
             ->set(
@@ -426,7 +441,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         }
                     }
 
-                    return [
+                    $handlers = [
                         $entityTypeNotFound,
                         $entityTypeHasEntities,
                         $entityTypeSlugConflict,
@@ -478,6 +493,14 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $notificationChannelNotFound,
                         $themeNotFound,
                     ];
+
+                    foreach ((new ModuleRegistry())->modules() as $module) {
+                        foreach ($module->exceptionHandlers($container) as $handler) {
+                            $handlers[] = $handler;
+                        }
+                    }
+
+                    return $handlers;
                 },
             );
     }
