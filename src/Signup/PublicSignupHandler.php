@@ -6,11 +6,14 @@ namespace NeNeRecords\Signup;
 
 use DateTimeImmutable;
 use DateTimeInterface;
+use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonRequestBodyParser;
 use Nene2\Http\JsonResponseFactory;
+use Nene2\Middleware\RateLimitStorageInterface;
 use Nene2\Validation\ValidationError;
 use Nene2\Validation\ValidationException;
 use NeNeRecords\Auth\SessionCookie;
+use NeNeRecords\Http\ClientIp;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -27,8 +30,14 @@ final readonly class PublicSignupHandler
     private const PASSWORD_MIN = 8;
 
     public function __construct(
-        private PublicSignupUseCase $useCase,
+        private PublicSignupUseCaseInterface $useCase,
         private JsonResponseFactory $response,
+        private ProblemDetailsResponseFactory $problemDetails,
+        private RateLimitStorageInterface $rateLimitStorage,
+        /** Max tenant signups accepted per client IP within the window. */
+        private int $maxSignupsPerWindow = 5,
+        /** Rate-limit window in seconds (default: 1 hour). */
+        private int $rateLimitWindowSeconds = 3600,
     ) {
     }
 
@@ -73,6 +82,14 @@ final readonly class PublicSignupHandler
             throw new ValidationException($errors);
         }
 
+        // Abuse guard: throttle well-formed signups per client IP so a script
+        // can't mass-create tenants. Checked after field validation (a mistyped
+        // form must not burn the budget) and before the expensive provisioning.
+        $rateLimited = $this->enforceRateLimit($request);
+        if ($rateLimited !== null) {
+            return $rateLimited;
+        }
+
         // The verification link points back at the host the signup came from
         // (the apex), where /verify-email confirms via the global token endpoint.
         $uri = $request->getUri();
@@ -101,6 +118,39 @@ final readonly class PublicSignupHandler
             'email'      => $output->email,
             'role'       => $output->role,
         ], 201, ['Set-Cookie' => $cookie]);
+    }
+
+    /**
+     * Throttle well-formed signups per client IP. Returns a 429 Problem Details
+     * response when the limit is exceeded, or null when the request may proceed.
+     */
+    private function enforceRateLimit(ServerRequestInterface $request): ?ResponseInterface
+    {
+        $key = 'signup:' . ClientIp::resolve($request);
+        $result = $this->rateLimitStorage->hit($key, $this->rateLimitWindowSeconds);
+
+        if ($result['count'] <= $this->maxSignupsPerWindow) {
+            return null;
+        }
+
+        $retryAfter = max(0, $result['reset_at'] - time());
+
+        return $this->problemDetails->create(
+            $request,
+            'too-many-requests',
+            'Too Many Requests',
+            429,
+            sprintf(
+                'Signup rate limit of %d per %d seconds exceeded. Try again in %d seconds.',
+                $this->maxSignupsPerWindow,
+                $this->rateLimitWindowSeconds,
+                $retryAfter,
+            ),
+        )
+            ->withHeader('Retry-After', (string) $retryAfter)
+            ->withHeader('X-RateLimit-Limit', (string) $this->maxSignupsPerWindow)
+            ->withHeader('X-RateLimit-Remaining', '0')
+            ->withHeader('X-RateLimit-Reset', (string) $result['reset_at']);
     }
 
     /** @param array<string, mixed> $body */

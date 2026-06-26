@@ -30,7 +30,7 @@ use Throwable;
  * email uniqueness are enforced by the underlying use cases (which raise
  * OrganizationSlugConflictException / UserEmailConflictException → 409).
  */
-final readonly class PublicSignupUseCase
+final readonly class PublicSignupUseCase implements PublicSignupUseCaseInterface
 {
     private const VERIFICATION_TTL_SECONDS = 24 * 3600;
 

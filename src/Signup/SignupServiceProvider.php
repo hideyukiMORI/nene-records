@@ -7,8 +7,10 @@ namespace NeNeRecords\Signup;
 use LogicException;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
+use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RequestScopedHolder;
+use Nene2\Middleware\RateLimitStorageInterface;
 use NeNeRecords\ApplicationServiceProvider;
 use NeNeRecords\Auth\LoginUseCase;
 use NeNeRecords\Auth\UserRepositoryInterface;
@@ -64,8 +66,10 @@ final readonly class SignupServiceProvider implements ServiceProviderInterface
             ->set(
                 PublicSignupHandler::class,
                 static function (ContainerInterface $c): PublicSignupHandler {
-                    $useCase = $c->get(PublicSignupUseCase::class);
-                    $json    = $c->get(JsonResponseFactory::class);
+                    $useCase     = $c->get(PublicSignupUseCase::class);
+                    $json        = $c->get(JsonResponseFactory::class);
+                    $problems    = $c->get(ProblemDetailsResponseFactory::class);
+                    $rateLimiter = $c->get(RateLimitStorageInterface::class);
 
                     if (!$useCase instanceof PublicSignupUseCase) {
                         throw new LogicException('PublicSignupUseCase is invalid.');
@@ -75,7 +79,15 @@ final readonly class SignupServiceProvider implements ServiceProviderInterface
                         throw new LogicException('JsonResponseFactory is invalid.');
                     }
 
-                    return new PublicSignupHandler($useCase, $json);
+                    if (!$problems instanceof ProblemDetailsResponseFactory) {
+                        throw new LogicException('ProblemDetailsResponseFactory is invalid.');
+                    }
+
+                    if (!$rateLimiter instanceof RateLimitStorageInterface) {
+                        throw new LogicException('RateLimitStorageInterface is invalid.');
+                    }
+
+                    return new PublicSignupHandler($useCase, $json, $problems, $rateLimiter);
                 },
             )
             ->set(
