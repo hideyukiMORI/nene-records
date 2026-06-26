@@ -176,6 +176,18 @@ final readonly class GetPublicRecordViewUseCase implements GetPublicRecordViewUs
             ),
         ];
 
+        // Derived chapter navigation (小説家になろう/AO3 hub-and-spoke): present only
+        // when this record is one chapter of a multi-chapter work. Hidden from the
+        // ordinary field display; resolved like the canonical permalink.
+        $chapterNav = ChapterNavBuilder::build(
+            $entityType->permalinkPattern,
+            $input->entityTypeSlug,
+            $this->findTextValue($textFieldRows, 'series'),
+            $this->findIntValue($intFieldRows, 'chapter_no'),
+            $this->findIntValue($intFieldRows, 'chapter_total'),
+        );
+        $bootstrap['chapterNav'] = ChapterNavBuilder::toBootstrapArray($chapterNav);
+
         $canonicalPath = PublicPermalinkResolver::resolve(
             $entityType->permalinkPattern,
             $input->entityTypeSlug,
@@ -199,6 +211,7 @@ final readonly class GetPublicRecordViewUseCase implements GetPublicRecordViewUs
             updatedAtIso: $entity->updatedAt?->format(\DateTimeInterface::ATOM),
             bootstrap: $bootstrap,
             displayFields: $displayFields,
+            chapterNav: $chapterNav,
         );
     }
 
@@ -252,6 +265,12 @@ final readonly class GetPublicRecordViewUseCase implements GetPublicRecordViewUs
         $displayFields = [];
 
         foreach ($fieldDefRows as $fieldDef) {
+            // Reserved chapter-nav metadata is surfaced as the derived chapter
+            // navigation, never as an ordinary field row.
+            if (in_array($fieldDef->fieldKey, ChapterNavBuilder::FIELD_KEYS, true)) {
+                continue;
+            }
+
             if ($fieldDef->dataType === 'relation') {
                 $targetEntityTypeId = $fieldDef->targetEntityTypeId;
 

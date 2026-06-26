@@ -20,6 +20,7 @@ use NeNeRecords\FieldDef\FieldDefRepositoryInterface;
 use NeNeRecords\IntField\IntField;
 use NeNeRecords\IntField\IntFieldRepositoryInterface;
 use NeNeRecords\Media\MediaDerivativeUrl;
+use NeNeRecords\PublicRecord\ChapterNavBuilder;
 use NeNeRecords\PublicRecord\GetPublicRecordViewOutput;
 use NeNeRecords\PublicRecord\PublicFieldDisplayFormatter;
 use NeNeRecords\PublicRecord\PublicPermalinkResolver;
@@ -172,6 +173,16 @@ final readonly class GetPreviewRecordViewUseCase implements GetPreviewRecordView
             ),
         ];
 
+        // Mirror the public view so previewing a chapter shows the same nav (#novel).
+        $chapterNav = ChapterNavBuilder::build(
+            $entityType->permalinkPattern,
+            $entityTypeSlug,
+            $this->findTextValue($textFieldRows, 'series'),
+            $this->findIntValue($intFieldRows, 'chapter_no'),
+            $this->findIntValue($intFieldRows, 'chapter_total'),
+        );
+        $bootstrap['chapterNav'] = ChapterNavBuilder::toBootstrapArray($chapterNav);
+
         $canonicalPath = PublicPermalinkResolver::resolve(
             $entityType->permalinkPattern,
             $entityTypeSlug,
@@ -205,6 +216,7 @@ final readonly class GetPreviewRecordViewUseCase implements GetPreviewRecordView
             updatedAtIso: $entity->updatedAt?->format(\DateTimeInterface::ATOM),
             bootstrap: $bootstrap,
             displayFields: $displayFields,
+            chapterNav: $chapterNav,
         );
     }
 
@@ -235,6 +247,12 @@ final readonly class GetPreviewRecordViewUseCase implements GetPreviewRecordView
         $displayFields = [];
 
         foreach ($fieldDefRows as $fieldDef) {
+            // Reserved chapter-nav metadata is surfaced as the derived chapter
+            // navigation, never as an ordinary field row.
+            if (in_array($fieldDef->fieldKey, ChapterNavBuilder::FIELD_KEYS, true)) {
+                continue;
+            }
+
             if ($fieldDef->dataType === 'relation') {
                 $targetEntityTypeId = $fieldDef->targetEntityTypeId;
 

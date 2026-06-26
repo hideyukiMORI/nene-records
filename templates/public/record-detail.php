@@ -68,6 +68,8 @@
       .markdown-body p { margin: 0; }
       .markdown-body ul, .markdown-body ol { margin: 0; padding-left: 1.25rem; }
       .markdown-body blockquote { margin: 0; padding-left: 0.75rem; border-left: 3px solid #d1d5db; color: #6b7280; }
+      .chapter-nav { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.75rem 1rem; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #e5e7eb; }
+      .chapter-nav__pos { margin-left: auto; color: #6b7280; font-size: 0.9rem; }
     </style>
     <?php if ($spaMode === 'prod'): ?>
       <?php foreach ($spaCss as $href): ?>
@@ -122,6 +124,19 @@
         <?php endif; ?>
       <?php endforeach; ?>
     </article>
+    <?php /* Derived chapter navigation (#novel): only on a chapter of a multi-chapter work. */ ?>
+    <?php if ($chapterNav !== null): ?>
+      <nav class="chapter-nav" aria-label="章ナビゲーション">
+        <?php if ($chapterNav->prevUrl !== null): ?>
+          <a rel="prev" href="<?= $e($basePath . $chapterNav->prevUrl) ?>">← 前の章</a>
+        <?php endif; ?>
+        <a href="<?= $e($basePath . $chapterNav->indexUrl) ?>">目次</a>
+        <?php if ($chapterNav->nextUrl !== null): ?>
+          <a rel="next" href="<?= $e($basePath . $chapterNav->nextUrl) ?>">次の章 →</a>
+        <?php endif; ?>
+        <span class="chapter-nav__pos">第<?= $e((string) $chapterNav->chapterNo) ?>章 / 全<?= $e((string) $chapterNav->chapterTotal) ?>章</span>
+      </nav>
+    <?php endif; ?>
     </div>
     <script
       id="nene-records-public-record-bootstrap"

@@ -171,4 +171,69 @@ describe('PublicRecordDetailPage', () => {
 
     expect(await screen.findByText('Not found')).toBeInTheDocument()
   })
+
+  it('renders the derived chapter nav and hides series/chapter_no/chapter_total', async () => {
+    seedEntityTypes([{ id: 1, name: 'Work', slug: 'work', permalink_pattern: '/{type}/{slug}' }])
+    seedEntities([
+      {
+        id: 5,
+        entity_type_id: 1,
+        slug: 'bocchan-2',
+        status: 'published',
+        is_deleted: false,
+        deleted_at: null,
+      },
+    ])
+    seedFieldDefs([
+      { id: 1, entity_type_id: 1, field_key: 'title', data_type: 'text' },
+      { id: 2, entity_type_id: 1, field_key: 'body', data_type: 'text' },
+      { id: 3, entity_type_id: 1, field_key: 'series', data_type: 'text' },
+      { id: 4, entity_type_id: 1, field_key: 'chapter_no', data_type: 'int' },
+      { id: 5, entity_type_id: 1, field_key: 'chapter_total', data_type: 'int' },
+    ])
+    seedTextFields([
+      { id: 1, entity_id: 5, field_key: 'title', value: 'Bocchan ch.2' },
+      { id: 2, entity_id: 5, field_key: 'body', value: 'Chapter body text.' },
+      { id: 3, entity_id: 5, field_key: 'series', value: 'bocchan' },
+    ])
+    seedIntFields([
+      { id: 1, entity_id: 5, field_key: 'chapter_no', value: 2 },
+      { id: 2, entity_id: 5, field_key: 'chapter_total', value: 3 },
+    ])
+
+    renderWithProviders(
+      <MemoryRouter initialEntries={['/work/bocchan-2']}>
+        <Routes>
+          <Route element={<PublicSiteTestProvider />}>
+            <Route path="/:entityTypeSlug/*" element={<PublicRecordDetailPage />} />
+          </Route>
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    // The chapter title is lifted into the masthead h1.
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Bocchan ch.2' }),
+    ).toBeInTheDocument()
+
+    // Derived nav (rendered at the top and bottom of the chapter), with sibling
+    // URLs resolved from the work's slug permalink — no extra fetch.
+    const contentsLinks = screen.getAllByRole('link', { name: 'Contents' })
+    expect(contentsLinks.length).toBeGreaterThanOrEqual(1)
+    contentsLinks.forEach((link) => {
+      expect(link).toHaveAttribute('href', '/work/bocchan')
+    })
+    screen.getAllByRole('link', { name: /Previous chapter/ }).forEach((link) => {
+      expect(link).toHaveAttribute('href', '/work/bocchan-1')
+    })
+    screen.getAllByRole('link', { name: /Next chapter/ }).forEach((link) => {
+      expect(link).toHaveAttribute('href', '/work/bocchan-3')
+    })
+    expect(screen.getAllByText('Chapter 2 / 3').length).toBeGreaterThanOrEqual(1)
+
+    // The reserved chapter-nav metadata is never shown as an ordinary field row.
+    expect(screen.queryByText('series')).toBeNull()
+    expect(screen.queryByText('chapter_no')).toBeNull()
+    expect(screen.queryByText('chapter_total')).toBeNull()
+  })
 })

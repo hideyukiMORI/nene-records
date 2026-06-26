@@ -158,6 +158,7 @@ final readonly class RenderPublicRecordViewHandler
             'entityTypeName' => $output->entityTypeName,
             'entityId' => $output->entityId,
             'displayFields' => $output->displayFields,
+            'chapterNav' => $output->chapterNav,
             'siteName' => $siteName,
             'metaDescription' => $metaDescription,
             'analyticsHead' => $analyticsHead,

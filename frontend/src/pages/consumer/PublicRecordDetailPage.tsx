@@ -5,12 +5,14 @@ import { useEntityTypeList } from '@/entities/entity-type'
 import { CommentSection, useCommentSection } from '@/features/comment-section'
 import { usePublicBrowseEntityRecordsPage } from '@/features/public-browse-entity-records'
 import {
+  ChapterNav,
   PublicRecordDetailView,
   type PublicFieldRow,
   usePublicViewEntityRecordPage,
 } from '@/features/public-view-entity-record'
 import { PageContentContext } from '@/features/render-widgets'
 import { useTranslation } from '@/shared/i18n'
+import { CHAPTER_NAV_FIELD_KEYS, deriveChapterNav } from '@/shared/lib/derive-chapter-nav'
 import { findEntityTypeBySlug } from '@/shared/lib/find-entity-type-by-slug'
 import { formatPublishedDate } from '@/shared/lib/format-published-date'
 import { isMarkdownBodyField } from '@/shared/lib/is-markdown-body-field'
@@ -223,11 +225,44 @@ function PublicRecordDetailContent({
     entity?.metaTitle?.trim() ||
     humanizeSlug(entity?.slug) ||
     `Record #${String(entityId)}`
-  const bodyRows = useMemo(
-    () => fieldRows.filter((row) => !(row.kind === 'scalar' && row.fieldKey === 'title')),
+  // Reserved chapter-nav metadata (series/chapter_no/chapter_total) is surfaced
+  // as the derived chapter navigation, never as an ordinary field row.
+  const contentRows = useMemo(
+    () =>
+      fieldRows.filter(
+        (row) => !(row.kind === 'scalar' && CHAPTER_NAV_FIELD_KEYS.includes(row.fieldKey)),
+      ),
     [fieldRows],
   )
+  const bodyRows = useMemo(
+    () => contentRows.filter((row) => !(row.kind === 'scalar' && row.fieldKey === 'title')),
+    [contentRows],
+  )
+
+  // Derived prev/目次/next navigation for a chapter of a multi-chapter work
+  // (#novel hub-and-spoke). Null for ordinary records.
+  const chapterNav = useMemo(() => {
+    const scalarValue = (key: string): string | null => {
+      const row = fieldRows.find(
+        (r): r is Extract<PublicFieldRow, { kind: 'scalar' }> =>
+          r.kind === 'scalar' && r.fieldKey === key && r.displayValue !== '—',
+      )
+      return row?.displayValue ?? null
+    }
+    const no = scalarValue('chapter_no')
+    const total = scalarValue('chapter_total')
+    return deriveChapterNav({
+      typeSlug: entityTypeSlug,
+      pattern: currentPattern,
+      series: scalarValue('series'),
+      chapterNo: no === null ? null : Number.parseInt(no, 10),
+      chapterTotal: total === null ? null : Number.parseInt(total, 10),
+    })
+  }, [fieldRows, entityTypeSlug, currentPattern])
+
   const publishedLabel = formatPublishedDate(entity?.publishedAt ?? null)
+  // Inlined at each render site (below) so TS narrows `chapterNav` to non-null.
+  const canShowChapterNav = !isLoading && !isError && entity !== null
 
   // Redirect if the current URL doesn't match the canonical URL for this entity.
   // This handles pattern changes (e.g. /{type}/{id} → /{type}/{slug}) transparently.
@@ -248,7 +283,7 @@ function PublicRecordDetailContent({
       <PageContentContext.Provider value={pageMarkdown}>
         <PublicRecordDetailView
           entity={entity}
-          fieldRows={fieldRows}
+          fieldRows={contentRows}
           entityTypeSlugById={entityTypeSlugById}
           entityTypePatternById={entityTypePatternById}
           isLoading={isLoading}
@@ -272,7 +307,7 @@ function PublicRecordDetailContent({
           <div className="custom-page">
             <PublicRecordDetailView
               entity={entity}
-              fieldRows={fieldRows}
+              fieldRows={contentRows}
               entityTypeSlugById={entityTypeSlugById}
               entityTypePatternById={entityTypePatternById}
               isLoading={isLoading}
@@ -323,6 +358,7 @@ function PublicRecordDetailContent({
             ) : null}
           </header>
 
+          {canShowChapterNav && chapterNav !== null ? <ChapterNav nav={chapterNav} /> : null}
           {isInlineTocLayout && !isLoading && !isError && entity !== null ? (
             <InlineTableOfContents markdown={pageMarkdown} />
           ) : null}
@@ -338,6 +374,7 @@ function PublicRecordDetailContent({
               void refetch()
             }}
           />
+          {canShowChapterNav && chapterNav !== null ? <ChapterNav nav={chapterNav} /> : null}
 
           {entity !== null && !isLoading && !isError ? (
             <>
