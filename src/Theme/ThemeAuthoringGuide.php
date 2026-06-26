@@ -226,6 +226,8 @@ final class ThemeAuthoringGuide
                 'createTheme' => 'Register a new runtime theme from a manifest.',
                 'updateTheme' => 'Replace an existing theme manifest (id must equal the key).',
                 'deleteTheme' => 'Delete a runtime theme by key.',
+                'activateTheme' => 'Make a theme live for the org: verifies the key resolves to a built-in or '
+                    . 'runtime theme, then sets the active_theme setting. Use this to publish what you create.',
             ],
         ];
     }
@@ -322,6 +324,14 @@ final class ThemeAuthoringGuide
                 'steps' => [
                     'Ensure color-on-accent contrasts with color-accent (and the same in dark mode).',
                     'Re-submit via updateTheme.',
+                ],
+            ],
+            [
+                'title' => 'Publish (make live) a theme',
+                'steps' => [
+                    'previewTheme first — contrast is reported, NOT enforced on create, so self-gate on WCAG AA here.',
+                    'createTheme so the key exists (or pick a built-in id from contract.reservedIds).',
+                    'Call activateTheme with the key — it verifies the theme exists, then sets the org active_theme.',
                 ],
             ],
         ];

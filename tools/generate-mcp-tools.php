@@ -880,6 +880,24 @@ $tools = [
         null,
         ['key'],
     ),
+    readTool(
+        'activateTheme',
+        'Activate Theme',
+        'Make a theme live for the organization. Verifies the key is a built-in id or an existing '
+            . 'runtime theme, then sets active_theme. Call after createTheme to publish what you made.',
+        'activateTheme',
+        'POST',
+        '/api/v1/themes/{key}/activate',
+        [
+            'key' => [
+                'type' => 'string',
+                'pattern' => '^[a-z][a-z0-9-]{1,40}$',
+                'description' => 'Theme key (built-in id or runtime theme key).',
+            ],
+        ],
+        null,
+        ['key'],
+    ),
 ];
 
 /** @return list<array<string, mixed>> */

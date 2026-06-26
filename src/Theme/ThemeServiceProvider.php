@@ -12,6 +12,7 @@ use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RequestScopedHolder;
 use NeNeRecords\Media\MediaRepositoryInterface;
+use NeNeRecords\Setting\UpdateSettingUseCaseInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 
@@ -78,6 +79,21 @@ final readonly class ThemeServiceProvider implements ServiceProviderInterface
                     }
 
                     return new UpdateThemeUseCase($repo);
+                },
+            )
+            ->set(
+                ActivateThemeUseCaseInterface::class,
+                static function (ContainerInterface $container): ActivateThemeUseCaseInterface {
+                    $repo = $container->get(ThemeRepositoryInterface::class);
+                    if (!$repo instanceof ThemeRepositoryInterface) {
+                        throw new LogicException('Theme repository service is invalid.');
+                    }
+                    $settings = $container->get(UpdateSettingUseCaseInterface::class);
+                    if (!$settings instanceof UpdateSettingUseCaseInterface) {
+                        throw new LogicException('UpdateSetting use case service is invalid.');
+                    }
+
+                    return new ActivateThemeUseCase($repo, $settings);
                 },
             )
             ->set(
@@ -165,6 +181,21 @@ final readonly class ThemeServiceProvider implements ServiceProviderInterface
                     }
 
                     return new UpdateThemeHandler($useCase, $response, $thumbnails);
+                },
+            )
+            ->set(
+                ActivateThemeHandler::class,
+                static function (ContainerInterface $container): ActivateThemeHandler {
+                    $useCase = $container->get(ActivateThemeUseCaseInterface::class);
+                    $response = $container->get(JsonResponseFactory::class);
+                    if (!$useCase instanceof ActivateThemeUseCaseInterface) {
+                        throw new LogicException('ActivateTheme use case service is invalid.');
+                    }
+                    if (!$response instanceof JsonResponseFactory) {
+                        throw new LogicException('JSON response factory service is invalid.');
+                    }
+
+                    return new ActivateThemeHandler($useCase, $response);
                 },
             )
             ->set(
@@ -265,6 +296,7 @@ final readonly class ThemeServiceProvider implements ServiceProviderInterface
                     $create = $container->get(CreateThemeHandler::class);
                     $update = $container->get(UpdateThemeHandler::class);
                     $delete = $container->get(DeleteThemeHandler::class);
+                    $activate = $container->get(ActivateThemeHandler::class);
                     $listPublic = $container->get(ListPublicThemesHandler::class);
                     $preview = $container->get(PreviewThemeHandler::class);
                     $authoringGuide = $container->get(ThemeAuthoringGuideHandler::class);
@@ -285,6 +317,9 @@ final readonly class ThemeServiceProvider implements ServiceProviderInterface
                     if (!$delete instanceof DeleteThemeHandler) {
                         throw new LogicException('DeleteTheme handler service is invalid.');
                     }
+                    if (!$activate instanceof ActivateThemeHandler) {
+                        throw new LogicException('ActivateTheme handler service is invalid.');
+                    }
                     if (!$listPublic instanceof ListPublicThemesHandler) {
                         throw new LogicException('ListPublicThemes handler service is invalid.');
                     }
@@ -298,7 +333,7 @@ final readonly class ThemeServiceProvider implements ServiceProviderInterface
                         throw new LogicException('ThemeEngineCss handler service is invalid.');
                     }
 
-                    return new ThemeRouteRegistrar($list, $get, $create, $update, $delete, $listPublic, $preview, $authoringGuide, $engineCss);
+                    return new ThemeRouteRegistrar($list, $get, $create, $update, $delete, $activate, $listPublic, $preview, $authoringGuide, $engineCss);
                 },
             );
     }
