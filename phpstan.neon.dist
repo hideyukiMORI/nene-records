@@ -4,4 +4,8 @@ parameters:
     - src
     - tests
     - tools
+  excludePaths:
+    # Standalone host-probe: deliberately inspects PHP_VERSION / extension_loaded
+    # of the *target* host, which PHPStan would constant-fold against the dev env.
+    - tools/hosting-precheck.php
   tmpDir: .phpstan.cache
