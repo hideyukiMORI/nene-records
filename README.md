@@ -33,10 +33,9 @@ docker compose up --build -d
 # Admin UI (dev): in another shell run `npm run dev --prefix frontend` → http://localhost:18084
 ```
 
-Default credentials (local only):
-
-- Admin: `admin@nene-records.local` / `nene1234`
-- Editor: `editor@nene-records.local` / `nene1234`
+Create the first admin via the installer (`composer app:install`) — there are no
+default credentials. (A previous default-credential seed was removed for security;
+see migration `20260711000000_delete_default_seed_users`.)
 
 > See [`docs/development/docker.md`](./docs/development/docker.md) for full setup details.
 
