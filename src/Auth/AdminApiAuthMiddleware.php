@@ -52,6 +52,7 @@ final readonly class AdminApiAuthMiddleware implements MiddlewareInterface
         '/api/v1/organizations',
         '/api/v1/themes',
         '/api/v1/migration',
+        '/api/v1/account',
     ];
 
     public function __construct(

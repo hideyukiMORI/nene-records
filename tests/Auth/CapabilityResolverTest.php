@@ -29,6 +29,16 @@ final class CapabilityResolverTest extends TestCase
         yield 'delete'     => ['/api/v1/organizations/1', 'DELETE'];
     }
 
+    // ── Account ─────────────────────────────────────────────────────────────────
+
+    public function testAccountRequiresManageAccount(): void
+    {
+        self::assertSame(
+            Capability::ManageAccount,
+            CapabilityResolver::resolve('/api/v1/account', 'GET'),
+        );
+    }
+
     // ── Settings ──────────────────────────────────────────────────────────────
 
     public function testSettingsPutRequiresManageSettings(): void

@@ -25,6 +25,11 @@ final class CapabilityResolver
             return Capability::ManageOrganizations;
         }
 
+        // Tenant self-serve account (own org): admin-only.
+        if (str_starts_with($path, '/api/v1/account')) {
+            return Capability::ManageAccount;
+        }
+
         if (str_starts_with($path, '/api/v1/settings')) {
             return match ($method) {
                 'PUT' => Capability::ManageSettings,

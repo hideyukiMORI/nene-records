@@ -9,6 +9,8 @@ use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\DomainExceptionHandlerInterface;
 use Nene2\Http\RequestScopedHolder;
+use NeNeRecords\Account\AccountRouteRegistrar;
+use NeNeRecords\Account\AccountServiceProvider;
 use NeNeRecords\Analytics\AnalyticsRouteRegistrar;
 use NeNeRecords\Analytics\AnalyticsServiceProvider;
 use NeNeRecords\Auth\AuthRouteRegistrar;
@@ -156,6 +158,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
         );
 
         $builder
+            ->addProvider(new AccountServiceProvider())
             ->addProvider(new EntityArchiveServiceProvider())
             ->addProvider(new EntityTypeServiceProvider())
             ->addProvider(new FieldDefServiceProvider())
@@ -227,6 +230,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $webhook = $container->get('nene-records.route_registrar.webhook');
                     $previewToken = $container->get('nene-records.route_registrar.preview_token');
                     $dashboard = $container->get('nene-records.route_registrar.dashboard');
+                    $account = $container->get('nene-records.route_registrar.account');
                     $user = $container->get('nene-records.route_registrar.user');
                     $userInvite = $container->get('nene-records.route_registrar.user_invite');
                     $auth = $container->get('nene-records.route_registrar.auth');
@@ -265,6 +269,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         || !$webhook instanceof WebhookRouteRegistrar
                         || !$previewToken instanceof PreviewTokenRouteRegistrar
                         || !$dashboard instanceof DashboardRouteRegistrar
+                        || !$account instanceof AccountRouteRegistrar
                         || !$user instanceof UserRouteRegistrar
                         || !$userInvite instanceof UserInviteRouteRegistrar
                         || !$auth instanceof AuthRouteRegistrar
@@ -307,6 +312,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $webhook,
                         $previewToken,
                         $dashboard,
+                        $account,
                         $user,
                         $userInvite,
                         $notification,
