@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NeNeRecords\Tests\Organization;
 
+use NeNeRecords\Entitlement\UnlimitedEntitlementResolver;
 use NeNeRecords\Organization\CreateOrganizationInput;
 use NeNeRecords\Organization\CreateOrganizationUseCase;
 use NeNeRecords\Organization\DeleteOrganizationInput;
@@ -84,7 +85,7 @@ final class OrganizationUseCaseTest extends TestCase
             new CreateOrganizationInput(name: 'Original Name', slug: 'my-org'),
         );
 
-        $output = (new UpdateOrganizationUseCase($organizations))->execute(
+        $output = (new UpdateOrganizationUseCase($organizations, new UnlimitedEntitlementResolver()))->execute(
             new UpdateOrganizationInput(
                 id: $created->id,
                 name: 'Updated Name',
@@ -108,7 +109,7 @@ final class OrganizationUseCaseTest extends TestCase
             new CreateOrganizationInput(name: 'My Org', slug: 'old-slug'),
         );
 
-        $output = (new UpdateOrganizationUseCase($organizations))->execute(
+        $output = (new UpdateOrganizationUseCase($organizations, new UnlimitedEntitlementResolver()))->execute(
             new UpdateOrganizationInput(
                 id: $created->id,
                 name: null,
@@ -130,7 +131,7 @@ final class OrganizationUseCaseTest extends TestCase
             new CreateOrganizationInput(name: 'My Org', slug: 'my-org', plan: 'free'),
         );
 
-        $output = (new UpdateOrganizationUseCase($organizations))->execute(
+        $output = (new UpdateOrganizationUseCase($organizations, new UnlimitedEntitlementResolver()))->execute(
             new UpdateOrganizationInput(
                 id: $created->id,
                 name: null,
@@ -152,7 +153,7 @@ final class OrganizationUseCaseTest extends TestCase
             new CreateOrganizationInput(name: 'My Org', slug: 'my-org', isActive: true),
         );
 
-        $output = (new UpdateOrganizationUseCase($organizations))->execute(
+        $output = (new UpdateOrganizationUseCase($organizations, new UnlimitedEntitlementResolver()))->execute(
             new UpdateOrganizationInput(
                 id: $created->id,
                 name: null,
@@ -174,7 +175,7 @@ final class OrganizationUseCaseTest extends TestCase
             new CreateOrganizationInput(name: 'My Org', slug: 'my-org'),
         );
 
-        $output = (new UpdateOrganizationUseCase($organizations))->execute(
+        $output = (new UpdateOrganizationUseCase($organizations, new UnlimitedEntitlementResolver()))->execute(
             new UpdateOrganizationInput(
                 id: $created->id,
                 name: null,
@@ -195,7 +196,7 @@ final class OrganizationUseCaseTest extends TestCase
 
         $this->expectException(OrganizationNotFoundException::class);
 
-        (new UpdateOrganizationUseCase($organizations))->execute(
+        (new UpdateOrganizationUseCase($organizations, new UnlimitedEntitlementResolver()))->execute(
             new UpdateOrganizationInput(
                 id: 999,
                 name: 'New Name',
@@ -218,7 +219,7 @@ final class OrganizationUseCaseTest extends TestCase
 
         $this->expectException(OrganizationSlugConflictException::class);
 
-        (new UpdateOrganizationUseCase($organizations))->execute(
+        (new UpdateOrganizationUseCase($organizations, new UnlimitedEntitlementResolver()))->execute(
             new UpdateOrganizationInput(
                 id: $createdB->id,
                 name: null,

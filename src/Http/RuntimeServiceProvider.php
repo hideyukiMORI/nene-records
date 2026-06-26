@@ -36,6 +36,7 @@ use NeNeRecords\Organization\OrganizationRepositoryInterface;
 use NeNeRecords\Organization\Resolution\EnvResolutionStrategy;
 use NeNeRecords\Organization\Resolution\OrgResolverMiddleware;
 use NeNeRecords\Organization\Resolution\PathPrefixResolutionStrategy;
+use NeNeRecords\Organization\Resolution\SubdomainOrCustomDomainResolutionStrategy;
 use NeNeRecords\Organization\Resolution\SubdomainResolutionStrategy;
 use NeNeRecords\RateLimit\RateLimitServiceProvider;
 use NeNeRecords\SystemConfig\SystemConfigRepositoryInterface;
@@ -322,7 +323,10 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
                     }
 
                     $strategy = match ($resolvedMode) {
-                        'subdomain' => new SubdomainResolutionStrategy($resolvedDomain),
+                        // Subdomain SaaS, plus bring-your-own custom domains
+                        // (resolved via findByCustomDomain when the host isn't a
+                        // base-domain subdomain or the apex).
+                        'subdomain' => new SubdomainOrCustomDomainResolutionStrategy(new SubdomainResolutionStrategy($resolvedDomain)),
                         'path'      => new PathPrefixResolutionStrategy(),
                         default     => new EnvResolutionStrategy($resolvedSlug),
                     };
