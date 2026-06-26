@@ -11,7 +11,8 @@
         "robmorgan/phinx": "^0.16.11",
         "symfony/html-sanitizer": "^8.1",
         "symfony/http-client": "^8.1",
-        "symfony/mailer": "^8.0"
+        "symfony/mailer": "^8.0",
+        "wikimedia/composer-merge-plugin": "^2.1"
     },
     "repositories": [
         {
@@ -54,7 +55,17 @@
         ]
     },
     "config": {
+        "allow-plugins": {
+            "wikimedia/composer-merge-plugin": true
+        },
         "sort-packages": true
+    },
+    "extra": {
+        "merge-plugin": {
+            "include": [
+                "composer.local.json"
+            ]
+        }
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.95",

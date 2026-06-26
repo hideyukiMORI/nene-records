@@ -15,3 +15,7 @@ test-results/
 
 # Design export for ClaudeDesign (generated, not tracked)
 /design-export/
+
+# Private commercial overlay injection (ayane build only, never public) — ADR 0005.
+# composer-merge-plugin merges this if present; absent on a fresh OSS clone.
+/composer.local.json

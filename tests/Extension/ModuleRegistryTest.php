@@ -4,17 +4,26 @@ declare(strict_types=1);
 
 namespace NeNeRecords\Tests\Extension;
 
+use NeNeRecords\Extension\ModuleInterface;
 use NeNeRecords\Extension\ModuleRegistry;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 
 final class ModuleRegistryTest extends TestCase
 {
-    public function testDefaultDiscoversNoModulesInOssBuild(): void
+    public function testEmptyCandidatesYieldNoModules(): void
     {
-        // The commercial package is not installed in the core/OSS repo, so a fresh
-        // build composes nothing on top of core.
-        self::assertSame([], (new ModuleRegistry())->modules());
+        self::assertSame([], (new ModuleRegistry([]))->modules());
+    }
+
+    public function testDefaultCandidatesYieldOnlyModuleInstances(): void
+    {
+        // The default candidate list resolves to nothing on an OSS build and to the
+        // commercial module on the ayane build; either way it must only yield
+        // ModuleInterface instances (assertion is environment-independent).
+        foreach ((new ModuleRegistry())->modules() as $module) {
+            self::assertInstanceOf(ModuleInterface::class, $module);
+        }
     }
 
     public function testDiscoversAnInstalledCandidate(): void
