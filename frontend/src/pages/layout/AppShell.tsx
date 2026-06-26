@@ -19,6 +19,7 @@ import {
   IconGlobe,
   IconHome,
   IconImage,
+  IconKey,
   IconLayers,
   IconLayout,
   IconLink,
@@ -259,6 +260,17 @@ export function AppShell() {
                     to="/admin/users"
                     icon={<IconUsers size={16} />}
                     label={t('admin.nav.users')}
+                    onClick={closeSidebar}
+                    rail={rail}
+                  />
+                </li>
+              ) : null}
+              {isAdmin ? (
+                <li>
+                  <NavItem
+                    to="/admin/account"
+                    icon={<IconKey size={16} />}
+                    label={t('admin.nav.account')}
                     onClick={closeSidebar}
                     rail={rail}
                   />

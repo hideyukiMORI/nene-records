@@ -23,6 +23,7 @@ const AcceptInvitePage = named(() => import('@/pages/accept-invite/AcceptInviteP
 const ResetPasswordPage = named(() => import('@/pages/reset-password/ResetPasswordPage'), 'ResetPasswordPage') // prettier-ignore
 const VerifyEmailPage = named(() => import('@/pages/verify-email/VerifyEmailPage'), 'VerifyEmailPage') // prettier-ignore
 const HomePage = named(() => import('@/pages/home/HomePage'), 'HomePage')
+const AccountPage = named(() => import('@/pages/account/AccountPage'), 'AccountPage')
 const EntityTypesPage = named(() => import('@/pages/entity-types/EntityTypesPage'), 'EntityTypesPage') // prettier-ignore
 const TagsPage = named(() => import('@/pages/tags/TagsPage'), 'TagsPage')
 const CommentsPage = named(() => import('@/pages/comments/CommentsPage'), 'CommentsPage')
@@ -124,6 +125,7 @@ const router = createBrowserRouter(
         { path: 'webhooks', element: <WebhooksPage /> },
         { path: 'notifications', element: <NotificationChannelsPage /> },
         { path: 'settings', element: <SiteSettingsPage /> },
+        { path: 'account', element: <AccountPage /> },
         { path: 'import', element: <ImportPage /> },
         { path: 'users', element: <UsersPage /> },
         { path: 'users/:id', element: <UserEditPage /> },
