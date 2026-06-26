@@ -1,6 +1,6 @@
 # Current Work
 
-Last updated: 2026-06-24
+Last updated: 2026-06-26
 
 ## 状態サマリー
 
@@ -41,35 +41,53 @@ Last updated: 2026-06-24
 #530 管理画面6言語化。詳細は下記「ポストM16」セクション。リッチページ #491 / Custom Page 厳格契約 #311 /
 フロント全体監査 #507 は一部進行中。）
 
-最新の検証基準（2026-06-24 実測）: PHPUnit 846 tests / 2305 assertions / PHPStan level 8（1156 files）/
+**ポスト #536 — UX/SEO/SSR・WordPress 移行・本番配備・subdomain SaaS 本番稼働: 進行中（コア出荷済み）（2026-06-24〜26）**
+（WordPress 比較×6ペルソナ討論を起点に公開 SEO/SSR を最優先化。公開 SEO/SSR #537 / OG 画像 #547 /
+計測 GA4+Consent #583/#584 / sitemap・robots #585–#588 / WYSIWYG #538 / 公開 i18n #540 /
+WordPress 移行 WXR #539 / 本番配備＋ subdomain マルチテナント SaaS を達成し
+**https://nene-records.com で本番稼働**（apex=プロモ LP・`slug.nene-records.com` で即利用・自動 TLS・メール認証）。
+詳細は下記「ポスト #536」セクション ＋ 引き継ぎ書 `docs/handoff-2026-06-25.md` §A。
+残: P1 #541 設定 UI 化 / #543 権限+2FA ＋ 公開前の signup レート制限・soak・収益モデル。）
+
+最新の検証基準（2026-06-26 実測）: PHPUnit 1038 tests / 2887 assertions / PHPStan level 8（1250 files・エラー 0）/
 CS-Fixer / OpenAPI / MCP（69 tools）＋ Playwright E2E 220 tests（20 files）＋
-`npm run check`（type-check / lint / prettier / test 367（75 files）/ validate:themes / knip / storybook）全グリーン。
+`npm run check`（type-check / lint / prettier / test 418（84 files）/ validate:themes / knip / storybook）全グリーン。
 
 ---
 
 ## 進行中エピック（現在のフロンティア）
 
-> 直近の作業文脈は新しいハンドオフが正本:
-> `docs/todo/handoff-2026-06-23-rich-pages-blocks.md`（リッチページ／ブロック・最新）/
+> 直近の作業文脈は引き継ぎ書が正本:
+> `docs/handoff-2026-06-25.md` §A（**最新**・#536 UX/SEO/SSR・本番配備・subdomain SaaS）/
+> `docs/todo/handoff-2026-06-23-rich-pages-blocks.md`（リッチページ／ブロック）/
 > `docs/todo/handoff-2026-06-17-public-theme-system.md`（テーマシステム）/
 > `docs/todo/handoff-2026-06-19-mcp-connector.md`（MCP コネクタ）。
 
-現在の主戦線は **リッチページ化／Custom Page 厳格契約（#491 / #311）** と
-**フロントエンド全体監査の remediation（#507）**、加えて **公開サイトのテーマ作り込み（#362 / #367 系）の派生フェーズ**。
-テーマのコア（runtime テーマ・カスタマイザ・スタイルフラグエンジン・MCP bridge）は M16＋#390 で完了済み。
+現在の主戦線は **EPIC #536（UX/SEO/SSR・WordPress 移行・本番配備・subdomain SaaS）**。
+公開 SEO/SSR・計測・WordPress 移行・本番 SaaS 化のコアは出荷済み（**https://nene-records.com 本番稼働**）で、
+残るは P1 の **設定 UI 化 #541 / 権限・2FA #543** と、公開拡大前提の **signup レート制限・soak・収益モデル**（engineering 外が中心）。
+並行して継続する旧フロンティア＝**リッチページ化／Custom Page #491 / #311**、**フロント全体監査 #507**、
+**公開テーマ派生 #362 / #371 / #372 / #373**。テーマのコア（runtime テーマ・カスタマイザ・スタイルフラグエンジン・MCP bridge）は
+M16＋#390 で完了済み。#536 の内訳は下記「ポスト #536」セクション。
 
 | Issue | 内容 | 状態 |
 | --- | --- | --- |
+| #536 | epic(ux): 公開 SEO/SSR 最優先の UX 改善（WordPress 移行・本番配備・subdomain SaaS） | 進行中（コア出荷済み・本番稼働。残 P1: #541/#543 ＋ 公開前の signup レート制限/soak/収益） |
+| #539 | WordPress 移行（WXR インポート＋メディア取込＋301 マップ） | 実装済み（#561–#572 マージ・epic は #536 P1 として open） |
+| #541 | 設定の生 JSON 露出を構造化 UI へ | 未着手（#536 P1） |
+| #543 | 権限細分化＋2FA＋パスワード忘れフォーム＋scoped API トークン | 未着手（#536 P1） |
 | #491 | リッチページ化 epic（ブロックを本文の主役に／レイアウトブロック／bundle 完全カスタム） | 進行中（WS1–WS3 S3a–S3d 済・残: S3e=ClaudeDesign 連携＋scoped creds＋JSON-LD） |
 | #311 | Custom Page（sandboxed iframe + 二重表現SEO + ClaudeDesign 連携）厳格契約 | 進行中（S3a–S3d 済・S3e 残。#491 と一体） |
-| #507 | フロントエンド全体監査の remediation（18 WS + セキュリティ + lint 強化） | 進行中（#508–531 マージ済み・残: WS-04/05/14/15/18・ENT-7 等＝要 API/プロダクト判断） |
-| #372 | テーマ カスタマイザ（トークン上書きノブ）Phase 2 | 進行中（残: 画像ノブ logo/hero・メディア #299 連携、ライブプレビュー iframe） |
+| #507 | フロントエンド全体監査の remediation（75 finding / 18 WS + セキュリティ + lint 強化） | 進行中（#508–#531 マージ済み・残: WS-04/05/14/15/18・ENT-7 等＝要 API/プロダクト判断） |
+| #372 | テーマ カスタマイザ（トークン上書きノブ）Phase 2 | 進行中（残: 画像ノブ logo/hero・メディア #299 連携。ライブプレビュー iframe は #538 で達成済み） |
 | #371 | モーション/インタラクション能力レイヤ Phase 1.5 | 進行中（基盤＋scroll-reveal #477・header sticky-shrink #479・hero split/gradient #481 済。残: View Transitions 等） |
 | #373 | ClaudeDesign「MD→テーマ」量産パイプライン＋バリデータ Phase 3 | 未着手 |
 | #362 | 公開サイトのテーマ/見た目の作り込み（design-first / ダークモード対応）epic | 進行中（上記テーマ系を束ねる） |
+| #586 | `/machine/health` に installed version を載せ Suite 更新追跡に対応 | 未着手（運用・standalone） |
 
-> 完了化されたフロンティア: **#390**（ハイブリッドテーマ engine・**クローズ**）/ **#402**（feedColumns・**クローズ**）/
-> **#435**（ClaudeDesign 向け MCP 実践ガイド・**クローズ**）。
+> 完了化されたフロンティア: **#537**（公開 SEO/SSR・**クローズ**）/ **#538**（WYSIWYG ライブプレビュー・**クローズ**）/
+> **#540**（公開 i18n・**クローズ**）/ **#542**（relation スキーマ UI・**クローズ**）/ **#390**（ハイブリッドテーマ engine・クローズ）/
+> **#402**（feedColumns・クローズ）/ **#435**（ClaudeDesign 向け MCP 実践ガイド・クローズ）。
 
 ### 完了済みエピック（旧「進行中」）
 
@@ -79,6 +97,88 @@ CS-Fixer / OpenAPI / MCP（69 tools）＋ Playwright E2E 220 tests（20 files）
   `menus.location`（テーマ表示場所）は方針どおり存置。
 - **#352 外観 › レイアウトビルダー: 完了** — スライス1〜5（#353〜#358）＋ページ別 cfg・公開接続（#360/#361/#408）まで全マージ。
   `layout_config` 設定（`20260617000001_add_layout_config_setting`）で永続化済み。
+
+---
+
+## ポスト #536 — UX/SEO/SSR・WordPress 移行・本番配備・subdomain SaaS（2026-06-24〜26）
+
+ポストM16 後、WordPress 比較×6ペルソナ討論（#534/#545）を起点に公開 SEO/SSR を最優先に据えた EPIC #536 を集中実装。
+**最大の残壁だった「非技術者の入口」を subdomain 型マルチテナント SaaS の本番稼働（https://nene-records.com）まで到達させた。**
+正本は引き継ぎ書 `docs/handoff-2026-06-25.md` §A ＋ 日報 `docs/daily/2026-06-26.md` ＋ 議事録 `docs/review/`。
+
+### 公開 SEO/SSR 統合（#537・P0・完了）
+
+| Issue | PR | 状態 | Summary |
+| --- | --- | --- | --- |
+| #537 | #544 / #548 / #549 / #553 / #554 | 完了 | SSR head に OGP/Twitter/canonical/JSON-LD（#544）、OG 画像を派生エンジンで自動生成し og:image 充填（#547/#548）、実 permalink でクローラブル SSR（#549 S2）、単一オリジンで本番 SPA をマウント（#553 S3）、`/view`→canonical 301＋SPA シェルフォールバック（#554 S4）。方式＝**PHP 前段＋SPA シェル**（Node SSR / bot-prerender は不採用）。 |
+| #557 | #558 | 完了 | 公開 HTML レスポンスの CSP を SPA 対応へ緩和（単一オリジン・厳格性維持）。 |
+
+### WordPress 移行 — WXR インポート（#539・P1・実装済み）
+
+| Issue | PR | 状態 | Summary |
+| --- | --- | --- | --- |
+| #539 | #561–#566 | 実装済み | WXR パーサ＋インポート計画プレビュー（#561 S1）、実行インポート（#562 S2・エンティティ/タグ生成・冪等）、HTTP エンドポイント（#563）、管理画面 UI（#564）、301 リダイレクトマップで SEO 資産保全（#565 S3）、メディア添付取込＋本文画像 URL 差替（#566 S4）。 |
+| #539 | #567–#572 | 実装済み | メディア取得の SSRF 遮断（#567）、単一オリジン fallback を PSR-15 `SingleOriginKernel` に集約（#568）、WXR 応答を OpenAPI 名前付きスキーマで型付け（#569）、SSR で html 型をサーバ側サニタイズ（#570）、本文を必ず html 型へ格納し忠実描画（#571）、Yoast/RankMath/AIOSEO の SEO メタ取込（#572）。 |
+
+> #539 は全スライス（#561–#572）マージ済みだが epic issue 自体は #536 P1 として open のまま。
+
+### 計測（GA4/GTM＋Consent Mode v2）
+
+| Issue | PR | 状態 | Summary |
+| --- | --- | --- | --- |
+| #536 | #583 / #584 / #589 | 完了 | バックエンド核（ID 厳格検証・**nonce 付き** head・consent default をローダ前・CSP は ID 設定時のみ緩和・#583）、フロント（SPA ルート page_view 初回スキップ＋同意バナー・#584）、同意既定のドロップダウン化（#589）。既定は analytics OFF（厳格 CSP）、管理者が実 ID を設定した時のみ有効。 |
+
+### SEO 周辺（sitemap / robots）
+
+| Issue | PR | 状態 | Summary |
+| --- | --- | --- | --- |
+| #536 | #585 / #587 / #588 | 完了 | `sitemap.xml`（org スコープ・正規 permalink・lastmod・5 万 URL 上限・#585）、`robots.txt`（バックオフィス Disallow・絶対 Sitemap 参照・#587）、大規模時のインデックス分割（既定 45,000 超で sitemapindex へ・#588）。 |
+
+### WYSIWYG ライブプレビュー（#538・P0・完了）
+
+| Issue | PR | 状態 | Summary |
+| --- | --- | --- | --- |
+| #538 | #590 / #591 | 完了 | ブロック編集のライブプレビュー（公開と同一 `BlocksRenderer`・`.nene-public` スコープ・#590 ①）、テーマカスタマイザの iframe ライブプレビュー（postMessage・同一オリジン origin 検証・#591 ②）。#372 の「ライブプレビュー iframe」も充足。 |
+
+### 公開サイト多言語化（#540・P1・完了）
+
+| Issue | PR | 状態 | Summary |
+| --- | --- | --- | --- |
+| #540 | #592 / #593 | 完了 | 公開コンテンツのロケール交渉＋`<html lang>`/canonical/hreflang（全 6＋x-default・#592 S1）、公開ヘッダの言語スイッチャ＋一覧（browse/recent/search/tag/archive/relation）のロケール解決（#593 S2）。bootstrap サーバ側解決でハイドレーション一貫。 |
+
+### relation フィールド スキーマ UI（#542・P1・完了）
+
+| Issue | PR | 状態 | Summary |
+| --- | --- | --- | --- |
+| #542 | #550 | 完了 | relation 型フィールドのスキーマ UI を配線。 |
+
+### 本番配備・オンボーディング
+
+| Issue | PR | 状態 | Summary |
+| --- | --- | --- | --- |
+| #536 | #573 / #574 / #575 / #579 / #580 | 完了 | ワンコマンド初回導入（組織+admin・冪等・#573）、本番スタック＋**fresh-DB migration P0 修正**（#574）、多段 `Dockerfile.prod` で self-contained イメージ（#575）、本番運用 3 点（healthcheck/backup/logs・#579）、README 実態整合（NENE2 sibling-clone 明記・#580）。 |
+| #536 | #577 / #578 / #582 | 完了（本番限定バグ） | デプロイで顕在化した 3 件: org 未解決パスで `UrlRedirectResolver` が fatal（#577）、本番 compose の `MAIL_DSN` 空既定で全リクエスト 500（#578・null transport へ）、単一 org の org-not-resolved（空 seed×ORG_SLUG・`??`→`?:`・#582）。 |
+
+### サブディレクトリ設置（base path 基盤・zip インストーラ前提）
+
+| Issue | PR | 状態 | Summary |
+| --- | --- | --- | --- |
+| #536 | #595 / #596 / #597 / #599 | 進行中 | バックエンド URL 生成の base 前置（`APP_BASE_PATH`・S1 #595）、フロント・ランタイム base（`<base href>` 由来・S2 #596）、CSP ブロック解消（#597）、ディレクトリ方式マルチテナントの公開 SEO 配線（S-path #599）。**残 S3**: Web サーバの prefix strip ＋ zip パッケージング。 |
+
+### subdomain マルチテナント SaaS（本番 cutover・完了）
+
+| Issue | PR | 状態 | Summary |
+| --- | --- | --- | --- |
+| #536 | #600–#609 | 完了（本番稼働） | on-demand TLS の ask エンドポイント（#600 ①）、apex をグローバル面として通す（#601 ②）、公開セルフサーブ signup（BE #602 / FE #603 ④）、apex デフォルト・プロモ LP（#604）、cron を全テナント対応（#605 ③ blocker）、`/`+html→SPA シェル（#606）、メール env キー是正 MAIL_FROM_ADDRESS（#607）、メール認証ソフトゲート（#608）、確認後にテナントログインへ案内（#609）。**本番＝https://nene-records.com（apex=LP / `slug.nene-records.com` で即利用 / 自動 TLS / Resend メール）、`records.nene-suite.com`→301。** |
+
+### ペルソナ討論・検証レポート（`docs/review/`）
+
+| Issue | PR | Summary |
+| --- | --- | --- |
+| #534/#545/#551/#555/#559 | #535/#546/#552/#556/#560 | WordPress 比較×6ペルソナ UX 検証（#534/#535）、12 ペルソナ討論（#545/#546）、第 2 回（実装後・#552）、本番デプロイ実機検証（#555/#556）、第 3 回（デプロイ実証後・#560）。 |
+| #536 | #576/#581/#594/#598/#610 | 第 4 回（#576）、第 5 回（#581）、計測/UTM 補遺（#594）、テナント URL 方式討論（#598）、第 6 回（#610）。判定は「使えるか」→「商売・信頼に足るか」へ質的転換（見送り 5→2・今すぐ 2→4）。 |
+
+**残課題（ペルソナ第 6 回の処方順）:** ① signup レート制限（最優先・小・公開前提＝大量 org 作成の濫用対策）/ ② soak（実コンテンツ投入＋数週間の無事故運用）/ ③ 収益モデルの事業判断（有料プラン/独自ドメイン SKU/保守 SLA・`CustomDomainResolutionStrategy` の土台あり）。詳細は引き継ぎ書 `docs/handoff-2026-06-25.md` §A。
 
 ---
 
@@ -290,13 +390,15 @@ M16 後に main へマージした作業。正本は `docs/todo/handoff-2026-06-
 
 | 項目 | 概要 | 難易度 | 優先度 |
 | --- | --- | --- | --- |
+| signup レート制限 | 公開セルフサーブ signup の abuse 対策（`ThrottleMiddleware` を `/api/v1/public/signup` に付与）。公開拡大の前提 | 小 | P1 |
+| 設定の構造化 UI（#541） | 設定の生 JSON 露出を構造化フォームへ（#536 P1） | 中 | P1 |
+| 権限細分化＋2FA（#543） | 権限粒度＋2FA＋パスワード忘れフォーム＋scoped API トークン（#536 P1） | 大 | P1 |
 | 人気記事の精度向上 | per-view ロギング（entity_id 明示記録）で管理 GET を除外し正確化 | 中 | P2 |
-| Consumer i18n | 公開 detail / アーカイブ系の多言語化 | 中 | P2 |
 | AI Consumer Chat | NeNe Records を外部 API として使うチャットシステム（**別リポジトリ**） | 大 | P2 |
 | スケジュール公開改善 | `scheduled_at` ジョブ状態 UI・失敗ハンドリング | 小〜中 | P2 |
 | ウィジェット表示順 UI | region 内のウィジェット並び替え（現状 display_order は固定 0） | 小 | P3 |
 
-> 完了済み（旧候補）: コメント通知/スパム対策（#263/#264）、コンテンツ検索（#265 → 公開検索 #335 で実現）。
+> 完了済み（旧候補）: コメント通知/スパム対策（#263/#264）、コンテンツ検索（#265 → 公開検索 #335 で実現）、**Consumer i18n（#540 で実現・2026-06-25）**。
 
 ---
 
