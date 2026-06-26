@@ -12,4 +12,5 @@ enum Capability
     case ManageTags;
     case EditContent;
     case ManageOrganizations;
+    case ManageAccount;
 }

@@ -21,7 +21,8 @@ enum Role: string
                 Capability::ManageSchema,
                 Capability::ManageSettings,
                 Capability::ManageTags,
-                Capability::ManageOrganizations => false,
+                Capability::ManageOrganizations,
+                Capability::ManageAccount => false,
             },
         };
     }

@@ -8,6 +8,8 @@ servers:
   - url: http://localhost:8080
     description: Local development server
 tags:
+  - name: Account
+    description: Tenant self-serve account (plan, entitlements, usage).
   - name: Auth
     description: Authentication endpoints.
   - name: System
@@ -3475,6 +3477,47 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /api/v1/account:
+    get:
+      tags:
+        - Account
+      summary: Get the current tenant's account
+      description: >-
+        Returns the calling tenant's own organization (name, slug, plan), the
+        entitlements it gets under its plan (custom-domain allowance and limits;
+        null = unlimited) and current usage. The organization is taken from the
+        resolved request context, never a client-supplied id. Requires the
+        ManageAccount capability (admin).
+      operationId: getAccount
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: The tenant's account.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountResponse'
+              examples:
+                ok:
+                  value:
+                    slug: my-shop
+                    name: My Shop
+                    plan: free
+                    custom_domain: null
+                    entitlements:
+                      custom_domain_allowed: false
+                      max_records: 1000
+                      max_storage_bytes: 1073741824
+                      max_admin_users: 1
+                    usage:
+                      records: 12
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
   /api/v1/dashboard:
     get:
       tags:
@@ -4369,6 +4412,42 @@ components:
                 detail: An unexpected error occurred.
                 instance: /api/v1/entity-types
   schemas:
+    AccountResponse:
+      type: object
+      required: [slug, name, plan, custom_domain, entitlements, usage]
+      properties:
+        slug:
+          type: string
+        name:
+          type: string
+        plan:
+          type: string
+        custom_domain:
+          type: string
+          nullable: true
+        entitlements:
+          type: object
+          required: [custom_domain_allowed, max_records, max_storage_bytes, max_admin_users]
+          properties:
+            custom_domain_allowed:
+              type: boolean
+            max_records:
+              type: integer
+              nullable: true
+              description: 'null = unlimited'
+            max_storage_bytes:
+              type: integer
+              format: int64
+              nullable: true
+            max_admin_users:
+              type: integer
+              nullable: true
+        usage:
+          type: object
+          required: [records]
+          properties:
+            records:
+              type: integer
     WxrPlannedItem:
       type: object
       required: [title, slug, entity_type, status, tags]
