@@ -51,6 +51,14 @@ final readonly class ListEntitiesHandler
         $rawOrder = $request->getQueryParams()['order'] ?? null;
         $sortOrder = is_string($rawOrder) ? (EntitySortOrder::tryFrom($rawOrder) ?? EntitySortOrder::Desc) : EntitySortOrder::Desc;
 
+        // `?include=excerpt,views` opt-ins: `excerpt` adds a server-computed teaser
+        // (public feed / post-list widgets); `views` adds a per-record view count
+        // (#674). Off by default so the admin list stays lean.
+        $rawInclude = $request->getQueryParams()['include'] ?? '';
+        $includes = is_string($rawInclude) ? explode(',', $rawInclude) : [];
+        $wantExcerpt = in_array('excerpt', $includes, true);
+        $wantViews = in_array('views', $includes, true);
+
         $output = $this->useCase->execute(new ListEntitiesInput(
             limit: $pagination->limit,
             offset: $pagination->offset,
@@ -65,18 +73,15 @@ final readonly class ListEntitiesHandler
                 publishedFrom: $publishedFrom,
                 publishedToExclusive: $publishedToExclusive,
             ),
+            includeViews: $wantViews,
         ));
 
-        // `?include=excerpt` adds a server-computed teaser (used by the public
-        // feed and post-list widgets). Off by default so the admin list stays lean.
-        $include = $request->getQueryParams()['include'] ?? '';
-        $wantExcerpt = is_string($include) && in_array('excerpt', explode(',', $include), true);
         $excerptByEntity = $wantExcerpt ? $this->excerpts->resolve($output->items) : [];
 
         return $this->response->create(
             (new PaginationResponse(
                 items: array_map(
-                    function (ListEntityItem $item) use ($wantExcerpt, $excerptByEntity) {
+                    function (ListEntityItem $item) use ($wantExcerpt, $excerptByEntity, $wantViews) {
                         $row = [
                             'id' => $item->id,
                             'entity_type_id' => $item->entityTypeId,
@@ -95,6 +100,9 @@ final readonly class ListEntitiesHandler
                         ];
                         if ($wantExcerpt) {
                             $row['excerpt'] = $excerptByEntity[$item->id] ?? '';
+                        }
+                        if ($wantViews) {
+                            $row['view_count'] = $item->viewCount;
                         }
 
                         return $row;

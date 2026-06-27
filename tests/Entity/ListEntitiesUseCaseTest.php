@@ -1,0 +1,70 @@
+<?php
+
+declare(strict_types=1);
+
+namespace NeNeRecords\Tests\Entity;
+
+use DateTimeImmutable;
+use NeNeRecords\Analytics\AccessLogEntry;
+use NeNeRecords\Entity\Entity;
+use NeNeRecords\Entity\EntityStatus;
+use NeNeRecords\Entity\ListEntitiesInput;
+use NeNeRecords\Entity\ListEntitiesUseCase;
+use NeNeRecords\Tests\Analytics\InMemoryAccessLogRepository;
+use PHPUnit\Framework\TestCase;
+
+final class ListEntitiesUseCaseTest extends TestCase
+{
+    private function hit(string $path): AccessLogEntry
+    {
+        return new AccessLogEntry(
+            requestId: null,
+            method: 'GET',
+            path: $path,
+            statusCode: 200,
+            durationMs: 1.0,
+            accessedAt: new DateTimeImmutable(),
+        );
+    }
+
+    public function testPopulatesPerEntityViewCountsWhenIncludeViewsIsSet(): void
+    {
+        $entities = new InMemoryEntityRepository([
+            new Entity(id: 1, entityTypeId: 1, permalink: '/a', status: EntityStatus::Published),
+            new Entity(id: 2, entityTypeId: 1, permalink: '/b', status: EntityStatus::Published),
+        ]);
+        $accessLogs = new InMemoryAccessLogRepository();
+        $accessLogs->insert($this->hit('/api/v1/entities/1'));
+        $accessLogs->insert($this->hit('/api/v1/entities/1'));
+        $accessLogs->insert($this->hit('/api/v1/entities/2'));
+        // A nested path must NOT count as a view of entity 1.
+        $accessLogs->insert($this->hit('/api/v1/entities/1/revisions'));
+
+        $useCase = new ListEntitiesUseCase($entities, $accessLogs);
+
+        $output = $useCase->execute(new ListEntitiesInput(includeViews: true));
+
+        $viewCountById = [];
+        foreach ($output->items as $item) {
+            $viewCountById[$item->id] = $item->viewCount;
+        }
+        self::assertSame(2, $viewCountById[1] ?? null);
+        self::assertSame(1, $viewCountById[2] ?? null);
+    }
+
+    public function testLeavesViewCountsAtZeroByDefault(): void
+    {
+        $entities = new InMemoryEntityRepository([
+            new Entity(id: 1, entityTypeId: 1, permalink: '/a', status: EntityStatus::Published),
+        ]);
+        $accessLogs = new InMemoryAccessLogRepository();
+        $accessLogs->insert($this->hit('/api/v1/entities/1'));
+
+        $useCase = new ListEntitiesUseCase($entities, $accessLogs);
+
+        // No includeViews → the GROUP BY is skipped and every viewCount stays 0.
+        $output = $useCase->execute(new ListEntitiesInput());
+
+        self::assertSame(0, $output->items[0]->viewCount ?? null);
+    }
+}

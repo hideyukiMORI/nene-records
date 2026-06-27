@@ -11,6 +11,7 @@ use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RequestScopedHolder;
+use NeNeRecords\Analytics\AccessLogRepositoryInterface;
 use NeNeRecords\EntityType\EntityTypeRepositoryInterface;
 use NeNeRecords\Organization\OrganizationIterator;
 use NeNeRecords\Setting\SettingRepositoryInterface;
@@ -153,7 +154,13 @@ final readonly class EntityServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Entity repository service is invalid.');
                     }
 
-                    return new ListEntitiesUseCase($repository);
+                    $accessLogs = $c->get(AccessLogRepositoryInterface::class);
+
+                    if (!$accessLogs instanceof AccessLogRepositoryInterface) {
+                        throw new LogicException('Access log repository service is invalid.');
+                    }
+
+                    return new ListEntitiesUseCase($repository, $accessLogs);
                 },
             )
             ->set(

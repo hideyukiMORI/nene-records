@@ -645,6 +645,7 @@ export const ja: Partial<MessageCatalog> = {
   'admin.entityRecords.directory.move.success': 'ページを移動しました。',
   'admin.entityRecords.directory.moveUp': '上へ',
   'admin.entityRecords.directory.moveDown': '下へ',
+  'admin.entityRecords.directory.views': '閲覧数（30日）: {{count}}',
   'admin.entityRecords.directory.filter.placeholder': 'パスやタイトルで絞り込み…',
   'admin.entityRecords.directory.filter.noMatches': '「{{query}}」に一致するページはありません。',
   'admin.entityRecords.directory.filter.clear': '絞り込みをクリア',

@@ -7,6 +7,8 @@ export interface DirectoryRecord {
   status: EntityStatus
   updatedAt: string | null
   menuOrder: number
+  /** View count over the last 30 days (#674). */
+  viewCount?: number
 }
 
 export interface DirectoryNode {

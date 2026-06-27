@@ -21,6 +21,7 @@ final readonly class ListEntityItem
         public ?string $metaTitle = null,
         public ?string $metaDescription = null,
         public int $menuOrder = 0,
+        public int $viewCount = 0,
     ) {
     }
 }

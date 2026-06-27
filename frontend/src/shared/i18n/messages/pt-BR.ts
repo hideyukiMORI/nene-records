@@ -650,6 +650,7 @@ export const ptBR: Partial<MessageCatalog> = {
   'admin.entityRecords.directory.move.success': 'Páginas movidas.',
   'admin.entityRecords.directory.moveUp': 'Mover para cima',
   'admin.entityRecords.directory.moveDown': 'Mover para baixo',
+  'admin.entityRecords.directory.views': 'Visualizações (30 d): {{count}}',
   'admin.entityRecords.directory.filter.placeholder': 'Filtrar por caminho ou título…',
   'admin.entityRecords.directory.filter.noMatches': 'Nenhuma página corresponde a “{{query}}”.',
   'admin.entityRecords.directory.filter.clear': 'Limpar filtro',

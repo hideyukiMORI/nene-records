@@ -619,6 +619,7 @@ export const zhHans: Partial<MessageCatalog> = {
   'admin.entityRecords.directory.move.success': '页面已移动。',
   'admin.entityRecords.directory.moveUp': '上移',
   'admin.entityRecords.directory.moveDown': '下移',
+  'admin.entityRecords.directory.views': '浏览量（30天）：{{count}}',
   'admin.entityRecords.directory.filter.placeholder': '按路径或标题筛选…',
   'admin.entityRecords.directory.filter.noMatches': '没有页面匹配“{{query}}”。',
   'admin.entityRecords.directory.filter.clear': '清除筛选',

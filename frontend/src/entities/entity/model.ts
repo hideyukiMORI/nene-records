@@ -22,6 +22,8 @@ export interface Entity {
   menuOrder: number
   /** Server-computed teaser; present only when listed with `include=excerpt`. */
   excerpt?: string | null
+  /** View count over the last 30 days; present only when listed with `include=views` (#674). */
+  viewCount?: number
   createdAt: string | null
   updatedAt: string | null
 }

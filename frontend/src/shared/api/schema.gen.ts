@@ -2189,6 +2189,8 @@ export interface components {
             menu_order?: number;
             /** @description Server-computed plain-text teaser. Present only when the list is requested with `?include=excerpt` (used by the public feed and post-list widgets). Source/length follow the excerpt_* settings. */
             excerpt?: string;
+            /** @description View count over the last 30 days (same metric as the analytics "popular" view). Present only when the list is requested with `?include=views` (used by the admin directory). (#674) */
+            view_count?: number;
             /** Format: date-time */
             created_at: string | null;
             /** Format: date-time */

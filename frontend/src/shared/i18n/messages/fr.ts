@@ -657,6 +657,7 @@ export const fr: Partial<MessageCatalog> = {
   'admin.entityRecords.directory.move.success': 'Pages déplacées.',
   'admin.entityRecords.directory.moveUp': 'Monter',
   'admin.entityRecords.directory.moveDown': 'Descendre',
+  'admin.entityRecords.directory.views': 'Vues (30 j) : {{count}}',
   'admin.entityRecords.directory.filter.placeholder': 'Filtrer par chemin ou titre…',
   'admin.entityRecords.directory.filter.noMatches': 'Aucune page ne correspond à « {{query}} ».',
   'admin.entityRecords.directory.filter.clear': 'Effacer le filtre',
