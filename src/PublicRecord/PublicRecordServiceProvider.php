@@ -198,6 +198,28 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
                 },
             )
             ->set(
+                ResolvePublicPermalinkHandler::class,
+                static function (ContainerInterface $container): ResolvePublicPermalinkHandler {
+                    $entities = $container->get(EntityRepositoryInterface::class);
+                    $entityTypes = $container->get(EntityTypeRepositoryInterface::class);
+                    $response = $container->get(JsonResponseFactory::class);
+
+                    if (!$entities instanceof EntityRepositoryInterface) {
+                        throw new LogicException('Entity repository service is invalid.');
+                    }
+
+                    if (!$entityTypes instanceof EntityTypeRepositoryInterface) {
+                        throw new LogicException('Entity type repository service is invalid.');
+                    }
+
+                    if (!$response instanceof JsonResponseFactory) {
+                        throw new LogicException('JSON response factory service is invalid.');
+                    }
+
+                    return new ResolvePublicPermalinkHandler($entities, $entityTypes, $response);
+                },
+            )
+            ->set(
                 RenderPublicRecordViewHandler::class,
                 static function (ContainerInterface $container): RenderPublicRecordViewHandler {
                     $useCase = $container->get(GetPublicRecordViewUseCaseInterface::class);
@@ -394,6 +416,7 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
                 static function (ContainerInterface $container): PublicRecordRouteRegistrar {
                     $getHandler = $container->get(GetPublicRecordViewHandler::class);
                     $hierarchyHandler = $container->get(GetPublicRecordHierarchyHandler::class);
+                    $resolveHandler = $container->get(ResolvePublicPermalinkHandler::class);
                     $renderHandler = $container->get(RenderPublicRecordViewHandler::class);
                     $permalinkHandler = $container->get(RenderPublicPermalinkHandler::class);
                     $sitemapHandler = $container->get(RenderSitemapHandler::class);
@@ -405,6 +428,10 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
 
                     if (!$hierarchyHandler instanceof GetPublicRecordHierarchyHandler) {
                         throw new LogicException('GetPublicRecordHierarchy handler service is invalid.');
+                    }
+
+                    if (!$resolveHandler instanceof ResolvePublicPermalinkHandler) {
+                        throw new LogicException('ResolvePublicPermalink handler service is invalid.');
                     }
 
                     if (!$renderHandler instanceof RenderPublicRecordViewHandler) {
@@ -426,6 +453,7 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
                     return new PublicRecordRouteRegistrar(
                         $getHandler,
                         $hierarchyHandler,
+                        $resolveHandler,
                         $renderHandler,
                         $permalinkHandler,
                         $sitemapHandler,

@@ -793,6 +793,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/public/records/resolve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Resolve a custom-permalink path to its record
+         * @description Resolves an arbitrary custom-permalink path (e.g. `/company/about`) to `{entityTypeSlug, entityId}` so the type-based public SPA router can render it on direct load and client-side navigation (#656). Always 200; `found:false` when no published record owns the path.
+         */
+        get: operations["resolvePublicPermalink"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/notification-channels": {
         parameters: {
             query?: never;
@@ -2558,6 +2578,16 @@ export interface components {
             nextUrl: string | null;
             chapterNo: number;
             chapterTotal: number;
+        };
+        PublicPermalinkResolution: {
+            found: boolean;
+            /** @description Present when found: the resolved record's entity type slug. */
+            entityTypeSlug?: string;
+            /**
+             * Format: int64
+             * @description Present when found: the resolved record id.
+             */
+            entityId?: number;
         };
         PublicRecordHierarchy: {
             /** @description Breadcrumb trail derived from the permalink path; empty for flat records. */
@@ -5249,6 +5279,32 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PublicRecordHierarchy"];
+                };
+            };
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    resolvePublicPermalink: {
+        parameters: {
+            query: {
+                /** @description The custom permalink path, e.g. `/company/about`. */
+                path: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Resolution result. */
+            200: {
+                headers: {
+                    /** @example public, max-age=60, stale-while-revalidate=300 */
+                    "Cache-Control"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicPermalinkResolution"];
                 };
             };
             500: components["responses"]["InternalServerError"];

@@ -7,6 +7,7 @@ import {
   PublicRecordListView,
   usePublicBrowseEntityRecordsPage,
 } from '@/features/public-browse-entity-records'
+import { PublicRecordByPermalink } from './PublicRecordDetailPage'
 import { PublicSiteShell } from './PublicSiteShell'
 import { usePublicSite } from './public-site-context'
 
@@ -39,6 +40,12 @@ export function PublicBrowsePage() {
       params.set('offset', String(nextOffset))
     }
     setSearchParams(params)
+  }
+
+  // A single-segment URL whose slug isn't a known type may be a top-level custom
+  // permalink (e.g. `/about`) → resolve it as one instead of "unknown type" (#656).
+  if (isUnknownType) {
+    return <PublicRecordByPermalink path={`/${entityTypeSlug}`} />
   }
 
   return (

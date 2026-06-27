@@ -166,10 +166,10 @@ describe('PublicRecordDetailPage', () => {
     expect(screen.getByText('bold')).toBeInTheDocument()
   })
 
-  it('shows not found for unknown entity type slug', async () => {
+  it('shows not found for a path that is not a known type or a custom permalink', async () => {
     renderDetailPage('unknown', 1)
 
-    expect(await screen.findByText('Not found')).toBeInTheDocument()
+    expect(await screen.findByText('Record not found')).toBeInTheDocument()
   })
 
   it('renders the derived chapter nav and hides series/chapter_no/chapter_total', async () => {
