@@ -1,5 +1,5 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
-import { cleanup, screen, waitFor } from '@testing-library/react'
+import { cleanup, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { ImportPage } from '@/pages/import/ImportPage'
 import { mswServer } from '@tests/msw/server'
@@ -19,6 +19,16 @@ describe('ImportPage (WXR migration)', () => {
     mswServer.close()
   })
 
+  // The page also renders the CSV redirect importer (#651 PR4), which has its own
+  // "Preview" button — scope WXR-specific queries to the WXR card.
+  function wxrScope() {
+    const card = screen.getByRole('heading', { name: 'WordPress import (WXR)' }).closest('div')
+    if (card === null) {
+      throw new Error('WXR import card not found')
+    }
+    return within(card)
+  }
+
   function selectFile() {
     const file = new File(['<rss><channel></channel></rss>'], 'export.xml', {
       type: 'application/xml',
@@ -31,7 +41,7 @@ describe('ImportPage (WXR migration)', () => {
     renderWithProviders(<ImportPage />)
 
     await selectFile()
-    await user.click(screen.getByRole('button', { name: 'Preview' }))
+    await user.click(wxrScope().getByRole('button', { name: 'Preview' }))
 
     await waitFor(() => {
       expect(screen.getByText('Import plan (preview)')).toBeInTheDocument()
@@ -51,7 +61,7 @@ describe('ImportPage (WXR migration)', () => {
   it('hides the run-import button until a preview exists', () => {
     renderWithProviders(<ImportPage />)
 
-    expect(screen.getByRole('button', { name: 'Preview' })).toBeInTheDocument()
+    expect(wxrScope().getByRole('button', { name: 'Preview' })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Run import' })).not.toBeInTheDocument()
   })
 })

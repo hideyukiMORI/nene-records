@@ -1804,6 +1804,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/migration/url-redirects": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Bulk-import 301 redirects from a CSV
+         * @description Admin-only. Accepts a multipart/form-data CSV of source,target path pairs (full old URLs are accepted — only the path is kept). With dry_run=true (default) validates and previews without writing; with dry_run=false upserts the redirects into the active organization (idempotent per source path). Keeps migrated WordPress URLs 1:1 (#651).
+         */
+        post: operations["importUrlRedirectsCsv"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1864,6 +1884,24 @@ export interface components {
             media_skipped: number;
             skipped: components["schemas"]["WxrSkippedItem"][];
             warnings: string[];
+        };
+        RedirectCsvImportResponse: {
+            /** @enum {string} */
+            mode: "preview" | "import";
+            total_rows: number;
+            valid_rows: number;
+            /** @description Number of redirects written (0 in preview mode). */
+            imported_rows: number;
+            skipped_rows: number;
+            errors: {
+                line: number;
+                message: string;
+            }[];
+            /** @description First normalized source→target mappings, for preview sanity-checking. */
+            samples: {
+                source: string;
+                target: string;
+            }[];
         };
         UserResponse: {
             id: number;
@@ -7152,6 +7190,53 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["WxrImportResultResponse"];
+                };
+            };
+            422: components["responses"]["ValidationFailed"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    importUrlRedirectsCsv: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /**
+                     * Format: binary
+                     * @description CSV with source,target path columns (an optional header row is detected and skipped).
+                     */
+                    file: string;
+                    /**
+                     * @description true = preview only; false = execute the import.
+                     * @default true
+                     * @enum {string}
+                     */
+                    dry_run?: "true" | "false";
+                };
+            };
+        };
+        responses: {
+            /** @description Dry-run preview (nothing written). */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RedirectCsvImportResponse"];
+                };
+            };
+            /** @description Import executed. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RedirectCsvImportResponse"];
                 };
             };
             422: components["responses"]["ValidationFailed"];

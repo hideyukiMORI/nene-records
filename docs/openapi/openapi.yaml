@@ -4176,6 +4176,48 @@ paths:
           $ref: '#/components/responses/ValidationFailed'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /api/v1/migration/url-redirects:
+    post:
+      tags:
+        - Migration
+      summary: Bulk-import 301 redirects from a CSV
+      description: "Admin-only. Accepts a multipart/form-data CSV of source,target path pairs (full old URLs are accepted — only the path is kept). With dry_run=true (default) validates and previews without writing; with dry_run=false upserts the redirects into the active organization (idempotent per source path). Keeps migrated WordPress URLs 1:1 (#651)."
+      operationId: importUrlRedirectsCsv
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: CSV with source,target path columns (an optional header row is detected and skipped).
+                dry_run:
+                  type: string
+                  enum: ['true', 'false']
+                  default: 'true'
+                  description: 'true = preview only; false = execute the import.'
+      responses:
+        '200':
+          description: Dry-run preview (nothing written).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RedirectCsvImportResponse'
+        '201':
+          description: Import executed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RedirectCsvImportResponse'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 components:
   parameters:
     IdPath:
@@ -4627,6 +4669,56 @@ components:
           type: array
           items:
             type: string
+    RedirectCsvImportResponse:
+      type: object
+      required:
+        - mode
+        - total_rows
+        - valid_rows
+        - imported_rows
+        - skipped_rows
+        - errors
+        - samples
+      properties:
+        mode:
+          type: string
+          enum: [preview, import]
+        total_rows:
+          type: integer
+        valid_rows:
+          type: integer
+        imported_rows:
+          type: integer
+          description: 'Number of redirects written (0 in preview mode).'
+        skipped_rows:
+          type: integer
+        errors:
+          type: array
+          items:
+            type: object
+            required:
+              - line
+              - message
+            properties:
+              line:
+                type: integer
+              message:
+                type: string
+            additionalProperties: false
+        samples:
+          type: array
+          description: 'First normalized source→target mappings, for preview sanity-checking.'
+          items:
+            type: object
+            required:
+              - source
+              - target
+            properties:
+              source:
+                type: string
+              target:
+                type: string
+            additionalProperties: false
     UserResponse:
       type: object
       required:
