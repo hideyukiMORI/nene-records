@@ -98,6 +98,10 @@ final class UrlRedirectResolverTest extends TestCase
             public function save(string $sourcePath, string $targetPath): void
             {
             }
+
+            public function recordMove(string $oldPath, string $newPath): void
+            {
+            }
         };
         $resolver = new UrlRedirectResolver($throwing, $this->factory);
 
