@@ -12,6 +12,7 @@ import { entityTypeHandlers } from './handlers/entity-type'
 import { enumFieldHandlers } from './handlers/enum-field'
 import { fieldDefHandlers } from './handlers/field-def'
 import { intFieldHandlers } from './handlers/int-field'
+import { publicPermalinkResolveHandlers } from './handlers/public-permalink-resolve'
 import { publicRecordHierarchyHandlers } from './handlers/public-record-hierarchy'
 import { tagHandlers } from './handlers/tag'
 import { textFieldHandlers } from './handlers/text-field'
@@ -37,4 +38,5 @@ export const mswServer = setupServer(
   ...commentHandlers,
   ...wxrImportHandlers,
   ...publicRecordHierarchyHandlers,
+  ...publicPermalinkResolveHandlers,
 )

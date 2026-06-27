@@ -1,6 +1,7 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import { cleanup, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { http, HttpResponse } from 'msw'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { PublicBrowsePage } from '@/pages/consumer/PublicBrowsePage'
 import { PublicIndexPage } from '@/pages/consumer/PublicIndexPage'
@@ -83,11 +84,10 @@ describe('PublicBrowsePage', () => {
     expect(screen.getByRole('link', { name: 'Second post' })).toHaveAttribute('href', '/article/2')
   })
 
-  it('shows empty state for unknown entity type slug', async () => {
+  it('treats an unknown slug as a custom permalink, showing not found when unresolved (#656)', async () => {
     renderBrowsePage('/missing-type')
 
-    expect(await screen.findByText('Entity type not found')).toBeInTheDocument()
-    expect(screen.getByText('No public content for “missing-type”.')).toBeInTheDocument()
+    expect(await screen.findByText('Record not found')).toBeInTheDocument()
   })
 
   it('navigates to record detail from the list', async () => {
@@ -118,6 +118,32 @@ describe('PublicBrowsePage', () => {
     await waitFor(() => {
       expect(screen.getByRole('link', { name: 'Back to Article' })).toBeInTheDocument()
     })
+  })
+
+  it('renders a custom-permalink page by resolving its path (#656)', async () => {
+    mswServer.use(
+      http.get('/api/v1/public/records/resolve', () =>
+        HttpResponse.json({ found: true, entityTypeSlug: 'article', entityId: 1 }),
+      ),
+    )
+    seedEntityTypes([{ id: 1, name: 'Article', slug: 'article' }])
+    seedEntities([
+      {
+        id: 1,
+        entity_type_id: 1,
+        permalink: '/about',
+        status: 'published',
+        is_deleted: false,
+        deleted_at: null,
+      },
+    ])
+    seedTextFields([{ id: 1, entity_id: 1, field_key: 'title', value: 'About Us' }])
+
+    renderBrowsePage('/about')
+
+    // The custom-permalink record resolves → renders the detail in place (no
+    // redirect, since its canonical IS the permalink — exercises the #656 fix).
+    expect(await screen.findByRole('link', { name: 'Back to Article' })).toBeInTheDocument()
   })
 
   it('paginates records with offset query param', async () => {

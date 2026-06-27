@@ -2282,6 +2282,38 @@ paths:
                 $ref: '#/components/schemas/PublicRecordHierarchy'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /api/v1/public/records/resolve:
+    get:
+      tags:
+        - PublicConsumer
+      summary: Resolve a custom-permalink path to its record
+      description: >
+        Resolves an arbitrary custom-permalink path (e.g. `/company/about`) to
+        `{entityTypeSlug, entityId}` so the type-based public SPA router can render
+        it on direct load and client-side navigation (#656). Always 200; `found:false`
+        when no published record owns the path.
+      operationId: resolvePublicPermalink
+      parameters:
+        - name: path
+          in: query
+          required: true
+          description: The custom permalink path, e.g. `/company/about`.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Resolution result.
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+              example: public, max-age=60, stale-while-revalidate=300
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicPermalinkResolution'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /api/v1/notification-channels:
     get:
       tags:
@@ -6427,6 +6459,22 @@ components:
         chapterTotal:
           type: integer
           minimum: 1
+      additionalProperties: false
+    PublicPermalinkResolution:
+      type: object
+      required:
+        - found
+      properties:
+        found:
+          type: boolean
+        entityTypeSlug:
+          type: string
+          description: 'Present when found: the resolved record''s entity type slug.'
+        entityId:
+          type: integer
+          format: int64
+          minimum: 1
+          description: 'Present when found: the resolved record id.'
       additionalProperties: false
     PublicRecordHierarchy:
       type: object

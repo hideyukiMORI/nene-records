@@ -31,6 +31,7 @@ use NeNeRecords\PublicRecord\RenderPublicPermalinkHandler;
 use NeNeRecords\PublicRecord\RenderPublicRecordViewHandler;
 use NeNeRecords\PublicRecord\RenderRobotsHandler;
 use NeNeRecords\PublicRecord\RenderSitemapHandler;
+use NeNeRecords\PublicRecord\ResolvePublicPermalinkHandler;
 use NeNeRecords\Setting\ListPublicSettingsUseCase;
 use NeNeRecords\Tests\BoolField\InMemoryBoolFieldRepository;
 use NeNeRecords\Tests\DateTimeField\InMemoryDateTimeFieldRepository;
@@ -168,6 +169,7 @@ final class PublicRecordHttpTest extends TestCase
         $registrar = new PublicRecordRouteRegistrar(
             new GetPublicRecordViewHandler($useCase, $jsonResponse, $this->factory),
             new GetPublicRecordHierarchyHandler(new PublicRecordHierarchyBuilder($entities, $textFields), $jsonResponse),
+            new ResolvePublicPermalinkHandler($entities, $entityTypes, $jsonResponse),
             $renderHandler,
             new RenderPublicPermalinkHandler($entityTypes, $renderHandler, $customPermalink),
             new RenderSitemapHandler(

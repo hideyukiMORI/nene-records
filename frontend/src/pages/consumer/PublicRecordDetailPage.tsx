@@ -10,6 +10,7 @@ import {
   type PublicFieldRow,
   RecordBreadcrumb,
   RecordChildPages,
+  usePublicPermalinkResolution,
   usePublicRecordHierarchy,
   usePublicViewEntityRecordPage,
 } from '@/features/public-view-entity-record'
@@ -157,14 +158,19 @@ function useCanonicalRedirect(
   entityId: number,
   entitySlug: string | null,
   publishedAt: string | null,
+  permalink: string | null,
 ): string | null {
   const { pathname } = useLocation()
-  const canonical = resolvePermalink(pattern ?? DEFAULT_PERMALINK_PATTERN, {
-    typeSlug: entityTypeSlug,
-    entitySlug,
-    entityId,
-    publishedAt,
-  })
+  // A custom permalink IS the canonical path — never redirect it to the type
+  // pattern (which would bounce custom-permalink pages away). #656
+  const canonical =
+    permalink ??
+    resolvePermalink(pattern ?? DEFAULT_PERMALINK_PATTERN, {
+      typeSlug: entityTypeSlug,
+      entitySlug,
+      entityId,
+      publishedAt,
+    })
   return pathname !== canonical ? canonical : null
 }
 
@@ -277,6 +283,7 @@ function PublicRecordDetailContent({
     entityId,
     entity?.slug ?? null,
     entity?.publishedAt ?? null,
+    entity?.permalink ?? null,
   )
   if (!isLoading && !isError && entity !== null && redirect !== null) {
     return <Navigate to={redirect} replace />
@@ -565,12 +572,87 @@ function PublicRecordDetailById({
   )
 }
 
+// ── Custom-permalink resolver (#656) ──────────────────────────────────────────
+
+/**
+ * Renders a record reached by an arbitrary custom permalink (e.g. `/company/about`).
+ * The type-based router can't resolve such a path, so resolve it server-side to
+ * `{entityTypeSlug, entityId}` and render the detail — for both direct loads and
+ * client-side navigation (breadcrumb / child links).
+ */
+export function PublicRecordByPermalink({ path }: { path: string }) {
+  const site = usePublicSite()
+  const { t } = useTranslation()
+  const resolution = usePublicPermalinkResolution(path)
+  const entityTypeQuery = useEntityTypeList({ limit: 100, offset: 0 })
+
+  const entityTypeSlugById = useMemo(
+    (): Record<number, string> =>
+      Object.fromEntries(
+        (entityTypeQuery.data?.items ?? []).map((item) => [Number(item.id), item.slug]),
+      ),
+    [entityTypeQuery.data?.items],
+  )
+  const entityTypePatternById = useMemo(
+    (): Record<number, string | null | undefined> =>
+      Object.fromEntries(
+        (entityTypeQuery.data?.items ?? []).map((item) => [Number(item.id), item.permalinkPattern]),
+      ),
+    [entityTypeQuery.data?.items],
+  )
+
+  if (resolution.isLoading || entityTypeQuery.isLoading) {
+    return (
+      <RecordShellMessage
+        site={site}
+        entityTypeSlug={null}
+        title="Loading…"
+        description="Fetching this record."
+      />
+    )
+  }
+
+  const data = resolution.data
+  const resolved =
+    data?.found === true && data.entityId !== undefined && data.entityTypeSlug !== undefined
+      ? { entityId: data.entityId, entityTypeSlug: data.entityTypeSlug }
+      : null
+  const type =
+    resolved !== null
+      ? findEntityTypeBySlug(entityTypeQuery.data?.items ?? [], resolved.entityTypeSlug)
+      : undefined
+
+  if (resolved === null || type === undefined) {
+    return (
+      <RecordShellMessage
+        site={site}
+        entityTypeSlug={null}
+        title={t('public.record.notFound.title')}
+        description={t('public.record.notFound.description', { slug: path })}
+        icon
+      />
+    )
+  }
+
+  return (
+    <PublicRecordDetailById
+      entityTypeSlug={type.slug}
+      entityTypeName={type.name}
+      entityTypeId={Number(type.id)}
+      entityId={resolved.entityId}
+      entityTypeSlugById={entityTypeSlugById}
+      entityTypePatternById={entityTypePatternById}
+      currentPattern={type.permalinkPattern}
+      entityTypeDefaultLayout={type.defaultLayout}
+    />
+  )
+}
+
 // ── Page root ─────────────────────────────────────────────────────────────────
 
 export function PublicRecordDetailPage() {
   // React Router v6: splat param is '*'
   const { entityTypeSlug = '', '*': splat = '' } = useParams()
-  const { t } = useTranslation()
   const site = usePublicSite()
 
   const entityTypeQuery = useEntityTypeList({ limit: 100, offset: 0 })
@@ -606,15 +688,10 @@ export function PublicRecordDetailPage() {
   }
 
   if (entityType === undefined) {
-    return (
-      <RecordShellMessage
-        site={site}
-        entityTypeSlug={null}
-        title={t('public.entityType.notFound.title')}
-        description={t('public.entityType.notFound.description', { slug: entityTypeSlug })}
-        icon
-      />
-    )
+    // The first URL segment isn't a known type → try resolving the full path as a
+    // custom permalink (e.g. `/company/about`) so the SPA renders it too (#656).
+    const customPath = splat !== '' ? `/${entityTypeSlug}/${splat}` : `/${entityTypeSlug}`
+    return <PublicRecordByPermalink path={customPath} />
   }
 
   const entityTypeId = Number(entityType.id)

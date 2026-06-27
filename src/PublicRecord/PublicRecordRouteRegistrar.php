@@ -12,6 +12,7 @@ final readonly class PublicRecordRouteRegistrar
     public function __construct(
         private GetPublicRecordViewHandler $getPublicRecordViewHandler,
         private GetPublicRecordHierarchyHandler $getPublicRecordHierarchyHandler,
+        private ResolvePublicPermalinkHandler $resolvePublicPermalinkHandler,
         private RenderPublicRecordViewHandler $renderPublicRecordViewHandler,
         private RenderPublicPermalinkHandler $renderPublicPermalinkHandler,
         private RenderSitemapHandler $renderSitemapHandler,
@@ -23,6 +24,7 @@ final readonly class PublicRecordRouteRegistrar
     {
         $getPublicRecordViewHandler = $this->getPublicRecordViewHandler;
         $getPublicRecordHierarchyHandler = $this->getPublicRecordHierarchyHandler;
+        $resolvePublicPermalinkHandler = $this->resolvePublicPermalinkHandler;
         $renderPublicRecordViewHandler = $this->renderPublicRecordViewHandler;
         $renderPublicPermalinkHandler = $this->renderPublicPermalinkHandler;
         $renderSitemapHandler = $this->renderSitemapHandler;
@@ -38,6 +40,13 @@ final readonly class PublicRecordRouteRegistrar
         $router->get(
             '/api/v1/public/records/{id}/hierarchy',
             static fn (ServerRequestInterface $request) => $getPublicRecordHierarchyHandler->handle($request),
+        );
+
+        // Resolve an arbitrary custom-permalink path → {entityTypeSlug, entityId}
+        // so the type-based SPA router can render it (#656).
+        $router->get(
+            '/api/v1/public/records/resolve',
+            static fn (ServerRequestInterface $request) => $resolvePublicPermalinkHandler->handle($request),
         );
 
         // Per-org XML sitemap. A registered route returns 200, so the 301 / SPA-shell
