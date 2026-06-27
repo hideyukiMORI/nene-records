@@ -8,6 +8,22 @@ import {
   type DirectoryRecord,
 } from '../lib/build-permalink-tree'
 
+/** Compact locale-aware date for tree rows (mirrors EntityListPanel). */
+function formatDate(iso: string | null, locale: string): string {
+  if (iso === null || iso === '') {
+    return ''
+  }
+  const date = new Date(iso)
+  if (Number.isNaN(date.getTime())) {
+    return ''
+  }
+  return new Intl.DateTimeFormat(locale, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  }).format(date)
+}
+
 export interface EntityDirectoryPanelProps {
   entityTypeSlug: string
   records: DirectoryRecord[]
@@ -88,8 +104,9 @@ function DirectoryNodeRow({
   entityTypeSlug: string
   depth: number
 }) {
-  const { t } = useTranslation()
-  const [open, setOpen] = useState(true)
+  const { t, locale } = useTranslation()
+  // Initially expand only the top level — a deep tree is otherwise a wall of rows (#657).
+  const [open, setOpen] = useState(depth === 0)
   const hasChildren = node.children.length > 0
 
   return (
@@ -128,17 +145,34 @@ function DirectoryNodeRow({
             >
               {node.record.label}
             </Link>
+            {hasChildren ? (
+              <span className="shrink-0 font-mono text-caption text-text-muted">
+                ({node.children.length})
+              </span>
+            ) : null}
             <StatusBadge status={node.record.status}>
               {t(`admin.entityStatus.status.${node.record.status}`)}
             </StatusBadge>
           </>
         ) : (
-          <span className="font-sans text-body font-medium text-text-muted">{node.segment}/</span>
+          <>
+            <span className="font-sans text-body font-medium text-text-muted">{node.segment}/</span>
+            <span className="shrink-0 font-mono text-caption text-text-muted">
+              ({node.children.length})
+            </span>
+          </>
         )}
 
-        <code className="ml-auto shrink-0 truncate font-mono text-caption text-text-muted">
-          {node.path}
-        </code>
+        <div className="ml-auto flex shrink-0 items-center gap-inline-sm">
+          {node.record !== null && formatDate(node.record.updatedAt, locale) !== '' ? (
+            <span className="font-sans text-caption text-text-muted">
+              {t('admin.entityRecords.list.item.updatedAt', {
+                date: formatDate(node.record.updatedAt, locale),
+              })}
+            </span>
+          ) : null}
+          <code className="truncate font-mono text-caption text-text-muted">{node.path}</code>
+        </div>
       </div>
 
       {hasChildren && open ? (

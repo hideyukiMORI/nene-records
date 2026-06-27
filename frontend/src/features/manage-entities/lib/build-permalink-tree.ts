@@ -5,6 +5,7 @@ export interface DirectoryRecord {
   permalink: string
   label: string
   status: EntityStatus
+  updatedAt: string | null
 }
 
 export interface DirectoryNode {

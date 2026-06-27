@@ -150,7 +150,9 @@ final readonly class GetPublicRecordViewUseCase implements GetPublicRecordViewUs
         // The SEO title override (entity.meta_title, e.g. imported from Yoast) wins
         // for <title>/og:title; otherwise fall back to the record's title field.
         $metaTitle = trim($entity->metaTitle ?? '');
-        $pageTitle = $metaTitle !== '' ? $metaTitle : $this->resolvePageTitle($textFieldRows, $entityId);
+        $pageTitle = $metaTitle !== ''
+            ? $metaTitle
+            : $this->resolvePageTitle($textFieldRows, $entityId, $entity->permalink);
 
         $bootstrap = PublicRecordViewHttpMapper::toBootstrap(
             entityTypeSlug: $input->entityTypeSlug,
@@ -355,13 +357,13 @@ final readonly class GetPublicRecordViewUseCase implements GetPublicRecordViewUs
     }
 
     /** @param list<TextField> $textFieldRows */
-    private function resolvePageTitle(array $textFieldRows, int $entityId): string
+    private function resolvePageTitle(array $textFieldRows, int $entityId, ?string $permalink): string
     {
-        return $this->resolveRecordLabel($entityId, $textFieldRows);
+        return $this->resolveRecordLabel($entityId, $textFieldRows, $permalink);
     }
 
     /** @param list<TextField> $textFieldRows */
-    private function resolveRecordLabel(int $entityId, array $textFieldRows): string
+    private function resolveRecordLabel(int $entityId, array $textFieldRows, ?string $permalink = null): string
     {
         foreach ($textFieldRows as $textField) {
             if ($textField->entityId === $entityId && $textField->fieldKey === 'title' && trim($textField->value) !== '') {
@@ -373,6 +375,12 @@ final readonly class GetPublicRecordViewUseCase implements GetPublicRecordViewUs
             if ($textField->entityId === $entityId && trim($textField->value) !== '') {
                 return $textField->value;
             }
+        }
+
+        // No title field → humanize the permalink's last segment before a bare id (#657).
+        $segment = PermalinkLabel::lastSegment($permalink);
+        if ($segment !== null) {
+            return PermalinkLabel::humanize($segment);
         }
 
         return 'Record #' . $entityId;
