@@ -35,6 +35,16 @@ function EntityRecordsContent({ entityType }: { entityType: EntityType }) {
     total,
     page,
     totalPages,
+    pageSize,
+    setPageSize,
+    pageSizeOptions,
+    viewMode,
+    setViewMode,
+    directoryRecords,
+    directoryTruncated,
+    directoryIsLoading,
+    directoryIsError,
+    directoryErrorTitle,
     sortKey,
     sortOrder,
     setSort,
@@ -142,6 +152,16 @@ function EntityRecordsContent({ entityType }: { entityType: EntityType }) {
         onRequestDelete={requestDelete}
         onCancelDelete={cancelDelete}
         onConfirmDelete={confirmDelete}
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
+        pageSize={pageSize}
+        pageSizeOptions={pageSizeOptions}
+        onPageSizeChange={setPageSize}
+        directoryItems={directoryRecords}
+        directoryTruncated={directoryTruncated}
+        directoryIsLoading={directoryIsLoading}
+        directoryIsError={directoryIsError}
+        directoryErrorTitle={directoryErrorTitle}
       />
     </Stack>
   )

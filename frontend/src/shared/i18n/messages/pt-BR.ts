@@ -611,6 +611,17 @@ export const ptBR: Partial<MessageCatalog> = {
   'admin.entityRecords.pagination.prev': '← Anterior',
   'admin.entityRecords.pagination.next': 'Próximo →',
   'admin.entityRecords.pagination.page': 'Página {{page}} / {{total}}',
+  'admin.entityRecords.view.label': 'Exibição',
+  'admin.entityRecords.view.list': 'Lista',
+  'admin.entityRecords.view.directory': 'Diretório',
+  'admin.entityRecords.pageSize.label': 'Por página',
+  'admin.entityRecords.directory.empty.title': 'Ainda não há páginas com caminho personalizado',
+  'admin.entityRecords.directory.empty.description':
+    'Registros com um caminho de permalink personalizado aparecem aqui como uma árvore de diretórios.',
+  'admin.entityRecords.directory.truncated':
+    'Mostrando os primeiros 100 registros. Use a visualização em lista para pesquisar todos.',
+  'admin.entityRecords.directory.expand': 'Expandir',
+  'admin.entityRecords.directory.collapse': 'Recolher',
 
   // ── Field definitions ────────────────────────────────────────────────────
   'admin.fieldDefs.pageTitle': 'Campos',

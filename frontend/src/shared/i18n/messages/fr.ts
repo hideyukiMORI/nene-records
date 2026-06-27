@@ -617,6 +617,18 @@ export const fr: Partial<MessageCatalog> = {
   'admin.entityRecords.pagination.prev': '← Précédent',
   'admin.entityRecords.pagination.next': 'Suivant →',
   'admin.entityRecords.pagination.page': 'Page {{page}} / {{total}}',
+  'admin.entityRecords.view.label': 'Affichage',
+  'admin.entityRecords.view.list': 'Liste',
+  'admin.entityRecords.view.directory': 'Répertoire',
+  'admin.entityRecords.pageSize.label': 'Par page',
+  'admin.entityRecords.directory.empty.title':
+    'Aucune page avec chemin personnalisé pour le moment',
+  'admin.entityRecords.directory.empty.description':
+    'Les fiches ayant un chemin de permalien personnalisé apparaissent ici sous forme d’arborescence.',
+  'admin.entityRecords.directory.truncated':
+    'Affichage des 100 premières fiches. Utilisez la vue liste pour tout rechercher.',
+  'admin.entityRecords.directory.expand': 'Déplier',
+  'admin.entityRecords.directory.collapse': 'Replier',
 
   // ── Field definitions ────────────────────────────────────────────────────
   'admin.fieldDefs.pageTitle': 'Champs',

@@ -607,6 +607,17 @@ export const de: Partial<MessageCatalog> = {
   'admin.entityRecords.pagination.prev': '← Zurück',
   'admin.entityRecords.pagination.next': 'Weiter →',
   'admin.entityRecords.pagination.page': 'Seite {{page}} / {{total}}',
+  'admin.entityRecords.view.label': 'Ansicht',
+  'admin.entityRecords.view.list': 'Liste',
+  'admin.entityRecords.view.directory': 'Verzeichnis',
+  'admin.entityRecords.pageSize.label': 'Pro Seite',
+  'admin.entityRecords.directory.empty.title': 'Noch keine Seiten mit eigenem Pfad',
+  'admin.entityRecords.directory.empty.description':
+    'Datensätze mit einem eigenen Permalink-Pfad erscheinen hier als Verzeichnisbaum.',
+  'admin.entityRecords.directory.truncated':
+    'Es werden die ersten 100 Datensätze angezeigt. Nutze die Listenansicht zum Durchsuchen aller.',
+  'admin.entityRecords.directory.expand': 'Aufklappen',
+  'admin.entityRecords.directory.collapse': 'Zuklappen',
   // ── Field definitions ────────────────────────────────────────────────────
   'admin.fieldDefs.pageTitle': 'Felder',
   'admin.fieldDefs.schemaFor': 'Felder für {{slug}}',

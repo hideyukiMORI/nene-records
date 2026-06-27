@@ -30,6 +30,7 @@ final readonly class ListEntitiesUseCase implements ListEntitiesUseCaseInterface
                 id: $entityId,
                 entityTypeId: $entity->entityTypeId,
                 slug: $entity->slug,
+                permalink: $entity->permalink,
                 status: $entity->status->value,
                 publishedAtIso: $entity->publishedAt?->format(DateTimeInterface::ATOM),
                 isDeleted: $entity->isDeleted,
