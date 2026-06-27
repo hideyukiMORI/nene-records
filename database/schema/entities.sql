@@ -4,6 +4,7 @@ CREATE TABLE entities (
     entity_type_id INTEGER UNSIGNED NOT NULL,
     slug VARCHAR(255) NULL,
     permalink VARCHAR(255) NULL,
+    menu_order INTEGER NOT NULL DEFAULT 0,
     layout VARCHAR(32) NULL,
     status VARCHAR(16) NOT NULL DEFAULT 'draft',
     published_at DATETIME NULL,

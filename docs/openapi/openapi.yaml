@@ -493,6 +493,47 @@ paths:
                 format: binary
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /api/v1/entities/reorder:
+    post:
+      tags:
+        - Entities
+      summary: Set manual sibling order
+      description: >
+        Assigns `menu_order = position` to each record id in the given order, so the
+        directory tree and public navigation reflect a manual order (#659).
+      operationId: reorderEntities
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - ids
+              properties:
+                ids:
+                  type: array
+                  items:
+                    type: integer
+                    format: int64
+                  description: Record ids in the desired order.
+      responses:
+        '200':
+          description: Order applied.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - reordered
+                properties:
+                  reordered:
+                    type: integer
+                    description: Number of records whose order was set.
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /api/v1/entities/{id}:
     get:
       tags:
@@ -5343,6 +5384,9 @@ components:
           type:
             - string
             - 'null'
+        menu_order:
+          type: integer
+          description: Manual sibling order in the directory / public nav, lower first (#659).
         excerpt:
           type: string
           description: >-

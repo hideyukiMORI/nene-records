@@ -24,6 +24,8 @@ final readonly class Entity
         public ?string $metaDescription = null,
         public ?DateTimeImmutable $scheduledAt = null,
         public ?string $layout = null,
+        /** Manual sibling order in the directory tree / public nav, lower first (#659). */
+        public int $menuOrder = 0,
     ) {
     }
 }

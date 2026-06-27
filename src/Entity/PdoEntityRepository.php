@@ -84,14 +84,14 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
         $prefix = $parentPermalink . '/';
         $rows = $this->query->fetchAll(
             <<<'SQL'
-                SELECT id, entity_type_id, slug, permalink, layout, status, published_at, scheduled_at, is_deleted, created_at, updated_at, deleted_at, meta_title, meta_description
+                SELECT id, entity_type_id, slug, permalink, layout, status, published_at, scheduled_at, is_deleted, created_at, updated_at, deleted_at, meta_title, meta_description, menu_order
                 FROM entities
                 WHERE organization_id = ?
                   AND is_deleted = 0
                   AND status = ?
                   AND permalink LIKE ?
                   AND permalink NOT LIKE ?
-                ORDER BY permalink ASC
+                ORDER BY menu_order ASC, permalink ASC
                 LIMIT ?
                 SQL,
             [$this->orgId->get(), EntityStatus::Published->value, $prefix . '%', $prefix . '%/%', $limit],
@@ -126,6 +126,14 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
         $this->query->execute(
             'UPDATE entities SET permalink = ?, updated_at = NOW() WHERE id = ? AND organization_id = ?',
             [$permalink, $id, $this->orgId->get()],
+        );
+    }
+
+    public function updateMenuOrder(int $id, int $menuOrder): void
+    {
+        $this->query->execute(
+            'UPDATE entities SET menu_order = ?, updated_at = NOW() WHERE id = ? AND organization_id = ?',
+            [$menuOrder, $id, $this->orgId->get()],
         );
     }
 
@@ -196,7 +204,7 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
 
         $rows = $this->query->fetchAll(
             <<<SQL
-                SELECT e.id, e.entity_type_id, e.slug, e.permalink, e.layout, e.status, e.published_at, e.scheduled_at, e.is_deleted, e.created_at, e.updated_at, e.deleted_at, e.meta_title, e.meta_description
+                SELECT e.id, e.entity_type_id, e.slug, e.permalink, e.layout, e.status, e.published_at, e.scheduled_at, e.is_deleted, e.created_at, e.updated_at, e.deleted_at, e.meta_title, e.meta_description, e.menu_order
                 FROM entities e
                 {$titleJoin}
                 WHERE {$where}
@@ -555,6 +563,7 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
             metaDescription: $metaDescription,
             scheduledAt: $scheduledAt,
             layout: $layout,
+            menuOrder: (int) ($row['menu_order'] ?? 0),
         );
     }
 }

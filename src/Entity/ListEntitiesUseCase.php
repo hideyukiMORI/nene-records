@@ -40,6 +40,7 @@ final readonly class ListEntitiesUseCase implements ListEntitiesUseCaseInterface
                 updatedAtIso: $entity->updatedAt?->format(DateTimeInterface::ATOM),
                 metaTitle: $entity->metaTitle,
                 metaDescription: $entity->metaDescription,
+                menuOrder: $entity->menuOrder,
             );
         }, $rows);
 

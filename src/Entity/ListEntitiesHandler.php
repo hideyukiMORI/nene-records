@@ -91,6 +91,7 @@ final readonly class ListEntitiesHandler
                             'updated_at' => $item->updatedAtIso,
                             'meta_title' => $item->metaTitle,
                             'meta_description' => $item->metaDescription,
+                            'menu_order' => $item->menuOrder,
                         ];
                         if ($wantExcerpt) {
                             $row['excerpt'] = $excerptByEntity[$item->id] ?? '';

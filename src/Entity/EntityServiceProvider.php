@@ -267,6 +267,35 @@ final readonly class EntityServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(
+                ReorderEntitiesUseCaseInterface::class,
+                static function (ContainerInterface $c): ReorderEntitiesUseCaseInterface {
+                    $entities = $c->get(EntityRepositoryInterface::class);
+
+                    if (!$entities instanceof EntityRepositoryInterface) {
+                        throw new LogicException('Entity repository service is invalid.');
+                    }
+
+                    return new ReorderEntitiesUseCase($entities);
+                },
+            )
+            ->set(
+                ReorderEntitiesHandler::class,
+                static function (ContainerInterface $c): ReorderEntitiesHandler {
+                    $useCase = $c->get(ReorderEntitiesUseCaseInterface::class);
+                    $response = $c->get(JsonResponseFactory::class);
+
+                    if (!$useCase instanceof ReorderEntitiesUseCaseInterface) {
+                        throw new LogicException('ReorderEntities use case service is invalid.');
+                    }
+
+                    if (!$response instanceof JsonResponseFactory) {
+                        throw new LogicException('JSON response factory service is invalid.');
+                    }
+
+                    return new ReorderEntitiesHandler($useCase, $response);
+                },
+            )
+            ->set(
                 DuplicateEntitySlugExceptionHandler::class,
                 static function (ContainerInterface $c): DuplicateEntitySlugExceptionHandler {
                     $problemDetails = $c->get(ProblemDetailsResponseFactory::class);
@@ -453,6 +482,7 @@ final readonly class EntityServiceProvider implements ServiceProviderInterface
                     $update = $c->get(UpdateEntityHandler::class);
                     $delete = $c->get(DeleteEntityHandler::class);
                     $move = $c->get(MoveEntityHandler::class);
+                    $reorder = $c->get(ReorderEntitiesHandler::class);
                     $list = $c->get(ListEntitiesHandler::class);
                     $listRevisions = $c->get(ListEntityRevisionsHandler::class);
                     $export = $c->get(ExportEntitiesHandler::class);
@@ -480,6 +510,10 @@ final readonly class EntityServiceProvider implements ServiceProviderInterface
                         throw new LogicException('MoveEntity handler service is invalid.');
                     }
 
+                    if (!$reorder instanceof ReorderEntitiesHandler) {
+                        throw new LogicException('ReorderEntities handler service is invalid.');
+                    }
+
                     if (!$list instanceof ListEntitiesHandler) {
                         throw new LogicException('ListEntities handler service is invalid.');
                     }
@@ -504,7 +538,7 @@ final readonly class EntityServiceProvider implements ServiceProviderInterface
                         throw new LogicException('ProcessScheduledPublish handler service is invalid.');
                     }
 
-                    return new EntityRouteRegistrar($get, $create, $update, $delete, $move, $list, $listRevisions, $export, $schedule, $unschedule, $processScheduled);
+                    return new EntityRouteRegistrar($get, $create, $update, $delete, $move, $reorder, $list, $listRevisions, $export, $schedule, $unschedule, $processScheduled);
                 },
             );
     }

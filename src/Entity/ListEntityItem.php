@@ -20,6 +20,7 @@ final readonly class ListEntityItem
         public ?string $updatedAtIso = null,
         public ?string $metaTitle = null,
         public ?string $metaDescription = null,
+        public int $menuOrder = 0,
     ) {
     }
 }
