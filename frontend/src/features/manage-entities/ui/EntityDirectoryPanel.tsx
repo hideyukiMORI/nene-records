@@ -106,6 +106,9 @@ export function EntityDirectoryPanel({
   const reorderMutation = useReorderEntities()
   const [pendingMove, setPendingMove] = useState<PendingMove | null>(null)
   const [treeFilter, setTreeFilter] = useState('')
+  // Remember which folders the user opened/closed so the state survives refetches
+  // (e.g. after a move / reorder) — keyed by path (#660).
+  const [openOverrides, setOpenOverrides] = useState<Map<string, boolean>>(() => new Map())
   const tree = useMemo(() => buildPermalinkTree(records), [records])
   const filteredTree = useMemo(() => filterDirectoryTree(tree, treeFilter), [tree, treeFilter])
 
@@ -171,6 +174,14 @@ export function EntityDirectoryPanel({
     reorderMutation.mutate({ ids })
   }
 
+  const toggleOpen = (path: string, currentlyOpen: boolean) => {
+    setOpenOverrides((prev) => {
+      const next = new Map(prev)
+      next.set(path, !currentlyOpen)
+      return next
+    })
+  }
+
   return (
     <div>
       {truncated ? (
@@ -222,9 +233,11 @@ export function EntityDirectoryPanel({
               depth={0}
               query={treeFilter}
               forceOpen={treeFilter !== ''}
+              openOverrides={openOverrides}
               onCreateHere={onCreateHere}
               onRequestMove={requestMove}
               onReorder={reorderSiblings}
+              onToggle={toggleOpen}
             />
           ))}
         </ul>
@@ -267,9 +280,11 @@ function DirectoryNodeRow({
   depth,
   query,
   forceOpen,
+  openOverrides,
   onCreateHere,
   onRequestMove,
   onReorder,
+  onToggle,
 }: {
   node: DirectoryNode
   /** The sibling array this node belongs to (for manual up/down reorder). */
@@ -278,13 +293,16 @@ function DirectoryNodeRow({
   depth: number
   query: string
   forceOpen: boolean
+  /** Persisted per-path open/closed overrides (#660). */
+  openOverrides: Map<string, boolean>
   onCreateHere: (permalinkPrefix: string) => void
   onRequestMove: (payload: DirectoryDragPayload, targetPath: string) => void
   onReorder: (orderedRecordIds: number[]) => void
+  onToggle: (path: string, currentlyOpen: boolean) => void
 }) {
   const { t, locale } = useTranslation()
-  // Initially expand only the top level — a deep tree is otherwise a wall of rows (#657).
-  const [open, setOpen] = useState(depth === 0)
+  // Initially expand only the top level; remember user toggles across refetches (#657, #660).
+  const open = openOverrides.get(node.path) ?? depth === 0
   const [isDropTarget, setIsDropTarget] = useState(false)
   const hasChildren = node.children.length > 0
   const record = node.record
@@ -346,7 +364,7 @@ function DirectoryNodeRow({
           <button
             type="button"
             onClick={() => {
-              setOpen((value) => !value)
+              onToggle(node.path, open)
             }}
             aria-expanded={isOpen}
             aria-label={
@@ -354,7 +372,7 @@ function DirectoryNodeRow({
                 ? t('admin.entityRecords.directory.collapse')
                 : t('admin.entityRecords.directory.expand')
             }
-            className="shrink-0 font-mono text-caption text-text-muted"
+            className="shrink-0 rounded font-mono text-caption text-text-muted focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
           >
             {isOpen ? '▾' : '▸'}
           </button>
@@ -418,7 +436,7 @@ function DirectoryNodeRow({
               })}
             </span>
           ) : null}
-          <code className="truncate font-mono text-caption text-text-muted">
+          <code title={node.path} className="truncate font-mono text-caption text-text-muted">
             {highlightMatch(node.path, query)}
           </code>
           {canReorder ? (
@@ -431,7 +449,7 @@ function DirectoryNodeRow({
                 }}
                 aria-label={t('admin.entityRecords.directory.moveUp')}
                 title={t('admin.entityRecords.directory.moveUp')}
-                className="shrink-0 rounded px-0.5 font-mono text-caption text-text-muted hover:text-accent disabled:cursor-not-allowed disabled:opacity-30"
+                className="shrink-0 rounded px-0.5 font-mono text-caption text-text-muted hover:text-accent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent disabled:cursor-not-allowed disabled:opacity-30"
               >
                 ▲
               </button>
@@ -443,7 +461,7 @@ function DirectoryNodeRow({
                 }}
                 aria-label={t('admin.entityRecords.directory.moveDown')}
                 title={t('admin.entityRecords.directory.moveDown')}
-                className="shrink-0 rounded px-0.5 font-mono text-caption text-text-muted hover:text-accent disabled:cursor-not-allowed disabled:opacity-30"
+                className="shrink-0 rounded px-0.5 font-mono text-caption text-text-muted hover:text-accent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent disabled:cursor-not-allowed disabled:opacity-30"
               >
                 ▼
               </button>
@@ -456,7 +474,7 @@ function DirectoryNodeRow({
             }}
             aria-label={t('admin.entityRecords.directory.newHere', { path: node.path })}
             title={t('admin.entityRecords.directory.newHere', { path: node.path })}
-            className="shrink-0 rounded px-1 font-mono text-body text-text-muted hover:bg-surface-raised hover:text-accent"
+            className="shrink-0 rounded px-1 font-mono text-body text-text-muted hover:bg-surface-raised hover:text-accent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
           >
             +
           </button>
@@ -474,9 +492,11 @@ function DirectoryNodeRow({
               depth={depth + 1}
               query={query}
               forceOpen={forceOpen}
+              openOverrides={openOverrides}
               onCreateHere={onCreateHere}
               onRequestMove={onRequestMove}
               onReorder={onReorder}
+              onToggle={onToggle}
             />
           ))}
         </ul>
