@@ -85,7 +85,7 @@ final readonly class MoveEntitySubtreeUseCase implements MoveEntitySubtreeUseCas
 
         foreach ($moves as $move) {
             $this->entities->updatePermalink($move['id'], $move['new']);
-            $this->redirects?->save($move['old'], $move['new']);
+            $this->redirects?->recordMove($move['old'], $move['new']);
         }
 
         return new MoveEntitySubtreeOutput($entity->id, $newPermalink, count($moves));

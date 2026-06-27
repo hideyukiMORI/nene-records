@@ -107,7 +107,7 @@ final readonly class UpdateEntityUseCase implements UpdateEntityUseCaseInterface
             );
 
             if ($oldCanonical !== $newCanonical) {
-                $this->redirects?->save($oldCanonical, $newCanonical);
+                $this->redirects?->recordMove($oldCanonical, $newCanonical);
             }
         }
 

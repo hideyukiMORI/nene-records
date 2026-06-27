@@ -95,4 +95,30 @@ final class MoveEntitySubtreeUseCaseTest extends TestCase
         self::assertSame(0, $output->movedCount);
         self::assertSame([], $redirects->all());
     }
+
+    public function testRoundTripMoveLeavesNoRedirectLoop(): void
+    {
+        $entities = new InMemoryEntityRepository([$this->entity(1, '/a')]);
+        $redirects = new InMemoryUrlRedirectRepository();
+        $useCase = new MoveEntitySubtreeUseCase($entities, $redirects);
+
+        $useCase->execute(new MoveEntitySubtreeInput(1, '/b')); // /a → /b
+        $useCase->execute(new MoveEntitySubtreeInput(1, '/a')); // /b → /a (back)
+
+        // No /a ↔ /b loop: only /b → /a remains (/a is the live page again).
+        self::assertSame(['/b' => '/a'], $redirects->all());
+    }
+
+    public function testChainedMovesCompressToASingleHop(): void
+    {
+        $entities = new InMemoryEntityRepository([$this->entity(1, '/a')]);
+        $redirects = new InMemoryUrlRedirectRepository();
+        $useCase = new MoveEntitySubtreeUseCase($entities, $redirects);
+
+        $useCase->execute(new MoveEntitySubtreeInput(1, '/b')); // /a → /b
+        $useCase->execute(new MoveEntitySubtreeInput(1, '/c')); // /b → /c
+
+        // /a and /b both redirect straight to /c — no /a → /b → /c chain.
+        self::assertSame(['/a' => '/c', '/b' => '/c'], $redirects->all());
+    }
 }
