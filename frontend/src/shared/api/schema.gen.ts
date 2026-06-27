@@ -191,6 +191,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/entities/reorder": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Set manual sibling order
+         * @description Assigns `menu_order = position` to each record id in the given order, so the directory tree and public navigation reflect a manual order (#659).
+         */
+        post: operations["reorderEntities"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/entities/{id}": {
         parameters: {
             query?: never;
@@ -2165,6 +2185,8 @@ export interface components {
             deleted_at: string | null;
             meta_title: string | null;
             meta_description: string | null;
+            /** @description Manual sibling order in the directory / public nav, lower first (#659). */
+            menu_order?: number;
             /** @description Server-computed plain-text teaser. Present only when the list is requested with `?include=excerpt` (used by the public feed and post-list widgets). Source/length follow the excerpt_* settings. */
             excerpt?: string;
             /** Format: date-time */
@@ -3602,6 +3624,38 @@ export interface operations {
                     "text/csv": string;
                 };
             };
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    reorderEntities: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Record ids in the desired order. */
+                    ids: number[];
+                };
+            };
+        };
+        responses: {
+            /** @description Order applied. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Number of records whose order was set. */
+                        reordered: number;
+                    };
+                };
+            };
+            422: components["responses"]["ValidationFailed"];
             500: components["responses"]["InternalServerError"];
         };
     };

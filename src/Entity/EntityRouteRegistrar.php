@@ -15,6 +15,7 @@ final readonly class EntityRouteRegistrar
         private UpdateEntityHandler $updateHandler,
         private DeleteEntityHandler $deleteHandler,
         private MoveEntityHandler $moveHandler,
+        private ReorderEntitiesHandler $reorderHandler,
         private ListEntitiesHandler $listHandler,
         private ListEntityRevisionsHandler $listRevisionsHandler,
         private ExportEntitiesHandler $exportHandler,
@@ -31,6 +32,7 @@ final readonly class EntityRouteRegistrar
         $updateHandler = $this->updateHandler;
         $deleteHandler = $this->deleteHandler;
         $moveHandler = $this->moveHandler;
+        $reorderHandler = $this->reorderHandler;
         $listHandler = $this->listHandler;
         $listRevisionsHandler = $this->listRevisionsHandler;
         $exportHandler = $this->exportHandler;
@@ -43,6 +45,7 @@ final readonly class EntityRouteRegistrar
         $router->post('/api/v1/entities/process-scheduled', static fn (ServerRequestInterface $request) => $processScheduledHandler->handle($request));
         $router->get('/api/v1/entities/{id}', static fn (ServerRequestInterface $request) => $getHandler->handle($request));
         $router->post('/api/v1/entities', static fn (ServerRequestInterface $request) => $createHandler->handle($request));
+        $router->post('/api/v1/entities/reorder', static fn (ServerRequestInterface $request) => $reorderHandler->handle($request));
         $router->put('/api/v1/entities/{id}', static fn (ServerRequestInterface $request) => $updateHandler->handle($request));
         $router->post('/api/v1/entities/{id}/move', static fn (ServerRequestInterface $request) => $moveHandler->handle($request));
         $router->delete('/api/v1/entities/{id}', static fn (ServerRequestInterface $request) => $deleteHandler->handle($request));

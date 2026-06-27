@@ -35,6 +35,9 @@ interface EntityRepositoryInterface
     /** Rewrite only a record's custom permalink (subtree move, #659). */
     public function updatePermalink(int $id, string $permalink): void;
 
+    /** Set a record's manual sibling order (reorder, #659). */
+    public function updateMenuOrder(int $id, int $menuOrder): void;
+
     public function existsBySlug(string $slug, int $entityTypeId, ?int $excludeId = null): bool;
 
     /** True when another record in the org already owns this custom permalink (#651). */

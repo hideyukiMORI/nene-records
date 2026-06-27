@@ -122,7 +122,11 @@ final class InMemoryEntityRepository implements EntityRepositoryInterface
             $children[] = $entity;
         }
 
-        usort($children, static fn (Entity $a, Entity $b): int => ($a->permalink ?? '') <=> ($b->permalink ?? ''));
+        usort(
+            $children,
+            static fn (Entity $a, Entity $b): int => $a->menuOrder <=> $b->menuOrder
+                ?: (($a->permalink ?? '') <=> ($b->permalink ?? '')),
+        );
 
         return array_slice($children, 0, $limit);
     }
@@ -168,6 +172,30 @@ final class InMemoryEntityRepository implements EntityRepositoryInterface
             metaDescription: $existing->metaDescription,
             scheduledAt: $existing->scheduledAt,
             layout: $existing->layout,
+            menuOrder: $existing->menuOrder,
+        );
+    }
+
+    public function updateMenuOrder(int $id, int $menuOrder): void
+    {
+        $existing = $this->entities[$id] ?? null;
+
+        if ($existing === null || $existing->isDeleted) {
+            return;
+        }
+
+        $this->entities[$id] = new Entity(
+            id: $existing->id,
+            entityTypeId: $existing->entityTypeId,
+            slug: $existing->slug,
+            permalink: $existing->permalink,
+            status: $existing->status,
+            publishedAt: $existing->publishedAt,
+            metaTitle: $existing->metaTitle,
+            metaDescription: $existing->metaDescription,
+            scheduledAt: $existing->scheduledAt,
+            layout: $existing->layout,
+            menuOrder: $menuOrder,
         );
     }
 
@@ -380,6 +408,7 @@ final class InMemoryEntityRepository implements EntityRepositoryInterface
             metaDescription: $entity->metaDescription,
             scheduledAt: $entity->scheduledAt,
             layout: $entity->layout,
+            menuOrder: $entity->menuOrder,
         );
 
         $this->revisions[] = new \NeNeRecords\Entity\EntityRevision(
@@ -435,6 +464,7 @@ final class InMemoryEntityRepository implements EntityRepositoryInterface
             status: $entity->status,
             isDeleted: true,
             deletedAt: new DateTimeImmutable('@1700000000'),
+            menuOrder: $entity->menuOrder,
         );
 
         $this->revisions[] = new \NeNeRecords\Entity\EntityRevision(
