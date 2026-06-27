@@ -12,6 +12,33 @@ import { entityKeys, type EntityListParams } from './query-keys'
 
 const DEFAULT_LIST_PARAMS = { limit: 20, offset: 0 } as const
 
+/** Append the shared list filters (status / tags / q / sort / relations / include). */
+function appendEntityListFilters(search: URLSearchParams, params: EntityListParams): void {
+  if (params.status !== undefined) {
+    search.set('status', params.status)
+  }
+  if (params.tagSlugs !== undefined && params.tagSlugs.length > 0) {
+    search.set('tags', params.tagSlugs.join(','))
+  }
+  if (params.q !== undefined && params.q !== '') {
+    search.set('q', params.q)
+  }
+  if (params.sortKey !== undefined) {
+    search.set('sort', params.sortKey)
+  }
+  if (params.sortOrder !== undefined) {
+    search.set('order', params.sortOrder)
+  }
+  if (params.relationFilters !== undefined) {
+    for (const [fieldKey, targetEntityId] of Object.entries(params.relationFilters)) {
+      search.set(`relation.${fieldKey}`, String(targetEntityId))
+    }
+  }
+  if (params.include !== undefined && params.include !== '') {
+    search.set('include', params.include)
+  }
+}
+
 export function useEntityList(
   params: EntityListParams,
   options?: { enabled?: boolean },
@@ -25,34 +52,69 @@ export function useEntityList(
         offset: String(params.offset),
         entity_type_id: String(params.entityTypeId),
       })
-      if (params.status !== undefined) {
-        search.set('status', params.status)
-      }
-      if (params.tagSlugs !== undefined && params.tagSlugs.length > 0) {
-        search.set('tags', params.tagSlugs.join(','))
-      }
-      if (params.q !== undefined && params.q !== '') {
-        search.set('q', params.q)
-      }
-      if (params.sortKey !== undefined) {
-        search.set('sort', params.sortKey)
-      }
-      if (params.sortOrder !== undefined) {
-        search.set('order', params.sortOrder)
-      }
-      if (params.relationFilters !== undefined) {
-        for (const [fieldKey, targetEntityId] of Object.entries(params.relationFilters)) {
-          search.set(`relation.${fieldKey}`, String(targetEntityId))
-        }
-      }
-      if (params.include !== undefined && params.include !== '') {
-        search.set('include', params.include)
-      }
+      appendEntityListFilters(search, params)
       const dto = await apiClient.get<EntityListDto>(
         `/api/v1/entities?${search.toString()}`,
         signal,
       )
       return mapEntityListDtoToModel(dto)
+    },
+  })
+}
+
+/** Per-request page size for the directory fetch — the public list endpoint's cap. */
+const DIRECTORY_PAGE_SIZE = 100
+/** Safety bound on how many permalink records the directory tree will load (#682). */
+export const DIRECTORY_MAX_RECORDS = 5000
+
+export interface DirectoryEntityList {
+  items: Entity[]
+  total: number
+  truncated: boolean
+}
+
+/**
+ * Fetches ALL permalink-bearing records for the admin directory tree by paging
+ * through the public list endpoint {@link DIRECTORY_PAGE_SIZE} at a time (its
+ * per-request cap), up to {@link DIRECTORY_MAX_RECORDS}. Each request stays small
+ * (public-safe) while the tree stays complete — no silent first-100 cut-off (#682).
+ */
+export function useDirectoryEntityList(
+  params: EntityListParams,
+  options?: { enabled?: boolean },
+): UseQueryResult<DirectoryEntityList, AppError> {
+  return useQuery({
+    queryKey: [...entityKeys.list(params), 'directory'],
+    enabled: options?.enabled ?? true,
+    queryFn: async ({ signal }) => {
+      const items: Entity[] = []
+      let offset = 0
+      // Assigned on the first (always-run) pass before the while-condition reads it.
+      let total: number
+      do {
+        const search = new URLSearchParams({
+          limit: String(DIRECTORY_PAGE_SIZE),
+          offset: String(offset),
+          entity_type_id: String(params.entityTypeId),
+          has_permalink: '1',
+        })
+        appendEntityListFilters(search, params)
+        search.set('include', 'views')
+        const dto = await apiClient.get<EntityListDto>(
+          `/api/v1/entities?${search.toString()}`,
+          signal,
+        )
+        const page = mapEntityListDtoToModel(dto)
+        items.push(...page.items)
+        total = page.total
+        offset += DIRECTORY_PAGE_SIZE
+      } while (offset < total && items.length < DIRECTORY_MAX_RECORDS)
+
+      return {
+        items: items.slice(0, DIRECTORY_MAX_RECORDS),
+        total,
+        truncated: total > DIRECTORY_MAX_RECORDS,
+      }
     },
   })
 }

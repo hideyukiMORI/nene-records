@@ -605,7 +605,7 @@ export const zhHans: Partial<MessageCatalog> = {
   'admin.entityRecords.directory.empty.title': '尚无自定义路径的页面',
   'admin.entityRecords.directory.empty.description':
     '具有自定义永久链接路径的记录将在此处以目录树形式显示。',
-  'admin.entityRecords.directory.truncated': '仅显示前 100 条记录。使用列表视图搜索全部。',
+  'admin.entityRecords.directory.truncated': '仅显示前 {{limit}} 条记录。使用列表视图搜索全部。',
   'admin.entityRecords.directory.expand': '展开',
   'admin.entityRecords.directory.collapse': '折叠',
   'admin.entityRecords.directory.newHere': '在 {{path}} 下新建页面',

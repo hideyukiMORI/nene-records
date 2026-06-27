@@ -636,7 +636,7 @@ export const ptBR: Partial<MessageCatalog> = {
   'admin.entityRecords.directory.empty.description':
     'Registros com um caminho de permalink personalizado aparecem aqui como uma árvore de diretórios.',
   'admin.entityRecords.directory.truncated':
-    'Mostrando os primeiros 100 registros. Use a visualização em lista para pesquisar todos.',
+    'Mostrando os primeiros {{limit}} registros. Use a visualização em lista para pesquisar todos.',
   'admin.entityRecords.directory.expand': 'Expandir',
   'admin.entityRecords.directory.collapse': 'Recolher',
   'admin.entityRecords.directory.newHere': 'Nova página em {{path}}',

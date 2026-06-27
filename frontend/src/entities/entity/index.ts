@@ -33,7 +33,9 @@ export {
   useUpdateEntity,
 } from './mutations'
 export {
+  DIRECTORY_MAX_RECORDS,
   defaultEntityListParams,
+  useDirectoryEntityList,
   useEntitiesByDateRange,
   useEntitiesByTag,
   useEntity,

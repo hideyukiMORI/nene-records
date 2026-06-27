@@ -264,6 +264,10 @@ final class InMemoryEntityRepository implements EntityRepositoryInterface
                 continue;
             }
 
+            if ($criteria->hasPermalink && ($entity->permalink === null || $entity->permalink === '')) {
+                continue;
+            }
+
             if ($criteria->status !== null && $entity->status !== $criteria->status) {
                 continue;
             }

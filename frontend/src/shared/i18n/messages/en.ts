@@ -635,7 +635,7 @@ export const en = {
   'admin.entityRecords.directory.empty.description':
     'Records with a custom permalink path appear here as a directory tree.',
   'admin.entityRecords.directory.truncated':
-    'Showing the first 100 records. Use the list view to search all.',
+    'Showing the first {{limit}} records. Use the list view to search all.',
   'admin.entityRecords.directory.expand': 'Expand',
   'admin.entityRecords.directory.collapse': 'Collapse',
   'admin.entityRecords.directory.newHere': 'New page under {{path}}',

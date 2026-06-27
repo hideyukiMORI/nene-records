@@ -4,6 +4,7 @@ import {
   defaultEntityListParams,
   useCreateEntity,
   useDeleteEntity,
+  useDirectoryEntityList,
   useEntityList,
   type Entity,
   type EntityId,
@@ -26,8 +27,6 @@ import { type DirectoryRecord } from '../lib/build-permalink-tree'
 
 export const PAGE_SIZE_OPTIONS = [20, 50, 100] as const
 const DEFAULT_PAGE_SIZE = 20
-/** Directory mode fetches this many records (the API's max page) to build the tree. */
-const DIRECTORY_FETCH_LIMIT = 100
 
 export function useManageEntitiesPage(entityTypeId: number) {
   const { t } = useTranslation()
@@ -69,12 +68,13 @@ export function useManageEntitiesPage(entityTypeId: number) {
     ],
   )
   const listQuery = useEntityList(listParams)
-  // Directory mode fetches a larger, unpaginated slice to build the path tree —
-  // honouring the active filters (search / status / tags / relations) so the tree
-  // reflects them too (#657). Sort/pagination don't apply: the tree sorts by path.
+  // Directory mode pages through ALL permalink records (100 at a time, the public
+  // endpoint's per-request cap) to build a COMPLETE path tree — honouring the active
+  // filters (search / status / tags / relations) (#657). The hook adds has_permalink
+  // + include=views; sort/pagination don't apply (the tree sorts by path) (#682).
   const directoryParams = useMemo(
-    () => ({
-      ...defaultEntityListParams(
+    () =>
+      defaultEntityListParams(
         entityTypeId,
         selectedTagSlugs,
         selectedRelationFilters,
@@ -84,10 +84,6 @@ export function useManageEntitiesPage(entityTypeId: number) {
         sortKey,
         sortOrder,
       ),
-      limit: DIRECTORY_FETCH_LIMIT,
-      // Attach per-record view counts so the directory can show readership (#674).
-      include: 'views',
-    }),
     [
       entityTypeId,
       selectedTagSlugs,
@@ -98,7 +94,9 @@ export function useManageEntitiesPage(entityTypeId: number) {
       sortOrder,
     ],
   )
-  const directoryQuery = useEntityList(directoryParams, { enabled: viewMode === 'directory' })
+  const directoryQuery = useDirectoryEntityList(directoryParams, {
+    enabled: viewMode === 'directory',
+  })
   const tagListQuery = useTagList({ limit: 100, offset: 0 })
   const fieldDefQuery = useFieldDefList(defaultFieldDefListParams(entityTypeId))
   const textFieldQuery = useTextFieldList(defaultTextFieldListParamsForEntityType(entityTypeId))
@@ -258,7 +256,7 @@ export function useManageEntitiesPage(entityTypeId: number) {
 
   const total = listQuery.data?.total ?? 0
   const totalPages = Math.max(1, Math.ceil(total / pageSize))
-  const directoryTruncated = (directoryQuery.data?.total ?? 0) > DIRECTORY_FETCH_LIMIT
+  const directoryTruncated = directoryQuery.data?.truncated ?? false
 
   return {
     items,

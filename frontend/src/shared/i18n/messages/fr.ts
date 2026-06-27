@@ -643,7 +643,7 @@ export const fr: Partial<MessageCatalog> = {
   'admin.entityRecords.directory.empty.description':
     'Les fiches ayant un chemin de permalien personnalisé apparaissent ici sous forme d’arborescence.',
   'admin.entityRecords.directory.truncated':
-    'Affichage des 100 premières fiches. Utilisez la vue liste pour tout rechercher.',
+    'Affichage des {{limit}} premières fiches. Utilisez la vue liste pour tout rechercher.',
   'admin.entityRecords.directory.expand': 'Déplier',
   'admin.entityRecords.directory.collapse': 'Replier',
   'admin.entityRecords.directory.newHere': 'Nouvelle page sous {{path}}',

@@ -3540,6 +3540,8 @@ export interface operations {
                 "relation.{field_key}"?: components["parameters"]["RelationFilterQuery"];
                 /** @description Full-text search across slug and text field values (partial match). */
                 q?: string;
+                /** @description When `1`, restrict to records carrying a non-empty custom permalink. Used by the admin directory to page through only the records it renders (#682). */
+                has_permalink?: "1";
                 /** @description Only entities published on or after this date (YYYY-MM-DD). */
                 published_from?: string;
                 /** @description Only entities published on or before this date, inclusive (YYYY-MM-DD). */

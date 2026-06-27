@@ -259,6 +259,10 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
             $params[] = $criteria->entityTypeId;
         }
 
+        if ($criteria->hasPermalink) {
+            $conditions[] = "(e.permalink IS NOT NULL AND e.permalink != '')";
+        }
+
         if ($criteria->status !== null) {
             $conditions[] = 'e.status = ?';
             $params[] = $criteria->status->value;
