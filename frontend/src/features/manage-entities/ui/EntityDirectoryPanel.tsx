@@ -33,6 +33,8 @@ export interface EntityDirectoryPanelProps {
   isError: boolean
   errorTitle: string | null
   onRetry: () => void
+  /** Create a new record under a folder, pre-filling its permalink prefix (#658). */
+  onCreateHere: (permalinkPrefix: string) => void
 }
 
 /**
@@ -48,6 +50,7 @@ export function EntityDirectoryPanel({
   isError,
   errorTitle,
   onRetry,
+  onCreateHere,
 }: EntityDirectoryPanelProps) {
   const { t } = useTranslation()
   const tree = useMemo(() => buildPermalinkTree(records), [records])
@@ -88,7 +91,13 @@ export function EntityDirectoryPanel({
         aria-label={t('admin.entityRecords.view.directory')}
       >
         {tree.map((node) => (
-          <DirectoryNodeRow key={node.path} node={node} entityTypeSlug={entityTypeSlug} depth={0} />
+          <DirectoryNodeRow
+            key={node.path}
+            node={node}
+            entityTypeSlug={entityTypeSlug}
+            depth={0}
+            onCreateHere={onCreateHere}
+          />
         ))}
       </ul>
     </div>
@@ -99,10 +108,12 @@ function DirectoryNodeRow({
   node,
   entityTypeSlug,
   depth,
+  onCreateHere,
 }: {
   node: DirectoryNode
   entityTypeSlug: string
   depth: number
+  onCreateHere: (permalinkPrefix: string) => void
 }) {
   const { t, locale } = useTranslation()
   // Initially expand only the top level — a deep tree is otherwise a wall of rows (#657).
@@ -172,6 +183,17 @@ function DirectoryNodeRow({
             </span>
           ) : null}
           <code className="truncate font-mono text-caption text-text-muted">{node.path}</code>
+          <button
+            type="button"
+            onClick={() => {
+              onCreateHere(`${node.path}/`)
+            }}
+            aria-label={t('admin.entityRecords.directory.newHere', { path: node.path })}
+            title={t('admin.entityRecords.directory.newHere', { path: node.path })}
+            className="shrink-0 rounded px-1 font-mono text-body text-text-muted hover:bg-surface-raised hover:text-accent"
+          >
+            +
+          </button>
         </div>
       </div>
 
@@ -183,6 +205,7 @@ function DirectoryNodeRow({
               node={child}
               entityTypeSlug={entityTypeSlug}
               depth={depth + 1}
+              onCreateHere={onCreateHere}
             />
           ))}
         </ul>

@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
@@ -30,6 +30,7 @@ function renderPanel(props?: Partial<Parameters<typeof EntityDirectoryPanel>[0]>
         isError={false}
         errorTitle={null}
         onRetry={() => {}}
+        onCreateHere={() => {}}
         {...props}
       />
     </MemoryRouter>,
@@ -72,5 +73,15 @@ describe('EntityDirectoryPanel', () => {
 
     // `company` (folder) and `About Us` (a page that also has children) each show (1).
     expect(screen.getAllByText('(1)')).toHaveLength(2)
+  })
+
+  it('creates a new page under a folder, passing its permalink prefix (#658)', async () => {
+    const user = userEvent.setup()
+    const onCreateHere = vi.fn()
+    renderPanel({ onCreateHere })
+
+    await user.click(screen.getByRole('button', { name: 'New page under /company' }))
+
+    expect(onCreateHere).toHaveBeenCalledWith('/company/')
   })
 })

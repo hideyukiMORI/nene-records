@@ -646,6 +646,7 @@ export const fr: Partial<MessageCatalog> = {
     'Affichage des 100 premières fiches. Utilisez la vue liste pour tout rechercher.',
   'admin.entityRecords.directory.expand': 'Déplier',
   'admin.entityRecords.directory.collapse': 'Replier',
+  'admin.entityRecords.directory.newHere': 'Nouvelle page sous {{path}}',
 
   // ── Field definitions ────────────────────────────────────────────────────
   'admin.fieldDefs.pageTitle': 'Champs',

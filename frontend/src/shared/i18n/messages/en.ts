@@ -638,6 +638,7 @@ export const en = {
     'Showing the first 100 records. Use the list view to search all.',
   'admin.entityRecords.directory.expand': 'Expand',
   'admin.entityRecords.directory.collapse': 'Collapse',
+  'admin.entityRecords.directory.newHere': 'New page under {{path}}',
 
   // ── Field definitions ────────────────────────────────────────────────────
   'admin.fieldDefs.pageTitle': 'Fields',

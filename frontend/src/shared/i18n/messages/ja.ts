@@ -634,6 +634,7 @@ export const ja: Partial<MessageCatalog> = {
     '先頭100件を表示しています。全件はリスト表示の検索をご利用ください。',
   'admin.entityRecords.directory.expand': '展開',
   'admin.entityRecords.directory.collapse': '折りたたむ',
+  'admin.entityRecords.directory.newHere': '{{path}} に新規ページ',
 
   // ── Field definitions ────────────────────────────────────────────────────
   'admin.fieldDefs.pageTitle': 'フィールド',

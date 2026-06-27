@@ -608,6 +608,7 @@ export const zhHans: Partial<MessageCatalog> = {
   'admin.entityRecords.directory.truncated': '仅显示前 100 条记录。使用列表视图搜索全部。',
   'admin.entityRecords.directory.expand': '展开',
   'admin.entityRecords.directory.collapse': '折叠',
+  'admin.entityRecords.directory.newHere': '在 {{path}} 下新建页面',
 
   // ── Field definitions ────────────────────────────────────────────────────
   'admin.fieldDefs.pageTitle': '字段',

@@ -103,6 +103,7 @@ export interface ManageEntitiesViewProps {
   directoryIsLoading: boolean
   directoryIsError: boolean
   directoryErrorTitle: string | null
+  onCreateHere: (permalinkPrefix: string) => void
 }
 
 export function ManageEntitiesView({
@@ -151,6 +152,7 @@ export function ManageEntitiesView({
   directoryIsLoading,
   directoryIsError,
   directoryErrorTitle,
+  onCreateHere,
 }: ManageEntitiesViewProps) {
   const { t } = useTranslation()
 
@@ -424,6 +426,7 @@ export function ManageEntitiesView({
               isError={directoryIsError}
               errorTitle={directoryErrorTitle}
               onRetry={onRetry}
+              onCreateHere={onCreateHere}
             />
           ) : (
             <EntityListPanel
