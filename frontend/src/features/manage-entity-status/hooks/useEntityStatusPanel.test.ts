@@ -20,6 +20,7 @@ function makeEntity(overrides: Partial<Entity> = {}): Entity {
     deletedAt: null,
     metaTitle: 'SEO Title',
     metaDescription: 'SEO Description',
+    menuOrder: 0,
     createdAt: null,
     updatedAt: null,
     ...overrides,

@@ -34,6 +34,7 @@ describe('entity mapper', () => {
       deletedAt: null,
       metaTitle: null,
       metaDescription: null,
+      menuOrder: 0,
       createdAt: null,
       updatedAt: null,
     })

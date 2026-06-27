@@ -18,6 +18,8 @@ export interface Entity {
   deletedAt: string | null
   metaTitle: string | null
   metaDescription: string | null
+  /** Manual sibling order in the directory / public nav, lower first (#659). */
+  menuOrder: number
   /** Server-computed teaser; present only when listed with `include=excerpt`. */
   excerpt?: string | null
   createdAt: string | null

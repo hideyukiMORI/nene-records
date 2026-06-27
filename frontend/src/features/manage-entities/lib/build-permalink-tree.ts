@@ -6,6 +6,7 @@ export interface DirectoryRecord {
   label: string
   status: EntityStatus
   updatedAt: string | null
+  menuOrder: number
 }
 
 export interface DirectoryNode {
@@ -19,7 +20,12 @@ export interface DirectoryNode {
 }
 
 function sortNodes(nodes: DirectoryNode[]): DirectoryNode[] {
-  nodes.sort((a, b) => a.segment.localeCompare(b.segment))
+  // Manual order first (records carrying a menu_order), then alphabetical by
+  // segment for ties / pure folders (#659).
+  nodes.sort(
+    (a, b) =>
+      (a.record?.menuOrder ?? 0) - (b.record?.menuOrder ?? 0) || a.segment.localeCompare(b.segment),
+  )
   for (const node of nodes) {
     sortNodes(node.children)
   }

@@ -158,6 +158,7 @@ export function useManageEntitiesPage(entityTypeId: number) {
           label: getRecordDisplayLabel(Number(entity.id), textFields, fallback),
           status: entity.status,
           updatedAt: entity.updatedAt,
+          menuOrder: entity.menuOrder,
         }
       })
   }, [directoryQuery.data?.items, textFieldQuery.data?.items])

@@ -1,6 +1,6 @@
 import { type DragEvent, type ReactNode, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { useMoveEntity } from '@/entities/entity'
+import { useMoveEntity, useReorderEntities } from '@/entities/entity'
 import { useTranslation } from '@/shared/i18n'
 import {
   ConfirmDialog,
@@ -21,6 +21,7 @@ import {
   clearDirectoryDragPayload,
   type DirectoryDragPayload,
   getDirectoryDragPayload,
+  moveInOrder,
   moveTargetPermalink,
   setDirectoryDragPayload,
 } from './directory-dnd'
@@ -102,6 +103,7 @@ export function EntityDirectoryPanel({
   const { t } = useTranslation()
   const { showToast } = useToast()
   const moveMutation = useMoveEntity()
+  const reorderMutation = useReorderEntities()
   const [pendingMove, setPendingMove] = useState<PendingMove | null>(null)
   const [treeFilter, setTreeFilter] = useState('')
   const tree = useMemo(() => buildPermalinkTree(records), [records])
@@ -165,6 +167,10 @@ export function EntityDirectoryPanel({
     )
   }
 
+  const reorderSiblings = (ids: number[]) => {
+    reorderMutation.mutate({ ids })
+  }
+
   return (
     <div>
       {truncated ? (
@@ -211,12 +217,14 @@ export function EntityDirectoryPanel({
             <DirectoryNodeRow
               key={node.path}
               node={node}
+              siblings={filteredTree}
               entityTypeSlug={entityTypeSlug}
               depth={0}
               query={treeFilter}
               forceOpen={treeFilter !== ''}
               onCreateHere={onCreateHere}
               onRequestMove={requestMove}
+              onReorder={reorderSiblings}
             />
           ))}
         </ul>
@@ -254,20 +262,25 @@ export function EntityDirectoryPanel({
 
 function DirectoryNodeRow({
   node,
+  siblings,
   entityTypeSlug,
   depth,
   query,
   forceOpen,
   onCreateHere,
   onRequestMove,
+  onReorder,
 }: {
   node: DirectoryNode
+  /** The sibling array this node belongs to (for manual up/down reorder). */
+  siblings: DirectoryNode[]
   entityTypeSlug: string
   depth: number
   query: string
   forceOpen: boolean
   onCreateHere: (permalinkPrefix: string) => void
   onRequestMove: (payload: DirectoryDragPayload, targetPath: string) => void
+  onReorder: (orderedRecordIds: number[]) => void
 }) {
   const { t, locale } = useTranslation()
   // Initially expand only the top level — a deep tree is otherwise a wall of rows (#657).
@@ -277,6 +290,20 @@ function DirectoryNodeRow({
   const record = node.record
   // A tree filter forces every surviving branch open so matches are always shown.
   const isOpen = forceOpen || open
+
+  // Manual reorder (#659) operates on RECORD siblings only (pure folders have no
+  // menu_order); disabled while a filter is active to avoid reordering a subset.
+  const recordSiblings = siblings.filter((sibling) => sibling.record !== null)
+  const recordIndex = recordSiblings.findIndex((sibling) => sibling.record?.id === record?.id)
+  const canReorder =
+    record !== null && query === '' && recordSiblings.length > 1 && recordIndex !== -1
+
+  const reorderTo = (delta: number) => {
+    const ids = recordSiblings
+      .map((sibling) => sibling.record?.id)
+      .filter((id): id is number => id !== undefined)
+    onReorder(moveInOrder(ids, recordIndex, delta))
+  }
 
   const handleDragOver = (event: DragEvent<HTMLElement>) => {
     const payload = getDirectoryDragPayload()
@@ -394,6 +421,34 @@ function DirectoryNodeRow({
           <code className="truncate font-mono text-caption text-text-muted">
             {highlightMatch(node.path, query)}
           </code>
+          {canReorder ? (
+            <>
+              <button
+                type="button"
+                disabled={recordIndex === 0}
+                onClick={() => {
+                  reorderTo(-1)
+                }}
+                aria-label={t('admin.entityRecords.directory.moveUp')}
+                title={t('admin.entityRecords.directory.moveUp')}
+                className="shrink-0 rounded px-0.5 font-mono text-caption text-text-muted hover:text-accent disabled:cursor-not-allowed disabled:opacity-30"
+              >
+                ▲
+              </button>
+              <button
+                type="button"
+                disabled={recordIndex === recordSiblings.length - 1}
+                onClick={() => {
+                  reorderTo(1)
+                }}
+                aria-label={t('admin.entityRecords.directory.moveDown')}
+                title={t('admin.entityRecords.directory.moveDown')}
+                className="shrink-0 rounded px-0.5 font-mono text-caption text-text-muted hover:text-accent disabled:cursor-not-allowed disabled:opacity-30"
+              >
+                ▼
+              </button>
+            </>
+          ) : null}
           <button
             type="button"
             onClick={() => {
@@ -414,12 +469,14 @@ function DirectoryNodeRow({
             <DirectoryNodeRow
               key={child.path}
               node={child}
+              siblings={node.children}
               entityTypeSlug={entityTypeSlug}
               depth={depth + 1}
               query={query}
               forceOpen={forceOpen}
               onCreateHere={onCreateHere}
               onRequestMove={onRequestMove}
+              onReorder={onReorder}
             />
           ))}
         </ul>

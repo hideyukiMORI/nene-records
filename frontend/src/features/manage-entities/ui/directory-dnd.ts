@@ -52,3 +52,18 @@ export function canDropInto(payload: DirectoryDragPayload, targetPath: string): 
   }
   return moveTargetPermalink(payload, targetPath) !== payload.permalink
 }
+
+/**
+ * The new ordering after moving the item at `index` by `delta` positions (#659).
+ * Out-of-range moves return the input unchanged.
+ */
+export function moveInOrder(ids: number[], index: number, delta: number): number[] {
+  const moved = ids[index]
+  const to = index + delta
+  if (moved === undefined || to < 0 || to >= ids.length) {
+    return ids
+  }
+  const next = ids.filter((_, i) => i !== index)
+  next.splice(to, 0, moved)
+  return next
+}

@@ -34,6 +34,7 @@ export function mapEntityDtoToModel(dto: EntityDto): Entity {
     deletedAt: dto.deleted_at,
     metaTitle: dto.meta_title,
     metaDescription: dto.meta_description,
+    menuOrder: dto.menu_order ?? 0,
     ...(dto.excerpt !== undefined ? { excerpt: dto.excerpt } : {}),
     createdAt: dto.created_at,
     updatedAt: dto.updated_at,

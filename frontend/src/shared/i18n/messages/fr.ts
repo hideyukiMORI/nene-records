@@ -655,6 +655,8 @@ export const fr: Partial<MessageCatalog> = {
     'Déplacer « {{label}} » vers {{target}} ? {{count}} pages obtiennent de nouvelles URL, chacune avec une redirection 301 depuis son ancien chemin.',
   'admin.entityRecords.directory.move.confirm': 'Déplacer',
   'admin.entityRecords.directory.move.success': 'Pages déplacées.',
+  'admin.entityRecords.directory.moveUp': 'Monter',
+  'admin.entityRecords.directory.moveDown': 'Descendre',
   'admin.entityRecords.directory.filter.placeholder': 'Filtrer par chemin ou titre…',
   'admin.entityRecords.directory.filter.noMatches': 'Aucune page ne correspond à « {{query}} ».',
   'admin.entityRecords.directory.filter.clear': 'Effacer le filtre',
