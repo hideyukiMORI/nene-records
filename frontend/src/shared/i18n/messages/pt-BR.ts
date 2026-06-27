@@ -639,6 +639,7 @@ export const ptBR: Partial<MessageCatalog> = {
     'Mostrando os primeiros 100 registros. Use a visualização em lista para pesquisar todos.',
   'admin.entityRecords.directory.expand': 'Expandir',
   'admin.entityRecords.directory.collapse': 'Recolher',
+  'admin.entityRecords.directory.newHere': 'Nova página em {{path}}',
 
   // ── Field definitions ────────────────────────────────────────────────────
   'admin.fieldDefs.pageTitle': 'Campos',

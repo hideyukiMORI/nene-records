@@ -76,9 +76,13 @@ function EntityRecordsContent({ entityType }: { entityType: EntityType }) {
     isDeleting,
   } = useManageEntitiesPage(Number(entityType.id))
 
-  const handleCreate = async () => {
+  const handleCreate = async (permalinkPrefix?: string) => {
     const newEntity = await createEntity()
-    void navigate(`/admin/${entityType.slug}/${String(newEntity.id)}`)
+    const query =
+      permalinkPrefix !== undefined && permalinkPrefix !== ''
+        ? `?permalinkPrefix=${encodeURIComponent(permalinkPrefix)}`
+        : ''
+    void navigate(`/admin/${entityType.slug}/${String(newEntity.id)}${query}`)
   }
 
   const localizedName = getLocalizedEntityTypeName(entityType, locale)
@@ -162,6 +166,9 @@ function EntityRecordsContent({ entityType }: { entityType: EntityType }) {
         directoryIsLoading={directoryIsLoading}
         directoryIsError={directoryIsError}
         directoryErrorTitle={directoryErrorTitle}
+        onCreateHere={(permalinkPrefix) => {
+          void handleCreate(permalinkPrefix)
+        }}
       />
     </Stack>
   )

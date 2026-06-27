@@ -635,6 +635,7 @@ export const de: Partial<MessageCatalog> = {
     'Es werden die ersten 100 Datensätze angezeigt. Nutze die Listenansicht zum Durchsuchen aller.',
   'admin.entityRecords.directory.expand': 'Aufklappen',
   'admin.entityRecords.directory.collapse': 'Zuklappen',
+  'admin.entityRecords.directory.newHere': 'Neue Seite unter {{path}}',
   // ── Field definitions ────────────────────────────────────────────────────
   'admin.fieldDefs.pageTitle': 'Felder',
   'admin.fieldDefs.schemaFor': 'Felder für {{slug}}',

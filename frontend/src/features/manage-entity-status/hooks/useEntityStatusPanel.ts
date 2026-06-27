@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import type { Entity, EntityStatus } from '@/entities/entity'
 import {
   useGeneratePreviewToken,
@@ -64,7 +65,12 @@ export function useEntityStatusPanel(
   const revokePreviewMutation = useRevokePreviewToken()
 
   const [slugInput, setSlugInput] = useState(entity.slug ?? '')
-  const [permalinkInput, setPermalinkInput] = useState(entity.permalink ?? '')
+  const [searchParams] = useSearchParams()
+  // "+ new here" in the directory tree pre-fills a folder prefix via ?permalinkPrefix,
+  // so a new page starts under the right path (only when it has none yet) — #658.
+  const [permalinkInput, setPermalinkInput] = useState(
+    (entity.permalink ?? '') || (searchParams.get('permalinkPrefix') ?? ''),
+  )
   const [showScheduleForm, setShowScheduleForm] = useState(false)
   const [scheduledAtInput, setScheduledAtInput] = useState('')
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)

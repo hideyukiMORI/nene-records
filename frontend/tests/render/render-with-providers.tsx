@@ -8,6 +8,7 @@ import {
   type RenderResult,
 } from '@testing-library/react'
 import type { ReactElement, ReactNode } from 'react'
+import { MemoryRouter } from 'react-router-dom'
 import { I18nProvider } from '@/shared/i18n'
 
 export function createTestQueryClient(): QueryClient {
@@ -43,10 +44,15 @@ export function renderHookWithProviders<Result, Props>(
   const queryClient = createTestQueryClient()
 
   return renderHook(hook, {
+    // MemoryRouter so hooks using router context (e.g. useSearchParams) work. Hook
+    // tests never supply their own Router, so there's no nesting risk (unlike
+    // renderWithProviders, where component tests often wrap their own).
     wrapper: ({ children }: { children: ReactNode }) => (
-      <I18nProvider>
-        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-      </I18nProvider>
+      <MemoryRouter>
+        <I18nProvider>
+          <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+        </I18nProvider>
+      </MemoryRouter>
     ),
     ...options,
   })
