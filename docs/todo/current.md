@@ -2,14 +2,15 @@
 
 Last updated: 2026-06-27
 
-## 短期TODO（directory-view レビュー由来・2026-06-27 / milestone「ページ階層/ディレクトリ 仕上げ」#1）
+## 短期TODO（directory-view レビュー由来・2026-06-27 / milestone「ページ階層/ディレクトリ 仕上げ」#1 — 完了）
 
-> 議事: `docs/review/directory-view-personas-2026-06-27.md`。マイルストーン #1 を**端から対応**。
-> - [ ] **#656 P0**: 公開 custom-permalink ページを実SPAで解決・描画（最優先・実バグ＝SSRは正・SPAルータが任意パス未解決）
-> - [ ] **#657 P1**: ディレクトリ表示拡充（status フィルタ復活・更新日・子件数・初期折りたたみ）＋ titleless fallback の humanize 統一
-> - [ ] **#658 P1**: ページ作成/整理の WP 同等 UX（permalink 接頭辞補完・手動並び順）
-> - [ ] **#659 P2**: DnD 親移動＋自動301・ツリー内検索・「＋ここに新規」（満場一致の目玉）
-> - [ ] **#660 P2**: 公開階層の磨き込み（セクションindex 自動生成・パス視認性・開閉記憶・a11y）
+> 議事: `docs/review/directory-view-personas-2026-06-27.md`。**マイルストーン #1 完了**（P0＋全P1＋目玉P2 着地）。
+> - [x] **#656 P0**: 公開 custom-permalink ページを実SPAで解決・描画（#663・実機確認済）
+> - [x] **#657 P1**: ディレクトリ表示拡充＋ titleless fallback humanize 統一（#664）
+> - [x] **#658 P1**: 「＋ここに新規」permalink 接頭辞補完（#665。手動並び順は #659 へ統合）
+> - [x] **#659 P2**: DnD 親移動＋自動301／ツリー内検索＋ハイライト／手動並び順 ▲▼＋menu_order（#666–#670）
+> - [x] **#660 P2**: 磨き込み — パス視認性・フォルダ開閉記憶・a11y フォーカス・sitemap（custom-permalink 掲載）確認済
+> - 残: **#671** phantom セグメントのセクションindex 自動生成（機能規模のため #660 から分離）。全 PR は `main` 反映のみ＝**本番デプロイ未**（本番に custom-permalink ページが無く非緊急）。
 
 ## 状態サマリー
 

@@ -158,4 +158,31 @@ describe('EntityDirectoryPanel', () => {
     expect(downButtons[1]).toBeDisabled()
     expect(downButtons[0]).toBeEnabled()
   })
+
+  it('remembers the open/closed folder state across a data refresh (#660)', async () => {
+    const user = userEvent.setup()
+    const ui = (records: DirectoryRecord[]) => (
+      <MemoryRouter>
+        <EntityDirectoryPanel
+          entityTypeSlug="pages"
+          records={records}
+          truncated={false}
+          isLoading={false}
+          isError={false}
+          errorTitle={null}
+          onRetry={() => {}}
+          onCreateHere={() => {}}
+        />
+      </MemoryRouter>
+    )
+    const { rerender } = renderWithProviders(ui(RECORDS))
+
+    // `company` is open by default → collapse it.
+    await user.click(screen.getByRole('button', { name: 'Collapse' }))
+    expect(screen.queryByRole('link', { name: 'About Us' })).not.toBeInTheDocument()
+
+    // A refetch passes a fresh records array — the collapse must persist.
+    rerender(ui([...RECORDS]))
+    expect(screen.queryByRole('link', { name: 'About Us' })).not.toBeInTheDocument()
+  })
 })
