@@ -20,9 +20,12 @@ import {
   canDropInto,
   clearDirectoryDragPayload,
   type DirectoryDragPayload,
+  dropPosition,
   getDirectoryDragPayload,
   moveInOrder,
   moveTargetPermalink,
+  parentPath,
+  reorderByInsert,
   setDirectoryDragPayload,
 } from './directory-dnd'
 
@@ -303,7 +306,7 @@ function DirectoryNodeRow({
   const { t, locale } = useTranslation()
   // Initially expand only the top level; remember user toggles across refetches (#657, #660).
   const open = openOverrides.get(node.path) ?? depth === 0
-  const [isDropTarget, setIsDropTarget] = useState(false)
+  const [dropMode, setDropMode] = useState<'into' | 'before' | 'after' | null>(null)
   const hasChildren = node.children.length > 0
   const record = node.record
   // A tree filter forces every surviving branch open so matches are always shown.
@@ -323,25 +326,55 @@ function DirectoryNodeRow({
     onReorder(moveInOrder(ids, recordIndex, delta))
   }
 
-  const handleDragOver = (event: DragEvent<HTMLElement>) => {
+  // Resolve the drop intent from the pointer (#675): the top/bottom edge of a
+  // SIBLING record reorders before/after it; the middle (or any non-sibling row)
+  // moves into the folder. Reorder is suppressed while a filter is active.
+  const resolveDropMode = (event: DragEvent<HTMLElement>): 'into' | 'before' | 'after' | null => {
     const payload = getDirectoryDragPayload()
-    if (payload === null || !canDropInto(payload, node.path)) {
+    if (payload === null) {
+      return null
+    }
+    const targetId = record?.id
+    const canReorderHere =
+      query === '' &&
+      targetId !== undefined &&
+      targetId !== payload.id &&
+      parentPath(payload.permalink) === parentPath(node.path)
+    const rect = event.currentTarget.getBoundingClientRect()
+    const position = dropPosition(event.clientY, rect.top, rect.height)
+    if (canReorderHere && (position === 'before' || position === 'after')) {
+      return position
+    }
+    return canDropInto(payload, node.path) ? 'into' : null
+  }
+
+  const handleDragOver = (event: DragEvent<HTMLElement>) => {
+    const mode = resolveDropMode(event)
+    if (mode === null) {
       return
     }
     event.preventDefault()
     event.stopPropagation()
-    setIsDropTarget(true)
+    setDropMode(mode)
   }
 
   const handleDrop = (event: DragEvent<HTMLElement>) => {
     const payload = getDirectoryDragPayload()
-    setIsDropTarget(false)
-    if (payload === null || !canDropInto(payload, node.path)) {
+    const mode = resolveDropMode(event)
+    setDropMode(null)
+    if (payload === null || mode === null) {
       return
     }
     event.preventDefault()
     event.stopPropagation()
-    onRequestMove(payload, node.path)
+    if (mode === 'into') {
+      onRequestMove(payload, node.path)
+    } else if (record !== null) {
+      const ids = recordSiblings
+        .map((sibling) => sibling.record?.id)
+        .filter((id): id is number => id !== undefined)
+      onReorder(reorderByInsert(ids, payload.id, record.id, mode))
+    }
     clearDirectoryDragPayload()
   }
 
@@ -349,14 +382,18 @@ function DirectoryNodeRow({
     <li>
       <div
         className={`flex items-center gap-inline-sm rounded-md py-stack-xs pr-inline-sm ${
-          isDropTarget
+          dropMode === 'into'
             ? 'bg-surface-raised ring-2 ring-inset ring-accent'
-            : 'hover:bg-surface-raised'
+            : dropMode === 'before'
+              ? 'border-t-2 border-accent'
+              : dropMode === 'after'
+                ? 'border-b-2 border-accent'
+                : 'hover:bg-surface-raised'
         }`}
         style={{ paddingLeft: depth * 20 + 8 }}
         onDragOver={handleDragOver}
         onDragLeave={() => {
-          setIsDropTarget(false)
+          setDropMode(null)
         }}
         onDrop={handleDrop}
       >

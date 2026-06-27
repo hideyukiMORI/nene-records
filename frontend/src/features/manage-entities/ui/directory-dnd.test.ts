@@ -2,8 +2,11 @@ import { describe, expect, it } from 'vitest'
 import {
   canDropInto,
   type DirectoryDragPayload,
+  dropPosition,
   moveInOrder,
   moveTargetPermalink,
+  parentPath,
+  reorderByInsert,
 } from './directory-dnd'
 
 const payload: DirectoryDragPayload = { id: 1, permalink: '/company/about', label: 'About Us' }
@@ -42,5 +45,23 @@ describe('moveInOrder (#659)', () => {
     const ids = [1, 2, 3]
     expect(moveInOrder(ids, 0, -1)).toBe(ids)
     expect(moveInOrder(ids, 2, 1)).toBe(ids)
+  })
+})
+
+describe('drop-between reorder (#675)', () => {
+  it('computes the parent path', () => {
+    expect(parentPath('/company/about')).toBe('/company')
+    expect(parentPath('/about')).toBe('')
+  })
+
+  it('reads the drop position from the pointer Y within a row', () => {
+    expect(dropPosition(2, 0, 20)).toBe('before') // top 10%
+    expect(dropPosition(10, 0, 20)).toBe('middle') // 50%
+    expect(dropPosition(18, 0, 20)).toBe('after') // bottom 90%
+  })
+
+  it('reorders by inserting before/after a target sibling', () => {
+    expect(reorderByInsert([1, 2, 3], 1, 2, 'after')).toEqual([2, 1, 3])
+    expect(reorderByInsert([1, 2, 3], 3, 1, 'before')).toEqual([3, 1, 2])
   })
 })
