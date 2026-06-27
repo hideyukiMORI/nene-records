@@ -635,6 +635,14 @@ export const ja: Partial<MessageCatalog> = {
   'admin.entityRecords.directory.expand': '展開',
   'admin.entityRecords.directory.collapse': '折りたたむ',
   'admin.entityRecords.directory.newHere': '{{path}} に新規ページ',
+  'admin.entityRecords.directory.dragHandle': '「{{label}}」をドラッグして移動',
+  'admin.entityRecords.directory.move.confirmTitle': 'ページを移動しますか？',
+  'admin.entityRecords.directory.move.confirmBody.one':
+    '「{{label}}」を {{target}} へ移動します。URL が変わり、旧パスから301リダイレクトを張ります。',
+  'admin.entityRecords.directory.move.confirmBody.other':
+    '「{{label}}」を {{target}} へ移動します。{{count}} 件のページの URL が変わり、それぞれ旧パスから301リダイレクトを張ります。',
+  'admin.entityRecords.directory.move.confirm': '移動',
+  'admin.entityRecords.directory.move.success': 'ページを移動しました。',
 
   // ── Field definitions ────────────────────────────────────────────────────
   'admin.fieldDefs.pageTitle': 'フィールド',

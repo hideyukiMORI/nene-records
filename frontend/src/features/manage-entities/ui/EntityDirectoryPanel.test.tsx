@@ -1,12 +1,16 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, screen } from '@testing-library/react'
+import { cleanup, fireEvent, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
-import { renderWithI18n } from '@/shared/i18n/test-helpers'
+import { renderWithProviders } from '@tests/render/render-with-providers'
 import type { DirectoryRecord } from '../lib/build-permalink-tree'
+import { clearDirectoryDragPayload, setDirectoryDragPayload } from './directory-dnd'
 import { EntityDirectoryPanel } from './EntityDirectoryPanel'
 
-afterEach(cleanup)
+afterEach(() => {
+  cleanup()
+  clearDirectoryDragPayload()
+})
 
 const RECORDS: DirectoryRecord[] = [
   { id: 1, permalink: '/company/about', label: 'About Us', status: 'published', updatedAt: null },
@@ -20,7 +24,7 @@ const RECORDS: DirectoryRecord[] = [
 ]
 
 function renderPanel(props?: Partial<Parameters<typeof EntityDirectoryPanel>[0]>) {
-  return renderWithI18n(
+  return renderWithProviders(
     <MemoryRouter>
       <EntityDirectoryPanel
         entityTypeSlug="pages"
@@ -83,5 +87,20 @@ describe('EntityDirectoryPanel', () => {
     await user.click(screen.getByRole('button', { name: 'New page under /company' }))
 
     expect(onCreateHere).toHaveBeenCalledWith('/company/')
+  })
+
+  it('opens a move confirmation when a record is dropped onto a folder (#659)', () => {
+    setDirectoryDragPayload({ id: 2, permalink: '/company/about/team', label: 'Our Team' })
+    renderPanel()
+
+    const companyRow = screen.getByText('company/').closest('div')
+    if (companyRow === null) {
+      throw new Error('Expected the /company folder row to render.')
+    }
+    fireEvent.drop(companyRow)
+
+    // The confirm dialog appears, showing the computed target permalink.
+    expect(screen.getByText('Move page?')).toBeInTheDocument()
+    expect(screen.getByText(/\/company\/team/)).toBeInTheDocument()
   })
 })

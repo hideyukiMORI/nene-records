@@ -639,6 +639,14 @@ export const en = {
   'admin.entityRecords.directory.expand': 'Expand',
   'admin.entityRecords.directory.collapse': 'Collapse',
   'admin.entityRecords.directory.newHere': 'New page under {{path}}',
+  'admin.entityRecords.directory.dragHandle': 'Drag to move “{{label}}”',
+  'admin.entityRecords.directory.move.confirmTitle': 'Move page?',
+  'admin.entityRecords.directory.move.confirmBody.one':
+    'Move “{{label}}” to {{target}}? Its URL changes and a 301 redirect from the old path is added.',
+  'admin.entityRecords.directory.move.confirmBody.other':
+    'Move “{{label}}” to {{target}}? {{count}} pages get new URLs, each with a 301 redirect from its old path.',
+  'admin.entityRecords.directory.move.confirm': 'Move',
+  'admin.entityRecords.directory.move.success': 'Pages moved.',
 
   // ── Field definitions ────────────────────────────────────────────────────
   'admin.fieldDefs.pageTitle': 'Fields',

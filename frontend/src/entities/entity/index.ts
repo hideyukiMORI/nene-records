@@ -25,6 +25,7 @@ export {
   useCreateEntity,
   useDeleteEntity,
   useGeneratePreviewToken,
+  useMoveEntity,
   useRevokePreviewToken,
   useScheduleEntity,
   useUnscheduleEntity,
