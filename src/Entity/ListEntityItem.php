@@ -10,6 +10,7 @@ final readonly class ListEntityItem
         public int $id,
         public int $entityTypeId,
         public ?string $slug,
+        public ?string $permalink,
         public string $status,
         public ?string $publishedAtIso,
         public bool $isDeleted,

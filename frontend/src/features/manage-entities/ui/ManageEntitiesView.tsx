@@ -11,6 +11,8 @@ import type { Tag } from '@/entities/tag'
 import { useTranslation } from '@/shared/i18n'
 import { Button, ConfirmDialog, Select, Stack, Text } from '@/shared/ui'
 import { buildExportUrl } from '../lib/build-export-url'
+import type { DirectoryRecord } from '../lib/build-permalink-tree'
+import { EntityDirectoryPanel } from './EntityDirectoryPanel'
 import { EntityListPanel } from './EntityListPanel'
 import { EntityRelationFilterPanel } from './EntityRelationFilterPanel'
 import { EntityTagFilterPanel } from './EntityTagFilterPanel'
@@ -91,6 +93,16 @@ export interface ManageEntitiesViewProps {
   onRequestDelete: (entity: Entity) => void
   onCancelDelete: () => void
   onConfirmDelete: () => Promise<void>
+  viewMode: 'list' | 'directory'
+  onViewModeChange: (mode: 'list' | 'directory') => void
+  pageSize: number
+  pageSizeOptions: readonly number[]
+  onPageSizeChange: (size: number) => void
+  directoryItems: DirectoryRecord[]
+  directoryTruncated: boolean
+  directoryIsLoading: boolean
+  directoryIsError: boolean
+  directoryErrorTitle: string | null
 }
 
 export function ManageEntitiesView({
@@ -129,6 +141,16 @@ export function ManageEntitiesView({
   onRequestDelete,
   onCancelDelete,
   onConfirmDelete,
+  viewMode,
+  onViewModeChange,
+  pageSize,
+  pageSizeOptions,
+  onPageSizeChange,
+  directoryItems,
+  directoryTruncated,
+  directoryIsLoading,
+  directoryIsError,
+  directoryErrorTitle,
 }: ManageEntitiesViewProps) {
   const { t } = useTranslation()
 
@@ -146,14 +168,42 @@ export function ManageEntitiesView({
 
   // 検索・フィルターはコンテンツが存在するか、すでにフィルターが有効な場合のみ表示
   // （Progressive Disclosure: 空ページで絞り込みUI を見せない）
-  const showFilters = total > 0 || isFilterActive
+  const showFilters = (total > 0 || isFilterActive) && viewMode === 'list'
 
   const currentSortValue = `${sortKey}-${sortOrder}`
 
   return (
     <>
       <Stack gap="lg">
-        {/* ── 検索 + ソート + フィルター（コンテンツがあるときのみ） ── */}
+        {/* ── 表示モード切替（リスト / パス由来ディレクトリ） ── */}
+        <div
+          className="flex items-center gap-1"
+          role="group"
+          aria-label={t('admin.entityRecords.view.label')}
+        >
+          <Button
+            variant={viewMode === 'list' ? 'primary' : 'secondary'}
+            size="sm"
+            aria-pressed={viewMode === 'list'}
+            onClick={() => {
+              onViewModeChange('list')
+            }}
+          >
+            {t('admin.entityRecords.view.list')}
+          </Button>
+          <Button
+            variant={viewMode === 'directory' ? 'primary' : 'secondary'}
+            size="sm"
+            aria-pressed={viewMode === 'directory'}
+            onClick={() => {
+              onViewModeChange('directory')
+            }}
+          >
+            {t('admin.entityRecords.view.directory')}
+          </Button>
+        </div>
+
+        {/* ── 検索 + ソート + フィルター（リスト表示・コンテンツがあるときのみ） ── */}
         {showFilters ? (
           <>
             {/* Search */}
@@ -206,6 +256,30 @@ export function ManageEntitiesView({
                   {SORT_OPTIONS.map((opt) => (
                     <option key={opt.value} value={opt.value}>
                       {t(opt.labelKey)}
+                    </option>
+                  ))}
+                </Select>
+              </div>
+
+              {/* 1ページあたりの件数（多数レコードのスケール対策） */}
+              <div className="flex items-center gap-1.5">
+                <label
+                  htmlFor="entity-page-size-select"
+                  className="shrink-0 font-sans text-caption text-text-muted"
+                >
+                  {t('admin.entityRecords.pageSize.label')}
+                </label>
+                <Select
+                  id="entity-page-size-select"
+                  size="sm"
+                  value={String(pageSize)}
+                  onChange={(e) => {
+                    onPageSizeChange(Number(e.target.value))
+                  }}
+                >
+                  {pageSizeOptions.map((size) => (
+                    <option key={size} value={size}>
+                      {size}
                     </option>
                   ))}
                 </Select>
@@ -336,21 +410,33 @@ export function ManageEntitiesView({
             ) : null}
           </div>
 
-          <EntityListPanel
-            entityTypeSlug={entityTypeSlug}
-            items={items}
-            recordLabels={recordLabels}
-            recordBodyMap={recordBodyMap}
-            isLoading={isLoading}
-            isError={isError}
-            errorTitle={errorTitle}
-            isDeleting={isDeleting}
-            isFilterActive={isFilterActive}
-            onRetry={onRetry}
-            onDelete={onRequestDelete}
-          />
+          {viewMode === 'directory' ? (
+            <EntityDirectoryPanel
+              entityTypeSlug={entityTypeSlug}
+              records={directoryItems}
+              truncated={directoryTruncated}
+              isLoading={directoryIsLoading}
+              isError={directoryIsError}
+              errorTitle={directoryErrorTitle}
+              onRetry={onRetry}
+            />
+          ) : (
+            <EntityListPanel
+              entityTypeSlug={entityTypeSlug}
+              items={items}
+              recordLabels={recordLabels}
+              recordBodyMap={recordBodyMap}
+              isLoading={isLoading}
+              isError={isError}
+              errorTitle={errorTitle}
+              isDeleting={isDeleting}
+              isFilterActive={isFilterActive}
+              onRetry={onRetry}
+              onDelete={onRequestDelete}
+            />
+          )}
 
-          {totalPages > 1 || page > 0 ? (
+          {viewMode === 'list' && (totalPages > 1 || page > 0) ? (
             <div className="flex items-center justify-between gap-inline-md pt-stack-xs">
               <Button
                 variant="secondary"

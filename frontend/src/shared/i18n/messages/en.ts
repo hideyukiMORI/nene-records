@@ -610,6 +610,17 @@ export const en = {
   'admin.entityRecords.pagination.prev': '← Prev',
   'admin.entityRecords.pagination.next': 'Next →',
   'admin.entityRecords.pagination.page': 'Page {{page}} / {{total}}',
+  'admin.entityRecords.view.label': 'View',
+  'admin.entityRecords.view.list': 'List',
+  'admin.entityRecords.view.directory': 'Directory',
+  'admin.entityRecords.pageSize.label': 'Per page',
+  'admin.entityRecords.directory.empty.title': 'No pages with custom paths yet',
+  'admin.entityRecords.directory.empty.description':
+    'Records with a custom permalink path appear here as a directory tree.',
+  'admin.entityRecords.directory.truncated':
+    'Showing the first 100 records. Use the list view to search all.',
+  'admin.entityRecords.directory.expand': 'Expand',
+  'admin.entityRecords.directory.collapse': 'Collapse',
 
   // ── Field definitions ────────────────────────────────────────────────────
   'admin.fieldDefs.pageTitle': 'Fields',

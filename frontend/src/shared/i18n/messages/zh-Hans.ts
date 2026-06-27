@@ -581,6 +581,16 @@ export const zhHans: Partial<MessageCatalog> = {
   'admin.entityRecords.pagination.prev': '← 上一页',
   'admin.entityRecords.pagination.next': '下一页 →',
   'admin.entityRecords.pagination.page': '第 {{page}} / {{total}} 页',
+  'admin.entityRecords.view.label': '视图',
+  'admin.entityRecords.view.list': '列表',
+  'admin.entityRecords.view.directory': '目录',
+  'admin.entityRecords.pageSize.label': '每页',
+  'admin.entityRecords.directory.empty.title': '尚无自定义路径的页面',
+  'admin.entityRecords.directory.empty.description':
+    '具有自定义永久链接路径的记录将在此处以目录树形式显示。',
+  'admin.entityRecords.directory.truncated': '仅显示前 100 条记录。使用列表视图搜索全部。',
+  'admin.entityRecords.directory.expand': '展开',
+  'admin.entityRecords.directory.collapse': '折叠',
 
   // ── Field definitions ────────────────────────────────────────────────────
   'admin.fieldDefs.pageTitle': '字段',

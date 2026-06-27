@@ -22,8 +22,12 @@ import { useTagList } from '@/entities/tag'
 import { defaultTextFieldListParamsForEntityType, useTextFieldList } from '@/entities/text-field'
 import { useTranslation } from '@/shared/i18n'
 import { getRecordDisplayLabel } from '@/shared/lib/get-record-display-label'
+import { type DirectoryRecord } from '../lib/build-permalink-tree'
 
-const PAGE_LIMIT = 20
+export const PAGE_SIZE_OPTIONS = [20, 50, 100] as const
+const DEFAULT_PAGE_SIZE = 20
+/** Directory mode fetches this many records (the API's max page) to build the tree. */
+const DIRECTORY_FETCH_LIMIT = 100
 
 export function useManageEntitiesPage(entityTypeId: number) {
   const { t } = useTranslation()
@@ -36,21 +40,26 @@ export function useManageEntitiesPage(entityTypeId: number) {
   const [sortKey, setSortKey] = useState<EntitySortKey>('id')
   const [sortOrder, setSortOrder] = useState<EntitySortOrder>('desc')
   const [page, setPage] = useState(0)
+  const [pageSize, setPageSizeState] = useState<number>(DEFAULT_PAGE_SIZE)
+  const [viewMode, setViewMode] = useState<'list' | 'directory'>('list')
   const listParams = useMemo(
-    () =>
-      defaultEntityListParams(
+    () => ({
+      ...defaultEntityListParams(
         entityTypeId,
         selectedTagSlugs,
         selectedRelationFilters,
-        page * PAGE_LIMIT,
+        page * pageSize,
         searchQuery,
         selectedStatus,
         sortKey,
         sortOrder,
       ),
+      limit: pageSize,
+    }),
     [
       entityTypeId,
       page,
+      pageSize,
       selectedRelationFilters,
       selectedTagSlugs,
       searchQuery,
@@ -60,6 +69,11 @@ export function useManageEntitiesPage(entityTypeId: number) {
     ],
   )
   const listQuery = useEntityList(listParams)
+  // Directory mode fetches a larger, unpaginated slice to build the path tree.
+  const directoryQuery = useEntityList(
+    { entityTypeId, limit: DIRECTORY_FETCH_LIMIT, offset: 0 },
+    { enabled: viewMode === 'directory' },
+  )
   const tagListQuery = useTagList({ limit: 100, offset: 0 })
   const fieldDefQuery = useFieldDefList(defaultFieldDefListParams(entityTypeId))
   const textFieldQuery = useTextFieldList(defaultTextFieldListParamsForEntityType(entityTypeId))
@@ -101,6 +115,28 @@ export function useManageEntitiesPage(entityTypeId: number) {
     }
     return result
   }, [items, textFieldQuery.data?.items])
+
+  // Directory-mode records: only those carrying a custom permalink, labelled from
+  // the type-wide title fields (falling back to meta_title or the last segment).
+  const directoryRecords = useMemo((): DirectoryRecord[] => {
+    const textFields = textFieldQuery.data?.items ?? []
+    return (directoryQuery.data?.items ?? [])
+      .filter((entity) => entity.permalink !== null && entity.permalink !== '')
+      .map((entity) => {
+        const permalink = entity.permalink ?? ''
+        const lastSegment = permalink.split('/').filter(Boolean).pop() ?? String(entity.id)
+        const fallback =
+          entity.metaTitle !== null && entity.metaTitle.trim() !== ''
+            ? entity.metaTitle
+            : lastSegment
+        return {
+          id: Number(entity.id),
+          permalink,
+          label: getRecordDisplayLabel(Number(entity.id), textFields, fallback),
+          status: entity.status,
+        }
+      })
+  }, [directoryQuery.data?.items, textFieldQuery.data?.items])
 
   const toggleTagSlug = useCallback((slug: string) => {
     setSelectedTagSlugs((current) =>
@@ -160,6 +196,11 @@ export function useManageEntitiesPage(entityTypeId: number) {
     setPage(0)
   }, [])
 
+  const setPageSize = useCallback((size: number) => {
+    setPageSizeState(size)
+    setPage(0)
+  }, [])
+
   const createEntity = useCallback(async (): Promise<Entity> => {
     return createMutation.mutateAsync({ entityTypeId })
   }, [createMutation, entityTypeId])
@@ -188,7 +229,8 @@ export function useManageEntitiesPage(entityTypeId: number) {
     listQuery.error?.title ?? textFieldQuery.error?.title ?? fieldDefQuery.error?.title ?? null
 
   const total = listQuery.data?.total ?? 0
-  const totalPages = Math.max(1, Math.ceil(total / PAGE_LIMIT))
+  const totalPages = Math.max(1, Math.ceil(total / pageSize))
+  const directoryTruncated = (directoryQuery.data?.total ?? 0) > DIRECTORY_FETCH_LIMIT
 
   return {
     items,
@@ -197,6 +239,16 @@ export function useManageEntitiesPage(entityTypeId: number) {
     total,
     page,
     totalPages,
+    pageSize,
+    setPageSize,
+    pageSizeOptions: PAGE_SIZE_OPTIONS,
+    viewMode,
+    setViewMode,
+    directoryRecords,
+    directoryTruncated,
+    directoryIsLoading: directoryQuery.isLoading,
+    directoryIsError: directoryQuery.isError,
+    directoryErrorTitle: directoryQuery.error?.title ?? null,
     sortKey,
     sortOrder,
     setSort,
@@ -235,6 +287,7 @@ export function useManageEntitiesPage(entityTypeId: number) {
     refetch: async () => {
       await Promise.all([
         listQuery.refetch(),
+        directoryQuery.refetch(),
         textFieldQuery.refetch(),
         tagListQuery.refetch(),
         fieldDefQuery.refetch(),

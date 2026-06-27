@@ -606,6 +606,17 @@ export const ja: Partial<MessageCatalog> = {
   'admin.entityRecords.pagination.prev': '← 前へ',
   'admin.entityRecords.pagination.next': '次へ →',
   'admin.entityRecords.pagination.page': '{{page}} / {{total}} ページ',
+  'admin.entityRecords.view.label': '表示',
+  'admin.entityRecords.view.list': 'リスト',
+  'admin.entityRecords.view.directory': 'ディレクトリ',
+  'admin.entityRecords.pageSize.label': '表示件数',
+  'admin.entityRecords.directory.empty.title': 'カスタムパスのページはまだありません',
+  'admin.entityRecords.directory.empty.description':
+    'カスタムパーマリンクを持つレコードがディレクトリツリーで表示されます。',
+  'admin.entityRecords.directory.truncated':
+    '先頭100件を表示しています。全件はリスト表示の検索をご利用ください。',
+  'admin.entityRecords.directory.expand': '展開',
+  'admin.entityRecords.directory.collapse': '折りたたむ',
 
   // ── Field definitions ────────────────────────────────────────────────────
   'admin.fieldDefs.pageTitle': 'フィールド',

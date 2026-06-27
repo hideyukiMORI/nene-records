@@ -81,6 +81,7 @@ final readonly class ListEntitiesHandler
                             'id' => $item->id,
                             'entity_type_id' => $item->entityTypeId,
                             'slug' => $item->slug,
+                            'permalink' => $item->permalink,
                             'status' => $item->status,
                             'published_at' => $item->publishedAtIso,
                             'scheduled_at' => $item->scheduledAtIso,

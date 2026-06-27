@@ -64,6 +64,7 @@ final class ExcerptResolverTest extends TestCase
             id: $id,
             entityTypeId: 1,
             slug: 's' . $id,
+            permalink: null,
             status: 'published',
             publishedAtIso: null,
             isDeleted: false,
