@@ -97,6 +97,36 @@ final class InMemoryEntityRepository implements EntityRepositoryInterface
         return null;
     }
 
+    /** @return list<Entity> */
+    public function findDirectChildrenByPermalink(string $parentPermalink, int $limit): array
+    {
+        $prefix = $parentPermalink . '/';
+        $children = [];
+
+        foreach ($this->entities as $entity) {
+            if ($entity->isDeleted || $entity->status !== \NeNeRecords\Entity\EntityStatus::Published) {
+                continue;
+            }
+
+            $permalink = $entity->permalink;
+            if ($permalink === null || !str_starts_with($permalink, $prefix)) {
+                continue;
+            }
+
+            // Direct children only: no further '/' after the parent prefix.
+            $rest = substr($permalink, strlen($prefix));
+            if ($rest === '' || str_contains($rest, '/')) {
+                continue;
+            }
+
+            $children[] = $entity;
+        }
+
+        usort($children, static fn (Entity $a, Entity $b): int => ($a->permalink ?? '') <=> ($b->permalink ?? ''));
+
+        return array_slice($children, 0, $limit);
+    }
+
     public function existsByPermalink(string $permalink, ?int $excludeId = null): bool
     {
         foreach ($this->entities as $entity) {

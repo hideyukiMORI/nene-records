@@ -60,6 +60,36 @@
       }
     ?>
     <script type="application/ld+json"><?= json_encode($jsonLd, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?></script>
+    <?php /* BreadcrumbList JSON-LD (#651 PR2): the path-hierarchy signal Google actually ranks on. */ ?>
+    <?php if ($breadcrumbs !== []): ?>
+    <?php
+      $breadcrumbItems = [[
+          '@type' => 'ListItem',
+          'position' => 1,
+          'name' => $siteName,
+          'item' => $siteOrigin . $basePath . '/',
+      ]];
+      $breadcrumbPosition = 2;
+      foreach ($breadcrumbs as $crumb) {
+          $breadcrumbItem = [
+              '@type' => 'ListItem',
+              'position' => $breadcrumbPosition,
+              'name' => $crumb->label,
+          ];
+          if ($crumb->path !== null) {
+              $breadcrumbItem['item'] = $siteOrigin . $basePath . $crumb->path;
+          }
+          $breadcrumbItems[] = $breadcrumbItem;
+          $breadcrumbPosition++;
+      }
+      $breadcrumbLd = [
+          '@context' => 'https://schema.org',
+          '@type' => 'BreadcrumbList',
+          'itemListElement' => $breadcrumbItems,
+      ];
+    ?>
+    <script type="application/ld+json"><?= json_encode($breadcrumbLd, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?></script>
+    <?php endif; ?>
     <style>
       .markdown-body { display: flex; flex-direction: column; gap: 0.75rem; line-height: 1.6; }
       .markdown-body :is(h1, h2, h3, h4) { font-weight: 600; line-height: 1.3; }
@@ -70,6 +100,11 @@
       .markdown-body blockquote { margin: 0; padding-left: 0.75rem; border-left: 3px solid #d1d5db; color: #6b7280; }
       .chapter-nav { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.75rem 1rem; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #e5e7eb; }
       .chapter-nav__pos { margin-left: auto; color: #6b7280; font-size: 0.9rem; }
+      .breadcrumb ol { display: flex; flex-wrap: wrap; gap: 0.25rem 0.5rem; margin: 0 0 1rem; padding: 0; list-style: none; font-size: 0.85rem; color: #6b7280; }
+      .breadcrumb li { display: flex; align-items: center; gap: 0.5rem; }
+      .breadcrumb li:not(:last-child)::after { content: "/"; color: #9ca3af; }
+      .child-pages { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #e5e7eb; }
+      .child-pages ul { margin: 0.5rem 0 0; padding-left: 1.25rem; }
     </style>
     <?php if ($spaMode === 'prod'): ?>
       <?php foreach ($spaCss as $href): ?>
@@ -83,6 +118,23 @@
     <!-- SSR content lives inside #root: crawlers / no-JS read it; the SPA
          (createRoot().render) replaces it with the interactive app on mount. -->
     <div id="root">
+    <?php /* Permalink-path breadcrumb (#651 PR2): populated only on custom-permalink pages. */ ?>
+    <?php if ($breadcrumbs !== []): ?>
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <ol>
+          <li><a href="<?= $e($basePath) ?>/"><?= $e($siteName) ?></a></li>
+          <?php foreach ($breadcrumbs as $crumb): ?>
+            <li>
+              <?php if ($crumb->current || $crumb->path === null): ?>
+                <span<?= $crumb->current ? ' aria-current="page"' : '' ?>><?= $e($crumb->label) ?></span>
+              <?php else: ?>
+                <a href="<?= $e($basePath . $crumb->path) ?>"><?= $e($crumb->label) ?></a>
+              <?php endif; ?>
+            </li>
+          <?php endforeach; ?>
+        </ol>
+      </nav>
+    <?php endif; ?>
     <header>
       <p><a href="<?= $e($basePath) ?>/view/<?= $e($entityTypeSlug) ?>">← <?= $e($entityTypeName) ?></a></p>
       <h1><?= $e($pageTitle) ?></h1>
@@ -124,6 +176,17 @@
         <?php endif; ?>
       <?php endforeach; ?>
     </article>
+    <?php /* Section child pages (#651 PR2): a section parent lists its direct children. */ ?>
+    <?php if ($childPages !== []): ?>
+      <nav class="child-pages" aria-label="In this section">
+        <h2>In this section</h2>
+        <ul>
+          <?php foreach ($childPages as $child): ?>
+            <li><a href="<?= $e($basePath . $child->path) ?>"><?= $e($child->title) ?></a></li>
+          <?php endforeach; ?>
+        </ul>
+      </nav>
+    <?php endif; ?>
     <?php /* Derived chapter navigation (#novel): only on a chapter of a multi-chapter work. */ ?>
     <?php if ($chapterNav !== null): ?>
       <nav class="chapter-nav" aria-label="章ナビゲーション">

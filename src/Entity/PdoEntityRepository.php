@@ -75,6 +75,31 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
         return $this->mapRow($row);
     }
 
+    /** @return list<Entity> */
+    public function findDirectChildrenByPermalink(string $parentPermalink, int $limit): array
+    {
+        // `/a/b` → children `/a/b/x` (LIKE `/a/b/%`) but not grandchildren
+        // `/a/b/x/y` (NOT LIKE `/a/b/%/%`). Permalinks are kebab + slash only, so
+        // the LIKE wildcards never collide with a literal `%`/`_` in the data.
+        $prefix = $parentPermalink . '/';
+        $rows = $this->query->fetchAll(
+            <<<'SQL'
+                SELECT id, entity_type_id, slug, permalink, layout, status, published_at, scheduled_at, is_deleted, created_at, updated_at, deleted_at, meta_title, meta_description
+                FROM entities
+                WHERE organization_id = ?
+                  AND is_deleted = 0
+                  AND status = ?
+                  AND permalink LIKE ?
+                  AND permalink NOT LIKE ?
+                ORDER BY permalink ASC
+                LIMIT ?
+                SQL,
+            [$this->orgId->get(), EntityStatus::Published->value, $prefix . '%', $prefix . '%/%', $limit],
+        );
+
+        return array_map(fn (array $row) => $this->mapRow($row), $rows);
+    }
+
     public function existsByPermalink(string $permalink, ?int $excludeId = null): bool
     {
         // No is_deleted filter: the unique index spans every row, so the pre-check

@@ -11,6 +11,7 @@ use NeNeRecords\FieldDef\FieldDef;
 use NeNeRecords\PublicRecord\GetPublicRecordViewInput;
 use NeNeRecords\PublicRecord\GetPublicRecordViewUseCase;
 use NeNeRecords\PublicRecord\PublicEntityTypeNotFoundException;
+use NeNeRecords\PublicRecord\PublicRecordHierarchyBuilder;
 use NeNeRecords\PublicRecord\PublicRecordNotFoundException;
 use NeNeRecords\Setting\ListPublicSettingsUseCase;
 use NeNeRecords\Tests\BoolField\InMemoryBoolFieldRepository;
@@ -59,6 +60,7 @@ final class GetPublicRecordViewUseCaseTest extends TestCase
             new InMemoryDateTimeFieldRepository(),
             new InMemoryEntityRelationRepository(),
             new ListPublicSettingsUseCase(new InMemorySettingRepository(), new InMemoryMediaRepository()),
+            new PublicRecordHierarchyBuilder(new InMemoryEntityRepository(), new InMemoryTextFieldRepository()),
         );
 
         $output = $useCase->execute(new GetPublicRecordViewInput('article', 'hello-world'));
@@ -85,6 +87,7 @@ final class GetPublicRecordViewUseCaseTest extends TestCase
             new InMemoryDateTimeFieldRepository(),
             new InMemoryEntityRelationRepository(),
             new ListPublicSettingsUseCase(new InMemorySettingRepository(), new InMemoryMediaRepository()),
+            new PublicRecordHierarchyBuilder(new InMemoryEntityRepository(), new InMemoryTextFieldRepository()),
         );
 
         $this->expectException(PublicEntityTypeNotFoundException::class);
@@ -108,6 +111,7 @@ final class GetPublicRecordViewUseCaseTest extends TestCase
             new InMemoryDateTimeFieldRepository(),
             new InMemoryEntityRelationRepository(),
             new ListPublicSettingsUseCase(new InMemorySettingRepository(), new InMemoryMediaRepository()),
+            new PublicRecordHierarchyBuilder(new InMemoryEntityRepository(), new InMemoryTextFieldRepository()),
         );
 
         $this->expectException(PublicRecordNotFoundException::class);
@@ -194,6 +198,7 @@ final class GetPublicRecordViewUseCaseTest extends TestCase
             new InMemoryDateTimeFieldRepository(),
             new InMemoryEntityRelationRepository(),
             new ListPublicSettingsUseCase(new InMemorySettingRepository(), new InMemoryMediaRepository()),
+            new PublicRecordHierarchyBuilder(new InMemoryEntityRepository(), new InMemoryTextFieldRepository()),
         );
 
         $output = $useCase->execute(new GetPublicRecordViewInput('article', 'hello-world'));
@@ -245,6 +250,7 @@ final class GetPublicRecordViewUseCaseTest extends TestCase
             new InMemoryDateTimeFieldRepository(),
             new InMemoryEntityRelationRepository(),
             new ListPublicSettingsUseCase(new InMemorySettingRepository(), new InMemoryMediaRepository()),
+            new PublicRecordHierarchyBuilder(new InMemoryEntityRepository(), new InMemoryTextFieldRepository()),
         );
 
         return $useCase->execute(new GetPublicRecordViewInput('work', $slug));

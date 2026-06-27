@@ -87,6 +87,7 @@ final class PreviewTokenHttpTest extends TestCase
             new InMemoryDateTimeFieldRepository(),
             new InMemoryEntityRelationRepository(),
             $publicSettings,
+            new \NeNeRecords\PublicRecord\PublicRecordHierarchyBuilder($this->entities, $textFields),
         );
 
         $registrar = new PreviewTokenRouteRegistrar(

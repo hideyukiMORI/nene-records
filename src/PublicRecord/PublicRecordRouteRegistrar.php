@@ -11,6 +11,7 @@ final readonly class PublicRecordRouteRegistrar
 {
     public function __construct(
         private GetPublicRecordViewHandler $getPublicRecordViewHandler,
+        private GetPublicRecordHierarchyHandler $getPublicRecordHierarchyHandler,
         private RenderPublicRecordViewHandler $renderPublicRecordViewHandler,
         private RenderPublicPermalinkHandler $renderPublicPermalinkHandler,
         private RenderSitemapHandler $renderSitemapHandler,
@@ -21,6 +22,7 @@ final readonly class PublicRecordRouteRegistrar
     public function __invoke(Router $router): void
     {
         $getPublicRecordViewHandler = $this->getPublicRecordViewHandler;
+        $getPublicRecordHierarchyHandler = $this->getPublicRecordHierarchyHandler;
         $renderPublicRecordViewHandler = $this->renderPublicRecordViewHandler;
         $renderPublicPermalinkHandler = $this->renderPublicPermalinkHandler;
         $renderSitemapHandler = $this->renderSitemapHandler;
@@ -29,6 +31,13 @@ final readonly class PublicRecordRouteRegistrar
         $router->get(
             '/api/v1/public/entity-types/{slug}/records/{entitySlug}',
             static fn (ServerRequestInterface $request) => $getPublicRecordViewHandler->handle($request),
+        );
+
+        // Permalink-derived breadcrumb + child pages for a record (#651 PR2).
+        // Public GET so the SPA can refresh the hierarchy on client-side nav.
+        $router->get(
+            '/api/v1/public/records/{id}/hierarchy',
+            static fn (ServerRequestInterface $request) => $getPublicRecordHierarchyHandler->handle($request),
         );
 
         // Per-org XML sitemap. A registered route returns 200, so the 301 / SPA-shell

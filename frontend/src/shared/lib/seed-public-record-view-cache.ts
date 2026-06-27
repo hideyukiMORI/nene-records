@@ -32,6 +32,10 @@ import {
   readPublicRecordBootstrap,
   type PublicRecordBootstrapDto,
 } from '@/shared/lib/public-record-bootstrap'
+import {
+  EMPTY_PUBLIC_RECORD_HIERARCHY,
+  publicRecordHierarchyKeys,
+} from '@/shared/lib/public-record-hierarchy'
 
 const ENTITY_TYPE_LIST_PARAMS = { limit: 100, offset: 0 } as const
 const FIELD_DEF_LIST_PARAMS = { limit: 20, offset: 0 } as const
@@ -53,6 +57,11 @@ export function seedPublicRecordViewCache(
   queryClient.setQueryData(
     entityKeys.detail(toEntityId(bootstrap.entityId)),
     mapEntityDtoToModel(bootstrap.entity as EntityDto),
+  )
+
+  queryClient.setQueryData(
+    publicRecordHierarchyKeys.detail(bootstrap.entityId),
+    bootstrap.hierarchy ?? EMPTY_PUBLIC_RECORD_HIERARCHY,
   )
 
   queryClient.setQueryData(

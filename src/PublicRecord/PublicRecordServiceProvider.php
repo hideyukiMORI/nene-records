@@ -68,6 +68,23 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
                 },
             )
             ->set(
+                PublicRecordHierarchyBuilder::class,
+                static function (ContainerInterface $container): PublicRecordHierarchyBuilder {
+                    $entities = $container->get(EntityRepositoryInterface::class);
+                    $textFields = $container->get(TextFieldRepositoryInterface::class);
+
+                    if (!$entities instanceof EntityRepositoryInterface) {
+                        throw new LogicException('Entity repository service is invalid.');
+                    }
+
+                    if (!$textFields instanceof TextFieldRepositoryInterface) {
+                        throw new LogicException('Text field repository service is invalid.');
+                    }
+
+                    return new PublicRecordHierarchyBuilder($entities, $textFields);
+                },
+            )
+            ->set(
                 GetPublicRecordViewUseCaseInterface::class,
                 static function (ContainerInterface $container): GetPublicRecordViewUseCaseInterface {
                     $entityTypes = $container->get(EntityTypeRepositoryInterface::class);
@@ -80,6 +97,7 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
                     $dateTimeFields = $container->get(DateTimeFieldRepositoryInterface::class);
                     $entityRelations = $container->get(EntityRelationRepositoryInterface::class);
                     $publicSettings = $container->get(ListPublicSettingsUseCaseInterface::class);
+                    $hierarchyBuilder = $container->get(PublicRecordHierarchyBuilder::class);
 
                     if (!$entityTypes instanceof EntityTypeRepositoryInterface) {
                         throw new LogicException('Entity type repository service is invalid.');
@@ -87,6 +105,10 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
 
                     if (!$entities instanceof EntityRepositoryInterface) {
                         throw new LogicException('Entity repository service is invalid.');
+                    }
+
+                    if (!$hierarchyBuilder instanceof PublicRecordHierarchyBuilder) {
+                        throw new LogicException('PublicRecordHierarchy builder service is invalid.');
                     }
 
                     if (!$fieldDefs instanceof FieldDefRepositoryInterface) {
@@ -132,6 +154,7 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
                         $dateTimeFields,
                         $entityRelations,
                         $publicSettings,
+                        $hierarchyBuilder,
                     );
                 },
             )
@@ -155,6 +178,23 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
                     }
 
                     return new GetPublicRecordViewHandler($useCase, $response, $responseFactory);
+                },
+            )
+            ->set(
+                GetPublicRecordHierarchyHandler::class,
+                static function (ContainerInterface $container): GetPublicRecordHierarchyHandler {
+                    $builder = $container->get(PublicRecordHierarchyBuilder::class);
+                    $response = $container->get(JsonResponseFactory::class);
+
+                    if (!$builder instanceof PublicRecordHierarchyBuilder) {
+                        throw new LogicException('PublicRecordHierarchy builder service is invalid.');
+                    }
+
+                    if (!$response instanceof JsonResponseFactory) {
+                        throw new LogicException('JSON response factory service is invalid.');
+                    }
+
+                    return new GetPublicRecordHierarchyHandler($builder, $response);
                 },
             )
             ->set(
@@ -353,6 +393,7 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
                 'nene-records.route_registrar.public_record',
                 static function (ContainerInterface $container): PublicRecordRouteRegistrar {
                     $getHandler = $container->get(GetPublicRecordViewHandler::class);
+                    $hierarchyHandler = $container->get(GetPublicRecordHierarchyHandler::class);
                     $renderHandler = $container->get(RenderPublicRecordViewHandler::class);
                     $permalinkHandler = $container->get(RenderPublicPermalinkHandler::class);
                     $sitemapHandler = $container->get(RenderSitemapHandler::class);
@@ -360,6 +401,10 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
 
                     if (!$getHandler instanceof GetPublicRecordViewHandler) {
                         throw new LogicException('GetPublicRecordView handler service is invalid.');
+                    }
+
+                    if (!$hierarchyHandler instanceof GetPublicRecordHierarchyHandler) {
+                        throw new LogicException('GetPublicRecordHierarchy handler service is invalid.');
                     }
 
                     if (!$renderHandler instanceof RenderPublicRecordViewHandler) {
@@ -380,6 +425,7 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
 
                     return new PublicRecordRouteRegistrar(
                         $getHandler,
+                        $hierarchyHandler,
                         $renderHandler,
                         $permalinkHandler,
                         $sitemapHandler,

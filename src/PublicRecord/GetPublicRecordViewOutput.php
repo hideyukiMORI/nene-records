@@ -9,6 +9,8 @@ final readonly class GetPublicRecordViewOutput
     /**
      * @param array<string, mixed> $bootstrap
      * @param list<PublicRecordViewDisplayField> $displayFields
+     * @param list<PublicRecordBreadcrumb> $breadcrumbs
+     * @param list<PublicRecordChildLink> $childPages
      */
     public function __construct(
         public string $entityTypeSlug,
@@ -24,6 +26,8 @@ final readonly class GetPublicRecordViewOutput
         public array $bootstrap,
         public array $displayFields,
         public ?PublicRecordChapterNav $chapterNav = null,
+        public array $breadcrumbs = [],
+        public array $childPages = [],
     ) {
     }
 }
