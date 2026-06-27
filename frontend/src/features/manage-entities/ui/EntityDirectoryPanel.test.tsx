@@ -103,4 +103,20 @@ describe('EntityDirectoryPanel', () => {
     expect(screen.getByText('Move page?')).toBeInTheDocument()
     expect(screen.getByText(/\/company\/team/)).toBeInTheDocument()
   })
+
+  it('filters the tree as you type, surfacing collapsed matches (#659)', async () => {
+    const user = userEvent.setup()
+    renderPanel()
+    const search = screen.getByPlaceholderText(/Filter by path or title/)
+
+    // `Our Team` sits at depth 2 (normally collapsed); filtering by it forces it open.
+    await user.type(search, 'team')
+    expect(screen.getByRole('link', { name: 'Our Team' })).toBeInTheDocument()
+
+    // A non-matching query hides everything → the no-matches message.
+    await user.clear(search)
+    await user.type(search, 'zzz')
+    expect(screen.getByText(/No pages match/)).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'About Us' })).not.toBeInTheDocument()
+  })
 })

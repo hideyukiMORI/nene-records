@@ -59,3 +59,32 @@ export function buildPermalinkTree(records: DirectoryRecord[]): DirectoryNode[] 
 
   return sortNodes(roots)
 }
+
+/**
+ * Filters a built tree to the branches matching a query (#659): a node is kept
+ * when its path or record label contains the query (case-insensitive), or any
+ * descendant is kept — so a match stays reachable through its ancestors. An empty
+ * query returns the tree unchanged.
+ */
+export function filterDirectoryTree(nodes: DirectoryNode[], query: string): DirectoryNode[] {
+  const needle = query.trim().toLowerCase()
+  if (needle === '') {
+    return nodes
+  }
+
+  const keep = (node: DirectoryNode): DirectoryNode | null => {
+    const selfMatches =
+      node.path.toLowerCase().includes(needle) ||
+      (node.record?.label.toLowerCase().includes(needle) ?? false)
+    const children = node.children
+      .map(keep)
+      .filter((child): child is DirectoryNode => child !== null)
+
+    if (selfMatches || children.length > 0) {
+      return { ...node, children }
+    }
+    return null
+  }
+
+  return nodes.map(keep).filter((node): node is DirectoryNode => node !== null)
+}

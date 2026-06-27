@@ -643,6 +643,9 @@ export const ja: Partial<MessageCatalog> = {
     '「{{label}}」を {{target}} へ移動します。{{count}} 件のページの URL が変わり、それぞれ旧パスから301リダイレクトを張ります。',
   'admin.entityRecords.directory.move.confirm': '移動',
   'admin.entityRecords.directory.move.success': 'ページを移動しました。',
+  'admin.entityRecords.directory.filter.placeholder': 'パスやタイトルで絞り込み…',
+  'admin.entityRecords.directory.filter.noMatches': '「{{query}}」に一致するページはありません。',
+  'admin.entityRecords.directory.filter.clear': '絞り込みをクリア',
 
   // ── Field definitions ────────────────────────────────────────────────────
   'admin.fieldDefs.pageTitle': 'フィールド',

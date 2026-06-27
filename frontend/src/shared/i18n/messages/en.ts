@@ -647,6 +647,9 @@ export const en = {
     'Move “{{label}}” to {{target}}? {{count}} pages get new URLs, each with a 301 redirect from its old path.',
   'admin.entityRecords.directory.move.confirm': 'Move',
   'admin.entityRecords.directory.move.success': 'Pages moved.',
+  'admin.entityRecords.directory.filter.placeholder': 'Filter by path or title…',
+  'admin.entityRecords.directory.filter.noMatches': 'No pages match “{{query}}”.',
+  'admin.entityRecords.directory.filter.clear': 'Clear filter',
 
   // ── Field definitions ────────────────────────────────────────────────────
   'admin.fieldDefs.pageTitle': 'Fields',

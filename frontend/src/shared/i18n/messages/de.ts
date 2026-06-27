@@ -644,6 +644,9 @@ export const de: Partial<MessageCatalog> = {
     '„{{label}}“ nach {{target}} verschieben? {{count}} Seiten erhalten neue URLs, jeweils mit einer 301-Weiterleitung vom alten Pfad.',
   'admin.entityRecords.directory.move.confirm': 'Verschieben',
   'admin.entityRecords.directory.move.success': 'Seiten verschoben.',
+  'admin.entityRecords.directory.filter.placeholder': 'Nach Pfad oder Titel filtern…',
+  'admin.entityRecords.directory.filter.noMatches': 'Keine Seiten passen zu „{{query}}“.',
+  'admin.entityRecords.directory.filter.clear': 'Filter zurücksetzen',
   // ── Field definitions ────────────────────────────────────────────────────
   'admin.fieldDefs.pageTitle': 'Felder',
   'admin.fieldDefs.schemaFor': 'Felder für {{slug}}',

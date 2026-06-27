@@ -1,8 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { buildPermalinkTree, type DirectoryRecord } from './build-permalink-tree'
+import {
+  buildPermalinkTree,
+  type DirectoryRecord,
+  filterDirectoryTree,
+} from './build-permalink-tree'
 
-function record(id: number, permalink: string): DirectoryRecord {
-  return { id, permalink, label: `Record ${String(id)}`, status: 'published', updatedAt: null }
+function record(id: number, permalink: string, label = `Record ${String(id)}`): DirectoryRecord {
+  return { id, permalink, label, status: 'published', updatedAt: null }
 }
 
 describe('buildPermalinkTree', () => {
@@ -40,5 +44,35 @@ describe('buildPermalinkTree', () => {
     const tree = buildPermalinkTree([record(1, '/company/about'), record(2, '/legal/privacy')])
 
     expect(tree.map((node) => node.segment)).toEqual(['company', 'legal'])
+  })
+})
+
+describe('filterDirectoryTree (#659)', () => {
+  const tree = buildPermalinkTree([
+    record(1, '/company/about', 'About Us'),
+    record(2, '/company/about/team', 'Our Team'),
+    record(3, '/legal/privacy', 'Privacy Policy'),
+  ])
+
+  it('returns the whole tree for an empty query', () => {
+    expect(filterDirectoryTree(tree, '')).toBe(tree)
+  })
+
+  it('keeps only branches whose path matches, preserving ancestors', () => {
+    const filtered = filterDirectoryTree(tree, 'legal')
+    expect(filtered.map((node) => node.segment)).toEqual(['legal'])
+    expect(filtered[0]?.children[0]?.segment).toBe('privacy')
+  })
+
+  it('matches by record label and keeps the ancestor folders', () => {
+    const filtered = filterDirectoryTree(tree, 'our team')
+    expect(filtered.map((node) => node.segment)).toEqual(['company'])
+    const about = filtered[0]?.children[0]
+    expect(about?.segment).toBe('about')
+    expect(about?.children[0]?.record?.label).toBe('Our Team')
+  })
+
+  it('returns an empty tree when nothing matches', () => {
+    expect(filterDirectoryTree(tree, 'nonexistent')).toEqual([])
   })
 })
