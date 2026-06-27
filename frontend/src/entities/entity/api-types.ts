@@ -16,6 +16,8 @@ export interface EntityDto {
   deleted_at: string | null
   meta_title: string | null
   meta_description: string | null
+  /** Manual sibling order in the directory / public nav, lower first (#659). */
+  menu_order?: number | null
   /** Server-computed teaser; present only when listed with `?include=excerpt`. */
   excerpt?: string | null
   created_at: string | null

@@ -13,13 +13,21 @@ afterEach(() => {
 })
 
 const RECORDS: DirectoryRecord[] = [
-  { id: 1, permalink: '/company/about', label: 'About Us', status: 'published', updatedAt: null },
+  {
+    id: 1,
+    permalink: '/company/about',
+    label: 'About Us',
+    status: 'published',
+    updatedAt: null,
+    menuOrder: 0,
+  },
   {
     id: 2,
     permalink: '/company/about/team',
     label: 'Our Team',
     status: 'draft',
     updatedAt: '2026-06-20T00:00:00Z',
+    menuOrder: 0,
   },
 ]
 
@@ -118,5 +126,36 @@ describe('EntityDirectoryPanel', () => {
     await user.type(search, 'zzz')
     expect(screen.getByText(/No pages match/)).toBeInTheDocument()
     expect(screen.queryByRole('link', { name: 'About Us' })).not.toBeInTheDocument()
+  })
+
+  it('shows up/down reorder controls for sibling records, disabled at the edges (#659)', () => {
+    const siblings: DirectoryRecord[] = [
+      {
+        id: 10,
+        permalink: '/docs/alpha',
+        label: 'Alpha',
+        status: 'published',
+        updatedAt: null,
+        menuOrder: 0,
+      },
+      {
+        id: 11,
+        permalink: '/docs/beta',
+        label: 'Beta',
+        status: 'published',
+        updatedAt: null,
+        menuOrder: 1,
+      },
+    ]
+    renderPanel({ records: siblings })
+
+    const upButtons = screen.getAllByRole('button', { name: 'Move up' })
+    const downButtons = screen.getAllByRole('button', { name: 'Move down' })
+    expect(upButtons).toHaveLength(2)
+    expect(downButtons).toHaveLength(2)
+    // First record can't move up; last can't move down.
+    expect(upButtons[0]).toBeDisabled()
+    expect(downButtons[1]).toBeDisabled()
+    expect(downButtons[0]).toBeEnabled()
   })
 })

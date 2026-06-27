@@ -6,7 +6,7 @@ import {
 } from './build-permalink-tree'
 
 function record(id: number, permalink: string, label = `Record ${String(id)}`): DirectoryRecord {
-  return { id, permalink, label, status: 'published', updatedAt: null }
+  return { id, permalink, label, status: 'published', updatedAt: null, menuOrder: 0 }
 }
 
 describe('buildPermalinkTree', () => {

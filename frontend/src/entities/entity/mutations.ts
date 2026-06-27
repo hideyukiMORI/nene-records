@@ -128,6 +128,27 @@ export function useMoveEntity(): UseMutationResult<
   })
 }
 
+/**
+ * Persist a manual sibling order (#659): send record ids in their new order and
+ * the backend writes `menu_order = position`. Invalidate the lists so the tree
+ * re-sorts.
+ */
+export function useReorderEntities(): UseMutationResult<void, AppError, { ids: number[] }> {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({ ids }) => {
+      await apiClient.post('/api/v1/entities/reorder', { ids })
+    },
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: entityKeys.lists() }),
+        invalidatePublicFeeds(queryClient),
+      ])
+    },
+  })
+}
+
 export function useDeleteEntity(): UseMutationResult<
   void,
   AppError,

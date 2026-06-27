@@ -648,6 +648,8 @@ export const ptBR: Partial<MessageCatalog> = {
     'Mover “{{label}}” para {{target}}? {{count}} páginas recebem novas URLs, cada uma com um redirecionamento 301 do caminho antigo.',
   'admin.entityRecords.directory.move.confirm': 'Mover',
   'admin.entityRecords.directory.move.success': 'Páginas movidas.',
+  'admin.entityRecords.directory.moveUp': 'Mover para cima',
+  'admin.entityRecords.directory.moveDown': 'Mover para baixo',
   'admin.entityRecords.directory.filter.placeholder': 'Filtrar por caminho ou título…',
   'admin.entityRecords.directory.filter.noMatches': 'Nenhuma página corresponde a “{{query}}”.',
   'admin.entityRecords.directory.filter.clear': 'Limpar filtro',
