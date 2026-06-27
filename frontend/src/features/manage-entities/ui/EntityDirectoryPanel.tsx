@@ -1,4 +1,4 @@
-import { type DragEvent, useMemo, useState } from 'react'
+import { type DragEvent, type ReactNode, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useMoveEntity } from '@/entities/entity'
 import { useTranslation } from '@/shared/i18n'
@@ -14,6 +14,7 @@ import {
   buildPermalinkTree,
   type DirectoryNode,
   type DirectoryRecord,
+  filterDirectoryTree,
 } from '../lib/build-permalink-tree'
 import {
   canDropInto,
@@ -38,6 +39,27 @@ function formatDate(iso: string | null, locale: string): string {
     month: 'short',
     day: 'numeric',
   }).format(date)
+}
+
+/** Wraps the first case-insensitive match of `query` in `text` for emphasis (#659). */
+function highlightMatch(text: string, query: string): ReactNode {
+  const needle = query.trim()
+  if (needle === '') {
+    return text
+  }
+  const index = text.toLowerCase().indexOf(needle.toLowerCase())
+  if (index === -1) {
+    return text
+  }
+  return (
+    <>
+      {text.slice(0, index)}
+      <mark className="bg-transparent font-semibold text-accent">
+        {text.slice(index, index + needle.length)}
+      </mark>
+      {text.slice(index + needle.length)}
+    </>
+  )
 }
 
 interface PendingMove {
@@ -81,7 +103,9 @@ export function EntityDirectoryPanel({
   const { showToast } = useToast()
   const moveMutation = useMoveEntity()
   const [pendingMove, setPendingMove] = useState<PendingMove | null>(null)
+  const [treeFilter, setTreeFilter] = useState('')
   const tree = useMemo(() => buildPermalinkTree(records), [records])
+  const filteredTree = useMemo(() => filterDirectoryTree(tree, treeFilter), [tree, treeFilter])
 
   if (isLoading) {
     return <LoadingState>{t('admin.entityRecords.list.loading')}</LoadingState>
@@ -148,21 +172,55 @@ export function EntityDirectoryPanel({
           {t('admin.entityRecords.directory.truncated')}
         </p>
       ) : null}
-      <ul
-        className="flex flex-col gap-stack-xs"
-        aria-label={t('admin.entityRecords.view.directory')}
-      >
-        {tree.map((node) => (
-          <DirectoryNodeRow
-            key={node.path}
-            node={node}
-            entityTypeSlug={entityTypeSlug}
-            depth={0}
-            onCreateHere={onCreateHere}
-            onRequestMove={requestMove}
-          />
-        ))}
-      </ul>
+      {/* Tree quick-filter (#659): instant client-side path/title filter over the loaded tree. */}
+      <div className="relative mb-stack-sm">
+        <input
+          type="search"
+          value={treeFilter}
+          onChange={(event) => {
+            setTreeFilter(event.target.value)
+          }}
+          placeholder={t('admin.entityRecords.directory.filter.placeholder')}
+          aria-label={t('admin.entityRecords.directory.filter.placeholder')}
+          className="w-full rounded-md border border-border bg-surface-raised px-inline-md py-stack-sm font-sans text-body text-text-primary shadow-sm focus-visible:shadow-focus focus-visible:outline-none"
+        />
+        {treeFilter !== '' ? (
+          <button
+            type="button"
+            onClick={() => {
+              setTreeFilter('')
+            }}
+            aria-label={t('admin.entityRecords.directory.filter.clear')}
+            className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-0.5 text-text-muted hover:text-text-primary"
+          >
+            ✕
+          </button>
+        ) : null}
+      </div>
+
+      {treeFilter !== '' && filteredTree.length === 0 ? (
+        <p className="font-sans text-body text-text-muted">
+          {t('admin.entityRecords.directory.filter.noMatches', { query: treeFilter })}
+        </p>
+      ) : (
+        <ul
+          className="flex flex-col gap-stack-xs"
+          aria-label={t('admin.entityRecords.view.directory')}
+        >
+          {filteredTree.map((node) => (
+            <DirectoryNodeRow
+              key={node.path}
+              node={node}
+              entityTypeSlug={entityTypeSlug}
+              depth={0}
+              query={treeFilter}
+              forceOpen={treeFilter !== ''}
+              onCreateHere={onCreateHere}
+              onRequestMove={requestMove}
+            />
+          ))}
+        </ul>
+      )}
 
       <ConfirmDialog
         open={pendingMove !== null}
@@ -198,12 +256,16 @@ function DirectoryNodeRow({
   node,
   entityTypeSlug,
   depth,
+  query,
+  forceOpen,
   onCreateHere,
   onRequestMove,
 }: {
   node: DirectoryNode
   entityTypeSlug: string
   depth: number
+  query: string
+  forceOpen: boolean
   onCreateHere: (permalinkPrefix: string) => void
   onRequestMove: (payload: DirectoryDragPayload, targetPath: string) => void
 }) {
@@ -213,6 +275,8 @@ function DirectoryNodeRow({
   const [isDropTarget, setIsDropTarget] = useState(false)
   const hasChildren = node.children.length > 0
   const record = node.record
+  // A tree filter forces every surviving branch open so matches are always shown.
+  const isOpen = forceOpen || open
 
   const handleDragOver = (event: DragEvent<HTMLElement>) => {
     const payload = getDirectoryDragPayload()
@@ -257,15 +321,15 @@ function DirectoryNodeRow({
             onClick={() => {
               setOpen((value) => !value)
             }}
-            aria-expanded={open}
+            aria-expanded={isOpen}
             aria-label={
-              open
+              isOpen
                 ? t('admin.entityRecords.directory.collapse')
                 : t('admin.entityRecords.directory.expand')
             }
             className="shrink-0 font-mono text-caption text-text-muted"
           >
-            {open ? '▾' : '▸'}
+            {isOpen ? '▾' : '▸'}
           </button>
         ) : (
           <span aria-hidden="true" className="shrink-0 font-mono text-caption text-text-muted">
@@ -297,7 +361,7 @@ function DirectoryNodeRow({
               to={`/admin/${entityTypeSlug}/${String(record.id)}`}
               className="truncate font-sans text-body text-text-primary hover:text-accent"
             >
-              {record.label}
+              {highlightMatch(record.label, query)}
             </Link>
             {hasChildren ? (
               <span className="shrink-0 font-mono text-caption text-text-muted">
@@ -310,7 +374,9 @@ function DirectoryNodeRow({
           </>
         ) : (
           <>
-            <span className="font-sans text-body font-medium text-text-muted">{node.segment}/</span>
+            <span className="font-sans text-body font-medium text-text-muted">
+              {highlightMatch(node.segment, query)}/
+            </span>
             <span className="shrink-0 font-mono text-caption text-text-muted">
               ({node.children.length})
             </span>
@@ -325,7 +391,9 @@ function DirectoryNodeRow({
               })}
             </span>
           ) : null}
-          <code className="truncate font-mono text-caption text-text-muted">{node.path}</code>
+          <code className="truncate font-mono text-caption text-text-muted">
+            {highlightMatch(node.path, query)}
+          </code>
           <button
             type="button"
             onClick={() => {
@@ -340,7 +408,7 @@ function DirectoryNodeRow({
         </div>
       </div>
 
-      {hasChildren && open ? (
+      {hasChildren && isOpen ? (
         <ul className="flex flex-col gap-stack-xs">
           {node.children.map((child) => (
             <DirectoryNodeRow
@@ -348,6 +416,8 @@ function DirectoryNodeRow({
               node={child}
               entityTypeSlug={entityTypeSlug}
               depth={depth + 1}
+              query={query}
+              forceOpen={forceOpen}
               onCreateHere={onCreateHere}
               onRequestMove={onRequestMove}
             />

@@ -617,6 +617,9 @@ export const zhHans: Partial<MessageCatalog> = {
     '将“{{label}}”移动到 {{target}}？{{count}} 个页面将获得新 URL，每个都从旧路径添加 301 重定向。',
   'admin.entityRecords.directory.move.confirm': '移动',
   'admin.entityRecords.directory.move.success': '页面已移动。',
+  'admin.entityRecords.directory.filter.placeholder': '按路径或标题筛选…',
+  'admin.entityRecords.directory.filter.noMatches': '没有页面匹配“{{query}}”。',
+  'admin.entityRecords.directory.filter.clear': '清除筛选',
 
   // ── Field definitions ────────────────────────────────────────────────────
   'admin.fieldDefs.pageTitle': '字段',
