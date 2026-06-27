@@ -22,6 +22,7 @@ use NeNeRecords\IntField\IntFieldRepositoryInterface;
 use NeNeRecords\Media\MediaDerivativeUrl;
 use NeNeRecords\PublicRecord\ChapterNavBuilder;
 use NeNeRecords\PublicRecord\GetPublicRecordViewOutput;
+use NeNeRecords\PublicRecord\PermalinkLabel;
 use NeNeRecords\PublicRecord\PublicFieldDisplayFormatter;
 use NeNeRecords\PublicRecord\PublicPermalinkResolver;
 use NeNeRecords\PublicRecord\PublicRecordHierarchyBuilder;
@@ -148,7 +149,7 @@ final readonly class GetPreviewRecordViewUseCase implements GetPreviewRecordView
             $relationsByFieldKey,
         );
 
-        $pageTitle = $this->resolvePageTitle($textFieldRows, $entityId);
+        $pageTitle = $this->resolvePageTitle($textFieldRows, $entityId, $entity->permalink);
 
         $bootstrap = PublicRecordViewHttpMapper::toBootstrap(
             entityTypeSlug: $entityTypeSlug,
@@ -338,13 +339,13 @@ final readonly class GetPreviewRecordViewUseCase implements GetPreviewRecordView
     }
 
     /** @param list<TextField> $textFieldRows */
-    private function resolvePageTitle(array $textFieldRows, int $entityId): string
+    private function resolvePageTitle(array $textFieldRows, int $entityId, ?string $permalink): string
     {
-        return $this->resolveRecordLabel($entityId, $textFieldRows);
+        return $this->resolveRecordLabel($entityId, $textFieldRows, $permalink);
     }
 
     /** @param list<TextField> $textFieldRows */
-    private function resolveRecordLabel(int $entityId, array $textFieldRows): string
+    private function resolveRecordLabel(int $entityId, array $textFieldRows, ?string $permalink = null): string
     {
         foreach ($textFieldRows as $textField) {
             if ($textField->entityId === $entityId && $textField->fieldKey === 'title' && trim($textField->value) !== '') {
@@ -356,6 +357,12 @@ final readonly class GetPreviewRecordViewUseCase implements GetPreviewRecordView
             if ($textField->entityId === $entityId && trim($textField->value) !== '') {
                 return $textField->value;
             }
+        }
+
+        // No title field → humanize the permalink's last segment before a bare id (#657).
+        $segment = PermalinkLabel::lastSegment($permalink);
+        if ($segment !== null) {
+            return PermalinkLabel::humanize($segment);
         }
 
         return 'Record #' . $entityId;

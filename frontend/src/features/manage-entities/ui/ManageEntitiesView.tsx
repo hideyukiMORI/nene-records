@@ -167,8 +167,9 @@ export function ManageEntitiesView({
     total === 1 ? 'admin.entityRecords.recordCount.one' : 'admin.entityRecords.recordCount.other'
 
   // 検索・フィルターはコンテンツが存在するか、すでにフィルターが有効な場合のみ表示
-  // （Progressive Disclosure: 空ページで絞り込みUI を見せない）
-  const showFilters = (total > 0 || isFilterActive) && viewMode === 'list'
+  // （Progressive Disclosure: 空ページで絞り込みUI を見せない）。検索＋絞り込み（status/tag/
+  // relation）は list / directory 両モードに適用、ソートとページ送りのみ list 限定（#657）。
+  const showFilters = total > 0 || isFilterActive
 
   const currentSortValue = `${sortKey}-${sortOrder}`
 
@@ -234,56 +235,60 @@ export function ManageEntitiesView({
 
             {/* Sort + Filter toggle toolbar */}
             <div className="flex items-center gap-inline-md">
-              {/* 並び順セレクト */}
-              <div className="flex items-center gap-1.5">
-                <label
-                  htmlFor="entity-sort-select"
-                  className="shrink-0 font-sans text-caption text-text-muted"
-                >
-                  {t('admin.entityRecords.sort.label')}
-                </label>
-                <Select
-                  id="entity-sort-select"
-                  size="sm"
-                  value={currentSortValue}
-                  onChange={(e) => {
-                    const opt = SORT_OPTIONS.find((o) => o.value === e.target.value)
-                    if (opt !== undefined) {
-                      onSortChange(opt.key, opt.order)
-                    }
-                  }}
-                >
-                  {SORT_OPTIONS.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {t(opt.labelKey)}
-                    </option>
-                  ))}
-                </Select>
-              </div>
+              {viewMode === 'list' ? (
+                <>
+                  {/* 並び順セレクト */}
+                  <div className="flex items-center gap-1.5">
+                    <label
+                      htmlFor="entity-sort-select"
+                      className="shrink-0 font-sans text-caption text-text-muted"
+                    >
+                      {t('admin.entityRecords.sort.label')}
+                    </label>
+                    <Select
+                      id="entity-sort-select"
+                      size="sm"
+                      value={currentSortValue}
+                      onChange={(e) => {
+                        const opt = SORT_OPTIONS.find((o) => o.value === e.target.value)
+                        if (opt !== undefined) {
+                          onSortChange(opt.key, opt.order)
+                        }
+                      }}
+                    >
+                      {SORT_OPTIONS.map((opt) => (
+                        <option key={opt.value} value={opt.value}>
+                          {t(opt.labelKey)}
+                        </option>
+                      ))}
+                    </Select>
+                  </div>
 
-              {/* 1ページあたりの件数（多数レコードのスケール対策） */}
-              <div className="flex items-center gap-1.5">
-                <label
-                  htmlFor="entity-page-size-select"
-                  className="shrink-0 font-sans text-caption text-text-muted"
-                >
-                  {t('admin.entityRecords.pageSize.label')}
-                </label>
-                <Select
-                  id="entity-page-size-select"
-                  size="sm"
-                  value={String(pageSize)}
-                  onChange={(e) => {
-                    onPageSizeChange(Number(e.target.value))
-                  }}
-                >
-                  {pageSizeOptions.map((size) => (
-                    <option key={size} value={size}>
-                      {size}
-                    </option>
-                  ))}
-                </Select>
-              </div>
+                  {/* 1ページあたりの件数（多数レコードのスケール対策） */}
+                  <div className="flex items-center gap-1.5">
+                    <label
+                      htmlFor="entity-page-size-select"
+                      className="shrink-0 font-sans text-caption text-text-muted"
+                    >
+                      {t('admin.entityRecords.pageSize.label')}
+                    </label>
+                    <Select
+                      id="entity-page-size-select"
+                      size="sm"
+                      value={String(pageSize)}
+                      onChange={(e) => {
+                        onPageSizeChange(Number(e.target.value))
+                      }}
+                    >
+                      {pageSizeOptions.map((size) => (
+                        <option key={size} value={size}>
+                          {size}
+                        </option>
+                      ))}
+                    </Select>
+                  </div>
+                </>
+              ) : null}
 
               <div className="flex-1" />
 

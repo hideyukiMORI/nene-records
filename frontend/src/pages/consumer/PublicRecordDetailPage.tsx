@@ -231,10 +231,14 @@ function PublicRecordDetailContent({
     (row): row is Extract<PublicFieldRow, { kind: 'scalar' }> =>
       row.kind === 'scalar' && row.fieldKey === 'title' && row.displayValue !== '—',
   )
+  // No title field? Humanize the slug, then the last permalink segment, before a
+  // bare "Record #N" — matches the breadcrumb / child-list labels (#657).
+  const permalinkSegments = (entity?.permalink ?? '').split('/').filter((part) => part !== '')
   const resolvedTitle =
     titleRow?.displayValue.trim() ||
     entity?.metaTitle?.trim() ||
     humanizeSlug(entity?.slug) ||
+    humanizeSlug(permalinkSegments.at(-1)) ||
     `Record #${String(entityId)}`
   // Reserved chapter-nav metadata (series/chapter_no/chapter_total) is surfaced
   // as the derived chapter navigation, never as an ordinary field row.

@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest'
 import { cleanup, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { renderWithI18n } from '@/shared/i18n/test-helpers'
 import type { DirectoryRecord } from '../lib/build-permalink-tree'
@@ -8,8 +9,14 @@ import { EntityDirectoryPanel } from './EntityDirectoryPanel'
 afterEach(cleanup)
 
 const RECORDS: DirectoryRecord[] = [
-  { id: 1, permalink: '/company/about', label: 'About Us', status: 'published' },
-  { id: 2, permalink: '/company/about/team', label: 'Our Team', status: 'draft' },
+  { id: 1, permalink: '/company/about', label: 'About Us', status: 'published', updatedAt: null },
+  {
+    id: 2,
+    permalink: '/company/about/team',
+    label: 'Our Team',
+    status: 'draft',
+    updatedAt: '2026-06-20T00:00:00Z',
+  },
 ]
 
 function renderPanel(props?: Partial<Parameters<typeof EntityDirectoryPanel>[0]>) {
@@ -41,10 +48,29 @@ describe('EntityDirectoryPanel', () => {
 
     // `/company` has no page of its own → a pure folder.
     expect(screen.getByText('company/')).toBeInTheDocument()
-    // Records link to their admin edit page.
+    // The top-level `About Us` page links to its admin edit page.
     expect(screen.getByRole('link', { name: 'About Us' })).toHaveAttribute('href', '/admin/pages/1')
+    // The cumulative path is shown for each visible node.
+    expect(screen.getByText('/company/about')).toBeInTheDocument()
+  })
+
+  it('initially collapses below the top level, expanding on demand (#657)', async () => {
+    const user = userEvent.setup()
+    renderPanel()
+
+    // `About Us` (depth 1) starts collapsed → its child `Our Team` is hidden.
+    expect(screen.queryByRole('link', { name: 'Our Team' })).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Expand' }))
+
     expect(screen.getByRole('link', { name: 'Our Team' })).toHaveAttribute('href', '/admin/pages/2')
-    // The cumulative path is shown for each node.
     expect(screen.getByText('/company/about/team')).toBeInTheDocument()
+  })
+
+  it('shows a child count next to folders and section pages (#657)', () => {
+    renderPanel()
+
+    // `company` (folder) and `About Us` (a page that also has children) each show (1).
+    expect(screen.getAllByText('(1)')).toHaveLength(2)
   })
 })

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { buildPermalinkTree, type DirectoryRecord } from './build-permalink-tree'
 
 function record(id: number, permalink: string): DirectoryRecord {
-  return { id, permalink, label: `Record ${String(id)}`, status: 'published' }
+  return { id, permalink, label: `Record ${String(id)}`, status: 'published', updatedAt: null }
 }
 
 describe('buildPermalinkTree', () => {

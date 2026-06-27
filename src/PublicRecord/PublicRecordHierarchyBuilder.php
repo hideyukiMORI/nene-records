@@ -183,14 +183,6 @@ final readonly class PublicRecordHierarchyBuilder
     /** "about-us" → "About Us"; falls back to the raw segment for non-kebab input. */
     private function humanize(string $segment): string
     {
-        $words = [];
-        foreach (explode('-', $segment) as $part) {
-            if ($part === '') {
-                continue;
-            }
-            $words[] = mb_strtoupper(mb_substr($part, 0, 1)) . mb_substr($part, 1);
-        }
-
-        return $words === [] ? $segment : implode(' ', $words);
+        return PermalinkLabel::humanize($segment);
     }
 }

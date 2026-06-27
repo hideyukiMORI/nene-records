@@ -69,11 +69,34 @@ export function useManageEntitiesPage(entityTypeId: number) {
     ],
   )
   const listQuery = useEntityList(listParams)
-  // Directory mode fetches a larger, unpaginated slice to build the path tree.
-  const directoryQuery = useEntityList(
-    { entityTypeId, limit: DIRECTORY_FETCH_LIMIT, offset: 0 },
-    { enabled: viewMode === 'directory' },
+  // Directory mode fetches a larger, unpaginated slice to build the path tree —
+  // honouring the active filters (search / status / tags / relations) so the tree
+  // reflects them too (#657). Sort/pagination don't apply: the tree sorts by path.
+  const directoryParams = useMemo(
+    () => ({
+      ...defaultEntityListParams(
+        entityTypeId,
+        selectedTagSlugs,
+        selectedRelationFilters,
+        0,
+        searchQuery,
+        selectedStatus,
+        sortKey,
+        sortOrder,
+      ),
+      limit: DIRECTORY_FETCH_LIMIT,
+    }),
+    [
+      entityTypeId,
+      selectedTagSlugs,
+      selectedRelationFilters,
+      searchQuery,
+      selectedStatus,
+      sortKey,
+      sortOrder,
+    ],
   )
+  const directoryQuery = useEntityList(directoryParams, { enabled: viewMode === 'directory' })
   const tagListQuery = useTagList({ limit: 100, offset: 0 })
   const fieldDefQuery = useFieldDefList(defaultFieldDefListParams(entityTypeId))
   const textFieldQuery = useTextFieldList(defaultTextFieldListParamsForEntityType(entityTypeId))
@@ -134,6 +157,7 @@ export function useManageEntitiesPage(entityTypeId: number) {
           permalink,
           label: getRecordDisplayLabel(Number(entity.id), textFields, fallback),
           status: entity.status,
+          updatedAt: entity.updatedAt,
         }
       })
   }, [directoryQuery.data?.items, textFieldQuery.data?.items])
