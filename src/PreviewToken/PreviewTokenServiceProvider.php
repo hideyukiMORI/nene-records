@@ -19,6 +19,7 @@ use NeNeRecords\EntityType\EntityTypeRepositoryInterface;
 use NeNeRecords\EnumField\EnumFieldRepositoryInterface;
 use NeNeRecords\FieldDef\FieldDefRepositoryInterface;
 use NeNeRecords\IntField\IntFieldRepositoryInterface;
+use NeNeRecords\PublicRecord\PublicRecordHierarchyBuilder;
 use NeNeRecords\Setting\ListPublicSettingsUseCaseInterface;
 use NeNeRecords\TextField\TextFieldRepositoryInterface;
 use Psr\Container\ContainerInterface;
@@ -94,9 +95,14 @@ final readonly class PreviewTokenServiceProvider implements ServiceProviderInter
                     $dateTimeFields = $container->get(DateTimeFieldRepositoryInterface::class);
                     $entityRelations = $container->get(EntityRelationRepositoryInterface::class);
                     $publicSettings = $container->get(ListPublicSettingsUseCaseInterface::class);
+                    $hierarchyBuilder = $container->get(PublicRecordHierarchyBuilder::class);
 
                     if (!$previewTokens instanceof EntityPreviewTokenRepositoryInterface) {
                         throw new LogicException('EntityPreviewToken repository service is invalid.');
+                    }
+
+                    if (!$hierarchyBuilder instanceof PublicRecordHierarchyBuilder) {
+                        throw new LogicException('PublicRecordHierarchy builder service is invalid.');
                     }
 
                     if (!$entityTypes instanceof EntityTypeRepositoryInterface) {
@@ -151,6 +157,7 @@ final readonly class PreviewTokenServiceProvider implements ServiceProviderInter
                         $dateTimeFields,
                         $entityRelations,
                         $publicSettings,
+                        $hierarchyBuilder,
                     );
                 },
             )

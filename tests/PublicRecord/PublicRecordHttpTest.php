@@ -18,10 +18,12 @@ use NeNeRecords\Entity\EntityStatus;
 use NeNeRecords\EntityType\EntityType;
 use NeNeRecords\FieldDef\FieldDef;
 use NeNeRecords\PublicRecord\GenerateSitemapUseCase;
+use NeNeRecords\PublicRecord\GetPublicRecordHierarchyHandler;
 use NeNeRecords\PublicRecord\GetPublicRecordViewHandler;
 use NeNeRecords\PublicRecord\GetPublicRecordViewUseCase;
 use NeNeRecords\PublicRecord\PublicEntityTypeNotFoundExceptionHandler;
 use NeNeRecords\PublicRecord\PublicHtmlSanitizer;
+use NeNeRecords\PublicRecord\PublicRecordHierarchyBuilder;
 use NeNeRecords\PublicRecord\PublicRecordNotFoundExceptionHandler;
 use NeNeRecords\PublicRecord\PublicRecordRouteRegistrar;
 use NeNeRecords\PublicRecord\RenderCustomPermalinkHandler;
@@ -136,6 +138,7 @@ final class PublicRecordHttpTest extends TestCase
             new InMemoryDateTimeFieldRepository(),
             new InMemoryEntityRelationRepository(),
             $publicSettings,
+            new PublicRecordHierarchyBuilder($entities, $textFields),
         );
 
         $jsonResponse = new JsonResponseFactory($this->factory, $this->factory);
@@ -164,6 +167,7 @@ final class PublicRecordHttpTest extends TestCase
         $customPermalink = new RenderCustomPermalinkHandler($entities, $entityTypes, $renderHandler);
         $registrar = new PublicRecordRouteRegistrar(
             new GetPublicRecordViewHandler($useCase, $jsonResponse, $this->factory),
+            new GetPublicRecordHierarchyHandler(new PublicRecordHierarchyBuilder($entities, $textFields), $jsonResponse),
             $renderHandler,
             new RenderPublicPermalinkHandler($entityTypes, $renderHandler, $customPermalink),
             new RenderSitemapHandler(

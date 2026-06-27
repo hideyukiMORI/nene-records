@@ -85,6 +85,7 @@ final class PublicCacheHttpTest extends TestCase
             new InMemoryDateTimeFieldRepository(),
             new InMemoryEntityRelationRepository(),
             $publicSettings,
+            new \NeNeRecords\PublicRecord\PublicRecordHierarchyBuilder($entities, $textFields),
         );
 
         $jsonResponse = new JsonResponseFactory($this->factory, $this->factory);
@@ -109,6 +110,7 @@ final class PublicCacheHttpTest extends TestCase
         );
         $publicRecordRegistrar = new PublicRecordRouteRegistrar(
             new GetPublicRecordViewHandler($useCase, $jsonResponse, $this->factory),
+            new \NeNeRecords\PublicRecord\GetPublicRecordHierarchyHandler(new \NeNeRecords\PublicRecord\PublicRecordHierarchyBuilder($entities, $textFields), $jsonResponse),
             $renderHandler,
             new \NeNeRecords\PublicRecord\RenderPublicPermalinkHandler(
                 $entityTypes,

@@ -43,6 +43,7 @@ final readonly class GetPublicRecordViewUseCase implements GetPublicRecordViewUs
         private DateTimeFieldRepositoryInterface $dateTimeFields,
         private EntityRelationRepositoryInterface $entityRelations,
         private ListPublicSettingsUseCaseInterface $publicSettings,
+        private PublicRecordHierarchyBuilder $hierarchyBuilder,
     ) {
     }
 
@@ -197,6 +198,11 @@ final readonly class GetPublicRecordViewUseCase implements GetPublicRecordViewUs
             $entity->publishedAt,
         );
 
+        // Permalink-path-derived breadcrumb + child pages (#651 PR2). Empty for
+        // ordinary `/{type}/{slug}` records; populated for custom-permalink pages.
+        $hierarchy = $this->hierarchyBuilder->build($entity->permalink, $canonicalPath, $pageTitle);
+        $bootstrap['hierarchy'] = $hierarchy->toArray();
+
         $ogImagePath = $this->resolveOgImagePath($displayFields);
 
         return new GetPublicRecordViewOutput(
@@ -213,6 +219,8 @@ final readonly class GetPublicRecordViewUseCase implements GetPublicRecordViewUs
             bootstrap: $bootstrap,
             displayFields: $displayFields,
             chapterNav: $chapterNav,
+            breadcrumbs: $hierarchy->breadcrumbs,
+            childPages: $hierarchy->childPages,
         );
     }
 

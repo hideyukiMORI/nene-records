@@ -773,6 +773,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/public/records/{id}/hierarchy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get a record's permalink-derived breadcrumb and child pages
+         * @description Returns the breadcrumb trail and direct child pages derived from a record's custom permalink path (#651 PR2). Empty arrays for missing, unpublished, or flat (`/{type}/{slug}`) records. The SSR shell renders this from the bootstrap on first paint; the SPA refetches here so client-side navigation stays correct.
+         */
+        get: operations["getPublicRecordHierarchy"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/notification-channels": {
         parameters: {
             query?: never;
@@ -2489,6 +2509,7 @@ export interface components {
             publicSettings: components["schemas"]["PublicSettingListResponse"];
             /** @description Derived chapter navigation when this record is one chapter of a multi-chapter work; null otherwise. */
             chapterNav: components["schemas"]["PublicRecordChapterNav"] | null;
+            hierarchy: components["schemas"]["PublicRecordHierarchy"];
         };
         PublicRecordChapterNav: {
             /** @description URL of the work's 目次 (index) record — the canonical front door. */
@@ -2499,6 +2520,24 @@ export interface components {
             nextUrl: string | null;
             chapterNo: number;
             chapterTotal: number;
+        };
+        PublicRecordHierarchy: {
+            /** @description Breadcrumb trail derived from the permalink path; empty for flat records. */
+            breadcrumbs: components["schemas"]["PublicRecordBreadcrumb"][];
+            /** @description Direct child pages (one path segment deeper); empty when none. */
+            childPages: components["schemas"]["PublicRecordChildLink"][];
+        };
+        PublicRecordBreadcrumb: {
+            /** @description Display label — the page title, or a humanized path segment. */
+            label: string;
+            /** @description Canonical path to link to, or null for a structural (non-page) segment. */
+            path: string | null;
+            /** @description True for the record being viewed (rendered without a link). */
+            current: boolean;
+        };
+        PublicRecordChildLink: {
+            title: string;
+            path: string;
         };
         PublicRecordRelationQuery: {
             fieldKey: string;
@@ -5148,6 +5187,32 @@ export interface operations {
                 content?: never;
             };
             404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    getPublicRecordHierarchy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Entity id. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The record's breadcrumb trail and direct child pages. */
+            200: {
+                headers: {
+                    /** @example public, max-age=60, stale-while-revalidate=300 */
+                    "Cache-Control"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicRecordHierarchy"];
+                };
+            };
             500: components["responses"]["InternalServerError"];
         };
     };

@@ -13,6 +13,15 @@ interface EntityRepositoryInterface
     /** Resolve a record by its custom permalink path (org-scoped), or null (#651). */
     public function findByPermalink(string $permalink): ?Entity;
 
+    /**
+     * Direct child records whose permalink is exactly one path segment below the
+     * given parent (e.g. parent `/a/b` → `/a/b/x`, not `/a/b/x/y`). Published and
+     * org-scoped, ordered by permalink. Powers the section child-list (#651 PR2).
+     *
+     * @return list<Entity>
+     */
+    public function findDirectChildrenByPermalink(string $parentPermalink, int $limit): array;
+
     public function existsBySlug(string $slug, int $entityTypeId, ?int $excludeId = null): bool;
 
     /** True when another record in the org already owns this custom permalink (#651). */

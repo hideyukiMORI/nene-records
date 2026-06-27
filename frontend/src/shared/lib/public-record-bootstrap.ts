@@ -1,4 +1,5 @@
 import type { PublicSettingListDto } from '@/entities/setting/api-types'
+import type { PublicRecordHierarchyDto } from '@/shared/lib/public-record-hierarchy'
 
 const BOOTSTRAP_SCRIPT_ID = 'nene-records-public-record-bootstrap'
 
@@ -33,6 +34,7 @@ export interface PublicRecordBootstrapDto {
   entityRelations: PublicRecordBootstrapRelationQuery[]
   relationTextFieldsByEntityTypeId: Record<string, PublicRecordBootstrapFieldListDto>
   publicSettings?: PublicSettingListDto
+  hierarchy?: PublicRecordHierarchyDto
 }
 
 export function readPublicRecordBootstrap(): PublicRecordBootstrapDto | null {

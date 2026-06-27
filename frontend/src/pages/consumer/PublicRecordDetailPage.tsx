@@ -8,6 +8,9 @@ import {
   ChapterNav,
   PublicRecordDetailView,
   type PublicFieldRow,
+  RecordBreadcrumb,
+  RecordChildPages,
+  usePublicRecordHierarchy,
   usePublicViewEntityRecordPage,
 } from '@/features/public-view-entity-record'
 import { PageContentContext } from '@/features/render-widgets'
@@ -190,6 +193,8 @@ function PublicRecordDetailContent({
   const { entity, fieldRows, isLoading, isError, errorTitle, refetch } =
     usePublicViewEntityRecordPage(entityTypeId, entityId)
   const commentSection = useCommentSection(entityId)
+  // Permalink-derived breadcrumb + child pages (#651 PR2). Empty for flat records.
+  const hierarchy = usePublicRecordHierarchy(entityId)
 
   const variant = resolveLayout(entity?.layout ?? null, entityTypeDefaultLayout)
   const isMultiColLayout = variant === 'two-col' || variant === 'three-col'
@@ -338,6 +343,7 @@ function PublicRecordDetailContent({
         withAside={variant === 'three-col'}
       >
         <article className="article">
+          <RecordBreadcrumb items={hierarchy.breadcrumbs} />
           <Link className="backlink" to={`/${entityTypeSlug}`}>
             <IconArrowLeft size={16} /> Back to {entityTypeName}
           </Link>
@@ -375,6 +381,8 @@ function PublicRecordDetailContent({
             }}
           />
           {canShowChapterNav && chapterNav !== null ? <ChapterNav nav={chapterNav} /> : null}
+
+          <RecordChildPages items={hierarchy.childPages} />
 
           {entity !== null && !isLoading && !isError ? (
             <>

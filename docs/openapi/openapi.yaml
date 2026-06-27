@@ -2249,6 +2249,39 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /api/v1/public/records/{id}/hierarchy:
+    get:
+      tags:
+        - PublicConsumer
+      summary: Get a record's permalink-derived breadcrumb and child pages
+      description: >
+        Returns the breadcrumb trail and direct child pages derived from a record's
+        custom permalink path (#651 PR2). Empty arrays for missing, unpublished, or
+        flat (`/{type}/{slug}`) records. The SSR shell renders this from the bootstrap
+        on first paint; the SPA refetches here so client-side navigation stays correct.
+      operationId: getPublicRecordHierarchy
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Entity id.
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: The record's breadcrumb trail and direct child pages.
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+              example: public, max-age=60, stale-while-revalidate=300
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicRecordHierarchy'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /api/v1/notification-channels:
     get:
       tags:
@@ -6228,6 +6261,7 @@ components:
         - relationTextFieldsByEntityTypeId
         - publicSettings
         - chapterNav
+        - hierarchy
       properties:
         entityTypeSlug:
           type: string
@@ -6269,6 +6303,8 @@ components:
           anyOf:
             - $ref: '#/components/schemas/PublicRecordChapterNav'
             - type: 'null'
+        hierarchy:
+          $ref: '#/components/schemas/PublicRecordHierarchy'
       additionalProperties: false
     PublicRecordChapterNav:
       type: object
@@ -6299,6 +6335,54 @@ components:
         chapterTotal:
           type: integer
           minimum: 1
+      additionalProperties: false
+    PublicRecordHierarchy:
+      type: object
+      required:
+        - breadcrumbs
+        - childPages
+      properties:
+        breadcrumbs:
+          type: array
+          description: 'Breadcrumb trail derived from the permalink path; empty for flat records.'
+          items:
+            $ref: '#/components/schemas/PublicRecordBreadcrumb'
+        childPages:
+          type: array
+          description: 'Direct child pages (one path segment deeper); empty when none.'
+          items:
+            $ref: '#/components/schemas/PublicRecordChildLink'
+      additionalProperties: false
+    PublicRecordBreadcrumb:
+      type: object
+      required:
+        - label
+        - path
+        - current
+      properties:
+        label:
+          type: string
+          description: 'Display label — the page title, or a humanized path segment.'
+        path:
+          type:
+            - string
+            - 'null'
+          description: 'Canonical path to link to, or null for a structural (non-page) segment.'
+        current:
+          type: boolean
+          description: 'True for the record being viewed (rendered without a link).'
+      additionalProperties: false
+    PublicRecordChildLink:
+      type: object
+      required:
+        - title
+        - path
+      properties:
+        title:
+          type: string
+        path:
+          type: string
+          minLength: 1
       additionalProperties: false
     PublicRecordRelationQuery:
       type: object

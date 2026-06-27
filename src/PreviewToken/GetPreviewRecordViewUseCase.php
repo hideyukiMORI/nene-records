@@ -24,6 +24,7 @@ use NeNeRecords\PublicRecord\ChapterNavBuilder;
 use NeNeRecords\PublicRecord\GetPublicRecordViewOutput;
 use NeNeRecords\PublicRecord\PublicFieldDisplayFormatter;
 use NeNeRecords\PublicRecord\PublicPermalinkResolver;
+use NeNeRecords\PublicRecord\PublicRecordHierarchyBuilder;
 use NeNeRecords\PublicRecord\PublicRecordViewDisplayField;
 use NeNeRecords\PublicRecord\PublicRecordViewHttpMapper;
 use NeNeRecords\Setting\ListPublicSettingsUseCaseInterface;
@@ -50,6 +51,7 @@ final readonly class GetPreviewRecordViewUseCase implements GetPreviewRecordView
         private DateTimeFieldRepositoryInterface $dateTimeFields,
         private EntityRelationRepositoryInterface $entityRelations,
         private ListPublicSettingsUseCaseInterface $publicSettings,
+        private PublicRecordHierarchyBuilder $hierarchyBuilder,
     ) {
     }
 
@@ -192,6 +194,11 @@ final readonly class GetPreviewRecordViewUseCase implements GetPreviewRecordView
             $entity->publishedAt,
         );
 
+        // Mirror the public view so previewing a section page shows the same
+        // breadcrumb + child-list it will have once published (#651 PR2).
+        $hierarchy = $this->hierarchyBuilder->build($entity->permalink, $canonicalPath, $pageTitle);
+        $bootstrap['hierarchy'] = $hierarchy->toArray();
+
         $ogImagePath = null;
         foreach ($displayFields as $field) {
             if ($field->dataType !== 'image') {
@@ -218,6 +225,8 @@ final readonly class GetPreviewRecordViewUseCase implements GetPreviewRecordView
             bootstrap: $bootstrap,
             displayFields: $displayFields,
             chapterNav: $chapterNav,
+            breadcrumbs: $hierarchy->breadcrumbs,
+            childPages: $hierarchy->childPages,
         );
     }
 
