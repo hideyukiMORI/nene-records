@@ -1,6 +1,15 @@
 # Current Work
 
-Last updated: 2026-06-26
+Last updated: 2026-06-27
+
+## 短期TODO（directory-view レビュー由来・2026-06-27 / milestone「ページ階層/ディレクトリ 仕上げ」#1）
+
+> 議事: `docs/review/directory-view-personas-2026-06-27.md`。マイルストーン #1 を**端から対応**。
+> - [ ] **#656 P0**: 公開 custom-permalink ページを実SPAで解決・描画（最優先・実バグ＝SSRは正・SPAルータが任意パス未解決）
+> - [ ] **#657 P1**: ディレクトリ表示拡充（status フィルタ復活・更新日・子件数・初期折りたたみ）＋ titleless fallback の humanize 統一
+> - [ ] **#658 P1**: ページ作成/整理の WP 同等 UX（permalink 接頭辞補完・手動並び順）
+> - [ ] **#659 P2**: DnD 親移動＋自動301・ツリー内検索・「＋ここに新規」（満場一致の目玉）
+> - [ ] **#660 P2**: 公開階層の磨き込み（セクションindex 自動生成・パス視認性・開閉記憶・a11y）
 
 ## 状態サマリー
 
