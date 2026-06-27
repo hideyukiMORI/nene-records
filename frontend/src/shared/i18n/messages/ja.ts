@@ -631,7 +631,7 @@ export const ja: Partial<MessageCatalog> = {
   'admin.entityRecords.directory.empty.description':
     'カスタムパーマリンクを持つレコードがディレクトリツリーで表示されます。',
   'admin.entityRecords.directory.truncated':
-    '先頭100件を表示しています。全件はリスト表示の検索をご利用ください。',
+    '先頭{{limit}}件を表示しています。全件はリスト表示の検索をご利用ください。',
   'admin.entityRecords.directory.expand': '展開',
   'admin.entityRecords.directory.collapse': '折りたたむ',
   'admin.entityRecords.directory.newHere': '{{path}} に新規ページ',

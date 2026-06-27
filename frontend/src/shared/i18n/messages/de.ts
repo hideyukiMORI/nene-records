@@ -632,7 +632,7 @@ export const de: Partial<MessageCatalog> = {
   'admin.entityRecords.directory.empty.description':
     'Datensätze mit einem eigenen Permalink-Pfad erscheinen hier als Verzeichnisbaum.',
   'admin.entityRecords.directory.truncated':
-    'Es werden die ersten 100 Datensätze angezeigt. Nutze die Listenansicht zum Durchsuchen aller.',
+    'Es werden die ersten {{limit}} Datensätze angezeigt. Nutze die Listenansicht zum Durchsuchen aller.',
   'admin.entityRecords.directory.expand': 'Aufklappen',
   'admin.entityRecords.directory.collapse': 'Zuklappen',
   'admin.entityRecords.directory.newHere': 'Neue Seite unter {{path}}',

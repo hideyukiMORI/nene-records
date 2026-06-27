@@ -1,6 +1,6 @@
 import { type DragEvent, type ReactNode, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { useMoveEntity, useReorderEntities } from '@/entities/entity'
+import { DIRECTORY_MAX_RECORDS, useMoveEntity, useReorderEntities } from '@/entities/entity'
 import { useTranslation } from '@/shared/i18n'
 import {
   ConfirmDialog,
@@ -103,7 +103,7 @@ export function EntityDirectoryPanel({
   onRetry,
   onCreateHere,
 }: EntityDirectoryPanelProps) {
-  const { t } = useTranslation()
+  const { t, locale } = useTranslation()
   const { showToast } = useToast()
   const moveMutation = useMoveEntity()
   const reorderMutation = useReorderEntities()
@@ -189,7 +189,9 @@ export function EntityDirectoryPanel({
     <div>
       {truncated ? (
         <p className="mb-stack-sm font-sans text-caption text-text-muted">
-          {t('admin.entityRecords.directory.truncated')}
+          {t('admin.entityRecords.directory.truncated', {
+            limit: DIRECTORY_MAX_RECORDS.toLocaleString(locale),
+          })}
         </p>
       ) : null}
       {/* Tree quick-filter (#659): instant client-side path/title filter over the loaded tree. */}

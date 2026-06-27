@@ -23,6 +23,8 @@ final readonly class EntityListCriteria
         // the last wanted day) so ISO timestamps within the range still match.
         public ?string $publishedFrom = null,
         public ?string $publishedToExclusive = null,
+        /** When true, restrict to records carrying a non-empty custom permalink (#682). */
+        public bool $hasPermalink = false,
     ) {
     }
 }

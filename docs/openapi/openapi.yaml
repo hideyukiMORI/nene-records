@@ -353,6 +353,15 @@ paths:
             type: string
             minLength: 1
           description: Full-text search across slug and text field values (partial match).
+        - name: has_permalink
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: ['1']
+          description: >-
+            When `1`, restrict to records carrying a non-empty custom permalink.
+            Used by the admin directory to page through only the records it renders (#682).
         - name: published_from
           in: query
           required: false

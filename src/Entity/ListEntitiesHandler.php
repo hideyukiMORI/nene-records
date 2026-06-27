@@ -59,6 +59,11 @@ final readonly class ListEntitiesHandler
         $wantExcerpt = in_array('excerpt', $includes, true);
         $wantViews = in_array('views', $includes, true);
 
+        // `?has_permalink=1` restricts to records with a custom permalink — the
+        // admin directory fetches only what it renders, so it can page through all
+        // of them rather than the first 100 of every record (#682).
+        $hasPermalink = ($request->getQueryParams()['has_permalink'] ?? null) === '1';
+
         $output = $this->useCase->execute(new ListEntitiesInput(
             limit: $pagination->limit,
             offset: $pagination->offset,
@@ -72,6 +77,7 @@ final readonly class ListEntitiesHandler
                 sortOrder: $sortOrder,
                 publishedFrom: $publishedFrom,
                 publishedToExclusive: $publishedToExclusive,
+                hasPermalink: $hasPermalink,
             ),
             includeViews: $wantViews,
         ));
