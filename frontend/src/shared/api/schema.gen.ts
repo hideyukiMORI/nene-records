@@ -210,6 +210,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/entities/{id}/move": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Move a record (and its subtree) to a new permalink
+         * @description Rewrites the record's custom permalink prefix and every descendant's, recording a 301 for each changed path so existing links and search results follow the move — no descendant-URL avalanche (#659).
+         */
+        post: operations["moveEntity"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/entities/{id}/revisions": {
         parameters: {
             query?: never;
@@ -2184,6 +2204,13 @@ export interface components {
              */
             layout?: "standard" | "full" | "two-col" | "three-col" | "bare" | "custom" | null;
         };
+        EntityMoveResponse: {
+            /** Format: int64 */
+            id: number;
+            permalink: string;
+            /** @description Records whose permalink was rewritten (root + descendants); 0 = no-op. */
+            moved_count: number;
+        };
         ScheduleEntityRequest: {
             /**
              * Format: date-time
@@ -3653,6 +3680,43 @@ export interface operations {
                 content?: never;
             };
             404: components["responses"]["NotFound"];
+            500: components["responses"]["InternalServerError"];
+        };
+    };
+    moveEntity: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @example 1 */
+                id: components["parameters"]["IdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * @description The record's new custom permalink; its subtree follows.
+                     * @example /legal/about
+                     */
+                    permalink: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Move applied (or a no-op when dropped onto its current parent). */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EntityMoveResponse"];
+                };
+            };
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            422: components["responses"]["ValidationFailed"];
             500: components["responses"]["InternalServerError"];
         };
     };

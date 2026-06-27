@@ -580,6 +580,46 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /api/v1/entities/{id}/move:
+    post:
+      tags:
+        - Entities
+      summary: Move a record (and its subtree) to a new permalink
+      description: >
+        Rewrites the record's custom permalink prefix and every descendant's,
+        recording a 301 for each changed path so existing links and search
+        results follow the move — no descendant-URL avalanche (#659).
+      operationId: moveEntity
+      parameters:
+        - $ref: '#/components/parameters/IdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - permalink
+              properties:
+                permalink:
+                  type: string
+                  description: The record's new custom permalink; its subtree follows.
+                  example: /legal/about
+      responses:
+        '200':
+          description: Move applied (or a no-op when dropped onto its current parent).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntityMoveResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /api/v1/entities/{id}/revisions:
     get:
       tags:
@@ -5395,6 +5435,22 @@ components:
             - 'null'
           enum: [standard, full, two-col, three-col, bare, custom, null]
           description: 'Per-entity layout override. Null = inherit the type''s default_layout.'
+      additionalProperties: false
+    EntityMoveResponse:
+      type: object
+      required:
+        - id
+        - permalink
+        - moved_count
+      properties:
+        id:
+          type: integer
+          format: int64
+        permalink:
+          type: string
+        moved_count:
+          type: integer
+          description: Records whose permalink was rewritten (root + descendants); 0 = no-op.
       additionalProperties: false
     ScheduleEntityRequest:
       type: object

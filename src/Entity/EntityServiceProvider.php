@@ -233,6 +233,40 @@ final readonly class EntityServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(
+                MoveEntitySubtreeUseCaseInterface::class,
+                static function (ContainerInterface $c): MoveEntitySubtreeUseCaseInterface {
+                    $entities = $c->get(EntityRepositoryInterface::class);
+                    $redirects = $c->get(UrlRedirectRepositoryInterface::class);
+
+                    if (!$entities instanceof EntityRepositoryInterface) {
+                        throw new LogicException('Entity repository service is invalid.');
+                    }
+
+                    if (!$redirects instanceof UrlRedirectRepositoryInterface) {
+                        throw new LogicException('URL redirect repository service is invalid.');
+                    }
+
+                    return new MoveEntitySubtreeUseCase($entities, $redirects);
+                },
+            )
+            ->set(
+                MoveEntityHandler::class,
+                static function (ContainerInterface $c): MoveEntityHandler {
+                    $useCase = $c->get(MoveEntitySubtreeUseCaseInterface::class);
+                    $response = $c->get(JsonResponseFactory::class);
+
+                    if (!$useCase instanceof MoveEntitySubtreeUseCaseInterface) {
+                        throw new LogicException('MoveEntitySubtree use case service is invalid.');
+                    }
+
+                    if (!$response instanceof JsonResponseFactory) {
+                        throw new LogicException('JSON response factory service is invalid.');
+                    }
+
+                    return new MoveEntityHandler($useCase, $response);
+                },
+            )
+            ->set(
                 DuplicateEntitySlugExceptionHandler::class,
                 static function (ContainerInterface $c): DuplicateEntitySlugExceptionHandler {
                     $problemDetails = $c->get(ProblemDetailsResponseFactory::class);
@@ -418,6 +452,7 @@ final readonly class EntityServiceProvider implements ServiceProviderInterface
                     $create = $c->get(CreateEntityHandler::class);
                     $update = $c->get(UpdateEntityHandler::class);
                     $delete = $c->get(DeleteEntityHandler::class);
+                    $move = $c->get(MoveEntityHandler::class);
                     $list = $c->get(ListEntitiesHandler::class);
                     $listRevisions = $c->get(ListEntityRevisionsHandler::class);
                     $export = $c->get(ExportEntitiesHandler::class);
@@ -439,6 +474,10 @@ final readonly class EntityServiceProvider implements ServiceProviderInterface
 
                     if (!$delete instanceof DeleteEntityHandler) {
                         throw new LogicException('DeleteEntity handler service is invalid.');
+                    }
+
+                    if (!$move instanceof MoveEntityHandler) {
+                        throw new LogicException('MoveEntity handler service is invalid.');
                     }
 
                     if (!$list instanceof ListEntitiesHandler) {
@@ -465,7 +504,7 @@ final readonly class EntityServiceProvider implements ServiceProviderInterface
                         throw new LogicException('ProcessScheduledPublish handler service is invalid.');
                     }
 
-                    return new EntityRouteRegistrar($get, $create, $update, $delete, $list, $listRevisions, $export, $schedule, $unschedule, $processScheduled);
+                    return new EntityRouteRegistrar($get, $create, $update, $delete, $move, $list, $listRevisions, $export, $schedule, $unschedule, $processScheduled);
                 },
             );
     }

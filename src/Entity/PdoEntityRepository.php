@@ -100,6 +100,35 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
         return array_map(fn (array $row) => $this->mapRow($row), $rows);
     }
 
+    /** @return list<Entity> */
+    public function findByPermalinkPrefix(string $prefix): array
+    {
+        // Every descendant under `/prefix/` (all levels, any status), org-scoped.
+        // Permalinks are kebab + slash only, so the LIKE wildcard never collides
+        // with a literal `%`/`_` in the data.
+        $rows = $this->query->fetchAll(
+            <<<'SQL'
+                SELECT id, entity_type_id, slug, permalink, layout, status, published_at, scheduled_at, is_deleted, created_at, updated_at, deleted_at, meta_title, meta_description
+                FROM entities
+                WHERE organization_id = ?
+                  AND is_deleted = 0
+                  AND permalink LIKE ?
+                ORDER BY permalink ASC
+                SQL,
+            [$this->orgId->get(), $prefix . '/%'],
+        );
+
+        return array_map(fn (array $row) => $this->mapRow($row), $rows);
+    }
+
+    public function updatePermalink(int $id, string $permalink): void
+    {
+        $this->query->execute(
+            'UPDATE entities SET permalink = ?, updated_at = NOW() WHERE id = ? AND organization_id = ?',
+            [$permalink, $id, $this->orgId->get()],
+        );
+    }
+
     public function existsByPermalink(string $permalink, ?int $excludeId = null): bool
     {
         // No is_deleted filter: the unique index spans every row, so the pre-check

@@ -64,6 +64,7 @@ final class EntityRevisionHttpTest extends TestCase
             new CreateEntityHandler($createUseCase, $jsonResponse),
             new UpdateEntityHandler(new UpdateEntityUseCase($this->entities, $this->entityTypes), $jsonResponse),
             new DeleteEntityHandler(new DeleteEntityUseCase($this->entities), $this->factory),
+            new \NeNeRecords\Entity\MoveEntityHandler(new \NeNeRecords\Entity\MoveEntitySubtreeUseCase($this->entities), $jsonResponse),
             new ListEntitiesHandler(new ListEntitiesUseCase($this->entities), $jsonResponse, new ExcerptResolver(new InMemoryTextFieldRepository(), new InMemorySettingRepository())),
             new ListEntityRevisionsHandler(new ListEntityRevisionsUseCase($this->entities), $jsonResponse),
             new ExportEntitiesHandler($this->entities, new InMemoryTextFieldRepository(), $this->factory),
