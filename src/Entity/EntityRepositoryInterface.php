@@ -22,6 +22,19 @@ interface EntityRepositoryInterface
      */
     public function findDirectChildrenByPermalink(string $parentPermalink, int $limit): array;
 
+    /**
+     * Every descendant record under a permalink prefix — all levels below
+     * `/prefix/`, ANY status, org-scoped, ordered by permalink. Unlike
+     * {@see findDirectChildrenByPermalink} this spans deeper levels and all
+     * statuses. Powers the directory subtree move (#659).
+     *
+     * @return list<Entity>
+     */
+    public function findByPermalinkPrefix(string $prefix): array;
+
+    /** Rewrite only a record's custom permalink (subtree move, #659). */
+    public function updatePermalink(int $id, string $permalink): void;
+
     public function existsBySlug(string $slug, int $entityTypeId, ?int $excludeId = null): bool;
 
     /** True when another record in the org already owns this custom permalink (#651). */

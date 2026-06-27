@@ -127,6 +127,50 @@ final class InMemoryEntityRepository implements EntityRepositoryInterface
         return array_slice($children, 0, $limit);
     }
 
+    /** @return list<Entity> */
+    public function findByPermalinkPrefix(string $prefix): array
+    {
+        $needle = $prefix . '/';
+        $result = [];
+
+        foreach ($this->entities as $entity) {
+            if ($entity->isDeleted) {
+                continue;
+            }
+
+            $permalink = $entity->permalink;
+            if ($permalink !== null && str_starts_with($permalink, $needle)) {
+                $result[] = $entity;
+            }
+        }
+
+        usort($result, static fn (Entity $a, Entity $b): int => ($a->permalink ?? '') <=> ($b->permalink ?? ''));
+
+        return $result;
+    }
+
+    public function updatePermalink(int $id, string $permalink): void
+    {
+        $existing = $this->entities[$id] ?? null;
+
+        if ($existing === null || $existing->isDeleted) {
+            return;
+        }
+
+        $this->entities[$id] = new Entity(
+            id: $existing->id,
+            entityTypeId: $existing->entityTypeId,
+            slug: $existing->slug,
+            permalink: $permalink,
+            status: $existing->status,
+            publishedAt: $existing->publishedAt,
+            metaTitle: $existing->metaTitle,
+            metaDescription: $existing->metaDescription,
+            scheduledAt: $existing->scheduledAt,
+            layout: $existing->layout,
+        );
+    }
+
     public function existsByPermalink(string $permalink, ?int $excludeId = null): bool
     {
         foreach ($this->entities as $entity) {
