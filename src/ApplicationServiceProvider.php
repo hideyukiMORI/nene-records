@@ -115,6 +115,7 @@ use NeNeRecords\TextField\TextFieldServiceProvider;
 use NeNeRecords\Theme\ThemeNotFoundExceptionHandler;
 use NeNeRecords\Theme\ThemeRouteRegistrar;
 use NeNeRecords\Theme\ThemeServiceProvider;
+use NeNeRecords\UrlRedirect\UrlRedirectRouteRegistrar;
 use NeNeRecords\UrlRedirect\UrlRedirectServiceProvider;
 use NeNeRecords\User\CannotDeleteSelfExceptionHandler;
 use NeNeRecords\User\EmailVerificationTokenExceptionHandler;
@@ -245,6 +246,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $orgExport     = $container->get(OrgExportRouteRegistrar::class);
                     $theme = $container->get('nene-records.route_registrar.theme');
                     $wxrImport = $container->get('nene-records.route_registrar.wxr_import');
+                    $urlRedirect = $container->get('nene-records.route_registrar.url_redirect');
 
                     if (
                         !$entityType instanceof EntityTypeRouteRegistrar
@@ -284,6 +286,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         || !$orgExport instanceof OrgExportRouteRegistrar
                         || !$theme instanceof ThemeRouteRegistrar
                         || !$wxrImport instanceof WxrImportRouteRegistrar
+                        || !$urlRedirect instanceof UrlRedirectRouteRegistrar
                     ) {
                         throw new LogicException('Route registrar service is invalid.');
                     }
@@ -326,6 +329,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $orgExport,
                         $theme,
                         $wxrImport,
+                        $urlRedirect,
                     ];
 
                     foreach ((new ModuleRegistry())->modules() as $module) {

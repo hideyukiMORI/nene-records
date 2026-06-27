@@ -1,3 +1,4 @@
+import { ImportUrlRedirectsView } from '@/features/import-url-redirects'
 import { WxrImportView } from '@/features/import-wxr'
 import { useTranslation } from '@/shared/i18n'
 import { Stack, Text } from '@/shared/ui'
@@ -14,6 +15,7 @@ export function ImportPage() {
         <Text muted>{t('admin.import.pageDescription')}</Text>
       </Stack>
       <WxrImportView />
+      <ImportUrlRedirectsView />
     </Stack>
   )
 }
