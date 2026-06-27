@@ -36,6 +36,9 @@ export function mapEntityDtoToModel(dto: EntityDto): Entity {
     metaDescription: dto.meta_description,
     menuOrder: dto.menu_order ?? 0,
     ...(dto.excerpt !== undefined ? { excerpt: dto.excerpt } : {}),
+    ...(dto.view_count !== undefined && dto.view_count !== null
+      ? { viewCount: dto.view_count }
+      : {}),
     createdAt: dto.created_at,
     updatedAt: dto.updated_at,
   }

@@ -466,6 +466,14 @@ function DirectoryNodeRow({
         )}
 
         <div className="ml-auto flex shrink-0 items-center gap-inline-sm">
+          {record !== null && (record.viewCount ?? 0) > 0 ? (
+            <span
+              className="font-sans text-caption text-text-muted"
+              title={t('admin.entityRecords.directory.views', { count: record.viewCount ?? 0 })}
+            >
+              👁 {record.viewCount ?? 0}
+            </span>
+          ) : null}
           {record !== null && formatDate(record.updatedAt, locale) !== '' ? (
             <span className="font-sans text-caption text-text-muted">
               {t('admin.entityRecords.list.item.updatedAt', {

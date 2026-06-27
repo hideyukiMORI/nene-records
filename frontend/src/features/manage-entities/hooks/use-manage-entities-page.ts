@@ -85,6 +85,8 @@ export function useManageEntitiesPage(entityTypeId: number) {
         sortOrder,
       ),
       limit: DIRECTORY_FETCH_LIMIT,
+      // Attach per-record view counts so the directory can show readership (#674).
+      include: 'views',
     }),
     [
       entityTypeId,
@@ -159,6 +161,7 @@ export function useManageEntitiesPage(entityTypeId: number) {
           status: entity.status,
           updatedAt: entity.updatedAt,
           menuOrder: entity.menuOrder,
+          viewCount: entity.viewCount ?? 0,
         }
       })
   }, [directoryQuery.data?.items, textFieldQuery.data?.items])

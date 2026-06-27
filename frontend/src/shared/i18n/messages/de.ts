@@ -646,6 +646,7 @@ export const de: Partial<MessageCatalog> = {
   'admin.entityRecords.directory.move.success': 'Seiten verschoben.',
   'admin.entityRecords.directory.moveUp': 'Nach oben',
   'admin.entityRecords.directory.moveDown': 'Nach unten',
+  'admin.entityRecords.directory.views': 'Aufrufe (30 T.): {{count}}',
   'admin.entityRecords.directory.filter.placeholder': 'Nach Pfad oder Titel filtern…',
   'admin.entityRecords.directory.filter.noMatches': 'Keine Seiten passen zu „{{query}}“.',
   'admin.entityRecords.directory.filter.clear': 'Filter zurücksetzen',

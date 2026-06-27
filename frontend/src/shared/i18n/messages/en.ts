@@ -649,6 +649,7 @@ export const en = {
   'admin.entityRecords.directory.move.success': 'Pages moved.',
   'admin.entityRecords.directory.moveUp': 'Move up',
   'admin.entityRecords.directory.moveDown': 'Move down',
+  'admin.entityRecords.directory.views': 'Views (30d): {{count}}',
   'admin.entityRecords.directory.filter.placeholder': 'Filter by path or title…',
   'admin.entityRecords.directory.filter.noMatches': 'No pages match “{{query}}”.',
   'admin.entityRecords.directory.filter.clear': 'Clear filter',

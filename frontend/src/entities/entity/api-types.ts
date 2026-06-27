@@ -20,6 +20,8 @@ export interface EntityDto {
   menu_order?: number | null
   /** Server-computed teaser; present only when listed with `?include=excerpt`. */
   excerpt?: string | null
+  /** View count over the last 30 days; present only when listed with `?include=views` (#674). */
+  view_count?: number | null
   created_at: string | null
   updated_at: string | null
 }
