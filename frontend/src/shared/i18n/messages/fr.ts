@@ -647,6 +647,14 @@ export const fr: Partial<MessageCatalog> = {
   'admin.entityRecords.directory.expand': 'Déplier',
   'admin.entityRecords.directory.collapse': 'Replier',
   'admin.entityRecords.directory.newHere': 'Nouvelle page sous {{path}}',
+  'admin.entityRecords.directory.dragHandle': 'Glisser pour déplacer « {{label}} »',
+  'admin.entityRecords.directory.move.confirmTitle': 'Déplacer la page ?',
+  'admin.entityRecords.directory.move.confirmBody.one':
+    'Déplacer « {{label}} » vers {{target}} ? Son URL change et une redirection 301 depuis l’ancien chemin est ajoutée.',
+  'admin.entityRecords.directory.move.confirmBody.other':
+    'Déplacer « {{label}} » vers {{target}} ? {{count}} pages obtiennent de nouvelles URL, chacune avec une redirection 301 depuis son ancien chemin.',
+  'admin.entityRecords.directory.move.confirm': 'Déplacer',
+  'admin.entityRecords.directory.move.success': 'Pages déplacées.',
 
   // ── Field definitions ────────────────────────────────────────────────────
   'admin.fieldDefs.pageTitle': 'Champs',

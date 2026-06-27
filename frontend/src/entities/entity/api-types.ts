@@ -59,6 +59,12 @@ export interface ScheduleEntityResponseDto {
   scheduled_at: string
 }
 
+export interface EntityMoveResponseDto {
+  id: number
+  permalink: string
+  moved_count: number
+}
+
 export interface GeneratePreviewTokenResponseDto {
   token: string
   expires_at: string

@@ -7,6 +7,7 @@ import {
 import { apiClient, AppError } from '@/shared/api/client'
 import type {
   EntityDto,
+  EntityMoveResponseDto,
   GeneratePreviewTokenResponseDto,
   ScheduleEntityResponseDto,
 } from './api-types'
@@ -84,6 +85,41 @@ export function useUpdateEntity(): UseMutationResult<Entity, AppError, UpdateEnt
     },
     onSuccess: async (data) => {
       queryClient.setQueryData(entityKeys.detail(data.id), data)
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: entityKeys.lists() }),
+        invalidatePublicFeeds(queryClient),
+      ])
+    },
+  })
+}
+
+export interface MoveEntityResult {
+  id: number
+  permalink: string
+  movedCount: number
+}
+
+/**
+ * Move a record (and its subtree) to a new custom permalink (#659). The backend
+ * cascades descendant paths and records 301s; on success we invalidate the lists
+ * so the directory tree reflects the new structure.
+ */
+export function useMoveEntity(): UseMutationResult<
+  MoveEntityResult,
+  AppError,
+  { id: number; permalink: string }
+> {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({ id, permalink }) => {
+      const dto = await apiClient.post<EntityMoveResponseDto>(
+        `/api/v1/entities/${String(id)}/move`,
+        { permalink },
+      )
+      return { id: dto.id, permalink: dto.permalink, movedCount: dto.moved_count }
+    },
+    onSuccess: async () => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: entityKeys.lists() }),
         invalidatePublicFeeds(queryClient),

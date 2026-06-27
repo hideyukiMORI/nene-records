@@ -640,6 +640,14 @@ export const ptBR: Partial<MessageCatalog> = {
   'admin.entityRecords.directory.expand': 'Expandir',
   'admin.entityRecords.directory.collapse': 'Recolher',
   'admin.entityRecords.directory.newHere': 'Nova página em {{path}}',
+  'admin.entityRecords.directory.dragHandle': 'Arraste para mover “{{label}}”',
+  'admin.entityRecords.directory.move.confirmTitle': 'Mover página?',
+  'admin.entityRecords.directory.move.confirmBody.one':
+    'Mover “{{label}}” para {{target}}? A URL muda e um redirecionamento 301 do caminho antigo é adicionado.',
+  'admin.entityRecords.directory.move.confirmBody.other':
+    'Mover “{{label}}” para {{target}}? {{count}} páginas recebem novas URLs, cada uma com um redirecionamento 301 do caminho antigo.',
+  'admin.entityRecords.directory.move.confirm': 'Mover',
+  'admin.entityRecords.directory.move.success': 'Páginas movidas.',
 
   // ── Field definitions ────────────────────────────────────────────────────
   'admin.fieldDefs.pageTitle': 'Campos',

@@ -636,6 +636,14 @@ export const de: Partial<MessageCatalog> = {
   'admin.entityRecords.directory.expand': 'Aufklappen',
   'admin.entityRecords.directory.collapse': 'Zuklappen',
   'admin.entityRecords.directory.newHere': 'Neue Seite unter {{path}}',
+  'admin.entityRecords.directory.dragHandle': '„{{label}}“ zum Verschieben ziehen',
+  'admin.entityRecords.directory.move.confirmTitle': 'Seite verschieben?',
+  'admin.entityRecords.directory.move.confirmBody.one':
+    '„{{label}}“ nach {{target}} verschieben? Die URL ändert sich und eine 301-Weiterleitung vom alten Pfad wird angelegt.',
+  'admin.entityRecords.directory.move.confirmBody.other':
+    '„{{label}}“ nach {{target}} verschieben? {{count}} Seiten erhalten neue URLs, jeweils mit einer 301-Weiterleitung vom alten Pfad.',
+  'admin.entityRecords.directory.move.confirm': 'Verschieben',
+  'admin.entityRecords.directory.move.success': 'Seiten verschoben.',
   // ── Field definitions ────────────────────────────────────────────────────
   'admin.fieldDefs.pageTitle': 'Felder',
   'admin.fieldDefs.schemaFor': 'Felder für {{slug}}',

@@ -609,6 +609,14 @@ export const zhHans: Partial<MessageCatalog> = {
   'admin.entityRecords.directory.expand': '展开',
   'admin.entityRecords.directory.collapse': '折叠',
   'admin.entityRecords.directory.newHere': '在 {{path}} 下新建页面',
+  'admin.entityRecords.directory.dragHandle': '拖动以移动“{{label}}”',
+  'admin.entityRecords.directory.move.confirmTitle': '移动页面？',
+  'admin.entityRecords.directory.move.confirmBody.one':
+    '将“{{label}}”移动到 {{target}}？其 URL 将更改，并从旧路径添加 301 重定向。',
+  'admin.entityRecords.directory.move.confirmBody.other':
+    '将“{{label}}”移动到 {{target}}？{{count}} 个页面将获得新 URL，每个都从旧路径添加 301 重定向。',
+  'admin.entityRecords.directory.move.confirm': '移动',
+  'admin.entityRecords.directory.move.success': '页面已移动。',
 
   // ── Field definitions ────────────────────────────────────────────────────
   'admin.fieldDefs.pageTitle': '字段',
