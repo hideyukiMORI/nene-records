@@ -1,6 +1,7 @@
-import { Fragment, useMemo, useRef, useState } from 'react'
+import { Fragment, type ReactNode, useMemo, useRef, useState } from 'react'
 import { useTranslation } from '@/shared/i18n'
-import { Button, Card, EmptyState, Stack, Text } from '@/shared/ui'
+import { useMediaQuery } from '@/shared/lib/use-media-query'
+import { Button, Card, EmptyState, Modal, Stack, Text } from '@/shared/ui'
 import {
   IconChevronDown,
   IconChevronUp,
@@ -116,6 +117,11 @@ export function BlocksFieldEditor({
   onChange,
 }: BlocksFieldEditorProps) {
   const { t } = useTranslation()
+  // Match the handoff's ≤820px breakpoint. Below it, touch DnD is unavailable
+  // (grip hidden, cards not draggable), the card row stacks, and the inspector
+  // opens as a modal instead of an inline panel.
+  const isMobile = useMediaQuery('(max-width: 820px)')
+  const inspectorTitleId = `${id}-inspector-title`
   const palette = useMemo(
     () =>
       allowedTypes === undefined
@@ -219,12 +225,15 @@ export function BlocksFieldEditor({
         ) : null}
       </div>
 
-      <div className="flex flex-wrap gap-inline-sm">
+      <div
+        className={isMobile ? 'flex gap-inline-sm overflow-x-auto' : 'flex flex-wrap gap-inline-sm'}
+      >
         {palette.map((entry) => (
           <Button
             key={entry.type}
             variant="secondary"
             size="sm"
+            className={isMobile ? 'shrink-0' : undefined}
             disabled={disabled || blocks.length >= MAX_BLOCKS_PER_DOCUMENT}
             onClick={() => {
               addBlock(entry.type)
@@ -260,7 +269,7 @@ export function BlocksFieldEditor({
                 <Card
                   padding="row"
                   data-bcard=""
-                  draggable={!disabled}
+                  draggable={!disabled && !isMobile}
                   className={isSelected ? 'ring-2 ring-accent' : undefined}
                   onDragStart={(event) => {
                     setBlockDragPayload({ kind: 'move', id: block.id })
@@ -271,10 +280,16 @@ export function BlocksFieldEditor({
                     setDropIndex(null)
                   }}
                 >
-                  <div className="flex items-center gap-inline-sm">
-                    <span className="text-text-muted" aria-hidden="true">
-                      <IconMenu size={15} />
-                    </span>
+                  <div
+                    className={
+                      isMobile ? 'flex flex-col gap-stack-xs' : 'flex items-center gap-inline-sm'
+                    }
+                  >
+                    {isMobile ? null : (
+                      <span className="text-text-muted" aria-hidden="true">
+                        <IconMenu size={15} />
+                      </span>
+                    )}
                     <button
                       type="button"
                       className="flex min-w-0 flex-1 items-center gap-inline-sm text-left"
@@ -294,41 +309,43 @@ export function BlocksFieldEditor({
                           : blockSummary(block)}
                       </span>
                     </button>
-                    {invalid ? (
-                      <span className="shrink-0 font-sans text-caption text-danger">
-                        {t('admin.blocks.card.invalid')}
+                    <div className="flex items-center gap-inline-sm">
+                      {invalid ? (
+                        <span className="font-sans text-caption text-danger">
+                          {t('admin.blocks.card.invalid')}
+                        </span>
+                      ) : null}
+                      <span className="ml-auto flex items-center gap-inline-xs">
+                        <RepeaterIconButton
+                          title={t('admin.blocks.moveUp')}
+                          disabled={disabled || index === 0}
+                          onClick={() => {
+                            moveBlock(index, -1)
+                          }}
+                        >
+                          <IconChevronUp size={15} />
+                        </RepeaterIconButton>
+                        <RepeaterIconButton
+                          title={t('admin.blocks.moveDown')}
+                          disabled={disabled || index === blocks.length - 1}
+                          onClick={() => {
+                            moveBlock(index, 1)
+                          }}
+                        >
+                          <IconChevronDown size={15} />
+                        </RepeaterIconButton>
+                        <RepeaterIconButton
+                          danger
+                          title={t('common.actions.delete')}
+                          disabled={disabled}
+                          onClick={() => {
+                            deleteBlock(block.id)
+                          }}
+                        >
+                          <IconX size={15} />
+                        </RepeaterIconButton>
                       </span>
-                    ) : null}
-                    <span className="flex items-center gap-inline-xs">
-                      <RepeaterIconButton
-                        title={t('admin.blocks.moveUp')}
-                        disabled={disabled || index === 0}
-                        onClick={() => {
-                          moveBlock(index, -1)
-                        }}
-                      >
-                        <IconChevronUp size={15} />
-                      </RepeaterIconButton>
-                      <RepeaterIconButton
-                        title={t('admin.blocks.moveDown')}
-                        disabled={disabled || index === blocks.length - 1}
-                        onClick={() => {
-                          moveBlock(index, 1)
-                        }}
-                      >
-                        <IconChevronDown size={15} />
-                      </RepeaterIconButton>
-                      <RepeaterIconButton
-                        danger
-                        title={t('common.actions.delete')}
-                        disabled={disabled}
-                        onClick={() => {
-                          deleteBlock(block.id)
-                        }}
-                      >
-                        <IconX size={15} />
-                      </RepeaterIconButton>
-                    </span>
+                    </div>
                   </div>
                 </Card>
               </Fragment>
@@ -339,34 +356,25 @@ export function BlocksFieldEditor({
       )}
 
       {selected !== null ? (
-        <Card padding="md">
-          <Stack gap="sm">
-            <div className="flex items-center justify-between">
-              <Text as="span" variant="caption" muted>
-                {t(blockCatalogEntry(selected.type).labelKey)}
-              </Text>
-              <button
-                type="button"
-                className="rounded p-1 text-text-muted hover:text-text-primary"
-                title={t('admin.blocks.deselect')}
-                onClick={() => {
-                  setSelectedId(null)
-                }}
-              >
-                <IconX size={15} />
-              </button>
-            </div>
-            <BlockInspector
-              block={selected}
-              errorCode={validateBlock(selected)}
-              disabled={disabled}
-              idPrefix={`${id}-${selected.id}`}
-              onChange={(data) => {
-                updateData(selected.id, data)
-              }}
-            />
-          </Stack>
-        </Card>
+        <InspectorPanel
+          asModal={isMobile}
+          titleId={inspectorTitleId}
+          title={t(blockCatalogEntry(selected.type).labelKey)}
+          closeLabel={t('admin.blocks.deselect')}
+          onClose={() => {
+            setSelectedId(null)
+          }}
+        >
+          <BlockInspector
+            block={selected}
+            errorCode={validateBlock(selected)}
+            disabled={disabled}
+            idPrefix={`${id}-${selected.id}`}
+            onChange={(data) => {
+              updateData(selected.id, data)
+            }}
+          />
+        </InspectorPanel>
       ) : null}
 
       {showPreview && blocks.length > 0 ? (
@@ -380,5 +388,70 @@ export function BlocksFieldEditor({
         </Card>
       ) : null}
     </div>
+  )
+}
+
+interface InspectorPanelProps {
+  /** Render as a centered modal (mobile) instead of an inline card (desktop). */
+  asModal: boolean
+  titleId: string
+  title: string
+  closeLabel: string
+  onClose: () => void
+  children: ReactNode
+}
+
+/**
+ * Wraps the selected block's settings form. On desktop it sits inline below the
+ * board (a `Card`); at ≤820px the board has no room beside it, so the form opens
+ * as a `Modal` over the card the user tapped (handoff's "card edit → modal").
+ */
+function InspectorPanel({
+  asModal,
+  titleId,
+  title,
+  closeLabel,
+  onClose,
+  children,
+}: InspectorPanelProps) {
+  const header = (
+    <div className="flex items-center justify-between">
+      <Text as="span" id={titleId} variant="caption" muted>
+        {title}
+      </Text>
+      <button
+        type="button"
+        className="rounded p-1 text-text-muted hover:text-text-primary"
+        title={closeLabel}
+        onClick={onClose}
+      >
+        <IconX size={15} />
+      </button>
+    </div>
+  )
+
+  if (asModal) {
+    return (
+      <Modal
+        onClose={onClose}
+        closeLabel={closeLabel}
+        labelledBy={titleId}
+        panelClassName="max-w-md max-h-full overflow-y-auto shadow-md"
+      >
+        <Stack gap="sm">
+          {header}
+          {children}
+        </Stack>
+      </Modal>
+    )
+  }
+
+  return (
+    <Card padding="md">
+      <Stack gap="sm">
+        {header}
+        {children}
+      </Stack>
+    </Card>
   )
 }
