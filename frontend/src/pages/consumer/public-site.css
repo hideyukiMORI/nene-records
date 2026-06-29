@@ -1765,6 +1765,14 @@
     flex-direction: column;
     gap: var(--space-sm);
   }
+  /* Several themes restate `align-items: flex-end` on `.section__head`
+     (selector `.nene-public[data-theme^=…]`, specificity 0,3,0), which outranks
+     the container reset above (0,2,0) and would right-align the stacked phone
+     head. Pinning the children with `align-self` beats the container's
+     `align-items` regardless of theme specificity, so the head stays left-aligned. */
+  .nene-public .section__head > * {
+    align-self: flex-start;
+  }
   .nene-public .pagehead__row {
     align-items: flex-start;
     flex-direction: column;
