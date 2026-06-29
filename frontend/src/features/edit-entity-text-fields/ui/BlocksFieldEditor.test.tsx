@@ -6,6 +6,26 @@ import { renderWithProviders } from '@tests/render/render-with-providers'
 import { BlocksFieldEditor } from './BlocksFieldEditor'
 
 afterEach(cleanup)
+afterEach(() => {
+  vi.unstubAllGlobals()
+})
+
+/** Force `useMediaQuery('(max-width: 820px)')` to report a phone-width viewport. */
+function stubMobileViewport() {
+  vi.stubGlobal(
+    'matchMedia',
+    vi.fn().mockReturnValue({
+      matches: true,
+      media: '(max-width: 820px)',
+      onchange: null,
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      addListener: () => {},
+      removeListener: () => {},
+      dispatchEvent: () => false,
+    }),
+  )
+}
 
 function Harness({ initial = '' }: { initial?: string }) {
   const [value, setValue] = useState(initial)
@@ -66,6 +86,35 @@ describe('BlocksFieldEditor', () => {
   it('hides the preview toggle when there are no blocks', () => {
     renderWithProviders(<Harness />)
     expect(screen.queryByRole('button', { name: 'Show preview' })).not.toBeInTheDocument()
+  })
+
+  it('opens the inspector as a modal and disables card DnD on mobile', async () => {
+    stubMobileViewport()
+    const user = userEvent.setup()
+    const doc = JSON.stringify([
+      { id: 'b1', type: 'callout', data: { kind: 'ok', title: 'Nice', body: 'Done' } },
+    ])
+    renderWithProviders(<Harness initial={doc} />)
+
+    // Touch DnD is unavailable: the card is not draggable.
+    expect(document.querySelector('[data-bcard]')).toHaveAttribute('draggable', 'false')
+
+    // No modal until the card is tapped; then the inspector opens as a dialog.
+    expect(screen.queryByRole('dialog')).toBeNull()
+    await user.click(screen.getByRole('button', { name: /Nice/ }))
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+  })
+
+  it('keeps the inspector inline (no modal) on desktop', async () => {
+    const user = userEvent.setup()
+    const doc = JSON.stringify([
+      { id: 'b1', type: 'callout', data: { kind: 'ok', title: 'Nice', body: 'Done' } },
+    ])
+    renderWithProviders(<Harness initial={doc} />)
+
+    expect(document.querySelector('[data-bcard]')).toHaveAttribute('draggable', 'true')
+    await user.click(screen.getByRole('button', { name: /Nice/ }))
+    expect(screen.queryByRole('dialog')).toBeNull()
   })
 
   it('limits the palette to allowedTypes', () => {
