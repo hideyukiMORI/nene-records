@@ -13,10 +13,15 @@ auto-seeds its default content types) and the admin user. **Idempotent** — saf
 to re-run on every deploy.
 
 ```bash
-NENE_INSTALL_ADMIN_EMAIL=admin@example.com \
-NENE_INSTALL_ADMIN_PASSWORD='change-me' \
-  docker compose exec -T app composer app:install
+docker compose exec -T \
+  -e NENE_INSTALL_ADMIN_EMAIL=admin@example.com \
+  -e NENE_INSTALL_ADMIN_PASSWORD='change-me' \
+  app composer app:install
 ```
+
+> `docker compose exec` does **not** forward host shell variables into the
+> container — pass the install vars with `-e`, otherwise `install.php` reports
+> `NENE_INSTALL_ADMIN_EMAIL and NENE_INSTALL_ADMIN_PASSWORD are required`.
 
 | Env var | Required | Default |
 | --- | --- | --- |
@@ -75,8 +80,10 @@ build context, so the build never needs the parent directory.
 # 2. build + start (frontend is built inside the image)
 docker compose -f compose.prod.yaml up -d --build
 # 3. first-run onboarding (idempotent)
-NENE_INSTALL_ADMIN_EMAIL=admin@example.com NENE_INSTALL_ADMIN_PASSWORD='change-me' \
-  docker compose -f compose.prod.yaml exec -T app composer app:install
+docker compose -f compose.prod.yaml exec -T \
+  -e NENE_INSTALL_ADMIN_EMAIL=admin@example.com \
+  -e NENE_INSTALL_ADMIN_PASSWORD='change-me' \
+  app composer app:install
 ```
 
 The image entrypoint (`docker/app/entrypoint.prod.sh`) waits for the DB and runs
