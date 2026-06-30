@@ -7,6 +7,7 @@ CLI utilities for local development and contract maintenance. Run from the repos
 | [`generate-mcp-tools.php`](./generate-mcp-tools.php) | Regenerate `docs/mcp/tools.json` from OpenAPI-aligned definitions |
 | [`validate-openapi.php`](./validate-openapi.php) | Validate `docs/openapi/openapi.yaml` |
 | [`seed-blog-demo.php`](./seed-blog-demo.php) | Seed ~50 blog demo records via the HTTP API (Consumer View testing) |
+| [`seed-docs-demo.php`](./seed-docs-demo.php) | Seed a nested custom-permalink page hierarchy (`docs`-type) for the directory view / breadcrumb demo (#651) |
 | [`webhook-worker.php`](./webhook-worker.php) | Drain the `webhook_deliveries` queue — send due deliveries with retry/backoff (#285) |
 
 ## Webhook delivery worker
@@ -52,3 +53,28 @@ Then open:
 - SSR detail (when enabled): http://localhost:8080/view/blog/{id}
 
 The script is idempotent: if `blog` already has 50 or more entities, it skips creation.
+
+## Docs-demo hierarchy seed
+
+Creates a dedicated `docs` entity type and ~90 published records with **nested custom permalinks** (`/docs`, `/docs/guides/authentication`, `/company/about`, `/legal/privacy`, …) so the permalink-derived **directory view** (admin) and the public **breadcrumb / child-list** (#651) have realistic data to render. The default `posts` / `pages` types are left untouched.
+
+**Requirements:** API running, an admin account (writes require auth), cURL extension enabled.
+
+```bash
+# Inside the app container (admin creds via -e)
+docker compose exec -T \
+  -e NENE_INSTALL_ADMIN_EMAIL=admin@example.com \
+  -e NENE_INSTALL_ADMIN_PASSWORD='change-me' \
+  app php tools/seed-docs-demo.php http://localhost
+
+# Host, explicit flags
+php tools/seed-docs-demo.php http://localhost:18082 \
+  --email=admin@example.com --password='change-me' [--limit=0] [--delay=500]
+```
+
+Calls are paced (`--delay`, ms) to stay under the API rate limit, and 429s are retried. Idempotent: records whose slug already exists are skipped, so reruns are safe. To reseed from scratch, delete the `docs` entity type in the admin first.
+
+Then check:
+
+- Admin: the **Docs** content type → **Directory** tab shows the folder tree.
+- Public: `/docs/guides/authentication` renders breadcrumb + JSON-LD; `/docs/guides` lists its children.
