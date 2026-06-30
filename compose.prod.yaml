@@ -8,8 +8,9 @@
 #   1. set required secrets in .env (NENE2_LOCAL_JWT_SECRET, DB_PASSWORD,
 #      MYSQL_ROOT_PASSWORD) — see .env.example / docs/deployment.md
 #   2. docker compose -f compose.prod.yaml up -d --build
-#   3. NENE_INSTALL_ADMIN_EMAIL=... NENE_INSTALL_ADMIN_PASSWORD=... \
-#        docker compose -f compose.prod.yaml exec -T app composer app:install
+#   3. docker compose -f compose.prod.yaml exec -T \
+#        -e NENE_INSTALL_ADMIN_EMAIL=... -e NENE_INSTALL_ADMIN_PASSWORD=... \
+#        app composer app:install   (-e: exec does not forward host shell vars)
 services:
   app:
     build:

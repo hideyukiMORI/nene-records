@@ -24,6 +24,11 @@ services:
       DB_CHARSET: ${DB_CHARSET:-utf8mb4}
       MAIL_DSN: ${MAIL_DSN:-smtp://mailpit:1025}
       MAIL_FROM: ${MAIL_FROM:-noreply@nene-records.local}
+      # Single-org tenant resolution: the app resolves the organization from this
+      # slug, which MUST match the install org slug (app:install default "default").
+      # Without it every org-scoped request is org-not-resolved 404. Mirrors
+      # compose.prod.yaml so dev and prod resolve the org identically.
+      ORG_SLUG: ${ORG_SLUG:-default}
     ports:
       - "${NENE_RECORDS_PORT:-18082}:80"
     volumes:

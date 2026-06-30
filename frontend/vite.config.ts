@@ -9,9 +9,12 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 export default defineConfig(({ mode }) => {
   // Read NENE_RECORDS_PORT from the project-root .env (one level up from frontend/).
   // This keeps the dev proxy in sync with whatever port is configured in .env
-  // without duplicating the value.
+  // without duplicating the value. The fallback MUST match the dev app port
+  // default in compose.yaml (`${NENE_RECORDS_PORT:-18082}`); otherwise `cp
+  // .env.example .env` (which leaves NENE_RECORDS_PORT commented) makes the proxy
+  // target :8080 while the API is on :18082, so every /api call 502s.
   const projectEnv = loadEnv(mode, path.resolve(__dirname, '..'), '')
-  const appPort = projectEnv['NENE_RECORDS_PORT'] ?? '8080'
+  const appPort = projectEnv['NENE_RECORDS_PORT'] ?? '18082'
   const target = `http://localhost:${appPort}`
 
   const frontendPort = parseInt(projectEnv['NENE_RECORDS_FRONTEND_PORT'] ?? '18084', 10)
