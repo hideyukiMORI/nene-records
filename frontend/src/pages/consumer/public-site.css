@@ -1720,6 +1720,49 @@
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   }
 }
+/* Collapse the desktop nav to the drawer BEFORE it stops fitting. The inline
+   header (brand + nav + search + language + theme switch) needs ~950px, but the
+   nav only used to fold at ≤680px, so 681–955px overflowed horizontally with a
+   real menu loaded. Fold at ≤960px and let the (now compact) header row shrink so
+   it never widens the page. (#693) */
+@media (max-width: 960px) {
+  .nene-public .hd__nav .navlink,
+  .nene-public .hd__nav .btn--primary {
+    display: none;
+  }
+  .nene-public .hd__search {
+    display: none;
+  }
+  .nene-public .hd__menu {
+    display: grid;
+  }
+  /* Once the nav is in the drawer, the header can never be allowed to overflow:
+     tighten gaps, let parts shrink, and — as a hard guarantee at any width
+     ≤960 — wrap to a second row instead of widening the page. (#693) */
+  .nene-public .hd__in {
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+    row-gap: var(--space-xs);
+    height: auto;
+    min-height: 62px;
+  }
+  .nene-public .hd__nav,
+  .nene-public .hd__actions {
+    min-width: 0;
+  }
+  .nene-public .hd__actions {
+    gap: var(--space-sm);
+  }
+  .nene-public .brand {
+    min-width: 0;
+  }
+  .nene-public .brand__name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
 @media (max-width: 860px) {
   .nene-public .hero__grid {
     grid-template-columns: 1fr;
@@ -1739,40 +1782,9 @@
   }
 }
 @media (max-width: 680px) {
-  .nene-public .hd__nav .navlink,
-  .nene-public .hd__nav .btn--primary {
-    display: none;
-  }
-  .nene-public .hd__search {
-    display: none;
-  }
-  .nene-public .hd__menu {
-    display: grid;
-  }
-  /* Keep the action cluster (language + theme switch + menu) from forcing the
-     page wider than the viewport: let the header row and its parts shrink and
-     tighten the gaps. Without this `.hd__actions` keeps its full intrinsic
-     width (~345px) and `.hd__in` (space-between, no shrink) pushes the whole
-     document to ~599px at 375px, stranding content in the left half. (#693) */
-  .nene-public .hd__in {
-    gap: var(--space-sm);
-  }
-  .nene-public .hd__nav,
-  .nene-public .hd__actions {
-    min-width: 0;
-  }
-  .nene-public .hd__actions {
-    gap: var(--space-sm);
-  }
-  .nene-public .brand {
-    min-width: 0;
-  }
-  .nene-public .brand__name {
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
+  /* Header nav-collapse + action-cluster shrink now live in the ≤960px block
+     above (they must trigger before the inline nav stops fitting, ~955px). This
+     block keeps the ≤680 content-area rules. (#693) */
   /* Top bar takes too much room on phones — fold it away (spec §6). */
   .nene-public .hd-topbar {
     display: none;
