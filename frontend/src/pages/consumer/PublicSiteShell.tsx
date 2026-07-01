@@ -187,7 +187,7 @@ export function PublicSiteShell({
 
   // Adopt a shared/crawled `?lang=` as the UI locale so the page (UI strings +
   // locale-resolved listing titles) matches the URL the visitor arrived on (#540).
-  const { locale: uiLocale, setLocale: setUiLocale } = useTranslation()
+  const { t, locale: uiLocale, setLocale: setUiLocale } = useTranslation()
   const [searchParams] = useSearchParams()
   const langParam = searchParams.get('lang')
   useEffect(() => {
@@ -374,7 +374,7 @@ export function PublicSiteShell({
             setDrawerOpen(false)
           }}
         />
-        <div className="drawer__panel" role="dialog" aria-label="Menu">
+        <div className="drawer__panel" role="dialog" aria-modal="true" aria-label="Menu">
           <div className="drawer__head">
             <span className="eyebrow">Menu</span>
             <button
@@ -401,9 +401,15 @@ export function PublicSiteShell({
               {link.label}
             </Link>
           ))}
-          <div style={{ marginTop: 'auto' }} className="flex flex-col gap-stack-sm">
-            <LanguageSwitch />
-            <ThemeSwitch mode={mode} onMode={setMode} />
+          <div className="drawer__prefs">
+            <div className="drawer__pref">
+              <span className="drawer__pref-label">{t('public.nav.language')}</span>
+              <LanguageSwitch />
+            </div>
+            <div className="drawer__pref">
+              <span className="drawer__pref-label">{t('public.nav.theme')}</span>
+              <ThemeSwitch mode={mode} onMode={setMode} />
+            </div>
           </div>
         </div>
       </div>
