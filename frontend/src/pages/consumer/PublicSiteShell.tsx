@@ -211,6 +211,7 @@ export function PublicSiteShell({
   // first-party JS implements scroll-reveal, gated by prefers-reduced-motion.
   const mainRef = useRef<HTMLElement>(null)
   const sentinelRef = useRef<HTMLDivElement>(null)
+  const headerRef = useRef<HTMLElement>(null)
   const { pathname } = useLocation()
   const motion = useConsumerMotion(flagAttrs)
   useScrollReveal({
@@ -255,6 +256,32 @@ export function PublicSiteShell({
     { label: 'Search', to: '/search', current: false },
   ]
 
+  // Fit-probe (#695): fold the inline nav into the drawer the instant it would
+  // overflow, so a long / many-item nav never overflows or clips the row ABOVE
+  // the 900px width floor (the CSS handles ≤900 on its own, no JS). `.hd__nav`
+  // and `.brand` are `flex:0 0 auto` (never shrink), so an over-long row genuinely
+  // overflows and is measurable; measuring with `data-nav` removed reads the
+  // expanded width, then it is re-applied — synchronously, so no flicker.
+  const navFitKey = navLinks.map((link) => link.label).join('')
+  useEffect(() => {
+    const header = headerRef.current
+    if (header === null) return
+    const row = header.querySelector<HTMLElement>('.hd__in')
+    if (row === null) return
+    const syncNav = () => {
+      header.removeAttribute('data-nav')
+      if (row.scrollWidth > row.clientWidth + 1) {
+        header.setAttribute('data-nav', 'drawer')
+      }
+    }
+    syncNav()
+    const observer = new ResizeObserver(syncNav)
+    observer.observe(row)
+    return () => {
+      observer.disconnect()
+    }
+  }, [navFitKey])
+
   const footerTypeLinks = types.slice(0, 4)
 
   return (
@@ -273,7 +300,7 @@ export function PublicSiteShell({
       {hasTopbarContent(site.headerConfig.topbar) ? (
         <HeaderTopbarRow topbar={site.headerConfig.topbar} />
       ) : null}
-      <header className="hd">
+      <header ref={headerRef} className="hd">
         <div className="wrap hd__in">
           <Brand siteName={site.siteName} tagline={site.tagline} logo={site.logo} />
           <nav className="hd__nav" aria-label="Primary">
