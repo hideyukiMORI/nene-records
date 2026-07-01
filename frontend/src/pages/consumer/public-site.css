@@ -1749,6 +1749,30 @@
   .nene-public .hd__menu {
     display: grid;
   }
+  /* Keep the action cluster (language + theme switch + menu) from forcing the
+     page wider than the viewport: let the header row and its parts shrink and
+     tighten the gaps. Without this `.hd__actions` keeps its full intrinsic
+     width (~345px) and `.hd__in` (space-between, no shrink) pushes the whole
+     document to ~599px at 375px, stranding content in the left half. (#693) */
+  .nene-public .hd__in {
+    gap: var(--space-sm);
+  }
+  .nene-public .hd__nav,
+  .nene-public .hd__actions {
+    min-width: 0;
+  }
+  .nene-public .hd__actions {
+    gap: var(--space-sm);
+  }
+  .nene-public .brand {
+    min-width: 0;
+  }
+  .nene-public .brand__name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
   /* Top bar takes too much room on phones — fold it away (spec §6). */
   .nene-public .hd-topbar {
     display: none;
@@ -1792,6 +1816,29 @@
   }
   .nene-public .brand__name {
     white-space: nowrap;
+  }
+  /* Compress the action cluster so language + theme switch + menu fit on the
+     narrowest phones; wrap to a second row as a last resort instead of ever
+     widening the page. Height is auto here so a wrapped row stays visible. (#693) */
+  .nene-public .hd__in {
+    height: auto;
+    min-height: 62px;
+    flex-wrap: wrap;
+    row-gap: var(--space-xs);
+    column-gap: var(--space-sm);
+  }
+  .nene-public .hd__actions {
+    gap: var(--space-xs);
+  }
+  .nene-public .themesw {
+    padding: 2px;
+  }
+  .nene-public .themesw__btn {
+    width: 28px;
+    height: 26px;
+  }
+  .nene-public .langsw {
+    padding: 5px 7px;
   }
 }
 /* ── Motion capability: scroll-reveal (#371 S1) ──────────────────────────────
