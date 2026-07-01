@@ -339,6 +339,7 @@ export const ja: Partial<MessageCatalog> = {
   'public.nav.allRecords': 'すべての記事',
   'public.nav.backToLatest': '最新の記事へ戻る',
   'public.nav.language': '言語',
+  'public.nav.theme': 'テーマ',
   'public.browse.subRange': '{{total}} 件 · {{start}}–{{end}} を表示',
   'public.browse.recordCount.one': '{{count}} 件',
   'public.browse.recordCount.other': '{{count}} 件',

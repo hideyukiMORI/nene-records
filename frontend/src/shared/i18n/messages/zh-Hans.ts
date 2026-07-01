@@ -330,6 +330,7 @@ export const zhHans: Partial<MessageCatalog> = {
   'public.nav.allRecords': '所有记录',
   'public.nav.backToLatest': '返回最新',
   'public.nav.language': '语言',
+  'public.nav.theme': '主题',
   'public.browse.subRange': '共 {{total}} 条记录 · 显示 {{start}}–{{end}}',
   'public.browse.recordCount.one': '{{count}} 条记录',
   'public.browse.recordCount.other': '{{count}} 条记录',

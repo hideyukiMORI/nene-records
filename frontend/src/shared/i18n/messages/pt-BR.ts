@@ -346,6 +346,7 @@ export const ptBR: Partial<MessageCatalog> = {
   'public.nav.allRecords': 'Todos os registros',
   'public.nav.backToLatest': 'Voltar aos mais recentes',
   'public.nav.language': 'Idioma',
+  'public.nav.theme': 'Tema',
   'public.browse.subRange': '{{total}} registros · exibindo {{start}}–{{end}}',
   'public.browse.recordCount.one': '{{count}} registro',
   'public.browse.recordCount.other': '{{count}} registros',
