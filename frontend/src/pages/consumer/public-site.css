@@ -144,8 +144,11 @@
   display: flex;
   align-items: center;
   gap: var(--space-sm);
-  min-width: 0; /* let the name truncate before the row overflows */
-  flex: 0 1 auto;
+  min-width: 0;
+  /* Full bar: brand does NOT shrink, so a long/short nav never squeezes the site
+     name to an ellipsis — if the row can't fit, the fit-probe folds the nav into
+     the drawer instead. Brand may shrink only once compact (see COMPACT BAR). */
+  flex: 0 0 auto;
 }
 .nene-public .brand__mark {
   width: 34px;
@@ -198,7 +201,9 @@
   /* Default skeleton (= nav-right): primary nav hugs the action cluster on the
      right. `data-header` layouts re-place it (see Style flags → Header layout). */
   margin-left: auto;
-  min-width: 0;
+  /* Do NOT shrink: a too-wide nav must overflow the row (which the fit-probe
+     detects) rather than silently shrinking and overlapping the actions. */
+  flex: 0 0 auto;
 }
 .nene-public .hd__actions {
   display: flex;
@@ -1806,11 +1811,18 @@
   }
 }
 /* ════════════════════════════════════════════════════════════════════════
-   ≤ 900px — COMPACT BAR (ClaudeDesign header redesign). One structural
-   breakpoint: fold the inline nav into the drawer and strip language + theme
-   from the bar (the drawer owns them). What remains on the right is two fixed
-   40px controls [search][menu], so the bar is identical from 900→320px and
-   CANNOT wrap — that is the overflow guarantee (no flex-wrap / second row). (#693)
+   COMPACT BAR (#695) — nav + language + theme fold into the drawer; only
+   brand + [search] + menu remain (fixed-width, cannot wrap).
+
+   Triggered by EITHER condition, so a variable-length nav is handled no matter
+   how many / how long the items are:
+     1. WIDTH FLOOR — @media (max-width: 900px). Phones/tablets always get the
+        hamburger UX, with zero JS.
+     2. FIT PROBE   — .hd[data-nav='drawer'], set by JS (PublicSiteShell) the
+        instant the expanded row would overflow ABOVE 900px (e.g. 7 long labels
+        at 1100px). Stops the inline nav overflowing/clipping and stops the brand
+        name from being pushed to an ellipsis above 900px.
+   Both branches apply the identical compact styling. See NOTES §fit-probe. (#693)
    ════════════════════════════════════════════════════════════════════════ */
 @media (max-width: 900px) {
   .nene-public .hd__in {
@@ -1836,9 +1848,40 @@
   .nene-public .hd__menu {
     display: grid;
   }
+  /* compact: the brand may now shrink + ellipsise (it does not in the full bar) */
+  .nene-public .brand {
+    flex: 0 1 auto;
+  }
   .nene-public .brand__tag {
     display: none;
   }
+}
+/* Fit-probe branch (JS toggles data-nav) — identical compact styling at ANY width. */
+.nene-public .hd[data-nav='drawer'] .hd__in {
+  height: 60px;
+}
+.nene-public .hd[data-nav='drawer'] .hd__nav {
+  display: none;
+}
+.nene-public .hd[data-nav='drawer'] .langsw,
+.nene-public .hd[data-nav='drawer'] .themesw {
+  display: none;
+}
+.nene-public .hd[data-nav='drawer'] .hd__cta {
+  display: none;
+}
+.nene-public .hd[data-nav='drawer'] .hd__actions {
+  margin-left: auto;
+  gap: var(--space-sm);
+}
+.nene-public .hd[data-nav='drawer'] .hd__menu {
+  display: grid;
+}
+.nene-public .hd[data-nav='drawer'] .brand {
+  flex: 0 1 auto;
+}
+.nene-public .hd[data-nav='drawer'] .brand__tag {
+  display: none;
 }
 @media (max-width: 860px) {
   .nene-public .hero__grid {
