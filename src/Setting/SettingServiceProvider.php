@@ -12,6 +12,8 @@ use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RequestScopedHolder;
+use NeNeRecords\Entity\EntityRepositoryInterface;
+use NeNeRecords\EntityType\EntityTypeRepositoryInterface;
 use NeNeRecords\Media\MediaRepositoryInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -65,7 +67,19 @@ final readonly class SettingServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Media repository service is invalid.');
                     }
 
-                    return new ListPublicSettingsUseCase($settings, $media);
+                    $entities = $container->get(EntityRepositoryInterface::class);
+
+                    if (!$entities instanceof EntityRepositoryInterface) {
+                        throw new LogicException('Entity repository service is invalid.');
+                    }
+
+                    $entityTypes = $container->get(EntityTypeRepositoryInterface::class);
+
+                    if (!$entityTypes instanceof EntityTypeRepositoryInterface) {
+                        throw new LogicException('Entity type repository service is invalid.');
+                    }
+
+                    return new ListPublicSettingsUseCase($settings, $media, $entities, $entityTypes);
                 },
             )
             ->set(
@@ -82,7 +96,13 @@ final readonly class SettingServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Org ID holder service is invalid.');
                     }
 
-                    return new UpdateSettingUseCase($transactions, $orgId);
+                    $entities = $container->get(EntityRepositoryInterface::class);
+
+                    if (!$entities instanceof EntityRepositoryInterface) {
+                        throw new LogicException('Entity repository service is invalid.');
+                    }
+
+                    return new UpdateSettingUseCase($transactions, $orgId, $entities);
                 },
             )
             ->set(

@@ -9,6 +9,8 @@ use NeNeRecords\Setting\ListPublicSettingsUseCase;
 use NeNeRecords\Setting\SettingDef;
 use NeNeRecords\Tests\Media\InMemoryMediaRepository;
 use PHPUnit\Framework\TestCase;
+use NeNeRecords\Tests\Entity\InMemoryEntityRepository;
+use NeNeRecords\Tests\EntityType\InMemoryEntityTypeRepository;
 
 final class ListPublicSettingsMediaTest extends TestCase
 {
@@ -31,7 +33,7 @@ final class ListPublicSettingsMediaTest extends TestCase
             ),
         ]);
 
-        $output = (new ListPublicSettingsUseCase($settings, $media))->execute();
+        $output = (new ListPublicSettingsUseCase($settings, $media, new InMemoryEntityRepository(), new InMemoryEntityTypeRepository()))->execute();
 
         $this->assertSame('/media/2026/06/logo.png', $this->valueOf($output->items, 'logo_media_id'));
     }
@@ -44,7 +46,7 @@ final class ListPublicSettingsMediaTest extends TestCase
         // value points at a media id that does not exist
         $settings->applyValueDirect('logo_media_id', '999', null);
 
-        $output = (new ListPublicSettingsUseCase($settings, new InMemoryMediaRepository()))->execute();
+        $output = (new ListPublicSettingsUseCase($settings, new InMemoryMediaRepository(), new InMemoryEntityRepository(), new InMemoryEntityTypeRepository()))->execute();
 
         $this->assertSame('', $this->valueOf($output->items, 'logo_media_id'));
     }

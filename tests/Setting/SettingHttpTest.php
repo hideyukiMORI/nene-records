@@ -23,6 +23,8 @@ use Nyholm\Psr7\Factory\Psr17Factory;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use NeNeRecords\Tests\Entity\InMemoryEntityRepository;
+use NeNeRecords\Tests\EntityType\InMemoryEntityTypeRepository;
 
 final class SettingHttpTest extends TestCase
 {
@@ -59,7 +61,7 @@ final class SettingHttpTest extends TestCase
 
         $registrar = new SettingRouteRegistrar(
             new ListSettingsHandler(new ListSettingsUseCase($this->repository), $jsonResponse),
-            new ListPublicSettingsHandler(new ListPublicSettingsUseCase($this->repository, new InMemoryMediaRepository()), $jsonResponse, $this->factory),
+            new ListPublicSettingsHandler(new ListPublicSettingsUseCase($this->repository, new InMemoryMediaRepository(), new InMemoryEntityRepository(), new InMemoryEntityTypeRepository()), $jsonResponse, $this->factory),
             new UpdateSettingHandler(new InMemoryUpdateSettingUseCase($this->repository), $jsonResponse),
             new ListSettingRevisionsHandler(new ListSettingRevisionsUseCase($this->repository), $jsonResponse),
         );

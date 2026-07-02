@@ -126,7 +126,7 @@ final class PublicRecordHttpTest extends TestCase
         ]);
         $textFields = new InMemoryTextFieldRepository($textFieldRecords, $entities);
 
-        $publicSettings = new ListPublicSettingsUseCase(new InMemorySettingRepository($settingDefs), new InMemoryMediaRepository());
+        $publicSettings = new ListPublicSettingsUseCase(new InMemorySettingRepository($settingDefs), new InMemoryMediaRepository(), new InMemoryEntityRepository(), new InMemoryEntityTypeRepository());
 
         $useCase = new GetPublicRecordViewUseCase(
             $entityTypes,

@@ -68,7 +68,7 @@ final class PublicCacheHttpTest extends TestCase
         ], $entities);
 
         $settingRepo = new InMemorySettingRepository();
-        $publicSettings = new ListPublicSettingsUseCase($settingRepo, new InMemoryMediaRepository());
+        $publicSettings = new ListPublicSettingsUseCase($settingRepo, new InMemoryMediaRepository(), new InMemoryEntityRepository(), new InMemoryEntityTypeRepository());
 
         $navRepo = new InMemoryNavigationItemRepository();
         $navRepo->save(new NavigationItem(id: null, label: 'Home', url: '/', displayOrder: 0, createdAt: '2026-01-01T00:00:00Z', updatedAt: '2026-01-01T00:00:00Z'));

@@ -68,7 +68,7 @@ final class PreviewTokenHttpTest extends TestCase
             new TextField(entityId: 10, fieldKey: 'title', value: 'Draft Article', id: 1),
         ], $this->entities);
 
-        $publicSettings = new ListPublicSettingsUseCase(new InMemorySettingRepository(), new InMemoryMediaRepository());
+        $publicSettings = new ListPublicSettingsUseCase(new InMemorySettingRepository(), new InMemoryMediaRepository(), new InMemoryEntityRepository(), new InMemoryEntityTypeRepository());
 
         $jsonResponse = new JsonResponseFactory($this->factory, $this->factory);
         $problemDetails = new ProblemDetailsResponseFactory($this->factory, $this->factory);
