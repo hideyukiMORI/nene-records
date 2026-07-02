@@ -23,6 +23,7 @@ use NeNeRecords\Http\PublicPermalinkRendererInterface;
 use NeNeRecords\Http\RuntimeServiceProvider;
 use NeNeRecords\IntField\IntFieldRepositoryInterface;
 use NeNeRecords\Setting\ListPublicSettingsUseCaseInterface;
+use NeNeRecords\Setting\SettingRepositoryInterface;
 use NeNeRecords\TextField\TextFieldRepositoryInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -409,6 +410,33 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
                         $streamFactory,
                         \NeNeRecords\Http\BasePath::fromEnv(),
                     );
+                },
+            )
+            ->set(
+                RenderPublicHomeHandler::class,
+                static function (ContainerInterface $container): RenderPublicHomeHandler {
+                    $settings = $container->get(SettingRepositoryInterface::class);
+                    $entities = $container->get(EntityRepositoryInterface::class);
+                    $entityTypes = $container->get(EntityTypeRepositoryInterface::class);
+                    $renderer = $container->get(RenderPublicRecordViewHandler::class);
+
+                    if (!$settings instanceof SettingRepositoryInterface) {
+                        throw new LogicException('Setting repository service is invalid.');
+                    }
+
+                    if (!$entities instanceof EntityRepositoryInterface) {
+                        throw new LogicException('Entity repository service is invalid.');
+                    }
+
+                    if (!$entityTypes instanceof EntityTypeRepositoryInterface) {
+                        throw new LogicException('Entity type repository service is invalid.');
+                    }
+
+                    if (!$renderer instanceof RenderPublicRecordViewHandler) {
+                        throw new LogicException('RenderPublicRecordView handler service is invalid.');
+                    }
+
+                    return new RenderPublicHomeHandler($settings, $entities, $entityTypes, $renderer);
                 },
             )
             ->set(

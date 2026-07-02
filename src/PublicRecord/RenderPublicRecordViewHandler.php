@@ -17,7 +17,7 @@ use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-final readonly class RenderPublicRecordViewHandler
+final readonly class RenderPublicRecordViewHandler implements PublicRecordViewRendererInterface
 {
     public function __construct(
         private GetPublicRecordViewUseCaseInterface $useCase,
@@ -78,6 +78,7 @@ final readonly class RenderPublicRecordViewHandler
         ?string $entitySlug,
         ?int $entityId,
         ServerRequestInterface $request,
+        bool $asFrontPage = false,
     ): ResponseInterface {
         $langParam = $request->getQueryParams()['lang'] ?? null;
         $locale = PublicLocale::resolve(is_string($langParam) ? $langParam : null);
@@ -100,7 +101,11 @@ final readonly class RenderPublicRecordViewHandler
         $uri = $request->getUri();
         $baseUrl = $uri->getScheme() . '://' . $uri->getAuthority();
         $effectiveBase = $this->effectiveBase($request);
-        $permalinkUrl = $baseUrl . BasePath::prefix($effectiveBase, $output->canonicalPath);
+        // As the front page (#701) the record is served at the site root, so canonical /
+        // og:url point at `/` (not the record's own permalink) to avoid a duplicate-content
+        // twin; the original permalink 301s here instead.
+        $canonicalPath = $asFrontPage ? '/' : $output->canonicalPath;
+        $permalinkUrl = $baseUrl . BasePath::prefix($effectiveBase, $canonicalPath);
         $canonicalUrl = $locale !== null ? $permalinkUrl . '?lang=' . $locale : $permalinkUrl;
         $htmlLang = $locale ?? PublicLocale::DEFAULT_LANG;
         $alternateLinks = [['hreflang' => 'x-default', 'href' => $permalinkUrl]];
@@ -159,8 +164,12 @@ final readonly class RenderPublicRecordViewHandler
             'entityId' => $output->entityId,
             'displayFields' => $output->displayFields,
             'chapterNav' => $output->chapterNav,
-            'breadcrumbs' => $output->breadcrumbs,
+            // The front page is a site root, not a node in the path hierarchy: drop the
+            // breadcrumb trail + its BreadcrumbList JSON-LD (the template hides both when empty).
+            'breadcrumbs' => $asFrontPage ? [] : $output->breadcrumbs,
             'childPages' => $output->childPages,
+            // og:type is `website` for the home page, `article` for a normal record.
+            'ogType' => $asFrontPage ? 'website' : 'article',
             'siteOrigin' => $baseUrl,
             'siteName' => $siteName,
             'metaDescription' => $metaDescription,

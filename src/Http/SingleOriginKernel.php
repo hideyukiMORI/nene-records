@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NeNeRecords\Http;
 
+use NeNeRecords\PublicRecord\RenderPublicHomeHandler;
 use NeNeRecords\UrlRedirect\UrlRedirectResolver;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -30,6 +31,7 @@ final readonly class SingleOriginKernel implements RequestHandlerInterface
         private RequestHandlerInterface $application,
         private CustomPermalinkResolver $customPermalink,
         private UrlRedirectResolver $redirects,
+        private RenderPublicHomeHandler $frontPage,
         private SpaShellFallback $shell,
     ) {
     }
@@ -39,6 +41,9 @@ final readonly class SingleOriginKernel implements RequestHandlerInterface
         $response = $this->application->handle($request);
         $response = $this->customPermalink->apply($request, $response);
         $response = $this->redirects->apply($request, $response);
+        // Front-page SSR (#701) runs before the shell so a pinned record renders at `/`
+        // (SpaShellFallback then honours the resulting text/html instead of the shell).
+        $response = $this->frontPage->apply($request, $response);
 
         return $this->shell->apply($request, $response);
     }

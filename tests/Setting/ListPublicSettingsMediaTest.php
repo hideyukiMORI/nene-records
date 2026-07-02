@@ -7,10 +7,10 @@ namespace NeNeRecords\Tests\Setting;
 use NeNeRecords\Media\Media;
 use NeNeRecords\Setting\ListPublicSettingsUseCase;
 use NeNeRecords\Setting\SettingDef;
-use NeNeRecords\Tests\Media\InMemoryMediaRepository;
-use PHPUnit\Framework\TestCase;
 use NeNeRecords\Tests\Entity\InMemoryEntityRepository;
 use NeNeRecords\Tests\EntityType\InMemoryEntityTypeRepository;
+use NeNeRecords\Tests\Media\InMemoryMediaRepository;
+use PHPUnit\Framework\TestCase;
 
 final class ListPublicSettingsMediaTest extends TestCase
 {

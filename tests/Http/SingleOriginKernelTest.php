@@ -4,10 +4,20 @@ declare(strict_types=1);
 
 namespace NeNeRecords\Tests\Http;
 
+use DateTimeImmutable;
+use NeNeRecords\Entity\Entity;
+use NeNeRecords\Entity\EntityStatus;
+use NeNeRecords\EntityType\EntityType;
 use NeNeRecords\Http\CustomPermalinkResolver;
 use NeNeRecords\Http\PublicPermalinkRendererInterface;
 use NeNeRecords\Http\SingleOriginKernel;
 use NeNeRecords\Http\SpaShellFallback;
+use NeNeRecords\PublicRecord\PublicRecordViewRendererInterface;
+use NeNeRecords\PublicRecord\RenderPublicHomeHandler;
+use NeNeRecords\Setting\SettingDef;
+use NeNeRecords\Tests\Entity\InMemoryEntityRepository;
+use NeNeRecords\Tests\EntityType\InMemoryEntityTypeRepository;
+use NeNeRecords\Tests\Setting\InMemorySettingRepository;
 use NeNeRecords\Tests\UrlRedirect\InMemoryUrlRedirectRepository;
 use NeNeRecords\UrlRedirect\UrlRedirectResolver;
 use Nyholm\Psr7\Factory\Psr17Factory;
@@ -59,14 +69,56 @@ final class SingleOriginKernelTest extends TestCase
         };
     }
 
-    private function kernel(RequestHandlerInterface $app, ?CustomPermalinkResolver $customPermalink = null): SingleOriginKernel
-    {
+    private function kernel(
+        RequestHandlerInterface $app,
+        ?CustomPermalinkResolver $customPermalink = null,
+        ?RenderPublicHomeHandler $frontPage = null,
+    ): SingleOriginKernel {
         return new SingleOriginKernel(
             $app,
             $customPermalink ?? new CustomPermalinkResolver($this->nullPermalinkRenderer()),
             new UrlRedirectResolver($this->redirects, $this->factory),
+            $frontPage ?? $this->frontPage(false),
             new SpaShellFallback($this->shellPath, $this->factory, $this->factory),
         );
+    }
+
+    /**
+     * A front-page edge layer. With `$withRecord` it pins a published record and its fake
+     * renderer tags the response so tests can assert the home was SSR'd; without it the
+     * layer resolves nothing and passes through (the default for the other tests).
+     */
+    private function frontPage(bool $withRecord): RenderPublicHomeHandler
+    {
+        $settings = new InMemorySettingRepository([new SettingDef('front_page', 'text', '', true, 'Front page')]);
+        $entities = new InMemoryEntityRepository();
+        $entityTypes = new InMemoryEntityTypeRepository();
+
+        if ($withRecord) {
+            $settings->applyValueDirect('front_page', '5', null);
+            $entities = new InMemoryEntityRepository([
+                new Entity(id: 5, entityTypeId: 2, slug: 'about', status: EntityStatus::Published, publishedAt: new DateTimeImmutable('2026-06-01 00:00:00')),
+            ]);
+            $entityTypes = new InMemoryEntityTypeRepository([
+                new EntityType(name: 'Pages', slug: 'pages', id: 2, permalinkPattern: '/{type}/{slug}'),
+            ]);
+        }
+
+        $renderer = new class ($this->factory) implements PublicRecordViewRendererInterface {
+            public function __construct(private Psr17Factory $factory)
+            {
+            }
+
+            public function renderEntity(string $typeSlug, ?string $entitySlug, ?int $entityId, ServerRequestInterface $request, bool $asFrontPage = false): ResponseInterface
+            {
+                return $this->factory->createResponse(200)
+                    ->withHeader('Content-Type', 'text/html; charset=utf-8')
+                    ->withHeader('X-Front-Page', $asFrontPage ? '1' : '0')
+                    ->withBody($this->factory->createStream('<!doctype html><title>FRONT</title>'));
+            }
+        };
+
+        return new RenderPublicHomeHandler($settings, $entities, $entityTypes, $renderer);
     }
 
     /** A renderer that never matches — the default for tests not exercising permalinks. */
@@ -184,6 +236,33 @@ final class SingleOriginKernelTest extends TestCase
         $response = $this->kernel($this->appReturning(404))->handle($request);
 
         self::assertSame(200, $response->getStatusCode());
+        self::assertStringContainsString('id="root"', (string) $response->getBody());
+    }
+
+    public function testFrontPageRecordIsServedAtRoot(): void
+    {
+        // A pinned front page turns `/` into a server-rendered record (kept by the shell).
+        $request = $this->factory
+            ->createServerRequest('GET', 'https://site.test/')
+            ->withHeader('Accept', 'text/html');
+
+        $response = $this->kernel($this->appReturning(200), null, $this->frontPage(true))->handle($request);
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('1', $response->getHeaderLine('X-Front-Page'));
+        self::assertStringContainsString('FRONT', (string) $response->getBody());
+    }
+
+    public function testRootWithoutFrontPageFallsBackToShell(): void
+    {
+        // App answers 200 (framework-info-shaped) and nothing is pinned, so the SPA shell
+        // still renders the default home at `/`.
+        $request = $this->factory
+            ->createServerRequest('GET', 'https://site.test/')
+            ->withHeader('Accept', 'text/html');
+
+        $response = $this->kernel($this->appReturning(200))->handle($request);
+
         self::assertStringContainsString('id="root"', (string) $response->getBody());
     }
 }

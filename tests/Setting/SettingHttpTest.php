@@ -18,13 +18,13 @@ use NeNeRecords\Setting\SettingKeyNotFoundExceptionHandler;
 use NeNeRecords\Setting\SettingRouteRegistrar;
 use NeNeRecords\Setting\SettingValueInvalidExceptionHandler;
 use NeNeRecords\Setting\UpdateSettingHandler;
+use NeNeRecords\Tests\Entity\InMemoryEntityRepository;
+use NeNeRecords\Tests\EntityType\InMemoryEntityTypeRepository;
 use NeNeRecords\Tests\Media\InMemoryMediaRepository;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use NeNeRecords\Tests\Entity\InMemoryEntityRepository;
-use NeNeRecords\Tests\EntityType\InMemoryEntityTypeRepository;
 
 final class SettingHttpTest extends TestCase
 {
