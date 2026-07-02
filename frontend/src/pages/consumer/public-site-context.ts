@@ -37,6 +37,8 @@ export interface PublicSite {
   headerConfig: HeaderConfig
   /** Home masthead — a JSON blocks document (one hero block); '' / '[]' → auto stats-hero. */
   homeHero: string
+  /** Pinned front-page permalink path (`front_page` resolved server-side); '' → latest-feed home (#701). */
+  frontPagePath: string
 }
 
 export function usePublicSite(): PublicSite {

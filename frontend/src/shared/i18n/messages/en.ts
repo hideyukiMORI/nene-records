@@ -827,6 +827,22 @@ export const en = {
   'admin.homeHero.saved': 'Home hero saved.',
   'admin.homeHero.saveError': 'Could not save the home hero.',
   'admin.homeHero.loading': 'Loading…',
+  'admin.frontPage.description':
+    'Choose what the site home page shows: your latest content feed, or a specific published record pinned as a fixed home page.',
+  'admin.frontPage.loading': 'Loading…',
+  'admin.frontPage.modeLatest': 'Your latest posts',
+  'admin.frontPage.modePage': 'A fixed page',
+  'admin.frontPage.typeLabel': 'Content type',
+  'admin.frontPage.searchLabel': 'Search',
+  'admin.frontPage.searchPlaceholder': 'Search published records…',
+  'admin.frontPage.recordLabel': 'Home page',
+  'admin.frontPage.recordPlaceholder': 'Select a record…',
+  'admin.frontPage.recordsLoading': 'Loading records…',
+  'admin.frontPage.noRecords': 'No published records found.',
+  'admin.frontPage.save': 'Save home page',
+  'admin.frontPage.saving': 'Saving…',
+  'admin.frontPage.saved': 'Home page display saved.',
+  'admin.frontPage.saveError': 'Could not save the home page display.',
 
   // ── Tags ─────────────────────────────────────────────────────────────────
   'admin.tags.eyebrow': 'Manage',
@@ -974,6 +990,7 @@ export const en = {
   'admin.settings.eyebrow': 'Configuration',
   'admin.settings.appearance.title': 'Appearance · Theme',
   'admin.settings.site.title': 'Site',
+  'admin.settings.frontPage.title': 'Home page display',
   'admin.settings.permalink.title': 'Permalinks',
   'admin.settings.permalink.description':
     'Choose the URL structure for each content type. Changes take effect immediately; old URLs redirect automatically.',

@@ -17,6 +17,7 @@ const TEST_SITE: PublicSite = {
   themeFlagAttrs: {},
   headerConfig: DEFAULT_HEADER_CONFIG,
   homeHero: '',
+  frontPagePath: '',
 }
 
 /**
