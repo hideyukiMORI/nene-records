@@ -27,6 +27,7 @@ final readonly class GenerateSitemapUseCase implements GenerateSitemapUseCaseInt
     public function __construct(
         private EntityTypeRepositoryInterface $entityTypes,
         private EntityRepositoryInterface $entities,
+        private FrontPageSetting $frontPage,
     ) {
     }
 
@@ -56,6 +57,7 @@ final readonly class GenerateSitemapUseCase implements GenerateSitemapUseCaseInt
         $windowEnd = $windowStart + $limit;
         $seen = 0; // global index of the first record of the current type
         $urls = [];
+        $frontPageId = $this->frontPage->pinnedRecordId();
 
         foreach ($this->entityTypes->findAll(self::TYPE_PAGE, 0) as $type) {
             if ($type->id === null) {
@@ -89,15 +91,21 @@ final readonly class GenerateSitemapUseCase implements GenerateSitemapUseCaseInt
                     continue;
                 }
 
-                $urls[] = new SitemapUrl(
-                    PublicPermalinkResolver::canonicalPath(
+                // The front page lives at `/`, not its own permalink — emit it once as the
+                // root so the sitemap carries no duplicate URL for it (#701).
+                $path = $entity->id === $frontPageId
+                    ? '/'
+                    : PublicPermalinkResolver::canonicalPath(
                         $entity->permalink,
                         $type->permalinkPattern,
                         $type->slug,
                         $entity->slug,
                         $entity->id,
                         $entity->publishedAt,
-                    ),
+                    );
+
+                $urls[] = new SitemapUrl(
+                    $path,
                     ($entity->updatedAt ?? $entity->publishedAt)?->format(DateTimeInterface::ATOM),
                 );
             }

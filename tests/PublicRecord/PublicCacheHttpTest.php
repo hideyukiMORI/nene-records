@@ -107,6 +107,7 @@ final class PublicCacheHttpTest extends TestCase
             dirname(__DIR__, 2),
             $this->factory,
             new \NeNeRecords\PublicRecord\PublicHtmlSanitizer(),
+            new \NeNeRecords\PublicRecord\FrontPageSetting(new \NeNeRecords\Tests\Setting\InMemorySettingRepository()),
         );
         $publicRecordRegistrar = new PublicRecordRouteRegistrar(
             new GetPublicRecordViewHandler($useCase, $jsonResponse, $this->factory),
@@ -119,7 +120,7 @@ final class PublicCacheHttpTest extends TestCase
                 new \NeNeRecords\PublicRecord\RenderCustomPermalinkHandler($entities, $entityTypes, $renderHandler),
             ),
             new \NeNeRecords\PublicRecord\RenderSitemapHandler(
-                new \NeNeRecords\PublicRecord\GenerateSitemapUseCase($entityTypes, $entities),
+                new \NeNeRecords\PublicRecord\GenerateSitemapUseCase($entityTypes, $entities, new \NeNeRecords\PublicRecord\FrontPageSetting(new \NeNeRecords\Tests\Setting\InMemorySettingRepository())),
                 $this->factory,
                 $this->factory,
             ),

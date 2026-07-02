@@ -17,6 +17,7 @@ use NeNeRecords\Entity\Entity;
 use NeNeRecords\Entity\EntityStatus;
 use NeNeRecords\EntityType\EntityType;
 use NeNeRecords\FieldDef\FieldDef;
+use NeNeRecords\PublicRecord\FrontPageSetting;
 use NeNeRecords\PublicRecord\GenerateSitemapUseCase;
 use NeNeRecords\PublicRecord\GetPublicRecordHierarchyHandler;
 use NeNeRecords\PublicRecord\GetPublicRecordViewHandler;
@@ -164,7 +165,7 @@ final class PublicRecordHttpTest extends TestCase
             machineApiKey: null,
         );
 
-        $renderHandler = new RenderPublicRecordViewHandler($useCase, $publicSettings, $htmlResponse, $config, $projectRoot, $this->factory, new PublicHtmlSanitizer(), $basePath);
+        $renderHandler = new RenderPublicRecordViewHandler($useCase, $publicSettings, $htmlResponse, $config, $projectRoot, $this->factory, new PublicHtmlSanitizer(), new FrontPageSetting(new InMemorySettingRepository()), $basePath);
         $customPermalink = new RenderCustomPermalinkHandler($entities, $entityTypes, $renderHandler);
         $registrar = new PublicRecordRouteRegistrar(
             new GetPublicRecordViewHandler($useCase, $jsonResponse, $this->factory),
@@ -173,7 +174,7 @@ final class PublicRecordHttpTest extends TestCase
             $renderHandler,
             new RenderPublicPermalinkHandler($entityTypes, $renderHandler, $customPermalink),
             new RenderSitemapHandler(
-                new GenerateSitemapUseCase($entityTypes, $entities),
+                new GenerateSitemapUseCase($entityTypes, $entities, new FrontPageSetting(new InMemorySettingRepository())),
                 $this->factory,
                 $this->factory,
                 null,
