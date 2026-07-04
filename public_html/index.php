@@ -37,6 +37,23 @@ $serverRequestCreator = new ServerRequestCreator(
 
 $request = $serverRequestCreator->fromGlobals();
 
+// サブディレクトリ設置（APP_BASE_PATH）の prefix strip（#707）: ルーティングは
+// 常にルート相対で、managed 環境では Caddy `handle_path` が prefix を剥がすが、
+// 共有ホスティングにはその層が無い。ここで剥がしてからアプリに渡す（URL 生成側は
+// BasePath が APP_BASE_PATH を前置する — 入口 strip と対で成立する）。ルート設置
+// （APP_BASE_PATH 空）では完全 no-op。
+$appBasePath = NeNeRecords\Http\BasePath::fromEnv();
+
+if ($appBasePath !== '') {
+    $uri = $request->getUri();
+    $path = $uri->getPath();
+
+    if ($path === $appBasePath || str_starts_with($path, $appBasePath . '/')) {
+        $stripped = substr($path, strlen($appBasePath));
+        $request = $request->withUri($uri->withPath($stripped === '' ? '/' : $stripped));
+    }
+}
+
 // SingleOriginKernel wraps the NENE2 application pipeline with the single-origin
 // edge layers (per-org 301 redirect map, then SPA shell fallback). See the kernel.
 $kernel = $container->get(SingleOriginKernel::class);
