@@ -7,6 +7,7 @@ namespace NeNeRecords\Http;
 use LogicException;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
+use NeNeRecords\PublicRecord\RenderPublicHomeHandler;
 use NeNeRecords\Setting\ListPublicSettingsUseCaseInterface;
 use NeNeRecords\SystemConfig\SystemConfigRepositoryInterface;
 use NeNeRecords\UrlRedirect\UrlRedirectResolver;
@@ -84,6 +85,7 @@ final readonly class SingleOriginServiceProvider implements ServiceProviderInter
                     $application = $c->get(RequestHandlerInterface::class);
                     $customPermalink = $c->get(CustomPermalinkResolver::class);
                     $redirects = $c->get(UrlRedirectResolver::class);
+                    $frontPage = $c->get(RenderPublicHomeHandler::class);
                     $shell = $c->get(SpaShellFallback::class);
 
                     if (!$application instanceof RequestHandlerInterface) {
@@ -95,11 +97,14 @@ final readonly class SingleOriginServiceProvider implements ServiceProviderInter
                     if (!$redirects instanceof UrlRedirectResolver) {
                         throw new LogicException('URL redirect resolver service is invalid.');
                     }
+                    if (!$frontPage instanceof RenderPublicHomeHandler) {
+                        throw new LogicException('Front page renderer service is invalid.');
+                    }
                     if (!$shell instanceof SpaShellFallback) {
                         throw new LogicException('SPA shell fallback service is invalid.');
                     }
 
-                    return new SingleOriginKernel($application, $customPermalink, $redirects, $shell);
+                    return new SingleOriginKernel($application, $customPermalink, $redirects, $frontPage, $shell);
                 },
             );
     }

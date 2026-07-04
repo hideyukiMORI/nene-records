@@ -185,6 +185,7 @@ function PublicRecordDetailContent({
   entityTypePatternById,
   currentPattern,
   entityTypeDefaultLayout,
+  isFrontPage = false,
 }: {
   entityTypeSlug: string
   entityTypeName: string
@@ -194,8 +195,11 @@ function PublicRecordDetailContent({
   entityTypePatternById: Record<number, string | null | undefined>
   currentPattern: string | null | undefined
   entityTypeDefaultLayout: PublicLayoutKey
+  /** Rendered as the site home at `/` (#701): suppress the canonical→permalink redirect. */
+  isFrontPage?: boolean
 }) {
   const site = usePublicSite()
+  const { pathname } = useLocation()
   const { entity, fieldRows, isLoading, isError, errorTitle, refetch } =
     usePublicViewEntityRecordPage(entityTypeId, entityId)
   const commentSection = useCommentSection(entityId)
@@ -289,8 +293,17 @@ function PublicRecordDetailContent({
     entity?.publishedAt ?? null,
     entity?.permalink ?? null,
   )
-  if (!isLoading && !isError && entity !== null && redirect !== null) {
-    return <Navigate to={redirect} replace />
+  if (!isFrontPage && !isLoading && !isError && entity !== null) {
+    // The pinned front page's canonical home is `/`: SPA navigations to its own
+    // permalink (type lists, related records, widgets) re-home there, mirroring the
+    // server-side 302 so the record never renders at two URLs (#701).
+    const canonicalPath = redirect ?? pathname
+    if (site.frontPagePath !== '' && canonicalPath === site.frontPagePath) {
+      return <Navigate to="/" replace />
+    }
+    if (redirect !== null) {
+      return <Navigate to={redirect} replace />
+    }
   }
 
   // `bare` escapes all chrome so a record can ship a fully custom page.
@@ -552,6 +565,7 @@ function PublicRecordDetailById({
   entityTypePatternById,
   currentPattern,
   entityTypeDefaultLayout,
+  isFrontPage = false,
 }: {
   entityTypeSlug: string
   entityTypeName: string
@@ -561,6 +575,7 @@ function PublicRecordDetailById({
   entityTypePatternById: Record<number, string | null | undefined>
   currentPattern: string | null | undefined
   entityTypeDefaultLayout: PublicLayoutKey
+  isFrontPage?: boolean
 }) {
   return (
     <PublicRecordDetailContent
@@ -572,6 +587,7 @@ function PublicRecordDetailById({
       entityTypePatternById={entityTypePatternById}
       currentPattern={currentPattern}
       entityTypeDefaultLayout={entityTypeDefaultLayout}
+      isFrontPage={isFrontPage}
     />
   )
 }
@@ -584,7 +600,13 @@ function PublicRecordDetailById({
  * `{entityTypeSlug, entityId}` and render the detail — for both direct loads and
  * client-side navigation (breadcrumb / child links).
  */
-export function PublicRecordByPermalink({ path }: { path: string }) {
+export function PublicRecordByPermalink({
+  path,
+  isFrontPage = false,
+}: {
+  path: string
+  isFrontPage?: boolean
+}) {
   const site = usePublicSite()
   const { t } = useTranslation()
   const resolution = usePublicPermalinkResolution(path)
@@ -648,6 +670,7 @@ export function PublicRecordByPermalink({ path }: { path: string }) {
       entityTypePatternById={entityTypePatternById}
       currentPattern={type.permalinkPattern}
       entityTypeDefaultLayout={type.defaultLayout}
+      isFrontPage={isFrontPage}
     />
   )
 }

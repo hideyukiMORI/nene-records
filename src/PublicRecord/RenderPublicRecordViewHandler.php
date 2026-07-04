@@ -17,7 +17,7 @@ use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-final readonly class RenderPublicRecordViewHandler
+final readonly class RenderPublicRecordViewHandler implements PublicRecordViewRendererInterface
 {
     public function __construct(
         private GetPublicRecordViewUseCaseInterface $useCase,
@@ -27,6 +27,7 @@ final readonly class RenderPublicRecordViewHandler
         private string $projectRoot,
         private ResponseFactoryInterface $responseFactory,
         private PublicHtmlSanitizer $htmlSanitizer,
+        private FrontPageSetting $frontPage,
         /** Sub-directory install prefix (`APP_BASE_PATH`); '' = served at root. */
         private string $basePath = '',
     ) {
@@ -78,6 +79,7 @@ final readonly class RenderPublicRecordViewHandler
         ?string $entitySlug,
         ?int $entityId,
         ServerRequestInterface $request,
+        bool $asFrontPage = false,
     ): ResponseInterface {
         $langParam = $request->getQueryParams()['lang'] ?? null;
         $locale = PublicLocale::resolve(is_string($langParam) ? $langParam : null);
@@ -85,6 +87,30 @@ final readonly class RenderPublicRecordViewHandler
         $output = $this->useCase->execute(
             new GetPublicRecordViewInput($typeSlug, $entitySlug, $entityId, $locale),
         );
+
+        // If this record is the org's front page, its canonical home is `/`: send the
+        // permalink there so there is a single home URL (#701). Skipped when we ARE
+        // rendering the front page (the home edge layer calls with $asFrontPage = true).
+        // A 302 — not 301 — because the pin is a mutable setting: after unpinning, the
+        // permalink must become reachable again without fighting browser/CDN caches of a
+        // permanent redirect. The query string is carried over so `?lang=` intent survives.
+        if (!$asFrontPage) {
+            $front = $this->frontPage->resolvePublished();
+
+            if ($front !== null && $front[0]->id === $output->entityId) {
+                $uri = $request->getUri();
+                $home = $uri->getScheme() . '://' . $uri->getAuthority()
+                    . BasePath::prefix($this->effectiveBase($request), '/');
+                $query = $uri->getQuery();
+
+                if ($query !== '') {
+                    $home .= '?' . $query;
+                }
+
+                return $this->responseFactory->createResponse(302)->withHeader('Location', $home);
+            }
+        }
+
         $settings = $this->publicSettingsMap();
         $siteName = $settings['site_name'] ?? 'NeNe Records';
         $defaultMetaDescription = $settings['default_meta_description'] ?? '';
@@ -100,7 +126,11 @@ final readonly class RenderPublicRecordViewHandler
         $uri = $request->getUri();
         $baseUrl = $uri->getScheme() . '://' . $uri->getAuthority();
         $effectiveBase = $this->effectiveBase($request);
-        $permalinkUrl = $baseUrl . BasePath::prefix($effectiveBase, $output->canonicalPath);
+        // As the front page (#701) the record is served at the site root, so canonical /
+        // og:url point at `/` (not the record's own permalink) to avoid a duplicate-content
+        // twin; the original permalink 301s here instead.
+        $canonicalPath = $asFrontPage ? '/' : $output->canonicalPath;
+        $permalinkUrl = $baseUrl . BasePath::prefix($effectiveBase, $canonicalPath);
         $canonicalUrl = $locale !== null ? $permalinkUrl . '?lang=' . $locale : $permalinkUrl;
         $htmlLang = $locale ?? PublicLocale::DEFAULT_LANG;
         $alternateLinks = [['hreflang' => 'x-default', 'href' => $permalinkUrl]];
@@ -159,8 +189,12 @@ final readonly class RenderPublicRecordViewHandler
             'entityId' => $output->entityId,
             'displayFields' => $output->displayFields,
             'chapterNav' => $output->chapterNav,
-            'breadcrumbs' => $output->breadcrumbs,
+            // The front page is a site root, not a node in the path hierarchy: drop the
+            // breadcrumb trail + its BreadcrumbList JSON-LD (the template hides both when empty).
+            'breadcrumbs' => $asFrontPage ? [] : $output->breadcrumbs,
             'childPages' => $output->childPages,
+            // og:type is `website` for the home page, `article` for a normal record.
+            'ogType' => $asFrontPage ? 'website' : 'article',
             'siteOrigin' => $baseUrl,
             'siteName' => $siteName,
             'metaDescription' => $metaDescription,

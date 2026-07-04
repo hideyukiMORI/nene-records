@@ -4,6 +4,7 @@ import { getBasePath } from '@/shared/lib/base-path'
 // Eager: route frame + entry/error pages (needed immediately; the shells render
 // the Suspense fallback while a lazy content page chunk loads).
 import { PublicShell } from '@/pages/consumer/PublicShell'
+import { usePublicSite } from '@/pages/consumer/public-site-context'
 import { ForbiddenPage } from '@/pages/forbidden/ForbiddenPage'
 import { AppShell } from '@/pages/layout/AppShell'
 import { LandingPage } from '@/pages/landing/LandingPage'
@@ -48,11 +49,25 @@ const PublicTagArchivePage = named(() => import('@/pages/consumer/PublicTagArchi
 const PublicDateArchivePage = named(() => import('@/pages/consumer/PublicDateArchivePage'), 'PublicDateArchivePage') // prettier-ignore
 const PublicBrowsePage = named(() => import('@/pages/consumer/PublicBrowsePage'), 'PublicBrowsePage') // prettier-ignore
 const PublicRecordDetailPage = named(() => import('@/pages/consumer/PublicRecordDetailPage'), 'PublicRecordDetailPage') // prettier-ignore
+// Direct lazy (not `named`) so the component's props stay typed for the front-page call.
+const PublicRecordByPermalink = lazy(() =>
+  import('@/pages/consumer/PublicRecordDetailPage').then((m) => ({
+    default: m.PublicRecordByPermalink,
+  })),
+)
 
 // Public root: the tenant-less apex shows the SaaS landing; a tenant subdomain
 // shows its own index. The server flags the apex via <meta name="nene:apex">.
 function PublicHome() {
-  return isApex() ? <LandingPage /> : <PublicIndexPage />
+  const site = usePublicSite()
+  if (isApex()) {
+    return <LandingPage />
+  }
+  // A pinned front page (#701) renders that record at `/`; otherwise the latest feed.
+  if (site.frontPagePath !== '') {
+    return <PublicRecordByPermalink path={site.frontPagePath} isFrontPage />
+  }
+  return <PublicIndexPage />
 }
 
 function AdminShell() {

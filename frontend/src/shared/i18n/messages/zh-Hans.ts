@@ -796,6 +796,22 @@ export const zhHans: Partial<MessageCatalog> = {
   'admin.homeHero.saved': '已保存主页主视觉。',
   'admin.homeHero.saveError': '无法保存主页主视觉。',
   'admin.homeHero.loading': '加载中…',
+  'admin.frontPage.description':
+    '选择网站首页显示的内容：最新内容列表，或将指定的已发布记录固定为首页。',
+  'admin.frontPage.loading': '加载中…',
+  'admin.frontPage.modeLatest': '最新发布列表（默认）',
+  'admin.frontPage.modePage': '固定页面',
+  'admin.frontPage.typeLabel': '内容类型',
+  'admin.frontPage.searchLabel': '搜索',
+  'admin.frontPage.searchPlaceholder': '搜索已发布的记录…',
+  'admin.frontPage.recordLabel': '首页',
+  'admin.frontPage.recordPlaceholder': '选择一条记录…',
+  'admin.frontPage.recordsLoading': '正在加载记录…',
+  'admin.frontPage.noRecords': '未找到已发布的记录。',
+  'admin.frontPage.save': '保存首页',
+  'admin.frontPage.saving': '保存中…',
+  'admin.frontPage.saved': '已保存首页显示设置。',
+  'admin.frontPage.saveError': '无法保存首页显示设置。',
 
   // ── Tags ─────────────────────────────────────────────────────────────────
   'admin.tags.eyebrow': '管理',
@@ -941,6 +957,7 @@ export const zhHans: Partial<MessageCatalog> = {
   'admin.settings.eyebrow': '配置',
   'admin.settings.appearance.title': '外观 · 主题',
   'admin.settings.site.title': '站点',
+  'admin.settings.frontPage.title': '首页显示',
   'admin.settings.permalink.title': '固定链接',
   'admin.settings.permalink.description':
     '为每种内容类型选择 URL 结构。更改会立即生效；旧 URL 会自动重定向。',

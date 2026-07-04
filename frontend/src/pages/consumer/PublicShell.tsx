@@ -147,6 +147,7 @@ export function PublicShell() {
     runtimeThemeCss,
     headerConfig: parseHeaderConfig(settings.header_config),
     homeHero: settings.home_hero ?? '',
+    frontPagePath: settings.front_page ?? '',
   }
 
   useSiteDocumentMeta(site.siteName, site.metaDescription)

@@ -23,6 +23,7 @@ use NeNeRecords\Http\PublicPermalinkRendererInterface;
 use NeNeRecords\Http\RuntimeServiceProvider;
 use NeNeRecords\IntField\IntFieldRepositoryInterface;
 use NeNeRecords\Setting\ListPublicSettingsUseCaseInterface;
+use NeNeRecords\Setting\SettingRepositoryInterface;
 use NeNeRecords\TextField\TextFieldRepositoryInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -220,6 +221,28 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
                 },
             )
             ->set(
+                FrontPageSetting::class,
+                static function (ContainerInterface $container): FrontPageSetting {
+                    $settings = $container->get(SettingRepositoryInterface::class);
+                    $entities = $container->get(EntityRepositoryInterface::class);
+                    $entityTypes = $container->get(EntityTypeRepositoryInterface::class);
+
+                    if (!$settings instanceof SettingRepositoryInterface) {
+                        throw new LogicException('Setting repository service is invalid.');
+                    }
+
+                    if (!$entities instanceof EntityRepositoryInterface) {
+                        throw new LogicException('Entity repository service is invalid.');
+                    }
+
+                    if (!$entityTypes instanceof EntityTypeRepositoryInterface) {
+                        throw new LogicException('Entity type repository service is invalid.');
+                    }
+
+                    return new FrontPageSetting($settings, $entities, $entityTypes);
+                },
+            )
+            ->set(
                 RenderPublicRecordViewHandler::class,
                 static function (ContainerInterface $container): RenderPublicRecordViewHandler {
                     $useCase = $container->get(GetPublicRecordViewUseCaseInterface::class);
@@ -228,6 +251,7 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
                     $config = $container->get(AppConfig::class);
                     $projectRoot = $container->get(RuntimeServiceProvider::PROJECT_ROOT);
                     $responseFactory = $container->get(ResponseFactoryInterface::class);
+                    $frontPage = $container->get(FrontPageSetting::class);
 
                     if (!$useCase instanceof GetPublicRecordViewUseCaseInterface) {
                         throw new LogicException('GetPublicRecordView use case service is invalid.');
@@ -253,6 +277,10 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
                         throw new LogicException('Response factory service is invalid.');
                     }
 
+                    if (!$frontPage instanceof FrontPageSetting) {
+                        throw new LogicException('Front page setting service is invalid.');
+                    }
+
                     return new RenderPublicRecordViewHandler(
                         $useCase,
                         $publicSettings,
@@ -261,6 +289,7 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
                         $projectRoot,
                         $responseFactory,
                         new PublicHtmlSanitizer(),
+                        $frontPage,
                         \NeNeRecords\Http\BasePath::fromEnv(),
                     );
                 },
@@ -350,6 +379,7 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
                 static function (ContainerInterface $container): GenerateSitemapUseCaseInterface {
                     $entityTypes = $container->get(EntityTypeRepositoryInterface::class);
                     $entities = $container->get(EntityRepositoryInterface::class);
+                    $frontPage = $container->get(FrontPageSetting::class);
 
                     if (!$entityTypes instanceof EntityTypeRepositoryInterface) {
                         throw new LogicException('Entity type repository service is invalid.');
@@ -359,7 +389,11 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
                         throw new LogicException('Entity repository service is invalid.');
                     }
 
-                    return new GenerateSitemapUseCase($entityTypes, $entities);
+                    if (!$frontPage instanceof FrontPageSetting) {
+                        throw new LogicException('Front page setting service is invalid.');
+                    }
+
+                    return new GenerateSitemapUseCase($entityTypes, $entities, $frontPage);
                 },
             )
             ->set(
@@ -409,6 +443,23 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
                         $streamFactory,
                         \NeNeRecords\Http\BasePath::fromEnv(),
                     );
+                },
+            )
+            ->set(
+                RenderPublicHomeHandler::class,
+                static function (ContainerInterface $container): RenderPublicHomeHandler {
+                    $frontPage = $container->get(FrontPageSetting::class);
+                    $renderer = $container->get(RenderPublicRecordViewHandler::class);
+
+                    if (!$frontPage instanceof FrontPageSetting) {
+                        throw new LogicException('Front page setting service is invalid.');
+                    }
+
+                    if (!$renderer instanceof RenderPublicRecordViewHandler) {
+                        throw new LogicException('RenderPublicRecordView handler service is invalid.');
+                    }
+
+                    return new RenderPublicHomeHandler($frontPage, $renderer);
                 },
             )
             ->set(

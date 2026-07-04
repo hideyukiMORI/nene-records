@@ -8,14 +8,17 @@ use DateTimeImmutable;
 use NeNeRecords\Entity\Entity;
 use NeNeRecords\Entity\EntityStatus;
 use NeNeRecords\EntityType\EntityType;
+use NeNeRecords\PublicRecord\FrontPageSetting;
 use NeNeRecords\PublicRecord\GenerateSitemapUseCase;
+use NeNeRecords\Setting\SettingDef;
 use NeNeRecords\Tests\Entity\InMemoryEntityRepository;
 use NeNeRecords\Tests\EntityType\InMemoryEntityTypeRepository;
+use NeNeRecords\Tests\Setting\InMemorySettingRepository;
 use PHPUnit\Framework\TestCase;
 
 final class GenerateSitemapUseCaseTest extends TestCase
 {
-    private function useCase(): GenerateSitemapUseCase
+    private function useCase(?int $frontPageId = null): GenerateSitemapUseCase
     {
         $types = new InMemoryEntityTypeRepository([
             new EntityType(name: 'Posts', slug: 'posts', id: 1, permalinkPattern: '/{type}/{slug}'),
@@ -40,7 +43,21 @@ final class GenerateSitemapUseCaseTest extends TestCase
             ),
         ]);
 
-        return new GenerateSitemapUseCase($types, $entities);
+        return new GenerateSitemapUseCase($types, $entities, $this->frontPage($frontPageId, $entities, $types));
+    }
+
+    private function frontPage(
+        ?int $id,
+        InMemoryEntityRepository $entities,
+        InMemoryEntityTypeRepository $types,
+    ): FrontPageSetting {
+        $settings = new InMemorySettingRepository([new SettingDef('front_page', 'text', '', true, 'Front page')]);
+
+        if ($id !== null) {
+            $settings->applyValueDirect('front_page', (string) $id, null);
+        }
+
+        return new FrontPageSetting($settings, $entities, $types);
     }
 
     public function testCountsOnlyPublishedRecords(): void
@@ -53,6 +70,15 @@ final class GenerateSitemapUseCaseTest extends TestCase
         $paths = array_map(static fn ($u) => $u->path, $this->useCase()->page(0, 100));
 
         self::assertSame(['/posts/hello', '/pages/20'], $paths); // types in order; default uses id
+    }
+
+    public function testFrontPageRecordIsEmittedAsRootNotItsPermalink(): void
+    {
+        // The pinned front page (record 20) lives at `/`, so the sitemap must carry `/`
+        // in its place — never a second URL for the same content (#701).
+        $paths = array_map(static fn ($u) => $u->path, $this->useCase(20)->page(0, 100));
+
+        self::assertSame(['/posts/hello', '/'], $paths);
     }
 
     public function testPageSlicesTheWindowAcrossTypes(): void
@@ -78,7 +104,7 @@ final class GenerateSitemapUseCaseTest extends TestCase
         $entities = new InMemoryEntityRepository([
             new Entity(id: 1, entityTypeId: 1, status: EntityStatus::Draft),
         ]);
-        $useCase = new GenerateSitemapUseCase($types, $entities);
+        $useCase = new GenerateSitemapUseCase($types, $entities, $this->frontPage(null, $entities, $types));
 
         self::assertSame(0, $useCase->count());
         self::assertSame([], $useCase->page(0, 100));

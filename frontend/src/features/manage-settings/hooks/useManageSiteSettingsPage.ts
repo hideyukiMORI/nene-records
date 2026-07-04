@@ -2,6 +2,13 @@ import { useCallback, useMemo, useState } from 'react'
 import type { SettingItem, SettingRevision } from '@/entities/setting'
 import { useSettingList, useSettingRevisions, useUpdateSetting } from '@/entities/setting'
 
+/**
+ * Settings with a dedicated editor elsewhere are hidden from this generic
+ * key-value form so they aren't edited twice (once here as a raw field, once in
+ * their purpose-built UI). `front_page` has the "Home page display" section (#701).
+ */
+const DEDICATED_UI_KEYS = new Set(['front_page'])
+
 export interface ManageSiteSettingsPageState {
   items: SettingItem[]
   isLoading: boolean
@@ -31,7 +38,10 @@ export function useManageSiteSettingsPage(): ManageSiteSettingsPageState {
     [updateMutation],
   )
 
-  const items = useMemo(() => listQuery.data?.items ?? [], [listQuery.data?.items])
+  const items = useMemo(
+    () => (listQuery.data?.items ?? []).filter((item) => !DEDICATED_UI_KEYS.has(item.settingKey)),
+    [listQuery.data?.items],
+  )
 
   return {
     items,

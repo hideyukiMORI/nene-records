@@ -68,7 +68,7 @@ final class PublicCacheHttpTest extends TestCase
         ], $entities);
 
         $settingRepo = new InMemorySettingRepository();
-        $publicSettings = new ListPublicSettingsUseCase($settingRepo, new InMemoryMediaRepository());
+        $publicSettings = new ListPublicSettingsUseCase($settingRepo, new InMemoryMediaRepository(), new \NeNeRecords\PublicRecord\FrontPageSetting($settingRepo, new InMemoryEntityRepository(), new InMemoryEntityTypeRepository()));
 
         $navRepo = new InMemoryNavigationItemRepository();
         $navRepo->save(new NavigationItem(id: null, label: 'Home', url: '/', displayOrder: 0, createdAt: '2026-01-01T00:00:00Z', updatedAt: '2026-01-01T00:00:00Z'));
@@ -107,6 +107,7 @@ final class PublicCacheHttpTest extends TestCase
             dirname(__DIR__, 2),
             $this->factory,
             new \NeNeRecords\PublicRecord\PublicHtmlSanitizer(),
+            new \NeNeRecords\PublicRecord\FrontPageSetting(new \NeNeRecords\Tests\Setting\InMemorySettingRepository(), new InMemoryEntityRepository(), new InMemoryEntityTypeRepository()),
         );
         $publicRecordRegistrar = new PublicRecordRouteRegistrar(
             new GetPublicRecordViewHandler($useCase, $jsonResponse, $this->factory),
@@ -119,7 +120,7 @@ final class PublicCacheHttpTest extends TestCase
                 new \NeNeRecords\PublicRecord\RenderCustomPermalinkHandler($entities, $entityTypes, $renderHandler),
             ),
             new \NeNeRecords\PublicRecord\RenderSitemapHandler(
-                new \NeNeRecords\PublicRecord\GenerateSitemapUseCase($entityTypes, $entities),
+                new \NeNeRecords\PublicRecord\GenerateSitemapUseCase($entityTypes, $entities, new \NeNeRecords\PublicRecord\FrontPageSetting(new \NeNeRecords\Tests\Setting\InMemorySettingRepository(), new InMemoryEntityRepository(), new InMemoryEntityTypeRepository())),
                 $this->factory,
                 $this->factory,
             ),

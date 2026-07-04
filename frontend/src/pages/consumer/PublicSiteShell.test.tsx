@@ -24,6 +24,7 @@ function makeSite(over: Partial<PublicSite> = {}): PublicSite {
     themeFlagAttrs: {},
     headerConfig: DEFAULT_HEADER_CONFIG,
     homeHero: '',
+    frontPagePath: '',
     ...over,
   }
 }

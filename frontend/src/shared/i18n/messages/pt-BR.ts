@@ -829,6 +829,22 @@ export const ptBR: Partial<MessageCatalog> = {
   'admin.homeHero.saved': 'Hero da home salvo.',
   'admin.homeHero.saveError': 'Não foi possível salvar o hero da home.',
   'admin.homeHero.loading': 'Carregando…',
+  'admin.frontPage.description':
+    'Escolha o que a página inicial do site exibe: o feed dos seus conteúdos recentes ou um registro publicado específico fixado como página inicial.',
+  'admin.frontPage.loading': 'Carregando…',
+  'admin.frontPage.modeLatest': 'Suas publicações mais recentes',
+  'admin.frontPage.modePage': 'Uma página fixa',
+  'admin.frontPage.typeLabel': 'Tipo de conteúdo',
+  'admin.frontPage.searchLabel': 'Pesquisar',
+  'admin.frontPage.searchPlaceholder': 'Pesquisar registros publicados…',
+  'admin.frontPage.recordLabel': 'Página inicial',
+  'admin.frontPage.recordPlaceholder': 'Selecione um registro…',
+  'admin.frontPage.recordsLoading': 'Carregando registros…',
+  'admin.frontPage.noRecords': 'Nenhum registro publicado encontrado.',
+  'admin.frontPage.save': 'Salvar página inicial',
+  'admin.frontPage.saving': 'Salvando…',
+  'admin.frontPage.saved': 'Exibição da página inicial salva.',
+  'admin.frontPage.saveError': 'Não foi possível salvar a exibição da página inicial.',
 
   // ── Tags ─────────────────────────────────────────────────────────────────
   'admin.tags.eyebrow': 'Gerenciar',
@@ -980,6 +996,7 @@ export const ptBR: Partial<MessageCatalog> = {
   'admin.settings.eyebrow': 'Configuração',
   'admin.settings.appearance.title': 'Aparência · Tema',
   'admin.settings.site.title': 'Site',
+  'admin.settings.frontPage.title': 'Exibição da página inicial',
   'admin.settings.permalink.title': 'Permalinks',
   'admin.settings.permalink.description':
     'Escolha a estrutura de URL para cada tipo de conteúdo. As alterações têm efeito imediato; URLs antigas redirecionam automaticamente.',

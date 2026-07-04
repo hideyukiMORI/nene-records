@@ -824,6 +824,22 @@ export const ja: Partial<MessageCatalog> = {
   'admin.homeHero.saved': 'ホームヒーローを保存しました。',
   'admin.homeHero.saveError': 'ホームヒーローを保存できませんでした。',
   'admin.homeHero.loading': '読み込み中…',
+  'admin.frontPage.description':
+    'サイトのトップページに表示する内容を選びます。最新コンテンツの一覧か、指定した公開レコードを固定ページとして表示します。',
+  'admin.frontPage.loading': '読み込み中…',
+  'admin.frontPage.modeLatest': '最新の投稿一覧（標準）',
+  'admin.frontPage.modePage': '固定ページを表示',
+  'admin.frontPage.typeLabel': 'コンテンツタイプ',
+  'admin.frontPage.searchLabel': '検索',
+  'admin.frontPage.searchPlaceholder': '公開レコードを検索…',
+  'admin.frontPage.recordLabel': 'トップページ',
+  'admin.frontPage.recordPlaceholder': 'レコードを選択…',
+  'admin.frontPage.recordsLoading': 'レコードを読み込み中…',
+  'admin.frontPage.noRecords': '公開レコードが見つかりません。',
+  'admin.frontPage.save': 'トップページを保存',
+  'admin.frontPage.saving': '保存中…',
+  'admin.frontPage.saved': 'ホームページの表示を保存しました。',
+  'admin.frontPage.saveError': 'ホームページの表示を保存できませんでした。',
 
   // ── Tags ─────────────────────────────────────────────────────────────────
   'admin.tags.eyebrow': '管理',
@@ -975,6 +991,7 @@ export const ja: Partial<MessageCatalog> = {
   'admin.settings.eyebrow': '環境設定',
   'admin.settings.appearance.title': '外観 · テーマ',
   'admin.settings.site.title': 'サイト',
+  'admin.settings.frontPage.title': 'ホームページの表示',
   'admin.settings.permalink.title': 'パーマリンク',
   'admin.settings.permalink.description':
     'コンテンツタイプごとに公開 URL の構造を選択します。変更はすぐ反映され、旧 URL は自動リダイレクトされます。',

@@ -13,6 +13,7 @@ use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RequestScopedHolder;
 use NeNeRecords\Media\MediaRepositoryInterface;
+use NeNeRecords\PublicRecord\FrontPageSetting;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 
@@ -65,7 +66,13 @@ final readonly class SettingServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Media repository service is invalid.');
                     }
 
-                    return new ListPublicSettingsUseCase($settings, $media);
+                    $frontPage = $container->get(FrontPageSetting::class);
+
+                    if (!$frontPage instanceof FrontPageSetting) {
+                        throw new LogicException('Front page setting service is invalid.');
+                    }
+
+                    return new ListPublicSettingsUseCase($settings, $media, $frontPage);
                 },
             )
             ->set(
@@ -82,7 +89,13 @@ final readonly class SettingServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Org ID holder service is invalid.');
                     }
 
-                    return new UpdateSettingUseCase($transactions, $orgId);
+                    $frontPage = $container->get(FrontPageSetting::class);
+
+                    if (!$frontPage instanceof FrontPageSetting) {
+                        throw new LogicException('Front page setting service is invalid.');
+                    }
+
+                    return new UpdateSettingUseCase($transactions, $orgId, $frontPage);
                 },
             )
             ->set(

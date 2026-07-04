@@ -837,6 +837,22 @@ export const fr: Partial<MessageCatalog> = {
   'admin.homeHero.saved': "Bannière d'accueil enregistrée.",
   'admin.homeHero.saveError': "Impossible d'enregistrer la bannière d'accueil.",
   'admin.homeHero.loading': 'Chargement…',
+  'admin.frontPage.description':
+    'Choisissez ce qu’affiche la page d’accueil du site : le flux de vos contenus récents ou un enregistrement publié précis épinglé comme page d’accueil fixe.',
+  'admin.frontPage.loading': 'Chargement…',
+  'admin.frontPage.modeLatest': 'Vos derniers articles',
+  'admin.frontPage.modePage': 'Une page fixe',
+  'admin.frontPage.typeLabel': 'Type de contenu',
+  'admin.frontPage.searchLabel': 'Rechercher',
+  'admin.frontPage.searchPlaceholder': 'Rechercher des enregistrements publiés…',
+  'admin.frontPage.recordLabel': 'Page d’accueil',
+  'admin.frontPage.recordPlaceholder': 'Sélectionner un enregistrement…',
+  'admin.frontPage.recordsLoading': 'Chargement des enregistrements…',
+  'admin.frontPage.noRecords': 'Aucun enregistrement publié trouvé.',
+  'admin.frontPage.save': 'Enregistrer la page d’accueil',
+  'admin.frontPage.saving': 'Enregistrement…',
+  'admin.frontPage.saved': 'Affichage de la page d’accueil enregistré.',
+  'admin.frontPage.saveError': 'Impossible d’enregistrer l’affichage de la page d’accueil.',
 
   // ── Tags ─────────────────────────────────────────────────────────────────
   'admin.tags.eyebrow': 'Gérer',
@@ -989,6 +1005,7 @@ export const fr: Partial<MessageCatalog> = {
   'admin.settings.eyebrow': 'Configuration',
   'admin.settings.appearance.title': 'Apparence · Thème',
   'admin.settings.site.title': 'Site',
+  'admin.settings.frontPage.title': 'Affichage de la page d’accueil',
   'admin.settings.permalink.title': 'Permaliens',
   'admin.settings.permalink.description':
     'Choisissez la structure des URL pour chaque type de contenu. Les changements prennent effet immédiatement ; les anciennes URL redirigent automatiquement.',

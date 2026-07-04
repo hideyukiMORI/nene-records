@@ -51,7 +51,10 @@ final readonly class SpaShellFallback
         // The home `/` is the NENE2 framework-info JSON for API clients, but a
         // browser there wants the public site / SaaS landing — serve the SPA shell
         // for `/` + text/html even though the framework answered 200 (not 404).
-        $isHtmlHome = $isGet && $wantsHtml && $path === '/';
+        // EXCEPT when an upstream handler already produced an HTML page for `/` (the
+        // front-page SSR, #701): that response is the real page, so let it pass through.
+        $alreadyHtml = str_contains($response->getHeaderLine('Content-Type'), 'text/html');
+        $isHtmlHome = $isGet && $wantsHtml && $path === '/' && !$alreadyHtml;
 
         if ($response->getStatusCode() !== 404 && !$isHtmlHome) {
             return $response;

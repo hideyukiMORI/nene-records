@@ -7,6 +7,7 @@ namespace NeNeRecords\Tests\Setting;
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RuntimeApplicationFactory;
+use NeNeRecords\PublicRecord\FrontPageSetting;
 use NeNeRecords\Setting\ListPublicSettingsHandler;
 use NeNeRecords\Setting\ListPublicSettingsUseCase;
 use NeNeRecords\Setting\ListSettingRevisionsHandler;
@@ -18,6 +19,8 @@ use NeNeRecords\Setting\SettingKeyNotFoundExceptionHandler;
 use NeNeRecords\Setting\SettingRouteRegistrar;
 use NeNeRecords\Setting\SettingValueInvalidExceptionHandler;
 use NeNeRecords\Setting\UpdateSettingHandler;
+use NeNeRecords\Tests\Entity\InMemoryEntityRepository;
+use NeNeRecords\Tests\EntityType\InMemoryEntityTypeRepository;
 use NeNeRecords\Tests\Media\InMemoryMediaRepository;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use PHPUnit\Framework\TestCase;
@@ -59,7 +62,7 @@ final class SettingHttpTest extends TestCase
 
         $registrar = new SettingRouteRegistrar(
             new ListSettingsHandler(new ListSettingsUseCase($this->repository), $jsonResponse),
-            new ListPublicSettingsHandler(new ListPublicSettingsUseCase($this->repository, new InMemoryMediaRepository()), $jsonResponse, $this->factory),
+            new ListPublicSettingsHandler(new ListPublicSettingsUseCase($this->repository, new InMemoryMediaRepository(), new FrontPageSetting($this->repository, new InMemoryEntityRepository(), new InMemoryEntityTypeRepository())), $jsonResponse, $this->factory),
             new UpdateSettingHandler(new InMemoryUpdateSettingUseCase($this->repository), $jsonResponse),
             new ListSettingRevisionsHandler(new ListSettingRevisionsUseCase($this->repository), $jsonResponse),
         );
