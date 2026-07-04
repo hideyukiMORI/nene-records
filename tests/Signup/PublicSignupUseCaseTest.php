@@ -14,6 +14,7 @@ use NeNeRecords\Signup\PublicSignupUseCase;
 use NeNeRecords\Tests\Mail\RecordingMailer;
 use NeNeRecords\Tests\Organization\InMemoryOrganizationRepository;
 use NeNeRecords\Tests\Organization\RecordingDefaultContentTypeSeeder;
+use NeNeRecords\Tests\Organization\RecordingDefaultSettingDefsSeeder;
 use NeNeRecords\Tests\User\InMemoryUserRepository;
 use NeNeRecords\User\CreateUserUseCase;
 use PHPUnit\Framework\TestCase;
@@ -44,7 +45,7 @@ final class PublicSignupUseCaseTest extends TestCase
         $holder = new RequestScopedHolder();
 
         return new PublicSignupUseCase(
-            new CreateOrganizationUseCase($this->orgs, $this->seeder),
+            new CreateOrganizationUseCase($this->orgs, $this->seeder, new RecordingDefaultSettingDefsSeeder()),
             new CreateUserUseCase($this->users),
             new LoginUseCase($this->users, $tokenIssuer),
             $holder,
