@@ -10,6 +10,21 @@ use Nyholm\Psr7Server\ServerRequestCreator;
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
+// 共有ホスティングブリッジ（#707）: phpdotenv v5 は .env を $_ENV/$_SERVER にしか
+// 書かず putenv しないため、getenv() 直読みのプロバイダ設定（APP_BASE_PATH /
+// BASE_DOMAIN / ORG_SLUG / TENANT_RESOLUTION / MEDIA_STORAGE_DRIVER）が「.env しか
+// 無い」Tier A 設置で全て既定値に落ちる。ここで .env を一度読み、実環境変数が
+// 無いキーだけ putenv で写す（実環境変数が優先＝Docker 系デプロイは挙動不変）。
+if (is_file(dirname(__DIR__) . '/.env')) {
+    Dotenv\Dotenv::createImmutable(dirname(__DIR__))->safeLoad();
+
+    foreach ($_ENV as $key => $value) {
+        if (is_string($value) && getenv($key) === false) {
+            putenv($key . '=' . $value);
+        }
+    }
+}
+
 $container = (new RuntimeContainerFactory(dirname(__DIR__)))->create();
 $psr17Factory = $container->get(Psr17Factory::class);
 assert($psr17Factory instanceof Psr17Factory);
