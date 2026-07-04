@@ -86,14 +86,15 @@ if (!is_dir(ROOT . '/var')) {
 /**
  * データベースに設置済みインスタンスがあるか。「admin が居る＝設置完了」を正とする
  * （migrate 済みでも admin 未作成ならウィザードは続行可能であるべき）。到達不能・
- * 未スキーマ・.env 不在はすべて「未設置」に倒す（probe 契約どおり throw しない）。
+ * 未スキーマは「未設置」に倒す（probe 契約どおり throw しない）。
+ *
+ * ⚠️ .env 不在でも必ず probe する（#713）: Docker 本番は DB 接続情報をコンテナ
+ * 環境変数で渡し .env を持たない。ConfigLoader は .env が無ければ実環境変数を
+ * 読むので、そのまま接続を試みる。「.env 無し＝未設置」と早期 return すると
+ * 設置済み本番でガードが素通しになる（実際に起きた）。
  */
 function databaseProvisioned(): bool
 {
-    if (!is_file(ENV_FILE)) {
-        return false;
-    }
-
     try {
         $database = (new ConfigLoader(ROOT))->load()->database;
 
