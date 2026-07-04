@@ -4,10 +4,6 @@ declare(strict_types=1);
 
 namespace NeNeRecords\PublicRecord;
 
-use NeNeRecords\Entity\EntityRepositoryInterface;
-use NeNeRecords\Entity\EntityStatus;
-use NeNeRecords\EntityType\EntityTypeRepositoryInterface;
-use NeNeRecords\Setting\SettingRepositoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
@@ -29,9 +25,7 @@ use Throwable;
 final readonly class RenderPublicHomeHandler
 {
     public function __construct(
-        private SettingRepositoryInterface $settings,
-        private EntityRepositoryInterface $entities,
-        private EntityTypeRepositoryInterface $entityTypes,
+        private FrontPageSetting $frontPage,
         private PublicRecordViewRendererInterface $renderer,
     ) {
     }
@@ -47,60 +41,28 @@ final readonly class RenderPublicHomeHandler
             return $response;
         }
 
-        $front = $this->resolveFrontPage();
+        // Only the framework's 200 info payload (non-HTML) may be taken over: a throttled
+        // 429 or a temporary 5xx must keep its status instead of being masked by a fresh
+        // 200 SSR (`/` would otherwise bypass rate limiting), and an upstream HTML page
+        // is already the real answer.
+        if ($response->getStatusCode() !== 200
+            || str_contains($response->getHeaderLine('Content-Type'), 'text/html')) {
+            return $response;
+        }
+
+        $front = $this->frontPage->resolvePublished();
 
         if ($front === null) {
             return $response;
         }
 
-        [$typeSlug, $entityId] = $front;
+        [$entity, $type] = $front;
 
         try {
-            return $this->renderer->renderEntity($typeSlug, null, $entityId, $request, asFrontPage: true);
+            return $this->renderer->renderEntity($type->slug, null, (int) $entity->id, $request, asFrontPage: true);
         } catch (Throwable) {
             // Never white-screen the home page: fall back to the default home on any failure.
             return $response;
         }
-    }
-
-    /**
-     * The (type slug, entity id) of the pinned front page, or null to fall back to the
-     * default home — on unset / non-numeric / not-found / not-published values, and on any
-     * settings-read failure (no org is resolved on the tenant-less apex).
-     *
-     * @return array{0: string, 1: int}|null
-     */
-    private function resolveFrontPage(): ?array
-    {
-        try {
-            $stored = $this->settings->findValueByKey('front_page');
-        } catch (Throwable) {
-            return null;
-        }
-
-        if ($stored === null) {
-            return null;
-        }
-
-        $value = $stored->value ?? '';
-
-        if ($value === '' || !ctype_digit($value)) {
-            return null;
-        }
-
-        // findById is org-scoped and excludes soft-deleted records.
-        $entity = $this->entities->findById((int) $value);
-
-        if ($entity === null || $entity->id === null || $entity->status !== EntityStatus::Published) {
-            return null;
-        }
-
-        $type = $this->entityTypes->findById($entity->entityTypeId);
-
-        if ($type === null) {
-            return null;
-        }
-
-        return [$type->slug, $entity->id];
     }
 }

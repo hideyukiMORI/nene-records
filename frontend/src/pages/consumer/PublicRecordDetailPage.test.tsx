@@ -166,6 +166,28 @@ describe('PublicRecordDetailPage', () => {
     expect(screen.getByText('bold')).toBeInTheDocument()
   })
 
+  it('re-homes an SPA navigation to the pinned front-page permalink (#701)', async () => {
+    // The pinned record's canonical home is `/`: reaching its own permalink via an
+    // in-app <Link> must replace the URL with the root, mirroring the server-side 302.
+    seedEntityTypes([{ id: 1, name: 'Article', slug: 'article' }])
+    seedEntities([{ id: 1, entity_type_id: 1, is_deleted: false, deleted_at: null }])
+    seedFieldDefs([{ id: 1, entity_type_id: 1, field_key: 'title', data_type: 'text' }])
+    seedTextFields([{ id: 1, entity_id: 1, field_key: 'title', value: 'Pinned home' }])
+
+    renderWithProviders(
+      <MemoryRouter initialEntries={['/article/1']}>
+        <Routes>
+          <Route element={<PublicSiteTestProvider site={{ frontPagePath: '/article/1' }} />}>
+            <Route path="/" element={<div>home route rendered</div>} />
+            <Route path="/:entityTypeSlug/*" element={<PublicRecordDetailPage />} />
+          </Route>
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    expect(await screen.findByText('home route rendered')).toBeInTheDocument()
+  })
+
   it('shows not found for a path that is not a known type or a custom permalink', async () => {
     renderDetailPage('unknown', 1)
 

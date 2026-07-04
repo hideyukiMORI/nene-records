@@ -24,7 +24,8 @@ const TEST_SITE: PublicSite = {
  * Supplies the site Outlet context that PublicShell normally provides, so
  * consumer pages (which call usePublicSite via PublicLayout) can be rendered in
  * isolation. Use as the element of a parent <Route> wrapping the page route.
+ * Pass `site` to override individual fields (e.g. `frontPagePath`).
  */
-export function PublicSiteTestProvider() {
-  return <Outlet context={TEST_SITE} />
+export function PublicSiteTestProvider({ site }: { site?: Partial<PublicSite> }) {
+  return <Outlet context={{ ...TEST_SITE, ...site }} />
 }

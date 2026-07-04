@@ -12,6 +12,7 @@ use NeNeRecords\Http\CustomPermalinkResolver;
 use NeNeRecords\Http\PublicPermalinkRendererInterface;
 use NeNeRecords\Http\SingleOriginKernel;
 use NeNeRecords\Http\SpaShellFallback;
+use NeNeRecords\PublicRecord\FrontPageSetting;
 use NeNeRecords\PublicRecord\PublicRecordViewRendererInterface;
 use NeNeRecords\PublicRecord\RenderPublicHomeHandler;
 use NeNeRecords\Setting\SettingDef;
@@ -118,7 +119,7 @@ final class SingleOriginKernelTest extends TestCase
             }
         };
 
-        return new RenderPublicHomeHandler($settings, $entities, $entityTypes, $renderer);
+        return new RenderPublicHomeHandler(new FrontPageSetting($settings, $entities, $entityTypes), $renderer);
     }
 
     /** A renderer that never matches — the default for tests not exercising permalinks. */
@@ -251,6 +252,51 @@ final class SingleOriginKernelTest extends TestCase
         self::assertSame(200, $response->getStatusCode());
         self::assertSame('1', $response->getHeaderLine('X-Front-Page'));
         self::assertStringContainsString('FRONT', (string) $response->getBody());
+    }
+
+    public function testUpstreamThrottleAtRootIsNotMaskedByFrontPageSsr(): void
+    {
+        // A throttled `/` must stay 429 (Retry-After intact): the front-page layer only
+        // takes over the framework's 200 info payload, so rate limiting keeps its bite
+        // and `/` never becomes a throttle-free multi-query endpoint.
+        $request = $this->factory
+            ->createServerRequest('GET', 'https://site.test/')
+            ->withHeader('Accept', 'text/html');
+        $upstream = $this->factory->createResponse(429)->withHeader('Retry-After', '60');
+
+        $response = $this->frontPage(true)->apply($request, $upstream);
+
+        self::assertSame(429, $response->getStatusCode());
+        self::assertSame('60', $response->getHeaderLine('Retry-After'));
+        self::assertSame('', $response->getHeaderLine('X-Front-Page'));
+    }
+
+    public function testUpstreamErrorAtRootIsNotMaskedByFrontPageSsr(): void
+    {
+        // A temporary upstream 5xx keeps signalling failure instead of a fresh 200 SSR.
+        $request = $this->factory
+            ->createServerRequest('GET', 'https://site.test/')
+            ->withHeader('Accept', 'text/html');
+
+        $response = $this->frontPage(true)->apply($request, $this->factory->createResponse(500));
+
+        self::assertSame(500, $response->getStatusCode());
+        self::assertSame('', $response->getHeaderLine('X-Front-Page'));
+    }
+
+    public function testUpstreamHtmlAtRootPassesThroughFrontPageLayer(): void
+    {
+        // An upstream handler that already produced an HTML page for `/` is the real
+        // answer — the layer must not render a second page over it.
+        $request = $this->factory
+            ->createServerRequest('GET', 'https://site.test/')
+            ->withHeader('Accept', 'text/html');
+        $upstream = $this->factory->createResponse(200)
+            ->withHeader('Content-Type', 'text/html; charset=utf-8');
+
+        $response = $this->frontPage(true)->apply($request, $upstream);
+
+        self::assertSame($upstream, $response);
     }
 
     public function testRootWithoutFrontPageFallsBackToShell(): void

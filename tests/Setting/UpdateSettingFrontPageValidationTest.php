@@ -8,10 +8,12 @@ use Nene2\Database\DatabaseTransactionManagerInterface;
 use Nene2\Http\RequestScopedHolder;
 use NeNeRecords\Entity\Entity;
 use NeNeRecords\Entity\EntityStatus;
+use NeNeRecords\PublicRecord\FrontPageSetting;
 use NeNeRecords\Setting\SettingValueInvalidException;
 use NeNeRecords\Setting\UpdateSettingInput;
 use NeNeRecords\Setting\UpdateSettingUseCase;
 use NeNeRecords\Tests\Entity\InMemoryEntityRepository;
+use NeNeRecords\Tests\EntityType\InMemoryEntityTypeRepository;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
@@ -71,7 +73,11 @@ final class UpdateSettingFrontPageValidationTest extends TestCase
         $orgId = new RequestScopedHolder();
         $orgId->set(1);
 
-        return new UpdateSettingUseCase($transactions, $orgId, new InMemoryEntityRepository($entities));
+        return new UpdateSettingUseCase($transactions, $orgId, new FrontPageSetting(
+            new InMemorySettingRepository(),
+            new InMemoryEntityRepository($entities),
+            new InMemoryEntityTypeRepository(),
+        ));
     }
 
     private function page(int $id, EntityStatus $status): Entity

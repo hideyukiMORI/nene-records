@@ -199,6 +199,7 @@ function PublicRecordDetailContent({
   isFrontPage?: boolean
 }) {
   const site = usePublicSite()
+  const { pathname } = useLocation()
   const { entity, fieldRows, isLoading, isError, errorTitle, refetch } =
     usePublicViewEntityRecordPage(entityTypeId, entityId)
   const commentSection = useCommentSection(entityId)
@@ -292,8 +293,17 @@ function PublicRecordDetailContent({
     entity?.publishedAt ?? null,
     entity?.permalink ?? null,
   )
-  if (!isFrontPage && !isLoading && !isError && entity !== null && redirect !== null) {
-    return <Navigate to={redirect} replace />
+  if (!isFrontPage && !isLoading && !isError && entity !== null) {
+    // The pinned front page's canonical home is `/`: SPA navigations to its own
+    // permalink (type lists, related records, widgets) re-home there, mirroring the
+    // server-side 302 so the record never renders at two URLs (#701).
+    const canonicalPath = redirect ?? pathname
+    if (site.frontPagePath !== '' && canonicalPath === site.frontPagePath) {
+      return <Navigate to="/" replace />
+    }
+    if (redirect !== null) {
+      return <Navigate to={redirect} replace />
+    }
   }
 
   // `bare` escapes all chrome so a record can ship a fully custom page.

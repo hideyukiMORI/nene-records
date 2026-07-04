@@ -34,6 +34,7 @@ use NeNeRecords\PublicRecord\RenderRobotsHandler;
 use NeNeRecords\PublicRecord\RenderSitemapHandler;
 use NeNeRecords\PublicRecord\ResolvePublicPermalinkHandler;
 use NeNeRecords\Setting\ListPublicSettingsUseCase;
+use NeNeRecords\Setting\SettingDef;
 use NeNeRecords\Tests\BoolField\InMemoryBoolFieldRepository;
 use NeNeRecords\Tests\DateTimeField\InMemoryDateTimeFieldRepository;
 use NeNeRecords\Tests\Entity\InMemoryEntityRepository;
@@ -56,6 +57,7 @@ final class PublicRecordHttpTest extends TestCase
     private Psr17Factory $factory;
     private RequestHandlerInterface $application;
     private string $projectRoot;
+    private RenderPublicRecordViewHandler $renderHandler;
 
     protected function setUp(): void
     {
@@ -74,6 +76,7 @@ final class PublicRecordHttpTest extends TestCase
         string $basePath = '',
         ?string $entity10Permalink = null,
         bool $withCollision = false,
+        ?int $frontPageId = null,
     ): RequestHandlerInterface {
         $entityTypes = new InMemoryEntityTypeRepository([
             new EntityType(name: 'Article', slug: 'article', id: 1),
@@ -127,7 +130,14 @@ final class PublicRecordHttpTest extends TestCase
         ]);
         $textFields = new InMemoryTextFieldRepository($textFieldRecords, $entities);
 
-        $publicSettings = new ListPublicSettingsUseCase(new InMemorySettingRepository($settingDefs), new InMemoryMediaRepository(), new InMemoryEntityRepository(), new InMemoryEntityTypeRepository());
+        $frontPageSettings = new InMemorySettingRepository([new SettingDef('front_page', 'text', '', true, 'Front page')]);
+
+        if ($frontPageId !== null) {
+            $frontPageSettings->applyValueDirect('front_page', (string) $frontPageId, null);
+        }
+
+        $frontPage = new FrontPageSetting($frontPageSettings, $entities, $entityTypes);
+        $publicSettings = new ListPublicSettingsUseCase(new InMemorySettingRepository($settingDefs), new InMemoryMediaRepository(), $frontPage);
 
         $useCase = new GetPublicRecordViewUseCase(
             $entityTypes,
@@ -165,7 +175,8 @@ final class PublicRecordHttpTest extends TestCase
             machineApiKey: null,
         );
 
-        $renderHandler = new RenderPublicRecordViewHandler($useCase, $publicSettings, $htmlResponse, $config, $projectRoot, $this->factory, new PublicHtmlSanitizer(), new FrontPageSetting(new InMemorySettingRepository()), $basePath);
+        $renderHandler = new RenderPublicRecordViewHandler($useCase, $publicSettings, $htmlResponse, $config, $projectRoot, $this->factory, new PublicHtmlSanitizer(), $frontPage, $basePath);
+        $this->renderHandler = $renderHandler;
         $customPermalink = new RenderCustomPermalinkHandler($entities, $entityTypes, $renderHandler);
         $registrar = new PublicRecordRouteRegistrar(
             new GetPublicRecordViewHandler($useCase, $jsonResponse, $this->factory),
@@ -174,7 +185,7 @@ final class PublicRecordHttpTest extends TestCase
             $renderHandler,
             new RenderPublicPermalinkHandler($entityTypes, $renderHandler, $customPermalink),
             new RenderSitemapHandler(
-                new GenerateSitemapUseCase($entityTypes, $entities, new FrontPageSetting(new InMemorySettingRepository())),
+                new GenerateSitemapUseCase($entityTypes, $entities, $frontPage),
                 $this->factory,
                 $this->factory,
                 null,
@@ -311,6 +322,57 @@ final class PublicRecordHttpTest extends TestCase
 
         self::assertSame(301, $response->getStatusCode());
         self::assertSame('https://example.test/article/10', $response->getHeaderLine('Location'));
+    }
+
+    public function testFrontPagePermalinkRedirectsHomeWith302PreservingQuery(): void
+    {
+        // Record 10 is pinned as the front page: its permalink sends visitors to the
+        // site root with a TEMPORARY 302 — the pin is a mutable setting, so browsers/CDNs
+        // must not cache a permanent redirect — and the query survives so `?lang=` keeps
+        // working after the hop (#701).
+        $app = $this->buildApplication(true, $this->projectRoot, frontPageId: 10);
+
+        $response = $app->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/article/10?lang=fr'),
+        );
+
+        self::assertSame(302, $response->getStatusCode());
+        self::assertSame('https://example.test/?lang=fr', $response->getHeaderLine('Location'));
+    }
+
+    public function testFrontPagePermalinkRedirectsHomeWithoutQuery(): void
+    {
+        $app = $this->buildApplication(true, $this->projectRoot, frontPageId: 10);
+
+        $response = $app->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/article/10'),
+        );
+
+        self::assertSame(302, $response->getStatusCode());
+        self::assertSame('https://example.test/', $response->getHeaderLine('Location'));
+    }
+
+    public function testFrontPageSsrTypesJsonLdAsWebPageWithoutDates(): void
+    {
+        // Rendered AS the front page, the record is the site home, not a dated article:
+        // JSON-LD is a WebPage without publication dates, matching og:type=website (#701).
+        // (A normal record keeps the dated BlogPosting — see the SEO head-tags test.)
+        $this->buildApplication(true, $this->projectRoot, frontPageId: 10);
+
+        $response = $this->renderHandler->renderEntity(
+            'article',
+            null,
+            10,
+            $this->factory->createServerRequest('GET', 'https://example.test/'),
+            asFrontPage: true,
+        );
+        $html = (string) $response->getBody();
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertStringContainsString('property="og:type" content="website"', $html);
+        self::assertStringContainsString('"@type":"WebPage"', $html);
+        self::assertStringNotContainsString('"datePublished"', $html);
+        self::assertStringNotContainsString('"dateModified"', $html);
     }
 
     public function testRealPermalinkServesCrawlableHtmlByIdPattern(): void

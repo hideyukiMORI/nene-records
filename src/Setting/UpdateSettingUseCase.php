@@ -8,8 +8,7 @@ use Nene2\Database\DatabaseQueryExecutorInterface;
 use Nene2\Database\DatabaseTransactionManagerInterface;
 use Nene2\Http\RequestScopedHolder;
 use NeNeRecords\BlocksField\BlocksDocumentValidator;
-use NeNeRecords\Entity\EntityRepositoryInterface;
-use NeNeRecords\Entity\EntityStatus;
+use NeNeRecords\PublicRecord\FrontPageSetting;
 
 final readonly class UpdateSettingUseCase implements UpdateSettingUseCaseInterface
 {
@@ -25,7 +24,7 @@ final readonly class UpdateSettingUseCase implements UpdateSettingUseCaseInterfa
     public function __construct(
         private DatabaseTransactionManagerInterface $transactions,
         private RequestScopedHolder $orgId,
-        private EntityRepositoryInterface $entities,
+        private FrontPageSetting $frontPage,
     ) {
     }
 
@@ -41,7 +40,7 @@ final readonly class UpdateSettingUseCase implements UpdateSettingUseCaseInterfa
         // The front page pins a record id; keep the invariant that it only ever points
         // at an existing, published, non-deleted record in this org (empty = unset).
         if ($input->settingKey === self::FRONT_PAGE_SETTING) {
-            $this->validateFrontPage($input->value);
+            $this->frontPage->assertPinnable($input->value);
         }
 
         $orgId = $this->orgId;
@@ -58,31 +57,5 @@ final readonly class UpdateSettingUseCase implements UpdateSettingUseCaseInterfa
             value: $stored->value ?? '',
             updatedAt: $stored->updatedAt,
         );
-    }
-
-    /**
-     * @throws SettingValueInvalidException when a non-empty value is not the id of an
-     *         existing, published, non-deleted record in the current org.
-     */
-    private function validateFrontPage(string $value): void
-    {
-        if ($value === '') {
-            return;
-        }
-
-        if (!ctype_digit($value)) {
-            throw new SettingValueInvalidException('Front page must be a record id.');
-        }
-
-        // findById is already org-scoped and excludes soft-deleted records.
-        $entity = $this->entities->findById((int) $value);
-
-        if ($entity === null) {
-            throw new SettingValueInvalidException('Front page record does not exist.');
-        }
-
-        if ($entity->status !== EntityStatus::Published) {
-            throw new SettingValueInvalidException('Front page record must be published.');
-        }
     }
 }

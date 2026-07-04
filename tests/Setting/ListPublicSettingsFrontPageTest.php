@@ -8,6 +8,7 @@ use DateTimeImmutable;
 use NeNeRecords\Entity\Entity;
 use NeNeRecords\Entity\EntityStatus;
 use NeNeRecords\EntityType\EntityType;
+use NeNeRecords\PublicRecord\FrontPageSetting;
 use NeNeRecords\Setting\ListPublicSettingsUseCase;
 use NeNeRecords\Setting\SettingDef;
 use NeNeRecords\Tests\Entity\InMemoryEntityRepository;
@@ -73,8 +74,7 @@ final class ListPublicSettingsFrontPageTest extends TestCase
         return (new ListPublicSettingsUseCase(
             $settings,
             new InMemoryMediaRepository(),
-            new InMemoryEntityRepository($entities),
-            $entityTypes,
+            new FrontPageSetting($settings, new InMemoryEntityRepository($entities), $entityTypes),
         ))->execute();
     }
 

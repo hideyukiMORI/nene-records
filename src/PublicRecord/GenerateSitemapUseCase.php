@@ -57,7 +57,8 @@ final readonly class GenerateSitemapUseCase implements GenerateSitemapUseCaseInt
         $windowEnd = $windowStart + $limit;
         $seen = 0; // global index of the first record of the current type
         $urls = [];
-        $frontPageId = $this->frontPage->pinnedRecordId();
+        $front = $this->frontPage->resolvePublished();
+        $frontPageId = $front === null ? null : $front[0]->id;
 
         foreach ($this->entityTypes->findAll(self::TYPE_PAGE, 0) as $type) {
             if ($type->id === null) {

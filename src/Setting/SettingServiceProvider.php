@@ -12,9 +12,8 @@ use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RequestScopedHolder;
-use NeNeRecords\Entity\EntityRepositoryInterface;
-use NeNeRecords\EntityType\EntityTypeRepositoryInterface;
 use NeNeRecords\Media\MediaRepositoryInterface;
+use NeNeRecords\PublicRecord\FrontPageSetting;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 
@@ -67,19 +66,13 @@ final readonly class SettingServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Media repository service is invalid.');
                     }
 
-                    $entities = $container->get(EntityRepositoryInterface::class);
+                    $frontPage = $container->get(FrontPageSetting::class);
 
-                    if (!$entities instanceof EntityRepositoryInterface) {
-                        throw new LogicException('Entity repository service is invalid.');
+                    if (!$frontPage instanceof FrontPageSetting) {
+                        throw new LogicException('Front page setting service is invalid.');
                     }
 
-                    $entityTypes = $container->get(EntityTypeRepositoryInterface::class);
-
-                    if (!$entityTypes instanceof EntityTypeRepositoryInterface) {
-                        throw new LogicException('Entity type repository service is invalid.');
-                    }
-
-                    return new ListPublicSettingsUseCase($settings, $media, $entities, $entityTypes);
+                    return new ListPublicSettingsUseCase($settings, $media, $frontPage);
                 },
             )
             ->set(
@@ -96,13 +89,13 @@ final readonly class SettingServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Org ID holder service is invalid.');
                     }
 
-                    $entities = $container->get(EntityRepositoryInterface::class);
+                    $frontPage = $container->get(FrontPageSetting::class);
 
-                    if (!$entities instanceof EntityRepositoryInterface) {
-                        throw new LogicException('Entity repository service is invalid.');
+                    if (!$frontPage instanceof FrontPageSetting) {
+                        throw new LogicException('Front page setting service is invalid.');
                     }
 
-                    return new UpdateSettingUseCase($transactions, $orgId, $entities);
+                    return new UpdateSettingUseCase($transactions, $orgId, $frontPage);
                 },
             )
             ->set(

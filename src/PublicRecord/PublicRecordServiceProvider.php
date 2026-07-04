@@ -224,12 +224,22 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
                 FrontPageSetting::class,
                 static function (ContainerInterface $container): FrontPageSetting {
                     $settings = $container->get(SettingRepositoryInterface::class);
+                    $entities = $container->get(EntityRepositoryInterface::class);
+                    $entityTypes = $container->get(EntityTypeRepositoryInterface::class);
 
                     if (!$settings instanceof SettingRepositoryInterface) {
                         throw new LogicException('Setting repository service is invalid.');
                     }
 
-                    return new FrontPageSetting($settings);
+                    if (!$entities instanceof EntityRepositoryInterface) {
+                        throw new LogicException('Entity repository service is invalid.');
+                    }
+
+                    if (!$entityTypes instanceof EntityTypeRepositoryInterface) {
+                        throw new LogicException('Entity type repository service is invalid.');
+                    }
+
+                    return new FrontPageSetting($settings, $entities, $entityTypes);
                 },
             )
             ->set(
@@ -438,28 +448,18 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
             ->set(
                 RenderPublicHomeHandler::class,
                 static function (ContainerInterface $container): RenderPublicHomeHandler {
-                    $settings = $container->get(SettingRepositoryInterface::class);
-                    $entities = $container->get(EntityRepositoryInterface::class);
-                    $entityTypes = $container->get(EntityTypeRepositoryInterface::class);
+                    $frontPage = $container->get(FrontPageSetting::class);
                     $renderer = $container->get(RenderPublicRecordViewHandler::class);
 
-                    if (!$settings instanceof SettingRepositoryInterface) {
-                        throw new LogicException('Setting repository service is invalid.');
-                    }
-
-                    if (!$entities instanceof EntityRepositoryInterface) {
-                        throw new LogicException('Entity repository service is invalid.');
-                    }
-
-                    if (!$entityTypes instanceof EntityTypeRepositoryInterface) {
-                        throw new LogicException('Entity type repository service is invalid.');
+                    if (!$frontPage instanceof FrontPageSetting) {
+                        throw new LogicException('Front page setting service is invalid.');
                     }
 
                     if (!$renderer instanceof RenderPublicRecordViewHandler) {
                         throw new LogicException('RenderPublicRecordView handler service is invalid.');
                     }
 
-                    return new RenderPublicHomeHandler($settings, $entities, $entityTypes, $renderer);
+                    return new RenderPublicHomeHandler($frontPage, $renderer);
                 },
             )
             ->set(

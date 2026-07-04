@@ -38,9 +38,11 @@
     <?php endif; ?>
 
     <?php
+      // As the front page (og:type=website) the record is the site home, not a dated
+      // article: type it WebPage and omit the publication dates (#701).
       $jsonLd = [
           '@context' => 'https://schema.org',
-          '@type' => 'BlogPosting',
+          '@type' => $ogType === 'website' ? 'WebPage' : 'BlogPosting',
           'headline' => $pageTitle,
           'url' => $canonicalUrl,
           'mainEntityOfPage' => $canonicalUrl,
@@ -49,10 +51,10 @@
 if ($metaDescription !== '') {
     $jsonLd['description'] = $metaDescription;
 }
-if ($publishedAtIso !== null) {
+if ($ogType !== 'website' && $publishedAtIso !== null) {
     $jsonLd['datePublished'] = $publishedAtIso;
 }
-if ($updatedAtIso !== null) {
+if ($ogType !== 'website' && $updatedAtIso !== null) {
     $jsonLd['dateModified'] = $updatedAtIso;
 }
 if ($ogImageUrl !== null) {

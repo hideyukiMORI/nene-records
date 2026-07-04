@@ -59,7 +59,7 @@ final class GetPublicRecordViewUseCaseTest extends TestCase
             new InMemoryBoolFieldRepository(),
             new InMemoryDateTimeFieldRepository(),
             new InMemoryEntityRelationRepository(),
-            new ListPublicSettingsUseCase(new InMemorySettingRepository(), new InMemoryMediaRepository(), new InMemoryEntityRepository(), new InMemoryEntityTypeRepository()),
+            new ListPublicSettingsUseCase(new InMemorySettingRepository(), new InMemoryMediaRepository(), new \NeNeRecords\PublicRecord\FrontPageSetting(new InMemorySettingRepository(), new InMemoryEntityRepository(), new InMemoryEntityTypeRepository())),
             new PublicRecordHierarchyBuilder(new InMemoryEntityRepository(), new InMemoryTextFieldRepository()),
         );
 
@@ -86,7 +86,7 @@ final class GetPublicRecordViewUseCaseTest extends TestCase
             new InMemoryBoolFieldRepository(),
             new InMemoryDateTimeFieldRepository(),
             new InMemoryEntityRelationRepository(),
-            new ListPublicSettingsUseCase(new InMemorySettingRepository(), new InMemoryMediaRepository(), new InMemoryEntityRepository(), new InMemoryEntityTypeRepository()),
+            new ListPublicSettingsUseCase(new InMemorySettingRepository(), new InMemoryMediaRepository(), new \NeNeRecords\PublicRecord\FrontPageSetting(new InMemorySettingRepository(), new InMemoryEntityRepository(), new InMemoryEntityTypeRepository())),
             new PublicRecordHierarchyBuilder(new InMemoryEntityRepository(), new InMemoryTextFieldRepository()),
         );
 
@@ -110,7 +110,7 @@ final class GetPublicRecordViewUseCaseTest extends TestCase
             new InMemoryBoolFieldRepository(),
             new InMemoryDateTimeFieldRepository(),
             new InMemoryEntityRelationRepository(),
-            new ListPublicSettingsUseCase(new InMemorySettingRepository(), new InMemoryMediaRepository(), new InMemoryEntityRepository(), new InMemoryEntityTypeRepository()),
+            new ListPublicSettingsUseCase(new InMemorySettingRepository(), new InMemoryMediaRepository(), new \NeNeRecords\PublicRecord\FrontPageSetting(new InMemorySettingRepository(), new InMemoryEntityRepository(), new InMemoryEntityTypeRepository())),
             new PublicRecordHierarchyBuilder(new InMemoryEntityRepository(), new InMemoryTextFieldRepository()),
         );
 
@@ -197,7 +197,7 @@ final class GetPublicRecordViewUseCaseTest extends TestCase
             new InMemoryBoolFieldRepository(),
             new InMemoryDateTimeFieldRepository(),
             new InMemoryEntityRelationRepository(),
-            new ListPublicSettingsUseCase(new InMemorySettingRepository(), new InMemoryMediaRepository(), new InMemoryEntityRepository(), new InMemoryEntityTypeRepository()),
+            new ListPublicSettingsUseCase(new InMemorySettingRepository(), new InMemoryMediaRepository(), new \NeNeRecords\PublicRecord\FrontPageSetting(new InMemorySettingRepository(), new InMemoryEntityRepository(), new InMemoryEntityTypeRepository())),
             new PublicRecordHierarchyBuilder(new InMemoryEntityRepository(), new InMemoryTextFieldRepository()),
         );
 
@@ -249,7 +249,7 @@ final class GetPublicRecordViewUseCaseTest extends TestCase
             new InMemoryBoolFieldRepository(),
             new InMemoryDateTimeFieldRepository(),
             new InMemoryEntityRelationRepository(),
-            new ListPublicSettingsUseCase(new InMemorySettingRepository(), new InMemoryMediaRepository(), new InMemoryEntityRepository(), new InMemoryEntityTypeRepository()),
+            new ListPublicSettingsUseCase(new InMemorySettingRepository(), new InMemoryMediaRepository(), new \NeNeRecords\PublicRecord\FrontPageSetting(new InMemorySettingRepository(), new InMemoryEntityRepository(), new InMemoryEntityTypeRepository())),
             new PublicRecordHierarchyBuilder(new InMemoryEntityRepository(), new InMemoryTextFieldRepository()),
         );
 

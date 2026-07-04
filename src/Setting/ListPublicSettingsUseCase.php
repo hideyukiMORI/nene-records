@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace NeNeRecords\Setting;
 
-use NeNeRecords\Entity\EntityRepositoryInterface;
-use NeNeRecords\Entity\EntityStatus;
-use NeNeRecords\EntityType\EntityTypeRepositoryInterface;
 use NeNeRecords\Media\MediaRepositoryInterface;
+use NeNeRecords\PublicRecord\FrontPageSetting;
 use NeNeRecords\PublicRecord\PublicPermalinkResolver;
 
 final readonly class ListPublicSettingsUseCase implements ListPublicSettingsUseCaseInterface
@@ -18,8 +16,7 @@ final readonly class ListPublicSettingsUseCase implements ListPublicSettingsUseC
     public function __construct(
         private SettingRepositoryInterface $settings,
         private MediaRepositoryInterface $media,
-        private EntityRepositoryInterface $entities,
-        private EntityTypeRepositoryInterface $entityTypes,
+        private FrontPageSetting $frontPage,
     ) {
     }
 
@@ -46,7 +43,7 @@ final readonly class ListPublicSettingsUseCase implements ListPublicSettingsUseC
         if ($entry->def->settingKey === self::FRONT_PAGE_SETTING) {
             return new SettingEntry(
                 $entry->def,
-                $this->resolveFrontPagePath($entry->effectiveValue),
+                $this->resolveFrontPagePath(),
                 $entry->storedValue,
             );
         }
@@ -74,34 +71,25 @@ final readonly class ListPublicSettingsUseCase implements ListPublicSettingsUseC
     /**
      * `front_page` stores a record id; the public site needs the record's canonical
      * path so it can render/link to it as the home page. Only a currently published,
-     * non-deleted record in this org resolves; anything else returns '' so the SPA
-     * falls back to the default magazine home.
+     * non-deleted record in this org resolves ({@see FrontPageSetting}); anything
+     * else returns '' so the SPA falls back to the default magazine home.
      */
-    private function resolveFrontPagePath(string $value): string
+    private function resolveFrontPagePath(): string
     {
-        if ($value === '' || !ctype_digit($value)) {
+        $front = $this->frontPage->resolvePublished();
+
+        if ($front === null) {
             return '';
         }
 
-        // findById is org-scoped and excludes soft-deleted records.
-        $entity = $this->entities->findById((int) $value);
-
-        if ($entity === null || $entity->id === null || $entity->status !== EntityStatus::Published) {
-            return '';
-        }
-
-        $type = $this->entityTypes->findById($entity->entityTypeId);
-
-        if ($type === null) {
-            return '';
-        }
+        [$entity, $type] = $front;
 
         return PublicPermalinkResolver::canonicalPath(
             $entity->permalink,
             $type->permalinkPattern,
             $type->slug,
             $entity->slug,
-            $entity->id,
+            (int) $entity->id,
             $entity->publishedAt,
         );
     }

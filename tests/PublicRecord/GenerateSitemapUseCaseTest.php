@@ -43,18 +43,21 @@ final class GenerateSitemapUseCaseTest extends TestCase
             ),
         ]);
 
-        return new GenerateSitemapUseCase($types, $entities, $this->frontPage($frontPageId));
+        return new GenerateSitemapUseCase($types, $entities, $this->frontPage($frontPageId, $entities, $types));
     }
 
-    private function frontPage(?int $id): FrontPageSetting
-    {
+    private function frontPage(
+        ?int $id,
+        InMemoryEntityRepository $entities,
+        InMemoryEntityTypeRepository $types,
+    ): FrontPageSetting {
         $settings = new InMemorySettingRepository([new SettingDef('front_page', 'text', '', true, 'Front page')]);
 
         if ($id !== null) {
             $settings->applyValueDirect('front_page', (string) $id, null);
         }
 
-        return new FrontPageSetting($settings);
+        return new FrontPageSetting($settings, $entities, $types);
     }
 
     public function testCountsOnlyPublishedRecords(): void
@@ -101,7 +104,7 @@ final class GenerateSitemapUseCaseTest extends TestCase
         $entities = new InMemoryEntityRepository([
             new Entity(id: 1, entityTypeId: 1, status: EntityStatus::Draft),
         ]);
-        $useCase = new GenerateSitemapUseCase($types, $entities, $this->frontPage(null));
+        $useCase = new GenerateSitemapUseCase($types, $entities, $this->frontPage(null, $entities, $types));
 
         self::assertSame(0, $useCase->count());
         self::assertSame([], $useCase->page(0, 100));

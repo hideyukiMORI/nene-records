@@ -7,6 +7,7 @@ namespace NeNeRecords\Tests\Setting;
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RuntimeApplicationFactory;
+use NeNeRecords\PublicRecord\FrontPageSetting;
 use NeNeRecords\Setting\ListPublicSettingsHandler;
 use NeNeRecords\Setting\ListPublicSettingsUseCase;
 use NeNeRecords\Setting\ListSettingRevisionsHandler;
@@ -61,7 +62,7 @@ final class SettingHttpTest extends TestCase
 
         $registrar = new SettingRouteRegistrar(
             new ListSettingsHandler(new ListSettingsUseCase($this->repository), $jsonResponse),
-            new ListPublicSettingsHandler(new ListPublicSettingsUseCase($this->repository, new InMemoryMediaRepository(), new InMemoryEntityRepository(), new InMemoryEntityTypeRepository()), $jsonResponse, $this->factory),
+            new ListPublicSettingsHandler(new ListPublicSettingsUseCase($this->repository, new InMemoryMediaRepository(), new FrontPageSetting($this->repository, new InMemoryEntityRepository(), new InMemoryEntityTypeRepository())), $jsonResponse, $this->factory),
             new UpdateSettingHandler(new InMemoryUpdateSettingUseCase($this->repository), $jsonResponse),
             new ListSettingRevisionsHandler(new ListSettingRevisionsUseCase($this->repository), $jsonResponse),
         );

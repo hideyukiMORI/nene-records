@@ -88,15 +88,27 @@ final readonly class RenderPublicRecordViewHandler implements PublicRecordViewRe
             new GetPublicRecordViewInput($typeSlug, $entitySlug, $entityId, $locale),
         );
 
-        // If this record is the org's front page, its canonical home is `/`: 301 the
+        // If this record is the org's front page, its canonical home is `/`: send the
         // permalink there so there is a single home URL (#701). Skipped when we ARE
         // rendering the front page (the home edge layer calls with $asFrontPage = true).
-        if (!$asFrontPage && $this->frontPage->pinnedRecordId() === $output->entityId) {
-            $uri = $request->getUri();
-            $home = $uri->getScheme() . '://' . $uri->getAuthority()
-                . BasePath::prefix($this->effectiveBase($request), '/');
+        // A 302 — not 301 — because the pin is a mutable setting: after unpinning, the
+        // permalink must become reachable again without fighting browser/CDN caches of a
+        // permanent redirect. The query string is carried over so `?lang=` intent survives.
+        if (!$asFrontPage) {
+            $front = $this->frontPage->resolvePublished();
 
-            return $this->responseFactory->createResponse(301)->withHeader('Location', $home);
+            if ($front !== null && $front[0]->id === $output->entityId) {
+                $uri = $request->getUri();
+                $home = $uri->getScheme() . '://' . $uri->getAuthority()
+                    . BasePath::prefix($this->effectiveBase($request), '/');
+                $query = $uri->getQuery();
+
+                if ($query !== '') {
+                    $home .= '?' . $query;
+                }
+
+                return $this->responseFactory->createResponse(302)->withHeader('Location', $home);
+            }
         }
 
         $settings = $this->publicSettingsMap();
