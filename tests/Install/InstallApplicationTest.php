@@ -10,6 +10,7 @@ use NeNeRecords\Install\InstallConfig;
 use NeNeRecords\Organization\CreateOrganizationUseCase;
 use NeNeRecords\Organization\DefaultContentTypeSeederInterface;
 use NeNeRecords\Tests\Organization\InMemoryOrganizationRepository;
+use NeNeRecords\Tests\Organization\RecordingDefaultSettingDefsSeeder;
 use NeNeRecords\Tests\User\InMemoryUserRepository;
 use NeNeRecords\User\CreateUserUseCase;
 use PHPUnit\Framework\TestCase;
@@ -31,7 +32,7 @@ final class InstallApplicationTest extends TestCase
         $holder = new RequestScopedHolder();
 
         return new InstallApplication(
-            new CreateOrganizationUseCase($orgs, $seeder),
+            new CreateOrganizationUseCase($orgs, $seeder, new RecordingDefaultSettingDefsSeeder()),
             $orgs,
             new CreateUserUseCase($users),
             $holder,

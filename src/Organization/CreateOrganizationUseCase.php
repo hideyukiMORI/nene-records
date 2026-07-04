@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace NeNeRecords\Organization;
 
+use NeNeRecords\Setting\DefaultSettingDefsSeederInterface;
+
 final readonly class CreateOrganizationUseCase implements CreateOrganizationUseCaseInterface
 {
     public function __construct(
         private OrganizationRepositoryInterface $organizations,
         private DefaultContentTypeSeederInterface $contentTypeSeeder,
+        private DefaultSettingDefsSeederInterface $settingDefsSeeder,
     ) {
     }
 
@@ -30,6 +33,9 @@ final readonly class CreateOrganizationUseCase implements CreateOrganizationUseC
         ));
 
         $this->contentTypeSeeder->seed($id);
+        // Setting defs are org-scoped too: without this, an org created after the def
+        // migrations ran has an almost empty settings surface (#711).
+        $this->settingDefsSeeder->seed($id);
 
         return new CreateOrganizationOutput(
             id: $id,

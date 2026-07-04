@@ -13,6 +13,8 @@ use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RequestScopedHolder;
 use NeNeRecords\ApplicationServiceProvider;
 use NeNeRecords\Entitlement\EntitlementResolverInterface;
+use NeNeRecords\Setting\DefaultSettingDefsSeederInterface;
+use NeNeRecords\Setting\PdoDefaultSettingDefsSeeder;
 use NeNeRecords\SystemConfig\SystemConfigRepositoryInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -32,6 +34,18 @@ final readonly class OrganizationServiceProvider implements ServiceProviderInter
                     }
 
                     return new PdoDefaultContentTypeSeeder($query);
+                },
+            )
+            ->set(
+                DefaultSettingDefsSeederInterface::class,
+                static function (ContainerInterface $c): DefaultSettingDefsSeederInterface {
+                    $query = $c->get(DatabaseQueryExecutorInterface::class);
+
+                    if (!$query instanceof DatabaseQueryExecutorInterface) {
+                        throw new LogicException('Database query executor service is invalid.');
+                    }
+
+                    return new PdoDefaultSettingDefsSeeder($query);
                 },
             )
             ->set(
@@ -76,6 +90,7 @@ final readonly class OrganizationServiceProvider implements ServiceProviderInter
                 static function (ContainerInterface $c): CreateOrganizationUseCaseInterface {
                     $repo   = $c->get(OrganizationRepositoryInterface::class);
                     $seeder = $c->get(DefaultContentTypeSeederInterface::class);
+                    $settingDefsSeeder = $c->get(DefaultSettingDefsSeederInterface::class);
 
                     if (!$repo instanceof OrganizationRepositoryInterface) {
                         throw new LogicException('Organization repository service is invalid.');
@@ -85,7 +100,11 @@ final readonly class OrganizationServiceProvider implements ServiceProviderInter
                         throw new LogicException('Default content type seeder service is invalid.');
                     }
 
-                    return new CreateOrganizationUseCase($repo, $seeder);
+                    if (!$settingDefsSeeder instanceof DefaultSettingDefsSeederInterface) {
+                        throw new LogicException('Default setting defs seeder service is invalid.');
+                    }
+
+                    return new CreateOrganizationUseCase($repo, $seeder, $settingDefsSeeder);
                 },
             )
             ->set(

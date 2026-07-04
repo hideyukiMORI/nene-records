@@ -19,7 +19,7 @@ final class UpdateOrganizationCustomDomainEntitlementTest extends TestCase
     public function testAllowsCustomDomainUnderUnlimitedEntitlements(): void
     {
         $organizations = new InMemoryOrganizationRepository();
-        $created = (new CreateOrganizationUseCase($organizations, new RecordingDefaultContentTypeSeeder()))->execute(
+        $created = (new CreateOrganizationUseCase($organizations, new RecordingDefaultContentTypeSeeder(), new RecordingDefaultSettingDefsSeeder()))->execute(
             new CreateOrganizationInput(name: 'Shop', slug: 'shop'),
         );
 
@@ -33,7 +33,7 @@ final class UpdateOrganizationCustomDomainEntitlementTest extends TestCase
     public function testDeniesCustomDomainWhenNotEntitled(): void
     {
         $organizations = new InMemoryOrganizationRepository();
-        $created = (new CreateOrganizationUseCase($organizations, new RecordingDefaultContentTypeSeeder()))->execute(
+        $created = (new CreateOrganizationUseCase($organizations, new RecordingDefaultContentTypeSeeder(), new RecordingDefaultSettingDefsSeeder()))->execute(
             new CreateOrganizationInput(name: 'Shop', slug: 'shop'),
         );
 
@@ -46,7 +46,7 @@ final class UpdateOrganizationCustomDomainEntitlementTest extends TestCase
     public function testNonCustomDomainUpdatesAreNotGated(): void
     {
         $organizations = new InMemoryOrganizationRepository();
-        $created = (new CreateOrganizationUseCase($organizations, new RecordingDefaultContentTypeSeeder()))->execute(
+        $created = (new CreateOrganizationUseCase($organizations, new RecordingDefaultContentTypeSeeder(), new RecordingDefaultSettingDefsSeeder()))->execute(
             new CreateOrganizationInput(name: 'Shop', slug: 'shop'),
         );
 
@@ -69,7 +69,7 @@ final class UpdateOrganizationCustomDomainEntitlementTest extends TestCase
     public function testClearingCustomDomainIsNotGated(): void
     {
         $organizations = new InMemoryOrganizationRepository();
-        $created = (new CreateOrganizationUseCase($organizations, new RecordingDefaultContentTypeSeeder()))->execute(
+        $created = (new CreateOrganizationUseCase($organizations, new RecordingDefaultContentTypeSeeder(), new RecordingDefaultSettingDefsSeeder()))->execute(
             new CreateOrganizationInput(name: 'Shop', slug: 'shop'),
         );
 
