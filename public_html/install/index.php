@@ -57,11 +57,18 @@ define('INSTALLED_MARKER', ROOT . '/var/.installed');
 if (!file_exists(ROOT . '/vendor/autoload.php')) {
     http_response_code(500);
     header('Content-Type: text/html; charset=utf-8');
-    echo '<!doctype html><html lang="ja"><meta charset="utf-8"><title>NeNe Records インストール</title>'
-        . '<body style="font-family:sans-serif;max-width:40rem;margin:4rem auto;padding:0 1rem">'
-        . '<h1>展開が不完全です</h1>'
+    echo '<!doctype html><html lang="ja"><head><meta charset="utf-8">'
+        . '<meta name="viewport" content="width=device-width, initial-scale=1">'
+        . '<meta name="robots" content="noindex">'
+        . '<title>NeNe Records インストール</title>'
+        . installerStyles()
+        . '</head><body><div class="wrap">'
+        . brandHeader()
+        . '<section class="installer-blocked"><h1>展開が不完全です</h1>'
         . '<p>vendor/ ディレクトリが見つかりません。配布 ZIP をすべて展開（アップロード）してから、もう一度このページを開いてください。</p>'
-        . '</body></html>';
+        . '</section>'
+        . '<footer class="pf-footer">Powered by NENE2 · © 2026 AYANE</footer>'
+        . '</div></body></html>';
 
     exit;
 }
@@ -258,31 +265,253 @@ $template = new class ($flow, $messages, $guard) implements InstallerTemplate {
 // 表示ヘルパー
 // -------------------------------------------------------------------
 
-function renderPage(string $body): never
+/**
+ * インストーラ共通スタイル（ClaudeDesign #716）。完了画面だけ $success=true で完了演出
+ * （cardGlow/pop）を付す。純粋関数で vendor に依存しないため、autoload 前の vendor 欠落
+ * 画面からも呼べる（PHP のトップレベル関数宣言は巻き上げられる）。
+ */
+function installerStyles(bool $success = false): string
+{
+    $css = <<<'CSS'
+:root{
+  --surface: oklch(22% 0.015 110);
+  --raised: oklch(26% 0.015 100);
+  --overlay: oklch(31% 0.015 100);
+  --side-bg: oklch(16% 0.012 95);
+  --text: oklch(95% 0.01 90);
+  --muted: oklch(60% 0.03 90);
+  --inverse: oklch(20% 0.015 110);
+  --border: oklch(33% 0.015 95);
+  --accent: oklch(82% 0.2 127);
+  --accent-hover: oklch(76% 0.2 127);
+  --accent-weak: color-mix(in oklch, var(--accent) 15%, var(--raised));
+  --danger: oklch(64% 0.24 0);
+  --danger-weak: color-mix(in oklch, var(--danger) 16%, var(--raised));
+  --ok: oklch(84% 0.2 127);
+  --warn: oklch(86% 0.16 90);
+  --shadow-lg: 0 18px 44px oklch(0% 0 0 / 0.55);
+  --r: 10px; --r-sm: 6px;
+  --disp:'Saira Semi Condensed','Oswald','Arial Narrow','Noto Sans JP',system-ui,sans-serif;
+  --chrome:'Space Grotesk','Noto Sans JP',ui-sans-serif,system-ui,sans-serif;
+  --font:'Inter','Noto Sans JP',ui-sans-serif,system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:var(--font);color:var(--text);margin:0;
+  font-size:.9rem;line-height:1.55;font-feature-settings:'cv02','cv03','cv04','ss01';
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+  background:
+    radial-gradient(120% 55% at 50% -8%, color-mix(in oklch, var(--accent) 7%, var(--surface)), transparent 60%),
+    radial-gradient(100% 60% at 100% 0%, color-mix(in oklch, var(--side-bg) 60%, transparent), transparent 55%),
+    var(--surface);
+  background-attachment:fixed;min-height:100vh;
+}
+.wrap{max-width:42rem;margin:0 auto;padding:2.75rem 1.25rem 2rem;min-height:100vh;display:flex;flex-direction:column}
+/* brand lockup */
+.brand{display:flex;align-items:center;gap:.7rem;margin:0 0 1.8rem}
+.brand .mark{width:30px;height:30px;color:var(--accent);flex:none}
+.brand-word{display:flex;align-items:center;gap:.6rem;font-family:var(--chrome);font-weight:700;letter-spacing:-.02em;font-size:1.12rem;color:var(--text)}
+.brand-pill{font-family:var(--chrome);font-size:.56rem;font-weight:700;text-transform:uppercase;letter-spacing:.13em;color:var(--inverse);background:var(--accent);padding:.24rem .5rem;border-radius:4px}
+/* stepper */
+.stepper{display:flex;gap:.55rem;margin:0 0 1.5rem;list-style:none;padding:0}
+.step{flex:1;min-width:0}
+.step .top{display:flex;align-items:center;gap:.42rem;margin-bottom:.5rem}
+.step .num{width:20px;height:20px;border-radius:999px;background:var(--overlay);color:var(--muted);font-family:var(--chrome);font-size:.64rem;font-weight:700;display:grid;place-items:center;flex:none;border:1px solid var(--border)}
+.step .lbl{font-family:var(--chrome);font-size:.72rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.step .bar{height:3px;border-radius:999px;background:var(--border)}
+.step.done .num{background:var(--accent);color:var(--inverse);border-color:transparent}
+.step.done .bar{background:var(--accent)}
+.step.current .num{background:var(--accent);color:var(--inverse);border-color:transparent;box-shadow:0 0 0 3px color-mix(in oklch,var(--accent) 30%,transparent)}
+.step.current .lbl{color:var(--text);font-weight:600}
+.step.current .bar{background:linear-gradient(90deg,var(--accent) 40%,var(--border))}
+/* card */
+.card{background:var(--raised);border:1px solid var(--border);border-radius:var(--r);padding:1.8rem 2rem;margin-bottom:1.1rem;box-shadow:var(--shadow-lg)}
+h1{font-family:var(--disp);font-size:1.5rem;font-weight:600;margin:0}
+h2{font-family:var(--disp);font-size:1.4rem;font-weight:600;letter-spacing:.005em;margin:0 0 .55rem;color:var(--text)}
+p{margin:.55rem 0}
+/* progress overline pill */
+.installer-progress{display:inline-block;font-family:var(--chrome);font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.13em;color:var(--accent);background:var(--accent-weak);padding:.26rem .6rem;border-radius:4px;margin:0 0 .95rem}
+/* table */
+table{border-collapse:separate;border-spacing:0;width:100%;margin-top:.3rem}
+td,th{padding:.6rem .1rem;border-bottom:1px solid var(--border);text-align:left;font-size:.85rem;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+td:last-child{text-align:right;width:1%;white-space:nowrap}
+/* status pills — console badge style */
+.ok,.ng,.warn{display:inline-flex;align-items:center;font-family:var(--chrome);font-size:.66rem;font-weight:700;padding:.16rem .55rem;border-radius:999px;letter-spacing:.02em;line-height:1.5}
+.ok{color:var(--ok);background:color-mix(in oklch,var(--ok) 16%,var(--raised))}
+.ng{color:var(--danger);background:color-mix(in oklch,var(--danger) 18%,var(--raised))}
+.warn{color:var(--warn);background:color-mix(in oklch,var(--warn) 18%,var(--raised))}
+/* fields */
+.installer-field{display:block;margin:1.05rem 0;font-family:var(--chrome);font-size:.76rem;font-weight:600;letter-spacing:.01em;color:var(--text)}
+.installer-field input,.installer-field select{display:block;width:100%;margin-top:.42rem;padding:.62rem .72rem;border:1px solid var(--border);border-radius:var(--r-sm);font-size:.95rem;font-family:var(--font);font-weight:400;letter-spacing:normal;background:var(--surface);color:var(--text);transition:border-color .15s,box-shadow .15s}
+.installer-field input::placeholder{color:var(--muted)}
+.installer-field input:focus,.installer-field select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in oklch,var(--accent) 24%,transparent)}
+.installer-field select{appearance:none;-webkit-appearance:none;color-scheme:dark;background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:calc(100% - 18px) 55%,calc(100% - 13px) 55%;background-size:5px 5px,5px 5px;background-repeat:no-repeat;padding-right:2rem}
+/* buttons */
+.btn{display:inline-flex;align-items:center;gap:.45rem;background:var(--accent);color:var(--inverse);border:none;border-radius:var(--r-sm);padding:.7rem 1.45rem;text-decoration:none;font-family:var(--chrome);font-size:.9rem;font-weight:700;cursor:pointer;box-shadow:0 1px 2px oklch(0 0 0 / .3);transition:background .15s,box-shadow .18s,transform .1s;margin-top:.5rem}
+.btn:hover{background:var(--accent-hover);box-shadow:0 8px 20px -8px var(--accent)}
+.btn:active{transform:translateY(1px)}
+/* muted */
+.muted{color:var(--muted);font-size:.8rem;font-weight:400}
+p.muted{margin-top:.75rem}
+span.muted{display:block;margin-top:.35rem}
+/* links */
+a{color:var(--accent)}
+.card p a:not(.btn){font-weight:600;text-decoration:none}
+.card p a:not(.btn):hover{text-decoration:underline}
+/* errors */
+.installer-errors{list-style:none;color:var(--danger);background:var(--danger-weak);border:1px solid color-mix(in oklch,var(--danger) 40%,var(--border));border-radius:var(--r-sm);padding:.9rem 1.05rem .9rem 2.75rem;margin:0 0 1.15rem;position:relative;font-size:.85rem;font-weight:500}
+.installer-errors::before{content:"!";position:absolute;left:.9rem;top:.85rem;width:19px;height:19px;border-radius:999px;background:var(--danger);color:var(--inverse);font-family:var(--chrome);font-weight:700;font-size:.72rem;display:grid;place-items:center}
+.installer-errors li{margin:.18rem 0;line-height:1.45}
+/* blocked */
+.installer-blocked{position:relative;overflow:hidden;background:var(--danger-weak);border:1px solid color-mix(in oklch,var(--danger) 40%,var(--border));border-radius:var(--r);padding:1.55rem 1.8rem 1.55rem 1.9rem;color:var(--text);font-size:.9rem;box-shadow:var(--shadow-lg)}
+.installer-blocked::before{content:"";position:absolute;inset:0 auto 0 0;width:4px;background:var(--danger)}
+.installer-blocked h1{margin:0 0 .5rem}
+/* details */
+details{margin:1.1rem 0;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--surface);padding:0 .95rem}
+summary{cursor:pointer;color:var(--text);font-family:var(--chrome);font-weight:600;font-size:.8rem;padding:.7rem 0;list-style:none}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"▸";display:inline-block;margin-right:.55rem;color:var(--accent);transition:transform .15s}
+details[open] summary::before{transform:rotate(90deg)}
+details[open]{padding-bottom:.85rem}
+details .installer-field:first-of-type{margin-top:.4rem}
+/* footer */
+.pf-footer{margin-top:auto;padding-top:1.6rem;font-family:var(--chrome);font-size:.7rem;letter-spacing:.02em;color:var(--muted);text-align:center}
+
+/* ── Motion (CSS-only, respects reduced-motion) ─────────────────────────── */
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes barGrow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes ringPulse{0%,100%{box-shadow:0 0 0 0 color-mix(in oklch,var(--accent) 45%,transparent)}70%{box-shadow:0 0 0 7px color-mix(in oklch,var(--accent) 0%,transparent)}}
+@keyframes ffwd{0%{opacity:0;transform:translateX(-5px)}60%{transform:translateX(1px)}100%{opacity:1;transform:none}}
+@keyframes shake{10%,90%{transform:translateX(-1px)}20%,80%{transform:translateX(2px)}30%,50%,70%{transform:translateX(-5px)}40%,60%{transform:translateX(5px)}}
+@keyframes pop{0%{opacity:0;transform:scale(.7)}60%{transform:scale(1.06)}100%{opacity:1;transform:scale(1)}}
+@keyframes cardGlow{0%{box-shadow:var(--shadow-lg)}45%{box-shadow:var(--shadow-lg),0 0 0 1px var(--accent),0 0 34px -6px var(--accent)}100%{box-shadow:var(--shadow-lg)}}
+
+.brand{animation:rise .5s var(--ease,cubic-bezier(.4,0,.2,1)) both}
+.brand .mark polyline{transform-box:fill-box;transform-origin:center;animation:ffwd .55s ease both}
+.brand .mark polyline:nth-child(2){animation-delay:.08s}
+
+.stepper .step{animation:rise .5s ease both}
+.stepper .step:nth-child(1){animation-delay:.06s}
+.stepper .step:nth-child(2){animation-delay:.12s}
+.stepper .step:nth-child(3){animation-delay:.18s}
+.stepper .step:nth-child(4){animation-delay:.24s}
+.stepper .step .bar{transform-origin:left center;animation:barGrow .55s cubic-bezier(.4,0,.2,1) both}
+.stepper .step:nth-child(1) .bar{animation-delay:.30s}
+.stepper .step:nth-child(2) .bar{animation-delay:.38s}
+.stepper .step:nth-child(3) .bar{animation-delay:.46s}
+.stepper .step:nth-child(4) .bar{animation-delay:.54s}
+.step.current .num{animation:ringPulse 2.6s ease-out .9s infinite}
+
+.card{animation:rise .55s ease both;animation-delay:.14s}
+.card:nth-of-type(2){animation-delay:.24s}
+.installer-blocked{animation:rise .55s ease both;animation-delay:.14s}
+
+.installer-progress{animation:fade .6s ease both;animation-delay:.28s}
+h2{animation:rise .5s ease both;animation-delay:.30s}
+
+.card table tr{animation:rise .42s ease both}
+.card table tr:nth-child(1){animation-delay:.30s}
+.card table tr:nth-child(2){animation-delay:.35s}
+.card table tr:nth-child(3){animation-delay:.40s}
+.card table tr:nth-child(4){animation-delay:.45s}
+.card table tr:nth-child(5){animation-delay:.50s}
+.card table tr:nth-child(6){animation-delay:.55s}
+.card table tr:nth-child(7){animation-delay:.60s}
+.card table tr:nth-child(8){animation-delay:.64s}
+.card table tr:nth-child(9){animation-delay:.68s}
+.card table tr:nth-child(n+10){animation-delay:.72s}
+
+.installer-field{animation:rise .45s ease both}
+form .installer-field:nth-of-type(1){animation-delay:.34s}
+form .installer-field:nth-of-type(2){animation-delay:.40s}
+form .installer-field:nth-of-type(3){animation-delay:.46s}
+form .installer-field:nth-of-type(4){animation-delay:.52s}
+form .installer-field:nth-of-type(5){animation-delay:.58s}
+form details{animation:rise .45s ease both;animation-delay:.60s}
+
+.btn{animation:rise .5s ease both;animation-delay:.5s}
+.installer-field input,.installer-field select{transition:border-color .18s var(--ease,ease),box-shadow .18s var(--ease,ease),background .18s ease}
+.installer-field input:hover,.installer-field select:hover{border-color:color-mix(in oklch,var(--accent) 45%,var(--border))}
+summary{transition:color .15s ease}
+summary:hover{color:var(--accent)}
+
+.installer-errors{animation:rise .4s ease both,shake .5s ease .35s 1}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation:none!important}
+  .stepper .step .bar{transform:none!important}
+}
+CSS;
+
+    if ($success) {
+        $css .= '.card{animation:rise .55s ease both,cardGlow 1.6s ease .5s 1;animation-delay:.14s}'
+            . '.card h2{animation:pop .55s cubic-bezier(.34,1.56,.64,1) both;animation-delay:.4s}';
+    }
+
+    return '<style>' . $css . '</style>';
+}
+
+/** ブランドロックアップ。完了画面のみピルを「完了」にする。純粋関数（vendor 非依存）。 */
+function brandHeader(bool $success = false): string
+{
+    $pill = $success ? '完了' : 'インストール';
+
+    return '<header class="brand"><svg class="mark" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="6" stroke-linejoin="miter" stroke-linecap="butt" aria-hidden="true"><polyline points="11,11 24,24 11,37"></polyline><polyline points="26,11 39,24 26,37"></polyline></svg><div class="brand-word"><span>NeNe Records</span><span class="brand-pill">' . $pill . '</span></div></header>';
+}
+
+/**
+ * フロー位置から 4 ステップのステッパーを描画する。$activeStep より前は done・当該は
+ * current・後は中立。$allDone（完了画面）は全ステップ done。
+ */
+function stepper(InstallerFlow $flow, string $activeStep, bool $allDone = false): string
+{
+    $labels = [
+        'requirements' => '要件',
+        'database' => 'データベース',
+        'administrator' => '管理者',
+        'complete' => '完了',
+    ];
+    $active = $flow->position($activeStep);
+    $html = '<ol class="stepper">';
+
+    foreach ($flow->steps as $index => $step) {
+        $number = $index + 1;
+
+        if ($allDone || $number < $active) {
+            $state = 'done';
+        } elseif ($number === $active) {
+            $state = 'current';
+        } else {
+            $state = '';
+        }
+
+        $label = $labels[$step->id] ?? $step->id;
+        $html .= '<li class="step ' . $state . '"><div class="top"><span class="num">' . $number
+            . '</span><span class="lbl">' . Html::escape($label) . '</span></div><div class="bar"></div></li>';
+    }
+
+    return $html . '</ol>';
+}
+
+/**
+ * 完成した 1 ページを出力して終了する。$stepper は空文字でステッパー無し（vendor 欠落・
+ * 再設置ブロックはフロー外なので付けない）。$success は完了画面のみ true。
+ */
+function renderPage(string $body, string $stepper = '', bool $success = false): never
 {
     header('Content-Type: text/html; charset=utf-8');
     echo '<!doctype html><html lang="ja"><head><meta charset="utf-8">'
         . '<meta name="viewport" content="width=device-width, initial-scale=1">'
         . '<meta name="robots" content="noindex">'
         . '<title>NeNe Records インストール</title>'
-        . '<style>'
-        . 'body{font-family:system-ui,sans-serif;background:#f4f5f7;color:#1f2328;margin:0}'
-        . '.wrap{max-width:44rem;margin:3rem auto;padding:0 1rem}'
-        . '.card{background:#fff;border:1px solid #d7dbe0;border-radius:8px;padding:1.5rem 2rem;margin-bottom:1rem}'
-        . 'h1{font-size:1.25rem}h2{font-size:1rem;margin-top:0}'
-        . 'table{border-collapse:collapse;width:100%}td,th{padding:.4rem .5rem;border-bottom:1px solid #eceff2;text-align:left;font-size:.9rem}'
-        . '.ok{color:#116329}.ng{color:#a40e26;font-weight:600}.warn{color:#7d4e00}'
-        . '.installer-progress{color:#57606a;font-size:.85rem}'
-        . '.installer-errors{color:#a40e26;background:#fff8f8;border:1px solid #e0b4b4;border-radius:6px;padding:.75rem 1rem .75rem 2rem}'
-        . '.installer-blocked{background:#fff8f8;border:1px solid #e0b4b4;border-radius:8px;padding:1rem 1.5rem}'
-        . '.installer-field{display:block;margin:.75rem 0;font-size:.9rem}'
-        . '.installer-field input,.installer-field select{display:block;width:100%;box-sizing:border-box;margin-top:.25rem;padding:.45rem .6rem;border:1px solid #d7dbe0;border-radius:6px;font-size:1rem}'
-        . '.btn{display:inline-block;background:#1f6feb;color:#fff;border:none;border-radius:6px;padding:.5rem 1.25rem;text-decoration:none;font-size:1rem;cursor:pointer}'
-        . '.muted{color:#57606a;font-size:.85rem}'
-        . 'details{margin:.75rem 0}summary{cursor:pointer;color:#57606a}'
-        . '</style></head><body><div class="wrap">'
-        . '<h1>NeNe Records インストール</h1>'
+        . installerStyles($success)
+        . '</head><body><div class="wrap">'
+        . brandHeader($success)
+        . $stepper
         . $body
+        . '<footer class="pf-footer">Powered by NENE2 · © 2026 AYANE</footer>'
         . '</div></body></html>';
 
     exit;
@@ -419,6 +648,7 @@ if ($stepId === 'requirements') {
         . ($allOk
             ? '<a class="btn" href="?step=database">続行 →</a>'
             : '<a class="btn" href="?step=requirements">再チェック</a> <p class="muted">未達の項目を解消してから再チェックしてください。</p>'),
+        stepper($flow, 'requirements'),
     );
 }
 
@@ -571,6 +801,7 @@ if ($stepId === 'database') {
         . '<button class="btn" type="submit">設定を保存して設置する</button>'
         . '<p class="muted">保存すると .env の書き込みとデータベースの初期化（migration）を実行します。</p>'
         . '</form></div>',
+        stepper($flow, 'database'),
     );
 }
 
@@ -582,6 +813,7 @@ if ($stepId === 'administrator') {
             . progressLine($flow, 'administrator')
             . '<p>先にデータベース設定を完了してください。</p>'
             . '<p><a href="?step=database">← データベース設定へ</a></p></div>',
+            stepper($flow, 'administrator'),
         );
     }
 
@@ -650,6 +882,8 @@ if ($stepId === 'administrator') {
                     . '<p><a class="btn" href="' . Html::escape($loginUrl) . '">管理画面にログイン →</a></p>'
                     . '<p class="muted">セキュリティのため、サーバー上の install/ ディレクトリは削除することをおすすめします（削除しなくても再実行は遮断されます）。</p>'
                     . '</div>',
+                    stepper($flow, 'complete', true),
+                    true,
                 );
             } catch (Throwable $e) {
                 $errors[] = '管理者の作成に失敗しました: ' . $e->getMessage();
@@ -668,6 +902,7 @@ if ($stepId === 'administrator') {
         . fieldRow('管理者パスワード', 'admin_password', '', 'password', '8 文字以上')
         . '<button class="btn" type="submit">管理者を作成して完了</button>'
         . '</form></div>',
+        stepper($flow, 'administrator'),
     );
 }
 
@@ -679,4 +914,5 @@ renderPage(
     . progressLine($flow, 'complete')
     . '<p>設置はまだ完了していません。</p>'
     . '<p><a href="?step=requirements">← 要件チェックへ</a></p></div>',
+    stepper($flow, 'complete'),
 );
