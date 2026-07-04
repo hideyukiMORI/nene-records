@@ -1,6 +1,22 @@
 # Current Work
 
-Last updated: 2026-06-27
+Last updated: 2026-07-04
+
+## 直近: WP式「固定ページをトップに」＋セッション文書の保全（2026-07-02〜04）
+
+- **#701 front_page 設定: 完了（PR #702 マージ・2026-07-04）** — 任意の公開レコード1件を
+  org 設定 `front_page` にピン留めし、公開トップ `/` で SSR（canonical=ルート・og:type=website・
+  JSON-LD WebPage）。元 permalink は **302**（クエリ維持）で `/` へ、sitemap は個別 URL を `/` に置換。
+  管理UI「ホームページの表示」（SiteSettingsPage 先頭・i18n 6ロケール）と SPA 側の描画/`/`への再ホームも同 PR。
+  multi-agent レビュー指摘 §3-1〜3-7 対応済み（正本: `docs/handoff-2026-07-03-front-page-review.md`・
+  設計: `docs/handoff-2026-07-03-front-page.md`）。front_page ルールは `FrontPageSetting`
+  （`resolvePublished()` / `assertPinnable()`）に一元化。
+  実装知見: NENE2 の `/` ルートは登録順で勝つため、上書きは `SingleOriginKernel` の**エッジ層**で行う。
+- **セッション文書の保全（#703）** — 日報3本（06-26/06-27/07-03）・Qiita 記事草稿・base-path
+  スモークスクリプトを main へ収録。**handoff-2026-06-25 / 06-27 は運用機密（本番 IP・SSH/DB 手順）を
+  含むため公開リポには置かず、private `nene-records-marketing` の `ops-inbox/records/` へ移設**
+  （本書中の `docs/handoff-2026-06-25.md` §A 参照はそちらを指す）。
+- **本番未反映**: #663 以降〜#702 の main は本番未デプロイ（board タスク・実施は施主 GO 待ち）。
 
 ## 短期TODO（directory-view レビュー由来・2026-06-27 / milestone「ページ階層/ディレクトリ 仕上げ」#1 — 完了）
 
