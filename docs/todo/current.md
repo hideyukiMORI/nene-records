@@ -2,6 +2,24 @@
 
 Last updated: 2026-07-04
 
+## 直近: 共有ホスティング Tier A インストーラ（S3・#707・2026-07-04）
+
+- **#707 Tier A インストーラ: 関所レビュー全5スライス合格（2026-07-04）・マージ進行** —
+  NENE2 `Nene2\Install` toolkit（v1.6.0・Packagist）を配線した `public_html/install/index.php`
+  （要件チェック→DB/tenant→migrate→管理者→完了・再訪403）＋ `tools/build-release.sh`
+  （Packagist `^1.6` 実体 vendor・**assets/theme-thumbnails を public_html へ移設**＝共有ホスティングに
+  Apache Alias が無いため）。**ZIP 66MB**（フォント 55MB・font-less 試算 11MB）。
+  設置手順は `docs/install-tier-a.md`。事前契約・関所承認は
+  `_work/handoff-installer-2026-07-04-s3-0-precontract.md`。
+- 併せて直した設置系の本質ギャップ 2 件: ① **共有ホスティング env ブリッジ**（phpdotenv v5 は
+  putenv しない→ getenv 直読み設定が .env-only 環境で全て既定値化。front controller で写す）
+  ② **APP_BASE_PATH の入口 prefix strip**（base-path 節の「残 S3」を消化 — サブディレクトリ設置が
+  実 URL で完走することを実機確認）。
+- 残: release ZIP の公開・tag・配布・Suite catalog 登録は**施主 GO 必須**（未実施）。
+  フォントのオンデマンド化（font-less 試算 11MB）・アップデート機構は別 Issue/レーン。
+  設計上のトレードオフ（記録）: migration 失敗時も .env は残す（phinx が ConfigLoader 経由で
+  .env を読むため書込先行が構造的に必須。docroot 外・再送信で上書き・ガードは users 基準で実害なし）。
+
 ## 直近: WP式「固定ページをトップに」＋セッション文書の保全（2026-07-02〜04）
 
 - **#701 front_page 設定: 完了（PR #702 マージ・2026-07-04）** — 任意の公開レコード1件を
