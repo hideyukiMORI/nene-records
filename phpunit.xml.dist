@@ -14,4 +14,17 @@
       <directory>src</directory>
     </include>
   </source>
+  <php>
+    <!--
+      Opt in to the framework's development JWT secret so any test that boots the
+      runtime container (RuntimeServiceProvider -> GuardedJwtSecretResolver) can
+      resolve a secret without a real NENE2_LOCAL_JWT_SECRET. APP_ENV is local
+      here, so production fail-closed behaviour is unaffected. This enables the
+      injected dev secret; it does NOT disable authentication. No current test
+      boots the full container (verified: suite passes without this too), but
+      this keeps the repo ready for one that does.
+    -->
+    <env name="APP_ENV" value="local"/>
+    <env name="NENE2_ALLOW_DEV_SECRET" value="1"/>
+  </php>
 </phpunit>
