@@ -158,7 +158,7 @@ export function AppShell() {
             NeNe Records
           </span>
           <span className="rounded-sm bg-accent px-1.5 py-0.5 font-chrome text-tiny font-bold uppercase tracking-wider text-text-inverse">
-            Admin
+            {t('admin.nav.adminBadge')}
           </span>
         </header>
 
@@ -180,7 +180,7 @@ export function AppShell() {
             rail ? 'lg:w-16' : 'lg:w-60',
             sidebarOpen ? 'translate-x-0' : '-translate-x-full',
           ].join(' ')}
-          aria-label="Sidebar"
+          aria-label={t('admin.nav.sidebar')}
         >
           {/* Brand */}
           <div
@@ -196,7 +196,7 @@ export function AppShell() {
                   NeNe Records
                 </span>
                 <span className="rounded-sm bg-accent px-1.5 py-0.5 font-chrome text-tiny font-bold uppercase tracking-wider text-text-inverse">
-                  Admin
+                  {t('admin.nav.adminBadge')}
                 </span>
               </>
             )}
@@ -214,7 +214,7 @@ export function AppShell() {
           {/* Nav links */}
           <nav
             className={['flex-1 overflow-y-auto py-4', rail ? 'px-2' : 'px-3'].join(' ')}
-            aria-label="Main"
+            aria-label={t('admin.nav.main')}
           >
             {/* ── Primary nav ── */}
             <ul className="space-y-0.5">
@@ -281,7 +281,7 @@ export function AppShell() {
                   <NavItem
                     to="/superadmin"
                     icon={<IconBuilding size={16} />}
-                    label="Superadmin"
+                    label={t('admin.superadmin.navTitle')}
                     onClick={closeSidebar}
                     rail={rail}
                   />
@@ -456,7 +456,7 @@ export function AppShell() {
             {/* Language selector — hidden in the icon rail */}
             {rail ? null : (
               <select
-                aria-label="Language"
+                aria-label={t('admin.nav.language')}
                 value={locale}
                 onChange={(e) => {
                   setLocale(e.target.value as typeof locale)

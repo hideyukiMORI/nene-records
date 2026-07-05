@@ -1295,6 +1295,118 @@ export const en = {
   'public.consent.message': 'We use cookies to measure site traffic. May we enable analytics?',
   'public.consent.accept': 'Allow',
   'public.consent.decline': 'Decline',
+
+  // ── Superadmin · Organizations (#728) ─────────────────────────────────────
+  'admin.organizations.pageTitle': 'Organizations',
+  'admin.organizations.pageDescription': 'Manage all tenant organizations.',
+  'admin.organizations.new': 'New Organization',
+  'admin.organizations.loading': 'Loading organizations…',
+  'admin.organizations.error': 'Failed to load organizations.',
+  'admin.organizations.empty': 'No organizations yet.',
+  'admin.organizations.createFirst': 'Create first organization',
+  'admin.organizations.plan': 'Plan',
+  'admin.organizations.status': 'Status',
+  'admin.organizations.actions': 'Actions',
+  'admin.organizations.idColumn': 'ID',
+  'admin.organizations.active': 'Active',
+  'admin.organizations.inactive': 'Inactive',
+  'admin.organizations.countTotal.one': '{{count}} organization total',
+  'admin.organizations.countTotal.other': '{{count}} organizations total',
+  'admin.organizations.form.namePlaceholder': 'Acme Corp',
+  'admin.organizations.form.slugPlaceholder': 'acme',
+  'admin.organizations.form.slugTitle': 'Lowercase letters, numbers, and hyphens only',
+  'admin.organizations.form.slugHelp': 'Lowercase letters, numbers, and hyphens only.',
+  'admin.organizations.form.domainPlaceholder': 'example.com',
+  'admin.organizations.form.domainHelp': 'Optional. Leave blank to use subdomain.',
+  'admin.organizations.form.submit': 'Create Organization',
+  'admin.organizations.delete.title': 'Delete Organization',
+  'admin.organizations.delete.description': 'Delete "{{name}}"? This cannot be undone.',
+  'admin.organizations.detail.loading': 'Loading…',
+  'admin.organizations.detail.notFound': 'Organization not found.',
+  'admin.organizations.detail.backToList': 'Back to Organizations',
+  'admin.organizations.detail.meta': 'ID: {{id}} · Created: {{date}}',
+  'admin.organizations.detail.settingsTitle': 'Organization Settings',
+  'admin.organizations.detail.exportImportTitle': 'Export & Import',
+  'admin.organizations.detail.exportImportDesc':
+    'Export all data for this organization as a JSON file, or import a previously exported file.',
+  'admin.organizations.detail.exporting': 'Exporting…',
+  'admin.organizations.detail.exportButton': 'Export JSON',
+  'admin.organizations.detail.importing': 'Importing…',
+  'admin.organizations.detail.importButton': 'Import JSON',
+  'admin.organizations.detail.dangerTitle': 'Danger Zone',
+  'admin.organizations.detail.dangerDesc':
+    'Deleting an organization is permanent and cannot be undone.',
+  'admin.organizations.detail.deleteConfirmDesc':
+    'Permanently delete "{{name}}"? All data will be removed. This cannot be undone.',
+  'admin.organizations.detail.deleteConfirm': 'Delete permanently',
+  'admin.organizations.toast.created': 'Organization "{{name}}" created.',
+  'admin.organizations.toast.deleted': 'Organization "{{name}}" deleted.',
+  'admin.organizations.toast.updated': 'Organization updated.',
+  'admin.organizations.toast.exportFailed': 'Export failed.',
+  'admin.organizations.toast.imported': 'Imported {{count}} records into "{{name}}".',
+  'admin.organizations.toast.invalidJson': 'Invalid JSON file.',
+
+  // ── Superadmin · Data migration (#728) ────────────────────────────────────
+  'admin.dataMigration.pageTitle': 'Data Migration',
+  'admin.dataMigration.pageDescription':
+    'Assign legacy records (organization_id = 0) to a specific organization. Use this when migrating from single-tenant to multi-tenant mode.',
+  'admin.dataMigration.unassignedTitle': 'Unassigned Records',
+  'admin.dataMigration.loading': 'Loading…',
+  'admin.dataMigration.statusError': 'Failed to load migration status.',
+  'admin.dataMigration.unassignedCount.one': '{{count}} unassigned record found',
+  'admin.dataMigration.unassignedCount.other': '{{count}} unassigned records found',
+  'admin.dataMigration.allAssigned': 'All records are assigned to an organization. ✓',
+  'admin.dataMigration.table.name': 'Table',
+  'admin.dataMigration.table.rows': 'Unassigned rows',
+  'admin.dataMigration.assignTitle': 'Assign to Organization',
+  'admin.dataMigration.assignDesc':
+    'All unassigned records will be moved to the selected organization. This cannot be undone.',
+  'admin.dataMigration.targetLabel': 'Target organization',
+  'admin.dataMigration.selectPlaceholder': '— Select organization —',
+  'admin.dataMigration.migrating': 'Migrating…',
+  'admin.dataMigration.assignSubmit': 'Assign Records',
+  'admin.dataMigration.noTarget': 'Please select a target organization.',
+  'admin.dataMigration.toast.migrated': 'Migrated {{count}} records to "{{name}}".',
+
+  // ── Superadmin · shell nav (#728) ─────────────────────────────────────────
+  'admin.superadmin.navTitle': 'Superadmin',
+  'admin.superadmin.backToAdmin': 'Back to Admin',
+
+  // ── Admin shell landmarks & badge (#728) ──────────────────────────────────
+  'admin.nav.sidebar': 'Sidebar',
+  'admin.nav.main': 'Main',
+  'admin.nav.language': 'Language',
+  'admin.nav.adminBadge': 'Admin',
+
+  // ── Entity type list (#728) ───────────────────────────────────────────────
+  'admin.entityTypeList.loading': 'Loading entity types…',
+  'admin.entityTypeList.error': 'Could not load entity types',
+  'admin.entityTypeList.empty.title': 'No entity types yet',
+  'admin.entityTypeList.empty.description':
+    'Entity type editor screens will arrive in a follow-up issue.',
+
+  // ── Relation filter (#728) ────────────────────────────────────────────────
+  'admin.relations.filter.loading': 'Loading {{field}} targets…',
+  'admin.relations.filter.error': 'Could not load {{field}} targets',
+  'admin.relations.filter.anyTarget': 'Any target',
+  'admin.relations.filter.title': 'Filter by relation',
+  'admin.relations.filter.clear': 'Clear',
+  'admin.relations.filter.activeNote': 'Showing records matching all selected relation filters.',
+
+  // ── Markdown editor toolbar (#728) ────────────────────────────────────────
+  'admin.markdownEditor.toolbar.bold': 'Bold',
+  'admin.markdownEditor.toolbar.italic': 'Italic',
+  'admin.markdownEditor.toolbar.h2': 'H2',
+  'admin.markdownEditor.toolbar.h3': 'H3',
+  'admin.markdownEditor.toolbar.unorderedList': 'Unordered list',
+  'admin.markdownEditor.toolbar.orderedList': 'Ordered list',
+  'admin.markdownEditor.toolbar.link': 'Link',
+  'admin.markdownEditor.toolbar.codeBlock': 'Code block',
+  'admin.markdownEditor.toolbar.blockquote': 'Blockquote',
+
+  // ── Misc (#728) ───────────────────────────────────────────────────────────
+  'common.tableOfContents': 'Table of contents',
+  'admin.entityRecords.breadcrumbLabel': 'Breadcrumb',
 } as const
 
 /**

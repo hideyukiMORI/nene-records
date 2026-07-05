@@ -1,3 +1,4 @@
+import { useTranslation } from '@/shared/i18n'
 import { Button, Card, PageHeader, Select, Stack, Text } from '@/shared/ui'
 import type { DataMigrationPageState } from '../hooks/useDataMigrationPage'
 
@@ -11,34 +12,30 @@ export function DataMigrationView({
   onTargetOrgIdChange,
   onAssign,
 }: DataMigrationPageState) {
+  const { t } = useTranslation()
   const hasUnassigned = (migrationStatus?.total ?? 0) > 0
 
   return (
     <Stack gap="lg">
       <PageHeader
-        title="Data Migration"
-        description={
-          <>
-            Assign legacy records (organization_id&nbsp;= 0) to a specific organization. Use this
-            when migrating from single-tenant to multi-tenant mode.
-          </>
-        }
+        title={t('admin.dataMigration.pageTitle')}
+        description={t('admin.dataMigration.pageDescription')}
       />
 
       {/* Status panel */}
       <Card padding="none" className="p-6">
         <Text as="h2" variant="heading-sm">
-          Unassigned Records
+          {t('admin.dataMigration.unassignedTitle')}
         </Text>
 
         {isStatusLoading && (
           <Text muted className="mt-3">
-            Loading…
+            {t('admin.dataMigration.loading')}
           </Text>
         )}
         {isStatusError && (
           <Text muted className="mt-3 text-danger">
-            Failed to load migration status.
+            {t('admin.dataMigration.statusError')}
           </Text>
         )}
 
@@ -48,14 +45,18 @@ export function DataMigrationView({
               {hasUnassigned ? (
                 <div className="rounded-md bg-warning-weak border border-warning px-4 py-3">
                   <Text className="font-semibold text-warning">
-                    {migrationStatus.total.toLocaleString()} unassigned record
-                    {migrationStatus.total !== 1 ? 's' : ''} found
+                    {t(
+                      migrationStatus.total === 1
+                        ? 'admin.dataMigration.unassignedCount.one'
+                        : 'admin.dataMigration.unassignedCount.other',
+                      { count: migrationStatus.total.toLocaleString() },
+                    )}
                   </Text>
                 </div>
               ) : (
                 <div className="rounded-md bg-success-weak border border-success px-4 py-3">
                   <Text className="font-semibold text-success">
-                    All records are assigned to an organization. ✓
+                    {t('admin.dataMigration.allAssigned')}
                   </Text>
                 </div>
               )}
@@ -66,9 +67,11 @@ export function DataMigrationView({
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-border">
-                      <th className="pb-2 text-left font-medium text-text-secondary">Table</th>
+                      <th className="pb-2 text-left font-medium text-text-secondary">
+                        {t('admin.dataMigration.table.name')}
+                      </th>
                       <th className="pb-2 text-right font-medium text-text-secondary">
-                        Unassigned rows
+                        {t('admin.dataMigration.table.rows')}
                       </th>
                     </tr>
                   </thead>
@@ -95,11 +98,10 @@ export function DataMigrationView({
       {hasUnassigned && (
         <Card padding="none" className="p-6">
           <Text as="h2" variant="heading-sm">
-            Assign to Organization
+            {t('admin.dataMigration.assignTitle')}
           </Text>
           <Text muted className="mt-1">
-            All unassigned records will be moved to the selected organization. This cannot be
-            undone.
+            {t('admin.dataMigration.assignDesc')}
           </Text>
 
           <Stack gap="md" className="mt-4">
@@ -108,7 +110,7 @@ export function DataMigrationView({
                 htmlFor="target-org"
                 className="mb-1 block text-sm font-medium text-text-primary"
               >
-                Target organization *
+                {t('admin.dataMigration.targetLabel')} *
               </label>
               <Select
                 id="target-org"
@@ -118,7 +120,7 @@ export function DataMigrationView({
                 }}
                 className="w-full"
               >
-                <option value={0}>— Select organization —</option>
+                <option value={0}>{t('admin.dataMigration.selectPlaceholder')}</option>
                 {organizations.map((org) => (
                   <option key={org.id} value={org.id}>
                     {org.name} ({org.slug})
@@ -133,7 +135,9 @@ export function DataMigrationView({
                 disabled={targetOrgId <= 0 || isAssigning}
                 onClick={onAssign}
               >
-                {isAssigning ? 'Migrating…' : 'Assign Records'}
+                {isAssigning
+                  ? t('admin.dataMigration.migrating')
+                  : t('admin.dataMigration.assignSubmit')}
               </Button>
             </div>
           </Stack>

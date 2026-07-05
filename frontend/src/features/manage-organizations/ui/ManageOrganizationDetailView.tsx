@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { PLANS } from '@/entities/organization'
+import { useTranslation } from '@/shared/i18n'
 import { Button, Card, ConfirmDialog, Input, PageHeader, Select, Stack, Text } from '@/shared/ui'
 import { IconChevronLeft, IconDownload, IconUpload } from '@/shared/ui/icons/Icons'
 import type { ManageOrganizationDetailPageState } from '../hooks/useManageOrganizationDetailPage'
@@ -31,21 +32,22 @@ export function ManageOrganizationDetailView({
   onDeleteConfirm,
   onDeleteCancel,
 }: ManageOrganizationDetailPageState) {
+  const { t } = useTranslation()
   const importFileRef = useRef<HTMLInputElement>(null)
 
   if (isLoading) {
-    return <Text muted>Loading…</Text>
+    return <Text muted>{t('admin.organizations.detail.loading')}</Text>
   }
 
   if (isError || org === undefined) {
     return (
       <Stack gap="md">
-        <Text muted>Organization not found.</Text>
+        <Text muted>{t('admin.organizations.detail.notFound')}</Text>
         <Link
           to="/superadmin/organizations"
           className="text-sm text-accent hover:text-accent-hover"
         >
-          ← Back to Organizations
+          ← {t('admin.organizations.detail.backToList')}
         </Link>
       </Stack>
     )
@@ -59,15 +61,14 @@ export function ManageOrganizationDetailView({
           className="mb-2 flex items-center gap-1 text-sm text-text-secondary hover:text-text-primary"
         >
           <IconChevronLeft size={14} />
-          Organizations
+          {t('admin.organizations.pageTitle')}
         </Link>
         <PageHeader
           title={org.name}
-          description={
-            <>
-              ID: {org.id} · Created: {org.createdAt ?? '—'}
-            </>
-          }
+          description={t('admin.organizations.detail.meta', {
+            id: org.id,
+            date: org.createdAt ?? '—',
+          })}
         />
       </div>
 
@@ -75,7 +76,7 @@ export function ManageOrganizationDetailView({
       <form onSubmit={onUpdate}>
         <Card padding="none" className="p-6">
           <Text as="h2" variant="heading-sm">
-            Organization Settings
+            {t('admin.organizations.detail.settingsTitle')}
           </Text>
           <Stack gap="md" className="mt-4">
             <div>
@@ -83,7 +84,7 @@ export function ManageOrganizationDetailView({
                 htmlFor="edit-org-name"
                 className="mb-1 block text-sm font-medium text-text-primary"
               >
-                Name *
+                {t('common.field.name')} *
               </label>
               <Input
                 id="edit-org-name"
@@ -91,7 +92,7 @@ export function ManageOrganizationDetailView({
                 onChange={(e) => {
                   onNameChange(e.target.value)
                 }}
-                placeholder="Acme Corp"
+                placeholder={t('admin.organizations.form.namePlaceholder')}
                 required
               />
             </div>
@@ -101,7 +102,7 @@ export function ManageOrganizationDetailView({
                 htmlFor="edit-org-slug"
                 className="mb-1 block text-sm font-medium text-text-primary"
               >
-                Slug *
+                {t('common.field.slug')} *
               </label>
               <Input
                 id="edit-org-slug"
@@ -109,9 +110,9 @@ export function ManageOrganizationDetailView({
                 onChange={(e) => {
                   onSlugChange(e.target.value)
                 }}
-                placeholder="acme"
+                placeholder={t('admin.organizations.form.slugPlaceholder')}
                 pattern="[a-z0-9]+(?:-[a-z0-9]+)*"
-                title="Lowercase letters, numbers, and hyphens only"
+                title={t('admin.organizations.form.slugTitle')}
                 required
               />
             </div>
@@ -121,7 +122,7 @@ export function ManageOrganizationDetailView({
                 htmlFor="edit-org-plan"
                 className="mb-1 block text-sm font-medium text-text-primary"
               >
-                Plan *
+                {t('admin.organizations.plan')} *
               </label>
               <Select
                 id="edit-org-plan"
@@ -144,7 +145,7 @@ export function ManageOrganizationDetailView({
                 htmlFor="edit-org-domain"
                 className="mb-1 block text-sm font-medium text-text-primary"
               >
-                Custom Domain
+                {t('admin.account.customDomainLabel')}
               </label>
               <Input
                 id="edit-org-domain"
@@ -152,7 +153,7 @@ export function ManageOrganizationDetailView({
                 onChange={(e) => {
                   onCustomDomainChange(e.target.value)
                 }}
-                placeholder="example.com"
+                placeholder={t('admin.organizations.form.domainPlaceholder')}
               />
             </div>
 
@@ -167,13 +168,13 @@ export function ManageOrganizationDetailView({
                 className="h-4 w-4 rounded border-border accent-accent"
               />
               <label htmlFor="edit-is-active" className="text-sm font-medium text-text-primary">
-                Active
+                {t('admin.organizations.active')}
               </label>
             </div>
 
             <div className="flex gap-2">
               <Button type="submit" variant="primary" disabled={isUpdating}>
-                {isUpdating ? 'Saving…' : 'Save Changes'}
+                {isUpdating ? t('common.actions.saving') : t('common.actions.save')}
               </Button>
             </div>
           </Stack>
@@ -183,11 +184,10 @@ export function ManageOrganizationDetailView({
       {/* Export / Import */}
       <Card padding="none" className="p-6">
         <Text as="h2" variant="heading-sm">
-          Export &amp; Import
+          {t('admin.organizations.detail.exportImportTitle')}
         </Text>
         <Text muted className="mt-1">
-          Export all data for this organization as a JSON file, or import a previously exported
-          file.
+          {t('admin.organizations.detail.exportImportDesc')}
         </Text>
 
         <div className="mt-4 flex flex-wrap gap-3">
@@ -199,7 +199,9 @@ export function ManageOrganizationDetailView({
             disabled={isExporting}
           >
             <IconDownload size={14} className="mr-1.5" />
-            {isExporting ? 'Exporting…' : 'Export JSON'}
+            {isExporting
+              ? t('admin.organizations.detail.exporting')
+              : t('admin.organizations.detail.exportButton')}
           </Button>
 
           <Button
@@ -210,7 +212,9 @@ export function ManageOrganizationDetailView({
             disabled={isImporting}
           >
             <IconUpload size={14} className="mr-1.5" />
-            {isImporting ? 'Importing…' : 'Import JSON'}
+            {isImporting
+              ? t('admin.organizations.detail.importing')
+              : t('admin.organizations.detail.importButton')}
           </Button>
           <input
             ref={importFileRef}
@@ -234,21 +238,21 @@ export function ManageOrganizationDetailView({
       {/* Danger zone */}
       <div className="rounded-lg border border-danger bg-danger-weak p-6">
         <Text as="h2" variant="heading-sm">
-          Danger Zone
+          {t('admin.organizations.detail.dangerTitle')}
         </Text>
         <Text muted className="mt-1">
-          Deleting an organization is permanent and cannot be undone.
+          {t('admin.organizations.detail.dangerDesc')}
         </Text>
         <Button variant="danger" className="mt-4" onClick={onDeleteRequest}>
-          Delete Organization
+          {t('admin.organizations.delete.title')}
         </Button>
       </div>
 
       <ConfirmDialog
         open={showDeleteConfirm}
-        title="Delete Organization"
-        description={`Permanently delete "${org.name}"? All data will be removed. This cannot be undone.`}
-        confirmLabel="Delete permanently"
+        title={t('admin.organizations.delete.title')}
+        description={t('admin.organizations.detail.deleteConfirmDesc', { name: org.name })}
+        confirmLabel={t('admin.organizations.detail.deleteConfirm')}
         isPending={isDeleting}
         onConfirm={onDeleteConfirm}
         onCancel={onDeleteCancel}

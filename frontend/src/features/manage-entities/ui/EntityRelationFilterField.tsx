@@ -1,4 +1,5 @@
 import type { RelationFieldDef } from '@/entities/field-def'
+import { useTranslation } from '@/shared/i18n'
 import { Button, Select, Stack, Text } from '@/shared/ui'
 import { useEntityRelationFilterField } from '../hooks/use-entity-relation-filter-field'
 
@@ -13,22 +14,25 @@ export function EntityRelationFilterField({
   selectedTargetId,
   onSelectTarget,
 }: EntityRelationFilterFieldProps) {
+  const { t } = useTranslation()
   const { targetOptions, isLoading, isError, errorTitle, refetch } =
     useEntityRelationFilterField(fieldDef)
 
   const selectId = `relation-filter-${fieldDef.fieldKey}`
 
   if (isLoading) {
-    return <Text muted>Loading {fieldDef.fieldKey} targets…</Text>
+    return <Text muted>{t('admin.relations.filter.loading', { field: fieldDef.fieldKey })}</Text>
   }
 
   if (isError) {
     return (
       <Stack gap="sm">
-        <Text variant="heading-sm">Could not load {fieldDef.fieldKey} targets</Text>
-        <Text muted>{errorTitle ?? 'Unknown error'}</Text>
+        <Text variant="heading-sm">
+          {t('admin.relations.filter.error', { field: fieldDef.fieldKey })}
+        </Text>
+        <Text muted>{errorTitle ?? t('common.error.unknown')}</Text>
         <Button variant="secondary" onClick={() => void refetch()}>
-          Retry
+          {t('common.actions.retry')}
         </Button>
       </Stack>
     )
@@ -49,7 +53,9 @@ export function EntityRelationFilterField({
         }}
       >
         <option value="">
-          {targetOptions.length === 0 ? 'No targets available' : 'Any target'}
+          {targetOptions.length === 0
+            ? t('admin.relations.noTargetsAvailable')
+            : t('admin.relations.filter.anyTarget')}
         </option>
         {targetOptions.map((option) => (
           <option key={String(option.id)} value={String(option.id)}>

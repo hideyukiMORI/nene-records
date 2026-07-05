@@ -1288,4 +1288,118 @@ export const de: Partial<MessageCatalog> = {
     'Wir verwenden Cookies, um die Zugriffe zu messen. Dürfen wir die Analyse aktivieren?',
   'public.consent.accept': 'Zulassen',
   'public.consent.decline': 'Ablehnen',
+
+  // ── Superadmin · Organizations (#728) ─────────────────────────────────────
+  'admin.organizations.pageTitle': 'Organisationen',
+  'admin.organizations.pageDescription': 'Alle Mandanten-Organisationen verwalten.',
+  'admin.organizations.new': 'Neue Organisation',
+  'admin.organizations.loading': 'Organisationen werden geladen…',
+  'admin.organizations.error': 'Organisationen konnten nicht geladen werden.',
+  'admin.organizations.empty': 'Noch keine Organisationen.',
+  'admin.organizations.createFirst': 'Erste Organisation erstellen',
+  'admin.organizations.plan': 'Tarif',
+  'admin.organizations.status': 'Status',
+  'admin.organizations.actions': 'Aktionen',
+  'admin.organizations.idColumn': 'ID',
+  'admin.organizations.active': 'Aktiv',
+  'admin.organizations.inactive': 'Inaktiv',
+  'admin.organizations.countTotal.one': '{{count}} Organisation insgesamt',
+  'admin.organizations.countTotal.other': '{{count}} Organisationen insgesamt',
+  'admin.organizations.form.namePlaceholder': 'Acme Corp',
+  'admin.organizations.form.slugPlaceholder': 'acme',
+  'admin.organizations.form.slugTitle': 'Nur Kleinbuchstaben, Ziffern und Bindestriche',
+  'admin.organizations.form.slugHelp': 'Nur Kleinbuchstaben, Ziffern und Bindestriche.',
+  'admin.organizations.form.domainPlaceholder': 'example.com',
+  'admin.organizations.form.domainHelp': 'Optional. Leer lassen, um die Subdomain zu verwenden.',
+  'admin.organizations.form.submit': 'Organisation erstellen',
+  'admin.organizations.delete.title': 'Organisation löschen',
+  'admin.organizations.delete.description':
+    '„{{name}}“ löschen? Dies kann nicht rückgängig gemacht werden.',
+  'admin.organizations.detail.loading': 'Wird geladen…',
+  'admin.organizations.detail.notFound': 'Organisation nicht gefunden.',
+  'admin.organizations.detail.backToList': 'Zurück zu den Organisationen',
+  'admin.organizations.detail.meta': 'ID: {{id}} · Erstellt: {{date}}',
+  'admin.organizations.detail.settingsTitle': 'Organisationseinstellungen',
+  'admin.organizations.detail.exportImportTitle': 'Export & Import',
+  'admin.organizations.detail.exportImportDesc':
+    'Alle Daten dieser Organisation als JSON-Datei exportieren oder eine zuvor exportierte Datei importieren.',
+  'admin.organizations.detail.exporting': 'Wird exportiert…',
+  'admin.organizations.detail.exportButton': 'JSON exportieren',
+  'admin.organizations.detail.importing': 'Wird importiert…',
+  'admin.organizations.detail.importButton': 'JSON importieren',
+  'admin.organizations.detail.dangerTitle': 'Gefahrenzone',
+  'admin.organizations.detail.dangerDesc':
+    'Das Löschen einer Organisation ist dauerhaft und kann nicht rückgängig gemacht werden.',
+  'admin.organizations.detail.deleteConfirmDesc':
+    '„{{name}}“ endgültig löschen? Alle Daten werden entfernt. Dies kann nicht rückgängig gemacht werden.',
+  'admin.organizations.detail.deleteConfirm': 'Endgültig löschen',
+  'admin.organizations.toast.created': 'Organisation „{{name}}“ erstellt.',
+  'admin.organizations.toast.deleted': 'Organisation „{{name}}“ gelöscht.',
+  'admin.organizations.toast.updated': 'Organisation aktualisiert.',
+  'admin.organizations.toast.exportFailed': 'Export fehlgeschlagen.',
+  'admin.organizations.toast.imported': '{{count}} Datensätze in „{{name}}“ importiert.',
+  'admin.organizations.toast.invalidJson': 'Ungültige JSON-Datei.',
+
+  // ── Superadmin · Data migration (#728) ────────────────────────────────────
+  'admin.dataMigration.pageTitle': 'Datenmigration',
+  'admin.dataMigration.pageDescription':
+    'Weisen Sie Alt-Datensätze (organization_id = 0) einer bestimmten Organisation zu. Verwenden Sie dies bei der Migration vom Einzel- zum Mehrmandantenmodus.',
+  'admin.dataMigration.unassignedTitle': 'Nicht zugewiesene Datensätze',
+  'admin.dataMigration.loading': 'Wird geladen…',
+  'admin.dataMigration.statusError': 'Migrationsstatus konnte nicht geladen werden.',
+  'admin.dataMigration.unassignedCount.one': '{{count}} nicht zugewiesener Datensatz gefunden',
+  'admin.dataMigration.unassignedCount.other': '{{count}} nicht zugewiesene Datensätze gefunden',
+  'admin.dataMigration.allAssigned': 'Alle Datensätze sind einer Organisation zugewiesen. ✓',
+  'admin.dataMigration.table.name': 'Tabelle',
+  'admin.dataMigration.table.rows': 'Nicht zugewiesene Zeilen',
+  'admin.dataMigration.assignTitle': 'Einer Organisation zuweisen',
+  'admin.dataMigration.assignDesc':
+    'Alle nicht zugewiesenen Datensätze werden in die ausgewählte Organisation verschoben. Dies kann nicht rückgängig gemacht werden.',
+  'admin.dataMigration.targetLabel': 'Zielorganisation',
+  'admin.dataMigration.selectPlaceholder': '— Organisation auswählen —',
+  'admin.dataMigration.migrating': 'Migration läuft…',
+  'admin.dataMigration.assignSubmit': 'Datensätze zuweisen',
+  'admin.dataMigration.noTarget': 'Bitte wählen Sie eine Zielorganisation aus.',
+  'admin.dataMigration.toast.migrated': '{{count}} Datensätze zu „{{name}}“ migriert.',
+
+  // ── Superadmin · shell nav (#728) ─────────────────────────────────────────
+  'admin.superadmin.navTitle': 'Superadmin',
+  'admin.superadmin.backToAdmin': 'Zurück zur Verwaltung',
+
+  // ── Admin shell landmarks & badge (#728) ──────────────────────────────────
+  'admin.nav.sidebar': 'Seitenleiste',
+  'admin.nav.main': 'Hauptbereich',
+  'admin.nav.language': 'Sprache',
+  'admin.nav.adminBadge': 'Admin',
+
+  // ── Entity type list (#728) ───────────────────────────────────────────────
+  'admin.entityTypeList.loading': 'Entitätstypen werden geladen…',
+  'admin.entityTypeList.error': 'Entitätstypen konnten nicht geladen werden',
+  'admin.entityTypeList.empty.title': 'Noch keine Entitätstypen',
+  'admin.entityTypeList.empty.description':
+    'Die Editor-Ansichten für Entitätstypen folgen in einem späteren Issue.',
+
+  // ── Relation filter (#728) ────────────────────────────────────────────────
+  'admin.relations.filter.loading': 'Ziele für {{field}} werden geladen…',
+  'admin.relations.filter.error': 'Ziele für {{field}} konnten nicht geladen werden',
+  'admin.relations.filter.anyTarget': 'Beliebiges Ziel',
+  'admin.relations.filter.title': 'Nach Beziehung filtern',
+  'admin.relations.filter.clear': 'Löschen',
+  'admin.relations.filter.activeNote':
+    'Es werden Datensätze angezeigt, die allen ausgewählten Beziehungsfiltern entsprechen.',
+
+  // ── Markdown editor toolbar (#728) ────────────────────────────────────────
+  'admin.markdownEditor.toolbar.bold': 'Fett',
+  'admin.markdownEditor.toolbar.italic': 'Kursiv',
+  'admin.markdownEditor.toolbar.h2': 'Überschrift 2',
+  'admin.markdownEditor.toolbar.h3': 'Überschrift 3',
+  'admin.markdownEditor.toolbar.unorderedList': 'Aufzählungsliste',
+  'admin.markdownEditor.toolbar.orderedList': 'Nummerierte Liste',
+  'admin.markdownEditor.toolbar.link': 'Link',
+  'admin.markdownEditor.toolbar.codeBlock': 'Codeblock',
+  'admin.markdownEditor.toolbar.blockquote': 'Zitat',
+
+  // ── Misc (#728) ───────────────────────────────────────────────────────────
+  'common.tableOfContents': 'Inhaltsverzeichnis',
+  'admin.entityRecords.breadcrumbLabel': 'Brotkrümelnavigation',
 }

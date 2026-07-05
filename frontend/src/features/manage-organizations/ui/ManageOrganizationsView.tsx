@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { PLANS } from '@/entities/organization'
 import type { CreateOrganizationInput, Organization } from '@/entities/organization'
+import { useTranslation } from '@/shared/i18n'
 import { Button, Card, ConfirmDialog, Input, PageHeader, Select, Stack, Text } from '@/shared/ui'
 import { IconBuilding, IconX } from '@/shared/ui/icons/Icons'
 import type { ManageOrganizationsPageState } from '../hooks/useManageOrganizationsPage'
@@ -15,6 +16,7 @@ interface CreateOrganizationFormProps {
 }
 
 function CreateOrganizationForm({ isCreating, onClose, onSubmit }: CreateOrganizationFormProps) {
+  const { t } = useTranslation()
   const [name, setName] = useState('')
   const [slug, setSlug] = useState('')
   const [plan, setPlan] = useState<string>('free')
@@ -34,13 +36,13 @@ function CreateOrganizationForm({ isCreating, onClose, onSubmit }: CreateOrganiz
     <Card padding="none" className="p-6">
       <div className="mb-4 flex items-center justify-between">
         <Text as="h2" variant="heading-sm">
-          New Organization
+          {t('admin.organizations.new')}
         </Text>
         <button
           type="button"
           onClick={onClose}
           className="text-text-muted hover:text-text-primary"
-          aria-label="Close"
+          aria-label={t('common.dialog.close')}
         >
           <IconX size={18} />
         </button>
@@ -50,7 +52,7 @@ function CreateOrganizationForm({ isCreating, onClose, onSubmit }: CreateOrganiz
         <Stack gap="md">
           <div>
             <label htmlFor="org-name" className="mb-1 block text-sm font-medium text-text-primary">
-              Name *
+              {t('common.field.name')} *
             </label>
             <Input
               id="org-name"
@@ -58,14 +60,14 @@ function CreateOrganizationForm({ isCreating, onClose, onSubmit }: CreateOrganiz
               onChange={(e) => {
                 setName(e.target.value)
               }}
-              placeholder="Acme Corp"
+              placeholder={t('admin.organizations.form.namePlaceholder')}
               required
             />
           </div>
 
           <div>
             <label htmlFor="org-slug" className="mb-1 block text-sm font-medium text-text-primary">
-              Slug *
+              {t('common.field.slug')} *
             </label>
             <Input
               id="org-slug"
@@ -73,19 +75,17 @@ function CreateOrganizationForm({ isCreating, onClose, onSubmit }: CreateOrganiz
               onChange={(e) => {
                 setSlug(e.target.value)
               }}
-              placeholder="acme"
+              placeholder={t('admin.organizations.form.slugPlaceholder')}
               pattern="[a-z0-9]+(?:-[a-z0-9]+)*"
-              title="Lowercase letters, numbers, and hyphens only"
+              title={t('admin.organizations.form.slugTitle')}
               required
             />
-            <p className="mt-1 text-xs text-text-muted">
-              Lowercase letters, numbers, and hyphens only.
-            </p>
+            <p className="mt-1 text-xs text-text-muted">{t('admin.organizations.form.slugHelp')}</p>
           </div>
 
           <div>
             <label htmlFor="org-plan" className="mb-1 block text-sm font-medium text-text-primary">
-              Plan *
+              {t('admin.organizations.plan')} *
             </label>
             <Select
               id="org-plan"
@@ -108,7 +108,7 @@ function CreateOrganizationForm({ isCreating, onClose, onSubmit }: CreateOrganiz
               htmlFor="org-domain"
               className="mb-1 block text-sm font-medium text-text-primary"
             >
-              Custom Domain
+              {t('admin.account.customDomainLabel')}
             </label>
             <Input
               id="org-domain"
@@ -116,17 +116,19 @@ function CreateOrganizationForm({ isCreating, onClose, onSubmit }: CreateOrganiz
               onChange={(e) => {
                 setCustomDomain(e.target.value)
               }}
-              placeholder="example.com"
+              placeholder={t('admin.organizations.form.domainPlaceholder')}
             />
-            <p className="mt-1 text-xs text-text-muted">Optional. Leave blank to use subdomain.</p>
+            <p className="mt-1 text-xs text-text-muted">
+              {t('admin.organizations.form.domainHelp')}
+            </p>
           </div>
 
           <div className="flex gap-2">
             <Button type="submit" variant="primary" disabled={isCreating}>
-              {isCreating ? 'Creating…' : 'Create Organization'}
+              {isCreating ? t('common.actions.creating') : t('admin.organizations.form.submit')}
             </Button>
             <Button type="button" variant="ghost" onClick={onClose}>
-              Cancel
+              {t('common.actions.cancel')}
             </Button>
           </div>
         </Stack>
@@ -152,15 +154,17 @@ export function ManageOrganizationsView({
   onSetDeleteTarget,
   onConfirmDelete,
 }: ManageOrganizationsPageState) {
+  const { t } = useTranslation()
+
   return (
     <Stack gap="lg">
       <PageHeader
-        title="Organizations"
-        description="Manage all tenant organizations."
+        title={t('admin.organizations.pageTitle')}
+        description={t('admin.organizations.pageDescription')}
         actions={
           !showCreateForm ? (
             <Button variant="primary" onClick={onShowCreateForm}>
-              New Organization
+              {t('admin.organizations.new')}
             </Button>
           ) : undefined
         }
@@ -174,15 +178,15 @@ export function ManageOrganizationsView({
         />
       )}
 
-      {isLoading && <Text muted>Loading organizations…</Text>}
-      {isError && <Text muted>Failed to load organizations.</Text>}
+      {isLoading && <Text muted>{t('admin.organizations.loading')}</Text>}
+      {isError && <Text muted>{t('admin.organizations.error')}</Text>}
 
       {!isLoading && !isError && organizations.length === 0 && (
         <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed border-border py-16 text-center">
           <IconBuilding size={32} className="text-text-muted" />
-          <Text muted>No organizations yet.</Text>
+          <Text muted>{t('admin.organizations.empty')}</Text>
           <Button variant="primary" onClick={onShowCreateForm}>
-            Create first organization
+            {t('admin.organizations.createFirst')}
           </Button>
         </div>
       )}
@@ -192,12 +196,24 @@ export function ManageOrganizationsView({
           <table className="w-full text-sm">
             <thead className="border-b border-border bg-surface-raised">
               <tr>
-                <th className="px-4 py-3 text-left font-medium text-text-secondary">ID</th>
-                <th className="px-4 py-3 text-left font-medium text-text-secondary">Name</th>
-                <th className="px-4 py-3 text-left font-medium text-text-secondary">Slug</th>
-                <th className="px-4 py-3 text-left font-medium text-text-secondary">Plan</th>
-                <th className="px-4 py-3 text-left font-medium text-text-secondary">Status</th>
-                <th className="px-4 py-3 text-left font-medium text-text-secondary">Actions</th>
+                <th className="px-4 py-3 text-left font-medium text-text-secondary">
+                  {t('admin.organizations.idColumn')}
+                </th>
+                <th className="px-4 py-3 text-left font-medium text-text-secondary">
+                  {t('common.field.name')}
+                </th>
+                <th className="px-4 py-3 text-left font-medium text-text-secondary">
+                  {t('common.field.slug')}
+                </th>
+                <th className="px-4 py-3 text-left font-medium text-text-secondary">
+                  {t('admin.organizations.plan')}
+                </th>
+                <th className="px-4 py-3 text-left font-medium text-text-secondary">
+                  {t('admin.organizations.status')}
+                </th>
+                <th className="px-4 py-3 text-left font-medium text-text-secondary">
+                  {t('admin.organizations.actions')}
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -213,9 +229,13 @@ export function ManageOrganizationsView({
                   </td>
                   <td className="px-4 py-3">
                     {org.isActive ? (
-                      <span className="text-xs text-success">Active</span>
+                      <span className="text-xs text-success">
+                        {t('admin.organizations.active')}
+                      </span>
                     ) : (
-                      <span className="text-xs text-text-muted">Inactive</span>
+                      <span className="text-xs text-text-muted">
+                        {t('admin.organizations.inactive')}
+                      </span>
                     )}
                   </td>
                   <td className="px-4 py-3">
@@ -224,7 +244,7 @@ export function ManageOrganizationsView({
                         to={`/superadmin/organizations/${String(org.id)}`}
                         className="text-xs text-accent hover:text-accent-hover"
                       >
-                        Edit
+                        {t('common.actions.edit')}
                       </Link>
                       <button
                         type="button"
@@ -233,7 +253,7 @@ export function ManageOrganizationsView({
                         }}
                         className="text-xs text-danger hover:text-danger-hover"
                       >
-                        Delete
+                        {t('common.actions.delete')}
                       </button>
                     </div>
                   </td>
@@ -243,18 +263,25 @@ export function ManageOrganizationsView({
           </table>
 
           <div className="border-t border-border px-4 py-2 text-xs text-text-muted">
-            {total} organization{total !== 1 ? 's' : ''} total
+            {t(
+              total === 1
+                ? 'admin.organizations.countTotal.one'
+                : 'admin.organizations.countTotal.other',
+              { count: total },
+            )}
           </div>
         </div>
       )}
 
       <ConfirmDialog
         open={deleteTarget !== null}
-        title="Delete Organization"
+        title={t('admin.organizations.delete.title')}
         description={
-          deleteTarget !== null ? `Delete "${deleteTarget.name}"? This cannot be undone.` : ''
+          deleteTarget !== null
+            ? t('admin.organizations.delete.description', { name: deleteTarget.name })
+            : ''
         }
-        confirmLabel="Delete"
+        confirmLabel={t('common.actions.delete')}
         isPending={isDeleting}
         onConfirm={onConfirmDelete}
         onCancel={() => {

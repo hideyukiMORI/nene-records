@@ -1307,4 +1307,117 @@ export const ptBR: Partial<MessageCatalog> = {
     'Usamos cookies para medir o tráfego do site. Podemos ativar a análise?',
   'public.consent.accept': 'Permitir',
   'public.consent.decline': 'Recusar',
+
+  // ── Superadmin · Organizations (#728) ─────────────────────────────────────
+  'admin.organizations.pageTitle': 'Organizações',
+  'admin.organizations.pageDescription': 'Gerencie todas as organizações de inquilinos.',
+  'admin.organizations.new': 'Nova organização',
+  'admin.organizations.loading': 'Carregando organizações…',
+  'admin.organizations.error': 'Falha ao carregar as organizações.',
+  'admin.organizations.empty': 'Nenhuma organização ainda.',
+  'admin.organizations.createFirst': 'Criar a primeira organização',
+  'admin.organizations.plan': 'Plano',
+  'admin.organizations.status': 'Status',
+  'admin.organizations.actions': 'Ações',
+  'admin.organizations.idColumn': 'ID',
+  'admin.organizations.active': 'Ativo',
+  'admin.organizations.inactive': 'Inativo',
+  'admin.organizations.countTotal.one': '{{count}} organização no total',
+  'admin.organizations.countTotal.other': '{{count}} organizações no total',
+  'admin.organizations.form.namePlaceholder': 'Acme Corp',
+  'admin.organizations.form.slugPlaceholder': 'acme',
+  'admin.organizations.form.slugTitle': 'Apenas letras minúsculas, números e hifens',
+  'admin.organizations.form.slugHelp': 'Apenas letras minúsculas, números e hifens.',
+  'admin.organizations.form.domainPlaceholder': 'example.com',
+  'admin.organizations.form.domainHelp': 'Opcional. Deixe em branco para usar o subdomínio.',
+  'admin.organizations.form.submit': 'Criar organização',
+  'admin.organizations.delete.title': 'Excluir organização',
+  'admin.organizations.delete.description': 'Excluir "{{name}}"? Isso não pode ser desfeito.',
+  'admin.organizations.detail.loading': 'Carregando…',
+  'admin.organizations.detail.notFound': 'Organização não encontrada.',
+  'admin.organizations.detail.backToList': 'Voltar às organizações',
+  'admin.organizations.detail.meta': 'ID: {{id}} · Criado: {{date}}',
+  'admin.organizations.detail.settingsTitle': 'Configurações da organização',
+  'admin.organizations.detail.exportImportTitle': 'Exportar e importar',
+  'admin.organizations.detail.exportImportDesc':
+    'Exporte todos os dados desta organização como um arquivo JSON, ou importe um arquivo exportado anteriormente.',
+  'admin.organizations.detail.exporting': 'Exportando…',
+  'admin.organizations.detail.exportButton': 'Exportar JSON',
+  'admin.organizations.detail.importing': 'Importando…',
+  'admin.organizations.detail.importButton': 'Importar JSON',
+  'admin.organizations.detail.dangerTitle': 'Zona de perigo',
+  'admin.organizations.detail.dangerDesc':
+    'Excluir uma organização é permanente e não pode ser desfeito.',
+  'admin.organizations.detail.deleteConfirmDesc':
+    'Excluir permanentemente "{{name}}"? Todos os dados serão removidos. Isso não pode ser desfeito.',
+  'admin.organizations.detail.deleteConfirm': 'Excluir permanentemente',
+  'admin.organizations.toast.created': 'Organização "{{name}}" criada.',
+  'admin.organizations.toast.deleted': 'Organização "{{name}}" excluída.',
+  'admin.organizations.toast.updated': 'Organização atualizada.',
+  'admin.organizations.toast.exportFailed': 'Falha na exportação.',
+  'admin.organizations.toast.imported': '{{count}} registros importados em "{{name}}".',
+  'admin.organizations.toast.invalidJson': 'Arquivo JSON inválido.',
+
+  // ── Superadmin · Data migration (#728) ────────────────────────────────────
+  'admin.dataMigration.pageTitle': 'Migração de dados',
+  'admin.dataMigration.pageDescription':
+    'Atribua registros legados (organization_id = 0) a uma organização específica. Use isso ao migrar do modo de inquilino único para multi-inquilino.',
+  'admin.dataMigration.unassignedTitle': 'Registros não atribuídos',
+  'admin.dataMigration.loading': 'Carregando…',
+  'admin.dataMigration.statusError': 'Falha ao carregar o status da migração.',
+  'admin.dataMigration.unassignedCount.one': '{{count}} registro não atribuído encontrado',
+  'admin.dataMigration.unassignedCount.other': '{{count}} registros não atribuídos encontrados',
+  'admin.dataMigration.allAssigned': 'Todos os registros estão atribuídos a uma organização. ✓',
+  'admin.dataMigration.table.name': 'Tabela',
+  'admin.dataMigration.table.rows': 'Linhas não atribuídas',
+  'admin.dataMigration.assignTitle': 'Atribuir a uma organização',
+  'admin.dataMigration.assignDesc':
+    'Todos os registros não atribuídos serão movidos para a organização selecionada. Isso não pode ser desfeito.',
+  'admin.dataMigration.targetLabel': 'Organização de destino',
+  'admin.dataMigration.selectPlaceholder': '— Selecionar organização —',
+  'admin.dataMigration.migrating': 'Migrando…',
+  'admin.dataMigration.assignSubmit': 'Atribuir registros',
+  'admin.dataMigration.noTarget': 'Selecione uma organização de destino.',
+  'admin.dataMigration.toast.migrated': '{{count}} registros migrados para "{{name}}".',
+
+  // ── Superadmin · shell nav (#728) ─────────────────────────────────────────
+  'admin.superadmin.navTitle': 'Superadministrador',
+  'admin.superadmin.backToAdmin': 'Voltar ao admin',
+
+  // ── Admin shell landmarks & badge (#728) ──────────────────────────────────
+  'admin.nav.sidebar': 'Barra lateral',
+  'admin.nav.main': 'Principal',
+  'admin.nav.language': 'Idioma',
+  'admin.nav.adminBadge': 'Admin',
+
+  // ── Entity type list (#728) ───────────────────────────────────────────────
+  'admin.entityTypeList.loading': 'Carregando tipos de entidade…',
+  'admin.entityTypeList.error': 'Não foi possível carregar os tipos de entidade',
+  'admin.entityTypeList.empty.title': 'Nenhum tipo de entidade ainda',
+  'admin.entityTypeList.empty.description':
+    'As telas de edição de tipos de entidade chegarão em uma issue posterior.',
+
+  // ── Relation filter (#728) ────────────────────────────────────────────────
+  'admin.relations.filter.loading': 'Carregando alvos de {{field}}…',
+  'admin.relations.filter.error': 'Não foi possível carregar os alvos de {{field}}',
+  'admin.relations.filter.anyTarget': 'Qualquer alvo',
+  'admin.relations.filter.title': 'Filtrar por relação',
+  'admin.relations.filter.clear': 'Limpar',
+  'admin.relations.filter.activeNote':
+    'Mostrando registros que correspondem a todos os filtros de relação selecionados.',
+
+  // ── Markdown editor toolbar (#728) ────────────────────────────────────────
+  'admin.markdownEditor.toolbar.bold': 'Negrito',
+  'admin.markdownEditor.toolbar.italic': 'Itálico',
+  'admin.markdownEditor.toolbar.h2': 'Título 2',
+  'admin.markdownEditor.toolbar.h3': 'Título 3',
+  'admin.markdownEditor.toolbar.unorderedList': 'Lista com marcadores',
+  'admin.markdownEditor.toolbar.orderedList': 'Lista numerada',
+  'admin.markdownEditor.toolbar.link': 'Link',
+  'admin.markdownEditor.toolbar.codeBlock': 'Bloco de código',
+  'admin.markdownEditor.toolbar.blockquote': 'Citação',
+
+  // ── Misc (#728) ───────────────────────────────────────────────────────────
+  'common.tableOfContents': 'Sumário',
+  'admin.entityRecords.breadcrumbLabel': 'Trilha de navegação',
 }

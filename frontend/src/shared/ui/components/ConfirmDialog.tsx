@@ -1,4 +1,5 @@
 import { useId, type ReactNode } from 'react'
+import { useTranslation } from '@/shared/i18n'
 import { Button } from '@/shared/ui/primitives/Button'
 import { Stack } from '@/shared/ui/primitives/Stack'
 import { Text } from '@/shared/ui/primitives/Text'
@@ -32,14 +33,15 @@ export function ConfirmDialog({
   title,
   description,
   errorDetail = null,
-  confirmLabel = 'Confirm',
-  cancelLabel = 'Cancel',
+  confirmLabel,
+  cancelLabel,
   isPending = false,
   confirmDisabled = false,
   children,
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
+  const { t } = useTranslation()
   // Unique per instance so simultaneously-open dialogs don't share an
   // aria-labelledby target (screen-reader label resolution would break).
   const titleId = useId()
@@ -51,7 +53,7 @@ export function ConfirmDialog({
   return (
     <Modal
       onClose={onCancel}
-      closeLabel="Close dialog"
+      closeLabel={t('common.dialog.close')}
       labelledBy={titleId}
       panelClassName="max-w-md shadow-md"
     >
@@ -73,10 +75,10 @@ export function ConfirmDialog({
         ) : null}
         <Stack direction="horizontal" gap="sm">
           <Button variant="secondary" disabled={isPending} onClick={onCancel}>
-            {cancelLabel}
+            {cancelLabel ?? t('common.actions.cancel')}
           </Button>
           <Button variant="danger" disabled={isPending || confirmDisabled} onClick={onConfirm}>
-            {confirmLabel}
+            {confirmLabel ?? t('common.actions.confirm')}
           </Button>
         </Stack>
       </Stack>

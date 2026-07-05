@@ -5,6 +5,7 @@ import {
   useDeleteOrganization,
 } from '@/entities/organization'
 import type { CreateOrganizationInput, Organization } from '@/entities/organization'
+import { useTranslation } from '@/shared/i18n'
 import { useToast } from '@/shared/ui'
 
 export interface ManageOrganizationsPageState {
@@ -24,6 +25,7 @@ export interface ManageOrganizationsPageState {
 }
 
 export function useManageOrganizationsPage(): ManageOrganizationsPageState {
+  const { t } = useTranslation()
   const { showToast } = useToast()
   const { data, isLoading, isError } = useOrganizationList()
   const createOrg = useCreateOrganization()
@@ -35,7 +37,7 @@ export function useManageOrganizationsPage(): ManageOrganizationsPageState {
   const onCreate = (input: CreateOrganizationInput) => {
     createOrg.mutate(input, {
       onSuccess: () => {
-        showToast(`Organization "${input.name}" created.`, 'success')
+        showToast(t('admin.organizations.toast.created', { name: input.name }), 'success')
         setShowCreateForm(false)
       },
       onError: (err) => {
@@ -50,7 +52,7 @@ export function useManageOrganizationsPage(): ManageOrganizationsPageState {
     const targetId = deleteTarget.id
     deleteOrg.mutate(targetId, {
       onSuccess: () => {
-        showToast(`Organization "${targetName}" deleted.`, 'success')
+        showToast(t('admin.organizations.toast.deleted', { name: targetName }), 'success')
         setDeleteTarget(null)
       },
       onError: (err) => {

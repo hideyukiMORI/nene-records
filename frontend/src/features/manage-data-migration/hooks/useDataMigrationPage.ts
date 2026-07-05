@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useDataMigrationStatus, useAssignOrg } from '@/entities/data-migration'
 import { useOrganizationList } from '@/entities/organization'
 import type { Organization } from '@/entities/organization'
+import { useTranslation } from '@/shared/i18n'
 import { useToast } from '@/shared/ui'
 
 export interface DataMigrationPageState {
@@ -16,6 +17,7 @@ export interface DataMigrationPageState {
 }
 
 export function useDataMigrationPage(): DataMigrationPageState {
+  const { t } = useTranslation()
   const { showToast } = useToast()
   const { data: status, isLoading: statusLoading, isError: statusError } = useDataMigrationStatus()
   const { data: orgs } = useOrganizationList()
@@ -25,7 +27,7 @@ export function useDataMigrationPage(): DataMigrationPageState {
 
   const onAssign = () => {
     if (targetOrgId <= 0) {
-      showToast('Please select a target organization.', 'error')
+      showToast(t('admin.dataMigration.noTarget'), 'error')
       return
     }
 
@@ -34,7 +36,10 @@ export function useDataMigrationPage(): DataMigrationPageState {
       {
         onSuccess: (result) => {
           showToast(
-            `Migrated ${String(result.total)} records to "${result.organizationName}".`,
+            t('admin.dataMigration.toast.migrated', {
+              count: result.total,
+              name: result.organizationName,
+            }),
             'success',
           )
         },

@@ -1,6 +1,7 @@
 import { Suspense } from 'react'
 import { Link, NavLink, Outlet, Navigate } from 'react-router-dom'
 import { currentUserIsSuperadmin } from '@/entities/auth'
+import { useTranslation } from '@/shared/i18n'
 import { IconBuilding, IconDatabase, IconHome, IconSettings } from '@/shared/ui/icons/Icons'
 
 interface SuperadminNavItemProps {
@@ -29,6 +30,8 @@ function SuperadminNavItem({ to, icon, label }: SuperadminNavItemProps) {
 }
 
 export function SuperadminShell() {
+  const { t } = useTranslation()
+
   if (!currentUserIsSuperadmin()) {
     return <Navigate to="/forbidden" replace />
   }
@@ -38,23 +41,25 @@ export function SuperadminShell() {
       {/* Sidebar */}
       <aside className="w-56 shrink-0 border-r border-border bg-surface-raised">
         <div className="flex h-14 items-center border-b border-border px-4">
-          <span className="text-sm font-semibold text-accent">Superadmin</span>
+          <span className="text-sm font-semibold text-accent">
+            {t('admin.superadmin.navTitle')}
+          </span>
         </div>
         <nav className="p-3 space-y-1">
           <SuperadminNavItem
             to="/superadmin/organizations"
             icon={<IconBuilding size={16} />}
-            label="Organizations"
+            label={t('admin.organizations.pageTitle')}
           />
           <SuperadminNavItem
             to="/superadmin/data-migration"
             icon={<IconDatabase size={16} />}
-            label="Data Migration"
+            label={t('admin.dataMigration.pageTitle')}
           />
           <SuperadminNavItem
             to="/superadmin/settings"
             icon={<IconSettings size={16} />}
-            label="Settings"
+            label={t('admin.nav.settings')}
           />
         </nav>
         <div className="absolute bottom-0 left-0 w-56 border-t border-border p-3">
@@ -63,7 +68,7 @@ export function SuperadminShell() {
             className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-text-secondary hover:text-text-primary"
           >
             <IconHome size={16} />
-            <span>Back to Admin</span>
+            <span>{t('admin.superadmin.backToAdmin')}</span>
           </Link>
         </div>
       </aside>

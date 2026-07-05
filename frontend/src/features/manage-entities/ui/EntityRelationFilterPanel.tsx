@@ -1,5 +1,6 @@
 import type { RelationFieldDef } from '@/entities/field-def'
 import type { EntityRelationFilters } from '@/entities/entity'
+import { useTranslation } from '@/shared/i18n'
 import { Button, Stack, Text } from '@/shared/ui'
 import { EntityRelationFilterField } from './EntityRelationFilterField'
 
@@ -16,6 +17,8 @@ export function EntityRelationFilterPanel({
   onSelectTarget,
   onClear,
 }: EntityRelationFilterPanelProps) {
+  const { t } = useTranslation()
+
   if (relationFieldDefs.length === 0) {
     return null
   }
@@ -26,11 +29,11 @@ export function EntityRelationFilterPanel({
     <Stack gap="sm">
       <Stack direction="horizontal" gap="sm">
         <Text as="h2" variant="heading-sm">
-          Filter by relation
+          {t('admin.relations.filter.title')}
         </Text>
         {isFilterActive ? (
           <Button variant="secondary" size="sm" onClick={onClear}>
-            Clear
+            {t('admin.relations.filter.clear')}
           </Button>
         ) : null}
       </Stack>
@@ -46,9 +49,7 @@ export function EntityRelationFilterPanel({
           />
         ))}
       </Stack>
-      {isFilterActive ? (
-        <Text muted>Showing records matching all selected relation filters.</Text>
-      ) : null}
+      {isFilterActive ? <Text muted>{t('admin.relations.filter.activeNote')}</Text> : null}
     </Stack>
   )
 }

@@ -1,4 +1,5 @@
 import { useCallback, useRef } from 'react'
+import { useTranslation, type MessageKey } from '@/shared/i18n'
 import { MarkdownEditorShell } from './MarkdownEditorShell'
 
 interface MarkdownFieldInputProps {
@@ -10,14 +11,14 @@ interface MarkdownFieldInputProps {
 }
 
 interface ToolbarAction {
-  label: string
+  labelKey: MessageKey
   icon: string
   action: (value: string, selStart: number, selEnd: number) => { text: string; cursor: number }
 }
 
 const TOOLBAR_ACTIONS: ToolbarAction[] = [
   {
-    label: 'Bold',
+    labelKey: 'admin.markdownEditor.toolbar.bold',
     icon: 'B',
     action: (v, s, e) => {
       const sel = v.slice(s, e) || 'text'
@@ -25,7 +26,7 @@ const TOOLBAR_ACTIONS: ToolbarAction[] = [
     },
   },
   {
-    label: 'Italic',
+    labelKey: 'admin.markdownEditor.toolbar.italic',
     icon: 'I',
     action: (v, s, e) => {
       const sel = v.slice(s, e) || 'text'
@@ -33,7 +34,7 @@ const TOOLBAR_ACTIONS: ToolbarAction[] = [
     },
   },
   {
-    label: 'H2',
+    labelKey: 'admin.markdownEditor.toolbar.h2',
     icon: 'H2',
     action: (v, s, e) => {
       const lineStart = v.lastIndexOf('\n', s - 1) + 1
@@ -45,7 +46,7 @@ const TOOLBAR_ACTIONS: ToolbarAction[] = [
     },
   },
   {
-    label: 'H3',
+    labelKey: 'admin.markdownEditor.toolbar.h3',
     icon: 'H3',
     action: (v, s, e) => {
       const lineStart = v.lastIndexOf('\n', s - 1) + 1
@@ -57,7 +58,7 @@ const TOOLBAR_ACTIONS: ToolbarAction[] = [
     },
   },
   {
-    label: 'Unordered list',
+    labelKey: 'admin.markdownEditor.toolbar.unorderedList',
     icon: '≡',
     action: (v, s) => {
       const lineStart = v.lastIndexOf('\n', s - 1) + 1
@@ -69,7 +70,7 @@ const TOOLBAR_ACTIONS: ToolbarAction[] = [
     },
   },
   {
-    label: 'Ordered list',
+    labelKey: 'admin.markdownEditor.toolbar.orderedList',
     icon: '1.',
     action: (v, s) => {
       const lineStart = v.lastIndexOf('\n', s - 1) + 1
@@ -81,7 +82,7 @@ const TOOLBAR_ACTIONS: ToolbarAction[] = [
     },
   },
   {
-    label: 'Link',
+    labelKey: 'admin.markdownEditor.toolbar.link',
     icon: '🔗',
     action: (v, s, e) => {
       const sel = v.slice(s, e) || 'link text'
@@ -90,7 +91,7 @@ const TOOLBAR_ACTIONS: ToolbarAction[] = [
     },
   },
   {
-    label: 'Code block',
+    labelKey: 'admin.markdownEditor.toolbar.codeBlock',
     icon: '</>',
     action: (v, s, e) => {
       const sel = v.slice(s, e) || 'code'
@@ -99,7 +100,7 @@ const TOOLBAR_ACTIONS: ToolbarAction[] = [
     },
   },
   {
-    label: 'Blockquote',
+    labelKey: 'admin.markdownEditor.toolbar.blockquote',
     icon: '❝',
     action: (v, s) => {
       const lineStart = v.lastIndexOf('\n', s - 1) + 1
@@ -119,6 +120,7 @@ export function MarkdownFieldInput({
   disabled,
   onChange,
 }: MarkdownFieldInputProps) {
+  const { t } = useTranslation()
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   const applyToolbar = useCallback(
@@ -143,9 +145,9 @@ export function MarkdownFieldInput({
       <div className="flex flex-wrap gap-0.5 border-b border-border bg-surface-overlay px-inline-sm py-stack-xs">
         {TOOLBAR_ACTIONS.map((action) => (
           <button
-            key={action.label}
+            key={action.labelKey}
             type="button"
-            title={action.label}
+            title={t(action.labelKey)}
             disabled={disabled}
             onClick={() => {
               applyToolbar(action)

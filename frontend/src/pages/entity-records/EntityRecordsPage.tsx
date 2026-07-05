@@ -91,7 +91,7 @@ function EntityRecordsContent({ entityType }: { entityType: EntityType }) {
     <Stack gap="md">
       <Stack gap="xs">
         {/* ── Breadcrumb ── */}
-        <nav aria-label="breadcrumb">
+        <nav aria-label={t('admin.entityRecords.breadcrumbLabel')}>
           <Link
             to="/admin/entity-types"
             className="inline-flex items-center gap-1 text-xs text-text-muted transition-colors duration-fast hover:text-text-primary"
