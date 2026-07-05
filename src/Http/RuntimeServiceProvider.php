@@ -40,6 +40,7 @@ use NeNeRecords\Organization\Resolution\SubdomainOrCustomDomainResolutionStrateg
 use NeNeRecords\Organization\Resolution\SubdomainResolutionStrategy;
 use NeNeRecords\RateLimit\RateLimitServiceProvider;
 use NeNeRecords\SystemConfig\SystemConfigRepositoryInterface;
+use NeNeRecords\Version;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -353,6 +354,9 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
                         throttleMiddleware: $throttle,
                         debug: $config->debug,
                         requestMaxBodyBytes: 10 * 1024 * 1024, // 10 MiB — required for media uploads
+                        // Surface our own release version on GET /machine/health so NeNe Suite
+                        // can track updates against Origin (#586). Null when VERSION is absent.
+                        appVersion: Version::current(),
                     );
                 },
             )
