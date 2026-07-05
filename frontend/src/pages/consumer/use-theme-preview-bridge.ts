@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import type { ThemeLogo } from '@/shared/lib/theme-customization'
 import {
   isThemePreviewRequest,
   THEME_PREVIEW_APPLY,
@@ -9,6 +10,14 @@ import {
 interface ThemePreviewState {
   overrideCss: string
   flagAttrs: Record<string, string>
+  themeLogo: ThemeLogo
+}
+
+function readThemeLogo(value: ThemeLogo | undefined): ThemeLogo {
+  return {
+    light: typeof value?.light === 'string' ? value.light : undefined,
+    dark: typeof value?.dark === 'string' ? value.dark : undefined,
+  }
 }
 
 interface ThemePreviewBridge {
@@ -52,6 +61,7 @@ export function useThemePreviewBridge(): ThemePreviewBridge {
         setPreview({
           overrideCss: typeof data.overrideCss === 'string' ? data.overrideCss : '',
           flagAttrs: data.flagAttrs ?? {},
+          themeLogo: readThemeLogo(data.themeLogo),
         })
       }
     }

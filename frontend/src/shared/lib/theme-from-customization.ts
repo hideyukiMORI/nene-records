@@ -10,7 +10,12 @@
 import { BASE_THEME_TOKENS, type BaseThemeTokens } from './base-theme-tokens'
 
 export type { BaseThemeTokens } from './base-theme-tokens'
-import { resolveModeColors, resolveOverrideStyle, type ThemeOverrides } from './theme-customization'
+import {
+  resolveModeColors,
+  resolveOverrideStyle,
+  type ThemeImages,
+  type ThemeOverrides,
+} from './theme-customization'
 
 export interface ThemeManifestDraft {
   id: string
@@ -20,6 +25,43 @@ export interface ThemeManifestDraft {
   tokens: { light: Record<string, string>; dark: Record<string, string> }
   description?: string
   flags?: Record<string, string>
+  /** Media-id image assets per slot/mode (contract §8; validator accepts media ids). #372 */
+  assets?: ThemeManifestAssets
+}
+
+/** Per-slot, per-mode media ids captured into a saved theme's asset map. */
+export interface ThemeManifestAssets {
+  logo?: { light?: number; dark?: number }
+  hero?: { light?: number; dark?: number }
+  background?: { light?: number; dark?: number }
+}
+
+/** Map customizer image slots (media ids) to the manifest `assets` map; empty → undefined. */
+function imagesToAssets(images: ThemeImages | undefined): ThemeManifestAssets | undefined {
+  if (images === undefined) {
+    return undefined
+  }
+
+  const assets: ThemeManifestAssets = {}
+  for (const slot of ['logo', 'hero', 'background'] as const) {
+    const ref = images[slot]
+    if (ref === undefined) {
+      continue
+    }
+
+    const mapped: { light?: number; dark?: number } = {}
+    if (typeof ref.light === 'number') {
+      mapped.light = ref.light
+    }
+    if (typeof ref.dark === 'number') {
+      mapped.dark = ref.dark
+    }
+    if (mapped.light !== undefined || mapped.dark !== undefined) {
+      assets[slot] = mapped
+    }
+  }
+
+  return Object.keys(assets).length > 0 ? assets : undefined
 }
 
 /** Built-in theme ids — runtime themes must not shadow them. */
@@ -93,6 +135,10 @@ export function buildThemeManifestFromCustomization(args: {
   }
   if (overrides.flags !== undefined && Object.keys(overrides.flags).length > 0) {
     manifest.flags = overrides.flags as Record<string, string>
+  }
+  const assets = imagesToAssets(overrides.images)
+  if (assets !== undefined) {
+    manifest.assets = assets
   }
   return manifest
 }

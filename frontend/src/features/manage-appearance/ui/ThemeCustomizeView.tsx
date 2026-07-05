@@ -1,4 +1,5 @@
-import { type ReactNode, useState } from 'react'
+import { type ReactNode, useMemo, useState } from 'react'
+import { useMediaList } from '@/entities/media'
 import { useTranslation } from '@/shared/i18n'
 import {
   DENSITY_OPTIONS,
@@ -9,14 +10,19 @@ import {
   GUTTER_OPTIONS,
   MONO_FONT_OPTIONS,
   RADIUS_OPTIONS,
+  resolveDraftImageUrls,
   TYPE_SCALE_OPTIONS,
   WIDTH_OPTIONS,
   type KnobOption,
+  type ThemeImages,
 } from '@/shared/lib/theme-customization'
 import { Button, Card, ConfirmDialog, Input, Stack, Text, Textarea } from '@/shared/ui'
 import { THEME_PREVIEW_PARAM } from '@/shared/lib/theme-preview-protocol'
 import { useThemePreviewSender } from '../hooks/useThemePreviewSender'
 import type { ThemeCustomizePageState } from '../hooks/useThemeCustomizePage'
+import { ThemeImageField } from './ThemeImageField'
+
+const IMAGE_SLOTS: ReadonlyArray<keyof ThemeImages> = ['logo', 'hero', 'background']
 
 function Field({ label, children }: { label: string; children: ReactNode }) {
   // Fixed-width label column + left-grouped control: keeps each control right
@@ -112,9 +118,58 @@ export function ThemeCustomizeView({
   const [newName, setNewName] = useState('')
   const [newDescription, setNewDescription] = useState('')
 
-  // Live preview (#538 ②): an embedded public page the draft is pushed to.
+  // Media library: the draft stores image ids, so we need id→url for thumbnails
+  // and to resolve the preview (which reuses the public URL-based CSS builder).
+  const mediaList = useMediaList()
+  const idToUrl = useMemo(() => {
+    const map = new Map<number, string>()
+    for (const item of mediaList.data?.items ?? []) {
+      map.set(item.id, item.url)
+    }
+    return map
+  }, [mediaList.data?.items])
+
+  const thumbUrl = (slot: keyof ThemeImages, mode: 'light' | 'dark'): string | undefined => {
+    const value = draft.images?.[slot]?.[mode]
+    if (typeof value === 'number') {
+      return idToUrl.get(value)
+    }
+    return typeof value === 'string' ? value : undefined
+  }
+
+  const setImage = (
+    slot: keyof ThemeImages,
+    mode: 'light' | 'dark',
+    id: number | undefined,
+  ): void => {
+    // Rebuild the slot map, pruning modes/slots that become empty (so storage and
+    // the exactOptional types stay clean without dynamic `delete`).
+    const nextImages: ThemeImages = {}
+    for (const key of IMAGE_SLOTS) {
+      const base = draft.images?.[key]
+      const light = key === slot && mode === 'light' ? id : base?.light
+      const dark = key === slot && mode === 'dark' ? id : base?.dark
+      if (light !== undefined || dark !== undefined) {
+        nextImages[key] = { light, dark }
+      }
+    }
+    setKnob('images', Object.keys(nextImages).length > 0 ? nextImages : undefined)
+  }
+
+  const imagePickerLabels = {
+    select: t('admin.blocks.media.select'),
+    change: t('admin.blocks.media.change'),
+    remove: t('admin.blocks.media.remove'),
+  }
+
+  // Live preview (#538 ②): an embedded public page the draft is pushed to. Image
+  // ids are resolved to URLs first so hero/background render like the public site.
   const [showPreview, setShowPreview] = useState(false)
-  const { iframeRef } = useThemePreviewSender(themeId, draft)
+  const previewDraft = useMemo(
+    () => resolveDraftImageUrls(draft, (id) => idToUrl.get(id)),
+    [draft, idToUrl],
+  )
+  const { iframeRef } = useThemePreviewSender(themeId, previewDraft)
 
   const closeSaveAs = () => {
     setSaveAsOpen(false)
@@ -292,6 +347,49 @@ export function ThemeCustomizeView({
               }}
             />
           </Field>
+        </Stack>
+
+        {/* Images — logo / hero / background, per light/dark, from the media library (#372). */}
+        <Stack gap="sm" className="border-t border-border pt-stack-sm">
+          <Text muted variant="caption">
+            {t('admin.themeCustomize.imagesGroup')}
+          </Text>
+          <ThemeImageField
+            label={t('admin.themeCustomize.logo')}
+            lightLabel="light"
+            darkLabel="dark"
+            pickerLabels={imagePickerLabels}
+            value={draft.images?.logo}
+            urlFor={(mode) => thumbUrl('logo', mode)}
+            disabled={disabled}
+            onChange={(mode, id) => {
+              setImage('logo', mode, id)
+            }}
+          />
+          <ThemeImageField
+            label={t('admin.themeCustomize.heroImage')}
+            lightLabel="light"
+            darkLabel="dark"
+            pickerLabels={imagePickerLabels}
+            value={draft.images?.hero}
+            urlFor={(mode) => thumbUrl('hero', mode)}
+            disabled={disabled}
+            onChange={(mode, id) => {
+              setImage('hero', mode, id)
+            }}
+          />
+          <ThemeImageField
+            label={t('admin.themeCustomize.background')}
+            lightLabel="light"
+            darkLabel="dark"
+            pickerLabels={imagePickerLabels}
+            value={draft.images?.background}
+            urlFor={(mode) => thumbUrl('background', mode)}
+            disabled={disabled}
+            onChange={(mode, id) => {
+              setImage('background', mode, id)
+            }}
+          />
         </Stack>
 
         {/* Advanced — finer tuning + structural flags, folded away by default. */}

@@ -1,6 +1,7 @@
 import { useOutletContext } from 'react-router-dom'
 import type { HeaderConfig } from '@/shared/lib/header-config'
 import type { PageLayout } from '@/shared/lib/layout-config'
+import type { ThemeLogo } from '@/shared/lib/theme-customization'
 
 export interface PublicSiteNavItem {
   id: number
@@ -20,6 +21,8 @@ export interface PublicSite {
   footerMarkdown: string
   /** Logo image URL (`logo_media_id` resolved server-side); '' → brand mark. */
   logo: string
+  /** Optional per-theme logo override (`images.logo`, URLs resolved server-side). #372 */
+  themeLogo?: ThemeLogo | undefined
   /** Footer copyright text; `{year}`/`{site}` tokens substituted at render. */
   copyrightText: string
   /** Top-page column layout (`layout_config.home`) — drives sidebar/aside on home. */

@@ -18,11 +18,15 @@ afterEach(() => {
   vi.restoreAllMocks()
 })
 
-function applyMessage(overrideCss: string, flagAttrs: Record<string, string>): void {
+function applyMessage(
+  overrideCss: string,
+  flagAttrs: Record<string, string>,
+  themeLogo?: { light?: string; dark?: string },
+): void {
   window.dispatchEvent(
     new MessageEvent('message', {
       origin: window.location.origin,
-      data: { type: THEME_PREVIEW_APPLY, overrideCss, flagAttrs },
+      data: { type: THEME_PREVIEW_APPLY, overrideCss, flagAttrs, themeLogo },
     }),
   )
 }
@@ -60,6 +64,20 @@ describe('useThemePreviewBridge', () => {
       expect(result.current.preview).toEqual({
         overrideCss: '.nene-public{--color-accent:red}',
         flagAttrs: { 'data-feed-layout': 'grid' },
+        themeLogo: { light: undefined, dark: undefined },
+      })
+    })
+
+    it('applies a per-mode logo from the message', () => {
+      const { result } = renderHook(() => useThemePreviewBridge())
+
+      act(() => {
+        applyMessage('', {}, { light: '/media/2026/06/logo.png' })
+      })
+
+      expect(result.current.preview?.themeLogo).toEqual({
+        light: '/media/2026/06/logo.png',
+        dark: undefined,
       })
     })
 

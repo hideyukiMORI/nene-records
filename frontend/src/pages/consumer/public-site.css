@@ -79,6 +79,16 @@
     color var(--dur-normal) var(--ease);
 }
 
+/* Optional site background image (theme customizer, #372). Layers over the surface
+   colour set above; `none` when the customizer sets no background, so themes
+   without one are unaffected. Emitted per-mode by resolveModeImages(). */
+.nene-public {
+  background-image: var(--site-bg-image, none);
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
 .nene-public a {
   color: inherit;
   text-decoration: none;
@@ -424,6 +434,11 @@
 /* ── Hero ────────────────────────────────────────────────────────────────── */
 .nene-public .hero {
   padding-top: clamp(2.5rem, 1rem + 5vw, 5rem);
+  /* Optional hero background image from the theme customizer (#372); `none` when
+     unset. Hero variants that set their own background (gradient) still win. */
+  background-image: var(--hero-image, none);
+  background-size: cover;
+  background-position: center;
 }
 .nene-public .hero__grid {
   display: grid;
