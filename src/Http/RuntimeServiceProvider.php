@@ -16,6 +16,8 @@ use Nene2\Database\DatabaseTransactionManagerInterface;
 use Nene2\Database\PdoConnectionFactory;
 use Nene2\Database\PdoDatabaseQueryExecutor;
 use Nene2\Database\PdoDatabaseTransactionManager;
+use Nene2\Database\Preflight\ApplicationIdentity;
+use Nene2\Database\Preflight\DefaultDatabaseCandidateInspector;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\DomainExceptionHandlerInterface;
@@ -32,6 +34,9 @@ use NeNeRecords\ApplicationServiceProvider;
 use NeNeRecords\Auth\AdminApiAuthMiddleware;
 use NeNeRecords\Auth\AuthServiceProvider;
 use NeNeRecords\Auth\CapabilityMiddleware;
+use NeNeRecords\Database\Preflight\CandidateProfileFactory;
+use NeNeRecords\Database\Preflight\MigrationVersions;
+use NeNeRecords\Database\Preflight\PreflightIdentity;
 use NeNeRecords\Organization\OrganizationRepositoryInterface;
 use NeNeRecords\Organization\Resolution\EnvResolutionStrategy;
 use NeNeRecords\Organization\Resolution\OrgResolverMiddleware;
@@ -357,6 +362,18 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
                         // Surface our own release version on GET /machine/health so NeNe Suite
                         // can track updates against Origin (#586). Null when VERSION is absent.
                         appVersion: Version::current(),
+                        // Opt into the auth-gated POST /machine/database/preflight endpoint (#648):
+                        // read-only diagnosis of a candidate database before adopting it. The inspector
+                        // knows our shipped migrations and our identity marker; candidate connection
+                        // details come only from the app's own env (SSRF-safe), never the request body.
+                        databaseCandidateInspector: new DefaultDatabaseCandidateInspector(
+                            applicationMigrationVersions: MigrationVersions::known(),
+                            // Phinx's default ledger table (phinx.php does not override
+                            // default_migration_table); the inspector otherwise assumes 'phinx_log'.
+                            ledgerTable: 'phinxlog',
+                            applicationIdentity: new ApplicationIdentity(PreflightIdentity::APPLICATION_ID),
+                        ),
+                        databaseCandidateProfiles: CandidateProfileFactory::fromEnv($_SERVER + $_ENV),
                     );
                 },
             )
