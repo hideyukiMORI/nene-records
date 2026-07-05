@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef } from 'react'
 import {
   flagAttrsForTheme,
   overrideCssForTheme,
+  type ThemeLogo,
   type ThemeOverrides,
 } from '@/shared/lib/theme-customization'
 import { THEME_PREVIEW_APPLY, THEME_PREVIEW_READY } from '@/shared/lib/theme-preview-protocol'
@@ -19,6 +20,15 @@ export function useThemePreviewSender(themeId: string, draft: ThemeOverrides) {
   const overrideCss = useMemo(() => overrideCssForTheme(raw, themeId), [raw, themeId])
   const flagAttrs = useMemo(() => flagAttrsForTheme(raw, themeId), [raw, themeId])
 
+  // The logo is rendered as an `<img>` (not CSS), so it rides its own field. The
+  // draft passed in already has image ids resolved to URLs (resolveDraftImageUrls).
+  const themeLogo = useMemo<ThemeLogo>(() => {
+    const logo = draft.images?.logo
+    const pick = (value: number | string | undefined): string | undefined =>
+      typeof value === 'string' ? value : undefined
+    return { light: pick(logo?.light), dark: pick(logo?.dark) }
+  }, [draft])
+
   const post = useCallback((): void => {
     const win = iframeRef.current?.contentWindow
 
@@ -26,8 +36,11 @@ export function useThemePreviewSender(themeId: string, draft: ThemeOverrides) {
       return
     }
 
-    win.postMessage({ type: THEME_PREVIEW_APPLY, overrideCss, flagAttrs }, window.location.origin)
-  }, [overrideCss, flagAttrs])
+    win.postMessage(
+      { type: THEME_PREVIEW_APPLY, overrideCss, flagAttrs, themeLogo },
+      window.location.origin,
+    )
+  }, [overrideCss, flagAttrs, themeLogo])
 
   // Push the draft whenever the computed CSS / flags change.
   useEffect(() => {

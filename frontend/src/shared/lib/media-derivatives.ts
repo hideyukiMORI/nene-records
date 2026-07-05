@@ -24,6 +24,31 @@ export interface ResponsiveSources {
   srcSet: string
 }
 
+/**
+ * Single derivative URL for a given preset (e.g. `lg`), or null when `url` is not
+ * a media-library image path. Used where one URL is needed (a CSS `background-image`
+ * has no srcset) — matches the backend `MediaDerivativeUrl::forPreset($url, $preset)`.
+ */
+export function mediaDerivativeUrl(url: string, preset: string): string | null {
+  const match = MEDIA_PATH.exec(url)
+  if (match === null) {
+    return null
+  }
+
+  const [, prefix, year, month, filename] = match
+  if (
+    prefix === undefined ||
+    year === undefined ||
+    month === undefined ||
+    filename === undefined ||
+    !IMAGE_EXTENSIONS.test(filename)
+  ) {
+    return null
+  }
+
+  return `${prefix}${preset}/${year}/${month}/${filename}`
+}
+
 export function mediaSrcSet(url: string): ResponsiveSources | null {
   const match = MEDIA_PATH.exec(url)
   if (match === null) {

@@ -6,6 +6,8 @@
  * are origin-checked against `window.location.origin`.
  */
 
+import type { ThemeLogo } from './theme-customization'
+
 export const THEME_PREVIEW_PARAM = 'nene-theme-preview'
 
 /** Customizer → iframe: apply this draft theme. */
@@ -20,6 +22,8 @@ export interface ThemePreviewApplyMessage {
   overrideCss: string
   /** Structural flag attributes (`data-*` → value) for the `.nene-public` root. */
   flagAttrs: Record<string, string>
+  /** Per-mode logo URLs (rendered as `<img>`, so not part of overrideCss). #372. */
+  themeLogo?: ThemeLogo
 }
 
 export interface ThemePreviewReadyMessage {

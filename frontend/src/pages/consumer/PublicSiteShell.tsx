@@ -207,6 +207,13 @@ export function PublicSiteShell({
   const overrideCss = previewState !== null ? previewState.overrideCss : site.themeOverrideCss
   const flagAttrs = previewState !== null ? previewState.flagAttrs : site.themeFlagAttrs
 
+  // Per-theme logo override (#372), rendered as an <img> (not CSS). Pick the slot
+  // for the mode actually shown — `resolvedTheme` is `<id>` (light) or `<id>-dark`,
+  // the same key the override CSS uses — and fall back to the global logo.
+  const themeLogo = previewState !== null ? previewState.themeLogo : site.themeLogo
+  const effectiveLogo =
+    (resolvedTheme.endsWith('-dark') ? themeLogo?.dark : themeLogo?.light) ?? site.logo
+
   // Motion capability layer (#371): the theme declares `data-motion-reveal`;
   // first-party JS implements scroll-reveal, gated by prefers-reduced-motion.
   const mainRef = useRef<HTMLElement>(null)
@@ -302,7 +309,7 @@ export function PublicSiteShell({
       ) : null}
       <header ref={headerRef} className="hd">
         <div className="wrap hd__in">
-          <Brand siteName={site.siteName} tagline={site.tagline} logo={site.logo} />
+          <Brand siteName={site.siteName} tagline={site.tagline} logo={effectiveLogo} />
           <nav className="hd__nav" aria-label="Primary">
             {navLinks.map((link) => (
               <Link
@@ -358,7 +365,7 @@ export function PublicSiteShell({
       <footer className="ft">
         <div className="wrap ft__grid">
           <div className="ft__brand">
-            <Brand siteName={site.siteName} logo={site.logo} />
+            <Brand siteName={site.siteName} logo={effectiveLogo} />
             {site.footerMarkdown !== '' ? <p className="ft__free">{site.footerMarkdown}</p> : null}
           </div>
           <div className="ft__col">

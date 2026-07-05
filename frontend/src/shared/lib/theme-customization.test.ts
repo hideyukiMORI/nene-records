@@ -4,7 +4,9 @@ import {
   flagAttrsForTheme,
   overrideCssForTheme,
   resolveFlagAttrs,
+  resolveDraftImageUrls,
   resolveModeColors,
+  resolveModeImages,
   resolveOverrideStyle,
 } from './theme-customization'
 
@@ -98,6 +100,75 @@ describe('resolveModeColors', () => {
   })
 })
 
+describe('resolveModeImages', () => {
+  it('emits hero/background url() vars for resolved same-origin paths', () => {
+    const style = resolveModeImages(
+      {
+        images: {
+          hero: { light: '/media/lg/2026/06/hero.png' },
+          background: { light: '/media/lg/2026/06/bg.jpg' },
+        },
+      },
+      'light',
+    )
+    expect(style['--hero-image']).toBe('url("/media/lg/2026/06/hero.png")')
+    expect(style['--site-bg-image']).toBe('url("/media/lg/2026/06/bg.jpg")')
+  })
+
+  it('skips unresolved numeric ids (never emits url(123))', () => {
+    expect(resolveModeImages({ images: { hero: { light: 42 } } }, 'light')).toEqual({})
+  })
+
+  it('rejects external / protocol-relative / injection attempts', () => {
+    for (const evil of [
+      '//evil.example/x.png',
+      'https://evil.example/x.png',
+      'data:image/png;base64,AAAA',
+      'javascript:alert(1)',
+      '/media/x.png") ; background: url(evil',
+      '/media/a b.png',
+    ]) {
+      expect(resolveModeImages({ images: { hero: { light: evil } } }, 'light')).toEqual({})
+    }
+  })
+
+  it('reads the requested mode only', () => {
+    const overrides = { images: { hero: { light: '/media/lg/l.png', dark: '/media/lg/d.png' } } }
+    expect(resolveModeImages(overrides, 'light')['--hero-image']).toBe('url("/media/lg/l.png")')
+    expect(resolveModeImages(overrides, 'dark')['--hero-image']).toBe('url("/media/lg/d.png")')
+  })
+})
+
+describe('resolveDraftImageUrls', () => {
+  const idToUrl = (id: number): string | undefined =>
+    ({ 2: '/media/2026/06/hero.png', 3: '/media/2026/06/logo.png' })[id]
+
+  it('resolves hero/background ids to the lg derivative and logo to the raw url', () => {
+    const out = resolveDraftImageUrls(
+      { images: { hero: { light: 2 }, background: { dark: 2 }, logo: { light: 3 } } },
+      idToUrl,
+    )
+    expect(out.images?.hero?.light).toBe('/media/lg/2026/06/hero.png')
+    expect(out.images?.background?.dark).toBe('/media/lg/2026/06/logo.png'.replace('logo', 'hero'))
+    expect(out.images?.logo?.light).toBe('/media/2026/06/logo.png')
+  })
+
+  it('drops unresolved ids and empties, and passes through string urls', () => {
+    const out = resolveDraftImageUrls(
+      { accent: '#fff', images: { hero: { light: 999, dark: '/media/lg/pre.png' } } },
+      idToUrl,
+    )
+    expect(out.images?.hero?.light).toBeUndefined()
+    expect(out.images?.hero?.dark).toBe('/media/lg/pre.png')
+    expect(out.accent).toBe('#fff')
+  })
+
+  it('returns the same object when there are no images', () => {
+    const input = { accent: '#fff' }
+    expect(resolveDraftImageUrls(input, idToUrl)).toBe(input)
+  })
+})
+
 describe('buildOverrideCss / overrideCssForTheme', () => {
   it('scopes mode-agnostic vars to both modes and colours per mode', () => {
     const css = buildOverrideCss(
@@ -109,6 +180,17 @@ describe('buildOverrideCss / overrideCssForTheme', () => {
     expect(css).toContain('--content-w: 1320px;')
     expect(css).toContain('--color-surface: #ffffff;')
     expect(css).toContain('--color-surface: #101010;')
+  })
+
+  it('places per-mode hero images in the matching mode block', () => {
+    const css = buildOverrideCss(
+      { images: { hero: { light: '/media/lg/l.png', dark: '/media/lg/d.png' } } },
+      'aurora',
+    )
+    const darkBlock = css.slice(css.indexOf(".nene-public[data-theme='aurora-dark']"))
+    const lightBlock = css.slice(0, css.indexOf(".nene-public[data-theme='aurora-dark']"))
+    expect(lightBlock).toContain('--hero-image: url("/media/lg/l.png");')
+    expect(darkBlock).toContain('--hero-image: url("/media/lg/d.png");')
   })
 
   it('returns the css for the requested theme only, empty otherwise', () => {

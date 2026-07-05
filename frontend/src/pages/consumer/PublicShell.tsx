@@ -24,9 +24,11 @@ import {
 import {
   flagAttrsForTheme,
   overrideCssForTheme,
+  parseThemeOverrides,
   readStoredThemeOverridesRaw,
   resolveFlagAttrs,
   storeThemeOverridesRaw,
+  type ThemeLogo,
 } from '@/shared/lib/theme-customization'
 import type { PublicSite } from './public-site-context'
 
@@ -132,12 +134,21 @@ export function PublicShell() {
     liveRuntimeFlagsJson,
   ])
 
+  // Per-theme logo override (#372): the public endpoint has already resolved the
+  // media ids to URLs, so pick out the string values for the active theme.
+  const themeLogoRef = parseThemeOverrides(overridesRaw)[activeTheme]?.images?.logo
+  const themeLogo: ThemeLogo = {
+    light: typeof themeLogoRef?.light === 'string' ? themeLogoRef.light : undefined,
+    dark: typeof themeLogoRef?.dark === 'string' ? themeLogoRef.dark : undefined,
+  }
+
   const site: PublicSite = {
     siteName: settings.site_name ?? 'NeNe Records',
     tagline: settings.tagline ?? '',
     metaDescription: settings.default_meta_description ?? '',
     footerMarkdown: settings.footer_markdown ?? '',
     logo: settings.logo_media_id ?? '',
+    themeLogo,
     copyrightText: settings.copyright_text ?? '',
     homeLayout: parseLayoutConfig(settings.layout_config).home,
     navItems,

@@ -63,4 +63,24 @@ describe('buildThemeManifestFromCustomization', () => {
     expect(manifest.description).toBeUndefined()
     expect(manifest.flags).toBeUndefined()
   })
+
+  it('captures image slots as media-id assets, dropping empty slots', () => {
+    const manifest = buildThemeManifestFromCustomization({
+      id: 'brand',
+      name: 'Brand',
+      baseTokens: BASE,
+      overrides: { images: { hero: { light: 5 }, logo: { light: 7, dark: 8 }, background: {} } },
+    })
+    expect(manifest.assets).toEqual({ hero: { light: 5 }, logo: { light: 7, dark: 8 } })
+  })
+
+  it('omits assets when there are no images', () => {
+    const manifest = buildThemeManifestFromCustomization({
+      id: 'plain',
+      name: 'Plain',
+      baseTokens: BASE,
+      overrides: { accent: '#123456' },
+    })
+    expect(manifest.assets).toBeUndefined()
+  })
 })

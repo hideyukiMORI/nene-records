@@ -8,9 +8,12 @@
  * we only ever emit known CSS variables with validated values, never raw input.
  *
  * Knobs: accent (色) / body・display・mono font (フォント) / content width (幅)
- * / gutter (余白) / radius (角丸) / font size × type scale (→ `--text-*`) / density (→ `--space-*`).
+ * / gutter (余白) / radius (角丸) / font size × type scale (→ `--text-*`) / density (→ `--space-*`)
+ * / image slots (logo・hero・background).
  * Derived tokens that reference these (e.g. `--color-accent-weak`) auto-follow.
  */
+
+import { mediaDerivativeUrl } from './media-derivatives'
 
 /** Per-theme override values as stored (one entry per theme id). */
 export interface ThemeOverrides {
@@ -40,12 +43,42 @@ export interface ThemeOverrides {
   text?: ColorPair
   /** Structural style flags (applied as data-* attributes; see theme-flags.md). */
   flags?: ThemeFlags
+  /** Image slots (logo / hero / background), per mode. See ThemeImages. */
+  images?: ThemeImages
 }
 
 /** A colour value per light/dark mode (hex). */
 export interface ColorPair {
   light?: string
   dark?: string
+}
+
+/**
+ * A media reference per light/dark mode. Persisted (and in the admin form) as the
+ * media **id** (number); the public settings endpoint rewrites it to a resolved
+ * same-origin URL (string) before it reaches the CSS layer — the same "id in, URL
+ * out" split used by `logo_media_id`. The CSS emitter only acts on strings, so an
+ * unresolved id never leaks into `url(...)`.
+ */
+export interface ThemeImageRef {
+  light?: number | string | undefined
+  dark?: number | string | undefined
+}
+
+/** Per-mode resolved logo URLs (from `images.logo`, ids already → URLs). */
+export interface ThemeLogo {
+  light?: string | undefined
+  dark?: string | undefined
+}
+
+/** Public-site image slots (contract §8.1); each is light/dark capable. */
+export interface ThemeImages {
+  /** Brand mark. Rendered as an `<img>` in the shell (keeps alt), not a CSS var. */
+  logo?: ThemeImageRef
+  /** Hero background image → `--hero-image`. */
+  hero?: ThemeImageRef
+  /** Optional site background → `--site-bg-image`. */
+  background?: ThemeImageRef
 }
 
 /** Structural style flags — enumerated; implemented once in base CSS. */
@@ -483,6 +516,36 @@ export function resolveModeColors(overrides: ThemeOverrides, mode: Mode): Record
   return style
 }
 
+/**
+ * A resolved, same-origin absolute media path (e.g. `/media/lg/2026/06/hero.png`).
+ * Rejects protocol-relative (`//host`), `data:`/`javascript:`, and any CSS-breaking
+ * character (quote/paren/whitespace/backslash) so we never emit an external or
+ * hostile `url(...)` (contract §8.4). Unresolved numeric ids fail `typeof string`.
+ */
+const SAFE_MEDIA_PATH = /^\/(?!\/)[^\s"'()\\]+$/
+
+/**
+ * Per-mode image overrides (hero / background) as CSS custom properties. Values
+ * arrive already resolved to same-origin URLs by the public settings endpoint;
+ * anything not matching a safe same-origin path (including a still-numeric id) is
+ * skipped, so the emitted CSS only ever contains a validated `url("...")`.
+ */
+export function resolveModeImages(overrides: ThemeOverrides, mode: Mode): Record<string, string> {
+  const style: Record<string, string> = {}
+
+  const hero = overrides.images?.hero?.[mode]
+  if (typeof hero === 'string' && SAFE_MEDIA_PATH.test(hero)) {
+    style['--hero-image'] = `url("${hero}")`
+  }
+
+  const background = overrides.images?.background?.[mode]
+  if (typeof background === 'string' && SAFE_MEDIA_PATH.test(background)) {
+    style['--site-bg-image'] = `url("${background}")`
+  }
+
+  return style
+}
+
 function cssVarsBlock(selector: string, vars: Record<string, string>): string {
   const entries = Object.entries(vars)
   if (entries.length === 0) {
@@ -504,8 +567,14 @@ export function buildOverrideCss(overrides: ThemeOverrides, themeId: string): st
 
   const agnostic = resolveOverrideStyle(overrides)
   let css = cssVarsBlock(`${light},\n${dark}`, agnostic)
-  css += cssVarsBlock(light, resolveModeColors(overrides, 'light'))
-  css += cssVarsBlock(dark, resolveModeColors(overrides, 'dark'))
+  css += cssVarsBlock(light, {
+    ...resolveModeColors(overrides, 'light'),
+    ...resolveModeImages(overrides, 'light'),
+  })
+  css += cssVarsBlock(dark, {
+    ...resolveModeColors(overrides, 'dark'),
+    ...resolveModeImages(overrides, 'dark'),
+  })
   return css
 }
 
@@ -513,6 +582,58 @@ export function buildOverrideCss(overrides: ThemeOverrides, themeId: string): st
 export function overrideCssForTheme(raw: string | undefined, themeId: string): string {
   const forTheme = parseThemeOverrides(raw)[themeId]
   return forTheme ? buildOverrideCss(forTheme, themeId) : ''
+}
+
+const IMAGE_SLOT_KEYS: ReadonlyArray<keyof ThemeImages> = ['logo', 'hero', 'background']
+const IMAGE_MODE_KEYS: ReadonlyArray<keyof ThemeImageRef> = ['light', 'dark']
+
+/**
+ * Resolve the image slots of a draft from media **ids** to same-origin **URLs**,
+ * so the live preview (which reuses the public CSS builder) can render them just
+ * like the public endpoint's already-resolved payload. hero/background bake to the
+ * `lg` derivative (matching the backend); logo uses the raw URL. Ids that don't
+ * resolve are dropped. Non-image knobs pass through untouched.
+ */
+export function resolveDraftImageUrls(
+  overrides: ThemeOverrides,
+  idToUrl: (id: number) => string | undefined,
+): ThemeOverrides {
+  if (overrides.images === undefined) {
+    return overrides
+  }
+
+  const images: ThemeImages = {}
+  for (const slot of IMAGE_SLOT_KEYS) {
+    const ref = overrides.images[slot]
+    if (ref === undefined) {
+      continue
+    }
+
+    const resolved: ThemeImageRef = {}
+    for (const mode of IMAGE_MODE_KEYS) {
+      const value = ref[mode]
+      if (typeof value === 'string') {
+        resolved[mode] = value
+      } else if (typeof value === 'number') {
+        const url = idToUrl(value)
+        if (url !== undefined) {
+          resolved[mode] = slot === 'logo' ? url : (mediaDerivativeUrl(url, 'lg') ?? url)
+        }
+      }
+    }
+
+    if (resolved.light !== undefined || resolved.dark !== undefined) {
+      images[slot] = resolved
+    }
+  }
+
+  if (Object.keys(images).length > 0) {
+    return { ...overrides, images }
+  }
+
+  const withoutImages = { ...overrides }
+  delete withoutImages.images
+  return withoutImages
 }
 
 /**
