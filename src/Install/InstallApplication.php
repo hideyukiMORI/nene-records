@@ -11,6 +11,8 @@ use NeNeRecords\Organization\CreateOrganizationInput;
 use NeNeRecords\Organization\CreateOrganizationUseCaseInterface;
 use NeNeRecords\Organization\OrganizationRepositoryInterface;
 use NeNeRecords\Organization\OrganizationSlugConflictException;
+use NeNeRecords\Setting\UpdateSettingInput;
+use NeNeRecords\Setting\UpdateSettingUseCaseInterface;
 use NeNeRecords\User\CreateUserInput;
 use NeNeRecords\User\CreateUserUseCaseInterface;
 use NeNeRecords\User\UserEmailConflictException;
@@ -31,6 +33,7 @@ final readonly class InstallApplication
         private OrganizationRepositoryInterface $organizations,
         private CreateUserUseCaseInterface $createUser,
         private RequestScopedHolder $orgHolder,
+        private UpdateSettingUseCaseInterface $updateSetting,
     ) {
     }
 
@@ -42,6 +45,15 @@ final readonly class InstallApplication
         $this->orgHolder->set($organizationId);
 
         $adminCreated = $this->ensureAdmin($config, $organizationId);
+
+        // Reflect the entered name into the public `site_name` setting so the site
+        // title is correct out of the box (otherwise it stays the "NeNe Records"
+        // default until the user edits it in the admin). Only on fresh creation:
+        // this seam runs on every deploy, so re-runs must not clobber a name the
+        // user has since customized.
+        if ($organizationCreated) {
+            $this->updateSetting->execute(new UpdateSettingInput('site_name', $config->organizationName));
+        }
 
         return new InstallResult(
             organizationId: $organizationId,

@@ -45,6 +45,7 @@ use NeNeRecords\Install\InstallApplication;
 use NeNeRecords\Install\InstallConfig;
 use NeNeRecords\Organization\CreateOrganizationUseCaseInterface;
 use NeNeRecords\Organization\OrganizationRepositoryInterface;
+use NeNeRecords\Setting\UpdateSettingUseCaseInterface;
 use NeNeRecords\User\CreateUserUseCaseInterface;
 
 define('ROOT', dirname(__DIR__, 2));
@@ -844,12 +845,14 @@ if ($stepId === 'administrator') {
                 $organizations = $container->get(OrganizationRepositoryInterface::class);
                 $createUser = $container->get(CreateUserUseCaseInterface::class);
                 $orgHolder = $container->get(ApplicationServiceProvider::ORG_ID_HOLDER);
+                $updateSetting = $container->get(UpdateSettingUseCaseInterface::class);
 
                 if (
                     !$createOrganization instanceof CreateOrganizationUseCaseInterface
                     || !$organizations instanceof OrganizationRepositoryInterface
                     || !$createUser instanceof CreateUserUseCaseInterface
                     || !$orgHolder instanceof RequestScopedHolder
+                    || !$updateSetting instanceof UpdateSettingUseCaseInterface
                 ) {
                     throw new RuntimeException('アプリケーションコンテナの構成が不正です。');
                 }
@@ -862,7 +865,7 @@ if ($stepId === 'administrator') {
                     : 'default';
 
                 /** @var RequestScopedHolder<int> $orgHolder */
-                $result = (new InstallApplication($createOrganization, $organizations, $createUser, $orgHolder))
+                $result = (new InstallApplication($createOrganization, $organizations, $createUser, $orgHolder, $updateSetting))
                     ->install(new InstallConfig($orgName, $orgSlug, $adminEmail, $adminPassword));
 
                 $guard->markInstalled(date('c'));
