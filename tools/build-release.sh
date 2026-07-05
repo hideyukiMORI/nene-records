@@ -16,8 +16,10 @@
 
 set -euo pipefail
 
-VERSION="${1:-dev}"
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+# 版は root の VERSION ファイルが単一ソース（/machine/health も同じ値を報告・#586）。
+# 明示引数があればそれを優先、無ければ VERSION、それも無ければ dev。
+VERSION="${1:-$(cat "$ROOT/VERSION" 2>/dev/null || echo dev)}"
 DIST="$ROOT/dist"
 STAGE="$DIST/build/stage"
 ZIP_NAME="nene-records-${VERSION}.zip"
@@ -50,6 +52,8 @@ cp "$ROOT/.env.example" "$STAGE/.env.example"
 cp "$ROOT/phinx.php" "$STAGE/phinx.php"
 cp "$ROOT/composer.json" "$STAGE/composer.json"
 cp "$ROOT/README.md" "$STAGE/README.md"
+# 版ファイル（/machine/health が実行時に読む単一ソース・#586）。
+cp "$ROOT/VERSION" "$STAGE/VERSION"
 
 # テーマ engine CSS: getThemeEngineCss（MCP テーマ生成）が FS 読みする唯一の
 # frontend ソース（欠けても公開サイトは無傷・MCP 応答が空になるだけ）。
