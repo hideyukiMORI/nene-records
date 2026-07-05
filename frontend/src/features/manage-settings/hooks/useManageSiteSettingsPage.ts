@@ -4,10 +4,25 @@ import { useSettingList, useSettingRevisions, useUpdateSetting } from '@/entitie
 
 /**
  * Settings with a dedicated editor elsewhere are hidden from this generic
- * key-value form so they aren't edited twice (once here as a raw field, once in
- * their purpose-built UI). `front_page` has the "Home page display" section (#701).
+ * key-value form so they aren't edited twice — and, crucially, so non-technical
+ * admins never face a raw JSON string here (#541). Each key below has a
+ * purpose-built, structured editor:
+ *
+ * - `front_page`     → the "Home page display" section on this page (#701)
+ * - `theme_overrides`→ Appearance → Theme (ThemeCustomizeView: colors/fonts/knobs)
+ * - `header_config`  → Appearance → Theme (HeaderContentView: topbar/CTA toggles)
+ * - `home_hero`      → Appearance → Theme (HomeHeroView: typed block editor, #486)
+ * - `layout_config`  → Appearance → Layout (LayoutConfigBar: columns/position)
+ * - `active_theme`   → Appearance → Theme (PublicThemeView: theme picker)
  */
-const DEDICATED_UI_KEYS = new Set(['front_page'])
+const DEDICATED_UI_KEYS = new Set([
+  'front_page',
+  'theme_overrides',
+  'header_config',
+  'home_hero',
+  'layout_config',
+  'active_theme',
+])
 
 export interface ManageSiteSettingsPageState {
   items: SettingItem[]
