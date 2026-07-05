@@ -1,3 +1,4 @@
+import { useTranslation } from '@/shared/i18n'
 import { Card, EmptyState, ErrorState, LoadingState, Stack, Text } from '@/shared/ui'
 import type { EntityTypeListItem } from '../hooks/use-entity-type-list-page'
 
@@ -16,17 +17,19 @@ export function EntityTypeListView({
   errorTitle,
   onRetry,
 }: EntityTypeListViewProps) {
+  const { t } = useTranslation()
+
   if (isLoading) {
-    return <LoadingState>Loading entity types…</LoadingState>
+    return <LoadingState>{t('admin.entityTypeList.loading')}</LoadingState>
   }
 
   if (isError) {
     return (
       <ErrorState
-        title="Could not load entity types"
-        message={errorTitle ?? 'Unknown error'}
+        title={t('admin.entityTypeList.error')}
+        message={errorTitle ?? t('common.error.unknown')}
         onRetry={onRetry}
-        retryLabel="Retry"
+        retryLabel={t('common.actions.retry')}
       />
     )
   }
@@ -34,8 +37,8 @@ export function EntityTypeListView({
   if (items.length === 0) {
     return (
       <EmptyState
-        title="No entity types yet"
-        description="Entity type editor screens will arrive in a follow-up issue."
+        title={t('admin.entityTypeList.empty.title')}
+        description={t('admin.entityTypeList.empty.description')}
       />
     )
   }

@@ -7,6 +7,7 @@ import {
 } from '@/entities/organization'
 import type { Organization, UpdateOrganizationInput } from '@/entities/organization'
 import { fetchOrgExport, useImportOrg } from '@/entities/org-export'
+import { useTranslation } from '@/shared/i18n'
 import { useToast } from '@/shared/ui'
 
 export interface ManageOrganizationDetailPageState {
@@ -38,6 +39,7 @@ export interface ManageOrganizationDetailPageState {
 
 export function useManageOrganizationDetailPage(orgId: number): ManageOrganizationDetailPageState {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const { showToast } = useToast()
 
   const { data: org, isLoading, isError } = useOrganization(orgId)
@@ -74,7 +76,7 @@ export function useManageOrganizationDetailPage(orgId: number): ManageOrganizati
       { id: orgId, input },
       {
         onSuccess: () => {
-          showToast('Organization updated.', 'success')
+          showToast(t('admin.organizations.toast.updated'), 'success')
         },
         onError: (err) => {
           showToast(err.title, 'error')
@@ -95,7 +97,7 @@ export function useManageOrganizationDetailPage(orgId: number): ManageOrganizati
       a.click()
       URL.revokeObjectURL(url)
     } catch {
-      showToast('Export failed.', 'error')
+      showToast(t('admin.organizations.toast.exportFailed'), 'error')
     } finally {
       setIsExporting(false)
     }
@@ -111,7 +113,10 @@ export function useManageOrganizationDetailPage(orgId: number): ManageOrganizati
         importOrg.mutate(payload, {
           onSuccess: (result) => {
             showToast(
-              `Imported ${String(result.total)} records into "${result.organizationName}".`,
+              t('admin.organizations.toast.imported', {
+                count: result.total,
+                name: result.organizationName,
+              }),
               'success',
             )
           },
@@ -120,7 +125,7 @@ export function useManageOrganizationDetailPage(orgId: number): ManageOrganizati
           },
         })
       } catch {
-        showToast('Invalid JSON file.', 'error')
+        showToast(t('admin.organizations.toast.invalidJson'), 'error')
       }
     }
     reader.readAsText(file)
@@ -130,7 +135,7 @@ export function useManageOrganizationDetailPage(orgId: number): ManageOrganizati
     const orgName = org?.name ?? ''
     deleteOrg.mutate(orgId, {
       onSuccess: () => {
-        showToast(`Organization "${orgName}" deleted.`, 'success')
+        showToast(t('admin.organizations.toast.deleted', { name: orgName }), 'success')
         void navigate('/superadmin/organizations')
       },
       onError: (err) => {

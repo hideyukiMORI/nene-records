@@ -1321,4 +1321,121 @@ export const fr: Partial<MessageCatalog> = {
     'Nous utilisons des cookies pour mesurer l’audience du site. Pouvons-nous activer les statistiques ?',
   'public.consent.accept': 'Autoriser',
   'public.consent.decline': 'Refuser',
+
+  // ── Superadmin · Organizations (#728) ─────────────────────────────────────
+  'admin.organizations.pageTitle': 'Organisations',
+  'admin.organizations.pageDescription': 'Gérez toutes les organisations locataires.',
+  'admin.organizations.new': 'Nouvelle organisation',
+  'admin.organizations.loading': 'Chargement des organisations…',
+  'admin.organizations.error': 'Échec du chargement des organisations.',
+  'admin.organizations.empty': 'Aucune organisation pour le moment.',
+  'admin.organizations.createFirst': 'Créer la première organisation',
+  'admin.organizations.plan': 'Forfait',
+  'admin.organizations.status': 'Statut',
+  'admin.organizations.actions': 'Actions',
+  'admin.organizations.idColumn': 'ID',
+  'admin.organizations.active': 'Actif',
+  'admin.organizations.inactive': 'Inactif',
+  'admin.organizations.countTotal.one': '{{count}} organisation au total',
+  'admin.organizations.countTotal.other': '{{count}} organisations au total',
+  'admin.organizations.form.namePlaceholder': 'Acme Corp',
+  'admin.organizations.form.slugPlaceholder': 'acme',
+  'admin.organizations.form.slugTitle':
+    'Uniquement des minuscules, des chiffres et des traits d’union',
+  'admin.organizations.form.slugHelp':
+    'Uniquement des minuscules, des chiffres et des traits d’union.',
+  'admin.organizations.form.domainPlaceholder': 'example.com',
+  'admin.organizations.form.domainHelp': 'Facultatif. Laissez vide pour utiliser le sous-domaine.',
+  'admin.organizations.form.submit': 'Créer l’organisation',
+  'admin.organizations.delete.title': 'Supprimer l’organisation',
+  'admin.organizations.delete.description':
+    'Supprimer « {{name}} » ? Cette action est irréversible.',
+  'admin.organizations.detail.loading': 'Chargement…',
+  'admin.organizations.detail.notFound': 'Organisation introuvable.',
+  'admin.organizations.detail.backToList': 'Retour aux organisations',
+  'admin.organizations.detail.meta': 'ID : {{id}} · Créé : {{date}}',
+  'admin.organizations.detail.settingsTitle': 'Paramètres de l’organisation',
+  'admin.organizations.detail.exportImportTitle': 'Export et import',
+  'admin.organizations.detail.exportImportDesc':
+    'Exportez toutes les données de cette organisation dans un fichier JSON, ou importez un fichier précédemment exporté.',
+  'admin.organizations.detail.exporting': 'Export en cours…',
+  'admin.organizations.detail.exportButton': 'Exporter le JSON',
+  'admin.organizations.detail.importing': 'Import en cours…',
+  'admin.organizations.detail.importButton': 'Importer le JSON',
+  'admin.organizations.detail.dangerTitle': 'Zone sensible',
+  'admin.organizations.detail.dangerDesc':
+    'La suppression d’une organisation est définitive et irréversible.',
+  'admin.organizations.detail.deleteConfirmDesc':
+    'Supprimer définitivement « {{name}} » ? Toutes les données seront supprimées. Cette action est irréversible.',
+  'admin.organizations.detail.deleteConfirm': 'Supprimer définitivement',
+  'admin.organizations.toast.created': 'Organisation « {{name}} » créée.',
+  'admin.organizations.toast.deleted': 'Organisation « {{name}} » supprimée.',
+  'admin.organizations.toast.updated': 'Organisation mise à jour.',
+  'admin.organizations.toast.exportFailed': 'Échec de l’export.',
+  'admin.organizations.toast.imported': '{{count}} enregistrements importés dans « {{name}} ».',
+  'admin.organizations.toast.invalidJson': 'Fichier JSON non valide.',
+
+  // ── Superadmin · Data migration (#728) ────────────────────────────────────
+  'admin.dataMigration.pageTitle': 'Migration des données',
+  'admin.dataMigration.pageDescription':
+    'Attribuez les enregistrements hérités (organization_id = 0) à une organisation spécifique. Utilisez cette fonction lors du passage du mode mono-locataire au mode multi-locataire.',
+  'admin.dataMigration.unassignedTitle': 'Enregistrements non attribués',
+  'admin.dataMigration.loading': 'Chargement…',
+  'admin.dataMigration.statusError': 'Échec du chargement de l’état de la migration.',
+  'admin.dataMigration.unassignedCount.one': '{{count}} enregistrement non attribué trouvé',
+  'admin.dataMigration.unassignedCount.other': '{{count}} enregistrements non attribués trouvés',
+  'admin.dataMigration.allAssigned':
+    'Tous les enregistrements sont attribués à une organisation. ✓',
+  'admin.dataMigration.table.name': 'Table',
+  'admin.dataMigration.table.rows': 'Lignes non attribuées',
+  'admin.dataMigration.assignTitle': 'Attribuer à une organisation',
+  'admin.dataMigration.assignDesc':
+    'Tous les enregistrements non attribués seront déplacés vers l’organisation sélectionnée. Cette action est irréversible.',
+  'admin.dataMigration.targetLabel': 'Organisation cible',
+  'admin.dataMigration.selectPlaceholder': '— Sélectionner une organisation —',
+  'admin.dataMigration.migrating': 'Migration en cours…',
+  'admin.dataMigration.assignSubmit': 'Attribuer les enregistrements',
+  'admin.dataMigration.noTarget': 'Veuillez sélectionner une organisation cible.',
+  'admin.dataMigration.toast.migrated': '{{count}} enregistrements migrés vers « {{name}} ».',
+
+  // ── Superadmin · shell nav (#728) ─────────────────────────────────────────
+  'admin.superadmin.navTitle': 'Super-administrateur',
+  'admin.superadmin.backToAdmin': 'Retour à l’administration',
+
+  // ── Admin shell landmarks & badge (#728) ──────────────────────────────────
+  'admin.nav.sidebar': 'Barre latérale',
+  'admin.nav.main': 'Principal',
+  'admin.nav.language': 'Langue',
+  'admin.nav.adminBadge': 'Admin',
+
+  // ── Entity type list (#728) ───────────────────────────────────────────────
+  'admin.entityTypeList.loading': 'Chargement des types d’entité…',
+  'admin.entityTypeList.error': 'Impossible de charger les types d’entité',
+  'admin.entityTypeList.empty.title': 'Aucun type d’entité pour le moment',
+  'admin.entityTypeList.empty.description':
+    'Les écrans d’édition des types d’entité arriveront dans un ticket ultérieur.',
+
+  // ── Relation filter (#728) ────────────────────────────────────────────────
+  'admin.relations.filter.loading': 'Chargement des cibles {{field}}…',
+  'admin.relations.filter.error': 'Impossible de charger les cibles {{field}}',
+  'admin.relations.filter.anyTarget': 'N’importe quelle cible',
+  'admin.relations.filter.title': 'Filtrer par relation',
+  'admin.relations.filter.clear': 'Effacer',
+  'admin.relations.filter.activeNote':
+    'Affichage des enregistrements correspondant à tous les filtres de relation sélectionnés.',
+
+  // ── Markdown editor toolbar (#728) ────────────────────────────────────────
+  'admin.markdownEditor.toolbar.bold': 'Gras',
+  'admin.markdownEditor.toolbar.italic': 'Italique',
+  'admin.markdownEditor.toolbar.h2': 'Titre 2',
+  'admin.markdownEditor.toolbar.h3': 'Titre 3',
+  'admin.markdownEditor.toolbar.unorderedList': 'Liste à puces',
+  'admin.markdownEditor.toolbar.orderedList': 'Liste numérotée',
+  'admin.markdownEditor.toolbar.link': 'Lien',
+  'admin.markdownEditor.toolbar.codeBlock': 'Bloc de code',
+  'admin.markdownEditor.toolbar.blockquote': 'Citation',
+
+  // ── Misc (#728) ───────────────────────────────────────────────────────────
+  'common.tableOfContents': 'Table des matières',
+  'admin.entityRecords.breadcrumbLabel': 'Fil d’Ariane',
 }

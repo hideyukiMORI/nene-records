@@ -1301,4 +1301,118 @@ export const ja: Partial<MessageCatalog> = {
     'サイトのアクセス解析のために Cookie を使用します。解析を有効にしてもよろしいですか？',
   'public.consent.accept': '許可する',
   'public.consent.decline': '拒否する',
+
+  // ── Superadmin · Organizations (#728) ─────────────────────────────────────
+  'admin.organizations.pageTitle': '組織',
+  'admin.organizations.pageDescription': 'すべてのテナント組織を管理します。',
+  'admin.organizations.new': '新しい組織',
+  'admin.organizations.loading': '組織を読み込んでいます…',
+  'admin.organizations.error': '組織の読み込みに失敗しました。',
+  'admin.organizations.empty': 'まだ組織がありません。',
+  'admin.organizations.createFirst': '最初の組織を作成',
+  'admin.organizations.plan': 'プラン',
+  'admin.organizations.status': 'ステータス',
+  'admin.organizations.actions': '操作',
+  'admin.organizations.idColumn': 'ID',
+  'admin.organizations.active': '有効',
+  'admin.organizations.inactive': '無効',
+  'admin.organizations.countTotal.one': '合計 {{count}} 件の組織',
+  'admin.organizations.countTotal.other': '合計 {{count}} 件の組織',
+  'admin.organizations.form.namePlaceholder': 'Acme Corp',
+  'admin.organizations.form.slugPlaceholder': 'acme',
+  'admin.organizations.form.slugTitle': '小文字の英字、数字、ハイフンのみ使用できます',
+  'admin.organizations.form.slugHelp': '小文字の英字、数字、ハイフンのみ使用できます。',
+  'admin.organizations.form.domainPlaceholder': 'example.com',
+  'admin.organizations.form.domainHelp': '任意。空欄の場合はサブドメインを使用します。',
+  'admin.organizations.form.submit': '組織を作成',
+  'admin.organizations.delete.title': '組織を削除',
+  'admin.organizations.delete.description':
+    '「{{name}}」を削除しますか？この操作は取り消せません。',
+  'admin.organizations.detail.loading': '読み込み中…',
+  'admin.organizations.detail.notFound': '組織が見つかりません。',
+  'admin.organizations.detail.backToList': '組織一覧に戻る',
+  'admin.organizations.detail.meta': 'ID: {{id}} · 作成日: {{date}}',
+  'admin.organizations.detail.settingsTitle': '組織の設定',
+  'admin.organizations.detail.exportImportTitle': 'エクスポートとインポート',
+  'admin.organizations.detail.exportImportDesc':
+    'この組織のすべてのデータを JSON ファイルとしてエクスポートするか、以前エクスポートしたファイルをインポートします。',
+  'admin.organizations.detail.exporting': 'エクスポート中…',
+  'admin.organizations.detail.exportButton': 'JSON をエクスポート',
+  'admin.organizations.detail.importing': 'インポート中…',
+  'admin.organizations.detail.importButton': 'JSON をインポート',
+  'admin.organizations.detail.dangerTitle': '危険な操作',
+  'admin.organizations.detail.dangerDesc': '組織の削除は恒久的で、取り消すことはできません。',
+  'admin.organizations.detail.deleteConfirmDesc':
+    '「{{name}}」を完全に削除しますか？すべてのデータが削除されます。この操作は取り消せません。',
+  'admin.organizations.detail.deleteConfirm': '完全に削除',
+  'admin.organizations.toast.created': '組織「{{name}}」を作成しました。',
+  'admin.organizations.toast.deleted': '組織「{{name}}」を削除しました。',
+  'admin.organizations.toast.updated': '組織を更新しました。',
+  'admin.organizations.toast.exportFailed': 'エクスポートに失敗しました。',
+  'admin.organizations.toast.imported':
+    '{{count}} 件のレコードを「{{name}}」にインポートしました。',
+  'admin.organizations.toast.invalidJson': '無効な JSON ファイルです。',
+
+  // ── Superadmin · Data migration (#728) ────────────────────────────────────
+  'admin.dataMigration.pageTitle': 'データ移行',
+  'admin.dataMigration.pageDescription':
+    '既存のレコード（organization_id = 0）を特定の組織に割り当てます。シングルテナントからマルチテナントに移行する際に使用します。',
+  'admin.dataMigration.unassignedTitle': '未割り当てのレコード',
+  'admin.dataMigration.loading': '読み込み中…',
+  'admin.dataMigration.statusError': '移行ステータスの読み込みに失敗しました。',
+  'admin.dataMigration.unassignedCount.one': '未割り当てのレコードが {{count}} 件見つかりました',
+  'admin.dataMigration.unassignedCount.other': '未割り当てのレコードが {{count}} 件見つかりました',
+  'admin.dataMigration.allAssigned': 'すべてのレコードが組織に割り当てられています。✓',
+  'admin.dataMigration.table.name': 'テーブル',
+  'admin.dataMigration.table.rows': '未割り当ての行数',
+  'admin.dataMigration.assignTitle': '組織に割り当てる',
+  'admin.dataMigration.assignDesc':
+    '未割り当てのすべてのレコードが選択した組織に移動されます。この操作は取り消せません。',
+  'admin.dataMigration.targetLabel': '対象の組織',
+  'admin.dataMigration.selectPlaceholder': '— 組織を選択 —',
+  'admin.dataMigration.migrating': '移行中…',
+  'admin.dataMigration.assignSubmit': 'レコードを割り当てる',
+  'admin.dataMigration.noTarget': '対象の組織を選択してください。',
+  'admin.dataMigration.toast.migrated': '{{count}} 件のレコードを「{{name}}」に移行しました。',
+
+  // ── Superadmin · shell nav (#728) ─────────────────────────────────────────
+  'admin.superadmin.navTitle': 'スーパー管理者',
+  'admin.superadmin.backToAdmin': '管理画面に戻る',
+
+  // ── Admin shell landmarks & badge (#728) ──────────────────────────────────
+  'admin.nav.sidebar': 'サイドバー',
+  'admin.nav.main': 'メイン',
+  'admin.nav.language': '言語',
+  'admin.nav.adminBadge': '管理',
+
+  // ── Entity type list (#728) ───────────────────────────────────────────────
+  'admin.entityTypeList.loading': 'エンティティタイプを読み込んでいます…',
+  'admin.entityTypeList.error': 'エンティティタイプを読み込めませんでした',
+  'admin.entityTypeList.empty.title': 'まだエンティティタイプがありません',
+  'admin.entityTypeList.empty.description':
+    'エンティティタイプの編集画面は今後の Issue で提供されます。',
+
+  // ── Relation filter (#728) ────────────────────────────────────────────────
+  'admin.relations.filter.loading': '{{field}} の対象を読み込んでいます…',
+  'admin.relations.filter.error': '{{field}} の対象を読み込めませんでした',
+  'admin.relations.filter.anyTarget': 'すべての対象',
+  'admin.relations.filter.title': 'リレーションで絞り込む',
+  'admin.relations.filter.clear': 'クリア',
+  'admin.relations.filter.activeNote':
+    '選択したすべてのリレーションフィルターに一致するレコードを表示しています。',
+
+  // ── Markdown editor toolbar (#728) ────────────────────────────────────────
+  'admin.markdownEditor.toolbar.bold': '太字',
+  'admin.markdownEditor.toolbar.italic': '斜体',
+  'admin.markdownEditor.toolbar.h2': '見出し2',
+  'admin.markdownEditor.toolbar.h3': '見出し3',
+  'admin.markdownEditor.toolbar.unorderedList': '箇条書きリスト',
+  'admin.markdownEditor.toolbar.orderedList': '番号付きリスト',
+  'admin.markdownEditor.toolbar.link': 'リンク',
+  'admin.markdownEditor.toolbar.codeBlock': 'コードブロック',
+  'admin.markdownEditor.toolbar.blockquote': '引用',
+
+  // ── Misc (#728) ───────────────────────────────────────────────────────────
+  'common.tableOfContents': '目次',
+  'admin.entityRecords.breadcrumbLabel': 'パンくずリスト',
 }

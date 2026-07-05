@@ -1,3 +1,4 @@
+import { useTranslation } from '@/shared/i18n'
 import { extractHeadings, type MarkdownHeading } from '@/shared/lib/markdown-headings'
 
 export interface TableOfContentsProps {
@@ -15,6 +16,7 @@ export interface TableOfContentsProps {
  * so both must derive from the same markdown. Renders nothing when empty.
  */
 export function TableOfContents({ markdown, minDepth = 2, maxDepth = 3 }: TableOfContentsProps) {
+  const { t } = useTranslation()
   const headings = extractHeadings(markdown).filter(
     (heading) => heading.depth >= minDepth && heading.depth <= maxDepth,
   )
@@ -24,7 +26,7 @@ export function TableOfContents({ markdown, minDepth = 2, maxDepth = 3 }: TableO
   }
 
   return (
-    <nav aria-label="Table of contents">
+    <nav aria-label={t('common.tableOfContents')}>
       <ul className="flex flex-col gap-stack-xs">
         {headings.map((heading: MarkdownHeading, index) => (
           <li
