@@ -9,6 +9,7 @@ use Nene2\Database\DatabaseQueryExecutorInterface;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
+use Nene2\Http\ClockInterface;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RequestScopedHolder;
 use Nene2\Middleware\RateLimitStorageInterface;
@@ -104,6 +105,7 @@ final readonly class CommentServiceProvider implements ServiceProviderInterface
                     $response = $c->get(JsonResponseFactory::class);
                     $problemDetails = $c->get(ProblemDetailsResponseFactory::class);
                     $rateLimitStorage = $c->get(RateLimitStorageInterface::class);
+                    $clock = $c->get(ClockInterface::class);
                     if (!$useCase instanceof PostCommentUseCaseInterface) {
                         throw new LogicException('PostComment use case service is invalid.');
                     }
@@ -116,8 +118,11 @@ final readonly class CommentServiceProvider implements ServiceProviderInterface
                     if (!$rateLimitStorage instanceof RateLimitStorageInterface) {
                         throw new LogicException('Rate limit storage service is invalid.');
                     }
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('ClockInterface service is invalid.');
+                    }
 
-                    return new PostCommentHandler($useCase, $response, $problemDetails, $rateLimitStorage);
+                    return new PostCommentHandler($useCase, $response, $problemDetails, $rateLimitStorage, $clock);
                 },
             )
             ->set(

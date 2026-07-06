@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NeNeRecords\Tests\Media;
 
+use Nene2\Http\UtcClock;
 use NeNeRecords\Media\DeleteMediaInput;
 use NeNeRecords\Media\DeleteMediaUseCase;
 use NeNeRecords\Media\LocalStorage;
@@ -26,7 +27,7 @@ final class MediaUseCaseTest extends TestCase
         file_put_contents($tmpFile, 'fake image content');
 
         $mediaRepo = new InMemoryMediaRepository();
-        $useCase = new UploadMediaUseCase($mediaRepo, new LocalStorage($storageRoot));
+        $useCase = new UploadMediaUseCase($mediaRepo, new LocalStorage($storageRoot), new UtcClock());
 
         $input = new UploadMediaInput(
             tmpPath: $tmpFile,
@@ -62,7 +63,7 @@ final class MediaUseCaseTest extends TestCase
         file_put_contents($tmpFile, $png);
 
         $mediaRepo = new InMemoryMediaRepository();
-        $useCase = new UploadMediaUseCase($mediaRepo, new LocalStorage($storageRoot));
+        $useCase = new UploadMediaUseCase($mediaRepo, new LocalStorage($storageRoot), new UtcClock());
 
         $output = $useCase->execute(new UploadMediaInput(
             tmpPath: $tmpFile,
@@ -88,7 +89,7 @@ final class MediaUseCaseTest extends TestCase
     {
         $storageRoot = sys_get_temp_dir() . '/nene_media_test_' . uniqid('', true);
         $mediaRepo = new InMemoryMediaRepository();
-        $useCase = new UploadMediaUseCase($mediaRepo, new LocalStorage($storageRoot));
+        $useCase = new UploadMediaUseCase($mediaRepo, new LocalStorage($storageRoot), new UtcClock());
 
         $input = new UploadMediaInput(
             tmpPath: '/tmp/irrelevant',
@@ -106,7 +107,7 @@ final class MediaUseCaseTest extends TestCase
     {
         $storageRoot = sys_get_temp_dir() . '/nene_media_test_' . uniqid('', true);
         $mediaRepo = new InMemoryMediaRepository();
-        $useCase = new UploadMediaUseCase($mediaRepo, new LocalStorage($storageRoot));
+        $useCase = new UploadMediaUseCase($mediaRepo, new LocalStorage($storageRoot), new UtcClock());
 
         $tenMibPlusOne = 10 * 1024 * 1024 + 1;
 
@@ -134,7 +135,7 @@ final class MediaUseCaseTest extends TestCase
         );
 
         $mediaRepo = new InMemoryMediaRepository();
-        $useCase = new UploadMediaUseCase($mediaRepo, new LocalStorage($storageRoot));
+        $useCase = new UploadMediaUseCase($mediaRepo, new LocalStorage($storageRoot), new UtcClock());
 
         $output = $useCase->execute(new UploadMediaInput(
             tmpPath: $tmpFile,
@@ -167,7 +168,7 @@ final class MediaUseCaseTest extends TestCase
         file_put_contents($tmpFile, '<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script></svg>');
 
         $mediaRepo = new InMemoryMediaRepository();
-        $useCase = new UploadMediaUseCase($mediaRepo, new LocalStorage($storageRoot));
+        $useCase = new UploadMediaUseCase($mediaRepo, new LocalStorage($storageRoot), new UtcClock());
 
         // Declared as PNG to try to dodge the SVG path — content sniff must catch it.
         $output = $useCase->execute(new UploadMediaInput(
@@ -199,7 +200,7 @@ final class MediaUseCaseTest extends TestCase
         file_put_contents($tmpFile, '<svg xmlns="http://www.w3.org/2000/svg">' . $padding . '</svg>');
 
         $mediaRepo = new InMemoryMediaRepository();
-        $useCase = new UploadMediaUseCase($mediaRepo, new LocalStorage($storageRoot));
+        $useCase = new UploadMediaUseCase($mediaRepo, new LocalStorage($storageRoot), new UtcClock());
 
         $this->expectException(MediaTooLargeException::class);
 
@@ -224,7 +225,7 @@ final class MediaUseCaseTest extends TestCase
         file_put_contents($tmpFile, '<svg xmlns="http://www.w3.org/2000/svg"><rect'); // truncated / unparseable
 
         $mediaRepo = new InMemoryMediaRepository();
-        $useCase = new UploadMediaUseCase($mediaRepo, new LocalStorage($storageRoot));
+        $useCase = new UploadMediaUseCase($mediaRepo, new LocalStorage($storageRoot), new UtcClock());
 
         $this->expectException(MediaInvalidTypeException::class);
 

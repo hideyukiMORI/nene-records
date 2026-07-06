@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NeNeRecords\Signup;
 
+use Nene2\Http\ClockInterface;
 use Nene2\Http\SecureTokenHelper;
 use NeNeRecords\Auth\UserRepositoryInterface;
 use NeNeRecords\Organization\OrganizationRepositoryInterface;
@@ -22,6 +23,7 @@ final readonly class ConfirmEmailUseCase
     public function __construct(
         private UserRepositoryInterface $users,
         private OrganizationRepositoryInterface $organizations,
+        private ClockInterface $clock,
     ) {
     }
 
@@ -33,7 +35,7 @@ final readonly class ConfirmEmailUseCase
             throw EmailVerificationTokenException::invalid();
         }
 
-        if ($user->emailVerificationExpiresAt === null || $user->emailVerificationExpiresAt < time()) {
+        if ($user->emailVerificationExpiresAt === null || $user->emailVerificationExpiresAt < $this->clock->now()->getTimestamp()) {
             $this->users->clearEmailVerification($user->id);
 
             throw EmailVerificationTokenException::expired();

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeNeRecords\Auth;
 
 use Nene2\Auth\TokenIssuerInterface;
+use Nene2\Http\ClockInterface;
 
 final readonly class LoginUseCase
 {
@@ -13,6 +14,7 @@ final readonly class LoginUseCase
     public function __construct(
         private UserRepositoryInterface $users,
         private TokenIssuerInterface $tokenIssuer,
+        private ClockInterface $clock,
     ) {
     }
 
@@ -30,7 +32,8 @@ final readonly class LoginUseCase
             throw new InvalidCredentialsException();
         }
 
-        $expiresAt = time() + self::TOKEN_TTL_SECONDS;
+        $now = $this->clock->now()->getTimestamp();
+        $expiresAt = $now + self::TOKEN_TTL_SECONDS;
 
         // superadmin はどの組織にも属さないため org_id は null。
         // admin / editor は所属組織の ID を JWT に埋め込む。
@@ -40,7 +43,7 @@ final readonly class LoginUseCase
             'sub'    => $user->email,
             'role'   => $role->value,
             'org_id' => $orgId,
-            'iat'    => time(),
+            'iat'    => $now,
             'exp'    => $expiresAt,
         ]);
 

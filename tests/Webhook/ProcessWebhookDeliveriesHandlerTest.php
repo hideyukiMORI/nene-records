@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeNeRecords\Tests\Webhook;
 
 use Nene2\Http\JsonResponseFactory;
+use Nene2\Http\UtcClock;
 use NeNeRecords\Webhook\ProcessWebhookDeliveriesHandler;
 use NeNeRecords\Webhook\WebhookDeliveryProcessor;
 use NeNeRecords\Webhook\WebhookSendResult;
@@ -42,7 +43,7 @@ final class ProcessWebhookDeliveriesHandlerTest extends TestCase
     private function handler(WebhookSendResult $result): ProcessWebhookDeliveriesHandler
     {
         return new ProcessWebhookDeliveriesHandler(
-            new WebhookDeliveryProcessor($this->deliveries, new FakeWebhookSender($result)),
+            new WebhookDeliveryProcessor($this->deliveries, new FakeWebhookSender($result), new UtcClock()),
             new JsonResponseFactory($this->factory, $this->factory),
         );
     }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace NeNeRecords\Analytics;
 
-use DateTimeImmutable;
+use Nene2\Http\ClockInterface;
 use Nene2\Middleware\RequestIdMiddleware;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -19,6 +19,7 @@ final readonly class AccessLogMiddleware implements MiddlewareInterface
     public function __construct(
         private AccessLogRepositoryInterface $accessLogs,
         private LoggerInterface $logger,
+        private ClockInterface $clock,
         private array $excludedPaths = ['/health', '/', '/machine/health', '/examples/ping'],
     ) {
     }
@@ -41,7 +42,7 @@ final readonly class AccessLogMiddleware implements MiddlewareInterface
                 path: $path,
                 statusCode: $response->getStatusCode(),
                 durationMs: $this->durationMilliseconds($startedAt),
-                accessedAt: new DateTimeImmutable('now', new \DateTimeZone('UTC')),
+                accessedAt: $this->clock->now(),
             ));
         } catch (Throwable $exception) {
             $this->logger->error('Failed to persist access log entry.', [

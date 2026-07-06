@@ -9,6 +9,7 @@ use Nene2\Database\DatabaseQueryExecutorInterface;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
+use Nene2\Http\ClockInterface;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RequestScopedHolder;
 use NeNeRecords\BoolField\BoolFieldRepositoryInterface;
@@ -61,7 +62,12 @@ final readonly class PreviewTokenServiceProvider implements ServiceProviderInter
                         throw new LogicException('EntityPreviewToken repository service is invalid.');
                     }
 
-                    return new GeneratePreviewTokenUseCase($entities, $previewTokens);
+                    $clock = $container->get(ClockInterface::class);
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('ClockInterface service is invalid.');
+                    }
+
+                    return new GeneratePreviewTokenUseCase($entities, $previewTokens, $clock);
                 },
             )
             ->set(
@@ -145,6 +151,11 @@ final readonly class PreviewTokenServiceProvider implements ServiceProviderInter
                         throw new LogicException('ListPublicSettings use case service is invalid.');
                     }
 
+                    $clock = $container->get(ClockInterface::class);
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('ClockInterface service is invalid.');
+                    }
+
                     return new GetPreviewRecordViewUseCase(
                         $previewTokens,
                         $entityTypes,
@@ -158,6 +169,7 @@ final readonly class PreviewTokenServiceProvider implements ServiceProviderInter
                         $entityRelations,
                         $publicSettings,
                         $hierarchyBuilder,
+                        $clock,
                     );
                 },
             )

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeNeRecords\Setting;
 
 use Nene2\Database\DatabaseQueryExecutorInterface;
+use Nene2\Http\ClockInterface;
 use Nene2\Http\RequestScopedHolder;
 
 final readonly class PdoSettingRepository implements SettingRepositoryInterface
@@ -15,6 +16,7 @@ final readonly class PdoSettingRepository implements SettingRepositoryInterface
     public function __construct(
         private DatabaseQueryExecutorInterface $query,
         private readonly RequestScopedHolder $orgId,
+        private ClockInterface $clock,
     ) {
     }
 
@@ -104,7 +106,7 @@ final readonly class PdoSettingRepository implements SettingRepositoryInterface
         $action = $existing === null || $existing->isDeleted
             ? SettingRevisionAction::Created
             : SettingRevisionAction::Updated;
-        $now = date('Y-m-d H:i:s');
+        $now = $this->clock->now()->format('Y-m-d H:i:s');
 
         $this->query->execute(
             'INSERT INTO setting_revisions (setting_key, value, previous_value, action, actor_user_id, created_at)

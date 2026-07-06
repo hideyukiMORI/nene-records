@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NeNeRecords\Tests\Webhook;
 
+use Nene2\Http\UtcClock;
 use NeNeRecords\Webhook\CreateWebhookInput;
 use NeNeRecords\Webhook\CreateWebhookUseCase;
 use NeNeRecords\Webhook\DeleteWebhookInput;
@@ -20,7 +21,7 @@ final class CreateWebhookUseCaseTest extends TestCase
     public function testCreatesWebhookAndReturnsCorrectOutput(): void
     {
         $webhooks = new InMemoryWebhookRepository();
-        $useCase = new CreateWebhookUseCase($webhooks);
+        $useCase = new CreateWebhookUseCase($webhooks, new UtcClock());
 
         $output = $useCase->execute(new CreateWebhookInput(
             url: 'https://example.com/hook',
@@ -43,7 +44,7 @@ final class CreateWebhookUseCaseTest extends TestCase
     public function testCreatesWebhookWithNullableFields(): void
     {
         $webhooks = new InMemoryWebhookRepository();
-        $useCase = new CreateWebhookUseCase($webhooks);
+        $useCase = new CreateWebhookUseCase($webhooks, new UtcClock());
 
         $output = $useCase->execute(new CreateWebhookInput(
             url: 'https://example.com/hook',
@@ -62,7 +63,7 @@ final class CreateWebhookUseCaseTest extends TestCase
     public function testAssignsSequentialIds(): void
     {
         $webhooks = new InMemoryWebhookRepository();
-        $useCase = new CreateWebhookUseCase($webhooks);
+        $useCase = new CreateWebhookUseCase($webhooks, new UtcClock());
 
         $first = $useCase->execute(new CreateWebhookInput(
             url: 'https://example.com/hook1',
@@ -89,7 +90,7 @@ final class UpdateWebhookUseCaseTest extends TestCase
     public function testUpdatesWebhookAndReturnsOutput(): void
     {
         $webhooks = new InMemoryWebhookRepository();
-        $createUseCase = new CreateWebhookUseCase($webhooks);
+        $createUseCase = new CreateWebhookUseCase($webhooks, new UtcClock());
         $createUseCase->execute(new CreateWebhookInput(
             url: 'https://example.com/hook',
             events: ['entity.created'],
@@ -98,7 +99,7 @@ final class UpdateWebhookUseCaseTest extends TestCase
             isActive: true,
         ));
 
-        $updateUseCase = new UpdateWebhookUseCase($webhooks);
+        $updateUseCase = new UpdateWebhookUseCase($webhooks, new UtcClock());
         $output = $updateUseCase->execute(new UpdateWebhookInput(
             id: 1,
             url: 'https://example.com/hook-updated',
@@ -119,7 +120,7 @@ final class UpdateWebhookUseCaseTest extends TestCase
     public function testThrowsWebhookNotFoundExceptionIfNotFound(): void
     {
         $webhooks = new InMemoryWebhookRepository();
-        $useCase = new UpdateWebhookUseCase($webhooks);
+        $useCase = new UpdateWebhookUseCase($webhooks, new UtcClock());
 
         $this->expectException(WebhookNotFoundException::class);
 
@@ -139,7 +140,7 @@ final class DeleteWebhookUseCaseTest extends TestCase
     public function testDeletesWebhook(): void
     {
         $webhooks = new InMemoryWebhookRepository();
-        $createUseCase = new CreateWebhookUseCase($webhooks);
+        $createUseCase = new CreateWebhookUseCase($webhooks, new UtcClock());
         $createUseCase->execute(new CreateWebhookInput(
             url: 'https://example.com/hook',
             events: [],
@@ -170,7 +171,7 @@ final class GetWebhookByIdUseCaseTest extends TestCase
     public function testReturnsWebhook(): void
     {
         $webhooks = new InMemoryWebhookRepository();
-        $createUseCase = new CreateWebhookUseCase($webhooks);
+        $createUseCase = new CreateWebhookUseCase($webhooks, new UtcClock());
         $createUseCase->execute(new CreateWebhookInput(
             url: 'https://example.com/hook',
             events: ['entity.created'],

@@ -7,6 +7,7 @@ namespace NeNeRecords\Dashboard;
 use LogicException;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
+use Nene2\Http\ClockInterface;
 use Nene2\Http\JsonResponseFactory;
 use NeNeRecords\Analytics\AccessLogRepositoryInterface;
 use NeNeRecords\Entity\EntityRepositoryInterface;
@@ -37,7 +38,12 @@ final readonly class DashboardServiceProvider implements ServiceProviderInterfac
                         throw new LogicException('Access log repository service is invalid.');
                     }
 
-                    return new GetDashboardSummaryUseCase($entities, $entityTypes, $accessLogs);
+                    $clock = $container->get(ClockInterface::class);
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('ClockInterface service is invalid.');
+                    }
+
+                    return new GetDashboardSummaryUseCase($entities, $entityTypes, $accessLogs, $clock);
                 },
             )
             ->set(

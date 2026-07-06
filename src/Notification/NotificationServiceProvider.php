@@ -9,6 +9,7 @@ use Nene2\Database\DatabaseQueryExecutorInterface;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
+use Nene2\Http\ClockInterface;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RequestScopedHolder;
 use NeNeRecords\Mail\MailerInterface;
@@ -39,7 +40,12 @@ final readonly class NotificationServiceProvider implements ServiceProviderInter
                     throw new LogicException('Org ID holder service is invalid.');
                 }
 
-                return new PdoNotificationChannelRepository($query, $orgId);
+                $clock = $c->get(ClockInterface::class);
+                if (!$clock instanceof ClockInterface) {
+                    throw new LogicException('ClockInterface service is invalid.');
+                }
+
+                return new PdoNotificationChannelRepository($query, $orgId, $clock);
             },
         );
 
@@ -60,7 +66,17 @@ final readonly class NotificationServiceProvider implements ServiceProviderInter
         $builder->set(SlackChannel::class, static fn (): SlackChannel => new SlackChannel());
         $builder->set(DiscordChannel::class, static fn (): DiscordChannel => new DiscordChannel());
         $builder->set(ChatWorkChannel::class, static fn (): ChatWorkChannel => new ChatWorkChannel());
-        $builder->set(WebhookChannel::class, static fn (): WebhookChannel => new WebhookChannel());
+        $builder->set(
+            WebhookChannel::class,
+            static function (ContainerInterface $c): WebhookChannel {
+                $clock = $c->get(ClockInterface::class);
+                if (!$clock instanceof ClockInterface) {
+                    throw new LogicException('ClockInterface service is invalid.');
+                }
+
+                return new WebhookChannel($clock);
+            },
+        );
 
         // ── Notifier ──────────────────────────────────────────────────────────
 

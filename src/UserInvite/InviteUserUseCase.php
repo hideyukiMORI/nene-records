@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NeNeRecords\UserInvite;
 
+use Nene2\Http\ClockInterface;
 use Nene2\Http\SecureTokenHelper;
 use NeNeRecords\Auth\Role;
 use NeNeRecords\Auth\UserRepositoryInterface;
@@ -19,6 +20,7 @@ final readonly class InviteUserUseCase implements InviteUserUseCaseInterface
     public function __construct(
         private UserRepositoryInterface $users,
         private MailerInterface $mailer,
+        private ClockInterface $clock,
     ) {
     }
 
@@ -45,7 +47,7 @@ final readonly class InviteUserUseCase implements InviteUserUseCaseInterface
         );
 
         [$rawToken, $tokenHash] = SecureTokenHelper::generateWithHash();
-        $expiresAt = time() + self::INVITE_TTL_SECONDS;
+        $expiresAt = $this->clock->now()->getTimestamp() + self::INVITE_TTL_SECONDS;
         $this->users->storeInviteToken($user->id, $tokenHash, $expiresAt);
 
         $acceptUrl = rtrim($input->appBaseUrl, '/') . '/admin/accept-invite?token=' . $rawToken;

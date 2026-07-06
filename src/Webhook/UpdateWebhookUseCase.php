@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace NeNeRecords\Webhook;
 
+use Nene2\Http\ClockInterface;
+
 final readonly class UpdateWebhookUseCase implements UpdateWebhookUseCaseInterface
 {
     public function __construct(
         private WebhookRepositoryInterface $webhooks,
+        private ClockInterface $clock,
     ) {
     }
 
@@ -19,7 +22,7 @@ final readonly class UpdateWebhookUseCase implements UpdateWebhookUseCaseInterfa
             throw new WebhookNotFoundException($input->id);
         }
 
-        $now = date('Y-m-d H:i:s');
+        $now = $this->clock->now()->format('Y-m-d H:i:s');
 
         $updated = new Webhook(
             id: $input->id,

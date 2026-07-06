@@ -8,6 +8,7 @@ use LogicException;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
+use Nene2\Http\ClockInterface;
 use Nene2\Http\JsonResponseFactory;
 use NeNeRecords\Auth\UserRepositoryInterface;
 use NeNeRecords\Mail\MailerInterface;
@@ -37,6 +38,7 @@ final readonly class UserInviteServiceProvider implements ServiceProviderInterfa
                 static function (ContainerInterface $c): InviteUserUseCaseInterface {
                     $users = $c->get(UserRepositoryInterface::class);
                     $mailer = $c->get(MailerInterface::class);
+                    $clock = $c->get(ClockInterface::class);
 
                     if (!$users instanceof UserRepositoryInterface) {
                         throw new LogicException('UserRepositoryInterface service is invalid.');
@@ -46,19 +48,28 @@ final readonly class UserInviteServiceProvider implements ServiceProviderInterfa
                         throw new LogicException('MailerInterface service is invalid.');
                     }
 
-                    return new InviteUserUseCase($users, $mailer);
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('ClockInterface service is invalid.');
+                    }
+
+                    return new InviteUserUseCase($users, $mailer, $clock);
                 },
             )
             ->set(
                 AcceptInviteUseCaseInterface::class,
                 static function (ContainerInterface $c): AcceptInviteUseCaseInterface {
                     $users = $c->get(UserRepositoryInterface::class);
+                    $clock = $c->get(ClockInterface::class);
 
                     if (!$users instanceof UserRepositoryInterface) {
                         throw new LogicException('UserRepositoryInterface service is invalid.');
                     }
 
-                    return new AcceptInviteUseCase($users);
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('ClockInterface service is invalid.');
+                    }
+
+                    return new AcceptInviteUseCase($users, $clock);
                 },
             )
             ->set(
@@ -66,6 +77,7 @@ final readonly class UserInviteServiceProvider implements ServiceProviderInterfa
                 static function (ContainerInterface $c): RequestPasswordResetUseCaseInterface {
                     $users = $c->get(UserRepositoryInterface::class);
                     $mailer = $c->get(MailerInterface::class);
+                    $clock = $c->get(ClockInterface::class);
 
                     if (!$users instanceof UserRepositoryInterface) {
                         throw new LogicException('UserRepositoryInterface service is invalid.');
@@ -75,19 +87,28 @@ final readonly class UserInviteServiceProvider implements ServiceProviderInterfa
                         throw new LogicException('MailerInterface service is invalid.');
                     }
 
-                    return new RequestPasswordResetUseCase($users, $mailer);
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('ClockInterface service is invalid.');
+                    }
+
+                    return new RequestPasswordResetUseCase($users, $mailer, $clock);
                 },
             )
             ->set(
                 ConfirmPasswordResetUseCaseInterface::class,
                 static function (ContainerInterface $c): ConfirmPasswordResetUseCaseInterface {
                     $users = $c->get(UserRepositoryInterface::class);
+                    $clock = $c->get(ClockInterface::class);
 
                     if (!$users instanceof UserRepositoryInterface) {
                         throw new LogicException('UserRepositoryInterface service is invalid.');
                     }
 
-                    return new ConfirmPasswordResetUseCase($users);
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('ClockInterface service is invalid.');
+                    }
+
+                    return new ConfirmPasswordResetUseCase($users, $clock);
                 },
             )
             ->set(

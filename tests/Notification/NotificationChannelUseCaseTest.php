@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NeNeRecords\Tests\Notification;
 
+use Nene2\Http\UtcClock;
 use NeNeRecords\Mail\MailerInterface;
 use NeNeRecords\Notification\Channel\ChatWorkChannel;
 use NeNeRecords\Notification\Channel\DiscordChannel;
@@ -188,7 +189,7 @@ final class NotificationChannelUseCaseTest extends TestCase
             slackChannel: new SlackChannel(),
             discordChannel: new DiscordChannel(),
             chatWorkChannel: new ChatWorkChannel(),
-            webhookChannel: new WebhookChannel(),
+            webhookChannel: new WebhookChannel(new UtcClock()),
         );
 
         $this->expectException(NotificationChannelNotFoundException::class);
@@ -209,7 +210,7 @@ final class NotificationChannelUseCaseTest extends TestCase
             slackChannel: new SlackChannel(),
             discordChannel: new DiscordChannel(),
             chatWorkChannel: new ChatWorkChannel(),
-            webhookChannel: new WebhookChannel(),
+            webhookChannel: new WebhookChannel(new UtcClock()),
         );
 
         // No exception should be thrown
@@ -234,7 +235,7 @@ final class NotificationChannelUseCaseTest extends TestCase
             slackChannel: new SlackChannel(),
             discordChannel: new DiscordChannel(),
             chatWorkChannel: new ChatWorkChannel(),
-            webhookChannel: new WebhookChannel(),
+            webhookChannel: new WebhookChannel(new UtcClock()),
         );
 
         $notifier->notify(new NotificationMessage(
@@ -258,7 +259,7 @@ final class NotificationChannelUseCaseTest extends TestCase
             slackChannel: new SlackChannel(),
             discordChannel: new DiscordChannel(),
             chatWorkChannel: new ChatWorkChannel(),
-            webhookChannel: new WebhookChannel(),
+            webhookChannel: new WebhookChannel(new UtcClock()),
         );
 
         // Should not throw
@@ -318,7 +319,7 @@ final class NotificationChannelUseCaseTest extends TestCase
             slackChannel: new SlackChannel(),
             discordChannel: new DiscordChannel(),
             chatWorkChannel: new ChatWorkChannel(),
-            webhookChannel: new WebhookChannel(),
+            webhookChannel: new WebhookChannel(new UtcClock()),
         );
 
         // Should NOT propagate the repository exception (fire-and-forget contract)

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeNeRecords\RateLimit;
 
 use Nene2\Database\DatabaseQueryExecutorInterface;
+use Nene2\Http\ClockInterface;
 use Nene2\Middleware\RateLimitStorageInterface;
 
 /**
@@ -22,6 +23,7 @@ final readonly class PdoRateLimitStorage implements RateLimitStorageInterface
 {
     public function __construct(
         private DatabaseQueryExecutorInterface $query,
+        private ClockInterface $clock,
     ) {
     }
 
@@ -31,7 +33,7 @@ final readonly class PdoRateLimitStorage implements RateLimitStorageInterface
     public function hit(string $key, int $windowSeconds): array
     {
         $keyHash = hash('sha256', $key);
-        $now = time();
+        $now = $this->clock->now()->getTimestamp();
         $newResetAt = $now + $windowSeconds;
 
         // Upsert: insert with count=1, or increment if the window is still open,

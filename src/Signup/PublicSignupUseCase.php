@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NeNeRecords\Signup;
 
+use Nene2\Http\ClockInterface;
 use Nene2\Http\RequestScopedHolder;
 use Nene2\Http\SecureTokenHelper;
 use NeNeRecords\Auth\LoginInput;
@@ -44,6 +45,7 @@ final readonly class PublicSignupUseCase implements PublicSignupUseCaseInterface
         private RequestScopedHolder $orgHolder,
         private UserRepositoryInterface $users,
         private MailerInterface $mailer,
+        private ClockInterface $clock,
     ) {
     }
 
@@ -96,7 +98,7 @@ final readonly class PublicSignupUseCase implements PublicSignupUseCaseInterface
                 $user->id,
                 $email,
                 $tokenHash,
-                time() + self::VERIFICATION_TTL_SECONDS,
+                $this->clock->now()->getTimestamp() + self::VERIFICATION_TTL_SECONDS,
             );
 
             $verifyUrl = rtrim($verifyUrlBase, '/') . '/verify-email?token=' . $rawToken;

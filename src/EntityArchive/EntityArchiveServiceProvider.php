@@ -8,6 +8,7 @@ use LogicException;
 use Nene2\Database\DatabaseQueryExecutorInterface;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
+use Nene2\Http\ClockInterface;
 use Nene2\Http\RequestScopedHolder;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -31,7 +32,12 @@ final readonly class EntityArchiveServiceProvider implements ServiceProviderInte
                         throw new LogicException('Org ID holder service is invalid.');
                     }
 
-                    return new PdoEntityArchiveRepository($query, $orgId);
+                    $clock = $c->get(ClockInterface::class);
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('ClockInterface service is invalid.');
+                    }
+
+                    return new PdoEntityArchiveRepository($query, $orgId, $clock);
                 },
             )
             ->set(
@@ -60,7 +66,12 @@ final readonly class EntityArchiveServiceProvider implements ServiceProviderInte
                         throw new LogicException('Response factory service is invalid.');
                     }
 
-                    return new GetEntityArchiveCsvHandler($useCase, $responseFactory);
+                    $clock = $c->get(ClockInterface::class);
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('ClockInterface service is invalid.');
+                    }
+
+                    return new GetEntityArchiveCsvHandler($useCase, $responseFactory, $clock);
                 },
             )
             ->set(

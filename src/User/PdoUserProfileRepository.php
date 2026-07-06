@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace NeNeRecords\User;
 
 use Nene2\Database\DatabaseQueryExecutorInterface;
+use Nene2\Http\ClockInterface;
 
 final readonly class PdoUserProfileRepository implements UserProfileRepositoryInterface
 {
     public function __construct(
         private DatabaseQueryExecutorInterface $query,
+        private ClockInterface $clock,
     ) {
     }
 
@@ -39,7 +41,7 @@ final readonly class PdoUserProfileRepository implements UserProfileRepositoryIn
         $existing = $this->findByUserId($userId);
 
         if ($existing === null) {
-            $now = date('Y-m-d H:i:s');
+            $now = $this->clock->now()->format('Y-m-d H:i:s');
             $this->query->execute(
                 'INSERT INTO user_profiles (user_id, display_name, full_name, job_title, created_at, updated_at)
                  VALUES (?, ?, ?, ?, ?, ?)',

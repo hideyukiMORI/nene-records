@@ -8,6 +8,7 @@ use Nene2\Config\DatabaseConfig;
 use Nene2\Database\PdoConnectionFactory;
 use Nene2\Database\PdoDatabaseQueryExecutor;
 use Nene2\Http\RequestScopedHolder;
+use Nene2\Http\UtcClock;
 use NeNeRecords\Entity\Entity;
 use NeNeRecords\Entity\EntityListCriteria;
 use NeNeRecords\Entity\PdoEntityRepository;
@@ -90,7 +91,7 @@ final class PdoEntityRepositoryTest extends TestCase
 
         $this->executor->execute('INSERT INTO entities (entity_type_id) VALUES (?)', [$typeId]);
 
-        $repository = new PdoEntityRepository($this->executor, $this->orgId);
+        $repository = new PdoEntityRepository($this->executor, $this->orgId, new UtcClock());
         $entity = $repository->findById(1);
 
         self::assertNotNull($entity);
@@ -104,7 +105,7 @@ final class PdoEntityRepositoryTest extends TestCase
         $typeId = $this->insertEntityTypeId();
         $this->executor->execute('INSERT INTO entities (entity_type_id) VALUES (?)', [$typeId]);
 
-        $repository = new PdoEntityRepository($this->executor, $this->orgId);
+        $repository = new PdoEntityRepository($this->executor, $this->orgId, new UtcClock());
         $repository->softDelete(1);
 
         self::assertNull($repository->findById(1));
@@ -115,7 +116,7 @@ final class PdoEntityRepositoryTest extends TestCase
         $typeId = $this->insertEntityTypeId();
         $this->executor->execute('INSERT INTO entities (entity_type_id) VALUES (?)', [$typeId]);
 
-        $repository = new PdoEntityRepository($this->executor, $this->orgId);
+        $repository = new PdoEntityRepository($this->executor, $this->orgId, new UtcClock());
         $repository->softDelete(1);
 
         $row = $this->executor->fetchOne(
@@ -131,7 +132,7 @@ final class PdoEntityRepositoryTest extends TestCase
     {
         $typeId = $this->insertEntityTypeId();
 
-        $repository = new PdoEntityRepository($this->executor, $this->orgId);
+        $repository = new PdoEntityRepository($this->executor, $this->orgId, new UtcClock());
         $id = $repository->save(new Entity(id: null, entityTypeId: $typeId));
 
         self::assertSame(1, $id);
@@ -141,7 +142,7 @@ final class PdoEntityRepositoryTest extends TestCase
     {
         $typeId = $this->insertEntityTypeId();
 
-        $repository = new PdoEntityRepository($this->executor, $this->orgId);
+        $repository = new PdoEntityRepository($this->executor, $this->orgId, new UtcClock());
         $id = $repository->save(new Entity(id: null, entityTypeId: $typeId));
         $entity = $repository->findById($id);
 
@@ -153,7 +154,7 @@ final class PdoEntityRepositoryTest extends TestCase
     {
         $typeId = $this->insertEntityTypeId();
 
-        $repository = new PdoEntityRepository($this->executor, $this->orgId);
+        $repository = new PdoEntityRepository($this->executor, $this->orgId, new UtcClock());
         $a = $repository->save(new Entity(id: null, entityTypeId: $typeId));
         $repository->save(new Entity(id: null, entityTypeId: $typeId));
 
@@ -169,7 +170,7 @@ final class PdoEntityRepositoryTest extends TestCase
     {
         $typeId = $this->insertEntityTypeId();
 
-        $repository = new PdoEntityRepository($this->executor, $this->orgId);
+        $repository = new PdoEntityRepository($this->executor, $this->orgId, new UtcClock());
 
         for ($i = 0; $i < 5; $i++) {
             $repository->save(new Entity(id: null, entityTypeId: $typeId));
@@ -189,7 +190,7 @@ final class PdoEntityRepositoryTest extends TestCase
         $this->executor->execute("INSERT INTO entity_types (name, slug) VALUES ('Other', 'other')");
         $typeB = 2;
 
-        $repository = new PdoEntityRepository($this->executor, $this->orgId);
+        $repository = new PdoEntityRepository($this->executor, $this->orgId, new UtcClock());
         $repository->save(new Entity(id: null, entityTypeId: $typeA));
         $repository->save(new Entity(id: null, entityTypeId: $typeB));
 
@@ -203,7 +204,7 @@ final class PdoEntityRepositoryTest extends TestCase
     public function testFindByCriteriaFiltersByPublishedDateRange(): void
     {
         $typeId = $this->insertEntityTypeId();
-        $repository = new PdoEntityRepository($this->executor, $this->orgId);
+        $repository = new PdoEntityRepository($this->executor, $this->orgId, new UtcClock());
 
         $may = $repository->save(new Entity(
             id: null,
@@ -232,7 +233,7 @@ final class PdoEntityRepositoryTest extends TestCase
     {
         $typeId = $this->insertEntityTypeId();
 
-        $repository = new PdoEntityRepository($this->executor, $this->orgId);
+        $repository = new PdoEntityRepository($this->executor, $this->orgId, new UtcClock());
         $entityA = $repository->save(new Entity(id: null, entityTypeId: $typeId));
         $entityB = $repository->save(new Entity(id: null, entityTypeId: $typeId));
         $repository->save(new Entity(id: null, entityTypeId: $typeId));
@@ -253,7 +254,7 @@ final class PdoEntityRepositoryTest extends TestCase
     {
         $typeId = $this->insertEntityTypeId();
 
-        $repository = new PdoEntityRepository($this->executor, $this->orgId);
+        $repository = new PdoEntityRepository($this->executor, $this->orgId, new UtcClock());
         $entityA = $repository->save(new Entity(id: null, entityTypeId: $typeId));
         $entityB = $repository->save(new Entity(id: null, entityTypeId: $typeId));
         $repository->save(new Entity(id: null, entityTypeId: $typeId));
@@ -290,7 +291,7 @@ final class PdoEntityRepositoryTest extends TestCase
     public function testFindByCriteriaSearchBySlug(): void
     {
         $typeId = $this->insertEntityTypeId();
-        $repository = new PdoEntityRepository($this->executor, $this->orgId);
+        $repository = new PdoEntityRepository($this->executor, $this->orgId, new UtcClock());
 
         $entityA = $repository->save(new Entity(id: null, entityTypeId: $typeId, slug: 'hello-world'));
         $repository->save(new Entity(id: null, entityTypeId: $typeId, slug: 'another-post'));
@@ -305,7 +306,7 @@ final class PdoEntityRepositoryTest extends TestCase
     public function testFindByCriteriaSearchByTextField(): void
     {
         $typeId = $this->insertEntityTypeId();
-        $repository = new PdoEntityRepository($this->executor, $this->orgId);
+        $repository = new PdoEntityRepository($this->executor, $this->orgId, new UtcClock());
 
         $entityA = $repository->save(new Entity(id: null, entityTypeId: $typeId));
         $entityB = $repository->save(new Entity(id: null, entityTypeId: $typeId));
@@ -329,7 +330,7 @@ final class PdoEntityRepositoryTest extends TestCase
     public function testFindByCriteriaSearchReturnsEmptyWhenNoMatch(): void
     {
         $typeId = $this->insertEntityTypeId();
-        $repository = new PdoEntityRepository($this->executor, $this->orgId);
+        $repository = new PdoEntityRepository($this->executor, $this->orgId, new UtcClock());
 
         $repository->save(new Entity(id: null, entityTypeId: $typeId, slug: 'hello-world'));
 
@@ -345,7 +346,7 @@ final class PdoEntityRepositoryTest extends TestCase
         $this->executor->execute("INSERT INTO entity_types (name, slug) VALUES ('Other', 'other')");
         $otherTypeId = $this->executor->lastInsertId();
 
-        $repository = new PdoEntityRepository($this->executor, $this->orgId);
+        $repository = new PdoEntityRepository($this->executor, $this->orgId, new UtcClock());
         $entityA = $repository->save(new Entity(id: null, entityTypeId: $typeId, slug: 'hello-world'));
         $repository->save(new Entity(id: null, entityTypeId: $otherTypeId, slug: 'hello-other'));
 

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace NeNeRecords\Dashboard;
 
-use DateTimeImmutable;
 use DateTimeInterface;
+use Nene2\Http\ClockInterface;
 use NeNeRecords\Analytics\AccessLogRepositoryInterface;
 use NeNeRecords\Entity\EntityRepositoryInterface;
 use NeNeRecords\EntityType\EntityTypeRepositoryInterface;
@@ -20,12 +20,13 @@ final readonly class GetDashboardSummaryUseCase implements GetDashboardSummaryUs
         private EntityRepositoryInterface $entities,
         private EntityTypeRepositoryInterface $entityTypes,
         private AccessLogRepositoryInterface $accessLogs,
+        private ClockInterface $clock,
     ) {
     }
 
     public function execute(): GetDashboardSummaryOutput
     {
-        $now = new DateTimeImmutable();
+        $now = $this->clock->now();
 
         // ── Recent published entities ──────────────────────────────────────
         $recentEntities = $this->entities->findRecentPublished(self::RECENT_PUBLISHED_LIMIT);

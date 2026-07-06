@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace NeNeRecords\Media;
 
+use Nene2\Http\ClockInterface;
+
 final readonly class UploadMediaUseCase implements UploadMediaUseCaseInterface
 {
     /** @var list<string> */
@@ -46,6 +48,7 @@ final readonly class UploadMediaUseCase implements UploadMediaUseCaseInterface
     public function __construct(
         private MediaRepositoryInterface $mediaRepository,
         private StorageInterface $storage,
+        private ClockInterface $clock,
     ) {
     }
 
@@ -69,9 +72,10 @@ final readonly class UploadMediaUseCase implements UploadMediaUseCaseInterface
             return $this->storeSvg($input);
         }
 
+        $now = $this->clock->now();
         $ext = $this->extensionForMimeType($input->mimeType);
         $storedName = bin2hex(random_bytes(16)) . '.' . $ext;
-        $key = date('Y') . '/' . date('m') . '/' . $storedName;
+        $key = $now->format('Y') . '/' . $now->format('m') . '/' . $storedName;
 
         // Read pixel dimensions from the header only (no full decode) before the
         // temp file is moved into storage. Returns null for non-image uploads.
@@ -80,7 +84,7 @@ final readonly class UploadMediaUseCase implements UploadMediaUseCaseInterface
         $this->storage->writeFromUpload($key, $input->tmpPath);
 
         $url = $this->storage->publicUrl($key);
-        $now = date('Y-m-d H:i:s');
+        $createdAt = $now->format('Y-m-d H:i:s');
 
         $media = new Media(
             id: null,
@@ -89,7 +93,7 @@ final readonly class UploadMediaUseCase implements UploadMediaUseCaseInterface
             mimeType: $input->mimeType,
             size: $input->size,
             url: $url,
-            createdAt: $now,
+            createdAt: $createdAt,
             storageKey: $key,
             width: $width,
             height: $height,
@@ -103,7 +107,7 @@ final readonly class UploadMediaUseCase implements UploadMediaUseCaseInterface
             originalName: $input->originalName,
             mimeType: $input->mimeType,
             size: $input->size,
-            createdAt: $now,
+            createdAt: $createdAt,
             width: $width,
             height: $height,
         );
@@ -127,13 +131,14 @@ final readonly class UploadMediaUseCase implements UploadMediaUseCaseInterface
         $clean = (new SvgSanitizer())->sanitize($raw);
         $size = strlen($clean);
 
+        $now = $this->clock->now();
         $storedName = bin2hex(random_bytes(16)) . '.svg';
-        $key = date('Y') . '/' . date('m') . '/' . $storedName;
+        $key = $now->format('Y') . '/' . $now->format('m') . '/' . $storedName;
 
         $this->storage->write($key, $clean);
 
         $url = $this->storage->publicUrl($key);
-        $now = date('Y-m-d H:i:s');
+        $createdAt = $now->format('Y-m-d H:i:s');
 
         $media = new Media(
             id: null,
@@ -142,7 +147,7 @@ final readonly class UploadMediaUseCase implements UploadMediaUseCaseInterface
             mimeType: 'image/svg+xml',
             size: $size,
             url: $url,
-            createdAt: $now,
+            createdAt: $createdAt,
             storageKey: $key,
             width: null,
             height: null,
@@ -156,7 +161,7 @@ final readonly class UploadMediaUseCase implements UploadMediaUseCaseInterface
             originalName: $input->originalName,
             mimeType: 'image/svg+xml',
             size: $size,
-            createdAt: $now,
+            createdAt: $createdAt,
             width: null,
             height: null,
         );

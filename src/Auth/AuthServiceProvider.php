@@ -10,6 +10,7 @@ use Nene2\Database\DatabaseQueryExecutorInterface;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
+use Nene2\Http\ClockInterface;
 use Nene2\Http\JsonResponseFactory;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -23,12 +24,17 @@ final readonly class AuthServiceProvider implements ServiceProviderInterface
                 UserRepositoryInterface::class,
                 static function (ContainerInterface $container): UserRepositoryInterface {
                     $query = $container->get(DatabaseQueryExecutorInterface::class);
+                    $clock = $container->get(ClockInterface::class);
 
                     if (!$query instanceof DatabaseQueryExecutorInterface) {
                         throw new LogicException('DatabaseQueryExecutorInterface service is invalid.');
                     }
 
-                    return new PdoUserRepository($query);
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('ClockInterface service is invalid.');
+                    }
+
+                    return new PdoUserRepository($query, $clock);
                 },
             )
             ->set(
@@ -36,6 +42,7 @@ final readonly class AuthServiceProvider implements ServiceProviderInterface
                 static function (ContainerInterface $container): LoginUseCase {
                     $users = $container->get(UserRepositoryInterface::class);
                     $tokenIssuer = $container->get('nene-records.token_issuer');
+                    $clock = $container->get(ClockInterface::class);
 
                     if (!$users instanceof UserRepositoryInterface) {
                         throw new LogicException('UserRepositoryInterface service is invalid.');
@@ -45,8 +52,12 @@ final readonly class AuthServiceProvider implements ServiceProviderInterface
                         throw new LogicException('TokenIssuerInterface service is invalid.');
                     }
 
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('ClockInterface service is invalid.');
+                    }
+
                     /** @var TokenIssuerInterface $tokenIssuer */
-                    return new LoginUseCase($users, $tokenIssuer);
+                    return new LoginUseCase($users, $tokenIssuer, $clock);
                 },
             )
             ->set(
@@ -54,6 +65,7 @@ final readonly class AuthServiceProvider implements ServiceProviderInterface
                 static function (ContainerInterface $container): LoginHandler {
                     $useCase = $container->get(LoginUseCase::class);
                     $response = $container->get(JsonResponseFactory::class);
+                    $clock = $container->get(ClockInterface::class);
 
                     if (!$useCase instanceof LoginUseCase) {
                         throw new LogicException('LoginUseCase service is invalid.');
@@ -63,7 +75,11 @@ final readonly class AuthServiceProvider implements ServiceProviderInterface
                         throw new LogicException('JsonResponseFactory service is invalid.');
                     }
 
-                    return new LoginHandler($useCase, $response);
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('ClockInterface service is invalid.');
+                    }
+
+                    return new LoginHandler($useCase, $response, $clock);
                 },
             )
             ->set(

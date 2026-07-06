@@ -9,6 +9,7 @@ use Nene2\Database\DatabaseQueryExecutorInterface;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
+use Nene2\Http\ClockInterface;
 use Nene2\Http\JsonResponseFactory;
 use NeNeRecords\Organization\OrganizationRepositoryInterface;
 use Psr\Container\ContainerInterface;
@@ -37,7 +38,12 @@ final readonly class OrgExportServiceProvider implements ServiceProviderInterfac
                         throw new LogicException('DatabaseQueryExecutorInterface is invalid.');
                     }
 
-                    return new PdoOrgImportRepository($query);
+                    $clock = $c->get(ClockInterface::class);
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('ClockInterface is invalid.');
+                    }
+
+                    return new PdoOrgImportRepository($query, $clock);
                 },
             )
             ->set(
@@ -47,16 +53,18 @@ final readonly class OrgExportServiceProvider implements ServiceProviderInterfac
                     $orgs    = $c->get(OrganizationRepositoryInterface::class);
                     $json    = $c->get(JsonResponseFactory::class);
                     $problem = $c->get(ProblemDetailsResponseFactory::class);
+                    $clock   = $c->get(ClockInterface::class);
                     if (
                         !$repo instanceof OrgExportRepositoryInterface
                         || !$orgs instanceof OrganizationRepositoryInterface
                         || !$json instanceof JsonResponseFactory
                         || !$problem instanceof ProblemDetailsResponseFactory
+                        || !$clock instanceof ClockInterface
                     ) {
                         throw new LogicException('ExportOrganizationHandler dependencies are invalid.');
                     }
 
-                    return new ExportOrganizationHandler($repo, $orgs, $json, $problem);
+                    return new ExportOrganizationHandler($repo, $orgs, $json, $problem, $clock);
                 },
             )
             ->set(

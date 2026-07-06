@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace NeNeRecords\PreviewToken;
 
-use DateTimeImmutable;
+use Nene2\Http\ClockInterface;
 use NeNeRecords\BoolField\BoolField;
 use NeNeRecords\BoolField\BoolFieldRepositoryInterface;
 use NeNeRecords\DateTimeField\DateTimeField;
@@ -53,6 +53,7 @@ final readonly class GetPreviewRecordViewUseCase implements GetPreviewRecordView
         private EntityRelationRepositoryInterface $entityRelations,
         private ListPublicSettingsUseCaseInterface $publicSettings,
         private PublicRecordHierarchyBuilder $hierarchyBuilder,
+        private ClockInterface $clock,
     ) {
     }
 
@@ -60,7 +61,7 @@ final readonly class GetPreviewRecordViewUseCase implements GetPreviewRecordView
     {
         $tokenRecord = $this->previewTokens->findByToken($input->token);
 
-        if ($tokenRecord === null || $tokenRecord->expiresAt <= new DateTimeImmutable()) {
+        if ($tokenRecord === null || $tokenRecord->expiresAt <= $this->clock->now()) {
             throw new PreviewTokenNotFoundException($input->token);
         }
 

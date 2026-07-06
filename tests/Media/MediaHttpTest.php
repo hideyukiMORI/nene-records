@@ -7,6 +7,7 @@ namespace NeNeRecords\Tests\Media;
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RuntimeApplicationFactory;
+use Nene2\Http\UtcClock;
 use NeNeRecords\Media\DeleteMediaHandler;
 use NeNeRecords\Media\DeleteMediaUseCase;
 use NeNeRecords\Media\FindMediaUsagesUseCase;
@@ -74,7 +75,7 @@ final class MediaHttpTest extends TestCase
 
         $registrar = new MediaRouteRegistrar(
             new UploadMediaHandler(
-                new UploadMediaUseCase($this->repository, $this->storage),
+                new UploadMediaUseCase($this->repository, $this->storage, new UtcClock()),
                 $jsonResponse,
             ),
             new ListMediaHandler(
@@ -165,7 +166,7 @@ final class MediaHttpTest extends TestCase
         $problemDetails = new ProblemDetailsResponseFactory($this->factory, $this->factory);
 
         $registrar = new MediaRouteRegistrar(
-            new UploadMediaHandler(new UploadMediaUseCase($emptyRepo, $this->storage), $jsonResponse),
+            new UploadMediaHandler(new UploadMediaUseCase($emptyRepo, $this->storage, new UtcClock()), $jsonResponse),
             new ListMediaHandler(new ListMediaUseCase($emptyRepo), $jsonResponse),
             new DeleteMediaHandler(new DeleteMediaUseCase($emptyRepo, $this->storage), $this->factory),
             new ServeMediaHandler($this->storage, $this->factory, $this->factory),

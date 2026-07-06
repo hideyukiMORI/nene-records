@@ -8,6 +8,7 @@ use DateTimeImmutable;
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RuntimeApplicationFactory;
+use Nene2\Http\UtcClock;
 use NeNeRecords\Entity\Entity;
 use NeNeRecords\Entity\EntityNotFoundExceptionHandler;
 use NeNeRecords\Entity\EntityStatus;
@@ -73,7 +74,7 @@ final class PreviewTokenHttpTest extends TestCase
         $jsonResponse = new JsonResponseFactory($this->factory, $this->factory);
         $problemDetails = new ProblemDetailsResponseFactory($this->factory, $this->factory);
 
-        $generateUseCase = new GeneratePreviewTokenUseCase($this->entities, $this->previewTokens);
+        $generateUseCase = new GeneratePreviewTokenUseCase($this->entities, $this->previewTokens, new UtcClock());
         $revokeUseCase = new RevokePreviewTokenUseCase($this->entities, $this->previewTokens);
         $getPreviewUseCase = new GetPreviewRecordViewUseCase(
             $this->previewTokens,
@@ -88,6 +89,7 @@ final class PreviewTokenHttpTest extends TestCase
             new InMemoryEntityRelationRepository(),
             $publicSettings,
             new \NeNeRecords\PublicRecord\PublicRecordHierarchyBuilder($this->entities, $textFields),
+            new UtcClock(),
         );
 
         $registrar = new PreviewTokenRouteRegistrar(

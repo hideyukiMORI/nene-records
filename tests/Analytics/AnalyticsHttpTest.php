@@ -8,6 +8,7 @@ use DateTimeImmutable;
 use DateTimeZone;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RuntimeApplicationFactory;
+use Nene2\Http\UtcClock;
 use NeNeRecords\Analytics\AccessLogEntry;
 use NeNeRecords\Analytics\AnalyticsRouteRegistrar;
 use NeNeRecords\Analytics\GetAccessStatsByDateHandler;
@@ -68,6 +69,7 @@ final class AnalyticsHttpTest extends TestCase
                     $this->repository,
                     $entities,
                     new InMemoryTextFieldRepository(),
+                    new UtcClock(),
                 ),
                 $jsonResponse,
             ),

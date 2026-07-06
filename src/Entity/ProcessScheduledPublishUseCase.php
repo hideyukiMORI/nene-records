@@ -4,20 +4,21 @@ declare(strict_types=1);
 
 namespace NeNeRecords\Entity;
 
-use DateTimeImmutable;
 use LogicException;
+use Nene2\Http\ClockInterface;
 
 final readonly class ProcessScheduledPublishUseCase implements ProcessScheduledPublishUseCaseInterface
 {
     public function __construct(
         private EntityRepositoryInterface $entities,
+        private ClockInterface $clock,
     ) {
     }
 
     public function execute(): ProcessScheduledPublishOutput
     {
         $due = $this->entities->findDueScheduled();
-        $now = new DateTimeImmutable();
+        $now = $this->clock->now();
         $publishedIds = [];
 
         foreach ($due as $entity) {

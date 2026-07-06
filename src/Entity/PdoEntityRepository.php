@@ -8,6 +8,7 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use LogicException;
 use Nene2\Database\DatabaseQueryExecutorInterface;
+use Nene2\Http\ClockInterface;
 use Nene2\Http\RequestScopedHolder;
 
 final readonly class PdoEntityRepository implements EntityRepositoryInterface
@@ -18,6 +19,7 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
     public function __construct(
         private DatabaseQueryExecutorInterface $query,
         private RequestScopedHolder $orgId,
+        private ClockInterface $clock,
     ) {
     }
 
@@ -346,7 +348,7 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
     {
         $publishedAt = $entity->publishedAt?->format(DateTimeInterface::ATOM);
         $scheduledAt = $entity->scheduledAt?->format(DateTimeInterface::ATOM);
-        $now = date('Y-m-d H:i:s');
+        $now = $this->clock->now()->format('Y-m-d H:i:s');
 
         $this->query->execute(
             'INSERT INTO entities (organization_id, entity_type_id, slug, permalink, layout, status, published_at, scheduled_at, created_at, updated_at, meta_title, meta_description) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
@@ -373,7 +375,7 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
         }
 
         $existing = $this->findById($id);
-        $now = date('Y-m-d H:i:s');
+        $now = $this->clock->now()->format('Y-m-d H:i:s');
         $publishedAt = $entity->publishedAt?->format(DateTimeInterface::ATOM);
         $scheduledAt = $entity->scheduledAt?->format(DateTimeInterface::ATOM);
 
@@ -404,7 +406,7 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
     public function softDelete(int $id): void
     {
         $existing = $this->findById($id);
-        $now = date('Y-m-d H:i:s');
+        $now = $this->clock->now()->format('Y-m-d H:i:s');
 
         $this->query->execute(
             <<<'SQL'

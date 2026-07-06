@@ -6,6 +6,7 @@ namespace NeNeRecords\Tests\Entity;
 
 use DateTimeImmutable;
 use InvalidArgumentException;
+use Nene2\Http\UtcClock;
 use NeNeRecords\Entity\DeleteEntityInput;
 use NeNeRecords\Entity\DeleteEntityUseCase;
 use NeNeRecords\Entity\Entity;
@@ -28,7 +29,7 @@ final class EntityScheduleUseCaseTest extends TestCase
         $entityId = $entities->save(new Entity(id: null, entityTypeId: 1));
 
         $scheduledAt = new DateTimeImmutable('+1 hour');
-        $useCase = new ScheduleEntityUseCase($entities);
+        $useCase = new ScheduleEntityUseCase($entities, new UtcClock());
 
         $output = $useCase->execute(new ScheduleEntityInput(id: $entityId, scheduledAt: $scheduledAt));
 
@@ -48,7 +49,7 @@ final class EntityScheduleUseCaseTest extends TestCase
     public function testScheduleEntityThrowsEntityNotFoundExceptionWhenEntityMissing(): void
     {
         $entities = new InMemoryEntityRepository([]);
-        $useCase = new ScheduleEntityUseCase($entities);
+        $useCase = new ScheduleEntityUseCase($entities, new UtcClock());
 
         $this->expectException(EntityNotFoundException::class);
 
@@ -60,7 +61,7 @@ final class EntityScheduleUseCaseTest extends TestCase
         $entities = new InMemoryEntityRepository([]);
         $entityId = $entities->save(new Entity(id: null, entityTypeId: 1));
 
-        $useCase = new ScheduleEntityUseCase($entities);
+        $useCase = new ScheduleEntityUseCase($entities, new UtcClock());
 
         $this->expectException(InvalidArgumentException::class);
 
@@ -135,7 +136,7 @@ final class EntityScheduleUseCaseTest extends TestCase
             scheduledAt: new DateTimeImmutable('-1 minute'),
         ));
 
-        $useCase = new ProcessScheduledPublishUseCase($entities);
+        $useCase = new ProcessScheduledPublishUseCase($entities, new UtcClock());
 
         $output = $useCase->execute();
 
@@ -151,7 +152,7 @@ final class EntityScheduleUseCaseTest extends TestCase
     {
         $entities = new InMemoryEntityRepository([]);
 
-        $useCase = new ProcessScheduledPublishUseCase($entities);
+        $useCase = new ProcessScheduledPublishUseCase($entities, new UtcClock());
 
         $output = $useCase->execute();
 
@@ -168,7 +169,7 @@ final class EntityScheduleUseCaseTest extends TestCase
             scheduledAt: new DateTimeImmutable('+1 hour'),
         ));
 
-        $useCase = new ProcessScheduledPublishUseCase($entities);
+        $useCase = new ProcessScheduledPublishUseCase($entities, new UtcClock());
 
         $output = $useCase->execute();
 

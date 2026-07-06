@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NeNeRecords\Notification\Channel;
 
+use Nene2\Http\ClockInterface;
 use NeNeRecords\Notification\NotificationChannelInterface;
 use NeNeRecords\Notification\NotificationMessage;
 use Throwable;
@@ -19,6 +20,11 @@ final readonly class WebhookChannel implements NotificationChannelInterface
 {
     private const TIMEOUT_SECONDS = 5;
 
+    public function __construct(
+        private ClockInterface $clock,
+    ) {
+    }
+
     public function send(NotificationMessage $message, array $config): void
     {
         try {
@@ -33,7 +39,7 @@ final readonly class WebhookChannel implements NotificationChannelInterface
                 'title' => $message->title,
                 'body' => $message->body,
                 'url' => $message->url,
-                'occurred_at' => date('c'),
+                'occurred_at' => $this->clock->now()->format('c'),
             ], JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE);
 
             $extraHeaders = $this->parseHeaders($config);

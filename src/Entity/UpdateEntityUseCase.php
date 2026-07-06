@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace NeNeRecords\Entity;
 
-use DateTimeImmutable;
 use DateTimeInterface;
 use LogicException;
+use Nene2\Http\ClockInterface;
 use NeNeRecords\EntityType\EntityTypeNotFoundException;
 use NeNeRecords\EntityType\EntityTypeRepositoryInterface;
 use NeNeRecords\PublicRecord\PublicPermalinkResolver;
@@ -18,6 +18,7 @@ final readonly class UpdateEntityUseCase implements UpdateEntityUseCaseInterface
     public function __construct(
         private EntityRepositoryInterface $entities,
         private EntityTypeRepositoryInterface $entityTypes,
+        private ClockInterface $clock,
         private ?WebhookDispatcherInterface $webhooks = null,
         /** Records a 301 from the old canonical path when the permalink changes (#651). */
         private ?UrlRedirectRepositoryInterface $redirects = null,
@@ -61,7 +62,7 @@ final readonly class UpdateEntityUseCase implements UpdateEntityUseCaseInterface
         // Auto-set published_at when transitioning to published for the first time.
         $publishedAt = $input->publishedAt ?? $existing->publishedAt;
         if ($input->status === EntityStatus::Published && $publishedAt === null) {
-            $publishedAt = new DateTimeImmutable();
+            $publishedAt = $this->clock->now();
         }
 
         // scheduled_at is only preserved when status is scheduled; clear otherwise.

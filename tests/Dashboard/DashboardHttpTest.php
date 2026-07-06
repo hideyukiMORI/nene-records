@@ -7,6 +7,7 @@ namespace NeNeRecords\Tests\Dashboard;
 use DateTimeImmutable;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RuntimeApplicationFactory;
+use Nene2\Http\UtcClock;
 use NeNeRecords\Dashboard\DashboardRouteRegistrar;
 use NeNeRecords\Dashboard\GetDashboardSummaryHandler;
 use NeNeRecords\Dashboard\GetDashboardSummaryUseCase;
@@ -43,6 +44,7 @@ final class DashboardHttpTest extends TestCase
             $this->entities,
             $this->entityTypes,
             $this->accessLogs,
+            new UtcClock(),
         );
 
         $registrar = new DashboardRouteRegistrar(
@@ -89,7 +91,7 @@ final class DashboardHttpTest extends TestCase
         $this->entities = new InMemoryEntityRepository([$entity]);
 
         $jsonResponse = new JsonResponseFactory($this->factory, $this->factory);
-        $useCase = new GetDashboardSummaryUseCase($this->entities, $this->entityTypes, $this->accessLogs);
+        $useCase = new GetDashboardSummaryUseCase($this->entities, $this->entityTypes, $this->accessLogs, new UtcClock());
         $registrar = new DashboardRouteRegistrar(
             new GetDashboardSummaryHandler($useCase, $jsonResponse),
         );
@@ -143,7 +145,7 @@ final class DashboardHttpTest extends TestCase
         $this->accessLogs->insert($entry2);
 
         $jsonResponse = new JsonResponseFactory($this->factory, $this->factory);
-        $useCase = new GetDashboardSummaryUseCase($this->entities, $this->entityTypes, $this->accessLogs);
+        $useCase = new GetDashboardSummaryUseCase($this->entities, $this->entityTypes, $this->accessLogs, new UtcClock());
         $registrar = new DashboardRouteRegistrar(
             new GetDashboardSummaryHandler($useCase, $jsonResponse),
         );
@@ -177,7 +179,7 @@ final class DashboardHttpTest extends TestCase
         $this->entities = new InMemoryEntityRepository([$published1, $published2, $draft]);
 
         $jsonResponse = new JsonResponseFactory($this->factory, $this->factory);
-        $useCase = new GetDashboardSummaryUseCase($this->entities, $this->entityTypes, $this->accessLogs);
+        $useCase = new GetDashboardSummaryUseCase($this->entities, $this->entityTypes, $this->accessLogs, new UtcClock());
         $registrar = new DashboardRouteRegistrar(
             new GetDashboardSummaryHandler($useCase, $jsonResponse),
         );

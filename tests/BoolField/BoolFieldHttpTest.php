@@ -7,6 +7,7 @@ namespace NeNeRecords\Tests\BoolField;
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RuntimeApplicationFactory;
+use Nene2\Http\UtcClock;
 use NeNeRecords\BoolField\BoolFieldNotFoundExceptionHandler;
 use NeNeRecords\BoolField\BoolFieldRouteRegistrar;
 use NeNeRecords\BoolField\CreateBoolFieldHandler;
@@ -81,16 +82,16 @@ final class BoolFieldHttpTest extends TestCase
         $entityRegistrar = new EntityRouteRegistrar(
             new GetEntityByIdHandler(new GetEntityByIdUseCase($this->entities), $jsonResponse),
             new CreateEntityHandler(new CreateEntityUseCase($this->entities, $this->entityTypes), $jsonResponse),
-            new UpdateEntityHandler(new UpdateEntityUseCase($this->entities, $this->entityTypes), $jsonResponse),
+            new UpdateEntityHandler(new UpdateEntityUseCase($this->entities, $this->entityTypes, new UtcClock()), $jsonResponse),
             new DeleteEntityHandler(new DeleteEntityUseCase($this->entities), $this->factory),
             new \NeNeRecords\Entity\MoveEntityHandler(new \NeNeRecords\Entity\MoveEntitySubtreeUseCase($this->entities), $jsonResponse),
             new \NeNeRecords\Entity\ReorderEntitiesHandler(new \NeNeRecords\Entity\ReorderEntitiesUseCase($this->entities), $jsonResponse),
-            new ListEntitiesHandler(new ListEntitiesUseCase($this->entities), $jsonResponse, new ExcerptResolver(new InMemoryTextFieldRepository(), new InMemorySettingRepository())),
+            new ListEntitiesHandler(new ListEntitiesUseCase($this->entities, new UtcClock()), $jsonResponse, new ExcerptResolver(new InMemoryTextFieldRepository(), new InMemorySettingRepository())),
             new ListEntityRevisionsHandler(new ListEntityRevisionsUseCase($this->entities), $jsonResponse),
             new ExportEntitiesHandler($this->entities, new InMemoryTextFieldRepository(), $this->factory),
-            new ScheduleEntityHandler(new ScheduleEntityUseCase($this->entities), $jsonResponse),
+            new ScheduleEntityHandler(new ScheduleEntityUseCase($this->entities, new UtcClock()), $jsonResponse),
             new UnscheduleEntityHandler(new UnscheduleEntityUseCase($this->entities), $this->factory),
-            new ProcessScheduledPublishHandler(new ProcessScheduledPublishUseCase($this->entities), $jsonResponse),
+            new ProcessScheduledPublishHandler(new ProcessScheduledPublishUseCase($this->entities, new UtcClock()), $jsonResponse),
         );
 
         $boolFieldRegistrar = new BoolFieldRouteRegistrar(

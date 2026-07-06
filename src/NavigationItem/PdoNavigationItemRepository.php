@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeNeRecords\NavigationItem;
 
 use Nene2\Database\DatabaseQueryExecutorInterface;
+use Nene2\Http\ClockInterface;
 use Nene2\Http\RequestScopedHolder;
 
 final readonly class PdoNavigationItemRepository implements NavigationItemRepositoryInterface
@@ -15,6 +16,7 @@ final readonly class PdoNavigationItemRepository implements NavigationItemReposi
     public function __construct(
         private DatabaseQueryExecutorInterface $query,
         private readonly RequestScopedHolder $orgId,
+        private ClockInterface $clock,
     ) {
     }
 
@@ -46,7 +48,7 @@ final readonly class PdoNavigationItemRepository implements NavigationItemReposi
 
     public function save(NavigationItem $item): int
     {
-        $now = date('Y-m-d H:i:s');
+        $now = $this->clock->now()->format('Y-m-d H:i:s');
 
         $this->query->execute(
             'INSERT INTO navigation_items (organization_id, menu_id, label, url, display_order, created_at, updated_at)
@@ -59,7 +61,7 @@ final readonly class PdoNavigationItemRepository implements NavigationItemReposi
 
     public function update(NavigationItem $item): void
     {
-        $now = date('Y-m-d H:i:s');
+        $now = $this->clock->now()->format('Y-m-d H:i:s');
 
         $this->query->execute(
             'UPDATE navigation_items

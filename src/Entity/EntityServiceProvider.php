@@ -9,6 +9,7 @@ use Nene2\Database\DatabaseQueryExecutorInterface;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
+use Nene2\Http\ClockInterface;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RequestScopedHolder;
 use NeNeRecords\Analytics\AccessLogRepositoryInterface;
@@ -40,7 +41,12 @@ final readonly class EntityServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Org ID holder service is invalid.');
                     }
 
-                    return new PdoEntityRepository($query, $orgId);
+                    $clock = $c->get(ClockInterface::class);
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('ClockInterface service is invalid.');
+                    }
+
+                    return new PdoEntityRepository($query, $orgId, $clock);
                 },
             )
             ->set(
@@ -160,7 +166,12 @@ final readonly class EntityServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Access log repository service is invalid.');
                     }
 
-                    return new ListEntitiesUseCase($repository, $accessLogs);
+                    $clock = $c->get(ClockInterface::class);
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('ClockInterface service is invalid.');
+                    }
+
+                    return new ListEntitiesUseCase($repository, $clock, $accessLogs);
                 },
             )
             ->set(
@@ -219,7 +230,12 @@ final readonly class EntityServiceProvider implements ServiceProviderInterface
                         throw new LogicException('URL redirect repository service is invalid.');
                     }
 
-                    return new UpdateEntityUseCase($entities, $entityTypes, $webhooks, $redirects);
+                    $clock = $c->get(ClockInterface::class);
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('ClockInterface service is invalid.');
+                    }
+
+                    return new UpdateEntityUseCase($entities, $entityTypes, $clock, $webhooks, $redirects);
                 },
             )
             ->set(
@@ -376,7 +392,12 @@ final readonly class EntityServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Entity repository service is invalid.');
                     }
 
-                    return new ScheduleEntityUseCase($repository);
+                    $clock = $c->get(ClockInterface::class);
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('ClockInterface service is invalid.');
+                    }
+
+                    return new ScheduleEntityUseCase($repository, $clock);
                 },
             )
             ->set(
@@ -434,7 +455,12 @@ final readonly class EntityServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Entity repository service is invalid.');
                     }
 
-                    return new ProcessScheduledPublishUseCase($repository);
+                    $clock = $c->get(ClockInterface::class);
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('ClockInterface service is invalid.');
+                    }
+
+                    return new ProcessScheduledPublishUseCase($repository, $clock);
                 },
             )
             ->set(

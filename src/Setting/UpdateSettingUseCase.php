@@ -6,6 +6,7 @@ namespace NeNeRecords\Setting;
 
 use Nene2\Database\DatabaseQueryExecutorInterface;
 use Nene2\Database\DatabaseTransactionManagerInterface;
+use Nene2\Http\ClockInterface;
 use Nene2\Http\RequestScopedHolder;
 use NeNeRecords\BlocksField\BlocksDocumentValidator;
 use NeNeRecords\PublicRecord\FrontPageSetting;
@@ -25,6 +26,7 @@ final readonly class UpdateSettingUseCase implements UpdateSettingUseCaseInterfa
         private DatabaseTransactionManagerInterface $transactions,
         private RequestScopedHolder $orgId,
         private FrontPageSetting $frontPage,
+        private ClockInterface $clock,
     ) {
     }
 
@@ -44,9 +46,10 @@ final readonly class UpdateSettingUseCase implements UpdateSettingUseCaseInterfa
         }
 
         $orgId = $this->orgId;
+        $clock = $this->clock;
         $stored = $this->transactions->transactional(
-            function (DatabaseQueryExecutorInterface $query) use ($input, $orgId): SettingValue {
-                $repository = new PdoSettingRepository($query, $orgId);
+            function (DatabaseQueryExecutorInterface $query) use ($input, $orgId, $clock): SettingValue {
+                $repository = new PdoSettingRepository($query, $orgId, $clock);
 
                 return $repository->applyValue($input->settingKey, $input->value, $input->actorUserId);
             },

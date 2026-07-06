@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeNeRecords\OrgExport;
 
 use Nene2\Database\DatabaseQueryExecutorInterface;
+use Nene2\Http\ClockInterface;
 
 /**
  * Inserts an exported org payload into the target organization.
@@ -17,6 +18,7 @@ final readonly class PdoOrgImportRepository implements OrgImportRepositoryInterf
 {
     public function __construct(
         private DatabaseQueryExecutorInterface $query,
+        private ClockInterface $clock,
     ) {
     }
 
@@ -211,8 +213,8 @@ final readonly class PdoOrgImportRepository implements OrgImportRepositoryInterf
                     (string) $row['label'],
                     (string) $row['url'],
                     (int) $row['display_order'],
-                    (string) ($row['created_at'] ?? date('Y-m-d H:i:s')),
-                    (string) ($row['updated_at'] ?? date('Y-m-d H:i:s')),
+                    (string) ($row['created_at'] ?? $this->clock->now()->format('Y-m-d H:i:s')),
+                    (string) ($row['updated_at'] ?? $this->clock->now()->format('Y-m-d H:i:s')),
                 ],
             );
             $navCount++;
@@ -232,8 +234,8 @@ final readonly class PdoOrgImportRepository implements OrgImportRepositoryInterf
                     isset($row['default_value']) ? (string) $row['default_value'] : null,
                     (int) $row['is_public'],
                     (string) $row['label'],
-                    (string) ($row['created_at'] ?? date('Y-m-d H:i:s')),
-                    (string) ($row['updated_at'] ?? date('Y-m-d H:i:s')),
+                    (string) ($row['created_at'] ?? $this->clock->now()->format('Y-m-d H:i:s')),
+                    (string) ($row['updated_at'] ?? $this->clock->now()->format('Y-m-d H:i:s')),
                 ],
             );
             $settingDefCount++;
@@ -252,8 +254,8 @@ final readonly class PdoOrgImportRepository implements OrgImportRepositoryInterf
                     isset($row['value']) ? (string) $row['value'] : null,
                     (int) $row['is_deleted'],
                     isset($row['deleted_at']) ? (string) $row['deleted_at'] : null,
-                    (string) ($row['created_at'] ?? date('Y-m-d H:i:s')),
-                    (string) ($row['updated_at'] ?? date('Y-m-d H:i:s')),
+                    (string) ($row['created_at'] ?? $this->clock->now()->format('Y-m-d H:i:s')),
+                    (string) ($row['updated_at'] ?? $this->clock->now()->format('Y-m-d H:i:s')),
                 ],
             );
             $settingValueCount++;
@@ -273,7 +275,7 @@ final readonly class PdoOrgImportRepository implements OrgImportRepositoryInterf
                     (string) $row['mime_type'],
                     (int) $row['size'],
                     (string) $row['url'],
-                    (string) ($row['created_at'] ?? date('Y-m-d H:i:s')),
+                    (string) ($row['created_at'] ?? $this->clock->now()->format('Y-m-d H:i:s')),
                 ],
             );
             $mediaCount++;

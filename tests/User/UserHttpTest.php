@@ -8,6 +8,7 @@ use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RuntimeApplicationFactory;
 use Nene2\Http\SecureTokenHelper;
+use Nene2\Http\UtcClock;
 use NeNeRecords\Auth\User;
 use NeNeRecords\Tests\UserInvite\NullMailer;
 use NeNeRecords\User\CannotDeleteSelfExceptionHandler;
@@ -83,8 +84,8 @@ final class UserHttpTest extends TestCase
             new ResetUserPasswordHandler(new ResetUserPasswordUseCase($this->repository), $this->factory),
             new DeleteUserHandler(new DeleteUserUseCase($this->repository), $this->factory),
             new ChangePasswordHandler(new ChangePasswordUseCase($this->repository), $this->factory),
-            new ChangeEmailHandler(new ChangeEmailUseCase($this->repository, $this->mailer), $this->factory),
-            new VerifyEmailChangeHandler(new VerifyEmailChangeUseCase($this->repository), $this->factory),
+            new ChangeEmailHandler(new ChangeEmailUseCase($this->repository, $this->mailer, new UtcClock()), $this->factory),
+            new VerifyEmailChangeHandler(new VerifyEmailChangeUseCase($this->repository, new UtcClock()), $this->factory),
             new UpdateUserProfileHandler(new UpdateUserProfileUseCase($this->repository, $this->profiles), $jsonResponse),
         );
 

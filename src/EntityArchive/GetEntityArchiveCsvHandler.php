@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NeNeRecords\EntityArchive;
 
+use Nene2\Http\ClockInterface;
 use Nene2\Routing\Router;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -16,6 +17,7 @@ final readonly class GetEntityArchiveCsvHandler
     public function __construct(
         private GetEntityArchiveCsvUseCaseInterface $useCase,
         private ResponseFactoryInterface $responseFactory,
+        private ClockInterface $clock,
     ) {
     }
 
@@ -28,7 +30,7 @@ final readonly class GetEntityArchiveCsvHandler
         $output = $this->useCase->execute($input);
 
         $csv      = $this->buildCsv($output->rows);
-        $filename = "entity_archive_{$output->entityTypeId}_" . date('Ymd_His') . '.csv';
+        $filename = "entity_archive_{$output->entityTypeId}_" . $this->clock->now()->format('Ymd_His') . '.csv';
 
         return $this->responseFactory->createResponse(200)
             ->withHeader('Content-Type', 'text/csv; charset=UTF-8')

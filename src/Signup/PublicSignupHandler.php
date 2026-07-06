@@ -7,6 +7,7 @@ namespace NeNeRecords\Signup;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
+use Nene2\Http\ClockInterface;
 use Nene2\Http\JsonRequestBodyParser;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Middleware\RateLimitStorageInterface;
@@ -34,6 +35,7 @@ final readonly class PublicSignupHandler
         private JsonResponseFactory $response,
         private ProblemDetailsResponseFactory $problemDetails,
         private RateLimitStorageInterface $rateLimitStorage,
+        private ClockInterface $clock,
         /** Max tenant signups accepted per client IP within the window. */
         private int $maxSignupsPerWindow = 5,
         /** Rate-limit window in seconds (default: 1 hour). */
@@ -106,7 +108,7 @@ final readonly class PublicSignupHandler
 
         $cookie = SessionCookie::build(
             $output->token,
-            $output->expiresAt - time(),
+            $output->expiresAt - $this->clock->now()->getTimestamp(),
             SessionCookie::isSecureRequest($request),
         );
 
@@ -133,7 +135,7 @@ final readonly class PublicSignupHandler
             return null;
         }
 
-        $retryAfter = max(0, $result['reset_at'] - time());
+        $retryAfter = max(0, $result['reset_at'] - $this->clock->now()->getTimestamp());
 
         return $this->problemDetails->create(
             $request,

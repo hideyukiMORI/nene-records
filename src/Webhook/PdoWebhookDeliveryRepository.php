@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeNeRecords\Webhook;
 
 use Nene2\Database\DatabaseQueryExecutorInterface;
+use Nene2\Http\ClockInterface;
 
 /**
  * Database-backed webhook delivery queue (#285).
@@ -23,6 +24,7 @@ final readonly class PdoWebhookDeliveryRepository implements WebhookDeliveryRepo
 
     public function __construct(
         private DatabaseQueryExecutorInterface $query,
+        private ClockInterface $clock,
     ) {
     }
 
@@ -37,7 +39,7 @@ final readonly class PdoWebhookDeliveryRepository implements WebhookDeliveryRepo
         int $maxAttempts,
         int $nextAttemptAt,
     ): int {
-        $now = date('Y-m-d H:i:s');
+        $now = $this->clock->now()->format('Y-m-d H:i:s');
 
         return $this->query->insert(
             'INSERT INTO webhook_deliveries

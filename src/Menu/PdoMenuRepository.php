@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeNeRecords\Menu;
 
 use Nene2\Database\DatabaseQueryExecutorInterface;
+use Nene2\Http\ClockInterface;
 use Nene2\Http\RequestScopedHolder;
 
 final readonly class PdoMenuRepository implements MenuRepositoryInterface
@@ -15,6 +16,7 @@ final readonly class PdoMenuRepository implements MenuRepositoryInterface
     public function __construct(
         private DatabaseQueryExecutorInterface $query,
         private readonly RequestScopedHolder $orgId,
+        private ClockInterface $clock,
     ) {
     }
 
@@ -63,7 +65,7 @@ final readonly class PdoMenuRepository implements MenuRepositoryInterface
 
     public function save(Menu $menu): int
     {
-        $now = date('Y-m-d H:i:s');
+        $now = $this->clock->now()->format('Y-m-d H:i:s');
 
         $this->query->execute(
             'INSERT INTO menus (organization_id, name, slug, location, created_at, updated_at)
@@ -76,7 +78,7 @@ final readonly class PdoMenuRepository implements MenuRepositoryInterface
 
     public function update(Menu $menu): void
     {
-        $now = date('Y-m-d H:i:s');
+        $now = $this->clock->now()->format('Y-m-d H:i:s');
 
         $this->query->execute(
             'UPDATE menus

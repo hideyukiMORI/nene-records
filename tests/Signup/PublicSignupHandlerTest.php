@@ -9,6 +9,7 @@ use Nene2\Http\JsonResponseFactory;
 use Nene2\Middleware\InMemoryRateLimitStorage;
 use Nene2\Validation\ValidationException;
 use NeNeRecords\Signup\PublicSignupHandler;
+use NeNeRecords\Tests\Support\FixedClock;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface;
@@ -32,6 +33,7 @@ final class PublicSignupHandlerTest extends TestCase
             new JsonResponseFactory($this->factory, $this->factory),
             new ProblemDetailsResponseFactory($this->factory, $this->factory),
             new InMemoryRateLimitStorage(),
+            new FixedClock(),
             maxSignupsPerWindow: 2,
             rateLimitWindowSeconds: 3600,
         );

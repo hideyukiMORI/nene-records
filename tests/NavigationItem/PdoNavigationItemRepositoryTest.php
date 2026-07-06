@@ -8,6 +8,7 @@ use Nene2\Config\DatabaseConfig;
 use Nene2\Database\PdoConnectionFactory;
 use Nene2\Database\PdoDatabaseQueryExecutor;
 use Nene2\Http\RequestScopedHolder;
+use Nene2\Http\UtcClock;
 use NeNeRecords\NavigationItem\NavigationItem;
 use NeNeRecords\NavigationItem\PdoNavigationItemRepository;
 use PHPUnit\Framework\TestCase;
@@ -65,13 +66,13 @@ final class PdoNavigationItemRepositoryTest extends TestCase
 
     public function testFindAllReturnsEmptyInitially(): void
     {
-        $repository = new PdoNavigationItemRepository($this->executor, $this->orgId);
+        $repository = new PdoNavigationItemRepository($this->executor, $this->orgId, new UtcClock());
         self::assertSame([], $repository->findAll());
     }
 
     public function testSaveAndFindById(): void
     {
-        $repository = new PdoNavigationItemRepository($this->executor, $this->orgId);
+        $repository = new PdoNavigationItemRepository($this->executor, $this->orgId, new UtcClock());
         $item = new NavigationItem(
             id: null,
             label: 'Home',
@@ -94,7 +95,7 @@ final class PdoNavigationItemRepositoryTest extends TestCase
 
     public function testFindAllReturnsSortedByDisplayOrder(): void
     {
-        $repository = new PdoNavigationItemRepository($this->executor, $this->orgId);
+        $repository = new PdoNavigationItemRepository($this->executor, $this->orgId, new UtcClock());
 
         foreach ([
             ['About', '/about', 2],
@@ -111,7 +112,7 @@ final class PdoNavigationItemRepositoryTest extends TestCase
 
     public function testUpdateChangesFields(): void
     {
-        $repository = new PdoNavigationItemRepository($this->executor, $this->orgId);
+        $repository = new PdoNavigationItemRepository($this->executor, $this->orgId, new UtcClock());
         $id = $repository->save(new NavigationItem(null, 'Home', '/', 0, '', ''));
 
         $found = $repository->findById($id);
@@ -135,7 +136,7 @@ final class PdoNavigationItemRepositoryTest extends TestCase
 
     public function testDeleteRemovesItem(): void
     {
-        $repository = new PdoNavigationItemRepository($this->executor, $this->orgId);
+        $repository = new PdoNavigationItemRepository($this->executor, $this->orgId, new UtcClock());
         $id = $repository->save(new NavigationItem(null, 'To Delete', '/delete', 0, '', ''));
 
         $repository->delete($id);
@@ -146,7 +147,7 @@ final class PdoNavigationItemRepositoryTest extends TestCase
 
     public function testFindByIdReturnsNullForMissing(): void
     {
-        $repository = new PdoNavigationItemRepository($this->executor, $this->orgId);
+        $repository = new PdoNavigationItemRepository($this->executor, $this->orgId, new UtcClock());
         self::assertNull($repository->findById(9999));
     }
 }
