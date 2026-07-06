@@ -1,0 +1,11 @@
+{
+    "version": 1,
+    "allow": [
+        {
+            "rule": "D4",
+            "file": "src/Analytics/PdoAccessLogRepository.php",
+            "reason": "False positive: mktime(0, 0, 0, $month, 1, $year) in countByYearMonth() builds a timestamp from explicit year/month arguments to derive the month's last day via date('t', ...). It never reads the wall clock, so ClockInterface is not applicable."
+        }
+    ],
+    "ignore": []
+}
