@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeNeRecords\WxrImport;
 
 use finfo;
+use NeNeRecords\Http\SsrfGuard;
 
 /**
  * Fetches WordPress attachment files over HTTP(S) during a WXR import.
@@ -27,14 +28,14 @@ final readonly class HttpWxrMediaFetcher implements WxrMediaFetcherInterface
     private const TIMEOUT_SECONDS = 15;
     private const MAX_BYTES = 10 * 1024 * 1024; // mirrors UploadMediaUseCase cap
 
+    public function __construct(
+        private SsrfGuard $ssrfGuard = new SsrfGuard(),
+    ) {
+    }
+
     public function fetch(string $url): ?WxrMediaFetchResult
     {
-        $scheme = parse_url($url, PHP_URL_SCHEME);
-        if ($scheme !== 'http' && $scheme !== 'https') {
-            return null;
-        }
-
-        if (!$this->hostIsPubliclyRoutable($url)) {
+        if (!$this->ssrfGuard->inspect($url)->allowed) {
             return null;
         }
 
@@ -63,60 +64,9 @@ final readonly class HttpWxrMediaFetcher implements WxrMediaFetcherInterface
         );
     }
 
-    /** Resolve the URL's host and require every resolved address to be public. */
-    private function hostIsPubliclyRoutable(string $url): bool
-    {
-        $host = parse_url($url, PHP_URL_HOST);
-        if (!is_string($host) || $host === '') {
-            return false;
-        }
-
-        $host = trim($host, '[]'); // strip IPv6 brackets
-
-        if (filter_var($host, FILTER_VALIDATE_IP) !== false) {
-            return self::isPublicIp($host); // literal IP host — no DNS needed
-        }
-
-        $addresses = $this->resolve($host);
-        if ($addresses === []) {
-            return false; // unresolvable → refuse
-        }
-
-        foreach ($addresses as $ip) {
-            if (!self::isPublicIp($ip)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /** @return list<string> resolved IPv4 + IPv6 addresses for the host */
-    private function resolve(string $host): array
-    {
-        $addresses = [];
-
-        $v4 = gethostbynamel($host);
-        if ($v4 !== false) {
-            $addresses = $v4;
-        }
-
-        foreach (@dns_get_record($host, DNS_AAAA) ?: [] as $record) {
-            if (isset($record['ipv6']) && is_string($record['ipv6'])) {
-                $addresses[] = $record['ipv6'];
-            }
-        }
-
-        return array_values(array_unique($addresses));
-    }
-
-    /** True only for globally routable addresses (rejects private + reserved ranges). */
+    /** True only for globally routable addresses (rejects private + reserved + CGN ranges). */
     public static function isPublicIp(string $ip): bool
     {
-        return filter_var(
-            $ip,
-            FILTER_VALIDATE_IP,
-            FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE,
-        ) !== false;
+        return SsrfGuard::isPublicIp($ip);
     }
 }
