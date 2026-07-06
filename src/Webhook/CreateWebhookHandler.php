@@ -8,6 +8,7 @@ use Nene2\Http\JsonRequestBodyParser;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Validation\ValidationError;
 use Nene2\Validation\ValidationException;
+use NeNeRecords\Http\SsrfGuard;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -74,6 +75,11 @@ final readonly class CreateWebhookHandler
             $errors[] = new ValidationError('url', 'URL is required.', 'required');
         } elseif (filter_var($url, FILTER_VALIDATE_URL) === false) {
             $errors[] = new ValidationError('url', 'URL must be a valid URL.', 'invalid');
+        } elseif (!(new SsrfGuard())->isLikelySafeUrl($url)) {
+            // SSRF guard: reject non-http(s) schemes and literal private/reserved
+            // IP hosts up-front. Hostnames are authoritatively re-checked (with
+            // DNS resolution + connection pinning) when the webhook is delivered.
+            $errors[] = new ValidationError('url', 'URL must be an http(s) endpoint on a public host.', 'invalid');
         }
 
         $events = $this->parseEvents($body);
