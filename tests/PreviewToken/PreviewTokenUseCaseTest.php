@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NeNeRecords\Tests\PreviewToken;
 
+use Nene2\Http\UtcClock;
 use NeNeRecords\Entity\Entity;
 use NeNeRecords\Entity\EntityNotFoundException;
 use NeNeRecords\PreviewToken\GeneratePreviewTokenInput;
@@ -21,7 +22,7 @@ final class PreviewTokenUseCaseTest extends TestCase
         $entityId = $entities->save(new Entity(id: null, entityTypeId: 1));
 
         $previewTokens = new InMemoryEntityPreviewTokenRepository();
-        $useCase = new GeneratePreviewTokenUseCase($entities, $previewTokens);
+        $useCase = new GeneratePreviewTokenUseCase($entities, $previewTokens, new UtcClock());
 
         $output = $useCase->execute(new GeneratePreviewTokenInput(entityId: $entityId));
 
@@ -34,7 +35,7 @@ final class PreviewTokenUseCaseTest extends TestCase
     {
         $entities = new InMemoryEntityRepository([]);
         $previewTokens = new InMemoryEntityPreviewTokenRepository();
-        $useCase = new GeneratePreviewTokenUseCase($entities, $previewTokens);
+        $useCase = new GeneratePreviewTokenUseCase($entities, $previewTokens, new UtcClock());
 
         $this->expectException(EntityNotFoundException::class);
 
@@ -48,7 +49,7 @@ final class PreviewTokenUseCaseTest extends TestCase
         $entities->softDelete($entityId);
 
         $previewTokens = new InMemoryEntityPreviewTokenRepository();
-        $useCase = new GeneratePreviewTokenUseCase($entities, $previewTokens);
+        $useCase = new GeneratePreviewTokenUseCase($entities, $previewTokens, new UtcClock());
 
         $this->expectException(EntityNotFoundException::class);
 
@@ -61,7 +62,7 @@ final class PreviewTokenUseCaseTest extends TestCase
         $entityId = $entities->save(new Entity(id: null, entityTypeId: 1));
 
         $previewTokens = new InMemoryEntityPreviewTokenRepository();
-        $useCase = new GeneratePreviewTokenUseCase($entities, $previewTokens);
+        $useCase = new GeneratePreviewTokenUseCase($entities, $previewTokens, new UtcClock());
 
         $first = $useCase->execute(new GeneratePreviewTokenInput(entityId: $entityId));
         $second = $useCase->execute(new GeneratePreviewTokenInput(entityId: $entityId));
@@ -80,7 +81,7 @@ final class PreviewTokenUseCaseTest extends TestCase
 
         $previewTokens = new InMemoryEntityPreviewTokenRepository();
 
-        $generate = new GeneratePreviewTokenUseCase($entities, $previewTokens);
+        $generate = new GeneratePreviewTokenUseCase($entities, $previewTokens, new UtcClock());
         $generated = $generate->execute(new GeneratePreviewTokenInput(entityId: $entityId));
 
         self::assertNotNull($previewTokens->findByToken($generated->token));

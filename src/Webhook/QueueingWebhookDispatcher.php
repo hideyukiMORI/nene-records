@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NeNeRecords\Webhook;
 
+use Nene2\Http\ClockInterface;
 use Throwable;
 
 /**
@@ -22,6 +23,7 @@ final readonly class QueueingWebhookDispatcher implements WebhookDispatcherInter
     public function __construct(
         private WebhookRepositoryInterface $webhooks,
         private WebhookDeliveryRepositoryInterface $deliveries,
+        private ClockInterface $clock,
         private int $maxAttempts = self::DEFAULT_MAX_ATTEMPTS,
     ) {
     }
@@ -35,14 +37,16 @@ final readonly class QueueingWebhookDispatcher implements WebhookDispatcherInter
                 return;
             }
 
+            $now = $this->clock->now();
+
             $payload = json_encode([
                 'event' => $event,
                 'entity_type_id' => $entityTypeId,
                 'entity_id' => $entityId,
-                'occurred_at' => date('c'),
+                'occurred_at' => $now->format('c'),
             ], JSON_THROW_ON_ERROR);
 
-            $now = time();
+            $nowTs = $now->getTimestamp();
 
             foreach ($matching as $webhook) {
                 if ($webhook->id === null) {
@@ -58,7 +62,7 @@ final readonly class QueueingWebhookDispatcher implements WebhookDispatcherInter
                     $webhook->secret,
                     $payload,
                     $this->maxAttempts,
-                    $now,
+                    $nowTs,
                 );
             }
         } catch (Throwable) {

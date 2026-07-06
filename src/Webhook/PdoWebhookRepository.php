@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeNeRecords\Webhook;
 
 use Nene2\Database\DatabaseQueryExecutorInterface;
+use Nene2\Http\ClockInterface;
 use Nene2\Http\RequestScopedHolder;
 
 final readonly class PdoWebhookRepository implements WebhookRepositoryInterface
@@ -15,6 +16,7 @@ final readonly class PdoWebhookRepository implements WebhookRepositoryInterface
     public function __construct(
         private DatabaseQueryExecutorInterface $query,
         private readonly RequestScopedHolder $orgId,
+        private ClockInterface $clock,
     ) {
     }
 
@@ -70,7 +72,7 @@ final readonly class PdoWebhookRepository implements WebhookRepositoryInterface
 
     public function save(Webhook $webhook): int
     {
-        $now = date('Y-m-d H:i:s');
+        $now = $this->clock->now()->format('Y-m-d H:i:s');
 
         $this->query->execute(
             'INSERT INTO webhooks (organization_id, url, events, entity_type_id, secret, is_active, created_at, updated_at)
@@ -92,7 +94,7 @@ final readonly class PdoWebhookRepository implements WebhookRepositoryInterface
 
     public function update(Webhook $webhook): void
     {
-        $now = date('Y-m-d H:i:s');
+        $now = $this->clock->now()->format('Y-m-d H:i:s');
 
         $this->query->execute(
             'UPDATE webhooks

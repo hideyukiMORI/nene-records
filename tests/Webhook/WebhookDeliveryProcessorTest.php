@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NeNeRecords\Tests\Webhook;
 
+use Nene2\Http\UtcClock;
 use NeNeRecords\Webhook\WebhookDeliveryProcessor;
 use NeNeRecords\Webhook\WebhookSendResult;
 use PHPUnit\Framework\TestCase;
@@ -37,7 +38,7 @@ final class WebhookDeliveryProcessorTest extends TestCase
     {
         $id = $this->enqueue();
         $sender = new FakeWebhookSender(WebhookSendResult::ok(200));
-        $processor = new WebhookDeliveryProcessor($this->deliveries, $sender);
+        $processor = new WebhookDeliveryProcessor($this->deliveries, $sender, new UtcClock());
 
         $summary = $processor->process(50, 2000);
 
@@ -52,7 +53,7 @@ final class WebhookDeliveryProcessorTest extends TestCase
     {
         $id = $this->enqueue(maxAttempts: 5);
         $sender = new FakeWebhookSender(WebhookSendResult::failure('timeout'));
-        $processor = new WebhookDeliveryProcessor($this->deliveries, $sender);
+        $processor = new WebhookDeliveryProcessor($this->deliveries, $sender, new UtcClock());
 
         $now = 2000;
         $summary = $processor->process(50, $now);
@@ -72,7 +73,7 @@ final class WebhookDeliveryProcessorTest extends TestCase
         // maxAttempts=1 → the first failure exhausts the budget.
         $id = $this->enqueue(maxAttempts: 1);
         $sender = new FakeWebhookSender(WebhookSendResult::failure('connection refused'));
-        $processor = new WebhookDeliveryProcessor($this->deliveries, $sender);
+        $processor = new WebhookDeliveryProcessor($this->deliveries, $sender, new UtcClock());
 
         $summary = $processor->process(50, 2000);
 
@@ -86,7 +87,7 @@ final class WebhookDeliveryProcessorTest extends TestCase
     {
         $this->enqueue(nextAttemptAt: 5000);
         $sender = new FakeWebhookSender(WebhookSendResult::ok(200));
-        $processor = new WebhookDeliveryProcessor($this->deliveries, $sender);
+        $processor = new WebhookDeliveryProcessor($this->deliveries, $sender, new UtcClock());
 
         $summary = $processor->process(50, 2000);
 

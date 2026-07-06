@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeNeRecords\Notification;
 
 use Nene2\Database\DatabaseQueryExecutorInterface;
+use Nene2\Http\ClockInterface;
 use Nene2\Http\RequestScopedHolder;
 
 final readonly class PdoNotificationChannelRepository implements NotificationChannelRepositoryInterface
@@ -15,6 +16,7 @@ final readonly class PdoNotificationChannelRepository implements NotificationCha
     public function __construct(
         private DatabaseQueryExecutorInterface $query,
         private RequestScopedHolder $orgId,
+        private ClockInterface $clock,
     ) {
     }
 
@@ -51,7 +53,7 @@ final readonly class PdoNotificationChannelRepository implements NotificationCha
     public function create(string $channelType, string $label, bool $isEnabled, array $config): NotificationChannel
     {
         $configJson = json_encode($config, JSON_THROW_ON_ERROR);
-        $now = date('Y-m-d H:i:s');
+        $now = $this->clock->now()->format('Y-m-d H:i:s');
 
         $this->query->execute(
             'INSERT INTO notification_channels (organization_id, channel_type, label, is_enabled, config_json, created_at, updated_at)
@@ -76,7 +78,7 @@ final readonly class PdoNotificationChannelRepository implements NotificationCha
     public function update(int $id, string $label, bool $isEnabled, array $config): void
     {
         $configJson = json_encode($config, JSON_THROW_ON_ERROR);
-        $now = date('Y-m-d H:i:s');
+        $now = $this->clock->now()->format('Y-m-d H:i:s');
 
         $this->query->execute(
             'UPDATE notification_channels SET label = ?, is_enabled = ?, config_json = ?, updated_at = ? WHERE id = ? AND organization_id = ?',

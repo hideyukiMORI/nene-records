@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace NeNeRecords\Webhook;
 
+use Nene2\Http\ClockInterface;
+
 /**
  * Worker that drains the webhook delivery queue (#285).
  *
@@ -19,6 +21,7 @@ final readonly class WebhookDeliveryProcessor
     public function __construct(
         private WebhookDeliveryRepositoryInterface $deliveries,
         private WebhookSenderInterface $sender,
+        private ClockInterface $clock,
     ) {
     }
 
@@ -29,7 +32,7 @@ final readonly class WebhookDeliveryProcessor
      */
     public function process(int $limit = 50, ?int $now = null): array
     {
-        $now ??= time();
+        $now ??= $this->clock->now()->getTimestamp();
         $due = $this->deliveries->claimDue($now, $limit);
 
         $delivered = 0;

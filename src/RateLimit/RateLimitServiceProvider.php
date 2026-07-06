@@ -9,6 +9,7 @@ use Nene2\Database\DatabaseQueryExecutorInterface;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
+use Nene2\Http\ClockInterface;
 use Nene2\Middleware\RateLimitStorageInterface;
 use Nene2\Middleware\ThrottleMiddleware;
 use Psr\Container\ContainerInterface;
@@ -27,7 +28,12 @@ final readonly class RateLimitServiceProvider implements ServiceProviderInterfac
                         throw new LogicException('Database query executor service is invalid.');
                     }
 
-                    return new PdoRateLimitStorage($query);
+                    $clock = $container->get(ClockInterface::class);
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('ClockInterface service is invalid.');
+                    }
+
+                    return new PdoRateLimitStorage($query, $clock);
                 },
             )
             ->set(

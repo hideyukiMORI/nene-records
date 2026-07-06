@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace NeNeRecords\Entity;
 
-use DateTimeImmutable;
 use DateTimeInterface;
 use LogicException;
+use Nene2\Http\ClockInterface;
 use NeNeRecords\Analytics\AccessLogRepositoryInterface;
 
 final readonly class ListEntitiesUseCase implements ListEntitiesUseCaseInterface
@@ -16,6 +16,7 @@ final readonly class ListEntitiesUseCase implements ListEntitiesUseCaseInterface
 
     public function __construct(
         private EntityRepositoryInterface $entities,
+        private ClockInterface $clock,
         /** Optional — enables `includeViews` (per-record view counts, #674). */
         private ?AccessLogRepositoryInterface $accessLogs = null,
     ) {
@@ -30,7 +31,7 @@ final readonly class ListEntitiesUseCase implements ListEntitiesUseCaseInterface
         // view. Opt-in so only callers that ask for it pay the GROUP BY aggregation.
         $viewCounts = [];
         if ($input->includeViews && $this->accessLogs !== null) {
-            $sinceDate = (new DateTimeImmutable())
+            $sinceDate = $this->clock->now()
                 ->modify(sprintf('-%d days', self::VIEW_WINDOW_DAYS - 1))
                 ->format('Y-m-d');
             $viewCounts = $this->accessLogs->aggregateEntityViews($sinceDate);

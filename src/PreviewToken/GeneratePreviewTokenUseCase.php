@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace NeNeRecords\PreviewToken;
 
-use DateTimeImmutable;
 use DateTimeInterface;
+use Nene2\Http\ClockInterface;
 use NeNeRecords\Entity\EntityNotFoundException;
 use NeNeRecords\Entity\EntityRepositoryInterface;
 
@@ -16,6 +16,7 @@ final readonly class GeneratePreviewTokenUseCase implements GeneratePreviewToken
     public function __construct(
         private EntityRepositoryInterface $entities,
         private EntityPreviewTokenRepositoryInterface $previewTokens,
+        private ClockInterface $clock,
     ) {
     }
 
@@ -30,7 +31,7 @@ final readonly class GeneratePreviewTokenUseCase implements GeneratePreviewToken
         // Revoke any existing token for this entity before issuing a new one.
         $this->previewTokens->deleteByEntityId($input->entityId);
 
-        $now = new DateTimeImmutable();
+        $now = $this->clock->now();
         $expiresAt = $now->modify('+' . self::TOKEN_TTL_SECONDS . ' seconds');
         $token = bin2hex(random_bytes(32));
 

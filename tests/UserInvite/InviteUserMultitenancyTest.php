@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NeNeRecords\Tests\UserInvite;
 
+use Nene2\Http\UtcClock;
 use NeNeRecords\Tests\User\InMemoryUserRepository;
 use NeNeRecords\UserInvite\InviteUserInput;
 use NeNeRecords\UserInvite\InviteUserUseCase;
@@ -24,7 +25,7 @@ final class InviteUserMultitenancyTest extends TestCase
     {
         $users = new InMemoryUserRepository([]);
         $mailer = new NullMailer();
-        $useCase = new InviteUserUseCase($users, $mailer);
+        $useCase = new InviteUserUseCase($users, $mailer, new UtcClock());
 
         $useCase->execute(new InviteUserInput(
             email: 'invite@org.example.com',
@@ -45,7 +46,7 @@ final class InviteUserMultitenancyTest extends TestCase
     {
         $users = new InMemoryUserRepository([]);
         $mailer = new NullMailer();
-        $useCase = new InviteUserUseCase($users, $mailer);
+        $useCase = new InviteUserUseCase($users, $mailer, new UtcClock());
 
         $useCase->execute(new InviteUserInput(
             email: 'editor@org.example.com',
@@ -66,7 +67,7 @@ final class InviteUserMultitenancyTest extends TestCase
     {
         $users = new InMemoryUserRepository([]);
         $mailer = new NullMailer();
-        $useCase = new InviteUserUseCase($users, $mailer);
+        $useCase = new InviteUserUseCase($users, $mailer, new UtcClock());
 
         $useCase->execute(new InviteUserInput(
             email: 'lead@org.example.com',
@@ -88,7 +89,7 @@ final class InviteUserMultitenancyTest extends TestCase
     {
         $users = new InMemoryUserRepository([]);
         $mailer = new NullMailer();
-        $useCase = new InviteUserUseCase($users, $mailer);
+        $useCase = new InviteUserUseCase($users, $mailer, new UtcClock());
 
         $output = $useCase->execute(new InviteUserInput(
             email: 'pending@org.example.com',
@@ -111,7 +112,7 @@ final class InviteUserMultitenancyTest extends TestCase
     {
         $users = new InMemoryUserRepository([]);
         $mailer = new NullMailer();
-        $useCase = new InviteUserUseCase($users, $mailer);
+        $useCase = new InviteUserUseCase($users, $mailer, new UtcClock());
 
         $useCase->execute(new InviteUserInput(
             email: 'newmember@org.example.com',
@@ -132,7 +133,7 @@ final class InviteUserMultitenancyTest extends TestCase
     {
         $users = new InMemoryUserRepository([]);
         $mailer = new NullMailer();
-        $useCase = new InviteUserUseCase($users, $mailer);
+        $useCase = new InviteUserUseCase($users, $mailer, new UtcClock());
 
         $useCase->execute(new InviteUserInput(
             email: 'org3member@example.com',

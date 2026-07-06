@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeNeRecords\Widget;
 
 use Nene2\Database\DatabaseQueryExecutorInterface;
+use Nene2\Http\ClockInterface;
 use Nene2\Http\RequestScopedHolder;
 
 final readonly class PdoWidgetRepository implements WidgetRepositoryInterface
@@ -17,6 +18,7 @@ final readonly class PdoWidgetRepository implements WidgetRepositoryInterface
     public function __construct(
         private DatabaseQueryExecutorInterface $query,
         private RequestScopedHolder $orgId,
+        private ClockInterface $clock,
     ) {
     }
 
@@ -43,7 +45,7 @@ final readonly class PdoWidgetRepository implements WidgetRepositoryInterface
 
     public function save(Widget $widget): int
     {
-        $now = date('Y-m-d H:i:s');
+        $now = $this->clock->now()->format('Y-m-d H:i:s');
 
         $this->query->execute(
             'INSERT INTO widgets (organization_id, widget_type, region, display_order, title, settings, created_at, updated_at)
@@ -65,7 +67,7 @@ final readonly class PdoWidgetRepository implements WidgetRepositoryInterface
 
     public function update(Widget $widget): void
     {
-        $now = date('Y-m-d H:i:s');
+        $now = $this->clock->now()->format('Y-m-d H:i:s');
 
         $this->query->execute(
             'UPDATE widgets SET widget_type = ?, region = ?, display_order = ?, title = ?, settings = ?, updated_at = ?

@@ -7,6 +7,7 @@ namespace NeNeRecords\Tests\UserInvite;
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RuntimeApplicationFactory;
+use Nene2\Http\UtcClock;
 use NeNeRecords\Auth\User;
 use NeNeRecords\Tests\User\InMemoryUserRepository;
 use NeNeRecords\User\InvalidUserRoleExceptionHandler;
@@ -56,10 +57,10 @@ final class UserInviteHttpTest extends TestCase
         $problemDetails = new ProblemDetailsResponseFactory($this->factory, $this->factory);
 
         $registrar = new UserInviteRouteRegistrar(
-            new InviteUserHandler(new InviteUserUseCase($this->repository, $this->mailer), $jsonResponse),
-            new AcceptInviteHandler(new AcceptInviteUseCase($this->repository), $this->factory),
-            new RequestPasswordResetHandler(new RequestPasswordResetUseCase($this->repository, $this->mailer), $this->factory),
-            new ConfirmPasswordResetHandler(new ConfirmPasswordResetUseCase($this->repository), $this->factory),
+            new InviteUserHandler(new InviteUserUseCase($this->repository, $this->mailer, new UtcClock()), $jsonResponse),
+            new AcceptInviteHandler(new AcceptInviteUseCase($this->repository, new UtcClock()), $this->factory),
+            new RequestPasswordResetHandler(new RequestPasswordResetUseCase($this->repository, $this->mailer, new UtcClock()), $this->factory),
+            new ConfirmPasswordResetHandler(new ConfirmPasswordResetUseCase($this->repository, new UtcClock()), $this->factory),
         );
 
         $this->application = (new RuntimeApplicationFactory(

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NeNeRecords\Tests\Webhook;
 
+use Nene2\Http\UtcClock;
 use NeNeRecords\Webhook\QueueingWebhookDispatcher;
 use NeNeRecords\Webhook\Webhook;
 use PHPUnit\Framework\TestCase;
@@ -20,7 +21,7 @@ final class QueueingWebhookDispatcherTest extends TestCase
 
         $this->webhooks = new InMemoryWebhookRepository();
         $this->deliveries = new InMemoryWebhookDeliveryRepository();
-        $this->dispatcher = new QueueingWebhookDispatcher($this->webhooks, $this->deliveries);
+        $this->dispatcher = new QueueingWebhookDispatcher($this->webhooks, $this->deliveries, new UtcClock());
     }
 
     private function seedWebhook(string $url, string $event, ?int $entityTypeId, ?string $secret = null): void

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeNeRecords\Analytics;
 
 use DateTimeImmutable;
+use Nene2\Http\ClockInterface;
 use NeNeRecords\Entity\EntityRepositoryInterface;
 use NeNeRecords\Entity\EntityStatus;
 use NeNeRecords\TextField\TextFieldRepositoryInterface;
@@ -15,12 +16,13 @@ final readonly class GetPopularEntitiesUseCase implements GetPopularEntitiesUseC
         private AccessLogRepositoryInterface $accessLogs,
         private EntityRepositoryInterface $entities,
         private TextFieldRepositoryInterface $textFields,
+        private ClockInterface $clock,
     ) {
     }
 
     public function execute(GetPopularEntitiesInput $input): GetPopularEntitiesOutput
     {
-        $sinceDate = (new DateTimeImmutable())
+        $sinceDate = $this->clock->now()
             ->modify(sprintf('-%d days', max(0, $input->days - 1)))
             ->format('Y-m-d');
 

@@ -9,6 +9,7 @@ use Nene2\Database\DatabaseQueryExecutorInterface;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
+use Nene2\Http\ClockInterface;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RequestScopedHolder;
 use Psr\Container\ContainerInterface;
@@ -32,7 +33,12 @@ final readonly class MenuServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Org ID holder service is invalid.');
                     }
 
-                    return new PdoMenuRepository($query, $orgId);
+                    $clock = $container->get(ClockInterface::class);
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('ClockInterface service is invalid.');
+                    }
+
+                    return new PdoMenuRepository($query, $orgId, $clock);
                 },
             )
             ->set(

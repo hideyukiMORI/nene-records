@@ -9,24 +9,36 @@ use NeNeRecords\Auth\InvalidCredentialsException;
 use NeNeRecords\Auth\LoginInput;
 use NeNeRecords\Auth\LoginUseCase;
 use NeNeRecords\Auth\User;
+use NeNeRecords\Tests\Support\FixedClock;
 use NeNeRecords\Tests\User\InMemoryUserRepository;
 use PHPUnit\Framework\TestCase;
 
 final class StubTokenIssuer implements TokenIssuerInterface
 {
+    /** @var array<string, mixed>|null */
+    public ?array $lastClaims = null;
+
     public function issue(array $claims): string
     {
+        $this->lastClaims = $claims;
+
         return 'stub-token';
     }
 }
 
 final class LoginUseCaseTest extends TestCase
 {
+    /** Fixed instant so token iat/exp are deterministic under test. */
+    private const FIXED_INSTANT = '2026-06-01T10:00:00+00:00';
+
     private StubTokenIssuer $tokenIssuer;
+
+    private FixedClock $clock;
 
     protected function setUp(): void
     {
         $this->tokenIssuer = new StubTokenIssuer();
+        $this->clock = new FixedClock(self::FIXED_INSTANT);
     }
 
     public function testReturnsOutputOnValidCredentials(): void
@@ -36,19 +48,19 @@ final class LoginUseCaseTest extends TestCase
             new User(id: 1, email: 'admin@example.com', passwordHash: $hash, role: 'admin'),
         ]);
 
-        $useCase = new LoginUseCase($users, $this->tokenIssuer);
+        $useCase = new LoginUseCase($users, $this->tokenIssuer, $this->clock);
         $output = $useCase->execute(new LoginInput(email: 'admin@example.com', password: 'secret'));
 
         self::assertSame('stub-token', $output->token);
         self::assertSame('admin@example.com', $output->email);
         self::assertSame('admin', $output->role);
-        self::assertGreaterThan(time(), $output->expiresAt);
+        self::assertSame((new \DateTimeImmutable(self::FIXED_INSTANT))->getTimestamp() + 86400, $output->expiresAt);
     }
 
     public function testThrowsInvalidCredentialsExceptionWhenUserNotFound(): void
     {
         $users = new InMemoryUserRepository([]);
-        $useCase = new LoginUseCase($users, $this->tokenIssuer);
+        $useCase = new LoginUseCase($users, $this->tokenIssuer, $this->clock);
 
         $this->expectException(InvalidCredentialsException::class);
 
@@ -62,7 +74,7 @@ final class LoginUseCaseTest extends TestCase
             new User(id: 1, email: 'admin@example.com', passwordHash: $hash, role: 'admin'),
         ]);
 
-        $useCase = new LoginUseCase($users, $this->tokenIssuer);
+        $useCase = new LoginUseCase($users, $this->tokenIssuer, $this->clock);
 
         $this->expectException(InvalidCredentialsException::class);
 
@@ -76,7 +88,7 @@ final class LoginUseCaseTest extends TestCase
             new User(id: 1, email: 'ghost@example.com', passwordHash: $hash, role: 'unknown_role'),
         ]);
 
-        $useCase = new LoginUseCase($users, $this->tokenIssuer);
+        $useCase = new LoginUseCase($users, $this->tokenIssuer, $this->clock);
 
         $this->expectException(InvalidCredentialsException::class);
 
@@ -95,7 +107,7 @@ final class LoginUseCaseTest extends TestCase
             new User(id: 1, email: 'admin@example.com', passwordHash: $hash, role: 'admin', organizationId: 42),
         ]);
 
-        $useCase = new LoginUseCase($users, $this->tokenIssuer);
+        $useCase = new LoginUseCase($users, $this->tokenIssuer, $this->clock);
         $output = $useCase->execute(new LoginInput(email: 'admin@example.com', password: 'secret'));
 
         self::assertSame(42, $output->orgId);
@@ -113,7 +125,7 @@ final class LoginUseCaseTest extends TestCase
             new User(id: 2, email: 'sa@example.com', passwordHash: $hash, role: 'superadmin', organizationId: null),
         ]);
 
-        $useCase = new LoginUseCase($users, $this->tokenIssuer);
+        $useCase = new LoginUseCase($users, $this->tokenIssuer, $this->clock);
         $output = $useCase->execute(new LoginInput(email: 'sa@example.com', password: 'secret'));
 
         self::assertNull($output->orgId);
@@ -130,7 +142,7 @@ final class LoginUseCaseTest extends TestCase
             new User(id: 3, email: 'editor@example.com', passwordHash: $hash, role: 'editor', organizationId: 7),
         ]);
 
-        $useCase = new LoginUseCase($users, $this->tokenIssuer);
+        $useCase = new LoginUseCase($users, $this->tokenIssuer, $this->clock);
         $output = $useCase->execute(new LoginInput(email: 'editor@example.com', password: 'secret'));
 
         self::assertSame(7, $output->orgId);
@@ -147,10 +159,32 @@ final class LoginUseCaseTest extends TestCase
             new User(id: 4, email: 'unassigned@example.com', passwordHash: $hash, role: 'admin', organizationId: null),
         ]);
 
-        $useCase = new LoginUseCase($users, $this->tokenIssuer);
+        $useCase = new LoginUseCase($users, $this->tokenIssuer, $this->clock);
         $output = $useCase->execute(new LoginInput(email: 'unassigned@example.com', password: 'secret'));
 
         self::assertNull($output->orgId);
         self::assertSame('admin', $output->role);
+    }
+
+    /**
+     * FixedClock を注入すると iat / exp / expiresAt が実クロックに依存せず決定論的になる。
+     * iat は固定時刻の Unix 秒、exp と expiresAt は固定時刻 + TOKEN_TTL(86400) に厳密一致する。
+     */
+    public function testTokenClaimsAreDeterministicWithFixedClock(): void
+    {
+        $fixed = (new \DateTimeImmutable(self::FIXED_INSTANT))->getTimestamp();
+
+        $hash = password_hash('secret', PASSWORD_BCRYPT);
+        $users = new InMemoryUserRepository([
+            new User(id: 1, email: 'admin@example.com', passwordHash: $hash, role: 'admin', organizationId: 42),
+        ]);
+
+        $useCase = new LoginUseCase($users, $this->tokenIssuer, $this->clock);
+        $output = $useCase->execute(new LoginInput(email: 'admin@example.com', password: 'secret'));
+
+        self::assertSame($fixed + 86400, $output->expiresAt);
+        self::assertNotNull($this->tokenIssuer->lastClaims);
+        self::assertSame($fixed, $this->tokenIssuer->lastClaims['iat']);
+        self::assertSame($fixed + 86400, $this->tokenIssuer->lastClaims['exp']);
     }
 }

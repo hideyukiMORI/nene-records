@@ -8,6 +8,7 @@ use Nene2\Config\DatabaseConfig;
 use Nene2\Database\PdoConnectionFactory;
 use Nene2\Database\PdoDatabaseQueryExecutor;
 use Nene2\Http\RequestScopedHolder;
+use Nene2\Http\UtcClock;
 use NeNeRecords\Menu\Menu;
 use NeNeRecords\Menu\PdoMenuRepository;
 use PHPUnit\Framework\TestCase;
@@ -54,7 +55,7 @@ final class PdoMenuRepositoryTest extends TestCase
 
     public function testSaveAndFindById(): void
     {
-        $repository = new PdoMenuRepository($this->executor, $this->orgId);
+        $repository = new PdoMenuRepository($this->executor, $this->orgId, new UtcClock());
         $id = $repository->save(new Menu(null, 'Main nav', 'main-nav', 'header', '', ''));
 
         $found = $repository->findById($id);
@@ -66,7 +67,7 @@ final class PdoMenuRepositoryTest extends TestCase
 
     public function testFindByIdSupportsNullLocation(): void
     {
-        $repository = new PdoMenuRepository($this->executor, $this->orgId);
+        $repository = new PdoMenuRepository($this->executor, $this->orgId, new UtcClock());
         $id = $repository->save(new Menu(null, 'Categories', 'categories', null, '', ''));
 
         $found = $repository->findById($id);
@@ -76,7 +77,7 @@ final class PdoMenuRepositoryTest extends TestCase
 
     public function testExistsBySlug(): void
     {
-        $repository = new PdoMenuRepository($this->executor, $this->orgId);
+        $repository = new PdoMenuRepository($this->executor, $this->orgId, new UtcClock());
         $id = $repository->save(new Menu(null, 'Footer', 'footer', 'footer', '', ''));
 
         self::assertTrue($repository->existsBySlug('footer'));
@@ -86,7 +87,7 @@ final class PdoMenuRepositoryTest extends TestCase
 
     public function testUpdateChangesFields(): void
     {
-        $repository = new PdoMenuRepository($this->executor, $this->orgId);
+        $repository = new PdoMenuRepository($this->executor, $this->orgId, new UtcClock());
         $id = $repository->save(new Menu(null, 'Old', 'old', null, '', ''));
         $existing = $repository->findById($id);
         self::assertNotNull($existing);
@@ -101,7 +102,7 @@ final class PdoMenuRepositoryTest extends TestCase
 
     public function testDeleteRemovesMenu(): void
     {
-        $repository = new PdoMenuRepository($this->executor, $this->orgId);
+        $repository = new PdoMenuRepository($this->executor, $this->orgId, new UtcClock());
         $id = $repository->save(new Menu(null, 'Temp', 'temp', null, '', ''));
 
         $repository->delete($id);

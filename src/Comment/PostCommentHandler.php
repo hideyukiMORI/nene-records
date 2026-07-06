@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeNeRecords\Comment;
 
 use Nene2\Error\ProblemDetailsResponseFactory;
+use Nene2\Http\ClockInterface;
 use Nene2\Http\JsonRequestBodyParser;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Middleware\RateLimitStorageInterface;
@@ -24,6 +25,7 @@ final readonly class PostCommentHandler
         private JsonResponseFactory $response,
         private ProblemDetailsResponseFactory $problemDetails,
         private RateLimitStorageInterface $rateLimitStorage,
+        private ClockInterface $clock,
         /** Max comments accepted per IP, per entity, within the window. */
         private int $maxCommentsPerWindow = 3,
         /** Rate-limit window in seconds (default: 1 hour). */
@@ -105,7 +107,7 @@ final readonly class PostCommentHandler
             return null;
         }
 
-        $retryAfter = max(0, $result['reset_at'] - time());
+        $retryAfter = max(0, $result['reset_at'] - $this->clock->now()->getTimestamp());
 
         return $this->problemDetails->create(
             $request,

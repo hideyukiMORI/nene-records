@@ -6,6 +6,7 @@ namespace NeNeRecords\Tests\Setting;
 
 use Nene2\Database\DatabaseTransactionManagerInterface;
 use Nene2\Http\RequestScopedHolder;
+use Nene2\Http\UtcClock;
 use NeNeRecords\Entity\Entity;
 use NeNeRecords\Entity\EntityStatus;
 use NeNeRecords\PublicRecord\FrontPageSetting;
@@ -77,7 +78,7 @@ final class UpdateSettingFrontPageValidationTest extends TestCase
             new InMemorySettingRepository(),
             new InMemoryEntityRepository($entities),
             new InMemoryEntityTypeRepository(),
-        ));
+        ), new UtcClock());
     }
 
     private function page(int $id, EntityStatus $status): Entity

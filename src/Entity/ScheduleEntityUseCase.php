@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace NeNeRecords\Entity;
 
-use DateTimeImmutable;
 use DateTimeInterface;
 use InvalidArgumentException;
 use LogicException;
+use Nene2\Http\ClockInterface;
 
 final readonly class ScheduleEntityUseCase implements ScheduleEntityUseCaseInterface
 {
     public function __construct(
         private EntityRepositoryInterface $entities,
+        private ClockInterface $clock,
     ) {
     }
 
@@ -30,7 +31,7 @@ final readonly class ScheduleEntityUseCase implements ScheduleEntityUseCaseInter
             throw new LogicException('Loaded entity missing id.');
         }
 
-        if ($input->scheduledAt <= new DateTimeImmutable()) {
+        if ($input->scheduledAt <= $this->clock->now()) {
             throw new InvalidArgumentException('scheduled_at must be in the future.');
         }
 

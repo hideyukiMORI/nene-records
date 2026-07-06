@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeNeRecords\Tests\Analytics;
 
 use DateTimeImmutable;
+use Nene2\Http\UtcClock;
 use NeNeRecords\Analytics\AccessLogEntry;
 use NeNeRecords\Analytics\GetPopularEntitiesInput;
 use NeNeRecords\Analytics\GetPopularEntitiesUseCase;
@@ -45,7 +46,7 @@ final class GetPopularEntitiesUseCaseTest extends TestCase
             new TextField(entityId: 2, fieldKey: 'title', value: 'Beta', id: 2),
         ]);
 
-        $useCase = new GetPopularEntitiesUseCase($accessLogs, $entities, $textFields);
+        $useCase = new GetPopularEntitiesUseCase($accessLogs, $entities, $textFields, new UtcClock());
         $output = $useCase->execute(new GetPopularEntitiesInput(days: 30, limit: 5));
 
         self::assertCount(2, $output->items);
@@ -68,7 +69,7 @@ final class GetPopularEntitiesUseCaseTest extends TestCase
             new Entity(id: 2, entityTypeId: 10, slug: 'live', status: EntityStatus::Published),
         ]);
 
-        $useCase = new GetPopularEntitiesUseCase($accessLogs, $entities, new InMemoryTextFieldRepository());
+        $useCase = new GetPopularEntitiesUseCase($accessLogs, $entities, new InMemoryTextFieldRepository(), new UtcClock());
         $output = $useCase->execute(new GetPopularEntitiesInput(days: 30, limit: 5));
 
         self::assertCount(1, $output->items);
@@ -89,7 +90,7 @@ final class GetPopularEntitiesUseCaseTest extends TestCase
             new Entity(id: 3, entityTypeId: 10, status: EntityStatus::Published),
         ]);
 
-        $useCase = new GetPopularEntitiesUseCase($accessLogs, $entities, new InMemoryTextFieldRepository());
+        $useCase = new GetPopularEntitiesUseCase($accessLogs, $entities, new InMemoryTextFieldRepository(), new UtcClock());
         $output = $useCase->execute(new GetPopularEntitiesInput(days: 30, limit: 2));
 
         self::assertCount(2, $output->items);

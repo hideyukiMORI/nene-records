@@ -8,6 +8,7 @@ use LogicException;
 use Nene2\Database\DatabaseQueryExecutorInterface;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
+use Nene2\Http\ClockInterface;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RequestScopedHolder;
 use NeNeRecords\Entity\EntityRepositoryInterface;
@@ -85,7 +86,12 @@ final readonly class AnalyticsServiceProvider implements ServiceProviderInterfac
                         throw new LogicException('Text field repository service is invalid.');
                     }
 
-                    return new GetPopularEntitiesUseCase($accessLogs, $entities, $textFields);
+                    $clock = $c->get(ClockInterface::class);
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('ClockInterface service is invalid.');
+                    }
+
+                    return new GetPopularEntitiesUseCase($accessLogs, $entities, $textFields, $clock);
                 },
             )
             ->set(
@@ -119,7 +125,12 @@ final readonly class AnalyticsServiceProvider implements ServiceProviderInterfac
                         throw new LogicException('Logger service is invalid.');
                     }
 
-                    return new AccessLogMiddleware($repository, $logger);
+                    $clock = $c->get(ClockInterface::class);
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('ClockInterface service is invalid.');
+                    }
+
+                    return new AccessLogMiddleware($repository, $logger, $clock);
                 },
             )
             ->set(

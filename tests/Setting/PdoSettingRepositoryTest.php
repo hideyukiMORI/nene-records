@@ -8,6 +8,7 @@ use Nene2\Config\DatabaseConfig;
 use Nene2\Database\PdoConnectionFactory;
 use Nene2\Database\PdoDatabaseQueryExecutor;
 use Nene2\Http\RequestScopedHolder;
+use Nene2\Http\UtcClock;
 use NeNeRecords\Setting\PdoSettingRepository;
 use NeNeRecords\Setting\SettingRevisionAction;
 use PHPUnit\Framework\TestCase;
@@ -72,7 +73,7 @@ final class PdoSettingRepositoryTest extends TestCase
 
     public function testApplyValueCreatesRevisionAndStoredValue(): void
     {
-        $repository = new PdoSettingRepository($this->executor, $this->orgId);
+        $repository = new PdoSettingRepository($this->executor, $this->orgId, new UtcClock());
         $stored = $repository->applyValue('site_name', 'Updated Site', null);
 
         self::assertSame('Updated Site', $stored->value);

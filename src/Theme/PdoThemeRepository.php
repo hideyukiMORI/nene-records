@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeNeRecords\Theme;
 
 use Nene2\Database\DatabaseQueryExecutorInterface;
+use Nene2\Http\ClockInterface;
 use Nene2\Http\RequestScopedHolder;
 
 final readonly class PdoThemeRepository implements ThemeRepositoryInterface
@@ -15,6 +16,7 @@ final readonly class PdoThemeRepository implements ThemeRepositoryInterface
     public function __construct(
         private DatabaseQueryExecutorInterface $query,
         private RequestScopedHolder $orgId,
+        private ClockInterface $clock,
     ) {
     }
 
@@ -56,7 +58,7 @@ final readonly class PdoThemeRepository implements ThemeRepositoryInterface
 
     public function save(Theme $theme): int
     {
-        $now = date('Y-m-d H:i:s');
+        $now = $this->clock->now()->format('Y-m-d H:i:s');
 
         $this->query->execute(
             'INSERT INTO themes (organization_id, theme_key, name, version, source, manifest, created_at, updated_at)
@@ -78,7 +80,7 @@ final readonly class PdoThemeRepository implements ThemeRepositoryInterface
 
     public function update(Theme $theme): void
     {
-        $now = date('Y-m-d H:i:s');
+        $now = $this->clock->now()->format('Y-m-d H:i:s');
 
         $this->query->execute(
             'UPDATE themes

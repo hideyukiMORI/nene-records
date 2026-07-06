@@ -7,6 +7,7 @@ namespace NeNeRecords\Tests\Comment;
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RuntimeApplicationFactory;
+use Nene2\Http\UtcClock;
 use Nene2\Middleware\InMemoryRateLimitStorage;
 use NeNeRecords\Comment\ApproveCommentHandler;
 use NeNeRecords\Comment\ApproveCommentUseCase;
@@ -48,6 +49,7 @@ final class CommentHttpTest extends TestCase
                 $jsonResponse,
                 $problemDetails,
                 new InMemoryRateLimitStorage(),
+                new UtcClock(),
             ),
             new ListCommentsHandler(new ListCommentsUseCase($this->repository), $jsonResponse),
             new ListAllCommentsHandler(new ListAllCommentsUseCase($this->repository), $jsonResponse),

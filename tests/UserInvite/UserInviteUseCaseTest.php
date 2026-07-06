@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeNeRecords\Tests\UserInvite;
 
 use Nene2\Http\SecureTokenHelper;
+use Nene2\Http\UtcClock;
 use NeNeRecords\Auth\User;
 use NeNeRecords\Tests\User\InMemoryUserRepository;
 use NeNeRecords\User\InvalidUserRoleException;
@@ -31,7 +32,7 @@ final class UserInviteUseCaseTest extends TestCase
     {
         $users = new InMemoryUserRepository([]);
         $mailer = new NullMailer();
-        $useCase = new InviteUserUseCase($users, $mailer);
+        $useCase = new InviteUserUseCase($users, $mailer, new UtcClock());
 
         $email = 'new-editor@example.com';
         $output = $useCase->execute(new InviteUserInput(
@@ -60,7 +61,7 @@ final class UserInviteUseCaseTest extends TestCase
     {
         $users = new InMemoryUserRepository([]);
         $mailer = new NullMailer();
-        $useCase = new InviteUserUseCase($users, $mailer);
+        $useCase = new InviteUserUseCase($users, $mailer, new UtcClock());
 
         $this->expectException(InvalidUserRoleException::class);
 
@@ -78,7 +79,7 @@ final class UserInviteUseCaseTest extends TestCase
             new User(id: 1, email: 'taken@example.com', passwordHash: $hash, role: 'admin'),
         ]);
         $mailer = new NullMailer();
-        $useCase = new InviteUserUseCase($users, $mailer);
+        $useCase = new InviteUserUseCase($users, $mailer, new UtcClock());
 
         $this->expectException(UserEmailConflictException::class);
 
@@ -102,7 +103,7 @@ final class UserInviteUseCaseTest extends TestCase
         [$rawToken, $tokenHash] = SecureTokenHelper::generateWithHash();
         $users->storeInviteToken($user->id, $tokenHash, time() + 3600);
 
-        $useCase = new AcceptInviteUseCase($users);
+        $useCase = new AcceptInviteUseCase($users, new UtcClock());
         $useCase->execute(new AcceptInviteInput(
             token: $rawToken,
             password: 'my-new-secure-password',
@@ -118,7 +119,7 @@ final class UserInviteUseCaseTest extends TestCase
     public function testAcceptInviteThrowsInvalidInviteTokenExceptionForInvalidToken(): void
     {
         $users = new InMemoryUserRepository([]);
-        $useCase = new AcceptInviteUseCase($users);
+        $useCase = new AcceptInviteUseCase($users, new UtcClock());
 
         $this->expectException(InvalidInviteTokenException::class);
 
@@ -138,7 +139,7 @@ final class UserInviteUseCaseTest extends TestCase
         // Store with an already-past expiry
         $users->storeInviteToken($user->id, $tokenHash, time() - 1);
 
-        $useCase = new AcceptInviteUseCase($users);
+        $useCase = new AcceptInviteUseCase($users, new UtcClock());
 
         $this->expectException(InvalidInviteTokenException::class);
 
@@ -161,7 +162,7 @@ final class UserInviteUseCaseTest extends TestCase
         [$rawToken, $tokenHash] = SecureTokenHelper::generateWithHash();
         $users->storePasswordResetToken($user->id, $tokenHash, time() + 3600);
 
-        $useCase = new ConfirmPasswordResetUseCase($users);
+        $useCase = new ConfirmPasswordResetUseCase($users, new UtcClock());
         $useCase->execute(new ConfirmPasswordResetInput(
             token: $rawToken,
             newPassword: 'brand-new-password',
@@ -177,7 +178,7 @@ final class UserInviteUseCaseTest extends TestCase
     public function testConfirmPasswordResetThrowsInvalidPasswordResetTokenExceptionForInvalidToken(): void
     {
         $users = new InMemoryUserRepository([]);
-        $useCase = new ConfirmPasswordResetUseCase($users);
+        $useCase = new ConfirmPasswordResetUseCase($users, new UtcClock());
 
         $this->expectException(InvalidPasswordResetTokenException::class);
 
@@ -197,7 +198,7 @@ final class UserInviteUseCaseTest extends TestCase
         // Store with an already-past expiry
         $users->storePasswordResetToken($user->id, $tokenHash, time() - 1);
 
-        $useCase = new ConfirmPasswordResetUseCase($users);
+        $useCase = new ConfirmPasswordResetUseCase($users, new UtcClock());
 
         $this->expectException(InvalidPasswordResetTokenException::class);
 
@@ -218,7 +219,7 @@ final class UserInviteUseCaseTest extends TestCase
             new User(id: 1, email: 'known@example.com', passwordHash: $hash, role: 'editor'),
         ]);
         $mailer = new NullMailer();
-        $useCase = new RequestPasswordResetUseCase($users, $mailer);
+        $useCase = new RequestPasswordResetUseCase($users, $mailer, new UtcClock());
 
         $useCase->execute(new RequestPasswordResetInput(
             email: 'known@example.com',
@@ -233,7 +234,7 @@ final class UserInviteUseCaseTest extends TestCase
     {
         $users = new InMemoryUserRepository([]);
         $mailer = new NullMailer();
-        $useCase = new RequestPasswordResetUseCase($users, $mailer);
+        $useCase = new RequestPasswordResetUseCase($users, $mailer, new UtcClock());
 
         // Must not throw — silently succeeds to prevent email enumeration
         $useCase->execute(new RequestPasswordResetInput(

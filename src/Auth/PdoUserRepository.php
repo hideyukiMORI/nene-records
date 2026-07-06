@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeNeRecords\Auth;
 
 use Nene2\Database\DatabaseQueryExecutorInterface;
+use Nene2\Http\ClockInterface;
 
 final readonly class PdoUserRepository implements UserRepositoryInterface
 {
@@ -21,6 +22,7 @@ final readonly class PdoUserRepository implements UserRepositoryInterface
 
     public function __construct(
         private DatabaseQueryExecutorInterface $query,
+        private ClockInterface $clock,
     ) {
     }
 
@@ -81,7 +83,7 @@ final readonly class PdoUserRepository implements UserRepositoryInterface
         ?int $organizationId = null,
         ?string $orgRole = null,
     ): User {
-        $now = date('Y-m-d H:i:s');
+        $now = $this->clock->now()->format('Y-m-d H:i:s');
         $this->query->execute(
             'INSERT INTO users (email, password_hash, role, organization_id, org_role, status, created_at, updated_at)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?)',

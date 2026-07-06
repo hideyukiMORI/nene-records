@@ -7,6 +7,7 @@ namespace NeNeRecords\Tests\Webhook;
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RuntimeApplicationFactory;
+use Nene2\Http\UtcClock;
 use NeNeRecords\Webhook\CreateWebhookHandler;
 use NeNeRecords\Webhook\CreateWebhookUseCase;
 use NeNeRecords\Webhook\DeleteWebhookHandler;
@@ -44,13 +45,13 @@ final class WebhookHttpTest extends TestCase
         $problemDetails = new ProblemDetailsResponseFactory($this->factory, $this->factory);
 
         $deliveries = new InMemoryWebhookDeliveryRepository();
-        $processor = new WebhookDeliveryProcessor($deliveries, new FakeWebhookSender(WebhookSendResult::ok(200)));
+        $processor = new WebhookDeliveryProcessor($deliveries, new FakeWebhookSender(WebhookSendResult::ok(200)), new UtcClock());
 
         $registrar = new WebhookRouteRegistrar(
             new ListWebhooksHandler(new ListWebhooksUseCase($this->webhooks), $jsonResponse),
             new GetWebhookByIdHandler(new GetWebhookByIdUseCase($this->webhooks), $jsonResponse),
-            new CreateWebhookHandler(new CreateWebhookUseCase($this->webhooks), $jsonResponse),
-            new UpdateWebhookHandler(new UpdateWebhookUseCase($this->webhooks), $jsonResponse),
+            new CreateWebhookHandler(new CreateWebhookUseCase($this->webhooks, new UtcClock()), $jsonResponse),
+            new UpdateWebhookHandler(new UpdateWebhookUseCase($this->webhooks, new UtcClock()), $jsonResponse),
             new DeleteWebhookHandler(new DeleteWebhookUseCase($this->webhooks), $jsonResponse),
             new ProcessWebhookDeliveriesHandler($processor, $jsonResponse),
         );

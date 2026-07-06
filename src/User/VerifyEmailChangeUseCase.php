@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NeNeRecords\User;
 
+use Nene2\Http\ClockInterface;
 use Nene2\Http\SecureTokenHelper;
 use NeNeRecords\Auth\UserRepositoryInterface;
 
@@ -15,6 +16,7 @@ final readonly class VerifyEmailChangeUseCase implements VerifyEmailChangeUseCas
 {
     public function __construct(
         private UserRepositoryInterface $users,
+        private ClockInterface $clock,
     ) {
     }
 
@@ -27,7 +29,7 @@ final readonly class VerifyEmailChangeUseCase implements VerifyEmailChangeUseCas
             throw EmailVerificationTokenException::invalid();
         }
 
-        if ($user->emailVerificationExpiresAt === null || $user->emailVerificationExpiresAt < time()) {
+        if ($user->emailVerificationExpiresAt === null || $user->emailVerificationExpiresAt < $this->clock->now()->getTimestamp()) {
             // Drop the stale token so it cannot be retried.
             $this->users->clearEmailVerification($user->id);
 

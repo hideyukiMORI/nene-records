@@ -7,6 +7,7 @@ namespace NeNeRecords\Tests\Notification;
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RuntimeApplicationFactory;
+use Nene2\Http\UtcClock;
 use NeNeRecords\Mail\MailerInterface;
 use NeNeRecords\Notification\Channel\ChatWorkChannel;
 use NeNeRecords\Notification\Channel\DiscordChannel;
@@ -49,7 +50,7 @@ final class NotificationChannelHttpTest extends TestCase
         $slackChannel = new SlackChannel();
         $discordChannel = new DiscordChannel();
         $chatWorkChannel = new ChatWorkChannel();
-        $webhookChannel = new WebhookChannel();
+        $webhookChannel = new WebhookChannel(new UtcClock());
         $emailStub = new EmailChannel($this->createStub(MailerInterface::class));
 
         $registrar = new NotificationRouteRegistrar(

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NeNeRecords\Tests\Entity;
 
+use Nene2\Http\UtcClock;
 use NeNeRecords\Entity\DuplicateEntityPermalinkException;
 use NeNeRecords\Entity\Entity;
 use NeNeRecords\Entity\EntityStatus;
@@ -24,7 +25,7 @@ final class UpdateEntityUseCaseTest extends TestCase
             new Entity(id: 1, entityTypeId: $typeId, permalink: '/company/about/team', status: EntityStatus::Published),
         ]);
         $redirects = new InMemoryUrlRedirectRepository();
-        $useCase = new UpdateEntityUseCase($entities, $entityTypes, null, $redirects);
+        $useCase = new UpdateEntityUseCase($entities, $entityTypes, new UtcClock(), null, $redirects);
 
         $useCase->execute(new UpdateEntityInput(
             id: 1,
@@ -45,7 +46,7 @@ final class UpdateEntityUseCaseTest extends TestCase
             new Entity(id: 5, entityTypeId: $typeId, status: EntityStatus::Published),
         ]);
         $redirects = new InMemoryUrlRedirectRepository();
-        $useCase = new UpdateEntityUseCase($entities, $entityTypes, null, $redirects);
+        $useCase = new UpdateEntityUseCase($entities, $entityTypes, new UtcClock(), null, $redirects);
 
         $useCase->execute(new UpdateEntityInput(
             id: 5,
@@ -66,7 +67,7 @@ final class UpdateEntityUseCaseTest extends TestCase
             new Entity(id: 1, entityTypeId: $typeId, slug: 'a', permalink: '/keep', status: EntityStatus::Published),
         ]);
         $redirects = new InMemoryUrlRedirectRepository();
-        $useCase = new UpdateEntityUseCase($entities, $entityTypes, null, $redirects);
+        $useCase = new UpdateEntityUseCase($entities, $entityTypes, new UtcClock(), null, $redirects);
 
         $useCase->execute(new UpdateEntityInput(
             id: 1,
@@ -87,7 +88,7 @@ final class UpdateEntityUseCaseTest extends TestCase
             new Entity(id: 1, entityTypeId: $typeId, permalink: '/taken'),
             new Entity(id: 2, entityTypeId: $typeId),
         ]);
-        $useCase = new UpdateEntityUseCase($entities, $entityTypes, null, new InMemoryUrlRedirectRepository());
+        $useCase = new UpdateEntityUseCase($entities, $entityTypes, new UtcClock(), null, new InMemoryUrlRedirectRepository());
 
         $this->expectException(DuplicateEntityPermalinkException::class);
         $useCase->execute(new UpdateEntityInput(

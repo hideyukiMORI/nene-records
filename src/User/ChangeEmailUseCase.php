@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NeNeRecords\User;
 
+use Nene2\Http\ClockInterface;
 use Nene2\Http\SecureTokenHelper;
 use NeNeRecords\Auth\UserRepositoryInterface;
 use NeNeRecords\Mail\MailerInterface;
@@ -21,6 +22,7 @@ final readonly class ChangeEmailUseCase implements ChangeEmailUseCaseInterface
     public function __construct(
         private UserRepositoryInterface $users,
         private MailerInterface $mailer,
+        private ClockInterface $clock,
     ) {
     }
 
@@ -43,7 +45,7 @@ final readonly class ChangeEmailUseCase implements ChangeEmailUseCaseInterface
         }
 
         [$rawToken, $tokenHash] = SecureTokenHelper::generateWithHash();
-        $expiresAt = time() + self::VERIFICATION_TTL_SECONDS;
+        $expiresAt = $this->clock->now()->getTimestamp() + self::VERIFICATION_TTL_SECONDS;
         $this->users->storeEmailVerification($input->userId, $input->email, $tokenHash, $expiresAt);
 
         $verifyUrl = rtrim($input->appBaseUrl, '/') . '/admin/verify-email?token=' . $rawToken;

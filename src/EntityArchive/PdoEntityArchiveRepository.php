@@ -6,6 +6,7 @@ namespace NeNeRecords\EntityArchive;
 
 use DateTimeImmutable;
 use Nene2\Database\DatabaseQueryExecutorInterface;
+use Nene2\Http\ClockInterface;
 use Nene2\Http\RequestScopedHolder;
 use NeNeRecords\EntityType\EntityType;
 
@@ -17,6 +18,7 @@ final readonly class PdoEntityArchiveRepository implements EntityArchiveReposito
     public function __construct(
         private DatabaseQueryExecutorInterface $query,
         private RequestScopedHolder $orgId,
+        private ClockInterface $clock,
     ) {
     }
 
@@ -71,7 +73,7 @@ final readonly class PdoEntityArchiveRepository implements EntityArchiveReposito
         $tagsByEntity = $this->groupBy($tags, 'entity_id');
         $relationsByEntity = $this->groupBy($relations, 'source_entity_id');
 
-        $now = new DateTimeImmutable();
+        $now = $this->clock->now();
         $archivedAt = $now->format('Y-m-d H:i:s');
 
         foreach ($rows as $row) {

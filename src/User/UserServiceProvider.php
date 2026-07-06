@@ -9,6 +9,7 @@ use Nene2\Database\DatabaseQueryExecutorInterface;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
+use Nene2\Http\ClockInterface;
 use Nene2\Http\JsonResponseFactory;
 use NeNeRecords\Auth\UserRepositoryInterface;
 use NeNeRecords\Mail\MailerInterface;
@@ -36,12 +37,17 @@ final readonly class UserServiceProvider implements ServiceProviderInterface
                 UserProfileRepositoryInterface::class,
                 static function (ContainerInterface $c): UserProfileRepositoryInterface {
                     $query = $c->get(DatabaseQueryExecutorInterface::class);
+                    $clock = $c->get(ClockInterface::class);
 
                     if (!$query instanceof DatabaseQueryExecutorInterface) {
                         throw new LogicException('DatabaseQueryExecutorInterface service is invalid.');
                     }
 
-                    return new PdoUserProfileRepository($query);
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('ClockInterface service is invalid.');
+                    }
+
+                    return new PdoUserProfileRepository($query, $clock);
                 },
             )
             ->set(
@@ -114,6 +120,7 @@ final readonly class UserServiceProvider implements ServiceProviderInterface
                 static function (ContainerInterface $c): ChangeEmailUseCaseInterface {
                     $users = $c->get(UserRepositoryInterface::class);
                     $mailer = $c->get(MailerInterface::class);
+                    $clock = $c->get(ClockInterface::class);
 
                     if (!$users instanceof UserRepositoryInterface) {
                         throw new LogicException('UserRepositoryInterface service is invalid.');
@@ -123,19 +130,28 @@ final readonly class UserServiceProvider implements ServiceProviderInterface
                         throw new LogicException('MailerInterface service is invalid.');
                     }
 
-                    return new ChangeEmailUseCase($users, $mailer);
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('ClockInterface service is invalid.');
+                    }
+
+                    return new ChangeEmailUseCase($users, $mailer, $clock);
                 },
             )
             ->set(
                 VerifyEmailChangeUseCaseInterface::class,
                 static function (ContainerInterface $c): VerifyEmailChangeUseCaseInterface {
                     $users = $c->get(UserRepositoryInterface::class);
+                    $clock = $c->get(ClockInterface::class);
 
                     if (!$users instanceof UserRepositoryInterface) {
                         throw new LogicException('UserRepositoryInterface service is invalid.');
                     }
 
-                    return new VerifyEmailChangeUseCase($users);
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('ClockInterface service is invalid.');
+                    }
+
+                    return new VerifyEmailChangeUseCase($users, $clock);
                 },
             )
             ->set(

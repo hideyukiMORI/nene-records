@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace NeNeRecords\OrgExport;
 
-use DateTimeImmutable;
 use Nene2\Error\ProblemDetailsResponseFactory;
+use Nene2\Http\ClockInterface;
 use Nene2\Http\JsonResponseFactory;
 use NeNeRecords\Organization\OrganizationRepositoryInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -24,6 +24,7 @@ final readonly class ExportOrganizationHandler implements RequestHandlerInterfac
         private OrganizationRepositoryInterface $orgs,
         private JsonResponseFactory $json,
         private ProblemDetailsResponseFactory $problemDetails,
+        private ClockInterface $clock,
     ) {
     }
 
@@ -42,7 +43,7 @@ final readonly class ExportOrganizationHandler implements RequestHandlerInterfac
             );
         }
 
-        $now = (new DateTimeImmutable('now'))->format('c');
+        $now = $this->clock->now()->format('c');
 
         $payload = [
             'meta'             => [

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NeNeRecords\UserInvite;
 
+use Nene2\Http\ClockInterface;
 use Nene2\Http\SecureTokenHelper;
 use NeNeRecords\Auth\UserRepositoryInterface;
 use NeNeRecords\Mail\MailerInterface;
@@ -16,6 +17,7 @@ final readonly class RequestPasswordResetUseCase implements RequestPasswordReset
     public function __construct(
         private UserRepositoryInterface $users,
         private MailerInterface $mailer,
+        private ClockInterface $clock,
     ) {
     }
 
@@ -29,7 +31,7 @@ final readonly class RequestPasswordResetUseCase implements RequestPasswordReset
         }
 
         [$rawToken, $tokenHash] = SecureTokenHelper::generateWithHash();
-        $expiresAt = time() + self::RESET_TTL_SECONDS;
+        $expiresAt = $this->clock->now()->getTimestamp() + self::RESET_TTL_SECONDS;
         $this->users->storePasswordResetToken($user->id, $tokenHash, $expiresAt);
 
         $resetUrl = rtrim($input->appBaseUrl, '/') . '/admin/reset-password?token=' . $rawToken;

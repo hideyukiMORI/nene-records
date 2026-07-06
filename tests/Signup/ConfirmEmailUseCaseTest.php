@@ -8,6 +8,7 @@ use Nene2\Http\SecureTokenHelper;
 use NeNeRecords\Organization\Organization;
 use NeNeRecords\Signup\ConfirmEmailUseCase;
 use NeNeRecords\Tests\Organization\InMemoryOrganizationRepository;
+use NeNeRecords\Tests\Support\FixedClock;
 use NeNeRecords\Tests\User\InMemoryUserRepository;
 use NeNeRecords\User\CreateUserInput;
 use NeNeRecords\User\CreateUserUseCase;
@@ -21,10 +22,12 @@ final class ConfirmEmailUseCaseTest extends TestCase
     /** @var array{0: string, 1: string} */
     private array $token;
     private int $orgId;
+    private FixedClock $clock;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->clock = new FixedClock('2026-06-01T10:00:00+00:00');
         $this->token = SecureTokenHelper::generateWithHash();
         $this->orgs = new InMemoryOrganizationRepository();
         $this->orgId = $this->orgs->save(new Organization('My Org', 'myorg', 'free', true));
@@ -38,9 +41,9 @@ final class ConfirmEmailUseCaseTest extends TestCase
         );
         $user = $this->users->findByEmail('a@b.test');
         self::assertNotNull($user);
-        $this->users->storeEmailVerification($user->id, 'a@b.test', $this->token[1], time() + $expiresInSeconds);
+        $this->users->storeEmailVerification($user->id, 'a@b.test', $this->token[1], $this->clock->now()->getTimestamp() + $expiresInSeconds);
 
-        return new ConfirmEmailUseCase($this->users, $this->orgs);
+        return new ConfirmEmailUseCase($this->users, $this->orgs, $this->clock);
     }
 
     public function testConfirmsValidTokenAndReturnsSlug(): void

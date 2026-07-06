@@ -10,6 +10,7 @@ use Nene2\Database\DatabaseTransactionManagerInterface;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
+use Nene2\Http\ClockInterface;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RequestScopedHolder;
 use NeNeRecords\Media\MediaRepositoryInterface;
@@ -36,7 +37,12 @@ final readonly class SettingServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Org ID holder service is invalid.');
                     }
 
-                    return new PdoSettingRepository($query, $orgId);
+                    $clock = $container->get(ClockInterface::class);
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('ClockInterface service is invalid.');
+                    }
+
+                    return new PdoSettingRepository($query, $orgId, $clock);
                 },
             )
             ->set(
@@ -95,7 +101,12 @@ final readonly class SettingServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Front page setting service is invalid.');
                     }
 
-                    return new UpdateSettingUseCase($transactions, $orgId, $frontPage);
+                    $clock = $container->get(ClockInterface::class);
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('ClockInterface service is invalid.');
+                    }
+
+                    return new UpdateSettingUseCase($transactions, $orgId, $frontPage, $clock);
                 },
             )
             ->set(

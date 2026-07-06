@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeNeRecords\Tests\Analytics;
 
 use DateTimeImmutable;
+use Nene2\Http\UtcClock;
 use NeNeRecords\Analytics\AccessLogMiddleware;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use PHPUnit\Framework\TestCase;
@@ -28,7 +29,7 @@ final class AccessLogMiddlewareTest extends TestCase
 
     public function testPersistsAccessLogForApiRequest(): void
     {
-        $middleware = new AccessLogMiddleware($this->repository, new NullLogger(), excludedPaths: ['/health']);
+        $middleware = new AccessLogMiddleware($this->repository, new NullLogger(), new UtcClock(), excludedPaths: ['/health']);
 
         $response = $middleware->process(
             $this->factory->createServerRequest('GET', 'https://example.test/api/v1/tags')
@@ -58,7 +59,7 @@ final class AccessLogMiddlewareTest extends TestCase
 
     public function testSkipsExcludedPaths(): void
     {
-        $middleware = new AccessLogMiddleware($this->repository, new NullLogger());
+        $middleware = new AccessLogMiddleware($this->repository, new NullLogger(), new UtcClock());
 
         $middleware->process(
             $this->factory->createServerRequest('GET', 'https://example.test/health'),
@@ -107,6 +108,7 @@ final class AccessLogMiddlewareTest extends TestCase
                 }
             },
             new NullLogger(),
+            new UtcClock(),
             excludedPaths: ['/health'],
         );
 

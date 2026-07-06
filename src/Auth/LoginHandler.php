@@ -6,6 +6,7 @@ namespace NeNeRecords\Auth;
 
 use DateTimeImmutable;
 use DateTimeInterface;
+use Nene2\Http\ClockInterface;
 use Nene2\Http\JsonRequestBodyParser;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Validation\ValidationError;
@@ -18,6 +19,7 @@ final readonly class LoginHandler
     public function __construct(
         private LoginUseCase $useCase,
         private JsonResponseFactory $response,
+        private ClockInterface $clock,
     ) {
     }
 
@@ -46,7 +48,7 @@ final readonly class LoginHandler
 
         // Set the session token as an HttpOnly cookie so page JS can't read it.
         // The token is still returned in the body for non-browser/machine clients.
-        $maxAge = $output->expiresAt - time();
+        $maxAge = $output->expiresAt - $this->clock->now()->getTimestamp();
         $cookie = SessionCookie::build($output->token, $maxAge, SessionCookie::isSecureRequest($request));
 
         return $this->response->create([

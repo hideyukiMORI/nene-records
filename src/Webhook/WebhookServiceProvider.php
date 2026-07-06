@@ -9,6 +9,7 @@ use Nene2\Database\DatabaseQueryExecutorInterface;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
+use Nene2\Http\ClockInterface;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RequestScopedHolder;
 use Psr\Container\ContainerInterface;
@@ -32,7 +33,12 @@ final readonly class WebhookServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Org ID holder service is invalid.');
                     }
 
-                    return new PdoWebhookRepository($query, $orgId);
+                    $clock = $container->get(ClockInterface::class);
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('ClockInterface service is invalid.');
+                    }
+
+                    return new PdoWebhookRepository($query, $orgId, $clock);
                 },
             )
             ->set(
@@ -44,7 +50,12 @@ final readonly class WebhookServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Database query executor service is invalid.');
                     }
 
-                    return new PdoWebhookDeliveryRepository($query);
+                    $clock = $container->get(ClockInterface::class);
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('ClockInterface service is invalid.');
+                    }
+
+                    return new PdoWebhookDeliveryRepository($query, $clock);
                 },
             )
             ->set(
@@ -65,7 +76,12 @@ final readonly class WebhookServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Webhook delivery repository service is invalid.');
                     }
 
-                    return new QueueingWebhookDispatcher($repo, $deliveries);
+                    $clock = $container->get(ClockInterface::class);
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('ClockInterface service is invalid.');
+                    }
+
+                    return new QueueingWebhookDispatcher($repo, $deliveries, $clock);
                 },
             )
             ->set(
@@ -82,7 +98,12 @@ final readonly class WebhookServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Webhook sender service is invalid.');
                     }
 
-                    return new WebhookDeliveryProcessor($deliveries, $sender);
+                    $clock = $container->get(ClockInterface::class);
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('ClockInterface service is invalid.');
+                    }
+
+                    return new WebhookDeliveryProcessor($deliveries, $sender, $clock);
                 },
             )
             ->set(
@@ -118,7 +139,12 @@ final readonly class WebhookServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Webhook repository service is invalid.');
                     }
 
-                    return new CreateWebhookUseCase($repo);
+                    $clock = $container->get(ClockInterface::class);
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('ClockInterface service is invalid.');
+                    }
+
+                    return new CreateWebhookUseCase($repo, $clock);
                 },
             )
             ->set(
@@ -130,7 +156,12 @@ final readonly class WebhookServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Webhook repository service is invalid.');
                     }
 
-                    return new UpdateWebhookUseCase($repo);
+                    $clock = $container->get(ClockInterface::class);
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('ClockInterface service is invalid.');
+                    }
+
+                    return new UpdateWebhookUseCase($repo, $clock);
                 },
             )
             ->set(

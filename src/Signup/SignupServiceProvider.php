@@ -8,6 +8,7 @@ use LogicException;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
+use Nene2\Http\ClockInterface;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RequestScopedHolder;
 use Nene2\Middleware\RateLimitStorageInterface;
@@ -34,6 +35,7 @@ final readonly class SignupServiceProvider implements ServiceProviderInterface
                     $orgHolder  = $c->get(ApplicationServiceProvider::ORG_ID_HOLDER);
                     $users      = $c->get(UserRepositoryInterface::class);
                     $mailer     = $c->get(MailerInterface::class);
+                    $clock      = $c->get(ClockInterface::class);
 
                     if (!$createOrg instanceof CreateOrganizationUseCaseInterface) {
                         throw new LogicException('CreateOrganizationUseCaseInterface is invalid.');
@@ -59,8 +61,12 @@ final readonly class SignupServiceProvider implements ServiceProviderInterface
                         throw new LogicException('MailerInterface is invalid.');
                     }
 
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('ClockInterface is invalid.');
+                    }
+
                     /** @var RequestScopedHolder<int> $orgHolder */
-                    return new PublicSignupUseCase($createOrg, $createUser, $login, $orgHolder, $users, $mailer);
+                    return new PublicSignupUseCase($createOrg, $createUser, $login, $orgHolder, $users, $mailer, $clock);
                 },
             )
             ->set(
@@ -70,6 +76,7 @@ final readonly class SignupServiceProvider implements ServiceProviderInterface
                     $json        = $c->get(JsonResponseFactory::class);
                     $problems    = $c->get(ProblemDetailsResponseFactory::class);
                     $rateLimiter = $c->get(RateLimitStorageInterface::class);
+                    $clock       = $c->get(ClockInterface::class);
 
                     if (!$useCase instanceof PublicSignupUseCase) {
                         throw new LogicException('PublicSignupUseCase is invalid.');
@@ -87,7 +94,11 @@ final readonly class SignupServiceProvider implements ServiceProviderInterface
                         throw new LogicException('RateLimitStorageInterface is invalid.');
                     }
 
-                    return new PublicSignupHandler($useCase, $json, $problems, $rateLimiter);
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('ClockInterface is invalid.');
+                    }
+
+                    return new PublicSignupHandler($useCase, $json, $problems, $rateLimiter, $clock);
                 },
             )
             ->set(
@@ -95,14 +106,18 @@ final readonly class SignupServiceProvider implements ServiceProviderInterface
                 static function (ContainerInterface $c): ConfirmEmailUseCase {
                     $users = $c->get(UserRepositoryInterface::class);
                     $orgs  = $c->get(OrganizationRepositoryInterface::class);
+                    $clock = $c->get(ClockInterface::class);
                     if (!$users instanceof UserRepositoryInterface) {
                         throw new LogicException('UserRepositoryInterface is invalid.');
                     }
                     if (!$orgs instanceof OrganizationRepositoryInterface) {
                         throw new LogicException('OrganizationRepositoryInterface is invalid.');
                     }
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('ClockInterface is invalid.');
+                    }
 
-                    return new ConfirmEmailUseCase($users, $orgs);
+                    return new ConfirmEmailUseCase($users, $orgs, $clock);
                 },
             )
             ->set(
