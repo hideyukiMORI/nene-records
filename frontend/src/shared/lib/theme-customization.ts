@@ -35,6 +35,12 @@ export interface ThemeOverrides {
    * unset = theme default (1.25rem) (#754).
    */
   brandSize?: string
+  /**
+   * Header/footer menu font-size preset (see MENU_SIZE_OPTIONS). Maps to both
+   * `--nav-size` and `--footer-size`; unset = theme default = follows the type
+   * scale (`--text-body-sm`). Themes may set the two tokens independently (#760).
+   */
+  menuSize?: string
   /** Content width preset key (see WIDTH_OPTIONS). Maps to `--content-w`. */
   contentWidth?: string
   /** Gutter preset key (see GUTTER_OPTIONS). Maps to `--gutter`. */
@@ -340,6 +346,23 @@ const BRAND_SIZE_VALUES: Record<string, string> = {
   xl: '2rem',
 }
 
+/**
+ * Header/footer menu font-size presets (→ `--nav-size` + `--footer-size`, one
+ * coarse knob for both). Finer per-region control is the theme layer's job —
+ * a manifest can set the two tokens independently (#760).
+ */
+export const MENU_SIZE_OPTIONS: readonly KnobOption[] = [
+  { value: 'compact', label: 'Compact' },
+  { value: 'default', label: 'Default' },
+  { value: 'large', label: 'Large' },
+]
+
+const MENU_SIZE_VALUES: Record<string, string> = {
+  compact: '0.8125rem',
+  default: '0.9375rem',
+  large: '1.0625rem',
+}
+
 const BRAND_FONT_STACKS: Record<string, string> = {
   roboto: "'Roboto', 'Noto Sans JP', ui-sans-serif, system-ui, sans-serif",
   inter: "'Inter', 'Noto Sans JP', ui-sans-serif, system-ui, sans-serif",
@@ -480,6 +503,13 @@ export function resolveOverrideStyle(overrides: ThemeOverrides): Record<string, 
   if (isOption(BRAND_SIZE_OPTIONS, overrides.brandSize)) {
     const size = BRAND_SIZE_VALUES[overrides.brandSize]
     if (size !== undefined) style['--brand-size'] = size
+  }
+  if (isOption(MENU_SIZE_OPTIONS, overrides.menuSize)) {
+    const size = MENU_SIZE_VALUES[overrides.menuSize]
+    if (size !== undefined) {
+      style['--nav-size'] = size
+      style['--footer-size'] = size
+    }
   }
   if (isOption(WIDTH_OPTIONS, overrides.contentWidth)) {
     const width = WIDTH_VALUES[overrides.contentWidth]

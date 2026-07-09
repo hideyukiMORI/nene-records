@@ -5,6 +5,7 @@ import {
   BRAND_FONT_OPTIONS,
   BRAND_SIZE_OPTIONS,
   DENSITY_OPTIONS,
+  MENU_SIZE_OPTIONS,
   DISPLAY_FONT_OPTIONS,
   FLAG_DEFS,
   FONT_OPTIONS,
@@ -316,6 +317,16 @@ export function ThemeCustomizeView({
               placeholder={themePlaceholder}
               onChange={(v) => {
                 setKnob('brandSize', v)
+              }}
+            />
+          </Field>
+          <Field label={t('admin.themeCustomize.menuSize')}>
+            <Select
+              value={draft.menuSize}
+              options={MENU_SIZE_OPTIONS}
+              placeholder={themePlaceholder}
+              onChange={(v) => {
+                setKnob('menuSize', v)
               }}
             />
           </Field>

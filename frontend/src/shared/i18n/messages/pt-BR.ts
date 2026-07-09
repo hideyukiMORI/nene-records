@@ -108,6 +108,7 @@ export const ptBR: Partial<MessageCatalog> = {
   'admin.themeCustomize.fontMono': 'Fonte monoespaçada',
   'admin.themeCustomize.fontBrand': 'Fonte do título do site',
   'admin.themeCustomize.brandSize': 'Tamanho do título do site',
+  'admin.themeCustomize.menuSize': 'Tamanho da fonte do menu',
   'admin.themeCustomize.width': 'Largura do conteúdo',
   'admin.themeCustomize.gutter': 'Margem lateral',
   'admin.themeCustomize.radius': 'Cantos',

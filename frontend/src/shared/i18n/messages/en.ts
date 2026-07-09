@@ -114,6 +114,7 @@ export const en = {
   'admin.themeCustomize.fontMono': 'Mono font',
   'admin.themeCustomize.fontBrand': 'Site title font',
   'admin.themeCustomize.brandSize': 'Site title size',
+  'admin.themeCustomize.menuSize': 'Menu font size',
   'admin.themeCustomize.width': 'Content width',
   'admin.themeCustomize.gutter': 'Side margin',
   'admin.themeCustomize.radius': 'Corners',

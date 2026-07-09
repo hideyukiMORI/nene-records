@@ -60,6 +60,14 @@ describe('resolveOverrideStyle', () => {
     expect(resolveOverrideStyle({ brandSize: '999px' })['--brand-size']).toBeUndefined()
   })
 
+  it('emits nav + footer sizes from the menu size preset (#760)', () => {
+    const style = resolveOverrideStyle({ menuSize: 'compact' })
+    expect(style['--nav-size']).toBe('0.8125rem')
+    expect(style['--footer-size']).toBe('0.8125rem')
+    expect(resolveOverrideStyle({})['--nav-size']).toBeUndefined()
+    expect(resolveOverrideStyle({ menuSize: 'huge' })['--nav-size']).toBeUndefined()
+  })
+
   it('ignores invalid / unknown values (no injection)', () => {
     const style = resolveOverrideStyle({
       accent: 'red; } body { display:none',
