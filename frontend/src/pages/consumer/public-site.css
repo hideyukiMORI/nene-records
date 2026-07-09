@@ -1128,6 +1128,45 @@
   width: 14px;
   height: 14px;
 }
+/* Above-footer CTA 行（#770）: 列グリッドの上の締めの訴求。 */
+.nene-public .ft-cta {
+  border-bottom: 1px solid var(--color-border);
+  background: color-mix(in oklch, var(--color-accent) 6%, var(--color-surface-raised));
+}
+.nene-public .ft-cta__in {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-lg);
+  padding-block: var(--space-lg);
+  flex-wrap: wrap;
+}
+.nene-public .ft-cta__copy h3 {
+  font-family: var(--font-display);
+  font-size: var(--text-h3);
+  margin: 0 0 var(--space-2xs);
+}
+.nene-public .ft-cta__copy p {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-body-sm);
+}
+
+/* バナー/trust box 帯（#770）: 列と Below バーの間の画像ストリップ。 */
+.nene-public .ft__banners {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-lg);
+  padding-block: var(--space-md);
+  border-top: 1px solid var(--color-border);
+}
+.nene-public .ft__banners img {
+  max-height: 44px;
+  width: auto;
+  display: block;
+}
+
 /* Below バー（#766）: 左＝コピーライト＋法務リンク（横インライン）／右＝SNS＋Powered by。 */
 .nene-public .ft__legal {
   display: inline-flex;
