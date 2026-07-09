@@ -19,6 +19,7 @@ vi.mock('@/entities/setting', () => {
     'tagline',
     'theme_overrides',
     'header_config',
+    'footer_config',
     'home_hero',
     'layout_config',
     'active_theme',
@@ -51,6 +52,7 @@ describe('useManageSiteSettingsPage', () => {
     for (const dedicated of [
       'theme_overrides',
       'header_config',
+      'footer_config',
       'home_hero',
       'layout_config',
       'active_theme',
