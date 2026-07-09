@@ -19,6 +19,7 @@ const DEDICATED_UI_KEYS = new Set([
   'front_page',
   'theme_overrides',
   'header_config',
+  'footer_config',
   'home_hero',
   'layout_config',
   'active_theme',
