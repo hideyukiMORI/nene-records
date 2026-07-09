@@ -7,7 +7,6 @@ import { LOCALES, SUPPORTED_LOCALE_IDS, type SupportedLocale, useTranslation } f
 import { hasCta, hasTopbarContent, safeHref } from '@/shared/lib/header-config'
 import { useHeaderShrink } from '@/shared/lib/motion/use-header-shrink'
 import { useScrollReveal } from '@/shared/lib/motion/use-scroll-reveal'
-import { NeneMark } from '@/shared/ui'
 import { IconMenu, IconMoon, IconSearch, IconSun, IconX } from '@/shared/ui/icons/Icons'
 import { IconAuto } from '@/shared/ui/icons/magazine-icons'
 import './public-site.css'
@@ -135,15 +134,15 @@ function HeaderCtaButton({ cta }: { cta: HeaderCta }) {
 }
 
 function Brand({ siteName, tagline, logo }: { siteName: string; tagline?: string; logo?: string }) {
+  // ロゴ未設定時はマーク枠ごと描画しない（サイト名のみ）。テナントのサイトに
+  // プラットフォームのブランド（NeneMark）をフォールバック表示しない (#752)。
   return (
     <Link className="brand" to="/">
-      <span className="brand__mark">
-        {logo !== undefined && logo !== '' ? (
+      {logo !== undefined && logo !== '' ? (
+        <span className="brand__mark">
           <img className="brand__logo" src={logo} alt={siteName} />
-        ) : (
-          <NeneMark size={22} />
-        )}
-      </span>
+        </span>
+      ) : null}
       <span className="brand__text">
         <span className="brand__name">{siteName}</span>
         {tagline !== undefined && tagline !== '' ? (
