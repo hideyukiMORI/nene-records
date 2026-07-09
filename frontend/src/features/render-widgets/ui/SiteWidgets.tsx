@@ -36,6 +36,20 @@ function orientationForRegion(region: WidgetRegion): WidgetOrientation {
   return region === 'header' || region === 'footer' ? 'horizontal' : 'vertical'
 }
 
+/**
+ * Renders a single widget's body without the section/title chrome — for hosts
+ * that provide their own heading (footer columns, #772).
+ */
+export function SiteWidgetBody({
+  widget,
+  orientation = 'vertical',
+}: {
+  widget: Widget
+  orientation?: WidgetOrientation
+}) {
+  return <>{WIDGET_REGISTRY[widget.widgetType](widget, orientation)}</>
+}
+
 /** Renders all site widgets placed into a given region, in order. */
 export function SiteWidgets({ region }: SiteWidgetsProps) {
   const { data } = usePublicWidgets()

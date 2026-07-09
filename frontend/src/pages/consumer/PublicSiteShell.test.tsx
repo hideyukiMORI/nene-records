@@ -1,4 +1,4 @@
-import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
 import { cleanup, screen, within } from '@testing-library/react'
 import { http, HttpResponse } from 'msw'
 import { MemoryRouter } from 'react-router-dom'
@@ -315,6 +315,60 @@ describe('PublicSiteShell header reflection', () => {
 
     expect(screen.getByText(/Powered by NENE2/)).toBeInTheDocument()
     expect(document.querySelector('.ft__social')).toBeNull()
+  })
+
+  it('renders a non-menu footer widget as a titled column (#772)', async () => {
+    seedEntityTypes([{ id: 1, name: 'Article', slug: 'article' }])
+    mswServer.use(
+      http.get('/api/v1/public/widgets', () =>
+        HttpResponse.json({
+          items: [
+            {
+              id: 11,
+              widget_type: 'search',
+              region: 'footer',
+              display_order: 0,
+              title: 'サイト内検索',
+              settings: {},
+              created_at: '2026-07-10 00:00:00',
+              updated_at: '2026-07-10 00:00:00',
+            },
+          ],
+        }),
+      ),
+    )
+
+    renderShell(makeSite())
+
+    expect(await screen.findByText('サイト内検索')).toBeInTheDocument()
+    // search ウィジェット本体（role=search のフォーム）が列内に描画される
+    expect(screen.getByRole('search')).toBeInTheDocument()
+    expect(screen.queryByText('Browse')).toBeNull()
+  })
+
+  it('turns footer column headings into accordions on narrow viewports (#772)', async () => {
+    // matchMedia を「常にマッチ」にスタブ → モバイル分岐（既定 閉）を検証。
+    seedEntityTypes([{ id: 1, name: 'Article', slug: 'article' }])
+    const mql = {
+      matches: true,
+      addEventListener: () => {},
+      removeEventListener: () => {},
+    }
+    vi.stubGlobal('matchMedia', () => mql)
+
+    try {
+      renderShell(makeSite())
+
+      const toggle = await screen.findByRole('button', { name: /Content/ })
+      expect(toggle).toHaveAttribute('aria-expanded', 'false')
+      // 閉じている間はフッター列の中身（Latest リンク）が描画されない
+      //（ヘッダー nav の Latest とは別物なのでフッタースコープで確認）。
+      const grid = document.querySelector('.ft__grid')
+      expect(grid).not.toBeNull()
+      expect(within(grid as HTMLElement).queryByRole('link', { name: 'Latest' })).toBeNull()
+    } finally {
+      vi.unstubAllGlobals()
+    }
   })
 
   it('keeps the default footer columns when no footer menu widget exists', async () => {

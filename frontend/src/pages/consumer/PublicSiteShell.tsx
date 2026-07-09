@@ -2,12 +2,13 @@ import { type ReactNode, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLocation, useSearchParams } from 'react-router-dom'
 import { useEntityTypeList } from '@/entities/entity-type'
 import { usePublicMenus } from '@/entities/menu'
-import { usePublicWidgets } from '@/entities/widget'
-import { SiteWidgets } from '@/features/render-widgets'
+import { usePublicWidgets, type Widget } from '@/entities/widget'
+import { SiteWidgetBody, SiteWidgets } from '@/features/render-widgets'
 import { LOCALES, SUPPORTED_LOCALE_IDS, type SupportedLocale, useTranslation } from '@/shared/i18n'
 import { hasFooterCta } from '@/shared/lib/footer-config'
 import { hasCta, hasTopbarContent, safeHref } from '@/shared/lib/header-config'
 import { useHeaderShrink } from '@/shared/lib/motion/use-header-shrink'
+import { useMediaQuery } from '@/shared/lib/use-media-query'
 import { useScrollReveal } from '@/shared/lib/motion/use-scroll-reveal'
 import { IconMenu, IconMoon, IconSearch, IconSun, IconX } from '@/shared/ui/icons/Icons'
 import { IconAuto } from '@/shared/ui/icons/magazine-icons'
@@ -16,7 +17,7 @@ import { PublicMarkdownContent } from '@/shared/ui/markdown'
 import './public-site.css'
 import type { HeaderCta, HeaderTopbar } from '@/shared/lib/header-config'
 import { useConsumerMotion } from './use-consumer-motion'
-import type { PublicSite } from './public-site-context'
+import type { PublicSite, PublicSiteNavItem } from './public-site-context'
 import { type ThemeMode, useConsumerTheme } from './use-consumer-theme'
 import { useThemePreviewBridge } from './use-theme-preview-bridge'
 
@@ -186,6 +187,50 @@ function Brand({ siteName, tagline, logo }: { siteName: string; tagline?: string
   )
 }
 
+/** One footer column: a named menu's links or a widget body (#758 / #772). */
+type FooterColumnModel =
+  | { kind: 'menu'; key: number; title: string; items: PublicSiteNavItem[] }
+  | { kind: 'widget'; key: number; title: string; widget: Widget }
+
+/**
+ * A footer column that collapses into an accordion on narrow viewports (#772):
+ * ≤680px the heading becomes an `aria-expanded` toggle (default closed) so tall
+ * multi-column footers stay compact on mobile. Desktop renders statically.
+ */
+function FooterColumn({ title, children }: { title: string; children: ReactNode }) {
+  const compact = useMediaQuery('(max-width: 680px)')
+  const [open, setOpen] = useState(false)
+
+  if (!compact || title === '') {
+    return (
+      <div className="ft__col">
+        {title !== '' ? <h4>{title}</h4> : null}
+        {children}
+      </div>
+    )
+  }
+
+  return (
+    <div className="ft__col ft__col--acc">
+      <h4>
+        <button
+          type="button"
+          aria-expanded={open}
+          onClick={() => {
+            setOpen((prev) => !prev)
+          }}
+        >
+          {title}
+          <span className="ft__acc-mark" aria-hidden="true">
+            {open ? '−' : '+'}
+          </span>
+        </button>
+      </h4>
+      {open ? children : null}
+    </div>
+  )
+}
+
 /** Footer copyright: substitute `{year}`/`{site}` tokens, fall back to a default. */
 function renderCopyright(template: string, siteName: string): string {
   const year = String(new Date().getFullYear())
@@ -311,22 +356,26 @@ export function PublicSiteShell({
           { label: 'Search', to: '/search', current: false },
         ]
 
-  // Footer-region menu widgets (#758): like the header (#756), menu widgets
-  // placed into the `footer` region replace the default Content/Browse columns —
-  // one column per widget, titled by the widget title (falling back to the menu
-  // name). Without any, the historical default columns render unchanged.
+  // Footer-region widgets (#758 / #772): widgets placed into the `footer` region
+  // replace the default Content/Browse columns — one column per widget. Menu
+  // widgets render their named menu's items (title falls back to the menu name);
+  // every other widget type renders via the widget registry under its title.
+  // Without any footer widgets, the historical default columns render unchanged.
   const menusQuery = usePublicMenus()
   const menus = menusQuery.data?.items ?? []
-  const footerMenuColumns = widgets
-    .filter((widget) => widget.region === 'footer' && widget.widgetType === 'menu')
+  const footerColumns: FooterColumnModel[] = widgets
+    .filter((widget) => widget.region === 'footer')
     .sort((a, b) => a.displayOrder - b.displayOrder)
-    .flatMap((widget) => {
-      const menuId = widget.settings['menuId']
-      if (typeof menuId !== 'number') return []
-      const items = site.navItems.filter((item) => item.menuId === menuId)
-      if (items.length === 0) return []
-      const title = widget.title ?? menus.find((menu) => menu.id === menuId)?.name ?? ''
-      return [{ key: widget.id, title, items }]
+    .flatMap((widget): FooterColumnModel[] => {
+      if (widget.widgetType === 'menu') {
+        const menuId = widget.settings['menuId']
+        if (typeof menuId !== 'number') return []
+        const items = site.navItems.filter((item) => item.menuId === menuId)
+        if (items.length === 0) return []
+        const title = widget.title ?? menus.find((menu) => menu.id === menuId)?.name ?? ''
+        return [{ kind: 'menu', key: widget.id, title, items }]
+      }
+      return [{ kind: 'widget', key: widget.id, title: widget.title ?? '', widget }]
     })
 
   // Fit-probe (#695): fold the inline nav into the drawer the instant it would
@@ -446,32 +495,34 @@ export function PublicSiteShell({
               </div>
             ) : null}
           </div>
-          {footerMenuColumns.length > 0 ? (
-            footerMenuColumns.map((column) => (
-              <div className="ft__col" key={`ft-menu-${String(column.key)}`}>
-                {column.title !== '' ? <h4>{column.title}</h4> : null}
-                <ul>
-                  {column.items.map((item) => {
-                    const external = !item.url.startsWith('/')
-                    const href = external ? safeHref(item.url) : item.url
-                    if (href === '') return null
-                    return (
-                      <li key={item.id}>
-                        {external ? (
-                          <a href={href}>{item.label}</a>
-                        ) : (
-                          <Link to={item.url}>{item.label}</Link>
-                        )}
-                      </li>
-                    )
-                  })}
-                </ul>
-              </div>
+          {footerColumns.length > 0 ? (
+            footerColumns.map((column) => (
+              <FooterColumn key={`ft-${column.kind}-${String(column.key)}`} title={column.title}>
+                {column.kind === 'menu' ? (
+                  <ul>
+                    {column.items.map((item) => {
+                      const external = !item.url.startsWith('/')
+                      const href = external ? safeHref(item.url) : item.url
+                      if (href === '') return null
+                      return (
+                        <li key={item.id}>
+                          {external ? (
+                            <a href={href}>{item.label}</a>
+                          ) : (
+                            <Link to={item.url}>{item.label}</Link>
+                          )}
+                        </li>
+                      )
+                    })}
+                  </ul>
+                ) : (
+                  <SiteWidgetBody widget={column.widget} />
+                )}
+              </FooterColumn>
             ))
           ) : (
             <>
-              <div className="ft__col">
-                <h4>Content</h4>
+              <FooterColumn title="Content">
                 <ul>
                   <li>
                     <Link to="/">Latest</Link>
@@ -482,9 +533,8 @@ export function PublicSiteShell({
                     </li>
                   ))}
                 </ul>
-              </div>
-              <div className="ft__col">
-                <h4>Browse</h4>
+              </FooterColumn>
+              <FooterColumn title="Browse">
                 <ul>
                   <li>
                     <Link to="/search">
@@ -492,7 +542,7 @@ export function PublicSiteShell({
                     </Link>
                   </li>
                 </ul>
-              </div>
+              </FooterColumn>
             </>
           )}
         </div>
