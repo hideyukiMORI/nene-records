@@ -257,7 +257,8 @@
   color: var(--color-text-primary);
 }
 .nene-public .navlink {
-  font-size: var(--text-body-sm);
+  /* Menu size token (#760): themes may set --nav-size; default follows the type scale. */
+  font-size: var(--nav-size, var(--text-body-sm));
   font-weight: var(--weight-medium);
   color: var(--color-text-muted);
   padding: 6px 2px;
@@ -1088,7 +1089,8 @@
   gap: var(--space-xs);
 }
 .nene-public .ft__col a {
-  font-size: var(--text-body-sm);
+  /* Menu size token (#760): themes may set --footer-size; default follows the type scale. */
+  font-size: var(--footer-size, var(--text-body-sm));
   color: var(--color-text-primary);
   display: inline-flex;
   align-items: center;

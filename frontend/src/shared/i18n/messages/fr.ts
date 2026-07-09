@@ -110,6 +110,7 @@ export const fr: Partial<MessageCatalog> = {
   'admin.themeCustomize.fontMono': 'Police à chasse fixe',
   'admin.themeCustomize.fontBrand': 'Police du titre du site',
   'admin.themeCustomize.brandSize': 'Taille du titre du site',
+  'admin.themeCustomize.menuSize': 'Taille de police du menu',
   'admin.themeCustomize.width': 'Largeur du contenu',
   'admin.themeCustomize.gutter': 'Marge latérale',
   'admin.themeCustomize.radius': 'Coins',

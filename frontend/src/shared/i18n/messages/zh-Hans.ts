@@ -107,6 +107,7 @@ export const zhHans: Partial<MessageCatalog> = {
   'admin.themeCustomize.fontMono': '等宽字体',
   'admin.themeCustomize.fontBrand': '站点标题字体',
   'admin.themeCustomize.brandSize': '站点标题字号',
+  'admin.themeCustomize.menuSize': '菜单字号',
   'admin.themeCustomize.width': '内容宽度',
   'admin.themeCustomize.gutter': '两侧边距',
   'admin.themeCustomize.radius': '圆角',
