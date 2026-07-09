@@ -1,7 +1,10 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import { cleanup, screen } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
-import { PublicRecordDetailPage } from '@/pages/consumer/PublicRecordDetailPage'
+import {
+  PublicRecordByPermalink,
+  PublicRecordDetailPage,
+} from '@/pages/consumer/PublicRecordDetailPage'
 import { resetBoolFieldStore, seedBoolFields } from '@tests/msw/handlers/bool-field'
 import { resetEntityStore, seedEntities } from '@tests/msw/handlers/entity'
 import { resetEntityRelationStore, seedEntityRelations } from '@tests/msw/handlers/entity-relation'
@@ -192,6 +195,64 @@ describe('PublicRecordDetailPage', () => {
     renderDetailPage('unknown', 1)
 
     expect(await screen.findByText('Record not found')).toBeInTheDocument()
+  })
+
+  it('front-page fallback: renders an id-pattern URL the resolver does not know (#748)', async () => {
+    // front_page が返す正規パスはパターン由来 URL（例 /article/1）でもよいが、
+    // resolve API はカスタム permalink 専用で found:false（MSW 既定）を返す。
+    // その場合でもパターン解釈で本文を描画し、notFound にしないこと。
+    seedEntityTypes([{ id: 1, name: 'Article', slug: 'article' }])
+    seedEntities([{ id: 1, entity_type_id: 1, is_deleted: false, deleted_at: null }])
+    seedFieldDefs([{ id: 1, entity_type_id: 1, field_key: 'title', data_type: 'text' }])
+    seedTextFields([{ id: 1, entity_id: 1, field_key: 'title', value: 'Pinned pattern home' }])
+
+    renderWithProviders(
+      <MemoryRouter initialEntries={['/']}>
+        <Routes>
+          <Route element={<PublicSiteTestProvider site={{ frontPagePath: '/article/1' }} />}>
+            <Route path="/" element={<PublicRecordByPermalink path="/article/1" isFrontPage />} />
+          </Route>
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Pinned pattern home' }),
+    ).toBeInTheDocument()
+    expect(screen.queryByText('Record not found')).not.toBeInTheDocument()
+  })
+
+  it('front-page fallback: renders a slug-pattern URL the resolver does not know (#748)', async () => {
+    seedEntityTypes([{ id: 1, name: 'Work', slug: 'work', permalink_pattern: '/{type}/{slug}' }])
+    seedEntities([
+      {
+        id: 7,
+        entity_type_id: 1,
+        slug: 'company',
+        status: 'published',
+        is_deleted: false,
+        deleted_at: null,
+      },
+    ])
+    seedFieldDefs([{ id: 1, entity_type_id: 1, field_key: 'title', data_type: 'text' }])
+    seedTextFields([{ id: 1, entity_id: 7, field_key: 'title', value: 'Slug pattern home' }])
+
+    renderWithProviders(
+      <MemoryRouter initialEntries={['/']}>
+        <Routes>
+          <Route element={<PublicSiteTestProvider site={{ frontPagePath: '/work/company' }} />}>
+            <Route
+              path="/"
+              element={<PublicRecordByPermalink path="/work/company" isFrontPage />}
+            />
+          </Route>
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Slug pattern home' }),
+    ).toBeInTheDocument()
   })
 
   it('renders the derived chapter nav and hides series/chapter_no/chapter_total', async () => {
