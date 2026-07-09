@@ -2,7 +2,9 @@ import { useState } from 'react'
 import { useSettingList, useUpdateSetting } from '@/entities/setting'
 import { useTranslation } from '@/shared/i18n'
 import {
+  type FooterBanner,
   type FooterConfig,
+  type FooterCta,
   type FooterLegalLink,
   type FooterSocialLink,
   parseFooterConfig,
@@ -21,6 +23,10 @@ export interface FooterConfigPageState {
   setLegalLinks: (legalLinks: FooterLegalLink[]) => void
   /** Toggle the Powered-by note. */
   setShowPoweredBy: (show: boolean) => void
+  /** Patch the Above-footer CTA row. */
+  setCta: (patch: Partial<FooterCta>) => void
+  /** Replace the banner list. */
+  setBanners: (banners: FooterBanner[]) => void
   /** Persist the draft to the `footer_config` setting. */
   save: () => void
   isLoading: boolean
@@ -77,6 +83,12 @@ export function useFooterConfigPage(): FooterConfigPageState {
     },
     setShowPoweredBy: (showPoweredBy) => {
       setDraft((prev) => ({ ...prev, showPoweredBy }))
+    },
+    setCta: (patch) => {
+      setDraft((prev) => ({ ...prev, cta: { ...prev.cta, ...patch } }))
+    },
+    setBanners: (banners) => {
+      setDraft((prev) => ({ ...prev, banners }))
     },
     save,
     isLoading: settingsQuery.isLoading,

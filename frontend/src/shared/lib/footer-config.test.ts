@@ -40,7 +40,32 @@ describe('parseFooterConfig', () => {
       social: [{ platform: 'line' as const, url: 'https://line.me/x' }],
       legalLinks: [{ label: '特定商取引法に基づく表記', url: '/tokushoho' }],
       showPoweredBy: false,
+      cta: {
+        enabled: true,
+        heading: 'お知らせ',
+        text: '毎月の更新情報',
+        buttonLabel: '登録する',
+        buttonUrl: 'https://example.com/newsletter',
+      },
+      banners: [{ image: '/media/2026/07/badge.png', url: 'https://example.com', alt: '認証' }],
     }
     expect(parseFooterConfig(serializeFooterConfig(config))).toEqual(config)
+  })
+
+  it('parses cta defensively and drops imageless banners (#770)', () => {
+    const config = parseFooterConfig(
+      JSON.stringify({
+        cta: { enabled: 'yes', heading: 42 },
+        banners: [{ url: '/x', alt: 'no image' }, { image: '/media/a.png' }, 'junk'],
+      }),
+    )
+    expect(config.cta).toEqual({
+      enabled: false,
+      heading: '',
+      text: '',
+      buttonLabel: '',
+      buttonUrl: '',
+    })
+    expect(config.banners).toEqual([{ image: '/media/a.png', url: '', alt: '' }])
   })
 })

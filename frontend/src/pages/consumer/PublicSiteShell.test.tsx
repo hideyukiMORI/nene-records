@@ -233,6 +233,8 @@ describe('PublicSiteShell header reflection', () => {
             { label: '特商法表記', url: 'https://example.com/tokushoho' },
           ],
           showPoweredBy: false,
+          cta: DEFAULT_FOOTER_CONFIG.cta,
+          banners: [],
         },
       }),
     )
@@ -249,6 +251,62 @@ describe('PublicSiteShell header reflection', () => {
     // 不正スキームの SNS リンクは落とす。Powered by は非表示。
     expect(screen.queryByRole('link', { name: 'line' })).toBeNull()
     expect(screen.queryByText(/Powered by NENE2/)).toBeNull()
+  })
+
+  it('renders the footer CTA row and banner strip from footer_config (#770)', () => {
+    seedEntityTypes([{ id: 1, name: 'Article', slug: 'article' }])
+    renderShell(
+      makeSite({
+        footerConfig: {
+          social: [],
+          legalLinks: [],
+          showPoweredBy: true,
+          cta: {
+            enabled: true,
+            heading: '月次レポートを受け取る',
+            text: '更新情報をお届けします',
+            buttonLabel: '登録する',
+            buttonUrl: 'https://example.com/newsletter',
+          },
+          banners: [
+            {
+              image: '/media/2026/07/badge.png',
+              url: 'https://example.com/cert',
+              alt: '認証バッジ',
+            },
+            { image: 'javascript:alert(1)', url: '', alt: 'evil' },
+          ],
+        },
+      }),
+    )
+
+    expect(screen.getByRole('heading', { name: '月次レポートを受け取る' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: '登録する' })).toHaveAttribute(
+      'href',
+      'https://example.com/newsletter',
+    )
+    const badge = screen.getByRole('img', { name: '認証バッジ' })
+    expect(badge).toHaveAttribute('src', '/media/2026/07/badge.png')
+    expect(badge.closest('a')).toHaveAttribute('href', 'https://example.com/cert')
+    // 不正スキームの画像 src は描画しない
+    expect(screen.queryByRole('img', { name: 'evil' })).toBeNull()
+  })
+
+  it('hides the CTA row when disabled or button is incomplete (#770)', () => {
+    seedEntityTypes([{ id: 1, name: 'Article', slug: 'article' }])
+    renderShell(
+      makeSite({
+        footerConfig: {
+          social: [],
+          legalLinks: [],
+          showPoweredBy: true,
+          cta: { enabled: true, heading: '見出しだけ', text: '', buttonLabel: '', buttonUrl: '' },
+          banners: [],
+        },
+      }),
+    )
+
+    expect(document.querySelector('.ft-cta')).toBeNull()
   })
 
   it('keeps the powered-by note and no social row by default', () => {

@@ -5,6 +5,7 @@ import { usePublicMenus } from '@/entities/menu'
 import { usePublicWidgets } from '@/entities/widget'
 import { SiteWidgets } from '@/features/render-widgets'
 import { LOCALES, SUPPORTED_LOCALE_IDS, type SupportedLocale, useTranslation } from '@/shared/i18n'
+import { hasFooterCta } from '@/shared/lib/footer-config'
 import { hasCta, hasTopbarContent, safeHref } from '@/shared/lib/header-config'
 import { useHeaderShrink } from '@/shared/lib/motion/use-header-shrink'
 import { useScrollReveal } from '@/shared/lib/motion/use-scroll-reveal'
@@ -421,6 +422,21 @@ export function PublicSiteShell({
       </main>
 
       <footer className="ft">
+        {hasFooterCta(site.footerConfig.cta) && safeHref(site.footerConfig.cta.buttonUrl) !== '' ? (
+          <div className="ft-cta">
+            <div className="wrap ft-cta__in">
+              <div className="ft-cta__copy">
+                {site.footerConfig.cta.heading !== '' ? (
+                  <h3>{site.footerConfig.cta.heading}</h3>
+                ) : null}
+                {site.footerConfig.cta.text !== '' ? <p>{site.footerConfig.cta.text}</p> : null}
+              </div>
+              <a className="btn btn--primary" href={safeHref(site.footerConfig.cta.buttonUrl)}>
+                {site.footerConfig.cta.buttonLabel}
+              </a>
+            </div>
+          </div>
+        ) : null}
         <div className="wrap ft__grid">
           <div className="ft__brand">
             <Brand siteName={site.siteName} logo={effectiveLogo} />
@@ -480,6 +496,23 @@ export function PublicSiteShell({
             </>
           )}
         </div>
+        {site.footerConfig.banners.length > 0 ? (
+          <div className="wrap ft__banners">
+            {site.footerConfig.banners.map((banner, index) => {
+              const src = safeHref(banner.image)
+              if (src === '') return null
+              const img = <img src={src} alt={banner.alt} loading="lazy" />
+              const href = banner.url === '' ? '' : safeHref(banner.url)
+              return href !== '' ? (
+                <a key={`${banner.image}-${String(index)}`} href={href}>
+                  {img}
+                </a>
+              ) : (
+                <span key={`${banner.image}-${String(index)}`}>{img}</span>
+              )
+            })}
+          </div>
+        ) : null}
         <div className="wrap ft__bar">
           <small className="ft__legal">
             <span>{renderCopyright(site.copyrightText, site.siteName)}</span>
