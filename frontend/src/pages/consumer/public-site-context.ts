@@ -7,6 +7,8 @@ export interface PublicSiteNavItem {
   id: number
   url: string
   label: string
+  /** Named-menu membership (#347); drives the header-region menu widget (#756). */
+  menuId: number | null
 }
 
 /**
