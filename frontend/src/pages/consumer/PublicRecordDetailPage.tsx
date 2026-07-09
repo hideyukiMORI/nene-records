@@ -497,6 +497,7 @@ function PublicRecordDetailBySlug({
   previousPattern,
   splat,
   entityTypeDefaultLayout,
+  isFrontPage = false,
 }: {
   entityTypeSlug: string
   entityTypeName: string
@@ -508,6 +509,7 @@ function PublicRecordDetailBySlug({
   previousPattern: string | null | undefined
   splat: string
   entityTypeDefaultLayout: PublicLayoutKey
+  isFrontPage?: boolean
 }) {
   const { t } = useTranslation()
   const site = usePublicSite()
@@ -550,6 +552,7 @@ function PublicRecordDetailBySlug({
       entityTypePatternById={entityTypePatternById}
       currentPattern={currentPattern}
       entityTypeDefaultLayout={entityTypeDefaultLayout}
+      isFrontPage={isFrontPage}
     />
   )
 }
@@ -649,6 +652,50 @@ export function PublicRecordByPermalink({
       : undefined
 
   if (resolved === null || type === undefined) {
+    // resolve API はカスタム permalink 専用。front_page 設定などから渡るパターン由来
+    // URL（例 `/pages/1118`）はここに落ちるため、catch-all ルートと同じ機構で
+    // 「タイプ slug ＋パターン」として解釈してから notFound に倒す（#748）。
+    // サーバ側の解決順序（カスタム permalink 優先→パターン URL）と対称。
+    const [patternTypeSlug = '', ...restSegments] = path.split('/').filter(Boolean)
+    const patternType = findEntityTypeBySlug(entityTypeQuery.data?.items ?? [], patternTypeSlug)
+
+    if (patternType !== undefined && restSegments.length > 0) {
+      const splat = restSegments.join('/')
+      const key = extractEntityKeyFromSplat(patternType.permalinkPattern, splat)
+
+      if (key.kind === 'id') {
+        return (
+          <PublicRecordDetailById
+            entityTypeSlug={patternType.slug}
+            entityTypeName={patternType.name}
+            entityTypeId={Number(patternType.id)}
+            entityId={key.id}
+            entityTypeSlugById={entityTypeSlugById}
+            entityTypePatternById={entityTypePatternById}
+            currentPattern={patternType.permalinkPattern}
+            entityTypeDefaultLayout={patternType.defaultLayout}
+            isFrontPage={isFrontPage}
+          />
+        )
+      }
+
+      return (
+        <PublicRecordDetailBySlug
+          entityTypeSlug={patternType.slug}
+          entityTypeName={patternType.name}
+          entityTypeId={Number(patternType.id)}
+          entitySlug={key.slug}
+          entityTypeSlugById={entityTypeSlugById}
+          entityTypePatternById={entityTypePatternById}
+          currentPattern={patternType.permalinkPattern}
+          previousPattern={patternType.previousPermalinkPattern}
+          splat={splat}
+          entityTypeDefaultLayout={patternType.defaultLayout}
+          isFrontPage={isFrontPage}
+        />
+      )
+    }
+
     return (
       <RecordShellMessage
         site={site}
