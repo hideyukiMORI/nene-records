@@ -90,6 +90,13 @@ composer migrations:migrate   # apply pending
 composer migrations:rollback  # rollback last batch
 ```
 
+## Release
+
+1. `VERSION` をバンプする（版の単一ソース。`/machine/health` も同じ値を報告する・#586）。
+2. `bash tools/build-release.sh <version>` で配布 zip を作る（→ `dist/nene-records-<version>.zip`。詳細は `docs/install-tier-a.md`）。
+3. zip と `.sha256` を GitHub Release に添付して公開する（Latest・target=main）。
+4. Release 公開後、プロフィール README（github.com/hideyukiMORI/hideyukiMORI）の版数・状況表を同期する（At a glance / Platform products / What shipped recently の該当行）。
+
 ## OpenAPI → TypeScript types
 
 The frontend types for API responses are **auto-generated** from `docs/openapi/openapi.yaml`.
