@@ -106,6 +106,7 @@ export const de: Partial<MessageCatalog> = {
   'admin.themeCustomize.fontDisplay': 'Display-Schrift',
   'admin.themeCustomize.fontMono': 'Monospace-Schrift',
   'admin.themeCustomize.fontBrand': 'Schriftart des Seitentitels',
+  'admin.themeCustomize.brandSize': 'Größe des Seitentitels',
   'admin.themeCustomize.width': 'Inhaltsbreite',
   'admin.themeCustomize.gutter': 'Seitenrand',
   'admin.themeCustomize.radius': 'Ecken',

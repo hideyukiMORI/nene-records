@@ -30,6 +30,11 @@ export interface ThemeOverrides {
    * `--font-brand`; unset = theme default = follows `--font-display` (#750).
    */
   fontBrand?: string
+  /**
+   * Site-title size preset (see BRAND_SIZE_OPTIONS). Maps to `--brand-size`;
+   * unset = theme default (1.25rem) (#754).
+   */
+  brandSize?: string
   /** Content width preset key (see WIDTH_OPTIONS). Maps to `--content-w`. */
   contentWidth?: string
   /** Gutter preset key (see GUTTER_OPTIONS). Maps to `--gutter`. */
@@ -317,6 +322,24 @@ export const BRAND_FONT_OPTIONS: readonly KnobOption[] = [
   { value: 'system', label: 'System sans' },
 ]
 
+/**
+ * Site-title size presets (→ `--brand-size`). Fixed steps, no free input; the
+ * header fit-probe (#697) absorbs any nav overflow a larger wordmark causes.
+ */
+export const BRAND_SIZE_OPTIONS: readonly KnobOption[] = [
+  { value: 'default', label: 'Default' },
+  { value: 'comfort', label: 'Comfort' },
+  { value: 'large', label: 'Large' },
+  { value: 'xl', label: 'XL' },
+]
+
+const BRAND_SIZE_VALUES: Record<string, string> = {
+  default: '1.25rem',
+  comfort: '1.5rem',
+  large: '1.75rem',
+  xl: '2rem',
+}
+
 const BRAND_FONT_STACKS: Record<string, string> = {
   roboto: "'Roboto', 'Noto Sans JP', ui-sans-serif, system-ui, sans-serif",
   inter: "'Inter', 'Noto Sans JP', ui-sans-serif, system-ui, sans-serif",
@@ -453,6 +476,10 @@ export function resolveOverrideStyle(overrides: ThemeOverrides): Record<string, 
   if (isOption(BRAND_FONT_OPTIONS, overrides.fontBrand)) {
     const stack = BRAND_FONT_STACKS[overrides.fontBrand]
     if (stack !== undefined) style['--font-brand'] = stack
+  }
+  if (isOption(BRAND_SIZE_OPTIONS, overrides.brandSize)) {
+    const size = BRAND_SIZE_VALUES[overrides.brandSize]
+    if (size !== undefined) style['--brand-size'] = size
   }
   if (isOption(WIDTH_OPTIONS, overrides.contentWidth)) {
     const width = WIDTH_VALUES[overrides.contentWidth]

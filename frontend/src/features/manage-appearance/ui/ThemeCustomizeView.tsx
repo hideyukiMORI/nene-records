@@ -3,6 +3,7 @@ import { useMediaList } from '@/entities/media'
 import { useTranslation } from '@/shared/i18n'
 import {
   BRAND_FONT_OPTIONS,
+  BRAND_SIZE_OPTIONS,
   DENSITY_OPTIONS,
   DISPLAY_FONT_OPTIONS,
   FLAG_DEFS,
@@ -305,6 +306,16 @@ export function ThemeCustomizeView({
               placeholder={themePlaceholder}
               onChange={(v) => {
                 setKnob('fontBrand', v)
+              }}
+            />
+          </Field>
+          <Field label={t('admin.themeCustomize.brandSize')}>
+            <Select
+              value={draft.brandSize}
+              options={BRAND_SIZE_OPTIONS}
+              placeholder={themePlaceholder}
+              onChange={(v) => {
+                setKnob('brandSize', v)
               }}
             />
           </Field>
