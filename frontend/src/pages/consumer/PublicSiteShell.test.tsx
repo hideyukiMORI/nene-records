@@ -106,4 +106,23 @@ describe('PublicSiteShell header reflection', () => {
 
     expect(screen.queryByRole('link', { name: 'Bad' })).toBeNull()
   })
+
+  it('renders no brand mark when the tenant has no logo (#752)', () => {
+    // ロゴ未設定時にプラットフォームのマーク（NeneMark）をフォールバック表示しない。
+    seedEntityTypes([{ id: 1, name: 'Article', slug: 'article' }])
+    const { container } = renderShell(makeSite())
+
+    expect(container.querySelector('.brand__mark')).toBeNull()
+    expect(screen.getAllByText('Test Site').length).toBeGreaterThan(0)
+  })
+
+  it('renders the logo image in the brand mark when a logo is set', () => {
+    seedEntityTypes([{ id: 1, name: 'Article', slug: 'article' }])
+    const { container } = renderShell(makeSite({ logo: '/media/2026/07/logo.png' }))
+
+    expect(container.querySelector('.brand__mark')).not.toBeNull()
+    const img = container.querySelector('.brand__logo')
+    expect(img).not.toBeNull()
+    expect(img?.getAttribute('src')).toBe('/media/2026/07/logo.png')
+  })
 })
