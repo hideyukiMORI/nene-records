@@ -25,6 +25,11 @@ export interface ThemeOverrides {
   fontDisplay?: string
   /** Mono/eyebrow font key (see MONO_FONT_OPTIONS). Maps to `--font-mono`. */
   fontMono?: string
+  /**
+   * Site-title (brand wordmark) font key (see BRAND_FONT_OPTIONS). Maps to
+   * `--font-brand`; unset = theme default = follows `--font-display` (#750).
+   */
+  fontBrand?: string
   /** Content width preset key (see WIDTH_OPTIONS). Maps to `--content-w`. */
   contentWidth?: string
   /** Gutter preset key (see GUTTER_OPTIONS). Maps to `--gutter`. */
@@ -256,6 +261,7 @@ export interface KnobOption {
 /** Body font allowlist (all self-hosted via @fontsource). */
 export const FONT_OPTIONS: readonly KnobOption[] = [
   { value: 'inter', label: 'Inter (sans)' },
+  { value: 'roboto', label: 'Roboto (sans)' },
   { value: 'source-serif', label: 'Source Serif 4 (serif)' },
   { value: 'saira', label: 'Saira Semi Condensed' },
   { value: 'space-grotesk', label: 'Space Grotesk' },
@@ -264,6 +270,7 @@ export const FONT_OPTIONS: readonly KnobOption[] = [
 
 const FONT_STACKS: Record<string, string> = {
   inter: "'Inter', 'Noto Sans JP', ui-sans-serif, system-ui, sans-serif",
+  roboto: "'Roboto', 'Noto Sans JP', ui-sans-serif, system-ui, sans-serif",
   'source-serif': "'Source Serif 4', 'Noto Serif JP', Georgia, 'Times New Roman', serif",
   saira: "'Saira Semi Condensed', 'Noto Sans JP', sans-serif",
   'space-grotesk': "'Space Grotesk', 'Noto Sans JP', sans-serif",
@@ -276,6 +283,7 @@ export const DISPLAY_FONT_OPTIONS: readonly KnobOption[] = [
   { value: 'bricolage', label: 'Bricolage Grotesque' },
   { value: 'archivo', label: 'Archivo' },
   { value: 'oswald', label: 'Oswald' },
+  { value: 'roboto', label: 'Roboto (sans)' },
   { value: 'source-serif', label: 'Source Serif 4 (serif)' },
   { value: 'system', label: 'System sans' },
 ]
@@ -285,7 +293,40 @@ const DISPLAY_FONT_STACKS: Record<string, string> = {
   bricolage: "'Bricolage Grotesque', 'Noto Sans JP', system-ui, sans-serif",
   archivo: "'Archivo', 'Arial Narrow', system-ui, sans-serif",
   oswald: "'Oswald', 'Noto Sans JP', system-ui, sans-serif",
+  roboto: "'Roboto', 'Noto Sans JP', system-ui, sans-serif",
   'source-serif': "'Source Serif 4', 'Noto Serif JP', Georgia, serif",
+  system: 'ui-sans-serif, system-ui, sans-serif',
+}
+
+/**
+ * Site-title (brand wordmark) allowlist (→ `--font-brand`). The union of the body
+ * and display faces: the brand voice may legitimately want either kind. Unset =
+ * theme default (the CSS falls back to `--font-display`), so there is no
+ * explicit "inherit" entry (#750).
+ */
+export const BRAND_FONT_OPTIONS: readonly KnobOption[] = [
+  { value: 'roboto', label: 'Roboto (sans)' },
+  { value: 'inter', label: 'Inter (sans)' },
+  { value: 'playfair', label: 'Playfair Display (serif)' },
+  { value: 'bricolage', label: 'Bricolage Grotesque' },
+  { value: 'archivo', label: 'Archivo' },
+  { value: 'oswald', label: 'Oswald' },
+  { value: 'source-serif', label: 'Source Serif 4 (serif)' },
+  { value: 'saira', label: 'Saira Semi Condensed' },
+  { value: 'space-grotesk', label: 'Space Grotesk' },
+  { value: 'system', label: 'System sans' },
+]
+
+const BRAND_FONT_STACKS: Record<string, string> = {
+  roboto: "'Roboto', 'Noto Sans JP', ui-sans-serif, system-ui, sans-serif",
+  inter: "'Inter', 'Noto Sans JP', ui-sans-serif, system-ui, sans-serif",
+  playfair: "'Playfair Display', Georgia, 'Times New Roman', serif",
+  bricolage: "'Bricolage Grotesque', 'Noto Sans JP', system-ui, sans-serif",
+  archivo: "'Archivo', 'Arial Narrow', system-ui, sans-serif",
+  oswald: "'Oswald', 'Noto Sans JP', system-ui, sans-serif",
+  'source-serif': "'Source Serif 4', 'Noto Serif JP', Georgia, serif",
+  saira: "'Saira Semi Condensed', 'Noto Sans JP', sans-serif",
+  'space-grotesk': "'Space Grotesk', 'Noto Sans JP', sans-serif",
   system: 'ui-sans-serif, system-ui, sans-serif',
 }
 
@@ -408,6 +449,10 @@ export function resolveOverrideStyle(overrides: ThemeOverrides): Record<string, 
   if (isOption(MONO_FONT_OPTIONS, overrides.fontMono)) {
     const stack = MONO_FONT_STACKS[overrides.fontMono]
     if (stack !== undefined) style['--font-mono'] = stack
+  }
+  if (isOption(BRAND_FONT_OPTIONS, overrides.fontBrand)) {
+    const stack = BRAND_FONT_STACKS[overrides.fontBrand]
+    if (stack !== undefined) style['--font-brand'] = stack
   }
   if (isOption(WIDTH_OPTIONS, overrides.contentWidth)) {
     const width = WIDTH_VALUES[overrides.contentWidth]

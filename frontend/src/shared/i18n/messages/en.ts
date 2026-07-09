@@ -112,6 +112,7 @@ export const en = {
   'admin.themeCustomize.font': 'Body font',
   'admin.themeCustomize.fontDisplay': 'Display font',
   'admin.themeCustomize.fontMono': 'Mono font',
+  'admin.themeCustomize.fontBrand': 'Site title font',
   'admin.themeCustomize.width': 'Content width',
   'admin.themeCustomize.gutter': 'Side margin',
   'admin.themeCustomize.radius': 'Corners',

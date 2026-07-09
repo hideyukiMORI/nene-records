@@ -39,6 +39,20 @@ describe('resolveOverrideStyle', () => {
     expect(style['--font-mono']).toBeUndefined()
   })
 
+  it('emits the brand font variable for a valid key and omits it when unset (#750)', () => {
+    // ブランド語ノブ: 設定時のみ --font-brand を発行（未設定＝CSS 側で
+    // var(--font-brand, var(--font-display)) にフォールバック＝テーマ既定）。
+    expect(resolveOverrideStyle({ fontBrand: 'roboto' })['--font-brand']).toContain('Roboto')
+    expect(resolveOverrideStyle({})['--font-brand']).toBeUndefined()
+    expect(resolveOverrideStyle({ fontBrand: 'evil-font' })['--font-brand']).toBeUndefined()
+  })
+
+  it('emits Roboto for body and display knobs (#750)', () => {
+    const style = resolveOverrideStyle({ fontBody: 'roboto', fontDisplay: 'roboto' })
+    expect(style['--font-sans']).toContain('Roboto')
+    expect(style['--font-display']).toContain('Roboto')
+  })
+
   it('ignores invalid / unknown values (no injection)', () => {
     const style = resolveOverrideStyle({
       accent: 'red; } body { display:none',
