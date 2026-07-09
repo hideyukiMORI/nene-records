@@ -1,6 +1,43 @@
 # Current Work
 
-Last updated: 2026-07-05
+Last updated: 2026-07-09
+
+## 直近: AYANE Tier A 設置リハーサル＋移送経路の実証（2026-07-09）
+
+> 文脈: AYANE サイトリニューアルは records で構築（施主決定 07-09）。制作は
+> `ayane.nene-records.com`、最終設置は **Tier A zip（独自ドメイン）**、差し替えは DNS 切替。
+> 指示書は `_work/handoff-records-ayane-tier-a-2026-07-09-work-order.md`、
+> AYANE 実設置の分担表は `_work/ayane-tier-a-install-runbook.md`（実サーバ情報を含むため公開リポ外）。
+
+- **Tier A 設置リハーサル（v0.5.1 zip・共有ホスティング相当ハーネス＝php:8.4-apache 公式・
+  Alias 無し・docroot=public_html）**: ルート設置／`/blog` サブディレクトリ設置（APP_BASE_PATH 自動導出）
+  とも、要件→DB/tenant→migrate 77本→管理者→完了→再訪403 まで完走。公開 SSR（canonical/OG の
+  base-path 前置）・SPA 管理画面（`<base href>`）・sitemap/robots・theme-thumbnails・メディア＋
+  オンデマンド派生・cron・設定17定義シード すべて動作確認。
+- **#737 修正（P0・merged PR #738）**: GD が AVIF 無しビルドの環境（共有ホスティングで実在・検証
+  ハーネス自体が該当）で、Chrome/Edge の `Accept: image/avif` により**派生画像が全て 500**。
+  形式交渉を encoder 能力込みに変更（avif→webp→ソース形式フォールバック）。Docker 本番は
+  `--with-avif` ビルドのため挙動不変。
+- **#739 修正（merged PR #740）**: superadmin org export/import API（M8 #215）が
+  `getAttribute('id')` で {id} を読めず**常に 404**（NENE2 Router は PARAMETERS_ATTRIBUTE 配列でしか
+  渡さない）。実 Router 配線の HTTP テストを新設（OrgExport は従来テスト皆無）。
+- **#741 起票（P0・今週レーン）: 移送経路（SaaS org → Tier A）は現状「不通」を実証** —
+  2インスタンス実走で ① fresh 設置へ import すると seed 済み posts/pages と
+  `uq_entity_types_org_slug` 衝突で**1行目から 500** ② import 非トランザクション
+  ③ M8 以降の列が import で脱落（entities.permalink/menu_order/layout・navigation_items.menu_id・
+  media.alt_text/width/height/storage_key）④ menus/widgets/themes/blocks_fields/entity_relations/
+  url_redirects がテーブルごと範囲外 ⑤ メディア実ファイルは別送 ⑥ Tier A に superadmin が
+  存在せず import 実行手段なし。受入基準と設計案は #741 参照。
+- **v0.5.2 zip ビルド＋スモーク済（公開は施主 GO 待ち）**: #737/#739/#710（サイト名→site_name 反映・
+  SSR title「— AYANE」確認）/#716 を収録。fresh ハーネスで設置→AVIF 交渉 200 webp→export 200 を確認。
+  `dist/nene-records-0.5.2.zip`（66MB・NENE2 v1.8.2・sha256 `ad469d1d…`）。
+  **AYANE 実設置は v0.5.2 以降を使うこと**（v0.5.1 以前は AVIF 500 を含む）。
+- **本番デプロイ残の実測（board 07-02 起票分の判定)**: 本番（nene-records.com）は `a1dba34`
+  （07-04 デプロイ・v0.5.0 タグ対象）と一致 → **07-02 起票分は消し込み可**。新たに 07-05〜07-07 の
+  main 15 コミット（#715〜#736: JWT フェイルクローズ #725・SSRF ガード #732・設定 UI #722・
+  画像ノブ #723 等）＋本日 2 件（#738/#740）が未デプロイ。反映は外向きのため施主 GO 待ち。
+- フォローアップ判定: **#709 フォント on-demand は後回し**（設置は FTP/SFTP 前提で 66MB は
+  アップロード制限に当たらない）。#710 は完了済み（v0.5.2 に収録）。
 
 ## 直近: 共有ホスティング Tier A インストーラ 公開（S3・#707・2026-07-04〜05）
 
