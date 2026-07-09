@@ -53,6 +53,13 @@ describe('resolveOverrideStyle', () => {
     expect(style['--font-display']).toContain('Roboto')
   })
 
+  it('emits the brand size for a valid preset and omits it when unset/unknown (#754)', () => {
+    expect(resolveOverrideStyle({ brandSize: 'xl' })['--brand-size']).toBe('2rem')
+    expect(resolveOverrideStyle({ brandSize: 'comfort' })['--brand-size']).toBe('1.5rem')
+    expect(resolveOverrideStyle({})['--brand-size']).toBeUndefined()
+    expect(resolveOverrideStyle({ brandSize: '999px' })['--brand-size']).toBeUndefined()
+  })
+
   it('ignores invalid / unknown values (no injection)', () => {
     const style = resolveOverrideStyle({
       accent: 'red; } body { display:none',

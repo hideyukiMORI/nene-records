@@ -192,7 +192,8 @@
      display face so themes without a brand override are unaffected. */
   font-family: var(--font-brand, var(--font-display));
   font-weight: var(--weight-bold);
-  font-size: 1.25rem;
+  /* Size preset knob (#754); unset = the historical fixed size. */
+  font-size: var(--brand-size, 1.25rem);
   letter-spacing: -0.01em;
   white-space: nowrap;
   overflow: hidden;

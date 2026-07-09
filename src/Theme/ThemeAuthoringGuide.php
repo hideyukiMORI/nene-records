@@ -120,6 +120,7 @@ final class ThemeAuthoringGuide
         'font-sans' => ['fontFamily', 'Font stack for body text.'],
         'font-mono' => ['fontFamily', 'Font stack for monospace.'],
         'font-brand' => ['fontFamily', 'Font stack for the site title (brand wordmark). Optional; falls back to font-display.'],
+        'brand-size' => ['fontSize', 'Site title (brand wordmark) size. Optional; defaults to 1.25rem.'],
         // Type sizes
         'text-display' => ['fontSize', 'Hero/display size.'],
         'text-h1' => ['fontSize', 'H1 size.'],
