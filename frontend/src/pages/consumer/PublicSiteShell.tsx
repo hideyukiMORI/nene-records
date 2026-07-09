@@ -1,6 +1,7 @@
 import { type ReactNode, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLocation, useSearchParams } from 'react-router-dom'
 import { useEntityTypeList } from '@/entities/entity-type'
+import { usePublicMenus } from '@/entities/menu'
 import { usePublicWidgets } from '@/entities/widget'
 import { SiteWidgets } from '@/features/render-widgets'
 import { LOCALES, SUPPORTED_LOCALE_IDS, type SupportedLocale, useTranslation } from '@/shared/i18n'
@@ -307,6 +308,24 @@ export function PublicSiteShell({
           { label: 'Search', to: '/search', current: false },
         ]
 
+  // Footer-region menu widgets (#758): like the header (#756), menu widgets
+  // placed into the `footer` region replace the default Content/Browse columns —
+  // one column per widget, titled by the widget title (falling back to the menu
+  // name). Without any, the historical default columns render unchanged.
+  const menusQuery = usePublicMenus()
+  const menus = menusQuery.data?.items ?? []
+  const footerMenuColumns = widgets
+    .filter((widget) => widget.region === 'footer' && widget.widgetType === 'menu')
+    .sort((a, b) => a.displayOrder - b.displayOrder)
+    .flatMap((widget) => {
+      const menuId = widget.settings['menuId']
+      if (typeof menuId !== 'number') return []
+      const items = site.navItems.filter((item) => item.menuId === menuId)
+      if (items.length === 0) return []
+      const title = widget.title ?? menus.find((menu) => menu.id === menuId)?.name ?? ''
+      return [{ key: widget.id, title, items }]
+    })
+
   // Fit-probe (#695): fold the inline nav into the drawer the instant it would
   // overflow, so a long / many-item nav never overflows or clips the row ABOVE
   // the 900px width floor (the CSS handles ≤900 on its own, no JS). `.hd__nav`
@@ -405,29 +424,55 @@ export function PublicSiteShell({
             <Brand siteName={site.siteName} logo={effectiveLogo} />
             {site.footerMarkdown !== '' ? <p className="ft__free">{site.footerMarkdown}</p> : null}
           </div>
-          <div className="ft__col">
-            <h4>Content</h4>
-            <ul>
-              <li>
-                <Link to="/">Latest</Link>
-              </li>
-              {footerTypeLinks.map((type) => (
-                <li key={type.slug}>
-                  <Link to={type.href}>{type.name}</Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="ft__col">
-            <h4>Browse</h4>
-            <ul>
-              <li>
-                <Link to="/search">
-                  <IconSearch size={14} /> Search
-                </Link>
-              </li>
-            </ul>
-          </div>
+          {footerMenuColumns.length > 0 ? (
+            footerMenuColumns.map((column) => (
+              <div className="ft__col" key={`ft-menu-${String(column.key)}`}>
+                {column.title !== '' ? <h4>{column.title}</h4> : null}
+                <ul>
+                  {column.items.map((item) => {
+                    const external = !item.url.startsWith('/')
+                    const href = external ? safeHref(item.url) : item.url
+                    if (href === '') return null
+                    return (
+                      <li key={item.id}>
+                        {external ? (
+                          <a href={href}>{item.label}</a>
+                        ) : (
+                          <Link to={item.url}>{item.label}</Link>
+                        )}
+                      </li>
+                    )
+                  })}
+                </ul>
+              </div>
+            ))
+          ) : (
+            <>
+              <div className="ft__col">
+                <h4>Content</h4>
+                <ul>
+                  <li>
+                    <Link to="/">Latest</Link>
+                  </li>
+                  {footerTypeLinks.map((type) => (
+                    <li key={type.slug}>
+                      <Link to={type.href}>{type.name}</Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="ft__col">
+                <h4>Browse</h4>
+                <ul>
+                  <li>
+                    <Link to="/search">
+                      <IconSearch size={14} /> Search
+                    </Link>
+                  </li>
+                </ul>
+              </div>
+            </>
+          )}
         </div>
         <div className="wrap ft__bar">
           <small>{renderCopyright(site.copyrightText, site.siteName)}</small>

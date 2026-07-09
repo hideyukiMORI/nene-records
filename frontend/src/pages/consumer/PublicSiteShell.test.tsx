@@ -160,6 +160,61 @@ describe('PublicSiteShell header reflection', () => {
     expect(within(nav).queryByText('Latest')).toBeNull()
   })
 
+  it('renders footer-region menu widgets as footer columns (#758)', async () => {
+    seedEntityTypes([{ id: 1, name: 'Article', slug: 'article' }])
+    mswServer.use(
+      http.get('/api/v1/public/widgets', () =>
+        HttpResponse.json({
+          items: [
+            {
+              id: 9,
+              widget_type: 'menu',
+              region: 'footer',
+              display_order: 0,
+              title: 'サイトマップ',
+              settings: { menuId: 1 },
+              created_at: '2026-07-09 00:00:00',
+              updated_at: '2026-07-09 00:00:00',
+            },
+          ],
+        }),
+      ),
+      http.get('/api/v1/public/menus', () =>
+        HttpResponse.json({
+          items: [
+            {
+              id: 1,
+              name: 'FOOTER MENU',
+              slug: 'footer-menu',
+              location: null,
+              created_at: '2026-07-09 00:00:00',
+              updated_at: '2026-07-09 00:00:00',
+            },
+          ],
+        }),
+      ),
+    )
+
+    renderShell(
+      makeSite({
+        navItems: [{ id: 1, url: '/company', label: 'COMPANY', menuId: 1 }],
+      }),
+    )
+
+    // widget title が列見出しになり、メニュー項目が列に並ぶ。既定の Browse 列は出ない。
+    expect(await screen.findByText('サイトマップ')).toBeInTheDocument()
+    expect(screen.getByText('COMPANY')).toBeInTheDocument()
+    expect(screen.queryByText('Browse')).toBeNull()
+  })
+
+  it('keeps the default footer columns when no footer menu widget exists', async () => {
+    seedEntityTypes([{ id: 1, name: 'Article', slug: 'article' }])
+    renderShell(makeSite())
+
+    expect(await screen.findByText('Browse')).toBeInTheDocument()
+    expect(screen.getByText('Content')).toBeInTheDocument()
+  })
+
   it('keeps the default nav when no header menu widget exists', async () => {
     seedEntityTypes([{ id: 1, name: 'Article', slug: 'article' }])
     renderShell(makeSite())
