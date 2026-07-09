@@ -4,6 +4,7 @@ import { http, HttpResponse } from 'msw'
 import { MemoryRouter } from 'react-router-dom'
 import { PublicSiteShell } from '@/pages/consumer/PublicSiteShell'
 import type { PublicSite } from '@/pages/consumer/public-site-context'
+import { DEFAULT_FOOTER_CONFIG } from '@/shared/lib/footer-config'
 import { DEFAULT_HEADER_CONFIG } from '@/shared/lib/header-config'
 import { resetEntityTypeStore, seedEntityTypes } from '@tests/msw/handlers/entity-type'
 import { mswServer } from '@tests/msw/server'
@@ -24,6 +25,7 @@ function makeSite(over: Partial<PublicSite> = {}): PublicSite {
     runtimeThemeCss: '',
     themeFlagAttrs: {},
     headerConfig: DEFAULT_HEADER_CONFIG,
+    footerConfig: DEFAULT_FOOTER_CONFIG,
     homeHero: '',
     frontPagePath: '',
     ...over,
@@ -215,6 +217,46 @@ describe('PublicSiteShell header reflection', () => {
 
     const link = await screen.findByRole('link', { name: '免責事項' })
     expect(link).toHaveAttribute('href', '/disclaimer')
+  })
+
+  it('renders footer_config: legal links, social icons, powered-by hidden (#766)', () => {
+    seedEntityTypes([{ id: 1, name: 'Article', slug: 'article' }])
+    renderShell(
+      makeSite({
+        footerConfig: {
+          social: [
+            { platform: 'x', url: 'https://x.com/ayane' },
+            { platform: 'line', url: 'javascript:alert(1)' },
+          ],
+          legalLinks: [
+            { label: 'プライバシーポリシー', url: '/privacy' },
+            { label: '特商法表記', url: 'https://example.com/tokushoho' },
+          ],
+          showPoweredBy: false,
+        },
+      }),
+    )
+
+    expect(screen.getByRole('link', { name: 'プライバシーポリシー' })).toHaveAttribute(
+      'href',
+      '/privacy',
+    )
+    expect(screen.getByRole('link', { name: '特商法表記' })).toHaveAttribute(
+      'href',
+      'https://example.com/tokushoho',
+    )
+    expect(screen.getByRole('link', { name: 'x' })).toHaveAttribute('href', 'https://x.com/ayane')
+    // 不正スキームの SNS リンクは落とす。Powered by は非表示。
+    expect(screen.queryByRole('link', { name: 'line' })).toBeNull()
+    expect(screen.queryByText(/Powered by NENE2/)).toBeNull()
+  })
+
+  it('keeps the powered-by note and no social row by default', () => {
+    seedEntityTypes([{ id: 1, name: 'Article', slug: 'article' }])
+    renderShell(makeSite())
+
+    expect(screen.getByText(/Powered by NENE2/)).toBeInTheDocument()
+    expect(document.querySelector('.ft__social')).toBeNull()
   })
 
   it('keeps the default footer columns when no footer menu widget exists', async () => {

@@ -10,6 +10,7 @@ import { useHeaderShrink } from '@/shared/lib/motion/use-header-shrink'
 import { useScrollReveal } from '@/shared/lib/motion/use-scroll-reveal'
 import { IconMenu, IconMoon, IconSearch, IconSun, IconX } from '@/shared/ui/icons/Icons'
 import { IconAuto } from '@/shared/ui/icons/magazine-icons'
+import { SocialIcon } from '@/shared/ui/icons/SocialIcons'
 import { PublicMarkdownContent } from '@/shared/ui/markdown'
 import './public-site.css'
 import type { HeaderCta, HeaderTopbar } from '@/shared/lib/header-config'
@@ -480,8 +481,46 @@ export function PublicSiteShell({
           )}
         </div>
         <div className="wrap ft__bar">
-          <small>{renderCopyright(site.copyrightText, site.siteName)}</small>
-          <small className="mono">Powered by NENE2 · {'>>'}</small>
+          <small className="ft__legal">
+            <span>{renderCopyright(site.copyrightText, site.siteName)}</span>
+            {site.footerConfig.legalLinks.map((legal) => {
+              const external = !legal.url.startsWith('/')
+              const href = external ? safeHref(legal.url) : legal.url
+              if (href === '') return null
+              return external ? (
+                <a key={`${legal.label}-${legal.url}`} href={href}>
+                  {legal.label}
+                </a>
+              ) : (
+                <Link key={`${legal.label}-${legal.url}`} to={legal.url}>
+                  {legal.label}
+                </Link>
+              )
+            })}
+          </small>
+          <span className="ft__bar-right">
+            {site.footerConfig.social.length > 0 ? (
+              <span className="ft__social">
+                {site.footerConfig.social.map((social) => {
+                  const href = safeHref(social.url)
+                  if (href === '') return null
+                  return (
+                    <a
+                      key={`${social.platform}-${social.url}`}
+                      href={href}
+                      aria-label={social.platform}
+                      title={social.platform}
+                    >
+                      <SocialIcon platform={social.platform} />
+                    </a>
+                  )
+                })}
+              </span>
+            ) : null}
+            {site.footerConfig.showPoweredBy ? (
+              <small className="mono">Powered by NENE2 · {'>>'}</small>
+            ) : null}
+          </span>
         </div>
       </footer>
 

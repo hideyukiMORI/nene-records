@@ -3,11 +3,13 @@ import { Link, Navigate, useParams } from 'react-router-dom'
 import { currentUserHasCapability } from '@/entities/auth'
 import { useMenuList } from '@/entities/menu'
 import {
+  FooterContentView,
   HeaderContentView,
   HeaderPreview,
   HomeHeroView,
   PublicThemeView,
   ThemeCustomizeView,
+  useFooterConfigPage,
   useHeaderConfigPage,
   useHomeHeroPage,
   usePublicThemePage,
@@ -43,6 +45,7 @@ function ThemeTab() {
   const page = usePublicThemePage()
   const customize = useThemeCustomizePage()
   const headerContent = useHeaderConfigPage()
+  const footerContent = useFooterConfigPage()
   const homeHero = useHomeHeroPage()
   // Warn before leaving with unsaved customizer edits (route change + tab close).
   const blocker = useUnsavedChangesGuard(customize.isDirty)
@@ -61,6 +64,12 @@ function ThemeTab() {
         </Text>
         <HeaderPreview flags={customize.draft.flags} header={headerContent.draft} />
         <HeaderContentView {...headerContent} />
+      </Stack>
+      <Stack gap="sm">
+        <Text as="h2" variant="heading-sm">
+          {t('admin.footerContent.title')}
+        </Text>
+        <FooterContentView {...footerContent} />
       </Stack>
       <HomeHeroView {...homeHero} />
 

@@ -1128,6 +1128,40 @@
   width: 14px;
   height: 14px;
 }
+/* Below バー（#766）: 左＝コピーライト＋法務リンク（横インライン）／右＝SNS＋Powered by。 */
+.nene-public .ft__legal {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+}
+.nene-public .ft__legal a {
+  color: var(--color-text-muted);
+  text-decoration: none;
+}
+.nene-public .ft__legal a:hover {
+  color: var(--color-text-primary);
+  text-decoration: underline;
+}
+.nene-public .ft__bar-right {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+.nene-public .ft__social {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+.nene-public .ft__social a {
+  color: var(--color-text-muted);
+  display: inline-flex;
+  align-items: center;
+}
+.nene-public .ft__social a:hover {
+  color: var(--color-accent);
+}
+
 .nene-public .ft__bar {
   border-top: 1px solid var(--color-border);
   padding-block: var(--space-lg);

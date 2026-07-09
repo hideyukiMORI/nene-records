@@ -6,6 +6,7 @@ import { ConsentBanner } from '@/features/consent-banner'
 import { usePublicNavigationItems } from '@/entities/navigation-item'
 import { publicSettingsToMap, usePublicSettings } from '@/entities/setting'
 import { usePublicThemes } from '@/entities/theme'
+import { parseFooterConfig } from '@/shared/lib/footer-config'
 import { parseHeaderConfig } from '@/shared/lib/header-config'
 import { useAnalyticsPageView } from '@/shared/lib/use-analytics-page-view'
 import { resolveWebAnalytics } from '@/shared/lib/web-analytics'
@@ -157,6 +158,7 @@ export function PublicShell() {
     themeFlagAttrs: { ...flagAttrsForTheme(overridesRaw, activeTheme), ...runtimeFlagAttrs },
     runtimeThemeCss,
     headerConfig: parseHeaderConfig(settings.header_config),
+    footerConfig: parseFooterConfig(settings.footer_config),
     homeHero: settings.home_hero ?? '',
     frontPagePath: settings.front_page ?? '',
   }

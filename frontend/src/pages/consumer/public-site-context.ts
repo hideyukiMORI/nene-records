@@ -1,4 +1,5 @@
 import { useOutletContext } from 'react-router-dom'
+import type { FooterConfig } from '@/shared/lib/footer-config'
 import type { HeaderConfig } from '@/shared/lib/header-config'
 import type { PageLayout } from '@/shared/lib/layout-config'
 import type { ThemeLogo } from '@/shared/lib/theme-customization'
@@ -40,6 +41,8 @@ export interface PublicSite {
   themeFlagAttrs: Record<string, string>
   /** Header content (Top bar + CTA) from the `header_config` setting. */
   headerConfig: HeaderConfig
+  /** Footer content (social icons / legal links / powered-by) from `footer_config` (#766). */
+  footerConfig: FooterConfig
   /** Home masthead — a JSON blocks document (one hero block); '' / '[]' → auto stats-hero. */
   homeHero: string
   /** Pinned front-page permalink path (`front_page` resolved server-side); '' → latest-feed home (#701). */
