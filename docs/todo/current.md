@@ -28,14 +28,21 @@ Last updated: 2026-07-09
   media.alt_text/width/height/storage_key）④ menus/widgets/themes/blocks_fields/entity_relations/
   url_redirects がテーブルごと範囲外 ⑤ メディア実ファイルは別送 ⑥ Tier A に superadmin が
   存在せず import 実行手段なし。受入基準と設計案は #741 参照。
-- **v0.5.2 zip ビルド＋スモーク済（公開は施主 GO 待ち）**: #737/#739/#710（サイト名→site_name 反映・
-  SSR title「— AYANE」確認）/#716 を収録。fresh ハーネスで設置→AVIF 交渉 200 webp→export 200 を確認。
-  `dist/nene-records-0.5.2.zip`（66MB・NENE2 v1.8.2・sha256 `ad469d1d…`）。
-  **AYANE 実設置は v0.5.2 以降を使うこと**（v0.5.1 以前は AVIF 500 を含む）。
-- **本番デプロイ残の実測（board 07-02 起票分の判定)**: 本番（nene-records.com）は `a1dba34`
-  （07-04 デプロイ・v0.5.0 タグ対象）と一致 → **07-02 起票分は消し込み可**。新たに 07-05〜07-07 の
-  main 15 コミット（#715〜#736: JWT フェイルクローズ #725・SSRF ガード #732・設定 UI #722・
-  画像ノブ #723 等）＋本日 2 件（#738/#740）が未デプロイ。反映は外向きのため施主 GO 待ち。
+- **v0.5.2 zip: ✅ GitHub Release 公開済み（2026-07-09・施主 GO・Latest）**: #737/#739/#710
+  （サイト名→site_name 反映・SSR title「— AYANE」確認）/#716 を収録。fresh ハーネスで
+  設置→AVIF 交渉 200 webp→export 200 をスモーク済み。66MB・NENE2 v1.8.2 同梱・
+  sha256 `ad469d1d…`（DL 再検証で一致）。**AYANE 実設置は v0.5.2 以降を使うこと**
+  （v0.5.1 以前は AVIF 500 を含む）。
+- **本番デプロイ: ✅ 完了（2026-07-09・施主 GO）**: 07-04 時点（`a1dba34`）から main 18 コミット
+  （#715〜#736: JWT フェイルクローズ #725・SSRF ガード #732・設定 UI #722・画像ノブ #723 等
+  ＋本日 #738/#740/#743/#745）を反映。**#745 で PHP ベースイメージを 8.4.23 にピン**
+  （CVE-2026-12184 FPM DoS / CVE-2026-14355・横断 board 課題 #39 の records 分）し、
+  `--pull` 再ビルドでコンテナ `php -v`=8.4.23 を確認。手順は runbook どおり
+  （DB バックアップ `backups/nene_records_pre_deploy_2026-07-09.sql` → NENE2 sibling rsync
+  （v1.8.2）→ 本体 rsync（commercial/composer.local.json 除外・`--exclude=.claude` を追加し
+  サーバ側の残骸も一掃）→ build --pull → up → phinx migrate（`20260716000000` 適用））。
+  検証: apex/aozora/ayane の health 200・SSR レコードページ描画・新 SPA バンドル配信 200。
+  これで移送元 `ayane.nene-records.com` の export API（#739 修正）も本番で使用可能。
 - フォローアップ判定: **#709 フォント on-demand は後回し**（設置は FTP/SFTP 前提で 66MB は
   アップロード制限に当たらない）。#710 は完了済み（v0.5.2 に収録）。
 
