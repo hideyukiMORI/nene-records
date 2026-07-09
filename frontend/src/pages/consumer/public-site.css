@@ -188,7 +188,9 @@
   line-height: 1.05;
 }
 .nene-public .brand__name {
-  font-family: var(--font-display);
+  /* Brand wordmark voice: its own token (customizer #750), falling back to the
+     display face so themes without a brand override are unaffected. */
+  font-family: var(--font-brand, var(--font-display));
   font-weight: var(--weight-bold);
   font-size: 1.25rem;
   letter-spacing: -0.01em;

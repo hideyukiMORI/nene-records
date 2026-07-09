@@ -9,6 +9,10 @@
  *   / Fredoka(funk) / Nunito(coastal) / Nunito Sans(japandi)。
  * Inter / Saira / Space Grotesk / JetBrains は admin の fonts.ts 経由で読まれる。
  */
+// Roboto: body/display/brand の汎用 sans（#750・AYANE ブランド語の実需）
+import '@fontsource/roboto/latin-400.css'
+import '@fontsource/roboto/latin-500.css'
+import '@fontsource/roboto/latin-700.css'
 import '@fontsource/source-serif-4/latin-400.css'
 import '@fontsource/source-serif-4/latin-400-italic.css'
 import '@fontsource/source-serif-4/latin-600.css'

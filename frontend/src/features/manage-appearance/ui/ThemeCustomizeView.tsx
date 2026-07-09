@@ -2,6 +2,7 @@ import { type ReactNode, useMemo, useState } from 'react'
 import { useMediaList } from '@/entities/media'
 import { useTranslation } from '@/shared/i18n'
 import {
+  BRAND_FONT_OPTIONS,
   DENSITY_OPTIONS,
   DISPLAY_FONT_OPTIONS,
   FLAG_DEFS,
@@ -294,6 +295,16 @@ export function ThemeCustomizeView({
               placeholder={themePlaceholder}
               onChange={(v) => {
                 setKnob('fontMono', v)
+              }}
+            />
+          </Field>
+          <Field label={t('admin.themeCustomize.fontBrand')}>
+            <Select
+              value={draft.fontBrand}
+              options={BRAND_FONT_OPTIONS}
+              placeholder={themePlaceholder}
+              onChange={(v) => {
+                setKnob('fontBrand', v)
               }}
             />
           </Field>

@@ -119,6 +119,7 @@ final class ThemeAuthoringGuide
         'font-display' => ['fontFamily', 'Font stack for display/headings.'],
         'font-sans' => ['fontFamily', 'Font stack for body text.'],
         'font-mono' => ['fontFamily', 'Font stack for monospace.'],
+        'font-brand' => ['fontFamily', 'Font stack for the site title (brand wordmark). Optional; falls back to font-display.'],
         // Type sizes
         'text-display' => ['fontSize', 'Hero/display size.'],
         'text-h1' => ['fontSize', 'H1 size.'],
@@ -169,6 +170,7 @@ final class ThemeAuthoringGuide
      * @var list<array{family: string, slug: string, kind: string}>
      */
     private const AVAILABLE_FONTS = [
+        ['family' => 'Roboto', 'slug' => 'roboto', 'kind' => 'sans'],
         ['family' => 'Bricolage Grotesque', 'slug' => 'bricolage-grotesque', 'kind' => 'display'],
         ['family' => 'Archivo', 'slug' => 'archivo', 'kind' => 'display'],
         ['family' => 'Oswald', 'slug' => 'oswald', 'kind' => 'display'],
