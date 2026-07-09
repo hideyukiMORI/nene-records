@@ -10,6 +10,7 @@ import { useHeaderShrink } from '@/shared/lib/motion/use-header-shrink'
 import { useScrollReveal } from '@/shared/lib/motion/use-scroll-reveal'
 import { IconMenu, IconMoon, IconSearch, IconSun, IconX } from '@/shared/ui/icons/Icons'
 import { IconAuto } from '@/shared/ui/icons/magazine-icons'
+import { PublicMarkdownContent } from '@/shared/ui/markdown'
 import './public-site.css'
 import type { HeaderCta, HeaderTopbar } from '@/shared/lib/header-config'
 import { useConsumerMotion } from './use-consumer-motion'
@@ -422,7 +423,11 @@ export function PublicSiteShell({
         <div className="wrap ft__grid">
           <div className="ft__brand">
             <Brand siteName={site.siteName} logo={effectiveLogo} />
-            {site.footerMarkdown !== '' ? <p className="ft__free">{site.footerMarkdown}</p> : null}
+            {site.footerMarkdown !== '' ? (
+              <div className="ft__free">
+                <PublicMarkdownContent markdown={site.footerMarkdown} />
+              </div>
+            ) : null}
           </div>
           {footerMenuColumns.length > 0 ? (
             footerMenuColumns.map((column) => (

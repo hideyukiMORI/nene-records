@@ -1070,7 +1070,32 @@
   font-size: var(--text-body-sm);
   color: var(--color-text-muted);
   line-height: 1.6;
-  white-space: pre-line;
+}
+/* footer_markdown は Markdown 描画（#762）。フッター文脈では見出し級を作らず、
+   全て周囲のサイズに畳む（免責・注釈・運営者情報などの短文用途）。 */
+.nene-public .ft__free .markdown-body,
+.nene-public .ft__free .markdown-body p,
+.nene-public .ft__free .markdown-body li,
+.nene-public .ft__free .markdown-body h1,
+.nene-public .ft__free .markdown-body h2,
+.nene-public .ft__free .markdown-body h3,
+.nene-public .ft__free .markdown-body h4 {
+  font-size: inherit;
+  color: inherit;
+  line-height: inherit;
+  margin: 0 0 var(--space-2xs);
+}
+.nene-public .ft__free .markdown-body a {
+  color: var(--color-text-primary);
+  text-decoration: underline;
+}
+.nene-public .ft__free .markdown-body a:hover {
+  color: var(--color-accent);
+}
+.nene-public .ft__free .markdown-body ul,
+.nene-public .ft__free .markdown-body ol {
+  margin: 0 0 var(--space-2xs);
+  padding-left: 1.2em;
 }
 .nene-public .ft__col h4 {
   font-family: var(--font-mono);
