@@ -1,5 +1,6 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
-import { cleanup, screen } from '@testing-library/react'
+import { cleanup, screen, within } from '@testing-library/react'
+import { http, HttpResponse } from 'msw'
 import { MemoryRouter } from 'react-router-dom'
 import { PublicSiteShell } from '@/pages/consumer/PublicSiteShell'
 import type { PublicSite } from '@/pages/consumer/public-site-context'
@@ -114,6 +115,57 @@ describe('PublicSiteShell header reflection', () => {
 
     expect(container.querySelector('.brand__mark')).toBeNull()
     expect(screen.getAllByText('Test Site').length).toBeGreaterThan(0)
+  })
+
+  it('renders the header-region menu widget items as the primary nav (#756)', async () => {
+    // レイアウトビルダーで header 領域に置いたメニューウィジェットが公開ナビを駆動する。
+    seedEntityTypes([{ id: 1, name: 'Article', slug: 'article' }])
+    mswServer.use(
+      http.get('/api/v1/public/widgets', () =>
+        HttpResponse.json({
+          items: [
+            {
+              id: 4,
+              widget_type: 'menu',
+              region: 'header',
+              display_order: 0,
+              title: null,
+              settings: { menuId: 1 },
+              created_at: '2026-07-09 00:00:00',
+              updated_at: '2026-07-09 00:00:00',
+            },
+          ],
+        }),
+      ),
+    )
+
+    renderShell(
+      makeSite({
+        navItems: [
+          { id: 1, url: '/', label: 'HOME', menuId: 1 },
+          { id: 2, url: '/services', label: 'SERVICES', menuId: 1 },
+          { id: 3, url: '/other', label: 'OTHER', menuId: 2 },
+        ],
+      }),
+    )
+
+    // widgets 取得後に primary nav がメニュー項目へ置き換わる。
+    expect((await screen.findAllByText('HOME')).length).toBeGreaterThan(0)
+    const nav = screen.getByRole('navigation', { name: 'Primary' })
+    expect(within(nav).getByText('HOME')).toBeInTheDocument()
+    expect(within(nav).getByText('SERVICES')).toBeInTheDocument()
+    // 他メニュー所属の項目・従来のフォールバックナビは primary nav に出ない
+    //（Latest はフッターには正当に存在するため nav スコープで確認する）。
+    expect(within(nav).queryByText('OTHER')).toBeNull()
+    expect(within(nav).queryByText('Latest')).toBeNull()
+  })
+
+  it('keeps the default nav when no header menu widget exists', async () => {
+    seedEntityTypes([{ id: 1, name: 'Article', slug: 'article' }])
+    renderShell(makeSite())
+
+    const nav = screen.getByRole('navigation', { name: 'Primary' })
+    expect(await within(nav).findByText('Latest')).toBeInTheDocument()
   })
 
   it('renders the logo image in the brand mark when a logo is set', () => {

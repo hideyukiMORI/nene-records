@@ -49,6 +49,35 @@ interface ShellNavLink {
   current: boolean
 }
 
+/**
+ * A primary-nav entry. Menu items (#756) may point at external URLs — those
+ * render as plain anchors (scheme-checked by `safeHref`); site paths use the
+ * SPA router.
+ */
+function NavLinkItem({ link, onClick }: { link: ShellNavLink; onClick?: () => void }) {
+  if (!link.to.startsWith('/')) {
+    const href = safeHref(link.to)
+    if (href === '') {
+      return null
+    }
+    return (
+      <a className="navlink" href={href} onClick={onClick}>
+        {link.label}
+      </a>
+    )
+  }
+  return (
+    <Link
+      className="navlink"
+      to={link.to}
+      aria-current={link.current ? 'page' : undefined}
+      onClick={onClick}
+    >
+      {link.label}
+    </Link>
+  )
+}
+
 function ThemeSwitch({ mode, onMode }: { mode: ThemeMode; onMode: (mode: ThemeMode) => void }) {
   const options: Array<{ key: ThemeMode; label: string; icon: ReactNode }> = [
     { key: 'light', label: 'Light theme', icon: <IconSun size={16} /> },
@@ -252,15 +281,31 @@ export function PublicSiteShell({
     [entityTypeQuery.data?.items],
   )
 
-  const navLinks: ShellNavLink[] = [
-    { label: 'Latest', to: '/', current: isHome },
-    ...types.slice(0, 3).map((type) => ({
-      label: type.name,
-      to: type.href,
-      current: !isHome && type.slug === activeTypeSlug,
-    })),
-    { label: 'Search', to: '/search', current: false },
-  ]
+  // Header-region menu widgets (#756): a menu widget placed in the `header`
+  // region (layout builder) drives the primary nav with its named menu's items.
+  // Without one, fall back to the historical default nav (Latest + types + Search).
+  const menuNavLinks: ShellNavLink[] = widgets
+    .filter((widget) => widget.region === 'header' && widget.widgetType === 'menu')
+    .sort((a, b) => a.displayOrder - b.displayOrder)
+    .flatMap((widget) => {
+      const menuId = widget.settings['menuId']
+      if (typeof menuId !== 'number') return []
+      return site.navItems.filter((item) => item.menuId === menuId)
+    })
+    .map((item) => ({ label: item.label, to: item.url, current: pathname === item.url }))
+
+  const navLinks: ShellNavLink[] =
+    menuNavLinks.length > 0
+      ? menuNavLinks
+      : [
+          { label: 'Latest', to: '/', current: isHome },
+          ...types.slice(0, 3).map((type) => ({
+            label: type.name,
+            to: type.href,
+            current: !isHome && type.slug === activeTypeSlug,
+          })),
+          { label: 'Search', to: '/search', current: false },
+        ]
 
   // Fit-probe (#695): fold the inline nav into the drawer the instant it would
   // overflow, so a long / many-item nav never overflows or clips the row ABOVE
@@ -311,14 +356,7 @@ export function PublicSiteShell({
           <Brand siteName={site.siteName} tagline={site.tagline} logo={effectiveLogo} />
           <nav className="hd__nav" aria-label="Primary">
             {navLinks.map((link) => (
-              <Link
-                key={`${link.label}-${link.to}`}
-                className="navlink"
-                to={link.to}
-                aria-current={link.current ? 'page' : undefined}
-              >
-                {link.label}
-              </Link>
+              <NavLinkItem key={`${link.label}-${link.to}`} link={link} />
             ))}
           </nav>
           <div className="hd__actions">
@@ -422,17 +460,13 @@ export function PublicSiteShell({
             </button>
           </div>
           {navLinks.map((link) => (
-            <Link
+            <NavLinkItem
               key={`drawer-${link.label}-${link.to}`}
-              className="navlink"
-              to={link.to}
-              aria-current={link.current ? 'page' : undefined}
+              link={link}
               onClick={() => {
                 setDrawerOpen(false)
               }}
-            >
-              {link.label}
-            </Link>
+            />
           ))}
           <div className="drawer__prefs">
             <div className="drawer__pref">
