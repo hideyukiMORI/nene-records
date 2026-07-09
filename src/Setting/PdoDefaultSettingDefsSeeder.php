@@ -40,6 +40,7 @@ final readonly class PdoDefaultSettingDefsSeeder implements DefaultSettingDefsSe
         ['setting_key' => 'excerpt_source', 'data_type' => 'text', 'default_value' => 'auto', 'is_public' => 0, 'label' => 'Excerpt source (auto / body / meta)'],
         ['setting_key' => 'excerpt_length', 'data_type' => 'text', 'default_value' => '160', 'is_public' => 0, 'label' => 'Excerpt length (characters)'],
         ['setting_key' => 'header_config', 'data_type' => 'text', 'default_value' => '{"topbar":{"enabled":false,"phone":"","email":"","infoText":""},"cta":{"enabled":false,"label":"","url":""}}', 'is_public' => 1, 'label' => 'Header'],
+        ['setting_key' => 'footer_config', 'data_type' => 'text', 'default_value' => '{"social":[],"legalLinks":[],"showPoweredBy":true}', 'is_public' => 1, 'label' => 'Footer content'],
         ['setting_key' => 'home_hero', 'data_type' => 'text', 'default_value' => '[]', 'is_public' => 1, 'label' => 'Home hero'],
         ['setting_key' => 'analytics_gtm_id', 'data_type' => 'text', 'default_value' => '', 'is_public' => 1, 'label' => 'Google Tag Manager container ID'],
         ['setting_key' => 'analytics_ga4_id', 'data_type' => 'text', 'default_value' => '', 'is_public' => 1, 'label' => 'Google Analytics 4 measurement ID'],
