@@ -1128,6 +1128,29 @@
   width: 14px;
   height: 14px;
 }
+/* フッター列のモバイルアコーディオン（#772・≤680px で JS が有効化）。 */
+.nene-public .ft__col--acc h4 button {
+  all: unset;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+}
+.nene-public .ft__col--acc h4 button:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+.nene-public .ft__acc-mark {
+  font-size: 1rem;
+  line-height: 1;
+  color: var(--color-text-muted);
+}
+
 /* Above-footer CTA 行（#770）: 列グリッドの上の締めの訴求。 */
 .nene-public .ft-cta {
   border-bottom: 1px solid var(--color-border);
