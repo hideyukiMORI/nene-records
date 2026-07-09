@@ -1,4 +1,5 @@
-FROM php:8.4-apache
+# CVE-2026-12184 / CVE-2026-14355 対応で patch level を固定（8.4.23 以上を維持・#744）
+FROM php:8.4.23-apache
 
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
