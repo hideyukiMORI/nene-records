@@ -106,24 +106,34 @@ final readonly class ServeDerivativeHandler
             ImageProcessorInterface::FORMAT_PNG,
         ];
 
-        if ($fm !== null && in_array($fm, $allowed, true)) {
+        // encoder はビルドフラグ依存（GD の AVIF 無しビルド等）。processor が出力
+        // できない形式を選ぶと encode 時に fatal になるため、交渉は常に能力込みで行う。
+        if ($fm !== null && in_array($fm, $allowed, true) && $this->processor->supportsOutput($fm)) {
             return $fm;
         }
 
-        if (str_contains($accept, 'image/avif')) {
+        if (str_contains($accept, 'image/avif') && $this->processor->supportsOutput(ImageProcessorInterface::FORMAT_AVIF)) {
             return ImageProcessorInterface::FORMAT_AVIF;
         }
 
-        if (str_contains($accept, 'image/webp')) {
+        if (str_contains($accept, 'image/webp') && $this->processor->supportsOutput(ImageProcessorInterface::FORMAT_WEBP)) {
             return ImageProcessorInterface::FORMAT_WEBP;
         }
 
-        return match ($sourceMime) {
+        $sourceFormat = match ($sourceMime) {
             'image/png' => ImageProcessorInterface::FORMAT_PNG,
             'image/webp' => ImageProcessorInterface::FORMAT_WEBP,
             'image/avif' => ImageProcessorInterface::FORMAT_AVIF,
             default => ImageProcessorInterface::FORMAT_JPEG,
         };
+
+        if ($this->processor->supportsOutput($sourceFormat)) {
+            return $sourceFormat;
+        }
+
+        return $this->processor->supportsOutput(ImageProcessorInterface::FORMAT_PNG)
+            ? ImageProcessorInterface::FORMAT_PNG
+            : ImageProcessorInterface::FORMAT_JPEG;
     }
 
     /** @return array{0: string, 1: string} [mime, extension] */

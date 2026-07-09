@@ -20,6 +20,14 @@ interface ImageProcessorInterface
     public function supportsSource(string $mimeType): bool;
 
     /**
+     * Whether this processor can encode the given output format (one of the
+     * FORMAT_* constants). Encoder availability depends on how the underlying
+     * library was built (e.g. GD without --with-avif has no imageavif()), so
+     * format negotiation must consult this before selecting a format.
+     */
+    public function supportsOutput(string $format): bool;
+
+    /**
      * Resize $sourceBytes to fit within $maxWidth (never upscaling) and encode as
      * $format (one of the FORMAT_* constants). Returns the encoded image bytes.
      *

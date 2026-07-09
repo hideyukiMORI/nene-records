@@ -73,4 +73,17 @@ final class GdImageProcessorTest extends TestCase
         self::assertFalse($processor->supportsSource('application/pdf'));
         self::assertFalse($processor->supportsSource('image/svg+xml'));
     }
+
+    public function testSupportsOutputReflectsAvailableEncoders(): void
+    {
+        $processor = new GdImageProcessor();
+
+        // PNG/JPEG/WebP は GD の標準構成で常に有効。AVIF はビルドフラグ依存なので
+        // 環境の実状（imageavif の有無）と一致することだけを検証する。
+        self::assertTrue($processor->supportsOutput(ImageProcessorInterface::FORMAT_PNG));
+        self::assertTrue($processor->supportsOutput(ImageProcessorInterface::FORMAT_JPEG));
+        self::assertTrue($processor->supportsOutput(ImageProcessorInterface::FORMAT_WEBP));
+        self::assertSame(function_exists('imageavif'), $processor->supportsOutput(ImageProcessorInterface::FORMAT_AVIF));
+        self::assertFalse($processor->supportsOutput('tiff'));
+    }
 }
