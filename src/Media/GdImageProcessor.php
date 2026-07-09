@@ -29,6 +29,18 @@ final readonly class GdImageProcessor implements ImageProcessorInterface
         return in_array($mimeType, self::SUPPORTED_SOURCES, true);
     }
 
+    public function supportsOutput(string $format): bool
+    {
+        // GD の encoder はビルドフラグ依存（共有ホスティングでは AVIF 無しが普通にある）。
+        return match ($format) {
+            self::FORMAT_WEBP => function_exists('imagewebp'),
+            self::FORMAT_AVIF => function_exists('imageavif'),
+            self::FORMAT_JPEG => function_exists('imagejpeg'),
+            self::FORMAT_PNG => function_exists('imagepng'),
+            default => false,
+        };
+    }
+
     public function resize(string $sourceBytes, int $maxWidth, string $format): string
     {
         $src = @imagecreatefromstring($sourceBytes);

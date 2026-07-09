@@ -8,10 +8,12 @@ use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RuntimeApplicationFactory;
 use Nene2\Http\UtcClock;
+use Nene2\Routing\Router;
 use NeNeRecords\Media\DeleteMediaHandler;
 use NeNeRecords\Media\DeleteMediaUseCase;
 use NeNeRecords\Media\FindMediaUsagesUseCase;
 use NeNeRecords\Media\GdImageProcessor;
+use NeNeRecords\Media\ImageProcessorInterface;
 use NeNeRecords\Media\ListMediaHandler;
 use NeNeRecords\Media\ListMediaUsagesHandler;
 use NeNeRecords\Media\ListMediaUseCase;
@@ -472,6 +474,33 @@ final class MediaHttpTest extends TestCase
         self::assertSame(404, $response->getStatusCode());
     }
 
+    public function testDerivativeFallsBackToWebpWhenAvifEncoderIsUnavailable(): void
+    {
+        // GD の AVIF 無しビルド（共有ホスティングで実在）では、Accept: image/avif を
+        // 受けても encode 可能な形式へフォールバックしなければならない（#737）。
+        $this->seedStorageImage('2026/05/pic.png', 200, 200);
+
+        $response = $this->avifLessDerivativeHandler()->handle(
+            $this->derivativeRequest('thumb', 'pic.png')
+                ->withHeader('Accept', 'image/avif,image/webp,image/*'),
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('image/webp', $response->getHeaderLine('Content-Type'));
+    }
+
+    public function testDerivativeWithUnsupportedFormatOverrideFallsBack(): void
+    {
+        $this->seedStorageImage('2026/05/pic.png', 200, 200);
+
+        $response = $this->avifLessDerivativeHandler()->handle(
+            $this->derivativeRequest('thumb', 'pic.png', '?fm=avif'),
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('image/png', $response->getHeaderLine('Content-Type'), 'fm=avif が使えない場合はソース形式へ');
+    }
+
     public function testDerivativeForUndecodableSourceReturns404(): void
     {
         // A file with an image extension but non-image bytes must not 500.
@@ -484,6 +513,53 @@ final class MediaHttpTest extends TestCase
         );
 
         self::assertSame(404, $response->getStatusCode());
+    }
+
+    /** AVIF encoder を持たない環境を模した ServeDerivativeHandler（#737 回帰用）。 */
+    private function avifLessDerivativeHandler(): ServeDerivativeHandler
+    {
+        $processor = new class () implements ImageProcessorInterface {
+            private GdImageProcessor $inner;
+
+            public function __construct()
+            {
+                $this->inner = new GdImageProcessor();
+            }
+
+            public function supportsSource(string $mimeType): bool
+            {
+                return $this->inner->supportsSource($mimeType);
+            }
+
+            public function supportsOutput(string $format): bool
+            {
+                return $format !== self::FORMAT_AVIF && $this->inner->supportsOutput($format);
+            }
+
+            public function resize(string $sourceBytes, int $maxWidth, string $format): string
+            {
+                if ($format === self::FORMAT_AVIF) {
+                    throw new \Error('Call to undefined function imageavif()');
+                }
+
+                return $this->inner->resize($sourceBytes, $maxWidth, $format);
+            }
+        };
+
+        return new ServeDerivativeHandler($this->storage, $processor, $this->factory, $this->factory);
+    }
+
+    private function derivativeRequest(string $preset, string $filename, string $query = ''): \Psr\Http\Message\ServerRequestInterface
+    {
+        return $this->factory
+            ->createServerRequest('GET', "https://example.test/media/{$preset}/2026/05/{$filename}{$query}")
+            ->withQueryParams($query === '' ? [] : ['fm' => substr($query, strlen('?fm='))])
+            ->withAttribute(Router::PARAMETERS_ATTRIBUTE, [
+                'preset' => $preset,
+                'year' => '2026',
+                'month' => '05',
+                'filename' => $filename,
+            ]);
     }
 
     /**
