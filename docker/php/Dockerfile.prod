@@ -17,7 +17,8 @@ COPY frontend/ ./
 RUN npm run build
 
 # ── Stage 2: PHP runtime (single-origin Apache) ──
-FROM php:8.4-apache AS runtime
+# CVE-2026-12184 / CVE-2026-14355 対応で patch level を固定（8.4.23 以上を維持・#744）
+FROM php:8.4.23-apache AS runtime
 
 ENV COMPOSER_ALLOW_SUPERUSER=1
 COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
