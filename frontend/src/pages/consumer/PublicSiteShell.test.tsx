@@ -207,6 +207,16 @@ describe('PublicSiteShell header reflection', () => {
     expect(screen.queryByText('Browse')).toBeNull()
   })
 
+  it('renders footer_markdown as markdown (links work) (#762)', async () => {
+    seedEntityTypes([{ id: 1, name: 'Article', slug: 'article' }])
+    renderShell(
+      makeSite({ footerMarkdown: '運営: AYANE — [免責事項](/disclaimer) をご確認ください。' }),
+    )
+
+    const link = await screen.findByRole('link', { name: '免責事項' })
+    expect(link).toHaveAttribute('href', '/disclaimer')
+  })
+
   it('keeps the default footer columns when no footer menu widget exists', async () => {
     seedEntityTypes([{ id: 1, name: 'Article', slug: 'article' }])
     renderShell(makeSite())
