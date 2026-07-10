@@ -123,6 +123,7 @@ final class ThemeAuthoringGuide
         'brand-size' => ['fontSize', 'Site title (brand wordmark) size. Optional; defaults to 1.25rem.'],
         'nav-size' => ['fontSize', 'Header menu link size. Optional; defaults to text-body-sm.'],
         'footer-size' => ['fontSize', 'Footer menu/link size. Optional; defaults to text-body-sm.'],
+        'footer-free-size' => ['fontSize', 'Footer free-text (footer_markdown) size. Optional; defaults to text-body-sm.'],
         // Type sizes
         'text-display' => ['fontSize', 'Hero/display size.'],
         'text-h1' => ['fontSize', 'H1 size.'],
