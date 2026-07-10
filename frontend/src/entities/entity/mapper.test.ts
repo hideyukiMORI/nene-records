@@ -27,6 +27,8 @@ describe('entity mapper', () => {
       slug: null,
       permalink: null,
       layout: null,
+      showComments: null,
+      showRelated: null,
       status: 'draft',
       publishedAt: null,
       scheduledAt: null,

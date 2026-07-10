@@ -209,6 +209,8 @@ export const entityHandlers = [
       slug?: string | null
       permalink?: string | null
       status?: EntityStatusDto
+      show_comments?: boolean | null
+      show_related?: boolean | null
     }
 
     if (typeof body.entity_type_id !== 'number' || body.entity_type_id < 1) {
@@ -236,6 +238,8 @@ export const entityHandlers = [
       deleted_at: null,
       created_at: now,
       updated_at: now,
+      show_comments: body.show_comments ?? null,
+      show_related: body.show_related ?? null,
     }
     items = [...items, created]
 
@@ -249,6 +253,8 @@ export const entityHandlers = [
       permalink?: string | null
       status?: EntityStatusDto
       published_at?: string | null
+      show_comments?: boolean | null
+      show_related?: boolean | null
     }
     const index = items.findIndex((item) => item.id === id && !item.is_deleted)
 
@@ -283,6 +289,8 @@ export const entityHandlers = [
       permalink: body.permalink !== undefined ? body.permalink : existing.permalink,
       status: newStatus,
       published_at: newPublishedAt,
+      show_comments: body.show_comments !== undefined ? body.show_comments : existing.show_comments,
+      show_related: body.show_related !== undefined ? body.show_related : existing.show_related,
       updated_at: new Date().toISOString(),
     }
     items = items.map((item, i) => (i === index ? updated : item))
