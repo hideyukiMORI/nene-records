@@ -185,6 +185,70 @@ export const ptBR: Partial<MessageCatalog> = {
   'admin.themeCustomize.tokens.add': 'Adicionar',
   'admin.themeCustomize.tokens.remove': 'Remover',
   'admin.themeCustomize.tokens.invalid': 'Este valor é inseguro e será ignorado.',
+  // ── Theme workspace (#787 IA redesign) ────────────────────────────────────
+  'admin.themeWs.groupAppearance': 'Aparência',
+  'admin.themeWs.groupCustomize': 'Personalizar',
+  'admin.themeWs.groupContent': 'Conteúdo',
+  'admin.themeWs.tagInstant': 'efeito imediato',
+  'admin.themeWs.tagOverrides': 'uma unidade de salvamento',
+  'admin.themeWs.tagIndependent': 'salvos separadamente',
+  'admin.themeWs.tagOverridesInline': 'Substituições do tema',
+  'admin.themeWs.tagInplace': 'Salvo aqui mesmo',
+  'admin.themeWs.groupCustomizeHint':
+    'Os itens abaixo são salvos juntos como “substituições do tema”.',
+  'admin.themeWs.navAria': 'Seções das configurações do tema',
+  'admin.themeWs.navTheme': 'Escolher um tema',
+  'admin.themeWs.navBrand': 'Marca',
+  'admin.themeWs.navType': 'Tipografia',
+  'admin.themeWs.navLayout': 'Layout',
+  'admin.themeWs.navHeader': 'Cabeçalho',
+  'admin.themeWs.navAdvanced': 'Avançado & tokens',
+  'admin.themeWs.navFooter': 'Rodapé',
+  'admin.themeWs.navHero': 'Herói da página inicial',
+  'admin.themeWs.descTheme':
+    'O tema base aplicado a todas as páginas públicas. “Aplicar” tem efeito imediato — não há botão de salvar. Ajuste cores e fontes em “Personalizar”.',
+  'admin.themeWs.descBrand':
+    'As mudanças mais comuns: cores e logotipo. Campos vazios mantêm o padrão do tema.',
+  'admin.themeWs.descType':
+    'Fontes e tamanhos de texto. Se “padrão do tema” estiver bom, nada a mudar aqui.',
+  'admin.themeWs.descLayout':
+    'Largura do conteúdo, densidade dos espaçamentos e apresentação do feed de posts.',
+  'admin.themeWs.descHeader':
+    'Tudo sobre o cabeçalho em um só lugar. “Conteúdo” e “Disposição & aparência” salvam em configurações diferentes (indicado em cada título).',
+  'admin.themeWs.descAdvanced':
+    'Para usuários avançados: substitua diretamente tokens documentados do motor ou capture o estado atual como um novo tema.',
+  'admin.themeWs.descFooter':
+    'A barra inferior: links sociais, links legais e a nota Powered by. As colunas do rodapé (menus) são montadas com widgets de menu na aba “Layout”.',
+  'admin.themeWs.scopeOverridesNote':
+    'As mudanças feitas aqui são salvas juntas pela barra inferior.',
+  'admin.themeWs.scopeInplaceNote': 'Esta seção é salva de forma independente.',
+  'admin.themeWs.cardColors': 'Cores',
+  'admin.themeWs.cardColorsSub': 'light / dark configuráveis separadamente',
+  'admin.themeWs.cardImagesSub': 'da biblioteca de mídia',
+  'admin.themeWs.cardFonts': 'Fontes',
+  'admin.themeWs.cardSizes': 'Tamanhos',
+  'admin.themeWs.cardPage': 'Página',
+  'admin.themeWs.cardFeed': 'Feed de posts',
+  'admin.themeWs.cardShape': 'Forma & espaçamento',
+  'admin.themeWs.cardStyleFlags': 'Estilo',
+  'admin.themeWs.cardTokens': 'Substituições de tokens',
+  'admin.themeWs.cardHeaderContent': 'Conteúdo',
+  'admin.themeWs.hintAccent': 'botões, links, destaques',
+  'admin.themeWs.hintDensity': 'quão compactos são os espaçamentos',
+  'admin.themeWs.discHeaderLook': 'Disposição & aparência',
+  'admin.themeWs.headerLookHint':
+    'A disposição e a altura do cabeçalho fazem parte do visual do tema. As mudanças são salvas pela barra inferior.',
+  'admin.themeWs.saveAsHint':
+    'Duplica o tema base mais suas substituições como um novo tema runtime, com nome e descrição.',
+  'admin.themeWs.pvLive': 'ao vivo',
+  'admin.themeWs.pvDesktop': 'Desktop',
+  'admin.themeWs.pvMobile': 'Móvel',
+  'admin.themeWs.pvFab': 'Prévia',
+  'admin.themeWs.pvNote':
+    'A página pública /search renderizada ao vivo; suas mudanças aplicam-se na hora.',
+  'admin.themeWs.sbTitle': 'Há substituições do tema não salvas',
+  'admin.themeWs.sbSub': 'Marca · Tipografia · Layout · Aparência do cabeçalho · Tokens',
+  'admin.themeWs.sbSave': 'Salvar mudanças',
   'admin.themeCustomize.saved': 'Personalização salva',
   'admin.themeCustomize.saveError': 'Não foi possível salvar a personalização',
   'admin.themeCustomize.save': 'Salvar',
