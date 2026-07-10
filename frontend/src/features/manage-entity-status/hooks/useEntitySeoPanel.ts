@@ -31,10 +31,12 @@ export function useEntitySeoPanel(entity: Entity): EntitySeoPanelState {
         id: Number(entity.id),
         entityTypeId: entity.entityTypeId,
         slug: entity.slug,
+        // Preserve the custom permalink / layout / visibility flags: the update
+        // endpoint is full-replace, so omitting them clears them (#776).
+        permalink: entity.permalink,
         status: entity.status,
         metaTitle: metaTitle !== '' ? metaTitle : null,
         metaDescription: metaDescription !== '' ? metaDescription : null,
-        // Preserve layout / visibility flags: the update endpoint is full-replace.
         layout: entity.layout,
         showComments: entity.showComments,
         showRelated: entity.showRelated,

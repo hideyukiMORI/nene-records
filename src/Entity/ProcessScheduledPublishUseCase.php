@@ -28,10 +28,14 @@ final readonly class ProcessScheduledPublishUseCase implements ProcessScheduledP
                 throw new LogicException('Scheduled entity missing id.');
             }
 
+            // repository::update() is full-replace: every column it writes must be
+            // carried from the loaded entity or it is silently nulled (#776).
             $updated = new Entity(
                 id: $entityId,
                 entityTypeId: $entity->entityTypeId,
                 slug: $entity->slug,
+                permalink: $entity->permalink,
+                layout: $entity->layout,
                 status: EntityStatus::Published,
                 publishedAt: $entity->publishedAt ?? $now,
                 isDeleted: $entity->isDeleted,
