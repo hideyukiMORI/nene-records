@@ -881,6 +881,17 @@ export const en = {
   'admin.frontPage.saved': 'Home page display saved.',
   'admin.frontPage.saveError': 'Could not save the home page display.',
 
+  // ── Record page display (#775) ───────────────────────────────────────────
+  'admin.recordPage.description':
+    'Site-wide defaults for public record pages. Each record can override these from its publish status panel.',
+  'admin.recordPage.loading': 'Loading…',
+  'admin.recordPage.commentsLabel': 'Show the comments section',
+  'admin.recordPage.relatedLabel': 'Show the related-records block (“Keep reading”)',
+  'admin.recordPage.save': 'Save record page display',
+  'admin.recordPage.saving': 'Saving…',
+  'admin.recordPage.saved': 'Record page display saved.',
+  'admin.recordPage.saveError': 'Could not save the record page display.',
+
   // ── Tags ─────────────────────────────────────────────────────────────────
   'admin.tags.eyebrow': 'Manage',
   'admin.tags.pageTitle': 'Tags',
@@ -939,6 +950,12 @@ export const en = {
   'admin.entityStatus.saveSlug': 'Save slug',
   'admin.entityStatus.slugSaved': 'Saved.',
   'admin.entityStatus.layoutSaved': 'Layout saved.',
+  'admin.entityStatus.showCommentsLabel': 'Comments',
+  'admin.entityStatus.showRelatedLabel': 'Related records',
+  'admin.entityStatus.visibilityInherit': 'Follow site setting',
+  'admin.entityStatus.visibilityShow': 'Show',
+  'admin.entityStatus.visibilityHide': 'Hide',
+  'admin.entityStatus.visibilitySaved': 'Display settings saved.',
   'admin.layout.entityLabel': 'Page layout',
   'admin.layout.defaultLayout': 'Default page layout',
   'admin.layout.inherit': 'Inherit from type default',
@@ -1028,6 +1045,7 @@ export const en = {
   'admin.settings.appearance.title': 'Appearance · Theme',
   'admin.settings.site.title': 'Site',
   'admin.settings.frontPage.title': 'Home page display',
+  'admin.settings.recordPage.title': 'Record page display',
   'admin.settings.permalink.title': 'Permalinks',
   'admin.settings.permalink.description':
     'Choose the URL structure for each content type. Changes take effect immediately; old URLs redirect automatically.',

@@ -38,6 +38,8 @@ final readonly class UnscheduleEntityUseCase implements UnscheduleEntityUseCaseI
             metaTitle: $existing->metaTitle,
             metaDescription: $existing->metaDescription,
             scheduledAt: null,
+            showComments: $existing->showComments,
+            showRelated: $existing->showRelated,
         );
 
         $this->entities->update($updated);

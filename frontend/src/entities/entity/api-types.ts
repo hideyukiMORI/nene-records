@@ -9,6 +9,10 @@ export interface EntityDto {
   /** Custom canonical URL path overriding the type pattern; null = use the pattern. */
   permalink: string | null
   layout: LayoutDto | null
+  /** Per-record comments visibility; null = follow record_page_config (#775). */
+  show_comments?: boolean | null
+  /** Per-record related-records visibility; null = follow record_page_config (#775). */
+  show_related?: boolean | null
   status: EntityStatusDto
   published_at: string | null
   scheduled_at: string | null
@@ -39,6 +43,8 @@ export interface CreateEntityDto {
   permalink?: string | null
   status?: EntityStatusDto
   layout?: LayoutDto | null
+  show_comments?: boolean | null
+  show_related?: boolean | null
 }
 
 export interface UpdateEntityDto {
@@ -51,6 +57,8 @@ export interface UpdateEntityDto {
   meta_title?: string | null
   meta_description?: string | null
   layout?: LayoutDto | null
+  show_comments?: boolean | null
+  show_related?: boolean | null
 }
 
 export interface ScheduleEntityDto {

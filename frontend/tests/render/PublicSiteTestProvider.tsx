@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom'
 import { DEFAULT_FOOTER_CONFIG } from '@/shared/lib/footer-config'
 import { DEFAULT_HEADER_CONFIG } from '@/shared/lib/header-config'
+import { DEFAULT_RECORD_PAGE_CONFIG } from '@/shared/lib/record-page-config'
 import type { PublicSite } from '@/pages/consumer/public-site-context'
 
 const TEST_SITE: PublicSite = {
@@ -18,6 +19,7 @@ const TEST_SITE: PublicSite = {
   themeFlagAttrs: {},
   footerConfig: DEFAULT_FOOTER_CONFIG,
   headerConfig: DEFAULT_HEADER_CONFIG,
+  recordPageConfig: DEFAULT_RECORD_PAGE_CONFIG,
   homeHero: '',
   frontPagePath: '',
 }

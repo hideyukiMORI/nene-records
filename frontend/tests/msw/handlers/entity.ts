@@ -16,6 +16,9 @@ interface EntityRecord {
   deleted_at: string | null
   created_at: string | null
   updated_at: string | null
+  /** Tri-state visibility overrides; null = follow record_page_config (#775). */
+  show_comments: boolean | null
+  show_related: boolean | null
 }
 
 let nextId = 1
@@ -38,6 +41,8 @@ export function seedEntities(
     deleted_at: string | null
     created_at?: string | null
     updated_at?: string | null
+    show_comments?: boolean | null
+    show_related?: boolean | null
   }>,
 ): void {
   items = seed.map((item) => ({
@@ -48,6 +53,8 @@ export function seedEntities(
     published_at: item.published_at ?? null,
     created_at: item.created_at ?? null,
     updated_at: item.updated_at ?? null,
+    show_comments: item.show_comments ?? null,
+    show_related: item.show_related ?? null,
   }))
   nextId = Math.max(0, ...seed.map((item) => item.id)) + 1
 }
@@ -202,6 +209,8 @@ export const entityHandlers = [
       slug?: string | null
       permalink?: string | null
       status?: EntityStatusDto
+      show_comments?: boolean | null
+      show_related?: boolean | null
     }
 
     if (typeof body.entity_type_id !== 'number' || body.entity_type_id < 1) {
@@ -229,6 +238,8 @@ export const entityHandlers = [
       deleted_at: null,
       created_at: now,
       updated_at: now,
+      show_comments: body.show_comments ?? null,
+      show_related: body.show_related ?? null,
     }
     items = [...items, created]
 
@@ -242,6 +253,8 @@ export const entityHandlers = [
       permalink?: string | null
       status?: EntityStatusDto
       published_at?: string | null
+      show_comments?: boolean | null
+      show_related?: boolean | null
     }
     const index = items.findIndex((item) => item.id === id && !item.is_deleted)
 
@@ -276,6 +289,8 @@ export const entityHandlers = [
       permalink: body.permalink !== undefined ? body.permalink : existing.permalink,
       status: newStatus,
       published_at: newPublishedAt,
+      show_comments: body.show_comments !== undefined ? body.show_comments : existing.show_comments,
+      show_related: body.show_related !== undefined ? body.show_related : existing.show_related,
       updated_at: new Date().toISOString(),
     }
     items = items.map((item, i) => (i === index ? updated : item))

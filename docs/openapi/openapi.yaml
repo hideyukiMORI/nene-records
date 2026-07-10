@@ -5365,6 +5365,20 @@ components:
             - 'null'
           enum: [standard, full, two-col, three-col, bare, custom, null]
           description: 'Per-entity layout override. Null = inherit the type''s default_layout.'
+        show_comments:
+          type:
+            - boolean
+            - 'null'
+          description: >-
+            Per-record comments visibility on the public page. Null = follow the
+            site-wide record_page_config setting (#775).
+        show_related:
+          type:
+            - boolean
+            - 'null'
+          description: >-
+            Per-record related-records visibility on the public page. Null = follow
+            the site-wide record_page_config setting (#775).
         status:
           $ref: '#/components/schemas/EntityStatus'
         published_at:
@@ -5446,6 +5460,16 @@ components:
             - 'null'
           enum: [standard, full, two-col, three-col, bare, custom, null]
           description: 'Per-entity layout override. Null/omitted = inherit the type''s default_layout.'
+        show_comments:
+          type:
+            - boolean
+            - 'null'
+          description: 'Per-record comments visibility. Null/omitted = follow record_page_config (#775).'
+        show_related:
+          type:
+            - boolean
+            - 'null'
+          description: 'Per-record related-records visibility. Null/omitted = follow record_page_config (#775).'
       additionalProperties: false
     UpdateEntityRequest:
       type: object
@@ -5494,6 +5518,16 @@ components:
             - 'null'
           enum: [standard, full, two-col, three-col, bare, custom, null]
           description: 'Per-entity layout override. Null = inherit the type''s default_layout.'
+        show_comments:
+          type:
+            - boolean
+            - 'null'
+          description: 'Per-record comments visibility. Null/omitted = follow record_page_config (#775).'
+        show_related:
+          type:
+            - boolean
+            - 'null'
+          description: 'Per-record related-records visibility. Null/omitted = follow record_page_config (#775).'
       additionalProperties: false
     EntityMoveResponse:
       type: object

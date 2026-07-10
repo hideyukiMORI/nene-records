@@ -410,14 +410,19 @@ function PublicRecordDetailContent({
 
           {entity !== null && !isLoading && !isError ? (
             <>
-              <section className="comments">
-                <CommentSection {...commentSection} />
-              </section>
-              <RelatedRecords
-                entityTypeSlug={entityTypeSlug}
-                entityTypeName={entityTypeName}
-                currentEntityId={entityId}
-              />
+              {/* Per-record tri-state override wins; null falls back to record_page_config (#775). */}
+              {(entity.showComments ?? site.recordPageConfig.comments) ? (
+                <section className="comments">
+                  <CommentSection {...commentSection} />
+                </section>
+              ) : null}
+              {(entity.showRelated ?? site.recordPageConfig.related) ? (
+                <RelatedRecords
+                  entityTypeSlug={entityTypeSlug}
+                  entityTypeName={entityTypeName}
+                  currentEntityId={entityId}
+                />
+              ) : null}
             </>
           ) : null}
         </article>

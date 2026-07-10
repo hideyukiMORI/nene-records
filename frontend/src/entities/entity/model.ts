@@ -11,6 +11,10 @@ export interface Entity {
   permalink: string | null
   /** Per-entity layout override; null = inherit the type's default layout. */
   layout: PublicLayoutKey | null
+  /** Comments visibility on the public page; null = follow record_page_config (#775). */
+  showComments: boolean | null
+  /** Related-records visibility on the public page; null = follow record_page_config (#775). */
+  showRelated: boolean | null
   status: EntityStatus
   publishedAt: string | null
   scheduledAt: string | null
@@ -41,6 +45,8 @@ export interface CreateEntityInput {
   permalink?: string | null
   status?: EntityStatus
   layout?: PublicLayoutKey | null
+  showComments?: boolean | null
+  showRelated?: boolean | null
 }
 
 export interface UpdateEntityInput {
@@ -54,6 +60,8 @@ export interface UpdateEntityInput {
   metaTitle?: string | null
   metaDescription?: string | null
   layout?: PublicLayoutKey | null
+  showComments?: boolean | null
+  showRelated?: boolean | null
 }
 
 export interface ScheduleEntityInput {

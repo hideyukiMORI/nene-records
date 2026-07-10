@@ -32,6 +32,9 @@ export interface EntityStatusPanelState {
   /** Advanced, opt-in custom permalink draft (#651); '' = use the type pattern. */
   permalinkInput: string
   layout: PublicLayoutKey | null
+  /** Tri-state visibility overrides; null = follow the site-wide record_page_config (#775). */
+  showComments: boolean | null
+  showRelated: boolean | null
   showScheduleForm: boolean
   scheduledAtInput: string
   previewUrl: string | null
@@ -44,6 +47,8 @@ export interface EntityStatusPanelState {
   onCancelScheduleForm: () => void
   onChangeStatus: (nextStatus: EntityStatus) => void
   onChangeLayout: (nextLayout: PublicLayoutKey | null) => void
+  onChangeShowComments: (next: boolean | null) => void
+  onChangeShowRelated: (next: boolean | null) => void
   onSaveSlug: () => void
   onSavePermalink: () => void
   onSchedulePublish: () => void
@@ -96,6 +101,8 @@ export function useEntityStatusPanel(
         metaTitle: entity.metaTitle,
         metaDescription: entity.metaDescription,
         layout: entity.layout,
+        showComments: entity.showComments,
+        showRelated: entity.showRelated,
       })
     } catch (e) {
       showToast(serverMessage(e, t('admin.entityStatus.updateError')), 'error')
@@ -110,10 +117,12 @@ export function useEntityStatusPanel(
         slug: slugInput !== '' ? slugInput : null,
         permalink: permalinkInput !== '' ? permalinkInput : null,
         status: entity.status,
-        // Full-replace endpoint: preserve SEO meta and layout we are not editing.
+        // Full-replace endpoint: preserve SEO meta, layout and visibility flags.
         metaTitle: entity.metaTitle,
         metaDescription: entity.metaDescription,
         layout: entity.layout,
+        showComments: entity.showComments,
+        showRelated: entity.showRelated,
       })
       showToast(t('admin.entityStatus.slugSaved'), 'success')
     } catch {
@@ -129,10 +138,12 @@ export function useEntityStatusPanel(
         slug: slugInput !== '' ? slugInput : null,
         permalink: permalinkInput !== '' ? permalinkInput : null,
         status: entity.status,
-        // Full-replace endpoint: preserve SEO meta and layout we are not editing.
+        // Full-replace endpoint: preserve SEO meta, layout and visibility flags.
         metaTitle: entity.metaTitle,
         metaDescription: entity.metaDescription,
         layout: entity.layout,
+        showComments: entity.showComments,
+        showRelated: entity.showRelated,
       })
       showToast(t('admin.entityStatus.permalinkSaved'), 'success')
     } catch (e) {
@@ -152,8 +163,33 @@ export function useEntityStatusPanel(
         metaTitle: entity.metaTitle,
         metaDescription: entity.metaDescription,
         layout: nextLayout,
+        showComments: entity.showComments,
+        showRelated: entity.showRelated,
       })
       showToast(t('admin.entityStatus.layoutSaved'), 'success')
+    } catch (e) {
+      showToast(serverMessage(e, t('admin.entityStatus.updateError')), 'error')
+    }
+  }
+
+  // Tri-state visibility overrides (#775): null = follow record_page_config.
+  const onChangeVisibility = async (next: {
+    showComments: boolean | null
+    showRelated: boolean | null
+  }) => {
+    try {
+      await updateMutation.mutateAsync({
+        id: Number(entity.id),
+        entityTypeId: entity.entityTypeId,
+        slug: slugInput !== '' ? slugInput : null,
+        permalink: permalinkInput !== '' ? permalinkInput : null,
+        status: entity.status,
+        metaTitle: entity.metaTitle,
+        metaDescription: entity.metaDescription,
+        layout: entity.layout,
+        ...next,
+      })
+      showToast(t('admin.entityStatus.visibilitySaved'), 'success')
     } catch (e) {
       showToast(serverMessage(e, t('admin.entityStatus.updateError')), 'error')
     }
@@ -207,6 +243,8 @@ export function useEntityStatusPanel(
     slugInput,
     permalinkInput,
     layout: entity.layout,
+    showComments: entity.showComments,
+    showRelated: entity.showRelated,
     showScheduleForm,
     scheduledAtInput,
     previewUrl,
@@ -227,6 +265,12 @@ export function useEntityStatusPanel(
     },
     onChangeLayout: (nextLayout) => {
       void onChangeLayout(nextLayout)
+    },
+    onChangeShowComments: (next) => {
+      void onChangeVisibility({ showComments: next, showRelated: entity.showRelated })
+    },
+    onChangeShowRelated: (next) => {
+      void onChangeVisibility({ showComments: entity.showComments, showRelated: next })
     },
     onSaveSlug: () => {
       void onSaveSlug()

@@ -891,6 +891,17 @@ export const fr: Partial<MessageCatalog> = {
   'admin.frontPage.saved': 'Affichage de la page d’accueil enregistré.',
   'admin.frontPage.saveError': 'Impossible d’enregistrer l’affichage de la page d’accueil.',
 
+  // ── Record page display (#775) ───────────────────────────────────────────
+  'admin.recordPage.description':
+    'Affichage par défaut des pages publiques d’enregistrement pour tout le site. Chaque enregistrement peut le remplacer depuis son panneau de statut de publication.',
+  'admin.recordPage.loading': 'Chargement…',
+  'admin.recordPage.commentsLabel': 'Afficher la section commentaires',
+  'admin.recordPage.relatedLabel': 'Afficher le bloc d’enregistrements liés (« Keep reading »)',
+  'admin.recordPage.save': 'Enregistrer l’affichage des pages',
+  'admin.recordPage.saving': 'Enregistrement…',
+  'admin.recordPage.saved': 'Affichage des pages d’enregistrement enregistré.',
+  'admin.recordPage.saveError': 'Impossible d’enregistrer l’affichage des pages d’enregistrement.',
+
   // ── Tags ─────────────────────────────────────────────────────────────────
   'admin.tags.eyebrow': 'Gérer',
   'admin.tags.pageTitle': 'Étiquettes',
@@ -951,6 +962,12 @@ export const fr: Partial<MessageCatalog> = {
   'admin.entityStatus.saveSlug': "Enregistrer l'identifiant",
   'admin.entityStatus.slugSaved': 'Enregistré.',
   'admin.entityStatus.layoutSaved': 'Mise en page enregistrée.',
+  'admin.entityStatus.showCommentsLabel': 'Commentaires',
+  'admin.entityStatus.showRelatedLabel': 'Enregistrements liés',
+  'admin.entityStatus.visibilityInherit': 'Suivre le réglage du site',
+  'admin.entityStatus.visibilityShow': 'Afficher',
+  'admin.entityStatus.visibilityHide': 'Masquer',
+  'admin.entityStatus.visibilitySaved': 'Réglages d’affichage enregistrés.',
   'admin.layout.entityLabel': 'Mise en page de la page',
   'admin.layout.defaultLayout': 'Mise en page par défaut',
   'admin.layout.inherit': 'Hériter de la valeur par défaut du type',
@@ -1043,6 +1060,7 @@ export const fr: Partial<MessageCatalog> = {
   'admin.settings.appearance.title': 'Apparence · Thème',
   'admin.settings.site.title': 'Site',
   'admin.settings.frontPage.title': 'Affichage de la page d’accueil',
+  'admin.settings.recordPage.title': 'Affichage des pages d’enregistrement',
   'admin.settings.permalink.title': 'Permaliens',
   'admin.settings.permalink.description':
     'Choisissez la structure des URL pour chaque type de contenu. Les changements prennent effet immédiatement ; les anciennes URL redirigent automatiquement.',

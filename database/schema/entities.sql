@@ -6,6 +6,8 @@ CREATE TABLE entities (
     permalink VARCHAR(255) NULL,
     menu_order INTEGER NOT NULL DEFAULT 0,
     layout VARCHAR(32) NULL,
+    show_comments BOOLEAN NULL,
+    show_related BOOLEAN NULL,
     status VARCHAR(16) NOT NULL DEFAULT 'draft',
     published_at DATETIME NULL,
     scheduled_at DATETIME NULL,

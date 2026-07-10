@@ -9,6 +9,7 @@ import { useSettingList, useSettingRevisions, useUpdateSetting } from '@/entitie
  * purpose-built, structured editor:
  *
  * - `front_page`     → the "Home page display" section on this page (#701)
+ * - `record_page_config` → the "Record page display" section on this page (#775)
  * - `theme_overrides`→ Appearance → Theme (ThemeCustomizeView: colors/fonts/knobs)
  * - `header_config`  → Appearance → Theme (HeaderContentView: topbar/CTA toggles)
  * - `home_hero`      → Appearance → Theme (HomeHeroView: typed block editor, #486)
@@ -17,6 +18,7 @@ import { useSettingList, useSettingRevisions, useUpdateSetting } from '@/entitie
  */
 const DEDICATED_UI_KEYS = new Set([
   'front_page',
+  'record_page_config',
   'theme_overrides',
   'header_config',
   'footer_config',

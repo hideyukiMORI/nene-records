@@ -6,6 +6,7 @@ import { PublicSiteShell } from '@/pages/consumer/PublicSiteShell'
 import type { PublicSite } from '@/pages/consumer/public-site-context'
 import { DEFAULT_FOOTER_CONFIG } from '@/shared/lib/footer-config'
 import { DEFAULT_HEADER_CONFIG } from '@/shared/lib/header-config'
+import { DEFAULT_RECORD_PAGE_CONFIG } from '@/shared/lib/record-page-config'
 import { resetEntityTypeStore, seedEntityTypes } from '@tests/msw/handlers/entity-type'
 import { mswServer } from '@tests/msw/server'
 import { renderWithProviders } from '@tests/render/render-with-providers'
@@ -26,6 +27,7 @@ function makeSite(over: Partial<PublicSite> = {}): PublicSite {
     themeFlagAttrs: {},
     headerConfig: DEFAULT_HEADER_CONFIG,
     footerConfig: DEFAULT_FOOTER_CONFIG,
+    recordPageConfig: DEFAULT_RECORD_PAGE_CONFIG,
     homeHero: '',
     frontPagePath: '',
     ...over,

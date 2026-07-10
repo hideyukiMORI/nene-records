@@ -13,6 +13,8 @@ function makeEntity(overrides: Partial<Entity> = {}): Entity {
     slug: 'hello',
     permalink: null,
     layout: null,
+    showComments: null,
+    showRelated: null,
     status: 'draft',
     publishedAt: null,
     scheduledAt: null,

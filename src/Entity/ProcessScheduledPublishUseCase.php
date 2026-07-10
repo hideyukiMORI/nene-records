@@ -39,6 +39,8 @@ final readonly class ProcessScheduledPublishUseCase implements ProcessScheduledP
                 metaTitle: $entity->metaTitle,
                 metaDescription: $entity->metaDescription,
                 scheduledAt: null,
+                showComments: $entity->showComments,
+                showRelated: $entity->showRelated,
             );
 
             $this->entities->update($updated);

@@ -5,6 +5,7 @@ import {
   usePermalinkSettingsPage,
 } from '@/features/manage-appearance'
 import { FrontPageView, useFrontPage } from '@/features/manage-front-page'
+import { RecordPageDisplayView, useRecordPageDisplay } from '@/features/manage-record-page'
 import { ManageSiteSettingsView, useManageSiteSettingsPage } from '@/features/manage-settings'
 import { useTranslation } from '@/shared/i18n'
 import { PageHeader, SectionHeader, Stack, Text } from '@/shared/ui'
@@ -13,6 +14,7 @@ export function SiteSettingsPage() {
   const { t } = useTranslation()
   const canManageSettings = currentUserHasCapability('manage_settings')
   const frontPage = useFrontPage()
+  const recordPage = useRecordPageDisplay()
   const settingsPage = useManageSiteSettingsPage()
   const permalinkPage = usePermalinkSettingsPage()
 
@@ -27,6 +29,11 @@ export function SiteSettingsPage() {
       <Stack gap="sm">
         <SectionHeader>{t('admin.settings.frontPage.title')}</SectionHeader>
         <FrontPageView {...frontPage} />
+      </Stack>
+
+      <Stack gap="sm">
+        <SectionHeader>{t('admin.settings.recordPage.title')}</SectionHeader>
+        <RecordPageDisplayView {...recordPage} />
       </Stack>
 
       <Stack gap="sm">

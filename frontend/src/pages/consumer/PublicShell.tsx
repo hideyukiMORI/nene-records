@@ -11,6 +11,7 @@ import { parseHeaderConfig } from '@/shared/lib/header-config'
 import { useAnalyticsPageView } from '@/shared/lib/use-analytics-page-view'
 import { resolveWebAnalytics } from '@/shared/lib/web-analytics'
 import { parseLayoutConfig } from '@/shared/lib/layout-config'
+import { parseRecordPageConfig } from '@/shared/lib/record-page-config'
 import {
   buildThemeStylesheet,
   readStoredRuntimeTheme,
@@ -159,6 +160,7 @@ export function PublicShell() {
     runtimeThemeCss,
     headerConfig: parseHeaderConfig(settings.header_config),
     footerConfig: parseFooterConfig(settings.footer_config),
+    recordPageConfig: parseRecordPageConfig(settings.record_page_config),
     homeHero: settings.home_hero ?? '',
     frontPagePath: settings.front_page ?? '',
   }

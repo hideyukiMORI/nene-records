@@ -27,7 +27,7 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
     {
         $row = $this->query->fetchOne(
             <<<'SQL'
-                SELECT id, entity_type_id, slug, permalink, layout, status, published_at, scheduled_at, is_deleted, created_at, updated_at, deleted_at, meta_title, meta_description
+                SELECT id, entity_type_id, slug, permalink, layout, show_comments, show_related, status, published_at, scheduled_at, is_deleted, created_at, updated_at, deleted_at, meta_title, meta_description
                 FROM entities
                 WHERE id = ? AND organization_id = ? AND is_deleted = 0
                 SQL,
@@ -45,7 +45,7 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
     {
         $row = $this->query->fetchOne(
             <<<'SQL'
-                SELECT id, entity_type_id, slug, permalink, layout, status, published_at, scheduled_at, is_deleted, created_at, updated_at, deleted_at, meta_title, meta_description
+                SELECT id, entity_type_id, slug, permalink, layout, show_comments, show_related, status, published_at, scheduled_at, is_deleted, created_at, updated_at, deleted_at, meta_title, meta_description
                 FROM entities
                 WHERE slug = ? AND entity_type_id = ? AND organization_id = ? AND is_deleted = 0
                 SQL,
@@ -63,7 +63,7 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
     {
         $row = $this->query->fetchOne(
             <<<'SQL'
-                SELECT id, entity_type_id, slug, permalink, layout, status, published_at, scheduled_at, is_deleted, created_at, updated_at, deleted_at, meta_title, meta_description
+                SELECT id, entity_type_id, slug, permalink, layout, show_comments, show_related, status, published_at, scheduled_at, is_deleted, created_at, updated_at, deleted_at, meta_title, meta_description
                 FROM entities
                 WHERE permalink = ? AND organization_id = ? AND is_deleted = 0
                 SQL,
@@ -86,7 +86,7 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
         $prefix = $parentPermalink . '/';
         $rows = $this->query->fetchAll(
             <<<'SQL'
-                SELECT id, entity_type_id, slug, permalink, layout, status, published_at, scheduled_at, is_deleted, created_at, updated_at, deleted_at, meta_title, meta_description, menu_order
+                SELECT id, entity_type_id, slug, permalink, layout, show_comments, show_related, status, published_at, scheduled_at, is_deleted, created_at, updated_at, deleted_at, meta_title, meta_description, menu_order
                 FROM entities
                 WHERE organization_id = ?
                   AND is_deleted = 0
@@ -110,7 +110,7 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
         // with a literal `%`/`_` in the data.
         $rows = $this->query->fetchAll(
             <<<'SQL'
-                SELECT id, entity_type_id, slug, permalink, layout, status, published_at, scheduled_at, is_deleted, created_at, updated_at, deleted_at, meta_title, meta_description
+                SELECT id, entity_type_id, slug, permalink, layout, show_comments, show_related, status, published_at, scheduled_at, is_deleted, created_at, updated_at, deleted_at, meta_title, meta_description
                 FROM entities
                 WHERE organization_id = ?
                   AND is_deleted = 0
@@ -206,7 +206,7 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
 
         $rows = $this->query->fetchAll(
             <<<SQL
-                SELECT e.id, e.entity_type_id, e.slug, e.permalink, e.layout, e.status, e.published_at, e.scheduled_at, e.is_deleted, e.created_at, e.updated_at, e.deleted_at, e.meta_title, e.meta_description, e.menu_order
+                SELECT e.id, e.entity_type_id, e.slug, e.permalink, e.layout, e.show_comments, e.show_related, e.status, e.published_at, e.scheduled_at, e.is_deleted, e.created_at, e.updated_at, e.deleted_at, e.meta_title, e.meta_description, e.menu_order
                 FROM entities e
                 {$titleJoin}
                 WHERE {$where}
@@ -351,8 +351,8 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
         $now = $this->clock->now()->format('Y-m-d H:i:s');
 
         $this->query->execute(
-            'INSERT INTO entities (organization_id, entity_type_id, slug, permalink, layout, status, published_at, scheduled_at, created_at, updated_at, meta_title, meta_description) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            [$this->orgId->get(), $entity->entityTypeId, $entity->slug, $entity->permalink, $entity->layout, $entity->status->value, $publishedAt, $scheduledAt, $now, $now, $entity->metaTitle, $entity->metaDescription],
+            'INSERT INTO entities (organization_id, entity_type_id, slug, permalink, layout, show_comments, show_related, status, published_at, scheduled_at, created_at, updated_at, meta_title, meta_description) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [$this->orgId->get(), $entity->entityTypeId, $entity->slug, $entity->permalink, $entity->layout, self::toDbBool($entity->showComments), self::toDbBool($entity->showRelated), $entity->status->value, $publishedAt, $scheduledAt, $now, $now, $entity->metaTitle, $entity->metaDescription],
         );
 
         $id = $this->query->lastInsertId();
@@ -382,10 +382,10 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
         $this->query->execute(
             <<<'SQL'
                 UPDATE entities
-                SET entity_type_id = ?, slug = ?, permalink = ?, layout = ?, status = ?, published_at = ?, scheduled_at = ?, updated_at = ?, meta_title = ?, meta_description = ?
+                SET entity_type_id = ?, slug = ?, permalink = ?, layout = ?, show_comments = ?, show_related = ?, status = ?, published_at = ?, scheduled_at = ?, updated_at = ?, meta_title = ?, meta_description = ?
                 WHERE id = ? AND organization_id = ? AND is_deleted = 0
                 SQL,
-            [$entity->entityTypeId, $entity->slug, $entity->permalink, $entity->layout, $entity->status->value, $publishedAt, $scheduledAt, $now, $entity->metaTitle, $entity->metaDescription, $id, $this->orgId->get()],
+            [$entity->entityTypeId, $entity->slug, $entity->permalink, $entity->layout, self::toDbBool($entity->showComments), self::toDbBool($entity->showRelated), $entity->status->value, $publishedAt, $scheduledAt, $now, $entity->metaTitle, $entity->metaDescription, $id, $this->orgId->get()],
         );
 
         $this->query->execute(
@@ -455,7 +455,7 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
     {
         $rows = $this->query->fetchAll(
             <<<'SQL'
-                SELECT id, entity_type_id, slug, permalink, layout, status, published_at, scheduled_at, is_deleted, created_at, updated_at, deleted_at, meta_title, meta_description
+                SELECT id, entity_type_id, slug, permalink, layout, show_comments, show_related, status, published_at, scheduled_at, is_deleted, created_at, updated_at, deleted_at, meta_title, meta_description
                 FROM entities
                 WHERE status = 'scheduled' AND scheduled_at <= CURRENT_TIMESTAMP AND organization_id = ? AND is_deleted = 0
                 SQL,
@@ -469,7 +469,7 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
     {
         $rows = $this->query->fetchAll(
             <<<SQL
-                SELECT id, entity_type_id, slug, permalink, layout, status, published_at, scheduled_at, is_deleted, created_at, updated_at, deleted_at, meta_title, meta_description
+                SELECT id, entity_type_id, slug, permalink, layout, show_comments, show_related, status, published_at, scheduled_at, is_deleted, created_at, updated_at, deleted_at, meta_title, meta_description
                 FROM entities
                 WHERE status = 'published' AND organization_id = ? AND is_deleted = 0
                 ORDER BY published_at DESC
@@ -548,6 +548,12 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
         $layoutRaw = $row['layout'] ?? null;
         $layout = ($layoutRaw !== null && $layoutRaw !== '') ? (string) $layoutRaw : null;
 
+        $showCommentsRaw = $row['show_comments'] ?? null;
+        $showComments = $showCommentsRaw !== null ? (bool) (int) $showCommentsRaw : null;
+
+        $showRelatedRaw = $row['show_related'] ?? null;
+        $showRelated = $showRelatedRaw !== null ? (bool) (int) $showRelatedRaw : null;
+
         $metaTitleRaw = $row['meta_title'] ?? null;
         $metaTitle = ($metaTitleRaw !== null && $metaTitleRaw !== '') ? (string) $metaTitleRaw : null;
 
@@ -570,6 +576,14 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
             scheduledAt: $scheduledAt,
             layout: $layout,
             menuOrder: (int) ($row['menu_order'] ?? 0),
+            showComments: $showComments,
+            showRelated: $showRelated,
         );
+    }
+
+    /** tri-state bool → nullable tinyint (NULL = follow record_page_config). */
+    private static function toDbBool(?bool $value): ?int
+    {
+        return $value === null ? null : (int) $value;
     }
 }

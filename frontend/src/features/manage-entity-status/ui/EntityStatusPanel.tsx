@@ -31,6 +31,8 @@ export function EntityStatusPanel({
   previewExpires,
   isPending,
   layout,
+  showComments,
+  showRelated,
   onSlugInputChange,
   onPermalinkInputChange,
   onScheduledAtChange,
@@ -38,6 +40,8 @@ export function EntityStatusPanel({
   onCancelScheduleForm,
   onChangeStatus,
   onChangeLayout,
+  onChangeShowComments,
+  onChangeShowRelated,
   onSaveSlug,
   onSavePermalink,
   onSchedulePublish,
@@ -169,6 +173,38 @@ export function EntityStatusPanel({
           <option value="custom">{t('admin.layout.custom')}</option>
         </Select>
       </Stack>
+
+      {/* Tri-state visibility overrides (#775): '' = follow record_page_config. */}
+      <div className="flex flex-wrap gap-inline-md">
+        <Select
+          id="entity-show-comments"
+          label={t('admin.entityStatus.showCommentsLabel')}
+          disabled={isPending}
+          value={showComments === null ? '' : String(showComments)}
+          onChange={(e) => {
+            const value = e.target.value
+            onChangeShowComments(value === '' ? null : value === 'true')
+          }}
+        >
+          <option value="">{t('admin.entityStatus.visibilityInherit')}</option>
+          <option value="true">{t('admin.entityStatus.visibilityShow')}</option>
+          <option value="false">{t('admin.entityStatus.visibilityHide')}</option>
+        </Select>
+        <Select
+          id="entity-show-related"
+          label={t('admin.entityStatus.showRelatedLabel')}
+          disabled={isPending}
+          value={showRelated === null ? '' : String(showRelated)}
+          onChange={(e) => {
+            const value = e.target.value
+            onChangeShowRelated(value === '' ? null : value === 'true')
+          }}
+        >
+          <option value="">{t('admin.entityStatus.visibilityInherit')}</option>
+          <option value="true">{t('admin.entityStatus.visibilityShow')}</option>
+          <option value="false">{t('admin.entityStatus.visibilityHide')}</option>
+        </Select>
+      </div>
 
       <div className="flex flex-wrap gap-inline-sm">
         {NEXT_STATUSES[currentStatus].map((nextStatus) => (
