@@ -68,6 +68,30 @@ describe('resolveOverrideStyle', () => {
     expect(resolveOverrideStyle({ menuSize: 'huge' })['--nav-size']).toBeUndefined()
   })
 
+  it('emits advanced token overrides with runtime-theme safety rules (#785)', () => {
+    const style = resolveOverrideStyle({
+      tokens: {
+        'footer-free-size': '0.75rem',
+        'Bad Key': '1rem',
+        'nav-size': 'url(https://evil.example/x)',
+        empty: '   ',
+      },
+    })
+    expect(style['--footer-free-size']).toBe('0.75rem')
+    expect(style['--Bad Key']).toBeUndefined()
+    expect(style['--nav-size']).toBeUndefined()
+    expect(style['--empty']).toBeUndefined()
+  })
+
+  it('advanced token overrides win over knob-derived values of the same name (#785)', () => {
+    const style = resolveOverrideStyle({
+      menuSize: 'compact',
+      tokens: { 'footer-size': '1.25rem' },
+    })
+    expect(style['--nav-size']).toBe('0.8125rem')
+    expect(style['--footer-size']).toBe('1.25rem')
+  })
+
   it('ignores invalid / unknown values (no injection)', () => {
     const style = resolveOverrideStyle({
       accent: 'red; } body { display:none',

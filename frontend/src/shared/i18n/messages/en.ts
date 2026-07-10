@@ -185,6 +185,12 @@ export const en = {
   'admin.footerContent.bannerAlt': 'Alt text',
   'admin.themeCustomize.basic': 'Basics',
   'admin.themeCustomize.advanced': 'Advanced',
+  'admin.themeCustomize.tokens.help':
+    'Token overrides (advanced): set a documented engine token directly — e.g. footer-free-size for the footer free text. Unsafe values are ignored.',
+  'admin.themeCustomize.tokens.placeholder': 'Select a token…',
+  'admin.themeCustomize.tokens.add': 'Add',
+  'admin.themeCustomize.tokens.remove': 'Remove',
+  'admin.themeCustomize.tokens.invalid': 'This value is unsafe and will be ignored.',
   'admin.themeCustomize.saved': 'Customization saved',
   'admin.themeCustomize.saveError': 'Could not save customization',
   'admin.themeCustomize.save': 'Save',

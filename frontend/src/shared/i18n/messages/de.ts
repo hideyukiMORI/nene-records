@@ -178,6 +178,12 @@ export const de: Partial<MessageCatalog> = {
   'admin.footerContent.bannerAlt': 'Alternativtext',
   'admin.themeCustomize.basic': 'Grundlagen',
   'admin.themeCustomize.advanced': 'Erweitert',
+  'admin.themeCustomize.tokens.help':
+    'Token-Überschreibungen (erweitert): dokumentierte Engine-Tokens direkt setzen — z. B. footer-free-size für den Footer-Freitext. Unsichere Werte werden ignoriert.',
+  'admin.themeCustomize.tokens.placeholder': 'Token auswählen…',
+  'admin.themeCustomize.tokens.add': 'Hinzufügen',
+  'admin.themeCustomize.tokens.remove': 'Entfernen',
+  'admin.themeCustomize.tokens.invalid': 'Dieser Wert ist unsicher und wird ignoriert.',
   'admin.themeCustomize.saved': 'Anpassung gespeichert',
   'admin.themeCustomize.saveError': 'Anpassung konnte nicht gespeichert werden',
   'admin.themeCustomize.save': 'Speichern',

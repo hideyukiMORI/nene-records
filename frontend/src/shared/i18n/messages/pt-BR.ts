@@ -179,6 +179,12 @@ export const ptBR: Partial<MessageCatalog> = {
   'admin.footerContent.bannerAlt': 'Texto alternativo',
   'admin.themeCustomize.basic': 'Básico',
   'admin.themeCustomize.advanced': 'Avançado',
+  'admin.themeCustomize.tokens.help':
+    'Substituições de tokens (avançado): defina diretamente um token documentado do motor — p. ex. footer-free-size para o texto livre do rodapé. Valores inseguros são ignorados.',
+  'admin.themeCustomize.tokens.placeholder': 'Selecionar um token…',
+  'admin.themeCustomize.tokens.add': 'Adicionar',
+  'admin.themeCustomize.tokens.remove': 'Remover',
+  'admin.themeCustomize.tokens.invalid': 'Este valor é inseguro e será ignorado.',
   'admin.themeCustomize.saved': 'Personalização salva',
   'admin.themeCustomize.saveError': 'Não foi possível salvar a personalização',
   'admin.themeCustomize.save': 'Salvar',

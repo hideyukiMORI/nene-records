@@ -181,6 +181,12 @@ export const fr: Partial<MessageCatalog> = {
   'admin.footerContent.bannerAlt': 'Texte alternatif',
   'admin.themeCustomize.basic': 'Bases',
   'admin.themeCustomize.advanced': 'Avancé',
+  'admin.themeCustomize.tokens.help':
+    'Surcharges de tokens (avancé) : définissez directement un token documenté du moteur — p. ex. footer-free-size pour le texte libre du pied de page. Les valeurs non sûres sont ignorées.',
+  'admin.themeCustomize.tokens.placeholder': 'Choisir un token…',
+  'admin.themeCustomize.tokens.add': 'Ajouter',
+  'admin.themeCustomize.tokens.remove': 'Retirer',
+  'admin.themeCustomize.tokens.invalid': 'Cette valeur n’est pas sûre et sera ignorée.',
   'admin.themeCustomize.saved': 'Personnalisation enregistrée',
   'admin.themeCustomize.saveError': "Impossible d'enregistrer la personnalisation",
   'admin.themeCustomize.save': 'Enregistrer',

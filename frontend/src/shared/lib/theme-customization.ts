@@ -14,6 +14,7 @@
  */
 
 import { mediaDerivativeUrl } from './media-derivatives'
+import { isSafeTokenValue, TOKEN_KEY } from './runtime-themes'
 
 /** Per-theme override values as stored (one entry per theme id). */
 export interface ThemeOverrides {
@@ -61,6 +62,14 @@ export interface ThemeOverrides {
   flags?: ThemeFlags
   /** Image slots (logo / hero / background), per mode. See ThemeImages. */
   images?: ThemeImages
+  /**
+   * Advanced raw token overrides (#785) — the customizer's escape hatch for the
+   * documented optional engine tokens (authoring-guide `optionalTokens`), so
+   * they are reachable without MCP/API. Keys/values are re-validated at emission
+   * with the same rules as runtime-theme manifests; they are emitted LAST so an
+   * explicit token wins over a knob-derived value of the same name.
+   */
+  tokens?: Record<string, string>
 }
 
 /** A colour value per light/dark mode (hex). */
@@ -551,6 +560,16 @@ export function resolveOverrideStyle(overrides: ThemeOverrides): Record<string, 
     if (factor !== undefined) {
       for (const [name, value] of SPACE_SCALE) {
         style[`--space-${name}`] = rem(value * factor)
+      }
+    }
+  }
+
+  // Advanced token overrides (#785): validated like runtime-theme manifest
+  // tokens, emitted last so they beat knob-derived values of the same name.
+  if (overrides.tokens !== undefined) {
+    for (const [key, value] of Object.entries(overrides.tokens)) {
+      if (TOKEN_KEY.test(key) && typeof value === 'string' && isSafeTokenValue(value)) {
+        style[`--${key}`] = value
       }
     }
   }
