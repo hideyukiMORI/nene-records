@@ -306,6 +306,9 @@ export const ptBR: Partial<MessageCatalog> = {
   'admin.widgets.type.calendar': 'Calendário',
   'admin.widgets.menuSettings': 'Configurações do menu',
   'admin.widgets.menuLabel': 'Menu',
+  'admin.widgets.menuLayoutLabel': 'Disposição dos links (rodapé)',
+  'admin.widgets.menuLayout.stack': 'Empilhados',
+  'admin.widgets.menuLayout.inline': 'Em linha (horizontal)',
   'admin.widgets.menuPlaceholder': 'Selecione um menu…',
   'admin.widgets.tocSettings':
     'Mostra os títulos da página atual. Sem configurações — é renderizado em páginas que têm títulos.',

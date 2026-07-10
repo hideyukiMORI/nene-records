@@ -27,7 +27,17 @@ export const WIDGET_CATALOG: readonly WidgetCatalogEntry[] = [
     type: 'menu',
     labelKey: 'admin.widgets.type.menu',
     descKey: 'admin.widgets.menuSettings',
-    settings: [{ key: 'menuId', labelKey: 'admin.widgets.menuLabel', editor: 'menu' }],
+    settings: [
+      { key: 'menuId', labelKey: 'admin.widgets.menuLabel', editor: 'menu' },
+      // Footer-only link flow (#782); ignored in other regions.
+      {
+        key: 'layout',
+        labelKey: 'admin.widgets.menuLayoutLabel',
+        editor: 'enum',
+        options: ['stack', 'inline'],
+        def: 'stack',
+      },
+    ],
   },
   {
     type: 'recent-posts',

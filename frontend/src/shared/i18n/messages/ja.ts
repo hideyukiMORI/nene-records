@@ -303,6 +303,9 @@ export const ja: Partial<MessageCatalog> = {
   'admin.widgets.type.calendar': 'カレンダー',
   'admin.widgets.menuSettings': 'メニューの設定',
   'admin.widgets.menuLabel': 'メニュー',
+  'admin.widgets.menuLayoutLabel': 'リンクの並び（フッター）',
+  'admin.widgets.menuLayout.stack': '縦積み',
+  'admin.widgets.menuLayout.inline': '横並び',
   'admin.widgets.menuPlaceholder': 'メニューを選択…',
   'admin.widgets.tocSettings':
     '現在ページの見出しを表示します。設定なし（見出しがあるページで描画）。',

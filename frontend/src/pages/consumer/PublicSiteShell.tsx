@@ -189,19 +189,29 @@ function Brand({ siteName, tagline, logo }: { siteName: string; tagline?: string
 
 /** One footer column: a named menu's links or a widget body (#758 / #772). */
 type FooterColumnModel =
-  | { kind: 'menu'; key: number; title: string; items: PublicSiteNavItem[] }
+  /** `inline` flows the links horizontally (`settings.layout === 'inline'`, #782). */
+  | { kind: 'menu'; key: number; title: string; items: PublicSiteNavItem[]; inline: boolean }
   | { kind: 'widget'; key: number; title: string; widget: Widget }
 
 /**
  * A footer column that collapses into an accordion on narrow viewports (#772):
  * ≤680px the heading becomes an `aria-expanded` toggle (default closed) so tall
  * multi-column footers stay compact on mobile. Desktop renders statically.
+ * `collapsible: false` opts out (inline menu columns are short rows — #782).
  */
-function FooterColumn({ title, children }: { title: string; children: ReactNode }) {
+function FooterColumn({
+  title,
+  collapsible = true,
+  children,
+}: {
+  title: string
+  collapsible?: boolean
+  children: ReactNode
+}) {
   const compact = useMediaQuery('(max-width: 680px)')
   const [open, setOpen] = useState(false)
 
-  if (!compact || title === '') {
+  if (!compact || !collapsible || title === '') {
     return (
       <div className="ft__col">
         {title !== '' ? <h4>{title}</h4> : null}
@@ -373,7 +383,8 @@ export function PublicSiteShell({
         const items = site.navItems.filter((item) => item.menuId === menuId)
         if (items.length === 0) return []
         const title = widget.title ?? menus.find((menu) => menu.id === menuId)?.name ?? ''
-        return [{ kind: 'menu', key: widget.id, title, items }]
+        const inline = widget.settings['layout'] === 'inline'
+        return [{ kind: 'menu', key: widget.id, title, items, inline }]
       }
       return [{ kind: 'widget', key: widget.id, title: widget.title ?? '', widget }]
     })
@@ -497,9 +508,13 @@ export function PublicSiteShell({
           </div>
           {footerColumns.length > 0 ? (
             footerColumns.map((column) => (
-              <FooterColumn key={`ft-${column.kind}-${String(column.key)}`} title={column.title}>
+              <FooterColumn
+                key={`ft-${column.kind}-${String(column.key)}`}
+                title={column.title}
+                collapsible={column.kind !== 'menu' || !column.inline}
+              >
                 {column.kind === 'menu' ? (
-                  <ul>
+                  <ul className={column.inline ? 'ft__list--inline' : undefined}>
                     {column.items.map((item) => {
                       const external = !item.url.startsWith('/')
                       const href = external ? safeHref(item.url) : item.url
