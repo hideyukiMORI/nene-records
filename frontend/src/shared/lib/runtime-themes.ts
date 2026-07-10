@@ -34,7 +34,8 @@ export interface RuntimeTheme {
 }
 
 const THEME_KEY = /^[a-z][a-z0-9-]{1,40}$/
-const TOKEN_KEY = /^[a-z][a-z0-9-]*$/
+/** Valid token key shape — shared with the customizer's advanced overrides (#785). */
+export const TOKEN_KEY = /^[a-z][a-z0-9-]*$/
 const BREAKOUT = /[;{}<>\\`]/
 const UNSAFE_SUBSTRINGS = ['url(', '@import', 'expression(', 'javascript:', '/*', '*/']
 

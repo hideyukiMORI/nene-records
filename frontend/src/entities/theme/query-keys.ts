@@ -8,4 +8,5 @@ export const themeKeys = {
   all: ['themes'] as const,
   publicList: () => [...themeKeys.all, 'public'] as const,
   adminList: () => [...themeKeys.all, 'admin'] as const,
+  authoringGuide: () => [...themeKeys.all, 'authoring-guide'] as const,
 }

@@ -178,6 +178,12 @@ export const ja: Partial<MessageCatalog> = {
   'admin.footerContent.bannerAlt': '代替テキスト',
   'admin.themeCustomize.basic': '基本',
   'admin.themeCustomize.advanced': '詳細設定',
+  'admin.themeCustomize.tokens.help':
+    'トークン上書き（上級者向け）: 文書化済みのエンジントークンを直接設定できます — 例: フッターのフリーテキストは footer-free-size。安全でない値は無視されます。',
+  'admin.themeCustomize.tokens.placeholder': 'トークンを選択…',
+  'admin.themeCustomize.tokens.add': '追加',
+  'admin.themeCustomize.tokens.remove': '削除',
+  'admin.themeCustomize.tokens.invalid': 'この値は安全でないため無視されます。',
   'admin.themeCustomize.saved': 'カスタマイズを保存しました',
   'admin.themeCustomize.saveError': 'カスタマイズを保存できませんでした',
   'admin.themeCustomize.save': '保存',

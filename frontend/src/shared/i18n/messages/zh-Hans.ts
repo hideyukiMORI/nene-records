@@ -177,6 +177,12 @@ export const zhHans: Partial<MessageCatalog> = {
   'admin.footerContent.bannerAlt': '替代文本',
   'admin.themeCustomize.basic': '基础',
   'admin.themeCustomize.advanced': '高级',
+  'admin.themeCustomize.tokens.help':
+    '令牌覆盖（高级）：直接设置文档化的引擎令牌 — 例如页脚自由文本用 footer-free-size。不安全的值将被忽略。',
+  'admin.themeCustomize.tokens.placeholder': '选择令牌…',
+  'admin.themeCustomize.tokens.add': '添加',
+  'admin.themeCustomize.tokens.remove': '移除',
+  'admin.themeCustomize.tokens.invalid': '该值不安全，将被忽略。',
   'admin.themeCustomize.saved': '已保存自定义设置',
   'admin.themeCustomize.saveError': '无法保存自定义设置',
   'admin.themeCustomize.save': '保存',
