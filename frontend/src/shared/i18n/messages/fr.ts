@@ -187,6 +187,70 @@ export const fr: Partial<MessageCatalog> = {
   'admin.themeCustomize.tokens.add': 'Ajouter',
   'admin.themeCustomize.tokens.remove': 'Retirer',
   'admin.themeCustomize.tokens.invalid': 'Cette valeur n’est pas sûre et sera ignorée.',
+  // ── Theme workspace (#787 IA redesign) ────────────────────────────────────
+  'admin.themeWs.groupAppearance': 'Apparence',
+  'admin.themeWs.groupCustomize': 'Personnaliser',
+  'admin.themeWs.groupContent': 'Contenu',
+  'admin.themeWs.tagInstant': 'effet immédiat',
+  'admin.themeWs.tagOverrides': 'une unité d’enregistrement',
+  'admin.themeWs.tagIndependent': 'enregistrés séparément',
+  'admin.themeWs.tagOverridesInline': 'Surcharges du thème',
+  'admin.themeWs.tagInplace': 'Enregistré sur place',
+  'admin.themeWs.groupCustomizeHint':
+    'Les éléments ci-dessous sont enregistrés ensemble comme « surcharges du thème ».',
+  'admin.themeWs.navAria': 'Sections des réglages du thème',
+  'admin.themeWs.navTheme': 'Choisir un thème',
+  'admin.themeWs.navBrand': 'Marque',
+  'admin.themeWs.navType': 'Typographie',
+  'admin.themeWs.navLayout': 'Mise en page',
+  'admin.themeWs.navHeader': 'En-tête',
+  'admin.themeWs.navAdvanced': 'Avancé & tokens',
+  'admin.themeWs.navFooter': 'Pied de page',
+  'admin.themeWs.navHero': 'Héros d’accueil',
+  'admin.themeWs.descTheme':
+    'Le thème de base appliqué à toutes les pages publiques. « Appliquer » prend effet immédiatement — pas de bouton d’enregistrement. Ajustez couleurs et polices dans « Personnaliser ».',
+  'admin.themeWs.descBrand':
+    'Les changements les plus courants : couleurs et logo. Les champs vides gardent la valeur du thème.',
+  'admin.themeWs.descType':
+    'Polices et tailles de texte. Si « défaut du thème » convient, rien à changer ici.',
+  'admin.themeWs.descLayout':
+    'Largeur du contenu, densité des espacements et présentation du flux d’articles.',
+  'admin.themeWs.descHeader':
+    'Tout ce qui concerne l’en-tête au même endroit. « Contenu » et « Disposition & apparence » s’enregistrent dans des réglages différents (indiqué sur chaque titre).',
+  'admin.themeWs.descAdvanced':
+    'Pour utilisateurs avancés : surcharger directement les tokens documentés du moteur, ou capturer l’état actuel comme nouveau thème.',
+  'admin.themeWs.descFooter':
+    'La barre inférieure : liens sociaux, liens légaux et mention Powered by. Les colonnes du pied de page (menus) se construisent avec les widgets de menu de l’onglet « Mise en page ».',
+  'admin.themeWs.scopeOverridesNote':
+    'Les changements effectués ici s’enregistrent ensemble depuis la barre en bas.',
+  'admin.themeWs.scopeInplaceNote': 'Cette section s’enregistre indépendamment.',
+  'admin.themeWs.cardColors': 'Couleurs',
+  'admin.themeWs.cardColorsSub': 'light / dark réglables séparément',
+  'admin.themeWs.cardImagesSub': 'depuis la médiathèque',
+  'admin.themeWs.cardFonts': 'Polices',
+  'admin.themeWs.cardSizes': 'Tailles',
+  'admin.themeWs.cardPage': 'Page',
+  'admin.themeWs.cardFeed': 'Flux d’articles',
+  'admin.themeWs.cardShape': 'Forme & espacements',
+  'admin.themeWs.cardStyleFlags': 'Style',
+  'admin.themeWs.cardTokens': 'Surcharges de tokens',
+  'admin.themeWs.cardHeaderContent': 'Contenu',
+  'admin.themeWs.hintAccent': 'boutons, liens, accents',
+  'admin.themeWs.hintDensity': 'densité des espacements',
+  'admin.themeWs.discHeaderLook': 'Disposition & apparence',
+  'admin.themeWs.headerLookHint':
+    'La disposition et la hauteur de l’en-tête font partie de l’apparence du thème. Les changements s’enregistrent depuis la barre en bas.',
+  'admin.themeWs.saveAsHint':
+    'Duplique le thème de base et vos surcharges en un nouveau thème runtime, avec nom et description.',
+  'admin.themeWs.pvLive': 'en direct',
+  'admin.themeWs.pvDesktop': 'Bureau',
+  'admin.themeWs.pvMobile': 'Mobile',
+  'admin.themeWs.pvFab': 'Aperçu',
+  'admin.themeWs.pvNote':
+    'La page publique /search rendue en direct ; vos changements s’appliquent aussitôt.',
+  'admin.themeWs.sbTitle': 'Surcharges du thème non enregistrées',
+  'admin.themeWs.sbSub': 'Marque · Typographie · Mise en page · Apparence de l’en-tête · Tokens',
+  'admin.themeWs.sbSave': 'Enregistrer les changements',
   'admin.themeCustomize.saved': 'Personnalisation enregistrée',
   'admin.themeCustomize.saveError': "Impossible d'enregistrer la personnalisation",
   'admin.themeCustomize.save': 'Enregistrer',

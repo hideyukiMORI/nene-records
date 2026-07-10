@@ -3,12 +3,7 @@ import { Link, Navigate, useParams } from 'react-router-dom'
 import { currentUserHasCapability } from '@/entities/auth'
 import { useMenuList } from '@/entities/menu'
 import {
-  FooterContentView,
-  HeaderContentView,
-  HeaderPreview,
-  HomeHeroView,
-  PublicThemeView,
-  ThemeCustomizeView,
+  ThemeWorkspace,
   useFooterConfigPage,
   useHeaderConfigPage,
   useHomeHeroPage,
@@ -51,27 +46,13 @@ function ThemeTab() {
   const blocker = useUnsavedChangesGuard(customize.isDirty)
   return (
     <Stack gap="lg">
-      <PublicThemeView {...page} />
-      <Stack gap="sm">
-        <Text as="h2" variant="heading-sm">
-          {t('admin.themeCustomize.title')}
-        </Text>
-        <ThemeCustomizeView {...customize} />
-      </Stack>
-      <Stack gap="sm">
-        <Text as="h2" variant="heading-sm">
-          {t('admin.headerContent.title')}
-        </Text>
-        <HeaderPreview flags={customize.draft.flags} header={headerContent.draft} />
-        <HeaderContentView {...headerContent} />
-      </Stack>
-      <Stack gap="sm">
-        <Text as="h2" variant="heading-sm">
-          {t('admin.footerContent.title')}
-        </Text>
-        <FooterContentView {...footerContent} />
-      </Stack>
-      <HomeHeroView {...homeHero} />
+      <ThemeWorkspace
+        pick={page}
+        customize={customize}
+        header={headerContent}
+        footer={footerContent}
+        hero={homeHero}
+      />
 
       {blocker.state === 'blocked' ? (
         <ConfirmDialog
