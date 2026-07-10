@@ -73,6 +73,10 @@ final readonly class PublicRecordViewHttpMapper
                 'deleted_at' => $entity->deletedAt?->format(\DateTimeInterface::ATOM),
                 'meta_title' => $entity->metaTitle,
                 'meta_description' => $entity->metaDescription,
+                // The SPA hydrates useEntity from this payload and never refetches,
+                // so the tri-state visibility overrides must ride along (#778).
+                'show_comments' => $entity->showComments,
+                'show_related' => $entity->showRelated,
             ],
             'fieldDefs' => [
                 'items' => array_map(

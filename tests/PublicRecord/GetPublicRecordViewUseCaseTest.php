@@ -72,6 +72,45 @@ final class GetPublicRecordViewUseCaseTest extends TestCase
         self::assertSame('Hello', $output->bootstrap['textFields']['items'][0]['value']);
         self::assertSame(42, $output->bootstrap['intFields']['items'][0]['value']);
         self::assertArrayHasKey('publicSettings', $output->bootstrap);
+        // The SPA hydrates useEntity from this payload without refetching (#778).
+        self::assertNull($output->bootstrap['entity']['show_comments']);
+        self::assertNull($output->bootstrap['entity']['show_related']);
+    }
+
+    public function testBootstrapEntityCarriesVisibilityOverrides(): void
+    {
+        $entityTypes = new InMemoryEntityTypeRepository([
+            new EntityType(name: 'Article', slug: 'article', id: 1),
+        ]);
+        $entities = new InMemoryEntityRepository([
+            new Entity(
+                id: 10,
+                entityTypeId: 1,
+                slug: 'hello-world',
+                status: EntityStatus::Published,
+                showComments: false,
+                showRelated: false,
+            ),
+        ]);
+
+        $useCase = new GetPublicRecordViewUseCase(
+            $entityTypes,
+            $entities,
+            new InMemoryFieldDefRepository(),
+            new InMemoryTextFieldRepository([], $entities),
+            new InMemoryIntFieldRepository(),
+            new InMemoryEnumFieldRepository(),
+            new InMemoryBoolFieldRepository(),
+            new InMemoryDateTimeFieldRepository(),
+            new InMemoryEntityRelationRepository(),
+            new ListPublicSettingsUseCase(new InMemorySettingRepository(), new InMemoryMediaRepository(), new \NeNeRecords\PublicRecord\FrontPageSetting(new InMemorySettingRepository(), new InMemoryEntityRepository(), new InMemoryEntityTypeRepository())),
+            new PublicRecordHierarchyBuilder(new InMemoryEntityRepository(), new InMemoryTextFieldRepository()),
+        );
+
+        $output = $useCase->execute(new GetPublicRecordViewInput('article', 'hello-world'));
+
+        self::assertFalse($output->bootstrap['entity']['show_comments']);
+        self::assertFalse($output->bootstrap['entity']['show_related']);
     }
 
     public function testThrowsWhenEntityTypeMissing(): void
