@@ -1067,7 +1067,9 @@
   max-width: 34ch;
 }
 .nene-public .ft__free {
-  font-size: var(--text-body-sm);
+  /* Free-text size token (#781): themes may set --footer-free-size; default
+     follows the type scale (independent of --footer-size = menu links). */
+  font-size: var(--footer-free-size, var(--text-body-sm));
   color: var(--color-text-muted);
   line-height: 1.6;
 }
