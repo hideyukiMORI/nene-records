@@ -35,10 +35,14 @@ final readonly class ScheduleEntityUseCase implements ScheduleEntityUseCaseInter
             throw new InvalidArgumentException('scheduled_at must be in the future.');
         }
 
+        // repository::update() is full-replace: every column it writes must be
+        // carried from $existing or it is silently nulled (#776).
         $updated = new Entity(
             id: $entityId,
             entityTypeId: $existing->entityTypeId,
             slug: $existing->slug,
+            permalink: $existing->permalink,
+            layout: $existing->layout,
             status: EntityStatus::Scheduled,
             publishedAt: $existing->publishedAt,
             isDeleted: $existing->isDeleted,

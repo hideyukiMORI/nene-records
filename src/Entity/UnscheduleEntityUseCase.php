@@ -27,10 +27,14 @@ final readonly class UnscheduleEntityUseCase implements UnscheduleEntityUseCaseI
             throw new LogicException('Loaded entity missing id.');
         }
 
+        // repository::update() is full-replace: every column it writes must be
+        // carried from $existing or it is silently nulled (#776).
         $updated = new Entity(
             id: $id,
             entityTypeId: $existing->entityTypeId,
             slug: $existing->slug,
+            permalink: $existing->permalink,
+            layout: $existing->layout,
             status: EntityStatus::Draft,
             publishedAt: $existing->publishedAt,
             isDeleted: $existing->isDeleted,

@@ -46,6 +46,31 @@ final class EntityScheduleUseCaseTest extends TestCase
         );
     }
 
+    public function testSchedulePreservesPermalinkLayoutAndVisibilityOverrides(): void
+    {
+        $entities = new InMemoryEntityRepository([]);
+        $entityId = $entities->save(new Entity(
+            id: null,
+            entityTypeId: 1,
+            slug: 'about',
+            permalink: '/company/about',
+            layout: 'two-col',
+            showComments: false,
+            showRelated: false,
+        ));
+
+        $useCase = new ScheduleEntityUseCase($entities, new UtcClock());
+        $useCase->execute(new ScheduleEntityInput(id: $entityId, scheduledAt: new DateTimeImmutable('+1 hour')));
+
+        // repository::update() is full-replace — scheduling must not wipe these (#776).
+        $updated = $entities->findById($entityId);
+        self::assertNotNull($updated);
+        self::assertSame('/company/about', $updated->permalink);
+        self::assertSame('two-col', $updated->layout);
+        self::assertFalse($updated->showComments);
+        self::assertFalse($updated->showRelated);
+    }
+
     public function testScheduleEntityThrowsEntityNotFoundExceptionWhenEntityMissing(): void
     {
         $entities = new InMemoryEntityRepository([]);
@@ -88,6 +113,28 @@ final class EntityScheduleUseCaseTest extends TestCase
         self::assertNotNull($updated);
         self::assertSame(EntityStatus::Draft, $updated->status);
         self::assertNull($updated->scheduledAt);
+    }
+
+    public function testUnschedulePreservesPermalinkAndLayout(): void
+    {
+        $entities = new InMemoryEntityRepository([]);
+        $entityId = $entities->save(new Entity(
+            id: null,
+            entityTypeId: 1,
+            slug: 'about',
+            permalink: '/company/about',
+            layout: 'bare',
+            status: EntityStatus::Scheduled,
+            scheduledAt: new DateTimeImmutable('+1 day'),
+        ));
+
+        (new UnscheduleEntityUseCase($entities))->execute(new UnscheduleEntityInput(entityId: $entityId));
+
+        // Full-replace update — cancelling a schedule must not wipe these (#776).
+        $updated = $entities->findById($entityId);
+        self::assertNotNull($updated);
+        self::assertSame('/company/about', $updated->permalink);
+        self::assertSame('bare', $updated->layout);
     }
 
     public function testUnscheduleEntityThrowsEntityNotFoundExceptionWhenEntityMissing(): void
@@ -146,6 +193,28 @@ final class EntityScheduleUseCaseTest extends TestCase
         self::assertNotNull($published);
         self::assertSame(EntityStatus::Published, $published->status);
         self::assertNull($published->scheduledAt);
+    }
+
+    public function testProcessScheduledPublishPreservesPermalinkAndLayout(): void
+    {
+        $entities = new InMemoryEntityRepository([]);
+        $entityId = $entities->save(new Entity(
+            id: null,
+            entityTypeId: 1,
+            slug: 'about',
+            permalink: '/company/about',
+            layout: 'full',
+            status: EntityStatus::Scheduled,
+            scheduledAt: new DateTimeImmutable('-1 minute'),
+        ));
+
+        (new ProcessScheduledPublishUseCase($entities, new UtcClock()))->execute();
+
+        // Full-replace update — the cron auto-publish must not wipe these (#776).
+        $published = $entities->findById($entityId);
+        self::assertNotNull($published);
+        self::assertSame('/company/about', $published->permalink);
+        self::assertSame('full', $published->layout);
     }
 
     public function testProcessScheduledPublishReturnsEmptyListWhenNoDueEntities(): void
