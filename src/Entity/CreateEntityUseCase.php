@@ -44,6 +44,8 @@ final readonly class CreateEntityUseCase implements CreateEntityUseCaseInterface
             permalink: $permalink,
             status: $input->status,
             layout: $input->layout,
+            showComments: $input->showComments,
+            showRelated: $input->showRelated,
         ));
 
         $this->webhooks?->dispatch('entity.created', $input->entityTypeId, $id);
@@ -58,6 +60,8 @@ final readonly class CreateEntityUseCase implements CreateEntityUseCaseInterface
             deletedAtIso: null,
             layout: $input->layout,
             permalink: $permalink,
+            showComments: $input->showComments,
+            showRelated: $input->showRelated,
         );
     }
 

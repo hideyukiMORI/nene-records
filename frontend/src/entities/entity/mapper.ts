@@ -27,6 +27,8 @@ export function mapEntityDtoToModel(dto: EntityDto): Entity {
     slug: dto.slug,
     permalink: dto.permalink ?? null,
     layout: dto.layout ?? null,
+    showComments: dto.show_comments ?? null,
+    showRelated: dto.show_related ?? null,
     status: dto.status,
     publishedAt: dto.published_at,
     scheduledAt: dto.scheduled_at,
@@ -70,6 +72,8 @@ export function mapCreateInputToDto(input: CreateEntityInput): CreateEntityDto {
     ...(input.permalink !== undefined ? { permalink: input.permalink } : {}),
     ...(input.status !== undefined ? { status: input.status } : {}),
     ...(input.layout !== undefined ? { layout: input.layout } : {}),
+    ...(input.showComments !== undefined ? { show_comments: input.showComments } : {}),
+    ...(input.showRelated !== undefined ? { show_related: input.showRelated } : {}),
   }
 }
 
@@ -83,6 +87,8 @@ export function mapUpdateInputToDto(input: UpdateEntityInput): UpdateEntityDto {
     ...(input.metaTitle !== undefined ? { meta_title: input.metaTitle } : {}),
     ...(input.metaDescription !== undefined ? { meta_description: input.metaDescription } : {}),
     ...(input.layout !== undefined ? { layout: input.layout } : {}),
+    ...(input.showComments !== undefined ? { show_comments: input.showComments } : {}),
+    ...(input.showRelated !== undefined ? { show_related: input.showRelated } : {}),
   }
 }
 

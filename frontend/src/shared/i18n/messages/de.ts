@@ -873,6 +873,16 @@ export const de: Partial<MessageCatalog> = {
   'admin.frontPage.saving': 'Wird gespeichert…',
   'admin.frontPage.saved': 'Startseitenanzeige gespeichert.',
   'admin.frontPage.saveError': 'Startseitenanzeige konnte nicht gespeichert werden.',
+  // ── Record page display (#775) ───────────────────────────────────────────
+  'admin.recordPage.description':
+    'Websiteweite Standardanzeige für öffentliche Datensatzseiten. Jeder Datensatz kann sie in seinem Veröffentlichungsstatus-Panel überschreiben.',
+  'admin.recordPage.loading': 'Wird geladen…',
+  'admin.recordPage.commentsLabel': 'Kommentarbereich anzeigen',
+  'admin.recordPage.relatedLabel': 'Block „Ähnliche Datensätze“ („Keep reading“) anzeigen',
+  'admin.recordPage.save': 'Datensatzseiten-Anzeige speichern',
+  'admin.recordPage.saving': 'Wird gespeichert…',
+  'admin.recordPage.saved': 'Datensatzseiten-Anzeige gespeichert.',
+  'admin.recordPage.saveError': 'Datensatzseiten-Anzeige konnte nicht gespeichert werden.',
   // ── Tags ─────────────────────────────────────────────────────────────────
   'admin.tags.eyebrow': 'Verwalten',
   'admin.tags.pageTitle': 'Schlagwörter',
@@ -930,6 +940,12 @@ export const de: Partial<MessageCatalog> = {
   'admin.entityStatus.saveSlug': 'Bezeichner speichern',
   'admin.entityStatus.slugSaved': 'Gespeichert.',
   'admin.entityStatus.layoutSaved': 'Layout gespeichert.',
+  'admin.entityStatus.showCommentsLabel': 'Kommentare',
+  'admin.entityStatus.showRelatedLabel': 'Ähnliche Datensätze',
+  'admin.entityStatus.visibilityInherit': 'Website-Einstellung folgen',
+  'admin.entityStatus.visibilityShow': 'Anzeigen',
+  'admin.entityStatus.visibilityHide': 'Ausblenden',
+  'admin.entityStatus.visibilitySaved': 'Anzeigeeinstellungen gespeichert.',
   'admin.layout.entityLabel': 'Seitenlayout',
   'admin.layout.defaultLayout': 'Standard-Seitenlayout',
   'admin.layout.inherit': 'Vom Typ-Standard erben',
@@ -1018,6 +1034,7 @@ export const de: Partial<MessageCatalog> = {
   'admin.settings.appearance.title': 'Darstellung · Theme',
   'admin.settings.site.title': 'Website',
   'admin.settings.frontPage.title': 'Startseitenanzeige',
+  'admin.settings.recordPage.title': 'Datensatzseiten-Anzeige',
   'admin.settings.permalink.title': 'Permalinks',
   'admin.settings.permalink.description':
     'Wählen Sie die URL-Struktur für jeden Inhaltstyp. Änderungen werden sofort wirksam; alte URLs werden automatisch weitergeleitet.',

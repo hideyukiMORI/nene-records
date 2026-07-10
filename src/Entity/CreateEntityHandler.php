@@ -15,6 +15,7 @@ use Psr\Http\Message\ServerRequestInterface;
 final readonly class CreateEntityHandler
 {
     use ParsesPermalinkField;
+    use ParsesTriStateBoolField;
 
     public function __construct(
         private CreateEntityUseCaseInterface $useCase,
@@ -53,6 +54,10 @@ final readonly class CreateEntityHandler
         // permalink: optional custom canonical path; null/empty = use the type pattern.
         $permalink = $this->parsePermalinkField($body['permalink'] ?? null, $errors);
 
+        // show_comments / show_related: tri-state; null/omitted = follow record_page_config.
+        $showComments = $this->parseTriStateBoolField($body, 'show_comments', $errors);
+        $showRelated = $this->parseTriStateBoolField($body, 'show_related', $errors);
+
         if ($errors !== []) {
             throw new ValidationException($errors);
         }
@@ -64,6 +69,8 @@ final readonly class CreateEntityHandler
             status: $status,
             layout: $layout,
             permalink: $permalink,
+            showComments: $showComments,
+            showRelated: $showRelated,
         ));
 
         return $this->response->create(
@@ -77,6 +84,8 @@ final readonly class CreateEntityHandler
                 'is_deleted' => $output->isDeleted,
                 'deleted_at' => $output->deletedAtIso,
                 'layout' => $output->layout,
+                'show_comments' => $output->showComments,
+                'show_related' => $output->showRelated,
             ],
             201,
             ['Location' => '/api/v1/entities/' . $output->id],

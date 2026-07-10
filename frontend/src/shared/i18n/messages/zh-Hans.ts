@@ -849,6 +849,17 @@ export const zhHans: Partial<MessageCatalog> = {
   'admin.frontPage.saved': '已保存首页显示设置。',
   'admin.frontPage.saveError': '无法保存首页显示设置。',
 
+  // ── Record page display (#775) ───────────────────────────────────────────
+  'admin.recordPage.description':
+    '公开记录页的站点级默认显示。每条记录可在其发布状态面板中单独覆盖。',
+  'admin.recordPage.loading': '加载中…',
+  'admin.recordPage.commentsLabel': '显示评论区',
+  'admin.recordPage.relatedLabel': '显示相关记录（Keep reading）',
+  'admin.recordPage.save': '保存记录页显示设置',
+  'admin.recordPage.saving': '保存中…',
+  'admin.recordPage.saved': '记录页显示设置已保存。',
+  'admin.recordPage.saveError': '无法保存记录页显示设置。',
+
   // ── Tags ─────────────────────────────────────────────────────────────────
   'admin.tags.eyebrow': '管理',
   'admin.tags.pageTitle': '标签',
@@ -906,6 +917,12 @@ export const zhHans: Partial<MessageCatalog> = {
   'admin.entityStatus.saveSlug': '保存标识符',
   'admin.entityStatus.slugSaved': '已保存。',
   'admin.entityStatus.layoutSaved': '已保存布局。',
+  'admin.entityStatus.showCommentsLabel': '评论区',
+  'admin.entityStatus.showRelatedLabel': '相关记录',
+  'admin.entityStatus.visibilityInherit': '跟随站点设置',
+  'admin.entityStatus.visibilityShow': '显示',
+  'admin.entityStatus.visibilityHide': '隐藏',
+  'admin.entityStatus.visibilitySaved': '已保存显示设置。',
   'admin.layout.entityLabel': '页面布局',
   'admin.layout.defaultLayout': '默认页面布局',
   'admin.layout.inherit': '继承类型默认值',
@@ -994,6 +1011,7 @@ export const zhHans: Partial<MessageCatalog> = {
   'admin.settings.appearance.title': '外观 · 主题',
   'admin.settings.site.title': '站点',
   'admin.settings.frontPage.title': '首页显示',
+  'admin.settings.recordPage.title': '记录页显示',
   'admin.settings.permalink.title': '固定链接',
   'admin.settings.permalink.description':
     '为每种内容类型选择 URL 结构。更改会立即生效；旧 URL 会自动重定向。',

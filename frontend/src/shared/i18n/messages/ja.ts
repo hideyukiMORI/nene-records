@@ -878,6 +878,17 @@ export const ja: Partial<MessageCatalog> = {
   'admin.frontPage.saved': 'ホームページの表示を保存しました。',
   'admin.frontPage.saveError': 'ホームページの表示を保存できませんでした。',
 
+  // ── Record page display (#775) ───────────────────────────────────────────
+  'admin.recordPage.description':
+    '公開レコードページのサイト共通の既定表示です。各レコードの公開ステータスパネルから個別に上書きできます。',
+  'admin.recordPage.loading': '読み込み中…',
+  'admin.recordPage.commentsLabel': 'コメント欄を表示する',
+  'admin.recordPage.relatedLabel': '関連レコード（Keep reading）を表示する',
+  'admin.recordPage.save': 'レコードページの表示を保存',
+  'admin.recordPage.saving': '保存中…',
+  'admin.recordPage.saved': 'レコードページの表示を保存しました。',
+  'admin.recordPage.saveError': 'レコードページの表示を保存できませんでした。',
+
   // ── Tags ─────────────────────────────────────────────────────────────────
   'admin.tags.eyebrow': '管理',
   'admin.tags.pageTitle': 'タグ',
@@ -937,6 +948,12 @@ export const ja: Partial<MessageCatalog> = {
   'admin.entityStatus.saveSlug': 'スラッグを保存',
   'admin.entityStatus.slugSaved': '保存しました。',
   'admin.entityStatus.layoutSaved': 'レイアウトを保存しました。',
+  'admin.entityStatus.showCommentsLabel': 'コメント欄',
+  'admin.entityStatus.showRelatedLabel': '関連レコード',
+  'admin.entityStatus.visibilityInherit': 'サイト設定に従う',
+  'admin.entityStatus.visibilityShow': '表示',
+  'admin.entityStatus.visibilityHide': '非表示',
+  'admin.entityStatus.visibilitySaved': '表示設定を保存しました。',
   'admin.layout.entityLabel': 'ページレイアウト',
   'admin.layout.defaultLayout': '既定のページレイアウト',
   'admin.layout.inherit': 'タイプの既定に従う',
@@ -1029,6 +1046,7 @@ export const ja: Partial<MessageCatalog> = {
   'admin.settings.appearance.title': '外観 · テーマ',
   'admin.settings.site.title': 'サイト',
   'admin.settings.frontPage.title': 'ホームページの表示',
+  'admin.settings.recordPage.title': 'レコードページの表示',
   'admin.settings.permalink.title': 'パーマリンク',
   'admin.settings.permalink.description':
     'コンテンツタイプごとに公開 URL の構造を選択します。変更はすぐ反映され、旧 URL は自動リダイレクトされます。',

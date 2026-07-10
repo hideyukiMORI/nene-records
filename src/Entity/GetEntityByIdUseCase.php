@@ -43,6 +43,8 @@ final readonly class GetEntityByIdUseCase implements GetEntityByIdUseCaseInterfa
             updatedAtIso: $entity->updatedAt?->format(DateTimeInterface::ATOM),
             layout: $entity->layout,
             permalink: $entity->permalink,
+            showComments: $entity->showComments,
+            showRelated: $entity->showRelated,
         );
     }
 }

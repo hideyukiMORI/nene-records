@@ -13,6 +13,10 @@ final readonly class CreateEntityInput
         public ?string $layout = null,
         /** Normalized custom permalink, or null to use the type pattern (#651). */
         public ?string $permalink = null,
+        /** Comments visibility override; null = follow `record_page_config` (#775). */
+        public ?bool $showComments = null,
+        /** Related-records visibility override; null = follow `record_page_config` (#775). */
+        public ?bool $showRelated = null,
     ) {
     }
 }

@@ -140,6 +140,102 @@ final class EntityHttpTest extends TestCase
         self::assertSame(422, $response->getStatusCode());
     }
 
+    public function testPostEntityPersistsVisibilityOverrides(): void
+    {
+        $typeId = $this->entityTypes->save(new EntityType(name: 'Doc', slug: 'doc'));
+
+        $body = $this->factory->createStream(json_encode([
+            'entity_type_id' => $typeId,
+            'show_comments' => false,
+            'show_related' => true,
+        ], JSON_THROW_ON_ERROR));
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('POST', 'https://example.test/api/v1/entities')->withBody($body),
+        );
+        $payload = $this->decodeJson($response);
+
+        self::assertSame(201, $response->getStatusCode());
+        self::assertFalse($payload['show_comments']);
+        self::assertTrue($payload['show_related']);
+
+        $get = $this->decodeJson($this->application->handle(
+            $this->factory->createServerRequest('GET', "https://example.test/api/v1/entities/{$payload['id']}"),
+        ));
+        self::assertFalse($get['show_comments']);
+        self::assertTrue($get['show_related']);
+    }
+
+    public function testPostEntityDefaultsVisibilityOverridesToNull(): void
+    {
+        $typeId = $this->entityTypes->save(new EntityType(name: 'Doc', slug: 'doc'));
+
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('POST', 'https://example.test/api/v1/entities')->withBody(
+                $this->factory->createStream(json_encode(['entity_type_id' => $typeId], JSON_THROW_ON_ERROR)),
+            ),
+        );
+        $payload = $this->decodeJson($response);
+
+        self::assertSame(201, $response->getStatusCode());
+        self::assertNull($payload['show_comments']);
+        self::assertNull($payload['show_related']);
+    }
+
+    public function testPostEntityRejectsNonBooleanShowCommentsWith422(): void
+    {
+        $typeId = $this->entityTypes->save(new EntityType(name: 'Doc', slug: 'doc'));
+
+        $body = $this->factory->createStream(json_encode([
+            'entity_type_id' => $typeId,
+            'show_comments' => 'yes',
+        ], JSON_THROW_ON_ERROR));
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('POST', 'https://example.test/api/v1/entities')->withBody($body),
+        );
+
+        self::assertSame(422, $response->getStatusCode());
+    }
+
+    public function testPutEntityUpdatesAndClearsVisibilityOverrides(): void
+    {
+        $typeId = $this->entityTypes->save(new EntityType(name: 'Doc', slug: 'doc'));
+        $created = $this->decodeJson($this->application->handle(
+            $this->factory->createServerRequest('POST', 'https://example.test/api/v1/entities')->withBody(
+                $this->factory->createStream(json_encode([
+                    'entity_type_id' => $typeId,
+                    'show_comments' => false,
+                ], JSON_THROW_ON_ERROR)),
+            ),
+        ));
+        $id = (int) $created['id'];
+
+        // Flip the override the other way.
+        $update = $this->decodeJson($this->application->handle(
+            $this->factory->createServerRequest('PUT', "https://example.test/api/v1/entities/{$id}")->withBody(
+                $this->factory->createStream(json_encode([
+                    'entity_type_id' => $typeId,
+                    'status' => 'draft',
+                    'show_comments' => true,
+                    'show_related' => false,
+                ], JSON_THROW_ON_ERROR)),
+            ),
+        ));
+        self::assertTrue($update['show_comments']);
+        self::assertFalse($update['show_related']);
+
+        // Omitting the fields clears them back to "follow the site setting".
+        $cleared = $this->decodeJson($this->application->handle(
+            $this->factory->createServerRequest('PUT', "https://example.test/api/v1/entities/{$id}")->withBody(
+                $this->factory->createStream(json_encode([
+                    'entity_type_id' => $typeId,
+                    'status' => 'draft',
+                ], JSON_THROW_ON_ERROR)),
+            ),
+        ));
+        self::assertNull($cleared['show_comments']);
+        self::assertNull($cleared['show_related']);
+    }
+
     public function testPublishingCustomLayoutWithoutMetaDescriptionReturns422(): void
     {
         $typeId = $this->entityTypes->save(new EntityType(name: 'Page', slug: 'page'));

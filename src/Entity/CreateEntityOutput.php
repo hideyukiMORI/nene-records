@@ -16,6 +16,8 @@ final readonly class CreateEntityOutput
         public ?string $deletedAtIso,
         public ?string $layout = null,
         public ?string $permalink = null,
+        public ?bool $showComments = null,
+        public ?bool $showRelated = null,
     ) {
     }
 }

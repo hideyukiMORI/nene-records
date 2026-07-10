@@ -2175,6 +2175,10 @@ export interface components {
              * @enum {string|null}
              */
             layout: "standard" | "full" | "two-col" | "three-col" | "bare" | "custom" | null;
+            /** @description Per-record comments visibility on the public page. Null = follow the site-wide record_page_config setting (#775). */
+            show_comments?: boolean | null;
+            /** @description Per-record related-records visibility on the public page. Null = follow the site-wide record_page_config setting (#775). */
+            show_related?: boolean | null;
             status: components["schemas"]["EntityStatus"];
             /** Format: date-time */
             published_at: string | null;
@@ -2208,6 +2212,10 @@ export interface components {
              * @enum {string|null}
              */
             layout?: "standard" | "full" | "two-col" | "three-col" | "bare" | "custom" | null;
+            /** @description Per-record comments visibility. Null/omitted = follow record_page_config (#775). */
+            show_comments?: boolean | null;
+            /** @description Per-record related-records visibility. Null/omitted = follow record_page_config (#775). */
+            show_related?: boolean | null;
         };
         UpdateEntityRequest: {
             /** Format: int64 */
@@ -2227,6 +2235,10 @@ export interface components {
              * @enum {string|null}
              */
             layout?: "standard" | "full" | "two-col" | "three-col" | "bare" | "custom" | null;
+            /** @description Per-record comments visibility. Null/omitted = follow record_page_config (#775). */
+            show_comments?: boolean | null;
+            /** @description Per-record related-records visibility. Null/omitted = follow record_page_config (#775). */
+            show_related?: boolean | null;
         };
         EntityMoveResponse: {
             /** Format: int64 */

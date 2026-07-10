@@ -46,6 +46,7 @@ final readonly class PdoDefaultSettingDefsSeeder implements DefaultSettingDefsSe
         ['setting_key' => 'analytics_ga4_id', 'data_type' => 'text', 'default_value' => '', 'is_public' => 1, 'label' => 'Google Analytics 4 measurement ID'],
         ['setting_key' => 'analytics_consent_default', 'data_type' => 'text', 'default_value' => 'denied', 'is_public' => 1, 'label' => 'Analytics consent default (denied/granted)'],
         ['setting_key' => 'front_page', 'data_type' => 'text', 'default_value' => '', 'is_public' => 1, 'label' => 'Front page'],
+        ['setting_key' => 'record_page_config', 'data_type' => 'text', 'default_value' => '{"comments":true,"related":true}', 'is_public' => 1, 'label' => 'Record page display'],
     ];
 
     public function __construct(private DatabaseQueryExecutorInterface $query)

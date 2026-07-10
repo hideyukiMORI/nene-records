@@ -34,8 +34,10 @@ export function useEntitySeoPanel(entity: Entity): EntitySeoPanelState {
         status: entity.status,
         metaTitle: metaTitle !== '' ? metaTitle : null,
         metaDescription: metaDescription !== '' ? metaDescription : null,
-        // Preserve layout: the update endpoint is full-replace.
+        // Preserve layout / visibility flags: the update endpoint is full-replace.
         layout: entity.layout,
+        showComments: entity.showComments,
+        showRelated: entity.showRelated,
       })
       .then(() => {
         showToast(t('admin.entitySeo.saveSuccess'), 'success')

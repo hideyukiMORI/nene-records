@@ -16,11 +16,15 @@ import { mswServer } from '@tests/msw/server'
 import { PublicSiteTestProvider } from '@tests/render/PublicSiteTestProvider'
 import { renderWithProviders } from '@tests/render/render-with-providers'
 
-function renderDetailPage(entityTypeSlug = 'article', entityId = 1) {
+function renderDetailPage(
+  entityTypeSlug = 'article',
+  entityId = 1,
+  site?: Parameters<typeof PublicSiteTestProvider>[0]['site'],
+) {
   return renderWithProviders(
     <MemoryRouter initialEntries={[`/${entityTypeSlug}/${String(entityId)}`]}>
       <Routes>
-        <Route element={<PublicSiteTestProvider />}>
+        <Route element={<PublicSiteTestProvider {...(site !== undefined ? { site } : {})} />}>
           <Route path="/:entityTypeSlug/*" element={<PublicRecordDetailPage />} />
         </Route>
       </Routes>
@@ -97,6 +101,79 @@ describe('PublicRecordDetailPage', () => {
     expect(screen.getByText('42')).toBeInTheDocument()
     expect(screen.getByText('published')).toBeInTheDocument()
     expect(screen.getByText('Yes')).toBeInTheDocument()
+  })
+
+  // ── Comments / related visibility (#775) ─────────────────────────────────
+  // Per-record tri-state (show_comments / show_related) wins; null falls back
+  // to the site-wide record_page_config default.
+
+  function seedTitledRecord(
+    overrides: { show_comments?: boolean | null; show_related?: boolean | null } = {},
+  ) {
+    seedEntityTypes([{ id: 1, name: 'Article', slug: 'article' }])
+    seedEntities([{ id: 1, entity_type_id: 1, is_deleted: false, deleted_at: null, ...overrides }])
+    seedFieldDefs([{ id: 1, entity_type_id: 1, field_key: 'title', data_type: 'text' }])
+    seedTextFields([{ id: 1, entity_id: 1, field_key: 'title', value: 'My article' }])
+  }
+
+  it('shows the comments section by default', async () => {
+    seedTitledRecord()
+    renderDetailPage()
+
+    await screen.findByRole('heading', { level: 1, name: 'My article' })
+    expect(screen.getByRole('heading', { name: 'Comments' })).toBeInTheDocument()
+  })
+
+  it('hides the comments section when the site default disables it', async () => {
+    seedTitledRecord()
+    renderDetailPage('article', 1, { recordPageConfig: { comments: false, related: true } })
+
+    await screen.findByRole('heading', { level: 1, name: 'My article' })
+    expect(screen.queryByRole('heading', { name: 'Comments' })).not.toBeInTheDocument()
+  })
+
+  it('show_comments=true overrides a site default that hides comments', async () => {
+    seedTitledRecord({ show_comments: true })
+    renderDetailPage('article', 1, { recordPageConfig: { comments: false, related: true } })
+
+    await screen.findByRole('heading', { level: 1, name: 'My article' })
+    expect(screen.getByRole('heading', { name: 'Comments' })).toBeInTheDocument()
+  })
+
+  it('show_comments=false hides comments even when the site default shows them', async () => {
+    seedTitledRecord({ show_comments: false })
+    renderDetailPage()
+
+    await screen.findByRole('heading', { level: 1, name: 'My article' })
+    expect(screen.queryByRole('heading', { name: 'Comments' })).not.toBeInTheDocument()
+  })
+
+  it('show_related=false hides the "Keep reading" block', async () => {
+    seedEntityTypes([{ id: 1, name: 'Article', slug: 'article' }])
+    // A second published record of the same type would otherwise populate the block.
+    seedEntities([
+      {
+        id: 1,
+        entity_type_id: 1,
+        is_deleted: false,
+        deleted_at: null,
+        show_related: false,
+      },
+      {
+        id: 2,
+        entity_type_id: 1,
+        status: 'published',
+        published_at: '2026-07-01T00:00:00+00:00',
+        is_deleted: false,
+        deleted_at: null,
+      },
+    ])
+    seedFieldDefs([{ id: 1, entity_type_id: 1, field_key: 'title', data_type: 'text' }])
+    seedTextFields([{ id: 1, entity_id: 1, field_key: 'title', value: 'My article' }])
+    renderDetailPage()
+
+    await screen.findByRole('heading', { level: 1, name: 'My article' })
+    expect(screen.queryByText('Keep reading')).not.toBeInTheDocument()
   })
 
   it('renders relation fields as links to target records', async () => {

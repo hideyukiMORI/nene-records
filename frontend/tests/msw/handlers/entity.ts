@@ -16,6 +16,9 @@ interface EntityRecord {
   deleted_at: string | null
   created_at: string | null
   updated_at: string | null
+  /** Tri-state visibility overrides; null = follow record_page_config (#775). */
+  show_comments: boolean | null
+  show_related: boolean | null
 }
 
 let nextId = 1
@@ -38,6 +41,8 @@ export function seedEntities(
     deleted_at: string | null
     created_at?: string | null
     updated_at?: string | null
+    show_comments?: boolean | null
+    show_related?: boolean | null
   }>,
 ): void {
   items = seed.map((item) => ({
@@ -48,6 +53,8 @@ export function seedEntities(
     published_at: item.published_at ?? null,
     created_at: item.created_at ?? null,
     updated_at: item.updated_at ?? null,
+    show_comments: item.show_comments ?? null,
+    show_related: item.show_related ?? null,
   }))
   nextId = Math.max(0, ...seed.map((item) => item.id)) + 1
 }

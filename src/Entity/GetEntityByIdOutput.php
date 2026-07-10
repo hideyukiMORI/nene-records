@@ -21,6 +21,8 @@ final readonly class GetEntityByIdOutput
         public ?string $updatedAtIso = null,
         public ?string $layout = null,
         public ?string $permalink = null,
+        public ?bool $showComments = null,
+        public ?bool $showRelated = null,
     ) {
     }
 }

@@ -17,6 +17,7 @@ use Psr\Http\Message\ServerRequestInterface;
 final readonly class UpdateEntityHandler
 {
     use ParsesPermalinkField;
+    use ParsesTriStateBoolField;
 
     public function __construct(
         private UpdateEntityUseCaseInterface $useCase,
@@ -82,6 +83,10 @@ final readonly class UpdateEntityHandler
         // permalink: optional custom canonical path; null/empty = use the type pattern.
         $permalink = $this->parsePermalinkField($body['permalink'] ?? null, $errors);
 
+        // show_comments / show_related: tri-state; null/omitted = follow record_page_config.
+        $showComments = $this->parseTriStateBoolField($body, 'show_comments', $errors);
+        $showRelated = $this->parseTriStateBoolField($body, 'show_related', $errors);
+
         if ($errors !== []) {
             throw new ValidationException($errors);
         }
@@ -98,6 +103,8 @@ final readonly class UpdateEntityHandler
             scheduledAt: $scheduledAt,
             layout: $layout,
             permalink: $permalink,
+            showComments: $showComments,
+            showRelated: $showRelated,
         ));
 
         return $this->response->create([
@@ -113,6 +120,8 @@ final readonly class UpdateEntityHandler
             'meta_title' => $output->metaTitle,
             'meta_description' => $output->metaDescription,
             'layout' => $output->layout,
+            'show_comments' => $output->showComments,
+            'show_related' => $output->showRelated,
         ]);
     }
 }

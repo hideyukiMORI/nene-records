@@ -46,6 +46,8 @@ final readonly class ScheduleEntityUseCase implements ScheduleEntityUseCaseInter
             metaTitle: $existing->metaTitle,
             metaDescription: $existing->metaDescription,
             scheduledAt: $input->scheduledAt,
+            showComments: $existing->showComments,
+            showRelated: $existing->showRelated,
         );
 
         $this->entities->update($updated);

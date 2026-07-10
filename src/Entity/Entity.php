@@ -26,6 +26,10 @@ final readonly class Entity
         public ?string $layout = null,
         /** Manual sibling order in the directory tree / public nav, lower first (#659). */
         public int $menuOrder = 0,
+        /** Comments visibility on the public page; null = follow `record_page_config` (#775). */
+        public ?bool $showComments = null,
+        /** Related-records visibility on the public page; null = follow `record_page_config` (#775). */
+        public ?bool $showRelated = null,
     ) {
     }
 }

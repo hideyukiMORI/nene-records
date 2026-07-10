@@ -173,6 +173,8 @@ final class InMemoryEntityRepository implements EntityRepositoryInterface
             scheduledAt: $existing->scheduledAt,
             layout: $existing->layout,
             menuOrder: $existing->menuOrder,
+            showComments: $existing->showComments,
+            showRelated: $existing->showRelated,
         );
     }
 
@@ -196,6 +198,8 @@ final class InMemoryEntityRepository implements EntityRepositoryInterface
             scheduledAt: $existing->scheduledAt,
             layout: $existing->layout,
             menuOrder: $menuOrder,
+            showComments: $existing->showComments,
+            showRelated: $existing->showRelated,
         );
     }
 
@@ -413,6 +417,8 @@ final class InMemoryEntityRepository implements EntityRepositoryInterface
             scheduledAt: $entity->scheduledAt,
             layout: $entity->layout,
             menuOrder: $entity->menuOrder,
+            showComments: $entity->showComments,
+            showRelated: $entity->showRelated,
         );
 
         $this->revisions[] = new \NeNeRecords\Entity\EntityRevision(

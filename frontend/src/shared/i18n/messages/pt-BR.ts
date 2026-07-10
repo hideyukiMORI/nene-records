@@ -883,6 +883,17 @@ export const ptBR: Partial<MessageCatalog> = {
   'admin.frontPage.saved': 'Exibição da página inicial salva.',
   'admin.frontPage.saveError': 'Não foi possível salvar a exibição da página inicial.',
 
+  // ── Record page display (#775) ───────────────────────────────────────────
+  'admin.recordPage.description':
+    'Exibição padrão das páginas públicas de registro em todo o site. Cada registro pode substituí-la no painel de status de publicação.',
+  'admin.recordPage.loading': 'Carregando…',
+  'admin.recordPage.commentsLabel': 'Mostrar a seção de comentários',
+  'admin.recordPage.relatedLabel': 'Mostrar o bloco de registros relacionados (“Keep reading”)',
+  'admin.recordPage.save': 'Salvar exibição da página de registro',
+  'admin.recordPage.saving': 'Salvando…',
+  'admin.recordPage.saved': 'Exibição da página de registro salva.',
+  'admin.recordPage.saveError': 'Não foi possível salvar a exibição da página de registro.',
+
   // ── Tags ─────────────────────────────────────────────────────────────────
   'admin.tags.eyebrow': 'Gerenciar',
   'admin.tags.pageTitle': 'Tags',
@@ -942,6 +953,12 @@ export const ptBR: Partial<MessageCatalog> = {
   'admin.entityStatus.saveSlug': 'Salvar slug',
   'admin.entityStatus.slugSaved': 'Salvo.',
   'admin.entityStatus.layoutSaved': 'Layout salvo.',
+  'admin.entityStatus.showCommentsLabel': 'Comentários',
+  'admin.entityStatus.showRelatedLabel': 'Registros relacionados',
+  'admin.entityStatus.visibilityInherit': 'Seguir configuração do site',
+  'admin.entityStatus.visibilityShow': 'Mostrar',
+  'admin.entityStatus.visibilityHide': 'Ocultar',
+  'admin.entityStatus.visibilitySaved': 'Configurações de exibição salvas.',
   'admin.layout.entityLabel': 'Layout da página',
   'admin.layout.defaultLayout': 'Layout de página padrão',
   'admin.layout.inherit': 'Herdar do padrão do tipo',
@@ -1034,6 +1051,7 @@ export const ptBR: Partial<MessageCatalog> = {
   'admin.settings.appearance.title': 'Aparência · Tema',
   'admin.settings.site.title': 'Site',
   'admin.settings.frontPage.title': 'Exibição da página inicial',
+  'admin.settings.recordPage.title': 'Exibição da página de registro',
   'admin.settings.permalink.title': 'Permalinks',
   'admin.settings.permalink.description':
     'Escolha a estrutura de URL para cada tipo de conteúdo. As alterações têm efeito imediato; URLs antigas redirecionam automaticamente.',
