@@ -107,6 +107,27 @@ export function WidgetInspector({
         </Select>
       )
     }
+    if (s.editor === 'enum' && s.key === 'layout') {
+      // Footer link flow (#782): only meaningful for footer columns, so the
+      // control is hidden in other regions (the setting is simply ignored there).
+      if (widget.region !== 'footer') {
+        return null
+      }
+      return (
+        <Select
+          key={s.key}
+          id={`insp-${s.key}`}
+          label={t(s.labelKey)}
+          value={typeof value === 'string' ? value : 'stack'}
+          onChange={(e) => {
+            onSettings(widget.id, { layout: e.target.value })
+          }}
+        >
+          <option value="stack">{t('admin.widgets.menuLayout.stack')}</option>
+          <option value="inline">{t('admin.widgets.menuLayout.inline')}</option>
+        </Select>
+      )
+    }
     if (s.editor === 'enum' && s.key === 'entityTypeSlug') {
       return (
         <Select

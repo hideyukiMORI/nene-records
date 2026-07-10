@@ -211,6 +211,51 @@ describe('PublicSiteShell header reflection', () => {
     expect(screen.queryByText('Browse')).toBeNull()
   })
 
+  it('flows a footer menu column horizontally when settings.layout=inline (#782)', async () => {
+    seedEntityTypes([{ id: 1, name: 'Article', slug: 'article' }])
+    mswServer.use(
+      http.get('/api/v1/public/widgets', () =>
+        HttpResponse.json({
+          items: [
+            {
+              id: 9,
+              widget_type: 'menu',
+              region: 'footer',
+              display_order: 0,
+              title: 'サイトマップ',
+              settings: { menuId: 1, layout: 'inline' },
+              created_at: '2026-07-10 00:00:00',
+              updated_at: '2026-07-10 00:00:00',
+            },
+          ],
+        }),
+      ),
+      http.get('/api/v1/public/menus', () =>
+        HttpResponse.json({
+          items: [
+            {
+              id: 1,
+              name: 'FOOTER MENU',
+              slug: 'footer-menu',
+              location: null,
+              created_at: '2026-07-10 00:00:00',
+              updated_at: '2026-07-10 00:00:00',
+            },
+          ],
+        }),
+      ),
+    )
+
+    renderShell(
+      makeSite({
+        navItems: [{ id: 1, url: '/company', label: 'COMPANY', menuId: 1 }],
+      }),
+    )
+
+    const item = await screen.findByText('COMPANY')
+    expect(item.closest('ul')).toHaveClass('ft__list--inline')
+  })
+
   it('renders footer_markdown as markdown (links work) (#762)', async () => {
     seedEntityTypes([{ id: 1, name: 'Article', slug: 'article' }])
     renderShell(

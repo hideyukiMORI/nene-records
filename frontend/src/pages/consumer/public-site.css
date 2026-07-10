@@ -1115,6 +1115,12 @@
   flex-direction: column;
   gap: var(--space-xs);
 }
+/* 横並びメニュー列（#782・widget settings.layout='inline'）: 折返し可の行フロー。 */
+.nene-public .ft__col ul.ft__list--inline {
+  flex-direction: row;
+  flex-wrap: wrap;
+  column-gap: var(--space-md);
+}
 .nene-public .ft__col a {
   /* Menu size token (#760): themes may set --footer-size; default follows the type scale. */
   font-size: var(--footer-size, var(--text-body-sm));

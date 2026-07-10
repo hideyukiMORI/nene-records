@@ -309,6 +309,9 @@ export const fr: Partial<MessageCatalog> = {
   'admin.widgets.type.calendar': 'Calendrier',
   'admin.widgets.menuSettings': 'Réglages du menu',
   'admin.widgets.menuLabel': 'Menu',
+  'admin.widgets.menuLayoutLabel': 'Disposition des liens (pied de page)',
+  'admin.widgets.menuLayout.stack': 'Empilés',
+  'admin.widgets.menuLayout.inline': 'En ligne (horizontal)',
   'admin.widgets.menuPlaceholder': 'Sélectionnez un menu…',
   'admin.widgets.tocSettings':
     "Affiche les titres de la page actuelle. Aucun réglage — il s'affiche sur les pages comportant des titres.",

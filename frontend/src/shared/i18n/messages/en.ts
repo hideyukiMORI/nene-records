@@ -311,6 +311,9 @@ export const en = {
   'admin.widgets.type.calendar': 'Calendar',
   'admin.widgets.menuSettings': 'Menu settings',
   'admin.widgets.menuLabel': 'Menu',
+  'admin.widgets.menuLayoutLabel': 'Link layout (footer)',
+  'admin.widgets.menuLayout.stack': 'Stacked',
+  'admin.widgets.menuLayout.inline': 'Inline (horizontal)',
   'admin.widgets.menuPlaceholder': 'Select a menu…',
   'admin.widgets.tocSettings':
     "Shows the current page's headings. No settings — it renders on pages that have headings.",

@@ -307,6 +307,9 @@ export const de: Partial<MessageCatalog> = {
   'admin.widgets.type.calendar': 'Kalender',
   'admin.widgets.menuSettings': 'Menüeinstellungen',
   'admin.widgets.menuLabel': 'Menü',
+  'admin.widgets.menuLayoutLabel': 'Link-Anordnung (Footer)',
+  'admin.widgets.menuLayout.stack': 'Gestapelt',
+  'admin.widgets.menuLayout.inline': 'Nebeneinander',
   'admin.widgets.menuPlaceholder': 'Menü auswählen…',
   'admin.widgets.tocSettings':
     'Zeigt die Überschriften der aktuellen Seite an. Keine Einstellungen — es wird auf Seiten mit Überschriften dargestellt.',
