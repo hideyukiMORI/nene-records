@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
 import { currentUserHasCapability } from '@/entities/auth'
 import { useMenuList } from '@/entities/menu'
@@ -18,6 +18,7 @@ import {
   useManageWidgetsPage,
 } from '@/features/manage-widgets'
 import { useTranslation } from '@/shared/i18n'
+import { setChromeRail } from '@/shared/lib/chrome-rail'
 import { useUnsavedChangesGuard } from '@/shared/lib/use-unsaved-changes-guard'
 import { Button, ConfirmDialog, Stack, Text } from '@/shared/ui'
 
@@ -80,6 +81,18 @@ export function AppearanceLayoutPage() {
   const [help, setHelp] = useState(false)
   const [tourOn, setTourOn] = useState(() => localStorage.getItem(TOUR_LS_KEY) === null)
 
+  const active: AppearanceTab = tab === 'menus' ? 'menus' : tab === 'theme' ? 'theme' : 'layout'
+
+  // The theme workspace (#787) and the layout builder are wide multi-pane
+  // surfaces: collapse the app sidebar into an icon rail while they are shown
+  // (#789). Desktop-only gating lives in AppShell; menus stays full-width nav.
+  useEffect(() => {
+    setChromeRail(active === 'theme' || active === 'layout')
+    return () => {
+      setChromeRail(false)
+    }
+  }, [active])
+
   if (!currentUserHasCapability('manage_settings')) {
     return <Navigate to="/forbidden" replace />
   }
@@ -88,8 +101,6 @@ export function AppearanceLayoutPage() {
     setTourOn(false)
     localStorage.setItem(TOUR_LS_KEY, '1')
   }
-
-  const active: AppearanceTab = tab === 'menus' ? 'menus' : tab === 'theme' ? 'theme' : 'layout'
 
   const tabTitle: Record<AppearanceTab, string> = {
     layout: t('admin.appearance.layoutTab'),

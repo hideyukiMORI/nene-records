@@ -1,7 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useUpdateSetting, useSettingList } from '@/entities/setting'
 import { useTranslation } from '@/shared/i18n'
-import { setChromeRail } from '@/shared/lib/chrome-rail'
 import {
   allActiveSideRegions,
   parseLayoutConfig,
@@ -77,14 +76,6 @@ export function ManageWidgetsView({ page }: ManageWidgetsViewProps) {
   }
   const pageLabel =
     layoutPage === 'home' ? t('admin.layout.previewHome') : t('admin.layout.previewRecord')
-
-  // Preview mode collapses the app sidebar into an icon rail (desktop only).
-  useEffect(() => {
-    setChromeRail(mode === 'preview')
-    return () => {
-      setChromeRail(false)
-    }
-  }, [mode])
 
   const segBtn = (on: boolean): string =>
     [
