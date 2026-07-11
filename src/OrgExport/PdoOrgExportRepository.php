@@ -144,4 +144,65 @@ final readonly class PdoOrgExportRepository implements OrgExportRepositoryInterf
             [$orgId],
         );
     }
+
+    /** @return list<array<string, mixed>> */
+    public function findAllMenus(int $orgId): array
+    {
+        return $this->query->fetchAll(
+            'SELECT * FROM menus WHERE organization_id = ? ORDER BY id',
+            [$orgId],
+        );
+    }
+
+    /** @return list<array<string, mixed>> */
+    public function findAllWidgets(int $orgId): array
+    {
+        return $this->query->fetchAll(
+            'SELECT * FROM widgets WHERE organization_id = ? ORDER BY id',
+            [$orgId],
+        );
+    }
+
+    /** @return list<array<string, mixed>> */
+    public function findAllThemes(int $orgId): array
+    {
+        return $this->query->fetchAll(
+            'SELECT * FROM themes WHERE organization_id = ? ORDER BY id',
+            [$orgId],
+        );
+    }
+
+    /** @return list<array<string, mixed>> */
+    public function findAllBlocksFields(int $orgId): array
+    {
+        return $this->query->fetchAll(
+            'SELECT * FROM blocks_fields WHERE organization_id = ? ORDER BY id',
+            [$orgId],
+        );
+    }
+
+    /**
+     * entity_relations has no organization_id column — scope through the source entity.
+     *
+     * @return list<array<string, mixed>>
+     */
+    public function findAllEntityRelations(int $orgId): array
+    {
+        return $this->query->fetchAll(
+            'SELECT er.* FROM entity_relations er
+             JOIN entities e ON e.id = er.source_entity_id
+             WHERE e.organization_id = ?
+             ORDER BY er.id',
+            [$orgId],
+        );
+    }
+
+    /** @return list<array<string, mixed>> */
+    public function findAllUrlRedirects(int $orgId): array
+    {
+        return $this->query->fetchAll(
+            'SELECT * FROM url_redirects WHERE organization_id = ? ORDER BY id',
+            [$orgId],
+        );
+    }
 }

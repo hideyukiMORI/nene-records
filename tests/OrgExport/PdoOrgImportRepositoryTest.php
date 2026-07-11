@@ -122,6 +122,74 @@ final class PdoOrgImportRepositoryTest extends TestCase
         self::assertSame(2, $counts['entity_types']);
     }
 
+    public function testImportsPhase2TablesWithIdRemap(): void
+    {
+        $repository = new PdoOrgImportRepository(
+            new PdoDatabaseTransactionManager($this->factory),
+            new FixedClock(),
+        );
+
+        $counts = $repository->import(1, $this->phase2Payload());
+
+        // menu imported → its id is used by both a navigation item and a menu widget.
+        $menu = $this->executor->fetchOne("SELECT id FROM menus WHERE organization_id = 1 AND slug = 'main'");
+        self::assertNotNull($menu);
+        $newMenuId = (int) $menu['id'];
+
+        // navigation_items.menu_id remapped onto the imported menu (not the source id 8).
+        $nav = $this->executor->fetchOne("SELECT menu_id FROM navigation_items WHERE label = 'Blog'");
+        self::assertNotNull($nav);
+        self::assertSame($newMenuId, (int) $nav['menu_id']);
+
+        // menu widget settings.menuId remapped.
+        $widget = $this->executor->fetchOne("SELECT settings FROM widgets WHERE widget_type = 'menu'");
+        self::assertNotNull($widget);
+        $settings = json_decode((string) $widget['settings'], true);
+        self::assertIsArray($settings);
+        self::assertSame($newMenuId, $settings['menuId']);
+
+        // theme imported.
+        $theme = $this->executor->fetchOne("SELECT manifest FROM themes WHERE organization_id = 1 AND theme_key = 'custom'");
+        self::assertNotNull($theme);
+        self::assertStringContainsString('brand', (string) $theme['manifest']);
+
+        // blocks_fields body preserved and remapped onto the new entity id.
+        $entity = $this->executor->fetchOne("SELECT id FROM entities WHERE slug = 'hello-world'");
+        self::assertNotNull($entity);
+        $block  = $this->executor->fetchOne(
+            'SELECT value FROM blocks_fields WHERE entity_id = ? AND field_key = ?',
+            [(int) $entity['id'], 'blocks'],
+        );
+        self::assertNotNull($block);
+        self::assertStringContainsString('paragraph', (string) $block['value']);
+
+        // entity_relations remapped onto the two new entity ids.
+        $other = $this->executor->fetchOne("SELECT id FROM entities WHERE slug = 'second'");
+        self::assertNotNull($other);
+        $relation = $this->executor->fetchOne(
+            'SELECT field_key FROM entity_relations WHERE source_entity_id = ? AND target_entity_id = ?',
+            [(int) $entity['id'], (int) $other['id']],
+        );
+        self::assertNotNull($relation);
+        self::assertSame('related', $relation['field_key']);
+
+        // url_redirect imported.
+        $redirect = $this->executor->fetchOne("SELECT target_path FROM url_redirects WHERE organization_id = 1 AND source_path = '/old'");
+        self::assertNotNull($redirect);
+        self::assertSame('/new', $redirect['target_path']);
+
+        // logo_media_id setting value remapped onto the imported media row.
+        $media = $this->executor->fetchOne("SELECT id FROM media WHERE stored_name = 'logo.png'");
+        self::assertNotNull($media);
+        $logo = $this->executor->fetchOne("SELECT value FROM setting_values WHERE organization_id = 1 AND setting_key = 'logo_media_id'");
+        self::assertNotNull($logo);
+        self::assertSame((string) (int) $media['id'], $logo['value']);
+
+        self::assertSame(1, $counts['menus']);
+        self::assertSame(1, $counts['widgets']);
+        self::assertSame(1, $counts['entity_relations']);
+    }
+
     public function testFailedImportRollsBackEntireOrg(): void
     {
         $repository = new PdoOrgImportRepository(
@@ -198,6 +266,43 @@ final class PdoOrgImportRepositoryTest extends TestCase
         ];
     }
 
+    /** @return array<string, mixed> */
+    private function phase2Payload(): array
+    {
+        return [
+            'meta'             => ['organization_id' => 99],
+            'entity_types'     => [['id' => 10, 'name' => 'Posts', 'slug' => 'posts', 'is_pinned' => 1]],
+            'entities'         => [
+                ['id' => 30, 'entity_type_id' => 10, 'slug' => 'hello-world', 'status' => 'published'],
+                ['id' => 31, 'entity_type_id' => 10, 'slug' => 'second', 'status' => 'published'],
+            ],
+            'media'            => [
+                ['id' => 60, 'original_name' => 'logo.png', 'stored_name' => 'logo.png', 'mime_type' => 'image/png', 'size' => 10, 'url' => '/media/logo.png', 'storage_key' => 'media/logo.png'],
+            ],
+            'menus'            => [['id' => 8, 'name' => 'Main', 'slug' => 'main', 'location' => 'header']],
+            'navigation_items' => [['id' => 70, 'menu_id' => 8, 'label' => 'Blog', 'url' => '/blog', 'display_order' => 0]],
+            'widgets'          => [
+                ['id' => 80, 'widget_type' => 'menu', 'region' => 'header', 'display_order' => 0, 'title' => 'Nav', 'settings' => '{"menuId":8,"layout":"inline"}'],
+            ],
+            'themes'           => [
+                ['id' => 90, 'theme_key' => 'custom', 'name' => 'Custom', 'version' => '1.0.0', 'source' => 'runtime', 'manifest' => '{"brand":"#ff0000"}'],
+            ],
+            'blocks_fields'    => [
+                ['id' => 100, 'entity_id' => 30, 'field_key' => 'blocks', 'value' => '[{"type":"paragraph","text":"hi"}]', 'is_deleted' => 0],
+            ],
+            'entity_relations' => [
+                ['id' => 110, 'source_entity_id' => 30, 'target_entity_id' => 31, 'field_key' => 'related'],
+            ],
+            'url_redirects'    => [['id' => 120, 'source_path' => '/old', 'target_path' => '/new']],
+            'setting_defs'     => [
+                ['id' => 130, 'setting_key' => 'logo_media_id', 'data_type' => 'media', 'default_value' => '', 'is_public' => 1, 'label' => 'Logo'],
+            ],
+            'setting_values'   => [
+                ['id' => 140, 'setting_key' => 'logo_media_id', 'value' => '60', 'is_deleted' => 0],
+            ],
+        ];
+    }
+
     private function seedFreshOrg(int $orgId): void
     {
         // Mirror the fresh-install seed: posts type + title/body field_defs, and one setting_def.
@@ -236,7 +341,13 @@ final class PdoOrgImportRepositoryTest extends TestCase
             $projectRoot . '/database/schema/tags.sql',
             $projectRoot . '/database/schema/entity_tags.sql',
             $projectRoot . '/database/schema/media.sql',
+            $projectRoot . '/database/schema/menus.sql',
             $projectRoot . '/database/schema/navigation_items.sql',
+            $projectRoot . '/database/schema/widgets.sql',
+            $projectRoot . '/database/schema/themes.sql',
+            $projectRoot . '/database/schema/blocks_fields.sql',
+            $projectRoot . '/database/schema/entity_relations.sql',
+            $projectRoot . '/database/schema/url_redirects.sql',
             $projectRoot . '/database/schema/settings.sql',
         ];
 

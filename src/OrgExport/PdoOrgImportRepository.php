@@ -277,14 +277,54 @@ final readonly class PdoOrgImportRepository implements OrgImportRepositoryInterf
         }
         $counts['media'] = $mediaCount;
 
-        // ── navigation_items (append) ─────────────────────────────────────
-        // The menu_id column tracks the live schema so named-menu links survive
-        // once menus are imported (#347). Menus are out of Phase 1 scope, so the
-        // FK is left NULL here; Phase 2 imports menus first and remaps menu_id.
+        // ── menus (merge on org+slug; build menuMap for FKs) (#347) ────────
+        /** @var array<int, int> $menuMap  old_id → new_id */
+        $menuMap    = [];
+        $menuCount  = 0;
+        foreach ((array) ($payload['menus'] ?? []) as $row) {
+            $oldId    = (int) $row['id'];
+            $now      = $this->clock->now()->format('Y-m-d H:i:s');
+            $existing = $query->fetchOne(
+                'SELECT id FROM menus WHERE organization_id = ? AND slug = ?',
+                [$targetOrgId, (string) $row['slug']],
+            );
+            if ($existing !== null) {
+                $newId = (int) $existing['id'];
+                $query->execute(
+                    'UPDATE menus SET name = ?, location = ?, updated_at = ? WHERE id = ?',
+                    [
+                        (string) $row['name'],
+                        isset($row['location']) ? (string) $row['location'] : null,
+                        $now,
+                        $newId,
+                    ],
+                );
+            } else {
+                $newId = $query->insert(
+                    'INSERT INTO menus (organization_id, name, slug, location, created_at, updated_at)
+                     VALUES (?, ?, ?, ?, ?, ?)',
+                    [
+                        $targetOrgId,
+                        (string) $row['name'],
+                        (string) $row['slug'],
+                        isset($row['location']) ? (string) $row['location'] : null,
+                        (string) ($row['created_at'] ?? $now),
+                        (string) ($row['updated_at'] ?? $now),
+                    ],
+                );
+            }
+            $menuMap[$oldId] = $newId;
+            $menuCount++;
+        }
+        $counts['menus'] = $menuCount;
+
+        // ── navigation_items (append; menu_id remapped via menuMap) ────────
         $navCount = 0;
         foreach ((array) ($payload['navigation_items'] ?? []) as $row) {
             $now       = $this->clock->now()->format('Y-m-d H:i:s');
-            $newMenuId = null;
+            $newMenuId = isset($row['menu_id'])
+                ? ($menuMap[(int) $row['menu_id']] ?? null)
+                : null;
             $query->insert(
                 'INSERT INTO navigation_items
                     (organization_id, menu_id, label, url, display_order, created_at, updated_at)
@@ -302,6 +342,136 @@ final readonly class PdoOrgImportRepository implements OrgImportRepositoryInterf
             $navCount++;
         }
         $counts['navigation_items'] = $navCount;
+
+        // ── widgets (append; remap settings.menuId for menu widgets) (#324) ─
+        $widgetCount = 0;
+        foreach ((array) ($payload['widgets'] ?? []) as $row) {
+            $now      = $this->clock->now()->format('Y-m-d H:i:s');
+            $settings = $this->remapWidgetSettings(
+                isset($row['settings']) ? (string) $row['settings'] : null,
+                (string) $row['widget_type'],
+                $menuMap,
+            );
+            $query->insert(
+                'INSERT INTO widgets (organization_id, widget_type, region, display_order, title, settings, created_at, updated_at)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+                [
+                    $targetOrgId,
+                    (string) $row['widget_type'],
+                    (string) $row['region'],
+                    (int) ($row['display_order'] ?? 0),
+                    isset($row['title']) ? (string) $row['title'] : null,
+                    $settings,
+                    (string) ($row['created_at'] ?? $now),
+                    (string) ($row['updated_at'] ?? $now),
+                ],
+            );
+            $widgetCount++;
+        }
+        $counts['widgets'] = $widgetCount;
+
+        // ── themes (merge on org+theme_key; manifest is self-contained) ────
+        $themeCount = 0;
+        foreach ((array) ($payload['themes'] ?? []) as $row) {
+            $now      = $this->clock->now()->format('Y-m-d H:i:s');
+            $existing = $query->fetchOne(
+                'SELECT id FROM themes WHERE organization_id = ? AND theme_key = ?',
+                [$targetOrgId, (string) $row['theme_key']],
+            );
+            if ($existing !== null) {
+                $query->execute(
+                    'UPDATE themes SET name = ?, version = ?, source = ?, manifest = ?, updated_at = ? WHERE id = ?',
+                    [
+                        (string) $row['name'],
+                        (string) ($row['version'] ?? '1.0.0'),
+                        (string) ($row['source'] ?? 'runtime'),
+                        (string) $row['manifest'],
+                        $now,
+                        (int) $existing['id'],
+                    ],
+                );
+            } else {
+                $query->insert(
+                    'INSERT INTO themes (organization_id, theme_key, name, version, source, manifest, created_at, updated_at)
+                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+                    [
+                        $targetOrgId,
+                        (string) $row['theme_key'],
+                        (string) $row['name'],
+                        (string) ($row['version'] ?? '1.0.0'),
+                        (string) ($row['source'] ?? 'runtime'),
+                        (string) $row['manifest'],
+                        (string) ($row['created_at'] ?? $now),
+                        (string) ($row['updated_at'] ?? $now),
+                    ],
+                );
+            }
+            $themeCount++;
+        }
+        $counts['themes'] = $themeCount;
+
+        // ── blocks_fields (append; entity_id remapped) (#486) ──────────────
+        // NOTE: the block body may embed media URLs / entity references. Those
+        // are NOT rewritten here (see #741 Phase 2 design note / follow-up issue);
+        // the body is imported verbatim so block content survives, and relative
+        // media URLs resolve because Tier A serves media from the same paths.
+        $blocksCount = 0;
+        foreach ((array) ($payload['blocks_fields'] ?? []) as $row) {
+            $newEntityId = $entityMap[(int) $row['entity_id']] ?? null;
+            if ($newEntityId === null) {
+                continue;
+            }
+            $query->insert(
+                'INSERT INTO blocks_fields (organization_id, entity_id, field_key, locale, value, is_deleted, deleted_at)
+                 VALUES (?, ?, ?, ?, ?, ?, ?)',
+                [
+                    $targetOrgId,
+                    $newEntityId,
+                    (string) $row['field_key'],
+                    isset($row['locale']) ? (string) $row['locale'] : null,
+                    (string) $row['value'],
+                    (int) ($row['is_deleted'] ?? 0),
+                    isset($row['deleted_at']) ? (string) $row['deleted_at'] : null,
+                ],
+            );
+            $blocksCount++;
+        }
+        $counts['blocks_fields'] = $blocksCount;
+
+        // ── entity_relations (remap source/target entity) (#200/#542) ──────
+        $relationCount = 0;
+        foreach ((array) ($payload['entity_relations'] ?? []) as $row) {
+            $newSource = $entityMap[(int) $row['source_entity_id']] ?? null;
+            $newTarget = $entityMap[(int) $row['target_entity_id']] ?? null;
+            if ($newSource === null || $newTarget === null) {
+                continue;
+            }
+            $query->insert(
+                'INSERT INTO entity_relations (source_entity_id, target_entity_id, field_key)
+                 VALUES (?, ?, ?)',
+                [$newSource, $newTarget, (string) $row['field_key']],
+            );
+            $relationCount++;
+        }
+        $counts['entity_relations'] = $relationCount;
+
+        // ── url_redirects (append) (#188/#565) ─────────────────────────────
+        $redirectCount = 0;
+        foreach ((array) ($payload['url_redirects'] ?? []) as $row) {
+            $now = $this->clock->now()->format('Y-m-d H:i:s');
+            $query->insert(
+                'INSERT INTO url_redirects (organization_id, source_path, target_path, created_at)
+                 VALUES (?, ?, ?, ?)',
+                [
+                    $targetOrgId,
+                    (string) $row['source_path'],
+                    (string) $row['target_path'],
+                    (string) ($row['created_at'] ?? $now),
+                ],
+            );
+            $redirectCount++;
+        }
+        $counts['url_redirects'] = $redirectCount;
 
         // ── setting_defs (merge on org+setting_key, source-wins) ───────────
         $settingDefCount = 0;
@@ -345,19 +515,28 @@ final readonly class PdoOrgImportRepository implements OrgImportRepositoryInterf
         $counts['setting_defs'] = $settingDefCount;
 
         // ── setting_values (merge on org+setting_key, source-wins) ─────────
+        // logo_media_id points at a media row id — remap it via the media map so
+        // the logo survives transport. Other settings that embed media URLs or
+        // entity references inside JSON blobs (home_hero, footer_config, …) are
+        // NOT rewritten here (see #741 Phase 2 design note / follow-up issue).
         $settingValueCount = 0;
         foreach ((array) ($payload['setting_values'] ?? []) as $row) {
-            $now      = $this->clock->now()->format('Y-m-d H:i:s');
+            $now       = $this->clock->now()->format('Y-m-d H:i:s');
+            $settingKey = (string) $row['setting_key'];
+            $value      = isset($row['value']) ? (string) $row['value'] : null;
+            if ($settingKey === 'logo_media_id' && $value !== null && $value !== '' && ctype_digit($value)) {
+                $value = isset($mediaMap[(int) $value]) ? (string) $mediaMap[(int) $value] : $value;
+            }
             $existing = $query->fetchOne(
                 'SELECT id FROM setting_values WHERE organization_id = ? AND setting_key = ?',
-                [$targetOrgId, (string) $row['setting_key']],
+                [$targetOrgId, $settingKey],
             );
             if ($existing !== null) {
                 $query->execute(
                     'UPDATE setting_values SET value = ?, is_deleted = ?, deleted_at = ?, updated_at = ?
                       WHERE id = ?',
                     [
-                        isset($row['value']) ? (string) $row['value'] : null,
+                        $value,
                         (int) ($row['is_deleted'] ?? 0),
                         isset($row['deleted_at']) ? (string) $row['deleted_at'] : null,
                         $now,
@@ -370,8 +549,8 @@ final readonly class PdoOrgImportRepository implements OrgImportRepositoryInterf
                      VALUES (?, ?, ?, ?, ?, ?, ?)',
                     [
                         $targetOrgId,
-                        (string) $row['setting_key'],
-                        isset($row['value']) ? (string) $row['value'] : null,
+                        $settingKey,
+                        $value,
                         (int) ($row['is_deleted'] ?? 0),
                         isset($row['deleted_at']) ? (string) $row['deleted_at'] : null,
                         (string) ($row['created_at'] ?? $now),
@@ -384,6 +563,37 @@ final readonly class PdoOrgImportRepository implements OrgImportRepositoryInterf
         $counts['setting_values'] = $settingValueCount;
 
         return $counts;
+    }
+
+    /**
+     * Remaps the `menuId` inside a menu widget's settings JSON via the menu map.
+     *
+     * Menu widgets (#324) store `{"menuId": <id>, ...}` pointing at a menus row.
+     * Other widget types carry no cross-table id, so their settings pass through
+     * untouched. Malformed / non-object JSON is returned verbatim.
+     *
+     * @param array<int, int> $menuMap  old menu id → new menu id
+     */
+    private function remapWidgetSettings(?string $settings, string $widgetType, array $menuMap): ?string
+    {
+        if ($settings === null || $settings === '' || $widgetType !== 'menu') {
+            return $settings;
+        }
+
+        $decoded = json_decode($settings, true);
+        if (!is_array($decoded) || !isset($decoded['menuId'])) {
+            return $settings;
+        }
+
+        $oldMenuId = (int) $decoded['menuId'];
+        if (!isset($menuMap[$oldMenuId])) {
+            return $settings;
+        }
+
+        $decoded['menuId'] = $menuMap[$oldMenuId];
+        $encoded           = json_encode($decoded, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+        return $encoded === false ? $settings : $encoded;
     }
 
     /**

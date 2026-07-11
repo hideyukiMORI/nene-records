@@ -203,6 +203,42 @@ final class StubOrgExportRepository implements OrgExportRepositoryInterface
     {
         return [];
     }
+
+    /** @return list<array<string, mixed>> */
+    public function findAllMenus(int $orgId): array
+    {
+        return [];
+    }
+
+    /** @return list<array<string, mixed>> */
+    public function findAllWidgets(int $orgId): array
+    {
+        return [];
+    }
+
+    /** @return list<array<string, mixed>> */
+    public function findAllThemes(int $orgId): array
+    {
+        return [];
+    }
+
+    /** @return list<array<string, mixed>> */
+    public function findAllBlocksFields(int $orgId): array
+    {
+        return [];
+    }
+
+    /** @return list<array<string, mixed>> */
+    public function findAllEntityRelations(int $orgId): array
+    {
+        return [];
+    }
+
+    /** @return list<array<string, mixed>> */
+    public function findAllUrlRedirects(int $orgId): array
+    {
+        return [];
+    }
 }
 
 final class RecordingOrgImportRepository implements OrgImportRepositoryInterface

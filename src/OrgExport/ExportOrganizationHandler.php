@@ -65,6 +65,12 @@ final readonly class ExportOrganizationHandler implements RequestHandlerInterfac
             'setting_defs'     => $this->repository->findAllSettingDefs($id),
             'setting_values'   => $this->repository->findAllSettingValues($id),
             'media'            => $this->repository->findAllMedia($id),
+            'menus'            => $this->repository->findAllMenus($id),
+            'widgets'          => $this->repository->findAllWidgets($id),
+            'themes'           => $this->repository->findAllThemes($id),
+            'blocks_fields'    => $this->repository->findAllBlocksFields($id),
+            'entity_relations' => $this->repository->findAllEntityRelations($id),
+            'url_redirects'    => $this->repository->findAllUrlRedirects($id),
         ];
 
         return $this->json->create($payload);
