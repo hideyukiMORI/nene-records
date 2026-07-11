@@ -26,7 +26,13 @@ final readonly class PublicHtmlSanitizer
             ->allowElement('img', ['src', 'alt', 'title', 'width', 'height'])
             ->allowRelativeLinks()
             ->allowRelativeMedias()
-            ->allowAttribute('style', '*');
+            ->allowAttribute('style', '*')
+            // A full custom page body (a `bare`/custom page authored as one html
+            // field) routinely exceeds Symfony's 20 KB default, which would
+            // silently truncate the crawlable SSR mid-page. Raise the cap to a
+            // generous-but-bounded ceiling so the whole body is sanitized and
+            // server-rendered, while still guarding against pathological input.
+            ->withMaxInputLength(5_000_000);
 
         $this->sanitizer = new HtmlSanitizer($config);
     }

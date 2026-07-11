@@ -53,6 +53,18 @@ export function PublicRecordFieldList({
           )
         }
 
+        // Rich HTML (a `html` field) is body prose, not a labelled attribute:
+        // render it as the article's reading column with no field-key label,
+        // so a `bare`/custom page whose body is a single sanitized-HTML field
+        // fills the content host cleanly (parity with markdown/blocks above).
+        if (row.dataType === 'html') {
+          return (
+            <div key={row.fieldKey} className="prose">
+              <SanitizedHtml html={row.displayValue === '—' ? '' : row.displayValue} />
+            </div>
+          )
+        }
+
         // Typed post blocks (#486) render as the article body via first-party,
         // theme-following block renderers — no field-key label.
         if (row.dataType === 'blocks') {
@@ -86,15 +98,9 @@ export function PublicRecordFieldList({
             <Text as="dt" variant="heading-sm">
               {row.fieldKey}
             </Text>
-            {row.dataType === 'html' ? (
-              <dd>
-                <SanitizedHtml html={row.displayValue === '—' ? '' : row.displayValue} />
-              </dd>
-            ) : (
-              <Text as="dd" muted>
-                {row.displayValue}
-              </Text>
-            )}
+            <Text as="dd" muted>
+              {row.displayValue}
+            </Text>
           </div>
         )
       })}
