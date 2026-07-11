@@ -85,7 +85,9 @@ final readonly class SpaShellFallback
         $html = $this->injectBasePath($html, $request);
         $html = $this->injectApexFlag($html, $request);
 
-        $analytics = $this->resolveAnalytics($path);
+        $settings = $this->resolveSettingsMap($path);
+        $analytics = $settings === null ? WebAnalyticsConfig::disabled() : WebAnalyticsConfig::fromSettings($settings);
+        $embeds = $settings === null ? EmbedAllowlist::empty() : EmbedAllowlist::fromSettings($settings);
         $nonce = $analytics->isEnabled() ? bin2hex(random_bytes(16)) : '';
 
         if ($analytics->isEnabled()) {
@@ -94,19 +96,22 @@ final readonly class SpaShellFallback
 
         return $this->responseFactory->createResponse(200)
             ->withHeader('Content-Type', 'text/html; charset=utf-8')
-            ->withHeader('Content-Security-Policy', PublicHtmlCsp::build($analytics, $nonce !== '' ? $nonce : null))
+            ->withHeader('Content-Security-Policy', PublicHtmlCsp::build($analytics, $nonce !== '' ? $nonce : null, $embeds))
             ->withBody($this->streamFactory->createStream($html));
     }
 
     /**
-     * Best-effort analytics resolution for the shell. Disabled on admin / auth
-     * paths and whenever settings can't be read (org-scoped lookup throws when no
-     * org is resolved — same resilience contract as the 301 redirect layer).
+     * Best-effort public-settings resolution for the shell. Returns null on admin /
+     * auth paths and whenever settings can't be read (org-scoped lookup throws when
+     * no org is resolved — same resilience contract as the 301 redirect layer), so
+     * both analytics and the trusted-embed allowlist stay disabled there.
+     *
+     * @return array<string, string>|null
      */
-    private function resolveAnalytics(string $path): WebAnalyticsConfig
+    private function resolveSettingsMap(string $path): ?array
     {
         if ($this->publicSettings === null || preg_match(self::ANALYTICS_SKIP, $path) === 1) {
-            return WebAnalyticsConfig::disabled();
+            return null;
         }
 
         try {
@@ -115,9 +120,9 @@ final readonly class SpaShellFallback
                 $map[$entry->def->settingKey] = $entry->effectiveValue;
             }
 
-            return WebAnalyticsConfig::fromSettings($map);
+            return $map;
         } catch (\Throwable) {
-            return WebAnalyticsConfig::disabled();
+            return null;
         }
     }
 
