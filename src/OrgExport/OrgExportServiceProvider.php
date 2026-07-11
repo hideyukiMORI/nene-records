@@ -6,6 +6,7 @@ namespace NeNeRecords\OrgExport;
 
 use LogicException;
 use Nene2\Database\DatabaseQueryExecutorInterface;
+use Nene2\Database\DatabaseTransactionManagerInterface;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
@@ -33,9 +34,9 @@ final readonly class OrgExportServiceProvider implements ServiceProviderInterfac
             ->set(
                 OrgImportRepositoryInterface::class,
                 static function (ContainerInterface $c): OrgImportRepositoryInterface {
-                    $query = $c->get(DatabaseQueryExecutorInterface::class);
-                    if (!$query instanceof DatabaseQueryExecutorInterface) {
-                        throw new LogicException('DatabaseQueryExecutorInterface is invalid.');
+                    $transactions = $c->get(DatabaseTransactionManagerInterface::class);
+                    if (!$transactions instanceof DatabaseTransactionManagerInterface) {
+                        throw new LogicException('DatabaseTransactionManagerInterface is invalid.');
                     }
 
                     $clock = $c->get(ClockInterface::class);
@@ -43,7 +44,7 @@ final readonly class OrgExportServiceProvider implements ServiceProviderInterfac
                         throw new LogicException('ClockInterface is invalid.');
                     }
 
-                    return new PdoOrgImportRepository($query, $clock);
+                    return new PdoOrgImportRepository($transactions, $clock);
                 },
             )
             ->set(
