@@ -21,9 +21,24 @@ Last updated: 2026-07-11
   確認済み（全行 organization_id 刻印・運用者ツール）。build-release.sh の同梱 allowlist に追加。
 - 検収: ローカル MySQL 実 DB で org1 export(160KB) → fresh org へ CLI import 成功。
   entity_types/setting_defs/field_defs が重複せずマージ・custom permalink 往復を確認。
-- 残（Phase 2）: menus/widgets/themes/blocks_fields/entity_relations/url_redirects の
-  export/import 追加＋ID リマップ、navigation_items.menu_id の実リマップ、settings/blocks 内の
-  media URL・entity 参照の扱い、メディア実ファイルの rsync/FTP 手順ドキュメント化。
+- **Phase 1 は merge 済み（PR #793・main 19eb9aa・CI 緑・本番デプロイは未実施）**。
+
+### Phase 2（ブランチ feat/741-org-transport-phase2・④⑤）
+
+- **④ テーブル拡充＋ID リマップ**: menus / widgets / themes / blocks_fields / entity_relations /
+  url_redirects を export・import 両方に追加。navigation_items.menu_id を menuMap で実リマップ、
+  menu ウィジェットの settings.menuId をリマップ、entity_relations の source/target を entityMap で
+  リマップ、blocks_fields の entity_id をリマップ、setting_values の logo_media_id を mediaMap で
+  リマップ。menus/themes は org+slug/theme_key でマージ。
+- **⑤ メディア実ファイル**: `docs/install-tier-a.md` に「別インスタンスからの移送」節を追加
+  （export → var/media rsync/FTP → CLI import の手順）。
+- 検収: 実 MySQL で org1 に menu/menu-widget/theme/url_redirect を仕込み → fresh org へ round-trip、
+  navigation_items.menu_id・widget settings.menuId が移送先 menu id に再マップされることを確認。
+- **設計所見（残・要 issue 化）**: ブロック本文・一部設定（home_hero/footer_config 等）の JSON に
+  埋め込まれた media URL・entity 参照は書き換えていない（body は verbatim 取り込みで本文は保全・
+  相対 URL は同一パス配置で解決）。comments/webhooks/notification_channels/user_profiles は
+  今回スコープ外。superadmin export 系ルートの capability 未設定（認証さえ通れば非 superadmin でも
+  HTTP import 可）の緩さも別 issue 化推奨。
 
 ## 直近: AYANE Tier A 設置リハーサル＋移送経路の実証（2026-07-09）
 

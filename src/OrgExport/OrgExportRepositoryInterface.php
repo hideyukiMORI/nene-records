@@ -47,4 +47,22 @@ interface OrgExportRepositoryInterface
 
     /** @return list<array<string, mixed>> */
     public function findAllMedia(int $orgId): array;
+
+    /** @return list<array<string, mixed>> */
+    public function findAllMenus(int $orgId): array;
+
+    /** @return list<array<string, mixed>> */
+    public function findAllWidgets(int $orgId): array;
+
+    /** @return list<array<string, mixed>> */
+    public function findAllThemes(int $orgId): array;
+
+    /** @return list<array<string, mixed>> */
+    public function findAllBlocksFields(int $orgId): array;
+
+    /** @return list<array<string, mixed>> */
+    public function findAllEntityRelations(int $orgId): array;
+
+    /** @return list<array<string, mixed>> */
+    public function findAllUrlRedirects(int $orgId): array;
 }
