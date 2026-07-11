@@ -1,6 +1,31 @@
 # Current Work
 
-Last updated: 2026-07-09
+Last updated: 2026-07-11
+
+## 進行中: #741 移送経路 Phase 1（SaaS org → Tier A・ブランチ feat/741-org-transport-phase1）
+
+指示書 `_work/handoff-records-741-export-import-2026-07-11-work-order.md`・報告
+`_work/handoff-records-741-export-import-2026-07-11-report.md`。
+
+- **① 衝突マージ + id リマップ**: `PdoOrgImportRepository` を、entity_types（org+slug）/
+  field_defs（org+entity_type+field_key）/ setting_defs・setting_values（org+setting_key）で
+  既存シード行にマージ（移送元優先の update）・id リマップ表を後続 FK に波及。
+- **② トランザクション化**: import 全体を `DatabaseTransactionManagerInterface::transactional`
+  で 1 トランザクション化。途中失敗で org 無傷を SQLite テストで実証。
+- **③ 列脱落解消**: entities.permalink/menu_order/layout/show_comments/show_related・
+  navigation_items.menu_id・media.alt_text/width/height/storage_key・entity_types.default_layout/
+  display_order・field_defs.region/display_order を INSERT に追加。SQLite ラウンドトリップ
+  テストで新列の往復を検証（列脱落再発を検知）。schema fixture `media.sql` も現行列に追随。
+- **⑥ Tier A import 手段**: `tools/import-org.php`（CLI・`--file`/`--org`）。install.php/
+  webhook-worker.php と同じ RuntimeContainer 経由。stop-gate（auth/tenancy 不変条件）不抵触を
+  確認済み（全行 organization_id 刻印・運用者ツール）。build-release.sh の同梱 allowlist に追加。
+- 検収: ローカル MySQL 実 DB で org1 export(160KB) → fresh org へ CLI import 成功。
+  entity_types/setting_defs/field_defs が重複せずマージ・custom permalink 往復を確認。
+- 残（Phase 2）: menus/widgets/themes/blocks_fields/entity_relations/url_redirects の
+  export/import 追加＋ID リマップ、navigation_items.menu_id の実リマップ、settings/blocks 内の
+  media URL・entity 参照の扱い、メディア実ファイルの rsync/FTP 手順ドキュメント化。
+
+## 直近: AYANE Tier A 設置リハーサル＋移送経路の実証（2026-07-09）
 
 ## 直近: AYANE Tier A 設置リハーサル＋移送経路の実証（2026-07-09）
 
