@@ -9,6 +9,7 @@ use Nene2\Routing\Router;
 use Nene2\View\HtmlResponseFactory;
 use NeNeRecords\BundleField\BundleDocumentValidator;
 use NeNeRecords\Http\BasePath;
+use NeNeRecords\Http\EmbedAllowlist;
 use NeNeRecords\Http\PublicHtmlCsp;
 use NeNeRecords\Http\WebAnalyticsConfig;
 use NeNeRecords\Http\WebAnalyticsHeadSnippet;
@@ -221,7 +222,11 @@ final readonly class RenderPublicRecordViewHandler implements PublicRecordViewRe
             'renderBundleSeo' => static fn (string $raw): string => PublicMarkdownRenderer::toSafeHtml(BundleDocumentValidator::seoTextOf($raw)),
         ])->withHeader(
             'Content-Security-Policy',
-            PublicHtmlCsp::build($analytics, $analyticsNonce !== '' ? $analyticsNonce : null),
+            PublicHtmlCsp::build(
+                $analytics,
+                $analyticsNonce !== '' ? $analyticsNonce : null,
+                EmbedAllowlist::fromSettings($settings),
+            ),
         );
     }
 

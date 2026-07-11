@@ -42,6 +42,9 @@ final readonly class PdoDefaultSettingDefsSeeder implements DefaultSettingDefsSe
         ['setting_key' => 'header_config', 'data_type' => 'text', 'default_value' => '{"topbar":{"enabled":false,"phone":"","email":"","infoText":""},"cta":{"enabled":false,"label":"","url":""}}', 'is_public' => 1, 'label' => 'Header'],
         ['setting_key' => 'footer_config', 'data_type' => 'text', 'default_value' => '{"social":[],"legalLinks":[],"showPoweredBy":true}', 'is_public' => 1, 'label' => 'Footer content'],
         ['setting_key' => 'home_hero', 'data_type' => 'text', 'default_value' => '[]', 'is_public' => 1, 'label' => 'Home hero'],
+        // Trusted-embed allowlist (#802): JSON array of self-owned https origins a
+        // public page may embed. Read server-side into the CSP; empty by default.
+        ['setting_key' => 'embed_allowlist', 'data_type' => 'text', 'default_value' => '[]', 'is_public' => 1, 'label' => 'Trusted embed origins'],
         ['setting_key' => 'analytics_gtm_id', 'data_type' => 'text', 'default_value' => '', 'is_public' => 1, 'label' => 'Google Tag Manager container ID'],
         ['setting_key' => 'analytics_ga4_id', 'data_type' => 'text', 'default_value' => '', 'is_public' => 1, 'label' => 'Google Analytics 4 measurement ID'],
         ['setting_key' => 'analytics_consent_default', 'data_type' => 'text', 'default_value' => 'denied', 'is_public' => 1, 'label' => 'Analytics consent default (denied/granted)'],
