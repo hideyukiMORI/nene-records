@@ -103,6 +103,32 @@ describe('PublicRecordDetailPage', () => {
     expect(screen.getByText('Yes')).toBeInTheDocument()
   })
 
+  it('renders an html body field as prose without a field-key label', async () => {
+    seedEntityTypes([{ id: 1, name: 'Article', slug: 'article' }])
+    seedEntities([{ id: 1, entity_type_id: 1, is_deleted: false, deleted_at: null }])
+    seedFieldDefs([
+      { id: 1, entity_type_id: 1, field_key: 'title', data_type: 'text' },
+      { id: 2, entity_type_id: 1, field_key: 'content', data_type: 'html' },
+    ])
+    seedTextFields([
+      { id: 1, entity_id: 1, field_key: 'title', value: 'My article' },
+      {
+        id: 2,
+        entity_id: 1,
+        field_key: 'content',
+        value: '<p>本文の<strong>段落</strong>です。</p>',
+      },
+    ])
+
+    renderDetailPage()
+
+    await screen.findByRole('heading', { level: 1, name: 'My article' })
+    // The rich html renders as the body...
+    expect(screen.getByText('段落')).toBeInTheDocument()
+    // ...but its field key is not surfaced as a label (parity with markdown body).
+    expect(screen.queryByText('content')).not.toBeInTheDocument()
+  })
+
   // ── Comments / related visibility (#775) ─────────────────────────────────
   // Per-record tri-state (show_comments / show_related) wins; null falls back
   // to the site-wide record_page_config default.

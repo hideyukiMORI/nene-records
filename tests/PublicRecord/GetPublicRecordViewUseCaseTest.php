@@ -75,6 +75,45 @@ final class GetPublicRecordViewUseCaseTest extends TestCase
         // The SPA hydrates useEntity from this payload without refetching (#778).
         self::assertNull($output->bootstrap['entity']['show_comments']);
         self::assertNull($output->bootstrap['entity']['show_related']);
+        // Pin: a record with no explicit layout carries layout=null, so the SPA
+        // resolves it to the type default (standard chrome) exactly as before —
+        // existing orgs' pages are unaffected by exposing layout in the payload.
+        self::assertNull($output->bootstrap['entity']['layout']);
+    }
+
+    public function testBootstrapEntityCarriesLayoutForCustomPages(): void
+    {
+        $entityTypes = new InMemoryEntityTypeRepository([
+            new EntityType(name: 'Article', slug: 'article', id: 1),
+        ]);
+        $entities = new InMemoryEntityRepository([
+            new Entity(
+                id: 10,
+                entityTypeId: 1,
+                slug: 'hello-world',
+                status: EntityStatus::Published,
+                layout: 'bare',
+            ),
+        ]);
+
+        $useCase = new GetPublicRecordViewUseCase(
+            $entityTypes,
+            $entities,
+            new InMemoryFieldDefRepository(),
+            new InMemoryTextFieldRepository([], $entities),
+            new InMemoryIntFieldRepository(),
+            new InMemoryEnumFieldRepository(),
+            new InMemoryBoolFieldRepository(),
+            new InMemoryDateTimeFieldRepository(),
+            new InMemoryEntityRelationRepository(),
+            new ListPublicSettingsUseCase(new InMemorySettingRepository(), new InMemoryMediaRepository(), new \NeNeRecords\PublicRecord\FrontPageSetting(new InMemorySettingRepository(), new InMemoryEntityRepository(), new InMemoryEntityTypeRepository())),
+            new PublicRecordHierarchyBuilder(new InMemoryEntityRepository(), new InMemoryTextFieldRepository()),
+        );
+
+        $output = $useCase->execute(new GetPublicRecordViewInput('article', 'hello-world'));
+
+        // A `bare`/custom page rides its layout to the SPA so it can drop the shell.
+        self::assertSame('bare', $output->bootstrap['entity']['layout']);
     }
 
     public function testBootstrapEntityCarriesVisibilityOverrides(): void

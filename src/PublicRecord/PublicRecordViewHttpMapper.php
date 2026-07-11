@@ -77,6 +77,11 @@ final readonly class PublicRecordViewHttpMapper
                 // so the tri-state visibility overrides must ride along (#778).
                 'show_comments' => $entity->showComments,
                 'show_related' => $entity->showRelated,
+                // Per-record layout must ride along too: the SPA resolves the
+                // page chrome (standard / full / two-col / bare / custom) from
+                // entity.layout, so a `bare`/`custom` custom page can only drop
+                // the shell if this payload carries the value it hydrates from.
+                'layout' => $entity->layout,
             ],
             'fieldDefs' => [
                 'items' => array_map(

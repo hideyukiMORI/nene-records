@@ -58,4 +58,19 @@ final class PublicHtmlSanitizerTest extends TestCase
         self::assertStringNotContainsString('<style', $clean);
         self::assertStringContainsString('style="color:red"', $clean);
     }
+
+    public function testKeepsLongCustomPageBodyPastSymfonyDefaultLimit(): void
+    {
+        // A full `bare`/custom page body easily exceeds Symfony's 20 KB default
+        // maxInputLength; raising the cap keeps the whole body crawlable in the
+        // SSR instead of silently truncating it mid-page.
+        $filler = str_repeat('<p style="margin:0">段落テキスト。</p>', 4000);
+        $html = $filler . '<footer id="page-end">末尾</footer>';
+        self::assertGreaterThan(20_000, \strlen($html));
+
+        $clean = $this->sanitizer->sanitize($html);
+
+        self::assertStringContainsString('id="page-end"', $clean);
+        self::assertStringContainsString('末尾', $clean);
+    }
 }
