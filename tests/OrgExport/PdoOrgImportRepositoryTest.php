@@ -191,6 +191,20 @@ final class PdoOrgImportRepositoryTest extends TestCase
         self::assertNotNull($frontPage);
         self::assertSame((string) (int) $entity['id'], $frontPage['value']);
 
+        // #795: the hero block's media reference was remapped onto the new media id
+        // and its absolute URL relativized — both in the blocks_fields body and in
+        // the home_hero setting (same block-document shape).
+        $newMediaId = (string) (int) $media['id'];
+        $blockMedia = json_decode((string) $block['value'], true);
+        self::assertSame($newMediaId, $blockMedia[1]['data']['media']['mediaId']);
+        self::assertSame('/media/logo.png', $blockMedia[1]['data']['media']['url']);
+
+        $homeHero = $this->executor->fetchOne("SELECT value FROM setting_values WHERE organization_id = 1 AND setting_key = 'home_hero'");
+        self::assertNotNull($homeHero);
+        $hero = json_decode((string) $homeHero['value'], true);
+        self::assertSame($newMediaId, $hero[0]['data']['media']['mediaId']);
+        self::assertSame('/media/logo.png', $hero[0]['data']['media']['url']);
+
         self::assertSame(1, $counts['menus']);
         self::assertSame(1, $counts['widgets']);
         self::assertSame(1, $counts['entity_relations']);
@@ -294,7 +308,10 @@ final class PdoOrgImportRepositoryTest extends TestCase
                 ['id' => 90, 'theme_key' => 'custom', 'name' => 'Custom', 'version' => '1.0.0', 'source' => 'runtime', 'manifest' => '{"brand":"#ff0000"}'],
             ],
             'blocks_fields'    => [
-                ['id' => 100, 'entity_id' => 30, 'field_key' => 'blocks', 'value' => '[{"type":"paragraph","text":"hi"}]', 'is_deleted' => 0],
+                // A paragraph (no media, preserved verbatim) plus a hero block whose
+                // media references source id 60 via an absolute same-origin URL — the
+                // mediaId must be remapped and the URL relativized on import (#795).
+                ['id' => 100, 'entity_id' => 30, 'field_key' => 'blocks', 'value' => '[{"type":"paragraph","text":"hi"},{"id":"h","type":"hero","data":{"media":{"mediaId":"60","url":"https://source.example/media/logo.png"}}}]', 'is_deleted' => 0],
             ],
             'entity_relations' => [
                 ['id' => 110, 'source_entity_id' => 30, 'target_entity_id' => 31, 'field_key' => 'related'],
@@ -303,11 +320,15 @@ final class PdoOrgImportRepositoryTest extends TestCase
             'setting_defs'     => [
                 ['id' => 130, 'setting_key' => 'logo_media_id', 'data_type' => 'media', 'default_value' => '', 'is_public' => 1, 'label' => 'Logo'],
                 ['id' => 131, 'setting_key' => 'front_page', 'data_type' => 'int', 'default_value' => '', 'is_public' => 1, 'label' => 'Front page'],
+                ['id' => 132, 'setting_key' => 'home_hero', 'data_type' => 'text', 'default_value' => '[]', 'is_public' => 1, 'label' => 'Home hero'],
             ],
             'setting_values'   => [
                 ['id' => 140, 'setting_key' => 'logo_media_id', 'value' => '60', 'is_deleted' => 0],
                 // front_page pins source entity 30 → must be remapped onto the new id.
                 ['id' => 141, 'setting_key' => 'front_page', 'value' => '30', 'is_deleted' => 0],
+                // home_hero is a blocks document → its hero media (id 60) is remapped
+                // + the absolute URL relativized on import (#795).
+                ['id' => 142, 'setting_key' => 'home_hero', 'value' => '[{"id":"hh","type":"hero","data":{"media":{"mediaId":"60","url":"https://source.example/media/logo.png"}}}]', 'is_deleted' => 0],
             ],
         ];
     }

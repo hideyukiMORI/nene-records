@@ -411,10 +411,11 @@ final readonly class PdoOrgImportRepository implements OrgImportRepositoryInterf
         $counts['themes'] = $themeCount;
 
         // ── blocks_fields (append; entity_id remapped) (#486) ──────────────
-        // NOTE: the block body may embed media URLs / entity references. Those
-        // are NOT rewritten here (see #741 Phase 2 design note / follow-up issue);
-        // the body is imported verbatim so block content survives, and relative
-        // media URLs resolve because Tier A serves media from the same paths.
+        // The block body embeds media references (hero/gallery mediaId + url). They
+        // are rewritten via the media map + relativized so images survive transport
+        // (#795). Block bodies carry no numeric entity-id references (internal links
+        // are permalink-based; relations live in entity_relations), so only media is
+        // rewritten; everything else is preserved verbatim.
         $blocksCount = 0;
         foreach ((array) ($payload['blocks_fields'] ?? []) as $row) {
             $newEntityId = $entityMap[(int) $row['entity_id']] ?? null;
@@ -429,7 +430,7 @@ final readonly class PdoOrgImportRepository implements OrgImportRepositoryInterf
                     $newEntityId,
                     (string) $row['field_key'],
                     isset($row['locale']) ? (string) $row['locale'] : null,
-                    (string) $row['value'],
+                    BlocksMediaRewriter::rewrite((string) $row['value'], $mediaMap),
                     (int) ($row['is_deleted'] ?? 0),
                     isset($row['deleted_at']) ? (string) $row['deleted_at'] : null,
                 ],
@@ -521,8 +522,10 @@ final readonly class PdoOrgImportRepository implements OrgImportRepositoryInterf
         //                     FrontPageSetting) — otherwise the pinned front page can't
         //                     resolve on the target and needs a manual post-fix on every
         //                     move (#801).
-        // Settings that embed media URLs or entity references INSIDE JSON blobs
-        // (home_hero, footer_config, …) are NOT rewritten here (see #795).
+        //   - home_hero     → a blocks document; its embedded media (hero/gallery) is
+        //                     remapped + relativized like blocks_fields (#795).
+        // footer_config / header_config hold only external {label,url} links (no media
+        // or entity ids), so they are imported verbatim.
         $settingValueCount = 0;
         foreach ((array) ($payload['setting_values'] ?? []) as $row) {
             $now       = $this->clock->now()->format('Y-m-d H:i:s');
@@ -533,6 +536,9 @@ final readonly class PdoOrgImportRepository implements OrgImportRepositoryInterf
             }
             if ($settingKey === 'front_page' && $value !== null && $value !== '' && ctype_digit($value)) {
                 $value = isset($entityMap[(int) $value]) ? (string) $entityMap[(int) $value] : $value;
+            }
+            if ($settingKey === 'home_hero' && $value !== null && $value !== '') {
+                $value = BlocksMediaRewriter::rewrite($value, $mediaMap);
             }
             $existing = $query->fetchOne(
                 'SELECT id FROM setting_values WHERE organization_id = ? AND setting_key = ?',
