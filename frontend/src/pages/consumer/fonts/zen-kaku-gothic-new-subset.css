@@ -1,0 +1,40 @@
+/*
+ * Zen Kaku Gothic New — AYANE 公開サイト用 subset (#818)
+ *
+ * @fontsource の `japanese-*` サブセットは unicode-range 分割されておらず 1 ウェイト
+ * ≈965KB（4 ウェイトで ≈3.9MB）と重すぎる。AYANE の全 11 ページで実際に使う文字に
+ * ひらがな/カタカナ/ASCII/JP 約物/全角形を加えた ≈1,050 グリフへ subset し、
+ * 1 ウェイト ≈97KB（4 ウェイト計 ≈389KB）に圧縮したものを同梱する（OFL・self-host）。
+ *
+ * 生成: fonttools pyftsubset（Zen Kaku Gothic New v5.2.7 の japanese woff2 を入力）。
+ * subset 文字集合を変えたい／新出漢字が増えたら再生成する（手順は #818 / redesign/DESIGN-SYSTEM.md）。
+ * 欧文専用の Latin グリフは軽いので、この subset がそのまま賄う（unicode-range なし）。
+ */
+@font-face {
+  font-family: 'Zen Kaku Gothic New';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url(./files/zen-kaku-gothic-new-jp-subset-400.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Zen Kaku Gothic New';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 500;
+  src: url(./files/zen-kaku-gothic-new-jp-subset-500.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Zen Kaku Gothic New';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 700;
+  src: url(./files/zen-kaku-gothic-new-jp-subset-700.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Zen Kaku Gothic New';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 900;
+  src: url(./files/zen-kaku-gothic-new-jp-subset-900.woff2) format('woff2');
+}
