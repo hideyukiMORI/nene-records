@@ -91,6 +91,7 @@ final class GetPublicRecordViewUseCaseTest extends TestCase
                 id: 10,
                 entityTypeId: 1,
                 slug: 'hello-world',
+                permalink: '/company/ip',
                 status: EntityStatus::Published,
                 layout: 'bare',
             ),
@@ -114,6 +115,11 @@ final class GetPublicRecordViewUseCaseTest extends TestCase
 
         // A `bare`/custom page rides its layout to the SPA so it can drop the shell.
         self::assertSame('bare', $output->bootstrap['entity']['layout']);
+        // The canonical URL identity rides along (#816): without permalink in the
+        // bootstrap, a direct load of an explicit-permalink page bounces to
+        // /pages/{id} on mount (useCanonicalRedirect falls back to /{type}/{id}).
+        self::assertSame('/company/ip', $output->bootstrap['entity']['permalink']);
+        self::assertSame('hello-world', $output->bootstrap['entity']['slug']);
     }
 
     public function testBootstrapEntityCarriesVisibilityOverrides(): void
