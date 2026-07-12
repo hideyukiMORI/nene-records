@@ -50,6 +50,10 @@ final readonly class PdoDefaultSettingDefsSeeder implements DefaultSettingDefsSe
         ['setting_key' => 'analytics_consent_default', 'data_type' => 'text', 'default_value' => 'denied', 'is_public' => 1, 'label' => 'Analytics consent default (denied/granted)'],
         ['setting_key' => 'front_page', 'data_type' => 'text', 'default_value' => '', 'is_public' => 1, 'label' => 'Front page'],
         ['setting_key' => 'record_page_config', 'data_type' => 'text', 'default_value' => '{"comments":true,"related":true}', 'is_public' => 1, 'label' => 'Record page display'],
+        // Per-org maintenance mode (#813): when 'true', anonymous visitors get a 503
+        // maintenance page on the public surface; logged-in staff pass through.
+        // Operational flag — not exposed via the public settings API (is_public 0).
+        ['setting_key' => 'maintenance_mode', 'data_type' => 'bool', 'default_value' => 'false', 'is_public' => 0, 'label' => 'Maintenance mode'],
     ];
 
     public function __construct(private DatabaseQueryExecutorInterface $query)

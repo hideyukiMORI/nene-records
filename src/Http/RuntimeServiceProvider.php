@@ -47,6 +47,7 @@ use NeNeRecords\Organization\Resolution\PathPrefixResolutionStrategy;
 use NeNeRecords\Organization\Resolution\SubdomainOrCustomDomainResolutionStrategy;
 use NeNeRecords\Organization\Resolution\SubdomainResolutionStrategy;
 use NeNeRecords\RateLimit\RateLimitServiceProvider;
+use NeNeRecords\Setting\SettingRepositoryInterface;
 use NeNeRecords\SystemConfig\SystemConfigRepositoryInterface;
 use NeNeRecords\Version;
 use Nyholm\Psr7\Factory\Psr17Factory;
@@ -354,6 +355,18 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
                     };
 
                     $authMiddleware[] = new OrgResolverMiddleware($orgIdHolder, $orgRepo, $problemDetails, $strategy);
+
+                    // Per-org maintenance mode (#813): gate the public surface for anonymous
+                    // visitors when the resolved org's `maintenance_mode` setting is on. Placed
+                    // after OrgResolver (org — and thus its setting — is known) and before auth
+                    // (public pages carry no auth claims, so the middleware verifies the session
+                    // itself, read-only).
+                    $settingRepository = $container->get(SettingRepositoryInterface::class);
+                    if (!$settingRepository instanceof SettingRepositoryInterface) {
+                        throw new LogicException('SettingRepositoryInterface service is invalid.');
+                    }
+                    $authMiddleware[] = new MaintenanceMiddleware($settingRepository, $tokenVerifier, $responseFactory, $streamFactory);
+
                     $authMiddleware[] = new AdminApiAuthMiddleware($problemDetails, $tokenVerifier);
                     $authMiddleware[] = new CapabilityMiddleware($problemDetails);
 
