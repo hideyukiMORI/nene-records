@@ -77,6 +77,14 @@ final readonly class PublicRecordViewHttpMapper
                 // so the tri-state visibility overrides must ride along (#778).
                 'show_comments' => $entity->showComments,
                 'show_related' => $entity->showRelated,
+                // Canonical URL identity must ride along too (#816): the SPA's
+                // useCanonicalRedirect derives the record's URL from entity.permalink
+                // (falling back to /{type}/{id} when absent). Without it, a direct
+                // load of an explicit-permalink page (e.g. /company/ip, which does
+                // not match the type's /{slug} pattern) bounces to /pages/{id} on
+                // mount. slug rides along for the title/humanize fallbacks (#657).
+                'slug' => $entity->slug,
+                'permalink' => $entity->permalink,
                 // Per-record layout must ride along too: the SPA resolves the
                 // page chrome (standard / full / two-col / bare / custom) from
                 // entity.layout, so a `bare`/`custom` custom page can only drop
