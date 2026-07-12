@@ -185,6 +185,12 @@ final class PdoOrgImportRepositoryTest extends TestCase
         self::assertNotNull($logo);
         self::assertSame((string) (int) $media['id'], $logo['value']);
 
+        // front_page setting value remapped onto the imported entity row (#801) —
+        // it pinned source id 30, which must now point at the new hello-world id.
+        $frontPage = $this->executor->fetchOne("SELECT value FROM setting_values WHERE organization_id = 1 AND setting_key = 'front_page'");
+        self::assertNotNull($frontPage);
+        self::assertSame((string) (int) $entity['id'], $frontPage['value']);
+
         self::assertSame(1, $counts['menus']);
         self::assertSame(1, $counts['widgets']);
         self::assertSame(1, $counts['entity_relations']);
@@ -296,9 +302,12 @@ final class PdoOrgImportRepositoryTest extends TestCase
             'url_redirects'    => [['id' => 120, 'source_path' => '/old', 'target_path' => '/new']],
             'setting_defs'     => [
                 ['id' => 130, 'setting_key' => 'logo_media_id', 'data_type' => 'media', 'default_value' => '', 'is_public' => 1, 'label' => 'Logo'],
+                ['id' => 131, 'setting_key' => 'front_page', 'data_type' => 'int', 'default_value' => '', 'is_public' => 1, 'label' => 'Front page'],
             ],
             'setting_values'   => [
                 ['id' => 140, 'setting_key' => 'logo_media_id', 'value' => '60', 'is_deleted' => 0],
+                // front_page pins source entity 30 → must be remapped onto the new id.
+                ['id' => 141, 'setting_key' => 'front_page', 'value' => '30', 'is_deleted' => 0],
             ],
         ];
     }

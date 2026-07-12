@@ -515,10 +515,14 @@ final readonly class PdoOrgImportRepository implements OrgImportRepositoryInterf
         $counts['setting_defs'] = $settingDefCount;
 
         // ── setting_values (merge on org+setting_key, source-wins) ─────────
-        // logo_media_id points at a media row id — remap it via the media map so
-        // the logo survives transport. Other settings that embed media URLs or
-        // entity references inside JSON blobs (home_hero, footer_config, …) are
-        // NOT rewritten here (see #741 Phase 2 design note / follow-up issue).
+        // Scalar id-valued settings are remapped so the reference survives transport:
+        //   - logo_media_id → media row id (via mediaMap)
+        //   - front_page    → published record's entity id (via entityMap, #701 /
+        //                     FrontPageSetting) — otherwise the pinned front page can't
+        //                     resolve on the target and needs a manual post-fix on every
+        //                     move (#801).
+        // Settings that embed media URLs or entity references INSIDE JSON blobs
+        // (home_hero, footer_config, …) are NOT rewritten here (see #795).
         $settingValueCount = 0;
         foreach ((array) ($payload['setting_values'] ?? []) as $row) {
             $now       = $this->clock->now()->format('Y-m-d H:i:s');
@@ -526,6 +530,9 @@ final readonly class PdoOrgImportRepository implements OrgImportRepositoryInterf
             $value      = isset($row['value']) ? (string) $row['value'] : null;
             if ($settingKey === 'logo_media_id' && $value !== null && $value !== '' && ctype_digit($value)) {
                 $value = isset($mediaMap[(int) $value]) ? (string) $mediaMap[(int) $value] : $value;
+            }
+            if ($settingKey === 'front_page' && $value !== null && $value !== '' && ctype_digit($value)) {
+                $value = isset($entityMap[(int) $value]) ? (string) $entityMap[(int) $value] : $value;
             }
             $existing = $query->fetchOne(
                 'SELECT id FROM setting_values WHERE organization_id = ? AND setting_key = ?',
