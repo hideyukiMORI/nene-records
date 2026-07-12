@@ -29,6 +29,26 @@ final class CapabilityResolverTest extends TestCase
         yield 'delete'     => ['/api/v1/organizations/1', 'DELETE'];
     }
 
+    // ── Superadmin console ────────────────────────────────────────────────────
+
+    #[DataProvider('provideSuperadminPaths')]
+    public function testSuperadminPathsRequireManageOrganizations(string $path, string $method): void
+    {
+        self::assertSame(Capability::ManageOrganizations, CapabilityResolver::resolve($path, $method));
+    }
+
+    /** @return iterable<string, array{string, string}> */
+    public static function provideSuperadminPaths(): iterable
+    {
+        // GET export must be gated too — it reads every tenant's data. See #797.
+        yield 'org export GET'         => ['/api/v1/superadmin/organizations/1/export', 'GET'];
+        yield 'org import POST'        => ['/api/v1/superadmin/organizations/1/import', 'POST'];
+        yield 'data-migration status'  => ['/api/v1/superadmin/data-migration/status', 'GET'];
+        yield 'data-migration assign'  => ['/api/v1/superadmin/data-migration/assign-org', 'POST'];
+        yield 'system-config GET'      => ['/api/v1/superadmin/system-config', 'GET'];
+        yield 'system-config PATCH'    => ['/api/v1/superadmin/system-config', 'PATCH'];
+    }
+
     // ── Account ─────────────────────────────────────────────────────────────────
 
     public function testAccountRequiresManageAccount(): void
