@@ -8,6 +8,7 @@ use Nene2\Error\ProblemDetailsResponseFactory;
 use NeNeRecords\Auth\CapabilityMiddleware;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\Response;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -90,6 +91,61 @@ final class CapabilityMiddlewareTest extends TestCase
         $response = $this->middleware->process($request, $this->createPassThroughHandler());
 
         self::assertSame(204, $response->getStatusCode());
+    }
+
+    // ── Superadmin console (export/import, data-migration, system-config) ────────
+
+    /**
+     * 非 superadmin（admin）が org export を叩くと 403。認証は通っても
+     * ManageOrganizations を持たないため拒否される（#797）。
+     */
+    public function testAdminExportingOrganizationReturns403(): void
+    {
+        $request = $this->factory
+            ->createServerRequest('GET', 'https://example.test/api/v1/superadmin/organizations/1/export')
+            ->withAttribute('nene2.auth.claims', ['role' => 'admin', 'sub' => 'admin@example.com', 'org_id' => 1]);
+
+        $response = $this->middleware->process($request, $this->createPassThroughHandler());
+
+        self::assertSame(403, $response->getStatusCode());
+    }
+
+    /**
+     * editor が org import を叩くと 403。
+     */
+    public function testEditorImportingOrganizationReturns403(): void
+    {
+        $request = $this->factory
+            ->createServerRequest('POST', 'https://example.test/api/v1/superadmin/organizations/1/import')
+            ->withAttribute('nene2.auth.claims', ['role' => 'editor', 'sub' => 'editor@example.com', 'org_id' => 1]);
+
+        $response = $this->middleware->process($request, $this->createPassThroughHandler());
+
+        self::assertSame(403, $response->getStatusCode());
+    }
+
+    /**
+     * superadmin は従来どおり通過する（export/data-migration/system-config）。
+     */
+    #[DataProvider('provideSuperadminConsoleRequests')]
+    public function testSuperadminPassesThroughConsoleRoutes(string $method, string $path): void
+    {
+        $request = $this->factory
+            ->createServerRequest($method, 'https://example.test' . $path)
+            ->withAttribute('nene2.auth.claims', ['role' => 'superadmin', 'sub' => 'sa@example.com', 'org_id' => null]);
+
+        $response = $this->middleware->process($request, $this->createPassThroughHandler());
+
+        self::assertSame(204, $response->getStatusCode());
+    }
+
+    /** @return iterable<string, array{string, string}> */
+    public static function provideSuperadminConsoleRequests(): iterable
+    {
+        yield 'org export'         => ['GET', '/api/v1/superadmin/organizations/1/export'];
+        yield 'org import'         => ['POST', '/api/v1/superadmin/organizations/1/import'];
+        yield 'data-migration'     => ['POST', '/api/v1/superadmin/data-migration/assign-org'];
+        yield 'system-config PATCH' => ['PATCH', '/api/v1/superadmin/system-config'];
     }
 
     // ── Organization scope checks ────────────────────────────────────────────────

@@ -50,6 +50,11 @@ final readonly class AdminApiAuthMiddleware implements MiddlewareInterface
         '/api/v1/users',
         '/api/v1/admin/comments',
         '/api/v1/organizations',
+        // Superadmin console (export/import, data-migration, system-config). Must
+        // be authenticated for ALL methods — the GET export is not a "non-GET"
+        // mutation, so without this prefix its read of every tenant's data would
+        // be unauthenticated. Role is then enforced by CapabilityMiddleware. See #797.
+        '/api/v1/superadmin/',
         '/api/v1/themes',
         '/api/v1/migration',
         '/api/v1/account',

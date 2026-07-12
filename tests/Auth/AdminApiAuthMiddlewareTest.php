@@ -113,6 +113,22 @@ final class AdminApiAuthMiddlewareTest extends TestCase
         self::assertSame(401, $this->middleware->process($request, $this->passThrough())->getStatusCode());
     }
 
+    public function testSuperadminExportGetRequiresAuth(): void
+    {
+        // GET export reads every tenant's data; it is not a "non-GET" mutation,
+        // so it must be gated by the admin-only prefix, not left open. See #797.
+        $request = $this->factory->createServerRequest('GET', 'https://example.test/api/v1/superadmin/organizations/1/export');
+
+        self::assertSame(401, $this->middleware->process($request, $this->passThrough())->getStatusCode());
+    }
+
+    public function testSuperadminSystemConfigGetRequiresAuth(): void
+    {
+        $request = $this->factory->createServerRequest('GET', 'https://example.test/api/v1/superadmin/system-config');
+
+        self::assertSame(401, $this->middleware->process($request, $this->passThrough())->getStatusCode());
+    }
+
     public function testInvalidTokenReturns401(): void
     {
         $request = $this->factory

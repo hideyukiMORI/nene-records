@@ -20,6 +20,15 @@ final class CapabilityResolver
     {
         $method = strtoupper($method);
 
+        // Superadmin console: every /api/v1/superadmin/** route is superadmin-only
+        // (org export/import, data-migration, system-config). ManageOrganizations is
+        // granted to superadmin alone (see Role::hasCapability), so it doubles as the
+        // "superadmin required" gate — for all methods, GET included. Checked first so
+        // no narrower rule below can widen these routes. See #797.
+        if (str_starts_with($path, '/api/v1/superadmin/')) {
+            return Capability::ManageOrganizations;
+        }
+
         // Organization management: superadmin only
         if (str_starts_with($path, '/api/v1/organizations')) {
             return Capability::ManageOrganizations;
