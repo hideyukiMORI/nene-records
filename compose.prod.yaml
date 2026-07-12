@@ -63,7 +63,12 @@ services:
       timeout: 5s
       retries: 3
       start_period: 40s
-    # No volumes: code, vendor and built assets are baked into the image.
+    volumes:
+      # Uploaded media (originals + on-demand derivatives) is written at runtime to
+      # var/media. Code/vendor/assets are baked into the image, so WITHOUT this
+      # volume every `up --build` starts from an empty var/media and destroys all
+      # uploaded files. Persist just that directory. See #807.
+      - media-prod-data:/var/www/html/var/media
     # No command: the image CMD is docker/app/entrypoint.prod.sh (migrate + serve).
 
   mysql:
@@ -97,3 +102,4 @@ services:
 
 volumes:
   mysql-prod-data:
+  media-prod-data:
