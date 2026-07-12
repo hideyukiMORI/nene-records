@@ -64,3 +64,12 @@ import '@fontsource/shippori-mincho/700.css'
 import '@fontsource/shippori-mincho/japanese-400.css'
 import '@fontsource/shippori-mincho/japanese-600.css'
 import '@fontsource/shippori-mincho/japanese-700.css'
+// Zen Kaku Gothic New (AYANE ブランド sans・#818) — 見出し 900 / bold 700 /
+// nav・label 500 / body 400。@fontsource の japanese サブセットは 1 ウェイト
+// ≈965KB と重い（unicode-range 未分割）ため、サイトで使う文字へ subset した
+// self-host 版（≈97KB/ウェイト）を同梱する。詳細は当該 CSS 冒頭を参照。
+import './fonts/zen-kaku-gothic-new-subset.css'
+// IBM Plex Mono (AYANE ラベル・数字 mono・#818) — 欧文のみ。400/500/600。
+import '@fontsource/ibm-plex-mono/latin-400.css'
+import '@fontsource/ibm-plex-mono/latin-500.css'
+import '@fontsource/ibm-plex-mono/latin-600.css'
