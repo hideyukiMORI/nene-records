@@ -120,7 +120,8 @@ final class EntityHttpTest extends TestCase
         self::assertSame('bare', $payload['layout']);
 
         $get = $this->application->handle(
-            $this->factory->createServerRequest('GET', "https://example.test/api/v1/entities/{$payload['id']}"),
+            $this->factory->createServerRequest('GET', "https://example.test/api/v1/entities/{$payload['id']}")
+                ->withAttribute('nene2.auth.claims', ['sub' => 'admin@example.test']),
         );
         self::assertSame('bare', $this->decodeJson($get)['layout']);
     }
@@ -159,7 +160,8 @@ final class EntityHttpTest extends TestCase
         self::assertTrue($payload['show_related']);
 
         $get = $this->decodeJson($this->application->handle(
-            $this->factory->createServerRequest('GET', "https://example.test/api/v1/entities/{$payload['id']}"),
+            $this->factory->createServerRequest('GET', "https://example.test/api/v1/entities/{$payload['id']}")
+                ->withAttribute('nene2.auth.claims', ['sub' => 'admin@example.test']),
         ));
         self::assertFalse($get['show_comments']);
         self::assertTrue($get['show_related']);
@@ -320,7 +322,8 @@ final class EntityHttpTest extends TestCase
         self::assertSame(201, $createResponse->getStatusCode());
 
         $getBefore = $this->application->handle(
-            $this->factory->createServerRequest('GET', "https://example.test/api/v1/entities/{$id}"),
+            $this->factory->createServerRequest('GET', "https://example.test/api/v1/entities/{$id}")
+                ->withAttribute('nene2.auth.claims', ['sub' => 'admin@example.test']),
         );
         self::assertSame(200, $getBefore->getStatusCode());
 
@@ -336,6 +339,54 @@ final class EntityHttpTest extends TestCase
 
         self::assertSame(404, $getAfter->getStatusCode());
         self::assertStringEndsWith('not-found', (string) $payload['type']);
+    }
+
+    public function testAnonymousReadsAreScopedToPublishedRecords(): void
+    {
+        // #828: the open content-read surface must never surface drafts to anonymous
+        // callers — the list hides them (even under ?status=draft) and get-by-id is
+        // 404 — while an authenticated admin still sees everything.
+        $typeId = $this->entityTypes->save(new EntityType(name: 'Doc', slug: 'doc'));
+
+        $draftId = (int) $this->decodeJson($this->application->handle(
+            $this->factory->createServerRequest('POST', 'https://example.test/api/v1/entities')->withBody(
+                $this->factory->createStream(json_encode(['entity_type_id' => $typeId, 'slug' => 'secret-draft'], JSON_THROW_ON_ERROR)),
+            ),
+        ))['id'];
+
+        $publishedId = (int) $this->decodeJson($this->application->handle(
+            $this->factory->createServerRequest('POST', 'https://example.test/api/v1/entities')->withBody(
+                $this->factory->createStream(json_encode(['entity_type_id' => $typeId, 'slug' => 'public-post', 'status' => 'published'], JSON_THROW_ON_ERROR)),
+            ),
+        ))['id'];
+
+        $anonList = $this->decodeJson($this->application->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/api/v1/entities'),
+        ));
+        $anonIds = array_map(static fn (array $row): int => (int) $row['id'], $anonList['items']);
+        self::assertContains($publishedId, $anonIds);
+        self::assertNotContains($draftId, $anonIds);
+
+        // `?status=draft` cannot bypass the anonymous published-only gate: the draft
+        // never appears (published-only overrides the requested status filter).
+        $anonDraftList = $this->decodeJson($this->application->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/api/v1/entities?status=draft'),
+        ));
+        $anonDraftIds = array_map(static fn (array $row): int => (int) $row['id'], $anonDraftList['items']);
+        self::assertNotContains($draftId, $anonDraftIds);
+
+        self::assertSame(200, $this->application->handle(
+            $this->factory->createServerRequest('GET', "https://example.test/api/v1/entities/{$publishedId}"),
+        )->getStatusCode());
+        self::assertSame(404, $this->application->handle(
+            $this->factory->createServerRequest('GET', "https://example.test/api/v1/entities/{$draftId}"),
+        )->getStatusCode());
+
+        // Authenticated admin still sees the draft by id.
+        self::assertSame(200, $this->application->handle(
+            $this->factory->createServerRequest('GET', "https://example.test/api/v1/entities/{$draftId}")
+                ->withAttribute('nene2.auth.claims', ['sub' => 'admin@example.test']),
+        )->getStatusCode());
     }
 
     /**

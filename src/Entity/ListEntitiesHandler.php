@@ -78,6 +78,9 @@ final readonly class ListEntitiesHandler
                 publishedFrom: $publishedFrom,
                 publishedToExclusive: $publishedToExclusive,
                 hasPermalink: $hasPermalink,
+                // Unauthenticated callers (the open public content-read surface) may
+                // only see published records — never drafts/scheduled. See #828.
+                publishedOnly: !is_array($request->getAttribute('nene2.auth.claims')),
             ),
             includeViews: $wantViews,
         ));

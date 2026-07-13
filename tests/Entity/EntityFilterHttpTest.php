@@ -96,7 +96,8 @@ final class EntityFilterHttpTest extends TestCase
     public function testListEntitiesFilteredByEntityTypeId(): void
     {
         $response = $this->application->handle(
-            $this->factory->createServerRequest('GET', 'https://example.test/api/v1/entities?entity_type_id=2'),
+            $this->factory->createServerRequest('GET', 'https://example.test/api/v1/entities?entity_type_id=2')
+                ->withAttribute('nene2.auth.claims', ['sub' => 'admin@example.test']),
         );
         $payload = $this->decodeJson($response);
 
@@ -109,7 +110,8 @@ final class EntityFilterHttpTest extends TestCase
     public function testListEntitiesFilteredByTagSlugsUsesOrSemantics(): void
     {
         $response = $this->application->handle(
-            $this->factory->createServerRequest('GET', 'https://example.test/api/v1/entities?tags=featured,draft'),
+            $this->factory->createServerRequest('GET', 'https://example.test/api/v1/entities?tags=featured,draft')
+                ->withAttribute('nene2.auth.claims', ['sub' => 'admin@example.test']),
         );
         $payload = $this->decodeJson($response);
 
@@ -121,7 +123,8 @@ final class EntityFilterHttpTest extends TestCase
     public function testListEntitiesMergesTagAndTagsQueryParameters(): void
     {
         $response = $this->application->handle(
-            $this->factory->createServerRequest('GET', 'https://example.test/api/v1/entities?tag=draft&tags=featured'),
+            $this->factory->createServerRequest('GET', 'https://example.test/api/v1/entities?tag=draft&tags=featured')
+                ->withAttribute('nene2.auth.claims', ['sub' => 'admin@example.test']),
         );
         $payload = $this->decodeJson($response);
 
@@ -131,7 +134,8 @@ final class EntityFilterHttpTest extends TestCase
     public function testListEntitiesFilteredByRelationFieldKey(): void
     {
         $response = $this->application->handle(
-            $this->factory->createServerRequest('GET', 'https://example.test/api/v1/entities?relation.author=10'),
+            $this->factory->createServerRequest('GET', 'https://example.test/api/v1/entities?relation.author=10')
+                ->withAttribute('nene2.auth.claims', ['sub' => 'admin@example.test']),
         );
         $payload = $this->decodeJson($response);
 
@@ -146,7 +150,7 @@ final class EntityFilterHttpTest extends TestCase
             $this->factory->createServerRequest(
                 'GET',
                 'https://example.test/api/v1/entities?relation.author=10&relation.category=20',
-            ),
+            )->withAttribute('nene2.auth.claims', ['sub' => 'admin@example.test']),
         );
         $payload = $this->decodeJson($response);
 

@@ -25,6 +25,12 @@ final readonly class EntityListCriteria
         public ?string $publishedToExclusive = null,
         /** When true, restrict to records carrying a non-empty custom permalink (#682). */
         public bool $hasPermalink = false,
+        /**
+         * When true, force published-only regardless of the `status` filter. Set for
+         * unauthenticated (anonymous) callers so the open content-read surface can
+         * never surface drafts/scheduled records via `?status`. See #828.
+         */
+        public bool $publishedOnly = false,
     ) {
     }
 }

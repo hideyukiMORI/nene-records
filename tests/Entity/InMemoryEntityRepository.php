@@ -272,7 +272,11 @@ final class InMemoryEntityRepository implements EntityRepositoryInterface
                 continue;
             }
 
-            if ($criteria->status !== null && $entity->status !== $criteria->status) {
+            if ($criteria->publishedOnly) {
+                if ($entity->status !== \NeNeRecords\Entity\EntityStatus::Published) {
+                    continue;
+                }
+            } elseif ($criteria->status !== null && $entity->status !== $criteria->status) {
                 continue;
             }
 

@@ -82,16 +82,23 @@ final readonly class AdminApiAuthMiddleware implements MiddlewareInterface
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        if (!$this->requiresAuthentication($request)) {
-            return $handler->handle($request);
-        }
+        // Whether this route ENFORCES auth (401 without a valid token). Open routes
+        // still authenticate *opportunistically*: if a valid token is present we
+        // attach the claims so downstream handlers (e.g. the open public content-read
+        // surface) can distinguish an authenticated admin from an anonymous visitor
+        // and widen what they return (drafts, all statuses). See #828.
+        $requiresAuth = $this->requiresAuthentication($request);
 
         $authorization = $request->getHeaderLine('Authorization');
         $credentialType = 'bearer';
 
         if ($authorization !== '') {
             if (!str_starts_with($authorization, 'Bearer ')) {
-                return $this->unauthorized($request, 'invalid_token', 'Authorization header must use the Bearer scheme.');
+                if ($requiresAuth) {
+                    return $this->unauthorized($request, 'invalid_token', 'Authorization header must use the Bearer scheme.');
+                }
+
+                return $handler->handle($request);
             }
 
             $token = substr($authorization, 7);
@@ -103,7 +110,11 @@ final readonly class AdminApiAuthMiddleware implements MiddlewareInterface
                 : '';
 
             if ($cookieToken === '') {
-                return $this->unauthorized($request, 'missing_token', 'No session token was provided.');
+                if ($requiresAuth) {
+                    return $this->unauthorized($request, 'missing_token', 'No session token was provided.');
+                }
+
+                return $handler->handle($request);
             }
 
             $token = $cookieToken;
@@ -125,7 +136,12 @@ final readonly class AdminApiAuthMiddleware implements MiddlewareInterface
         try {
             $claims = $this->verifier->verify($token);
         } catch (TokenVerificationException $e) {
-            return $this->unauthorized($request, 'invalid_token', $e->getMessage());
+            if ($requiresAuth) {
+                return $this->unauthorized($request, 'invalid_token', $e->getMessage());
+            }
+
+            // Open route with an invalid/expired token → serve as anonymous.
+            return $handler->handle($request);
         }
 
         return $handler->handle(

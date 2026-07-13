@@ -28,6 +28,13 @@ final readonly class GetEntityByIdHandler
 
         $output = $this->useCase->execute(new GetEntityByIdInput($id));
 
+        // Unauthenticated callers may only read published records — a draft/scheduled
+        // record is indistinguishable from a non-existent one (no metadata leak). See #828.
+        $isAnonymous = !is_array($request->getAttribute('nene2.auth.claims'));
+        if ($isAnonymous && $output->status !== EntityStatus::Published->value) {
+            throw new EntityNotFoundException($id);
+        }
+
         return $this->response->create([
             'id' => $output->id,
             'entity_type_id' => $output->entityTypeId,
