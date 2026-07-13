@@ -8,7 +8,13 @@
 
 API-first flexible entity platform built on [NENE2](https://github.com/hideyukiMORI/NENE2).
 
-NeNe Records lets you define entity types and typed fields from the admin frontend, persist them through a thin JSON API, and expose the same operations to humans, SPAs, and AI agents via OpenAPI and MCP.
+> **Separate product** — NeNe Records is a **product that consumes [NENE2](https://github.com/hideyukiMORI/NENE2)**, not a framework: a multi-tenant entity/CMS platform (define typed entity types from the admin UI, persist via a thin JSON API, expose the same ops to humans/SPAs/AI over OpenAPI + MCP). Own repo, own database; siblings integrate over HTTP only. Boundaries are binding:
+>
+> | Sibling | Boundary |
+> | --- | --- |
+> | NeNe Corpus | Corpus calls Records' read APIs as an optional CMS upstream — `Corpus → Records API` only, no shared DB, no chat/ingestion in Records ([Corpus ADR 0002](https://github.com/hideyukiMORI/nene-corpus/blob/main/docs/adr/0002-separate-from-nene-records.md)) |
+> | NeNe Concierge | Concierge reads Records' API as an optional upstream — one-way, no shared code/DB ([Concierge ADR 0002](https://github.com/hideyukiMORI/nene-concierge/blob/main/docs/adr/0002-separation-from-nene-records-and-corpus.md)) |
+> | NeNe Invoice / Deal | Optional HTTP link only — Records is an optional CMS/catalog upstream, separate database, no embedded billing or pipeline ([Invoice ADR 0002](https://github.com/hideyukiMORI/nene-invoice/blob/main/docs/adr/0002-separate-from-sibling-products.md)) |
 
 ## Goals
 
@@ -16,7 +22,7 @@ NeNe Records lets you define entity types and typed fields from the admin fronte
 - **Readable**: explicit schema registry, typed value tables, OpenAPI contracts
 - **Secure**: auth and validation at the API boundary; MCP tools never touch the database directly
 - **Replaceable layers**: swap the API runtime, admin UI, or consumer views independently
-- **AI-native**: 130+ MCP tools expose every API operation to AI clients
+- **AI-native**: MCP tools, auto-generated 1:1 from the OpenAPI contract, expose every API operation to AI clients
 - **Multi-tenant**: organization-scoped data with superadmin / admin / editor roles and JWT org_id enforcement
 
 ## Quick Start
@@ -50,12 +56,21 @@ AI clients (MCP)        ──┘
 - **Backend**: PHP 8.4, NENE2 framework, Clean Architecture (Use Cases / Repositories)
 - **Frontend**: React 19, TypeScript, Vite, TailwindCSS v4, React Query
 - **API contract**: OpenAPI 3.1 ([`docs/openapi/openapi.yaml`](./docs/openapi/openapi.yaml))
-- **MCP**: 130+ tools auto-generated from OpenAPI
+- **MCP**: tools auto-generated 1:1 from the OpenAPI contract
 - **Multi-tenancy**: organization-scoped data isolation; `OrgResolverMiddleware` + JWT `org_id` claim
 
 ## Current Status
 
-Milestones M1 – M16 are complete, plus the post-#536 frontier: single-origin crawlable SSR, WordPress (WXR) migration, public i18n, and production deployment all shipped. NeNe Records runs in production as a subdomain multi-tenant SaaS and ships as a self-contained **Tier A zip installer** for shared hosting (current release **v0.5.2**). Active work — SaaS → Tier A org transport (#741) and public-site hardening (CSP trusted-embed, maintenance mode) — is tracked in [`docs/todo/current.md`](./docs/todo/current.md); see [`docs/roadmap.md`](./docs/roadmap.md) for direction.
+| Phase | Scope | Status |
+| --- | --- | --- |
+| M1–M16 | Entity model, typed fields, admin UI, auth/multi-tenancy, publish workflow, media, comments | ✅ |
+| Post-M16 frontier | Single-origin crawlable SSR, WordPress (WXR) import, public i18n, production deployment | ✅ |
+| #741 (org transport, Phase 1+2) | SaaS → Tier A: conflict-merge import, transactional import, column parity, CLI import, menus/widgets/themes/relations/redirects + ID remap | ✅ merged (PR #793, #794) |
+| #741 (remaining scope) | Transport coverage for comments / webhooks / notification_channels / user_profiles; media file bundling | 🔄 open (#796, #798) |
+| Public-site hardening | Superadmin-only console, CSP trusted-embed allowlist (Phase 1), org-level maintenance mode | ✅ merged (#797, #802 Phase 1, #813) |
+| Public-site hardening (remaining) | Trusted-embed Phase 2 (widget primitive) / Phase 3 (media); maintenance-mode admin UI toggle | 🔄 open (#802, #814) |
+
+NeNe Records runs in production as a subdomain multi-tenant SaaS and ships as a self-contained **Tier A zip installer** for shared hosting (current release **v0.5.2**, deployed to production 2026-07-13). Open follow-up work is tracked in [`docs/todo/current.md`](./docs/todo/current.md); see [`docs/roadmap.md`](./docs/roadmap.md) for direction.
 
 | Area | State |
 | --- | --- |
@@ -69,8 +84,8 @@ Milestones M1 – M16 are complete, plus the post-#536 frontier: single-origin c
 | Comments | submission, moderation API, public comment UI, admin comment management |
 | Public consumer | crawlable single-origin SSR at real permalinks (`/posts/{id}`, `{slug}`), OGP/JSON-LD, 301 redirect map, WordPress (WXR) import |
 | OpenAPI | 3.1 contract, validated on every CI run |
-| MCP tools | 130+ tools auto-generated from OpenAPI |
-| CI | Backend (940 PHPUnit tests / PHPStan level 8 / CS-Fixer / OpenAPI / MCP) + Frontend (ESLint / TypeScript / Vitest) + Playwright 220 E2E tests |
+| MCP tools | auto-generated 1:1 from the OpenAPI contract, covering every endpoint |
+| CI | Backend (PHPUnit / PHPStan level 8 / CS-Fixer / OpenAPI / MCP contract tests) + Frontend (ESLint / TypeScript / Vitest) + Playwright E2E |
 
 ## Contributing
 
