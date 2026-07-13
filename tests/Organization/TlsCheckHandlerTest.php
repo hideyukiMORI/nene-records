@@ -41,6 +41,17 @@ final class TlsCheckHandlerTest extends TestCase
         self::assertSame(200, $this->statusFor('shop.nene-records.com:443'));
     }
 
+    /**
+     * `www.<base>` is a reserved host, not an org slug: allow the on-demand cert so
+     * the TLS handshake succeeds (WwwRedirectMiddleware 301s it to the apex at the
+     * application layer). Regression for #832.
+     */
+    public function testReservedWwwHostIsAllowed(): void
+    {
+        self::assertSame(200, $this->statusFor('www.nene-records.com'));
+        self::assertSame(200, $this->statusFor('www.nene-records.com:443'));
+    }
+
     public function testUnknownSubdomainIsDenied(): void
     {
         self::assertSame(403, $this->statusFor('nope.nene-records.com'));

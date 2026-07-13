@@ -50,6 +50,14 @@ final readonly class TlsCheckHandler
             return $this->decide(true);
         }
 
+        // Reserved `www` host: not an org slug, but `www.<base>` is the near-universal
+        // DNS default a subdomain-mode deployer's own promotional domain lands on. Allow
+        // the on-demand cert so the TLS handshake succeeds — WwwRedirectMiddleware then
+        // 301s it to the apex at the application layer (#832).
+        if ($domain === 'www.' . $this->baseDomain) {
+            return $this->decide(true);
+        }
+
         $baseParts = explode('.', $this->baseDomain);
         $hostParts = explode('.', $domain);
 

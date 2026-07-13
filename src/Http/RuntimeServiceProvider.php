@@ -46,6 +46,7 @@ use NeNeRecords\Organization\Resolution\OrgResolverMiddleware;
 use NeNeRecords\Organization\Resolution\PathPrefixResolutionStrategy;
 use NeNeRecords\Organization\Resolution\SubdomainOrCustomDomainResolutionStrategy;
 use NeNeRecords\Organization\Resolution\SubdomainResolutionStrategy;
+use NeNeRecords\Organization\Resolution\WwwRedirectMiddleware;
 use NeNeRecords\RateLimit\RateLimitServiceProvider;
 use NeNeRecords\Setting\SettingRepositoryInterface;
 use NeNeRecords\SystemConfig\SystemConfigRepositoryInterface;
@@ -353,6 +354,14 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
                         'path'      => new PathPrefixResolutionStrategy(),
                         default     => new EnvResolutionStrategy($resolvedSlug),
                     };
+
+                    // Reserved `www.<base>` host (#832): 301 to the apex ahead of org
+                    // resolution. `localhost` is the "unconfigured" sentinel (same as
+                    // $resolvedDomain's own fallback above) — normalize it to '' so the
+                    // middleware no-ops for single/path mode deployers that never set
+                    // BASE_DOMAIN, matching SingleOriginServiceProvider's SpaShellFallback wiring.
+                    $wwwBaseDomain = $resolvedDomain === 'localhost' ? '' : $resolvedDomain;
+                    $authMiddleware[] = new WwwRedirectMiddleware($responseFactory, $wwwBaseDomain);
 
                     $authMiddleware[] = new OrgResolverMiddleware($orgIdHolder, $orgRepo, $problemDetails, $strategy);
 
