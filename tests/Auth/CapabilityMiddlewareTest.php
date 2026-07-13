@@ -38,6 +38,32 @@ final class CapabilityMiddlewareTest extends TestCase
         self::assertSame(204, $response->getStatusCode());
     }
 
+    /**
+     * クロステナント遮断（#824）: CapabilityResolver が capability をマップしない
+     * org-scoped ルート（例 GET /api/v1/webhooks）でも、JWT org_id と解決済み
+     * org_id が食い違えば 403。以前は capability 未マップだと org チェックごと
+     * スキップされ、JWT を別 org のホストへ Bearer で使い回すと越境読取できた。
+     */
+    public function testUnmappedOrgScopedRouteWithMismatchedOrgIdReturns403(): void
+    {
+        $request = $this->factory
+            ->createServerRequest('GET', 'https://example.test/api/v1/webhooks')
+            ->withAttribute('nene2.auth.claims', ['role' => 'admin', 'sub' => 'a@example.com', 'org_id' => 1])
+            ->withAttribute('nene2.org.id', 2);
+
+        self::assertSame(403, $this->middleware->process($request, $this->createPassThroughHandler())->getStatusCode());
+    }
+
+    public function testUnmappedOrgScopedRouteWithMatchingOrgIdPassesThrough(): void
+    {
+        $request = $this->factory
+            ->createServerRequest('GET', 'https://example.test/api/v1/webhooks')
+            ->withAttribute('nene2.auth.claims', ['role' => 'admin', 'sub' => 'a@example.com', 'org_id' => 2])
+            ->withAttribute('nene2.org.id', 2);
+
+        self::assertSame(204, $this->middleware->process($request, $this->createPassThroughHandler())->getStatusCode());
+    }
+
     public function testEditorDeletingEntityTypeReturns403(): void
     {
         $request = $this->factory

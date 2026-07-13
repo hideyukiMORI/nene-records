@@ -36,26 +36,17 @@ final readonly class CapabilityMiddleware implements MiddlewareInterface
         }
 
         $path = $request->getUri()->getPath() ?: '/';
-        $required = CapabilityResolver::resolve($path, $request->getMethod());
-
-        if ($required === null) {
-            return $handler->handle($request);
-        }
-
         $role = Role::tryFrom((string) ($claims['role'] ?? ''));
 
-        if ($role === null || !$role->hasCapability($required)) {
-            return $this->problemDetails->create(
-                $request,
-                'forbidden',
-                'Forbidden',
-                403,
-                'You do not have permission to perform this action.',
-            );
-        }
-
-        // Organization scope check: skip for superadmin and routes where org is not resolved.
-        // OrgResolverMiddleware sets nene2.org.id (an int) only for org-scoped routes.
+        // Organization scope check — runs for EVERY authenticated org-scoped request,
+        // BEFORE (and independent of) capability resolution. OrgResolverMiddleware sets
+        // the nene2.org.id attribute (an int) only for org-scoped routes; bypass routes
+        // (superadmin / organizations / auth) leave it unset and are skipped here.
+        //
+        // This must NOT be gated behind a mapped capability: a route CapabilityResolver
+        // does not map (e.g. GET /api/v1/webhooks) would otherwise skip the org check
+        // entirely, letting a user of org A read org B's data by replaying their JWT as
+        // a Bearer token against org B's host. Fail-closed by default. See #824.
         if ($role !== Role::Superadmin) {
             $resolvedOrgId = $request->getAttribute('nene2.org.id');
 
@@ -74,6 +65,22 @@ final readonly class CapabilityMiddleware implements MiddlewareInterface
                     );
                 }
             }
+        }
+
+        $required = CapabilityResolver::resolve($path, $request->getMethod());
+
+        if ($required === null) {
+            return $handler->handle($request);
+        }
+
+        if ($role === null || !$role->hasCapability($required)) {
+            return $this->problemDetails->create(
+                $request,
+                'forbidden',
+                'Forbidden',
+                403,
+                'You do not have permission to perform this action.',
+            );
         }
 
         return $handler->handle($request);
