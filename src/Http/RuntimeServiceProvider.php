@@ -361,7 +361,7 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
                     // middleware no-ops for single/path mode deployers that never set
                     // BASE_DOMAIN, matching SingleOriginServiceProvider's SpaShellFallback wiring.
                     $wwwBaseDomain = $resolvedDomain === 'localhost' ? '' : $resolvedDomain;
-                    $authMiddleware[] = new WwwRedirectMiddleware($responseFactory, $wwwBaseDomain);
+                    $authMiddleware[] = new WwwRedirectMiddleware($responseFactory, $orgIdHolder, $wwwBaseDomain);
 
                     $authMiddleware[] = new OrgResolverMiddleware($orgIdHolder, $orgRepo, $problemDetails, $strategy);
 

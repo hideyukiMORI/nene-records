@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NeNeRecords\Organization\Resolution;
 
+use Nene2\Http\RequestScopedHolder;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -27,8 +28,12 @@ use Psr\Http\Server\RequestHandlerInterface;
  */
 final readonly class WwwRedirectMiddleware implements MiddlewareInterface
 {
+    /**
+     * @param RequestScopedHolder<int> $orgId
+     */
     public function __construct(
         private ResponseFactoryInterface $responseFactory,
+        private RequestScopedHolder $orgId,
         /** Subdomain SaaS base domain, e.g. `nene-records.com`; '' disables this middleware. */
         private string $baseDomain = '',
     ) {
@@ -39,6 +44,12 @@ final readonly class WwwRedirectMiddleware implements MiddlewareInterface
         if ($this->baseDomain === '' || !$this->isWwwHost($request)) {
             return $handler->handle($request);
         }
+
+        // Short-circuiting ahead of OrgResolverMiddleware means downstream
+        // request-scoped readers (the access-log writer wraps this middleware)
+        // never see the holder populated — seed the no-org sentinel, same as
+        // OrgResolver's own bypass branch (#528, #834).
+        $this->orgId->set(0);
 
         $uri = $request->getUri();
         $target = $uri->getPath() . ($uri->getQuery() !== '' ? '?' . $uri->getQuery() : '');
