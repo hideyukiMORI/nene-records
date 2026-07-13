@@ -6,6 +6,57 @@ NeNe Records does not yet follow Semantic Versioning — entries are grouped by 
 
 ---
 
+## [ポスト #536 続 — Tier A インストーラ・移送経路・公開サイト堅牢化] — 2026-06-27 〜 2026-07-13
+
+> ポスト #536（本番 SaaS 稼働）以降、**共有ホスティング向け Tier A インストーラ**（自己完結 zip）を
+> GitHub Release として公開し、**SaaS org → Tier A の別インスタンス移送経路**を成立させ、公開サイト側の
+> 堅牢化を連続出荷した。Issue/PR の詳細内訳と再開手順は `docs/todo/current.md` を正本とする。
+> 版は **v0.5.0 → v0.5.2**（`VERSION` を単一ソース化）。本番は 2026-07-09 デプロイ（`php` 8.4.23 ピン）、
+> 2026-07-13 に本節の main 差分の本番反映を施主 GO。
+
+### Added
+- **Tier A 共有ホスティング インストーラ（#707/#708）** — NENE2 `Nene2\Install` toolkit を配線した
+  `public_html/install/`（要件チェック→DB/tenant→migrate→管理者→完了・再訪403）＋ `tools/build-release.sh`
+  で自己完結 zip を生成し、**GitHub Release `v0.5.0`（66MB・Latest）**を公開。設置手順は `docs/install-tier-a.md`。
+- **WP 式トップページ固定（front_page 設定、#701/#702）** — 任意の公開レコード1件を org 設定 `front_page` に
+  ピン留めし公開トップ `/` で SSR（canonical=ルート・JSON-LD WebPage）、元 permalink は 302、sitemap を `/` に置換。
+- **ページ階層／ディレクトリ（#656–#671）** — 公開 custom-permalink ページを実 SPA で解決・描画（#663）、
+  ディレクトリ表示拡充＋titleless humanize（#664/#665）、DnD 親移動＋自動301・ツリー内検索・手動並び順（#666–#670）。
+- **小説の章モード（なろう式、#646）** — 目次＋章レコード＋導出ナビ。本番 org `aozora` に漱石 1114 レコードを収録。
+- **org 間移送経路（SaaS org → Tier A、#741）** — 衝突マージ＋id リマップ・トランザクション化・M8 以降の列追随・
+  `tools/import-org.php`（CLI import）（#793 Phase 1）、menus/widgets/themes/blocks_fields/entity_relations/
+  url_redirects の移送＋各 FK 再マップ（#794 Phase 2）、ブロック本文・`home_hero` の media 参照書き換え（#795）、
+  `front_page` エンティティ id 再マップ（#801）。
+- **org 単位の公開メンテナンスモード（#813）** — org ごとに公開ページをメンテ表示へ切替（管理 UI トグルは #814 で継続）。
+- **公開サイトのフォント self-host（#818）** — Zen Kaku Gothic New / IBM Plex Mono を自前配信（外部 CDN 依存を排除）。
+- **信頼済み外部埋め込みの per-org CSP allowlist（Phase 1、#802/#803）** — 公開ページ CSP に per-org の
+  trusted-embed allowlist を導入（Phase 2 widget プリミティブ・Phase 3 media 同乗は継続）。
+- **bare レイアウトの単一 html 描画（#799/#800）** — 1 html フィールドの bespoke ページを inline＋bare layout で忠実描画。
+
+### Changed
+- **`VERSION` を 0.5.2 にバンプ（#808）** — 版の単一ソースを公開最新に一致（`/machine/health` も同値を報告）。
+- **設定定義シードの systemic 修正（#711/#712）** — org 作成時に `setting_defs`（17定義）を自動投入＋バックフィル
+  migration。signup/インストーラ産 org の設定 UI が空だった問題を解消。
+- **superadmin コンソールを superadmin 専用に封鎖（#797/#805）** — 認証済みなら非 superadmin でも横断コンソール／
+  org export・import API に到達できた緩さを capability で閉じる。
+- **本番 compose に `var/media` 永続ボリューム（#807/#809）** — 再ビルドでのメディア消失を防止。
+- **テーマサムネの配信（#705/#706）** — 本番 Apache が `/assets` のみ配信だった問題に `/theme-thumbnails` Alias を追加。
+
+### Fixed
+- **派生画像が AVIF 無しビルド環境で全 500（#737/#738）** — GD が AVIF 非対応（共有ホスティングで実在）でも
+  `Accept: image/avif` で 500 になっていたのを、encoder 能力込みの形式交渉（avif→webp→ソース形式）に是正。**v0.5.2 収録**。
+- **superadmin org export/import API が常に 404（#739/#740）** — NENE2 Router のパラメータ受け渡し（PARAMETERS_ATTRIBUTE）
+  非対応で `{id}` を読めなかったのを修正。実 Router 配線の HTTP テストを新設。**v0.5.2 収録**。
+- **直リンク `/pages/{id}` が落ちる（#816/#817）** — SSR bootstrap の entity に permalink/slug を載せて解消。
+- **再設置ガード素通し（#713）** — `.env` 無し早期 return が Docker 本番でガードを無効化していたのを probe 常時実行に。
+- **共有ホスティングの env ブリッジ** — phpdotenv v5 が putenv しない環境で getenv 直読み設定が全て既定値化する問題を
+  front controller で写して解消。**APP_BASE_PATH の入口 prefix strip** も是正。
+
+### Security
+- superadmin コンソール／org export・import API を capability で保護（#797）。
+
+---
+
 ## [ポスト #536 — UX/SEO/SSR・WordPress 移行・本番配備・subdomain SaaS] — 2026-06-24 〜 2026-06-26
 
 > WordPress 比較×6ペルソナ討論を起点に公開 SEO/SSR を最優先化し、最大の残壁「非技術者の入口」を

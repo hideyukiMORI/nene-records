@@ -1,6 +1,58 @@
 # Current Work
 
-Last updated: 2026-07-11
+Last updated: 2026-07-13
+
+## 最新: 移送経路の仕上げ＋公開サイト堅牢化バッチ（2026-07-12〜13・main 反映）
+
+> #741 Phase 1/2 のマージ後、移送の取りこぼしを埋めつつ公開サイト側の堅牢化を連続出荷した。
+> すべて main 反映済み・CI 緑。**本番デプロイは施主 GO（2026-07-13）** — 下記「本番デプロイ」参照。
+
+- **移送（#741 系）の追い込み**:
+  - **#795（PR #812）ブロック本文・home_hero の media 参照書き換え**: export/import 時に
+    ブロック本文 JSON・`home_hero` 等に埋め込まれた media 参照を mediaMap で再マップ（Phase 2 の
+    設計残＝「JSON 内 media URL 未書き換え」を解消）。本文 verbatim 取り込みの穴を塞いだ。
+  - **#801（PR #806）front_page エンティティ id 再マップ**: 移送時に org 設定 `front_page` が
+    指すエンティティ id を entityMap で再マップ（移送先で別 id になってもトップ固定が壊れない）。
+- **公開サイト堅牢化**:
+  - **#797（PR #805）superadmin コンソールを superadmin 専用に閉じる**: 認証さえ通れば非 superadmin でも
+    横断コンソール／org export・import API に到達できた緩さ（#741 設計所見の別 issue 化分）を capability で封鎖。
+  - **#802（PR #803）信頼済み埋め込みオリジンの CSP allowlist（Phase 1）**: 公開ページ CSP に
+    per-org の trusted-embed allowlist を導入（査読承認＋施主 GO 07-12・board due 07-16・07-25 公開の依存）。
+    残 = Phase 2（widget 一級 trusted-embed プリミティブ）／Phase 3（media 同乗）＝#802 継続。
+  - **#799（PR #800）bare レイアウトで単一 html 本文を素直に描画**: 1 html フィールドの bespoke ページ
+    （AYANE 型）を inline＋bare layout で忠実描画。
+  - **#813（PR #815）org 単位の公開メンテナンスモード**: org ごとに公開ページをメンテ表示へ。
+    管理 UI トグル（#814）はフォローアップ（open）。
+  - **#816（PR #817）SSR bootstrap の permalink/slug 欠落で直リンク `/pages/{id}` が落ちる不具合を修正**。
+  - **#818（PR #819）公開サイトのフォント self-host**: Zen Kaku Gothic New / IBM Plex Mono を自前配信
+    （外部 CDN 依存を排し CSP と整合）。
+- **リリース／運用**:
+  - **#807（PR #809）本番 compose に `var/media` 永続ボリュームを追加**（再ビルドでメディア消失を防止）。
+  - **#808（PR #810）`VERSION` を 0.5.2 にバンプ**（版の単一ソースを公開最新 0.5.2 に一致・`/machine/health` も同値）。
+
+### 本番デプロイ（2026-07-13・施主 GO・✅ 反映済み）
+
+- **判定: GO（施主承認 2026-07-13）。反映は既に完了済み** — 本節の main 差分（#793/#794 移送 Phase 1/2・
+  #795・#797・#799・#801・#802・#807・#808・#813・#816・#818）は **2026-07-13 05:28 JST のビルドで本番反映済み**
+  （最終コミット #819 の 3 分後にイメージ build＝HEAD 相当）。当日 15:46 に検証で確認:
+  - `records-app` イメージ build 時刻 = 2026-07-13 05:28、baked `VERSION`=0.5.2。
+  - phinx migration は `20260720000000`（メンテモード #813）まで **全 up・pending 0**。
+  - `var/media` 永続ボリューム（#807）は `records-media-data` として稼働・既存メディア保持（消失なし）。
+  - health 200: apex `nene-records.com` / `aozora.nene-records.com` / `ayane.nene-records.com`。
+  - SSR 実証: `/work/aozora-000148-60818` が SSR（title/OG/canonical/JSON-LD BlogPosting）で描画、
+    bootstrap に `slug` 同梱（#816 の直リンク修正が live）、self-host フォント
+    `zen-kaku-gothic-new-*.woff2`（#818）が同一オリジン 200 で配信。
+- ⚠️ 記録の齟齬: 本 doc は以前「07-09 が最終デプロイ」と記していたが、実際は **07-12〜13 に再デプロイ済み**
+  だった（current.md の遅延が原因）。以後の「未デプロイ」判断は git／サーバ実測で確認する（memory `verify-state-via-git-not-docs`）。
+- server 側 authoritative compose は `~/envs/suite-stg/records/compose.yaml`（repo `compose.prod.yaml` とは別・
+  `records-media-data` volume も反映済み）。再デプロイ手順は runbook（private `nene-records-marketing/ops-inbox/records/`）。
+
+### 残フォローアップ（open）
+
+- **#814** メンテナンスモードの管理 UI トグル（#813 の続き）。
+- **#802** trusted-embed Phase 2（widget プリミティブ）／Phase 3（media 同乗）。
+- **#796 / #798** 移送カバレッジ拡充（comments/webhooks/notification_channels/user_profiles／メディア実ファイルの zip 同梱）。
+- **#774** ニュースレター購読フォームの実体、**#709** 配布 ZIP フォントの on-demand 化（66MB→約11MB）。
 
 ## 進行中: #741 移送経路 Phase 1（SaaS org → Tier A・ブランチ feat/741-org-transport-phase1）
 

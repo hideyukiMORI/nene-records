@@ -55,7 +55,7 @@ AI clients (MCP)        ──┘
 
 ## Current Status
 
-Milestones M1 – M15 are complete (admin platform). Active work — single-origin crawlable SSR, WordPress (WXR) migration, and production deployment — is tracked in [`docs/todo/current.md`](./docs/todo/current.md); see [`docs/roadmap.md`](./docs/roadmap.md) for direction.
+Milestones M1 – M16 are complete, plus the post-#536 frontier: single-origin crawlable SSR, WordPress (WXR) migration, public i18n, and production deployment all shipped. NeNe Records runs in production as a subdomain multi-tenant SaaS and ships as a self-contained **Tier A zip installer** for shared hosting (current release **v0.5.2**). Active work — SaaS → Tier A org transport (#741) and public-site hardening (CSP trusted-embed, maintenance mode) — is tracked in [`docs/todo/current.md`](./docs/todo/current.md); see [`docs/roadmap.md`](./docs/roadmap.md) for direction.
 
 | Area | State |
 | --- | --- |
