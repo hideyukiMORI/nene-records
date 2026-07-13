@@ -281,7 +281,8 @@ final class TextFieldHttpTest extends TestCase
         );
 
         $response = $this->application->handle(
-            $this->factory->createServerRequest('GET', "https://example.test/api/v1/text-fields?entity_id={$entityAId}"),
+            $this->factory->createServerRequest('GET', "https://example.test/api/v1/text-fields?entity_id={$entityAId}")
+                ->withAttribute('nene2.auth.claims', ['sub' => 'admin@example.test']),
         );
         $payload = $this->decodeJson($response);
 
@@ -306,7 +307,8 @@ final class TextFieldHttpTest extends TestCase
         $this->createTextField($entityBId, 'title', 'Type B title');
 
         $response = $this->application->handle(
-            $this->factory->createServerRequest('GET', "https://example.test/api/v1/text-fields?entity_type_id={$typeAId}"),
+            $this->factory->createServerRequest('GET', "https://example.test/api/v1/text-fields?entity_type_id={$typeAId}")
+                ->withAttribute('nene2.auth.claims', ['sub' => 'admin@example.test']),
         );
         $payload = $this->decodeJson($response);
 
@@ -359,7 +361,8 @@ final class TextFieldHttpTest extends TestCase
 
         // Filter by locale=ja → should return only the Japanese version
         $response = $this->application->handle(
-            $this->factory->createServerRequest('GET', "https://example.test/api/v1/text-fields?entity_id={$entityId}&locale=ja"),
+            $this->factory->createServerRequest('GET', "https://example.test/api/v1/text-fields?entity_id={$entityId}&locale=ja")
+                ->withAttribute('nene2.auth.claims', ['sub' => 'admin@example.test']),
         );
         $payload = $this->decodeJson($response);
 
@@ -389,6 +392,28 @@ final class TextFieldHttpTest extends TestCase
         self::assertSame(201, $response->getStatusCode());
         self::assertArrayHasKey('locale', $payload);
         self::assertNull($payload['locale']);
+    }
+
+    public function testAnonymousTextFieldsExcludeDraftParents(): void
+    {
+        // #828: anonymous callers may not read the body of an unpublished record,
+        // even by guessing its entity id. Authenticated admins still can.
+        $typeId = $this->entityTypes->save(new EntityType(name: 'Doc', slug: 'doc'));
+        $this->fieldDefs->save(new FieldDef(entityTypeId: $typeId, fieldKey: 'title', dataType: 'text'));
+
+        $draftId = $this->createEntity($typeId); // default status = draft
+        $this->createTextField($draftId, 'title', 'Secret draft body');
+
+        $anon = $this->decodeJson($this->application->handle(
+            $this->factory->createServerRequest('GET', "https://example.test/api/v1/text-fields?entity_id={$draftId}"),
+        ));
+        self::assertSame([], $anon['items']);
+
+        $authed = $this->decodeJson($this->application->handle(
+            $this->factory->createServerRequest('GET', "https://example.test/api/v1/text-fields?entity_id={$draftId}")
+                ->withAttribute('nene2.auth.claims', ['sub' => 'admin@example.test']),
+        ));
+        self::assertCount(1, $authed['items']);
     }
 
     private function createEntity(int $entityTypeId): int

@@ -184,6 +184,57 @@ final class AdminApiAuthMiddlewareTest extends TestCase
         self::assertSame(204, $this->middleware->process($request, $this->passThrough())->getStatusCode());
     }
 
+    public function testOpenGetRouteAttachesClaimsForValidToken(): void
+    {
+        // #828: on an open content-read route, a valid token must still attach claims
+        // so downstream handlers can widen results for an authenticated admin.
+        $capture = new class () implements RequestHandlerInterface {
+            /** @var array<string, mixed>|null */
+            public ?array $claims = null;
+
+            public function handle(ServerRequestInterface $request): \Psr\Http\Message\ResponseInterface
+            {
+                $claims = $request->getAttribute('nene2.auth.claims');
+                $this->claims = is_array($claims) ? $claims : null;
+
+                return new Response(204);
+            }
+        };
+
+        $request = $this->factory
+            ->createServerRequest('GET', 'https://example.test/api/v1/entities')
+            ->withHeader('Authorization', 'Bearer good');
+
+        self::assertSame(204, $this->middleware->process($request, $capture)->getStatusCode());
+        self::assertIsArray($capture->claims);
+        self::assertSame('admin', $capture->claims['role'] ?? null);
+    }
+
+    public function testOpenGetRouteWithInvalidTokenServesAnonymously(): void
+    {
+        // Invalid/expired token on an open route → no 401, no claims (anonymous).
+        $capture = new class () implements RequestHandlerInterface {
+            public bool $handled = false;
+            public mixed $claims = 'unset';
+
+            public function handle(ServerRequestInterface $request): \Psr\Http\Message\ResponseInterface
+            {
+                $this->handled = true;
+                $this->claims = $request->getAttribute('nene2.auth.claims');
+
+                return new Response(204);
+            }
+        };
+
+        $request = $this->factory
+            ->createServerRequest('GET', 'https://example.test/api/v1/entities')
+            ->withHeader('Authorization', 'Bearer bad');
+
+        self::assertSame(204, $this->middleware->process($request, $capture)->getStatusCode());
+        self::assertTrue($capture->handled);
+        self::assertNull($capture->claims);
+    }
+
     private function passThrough(): RequestHandlerInterface
     {
         return new class () implements RequestHandlerInterface {

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeNeRecords\Tests\TextField;
 
 use NeNeRecords\Entity\EntityRepositoryInterface;
+use NeNeRecords\Entity\EntityStatus;
 use NeNeRecords\TextField\TextField;
 use NeNeRecords\TextField\TextFieldNotFoundException;
 use NeNeRecords\TextField\TextFieldRepositoryInterface;
@@ -49,13 +50,17 @@ final class InMemoryTextFieldRepository implements TextFieldRepositoryInterface
     }
 
     /** @return list<TextField> */
-    public function findAll(int $limit, int $offset, ?string $locale = null): array
+    public function findAll(int $limit, int $offset, ?string $locale = null, bool $publishedOnly = false): array
     {
         $active = [];
 
         foreach ($this->fields as $id => $textField) {
             if (!isset($this->deletedIds[$id])) {
                 if ($locale !== null && $textField->locale !== $locale) {
+                    continue;
+                }
+
+                if ($publishedOnly && !$this->isPublishedParent($textField->entityId)) {
                     continue;
                 }
 
@@ -69,8 +74,12 @@ final class InMemoryTextFieldRepository implements TextFieldRepositoryInterface
     }
 
     /** @return list<TextField> */
-    public function findByEntityId(int $entityId, int $limit, int $offset, ?string $locale = null): array
+    public function findByEntityId(int $entityId, int $limit, int $offset, ?string $locale = null, bool $publishedOnly = false): array
     {
+        if ($publishedOnly && !$this->isPublishedParent($entityId)) {
+            return [];
+        }
+
         $active = [];
 
         foreach ($this->fields as $id => $textField) {
@@ -89,7 +98,7 @@ final class InMemoryTextFieldRepository implements TextFieldRepositoryInterface
     }
 
     /** @return list<TextField> */
-    public function findByEntityTypeId(int $entityTypeId, int $limit, int $offset, ?string $locale = null): array
+    public function findByEntityTypeId(int $entityTypeId, int $limit, int $offset, ?string $locale = null, bool $publishedOnly = false): array
     {
         $active = [];
 
@@ -109,6 +118,10 @@ final class InMemoryTextFieldRepository implements TextFieldRepositoryInterface
                     continue;
                 }
 
+                if ($publishedOnly && $entity->status !== EntityStatus::Published) {
+                    continue;
+                }
+
                 $active[] = $textField;
             }
         }
@@ -116,6 +129,17 @@ final class InMemoryTextFieldRepository implements TextFieldRepositoryInterface
         usort($active, static fn (TextField $a, TextField $b): int => ($a->id ?? 0) <=> ($b->id ?? 0));
 
         return array_slice($active, $offset, $limit);
+    }
+
+    private function isPublishedParent(int $entityId): bool
+    {
+        if ($this->entities === null) {
+            return false;
+        }
+
+        $entity = $this->entities->findById($entityId);
+
+        return $entity !== null && $entity->status === EntityStatus::Published;
     }
 
     /**

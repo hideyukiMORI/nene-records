@@ -41,17 +41,28 @@ final readonly class PdoTextFieldRepository implements TextFieldRepositoryInterf
         return $this->mapRow($row);
     }
 
+    /**
+     * SQL fragment gating an unaliased `text_fields` query to fields whose parent
+     * entity is published. Appended for anonymous callers so the open content-read
+     * surface can never return draft/scheduled bodies (`?entity_id`/`findAll`). #828.
+     */
+    private const PUBLISHED_PARENT_GATE =
+        ' AND EXISTS (SELECT 1 FROM entities e WHERE e.id = text_fields.entity_id'
+        . " AND e.status = 'published' AND e.is_deleted = 0)";
+
     /** @return list<TextField> */
-    public function findAll(int $limit, int $offset, ?string $locale = null): array
+    public function findAll(int $limit, int $offset, ?string $locale = null, bool $publishedOnly = false): array
     {
+        $gate = $publishedOnly ? self::PUBLISHED_PARENT_GATE : '';
+
         if ($locale !== null) {
             $rows = $this->query->fetchAll(
-                'SELECT id, entity_id, field_key, locale, value FROM text_fields WHERE is_deleted = 0 AND locale = ? AND organization_id = ? ORDER BY id ASC LIMIT ? OFFSET ?',
+                "SELECT id, entity_id, field_key, locale, value FROM text_fields WHERE is_deleted = 0 AND locale = ? AND organization_id = ?{$gate} ORDER BY id ASC LIMIT ? OFFSET ?",
                 [$locale, $this->orgId->get(), $limit, $offset],
             );
         } else {
             $rows = $this->query->fetchAll(
-                'SELECT id, entity_id, field_key, locale, value FROM text_fields WHERE is_deleted = 0 AND organization_id = ? ORDER BY id ASC LIMIT ? OFFSET ?',
+                "SELECT id, entity_id, field_key, locale, value FROM text_fields WHERE is_deleted = 0 AND organization_id = ?{$gate} ORDER BY id ASC LIMIT ? OFFSET ?",
                 [$this->orgId->get(), $limit, $offset],
             );
         }
@@ -60,16 +71,18 @@ final readonly class PdoTextFieldRepository implements TextFieldRepositoryInterf
     }
 
     /** @return list<TextField> */
-    public function findByEntityId(int $entityId, int $limit, int $offset, ?string $locale = null): array
+    public function findByEntityId(int $entityId, int $limit, int $offset, ?string $locale = null, bool $publishedOnly = false): array
     {
+        $gate = $publishedOnly ? self::PUBLISHED_PARENT_GATE : '';
+
         if ($locale !== null) {
             $rows = $this->query->fetchAll(
-                'SELECT id, entity_id, field_key, locale, value FROM text_fields WHERE entity_id = ? AND locale = ? AND is_deleted = 0 AND organization_id = ? ORDER BY id ASC LIMIT ? OFFSET ?',
+                "SELECT id, entity_id, field_key, locale, value FROM text_fields WHERE entity_id = ? AND locale = ? AND is_deleted = 0 AND organization_id = ?{$gate} ORDER BY id ASC LIMIT ? OFFSET ?",
                 [$entityId, $locale, $this->orgId->get(), $limit, $offset],
             );
         } else {
             $rows = $this->query->fetchAll(
-                'SELECT id, entity_id, field_key, locale, value FROM text_fields WHERE entity_id = ? AND is_deleted = 0 AND organization_id = ? ORDER BY id ASC LIMIT ? OFFSET ?',
+                "SELECT id, entity_id, field_key, locale, value FROM text_fields WHERE entity_id = ? AND is_deleted = 0 AND organization_id = ?{$gate} ORDER BY id ASC LIMIT ? OFFSET ?",
                 [$entityId, $this->orgId->get(), $limit, $offset],
             );
         }
@@ -78,37 +91,36 @@ final readonly class PdoTextFieldRepository implements TextFieldRepositoryInterf
     }
 
     /** @return list<TextField> */
-    public function findByEntityTypeId(int $entityTypeId, int $limit, int $offset, ?string $locale = null): array
+    public function findByEntityTypeId(int $entityTypeId, int $limit, int $offset, ?string $locale = null, bool $publishedOnly = false): array
     {
+        // findByEntityTypeId already joins `entities e`, so gate on the alias directly.
+        $gate = $publishedOnly ? "\n                  AND e.status = 'published'" : '';
+
         if ($locale !== null) {
             $rows = $this->query->fetchAll(
-                <<<'SQL'
-                SELECT tf.id, tf.entity_id, tf.field_key, tf.locale, tf.value
+                "SELECT tf.id, tf.entity_id, tf.field_key, tf.locale, tf.value
                 FROM text_fields tf
                 INNER JOIN entities e ON e.id = tf.entity_id
                 WHERE tf.is_deleted = 0
                   AND e.is_deleted = 0
                   AND e.entity_type_id = ?
                   AND tf.locale = ?
-                  AND tf.organization_id = ?
+                  AND tf.organization_id = ?{$gate}
                 ORDER BY tf.id ASC
-                LIMIT ? OFFSET ?
-                SQL,
+                LIMIT ? OFFSET ?",
                 [$entityTypeId, $locale, $this->orgId->get(), $limit, $offset],
             );
         } else {
             $rows = $this->query->fetchAll(
-                <<<'SQL'
-                SELECT tf.id, tf.entity_id, tf.field_key, tf.locale, tf.value
+                "SELECT tf.id, tf.entity_id, tf.field_key, tf.locale, tf.value
                 FROM text_fields tf
                 INNER JOIN entities e ON e.id = tf.entity_id
                 WHERE tf.is_deleted = 0
                   AND e.is_deleted = 0
                   AND e.entity_type_id = ?
-                  AND tf.organization_id = ?
+                  AND tf.organization_id = ?{$gate}
                 ORDER BY tf.id ASC
-                LIMIT ? OFFSET ?
-                SQL,
+                LIMIT ? OFFSET ?",
                 [$entityTypeId, $this->orgId->get(), $limit, $offset],
             );
         }

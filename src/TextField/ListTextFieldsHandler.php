@@ -50,6 +50,8 @@ final readonly class ListTextFieldsHandler
             limit: $pagination->limit,
             offset: $pagination->offset,
             locale: $locale,
+            // Anonymous callers may only read fields of published records. See #828.
+            publishedOnly: !is_array($request->getAttribute('nene2.auth.claims')),
         ));
 
         return $this->response->create(

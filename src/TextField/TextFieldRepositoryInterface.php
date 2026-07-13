@@ -14,7 +14,7 @@ interface TextFieldRepositoryInterface
      *
      * @return list<TextField>
      */
-    public function findAll(int $limit, int $offset, ?string $locale = null): array;
+    public function findAll(int $limit, int $offset, ?string $locale = null, bool $publishedOnly = false): array;
 
     /**
      * Active (non-soft-deleted) rows for the given entity only.
@@ -22,7 +22,7 @@ interface TextFieldRepositoryInterface
      *
      * @return list<TextField>
      */
-    public function findByEntityId(int $entityId, int $limit, int $offset, ?string $locale = null): array;
+    public function findByEntityId(int $entityId, int $limit, int $offset, ?string $locale = null, bool $publishedOnly = false): array;
 
     /**
      * Active (non-soft-deleted) rows for entities belonging to the given entity type.
@@ -30,7 +30,7 @@ interface TextFieldRepositoryInterface
      *
      * @return list<TextField>
      */
-    public function findByEntityTypeId(int $entityTypeId, int $limit, int $offset, ?string $locale = null): array;
+    public function findByEntityTypeId(int $entityTypeId, int $limit, int $offset, ?string $locale = null, bool $publishedOnly = false): array;
 
     /**
      * Active (non-soft-deleted) rows for a batch of entity ids (no limit).

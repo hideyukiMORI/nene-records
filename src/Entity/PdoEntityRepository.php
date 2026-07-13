@@ -265,7 +265,12 @@ final readonly class PdoEntityRepository implements EntityRepositoryInterface
             $conditions[] = "(e.permalink IS NOT NULL AND e.permalink != '')";
         }
 
-        if ($criteria->status !== null) {
+        if ($criteria->publishedOnly) {
+            // Anonymous callers: force published-only and ignore any client `status`
+            // filter (so `?status=draft` cannot surface unpublished records). See #828.
+            $conditions[] = 'e.status = ?';
+            $params[] = EntityStatus::Published->value;
+        } elseif ($criteria->status !== null) {
             $conditions[] = 'e.status = ?';
             $params[] = $criteria->status->value;
         }

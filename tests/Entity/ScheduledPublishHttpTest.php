@@ -230,7 +230,8 @@ final class ScheduledPublishHttpTest extends TestCase
             scheduledAt: $scheduledAt,
         ));
 
-        $request = $this->factory->createServerRequest('GET', "https://example.test/api/v1/entities/{$entityId}");
+        $request = $this->factory->createServerRequest('GET', "https://example.test/api/v1/entities/{$entityId}")
+            ->withAttribute('nene2.auth.claims', ['sub' => 'admin@example.test']);
         $response = $this->application->handle($request);
 
         self::assertSame(200, $response->getStatusCode());
