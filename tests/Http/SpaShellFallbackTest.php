@@ -137,6 +137,21 @@ final class SpaShellFallbackTest extends TestCase
         self::assertStringContainsString('<div id="root">', (string) $result->getBody());
     }
 
+    public function testLeavesRedirectAtHomeUntouched(): void
+    {
+        // The www→apex 301 (WwwRedirectMiddleware) is a bare redirect with no
+        // Content-Type; the HTML-home carve-out must not swallow it into the shell
+        // for browser navigations (GET + text/html). Regression for #834.
+        $redirect = $this->factory->createResponse(301)
+            ->withHeader('Location', 'https://nene-records.com/');
+
+        $result = $this->fallback->apply($this->request('GET', '/'), $redirect);
+
+        self::assertSame(301, $result->getStatusCode());
+        self::assertSame('https://nene-records.com/', $result->getHeaderLine('Location'));
+        self::assertSame('', (string) $result->getBody());
+    }
+
     public function testLeavesJsonHomeForApiClients(): void
     {
         // No text/html Accept → the framework JSON passes through untouched.

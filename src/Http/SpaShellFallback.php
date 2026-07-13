@@ -53,8 +53,12 @@ final readonly class SpaShellFallback
         // for `/` + text/html even though the framework answered 200 (not 404).
         // EXCEPT when an upstream handler already produced an HTML page for `/` (the
         // front-page SSR, #701): that response is the real page, so let it pass through.
+        // Only the 200 framework JSON qualifies: a non-200 at `/` (e.g. the bare
+        // www→apex 301 from WwwRedirectMiddleware, #834) is a deliberate answer and
+        // must never be swallowed by the shell.
         $alreadyHtml = str_contains($response->getHeaderLine('Content-Type'), 'text/html');
-        $isHtmlHome = $isGet && $wantsHtml && $path === '/' && !$alreadyHtml;
+        $isHtmlHome = $isGet && $wantsHtml && $path === '/' && !$alreadyHtml
+            && $response->getStatusCode() === 200;
 
         if ($response->getStatusCode() !== 404 && !$isHtmlHome) {
             return $response;
