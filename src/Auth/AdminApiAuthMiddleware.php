@@ -19,8 +19,9 @@ use Psr\Http\Server\RequestHandlerInterface;
  *  1. Always open: /health, /api/v1/auth/*, /api/v1/public/*, and the
  *     cron-triggered batch endpoints (process-scheduled / process-deliveries)
  *  2. Always protected (all HTTP methods incl. OPTIONS): the ADMIN_ONLY_PREFIXES
- *  3. Protected for every method except OPTIONS (CORS preflight): all other
- *     /api/v1/ paths — GET and HEAD included. Fail-closed by default.
+ *     (includes sensitive reads: webhooks / notification-channels / export / dashboard)
+ *  3. Protected for non-GET methods: all other /api/v1/ paths. GET/HEAD are the
+ *     public content-read surface (the consumer site reads them unauthenticated).
  *  4. Everything else: open (static assets, public HTML pages)
  */
 final readonly class AdminApiAuthMiddleware implements MiddlewareInterface
@@ -59,6 +60,18 @@ final readonly class AdminApiAuthMiddleware implements MiddlewareInterface
         '/api/v1/themes',
         '/api/v1/migration',
         '/api/v1/account',
+        // Sensitive reads that must never be anonymous, even though the rest of the
+        // content API (entity-types / entities / text-fields / tags / analytics-
+        // popular) stays readable for the public consumer site. Webhooks expose
+        // signing secrets, notification-channels expose delivery configs, export is
+        // a bulk dump, dashboard is org business metrics. None are used by the public
+        // site. See security assessment #824 and public-site regression #826.
+        // (`/api/v1/webhooks/process-deliveries` stays open via ALWAYS_OPEN above,
+        // which is matched first.)
+        '/api/v1/webhooks',
+        '/api/v1/notification-channels',
+        '/api/v1/entities/export',
+        '/api/v1/dashboard',
     ];
 
     public function __construct(
@@ -152,16 +165,17 @@ final readonly class AdminApiAuthMiddleware implements MiddlewareInterface
             }
         }
 
-        // 3. All other /api/v1/* paths: protect EVERY method except the CORS
-        //    preflight OPTIONS. GET/HEAD are protected too — admin reads must be
-        //    authenticated. The only unauthenticated reads are the dedicated
-        //    /api/v1/public/* surface and /api/v1/auth/* (both ALWAYS_OPEN above)
-        //    plus the cron batch endpoints. Fail-closed: a newly added admin
-        //    route is protected by default instead of leaking its GET response
-        //    (incl. drafts, webhook secrets, exports) until someone remembers to
-        //    add a prefix. See security assessment #824.
+        // 3. All other /api/v1/* paths: protect non-GET methods. GET/HEAD are the
+        //    public content-read surface the consumer site depends on (entity-types,
+        //    entities, text-fields, tags, analytics-popular — all read unauthenticated
+        //    to render public pages). Genuinely sensitive GETs are enumerated in
+        //    ADMIN_ONLY_PREFIXES above. See #824 (secret/export lockdown) and #826
+        //    (public-site regression: over-broad GET lockdown broke the consumer site).
+        //    KNOWN RESIDUAL: anonymous content reads can still surface unpublished
+        //    records via `?status` — to be tightened to published-only for anonymous
+        //    callers (#826 follow-up), not by blanket-protecting the read surface.
         if (str_starts_with($path, '/api/v1/')) {
-            return $method !== 'OPTIONS';
+            return $method !== 'GET' && $method !== 'HEAD' && $method !== 'OPTIONS';
         }
 
         // 4. Everything else: open (HTML pages, static assets)

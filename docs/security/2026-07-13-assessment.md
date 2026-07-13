@@ -76,6 +76,19 @@ unauthenticated; authenticated admin reads still return 200; `/health` and `/api
 read responses. Consider a write-only secret (return a masked/last-4 value on read) so the signing secret is
 never echoed back even to authenticated admins. Tracked as a follow-up.
 
+> **Revision 2026-07-14 (#826).** The original F-01 fix ("require auth for every
+> `/api/v1/*` GET") was **too broad** and broke the public consumer site: `PublicSiteShell`
+> and the public feature hooks read content (entity-types, entities, text-fields, tags,
+> analytics-popular) unauthenticated to render public pages, so a global 401→`/login`
+> interceptor bounced every visitor to the login page. Refined remediation: the sensitive
+> reads that actually caused the leak — `/api/v1/webhooks` (signing secrets),
+> `/api/v1/notification-channels`, `/api/v1/entities/export`, `/api/v1/dashboard` — are
+> now in `ADMIN_ONLY_PREFIXES` (auth required for all methods), while the content-read
+> surface stays open. **The Critical (webhook-secret disclosure) remains closed.**
+> **Known residual (High, follow-up #826):** anonymous content reads can still surface
+> unpublished records via `?status`; to be tightened to published-only for anonymous
+> callers (not by blanket-locking the read surface).
+
 ### F-02 — Cross-tenant read via JWT replay (Medium) — FIXED
 
 **Observed.** An authenticated user of org A, replaying their session JWT as an `Authorization: Bearer`

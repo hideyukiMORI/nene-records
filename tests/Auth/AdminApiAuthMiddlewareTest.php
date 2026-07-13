@@ -139,18 +139,31 @@ final class AdminApiAuthMiddlewareTest extends TestCase
         self::assertSame(401, $this->middleware->process($request, $this->passThrough())->getStatusCode());
     }
 
-    public function testUnauthenticatedGetOnUnmappedApiRouteIsRejected(): void
+    public function testSensitiveUnauthenticatedGetIsRejected(): void
     {
-        // Fail-closed regression (#824): a GET on an admin resource that is NOT in
-        // ADMIN_ONLY_PREFIXES must still require auth. Before the fix these leaked
-        // their response unauthenticated (drafts, webhook secrets, exports, field
-        // values). GET is no longer exempt.
-        foreach (['/api/v1/webhooks', '/api/v1/entities', '/api/v1/entities/export', '/api/v1/text-fields'] as $path) {
+        // #824: sensitive reads (webhook signing secrets, notification-channel
+        // configs, bulk export, org dashboard metrics) must require auth even for
+        // GET — they are in ADMIN_ONLY_PREFIXES.
+        foreach (['/api/v1/webhooks', '/api/v1/notification-channels', '/api/v1/entities/export', '/api/v1/dashboard'] as $path) {
             $request = $this->factory->createServerRequest('GET', 'https://example.test' . $path);
             self::assertSame(
                 401,
                 $this->middleware->process($request, $this->passThrough())->getStatusCode(),
                 sprintf('Unauthenticated GET %s must be 401', $path),
+            );
+        }
+    }
+
+    public function testPublicContentGetSurfaceStaysOpen(): void
+    {
+        // #826: the consumer site reads content unauthenticated to render public
+        // pages — these GETs must stay open (protecting them broke the public site).
+        foreach (['/api/v1/entities', '/api/v1/text-fields', '/api/v1/entity-types', '/api/v1/tags', '/api/v1/analytics/popular-entities'] as $path) {
+            $request = $this->factory->createServerRequest('GET', 'https://example.test' . $path);
+            self::assertSame(
+                204,
+                $this->middleware->process($request, $this->passThrough())->getStatusCode(),
+                sprintf('Unauthenticated GET %s must stay open (public content read)', $path),
             );
         }
     }
