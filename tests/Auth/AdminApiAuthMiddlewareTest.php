@@ -139,6 +139,38 @@ final class AdminApiAuthMiddlewareTest extends TestCase
         self::assertSame(401, $this->middleware->process($request, $this->passThrough())->getStatusCode());
     }
 
+    public function testUnauthenticatedGetOnUnmappedApiRouteIsRejected(): void
+    {
+        // Fail-closed regression (#824): a GET on an admin resource that is NOT in
+        // ADMIN_ONLY_PREFIXES must still require auth. Before the fix these leaked
+        // their response unauthenticated (drafts, webhook secrets, exports, field
+        // values). GET is no longer exempt.
+        foreach (['/api/v1/webhooks', '/api/v1/entities', '/api/v1/entities/export', '/api/v1/text-fields'] as $path) {
+            $request = $this->factory->createServerRequest('GET', 'https://example.test' . $path);
+            self::assertSame(
+                401,
+                $this->middleware->process($request, $this->passThrough())->getStatusCode(),
+                sprintf('Unauthenticated GET %s must be 401', $path),
+            );
+        }
+    }
+
+    public function testPublicApiGetRemainsOpen(): void
+    {
+        // The dedicated public surface (/api/v1/public/*) stays unauthenticated.
+        $request = $this->factory->createServerRequest('GET', 'https://example.test/api/v1/public/settings');
+
+        self::assertSame(204, $this->middleware->process($request, $this->passThrough())->getStatusCode());
+    }
+
+    public function testCorsPreflightOptionsIsOpen(): void
+    {
+        // OPTIONS carries no credentials (CORS preflight) and must pass through.
+        $request = $this->factory->createServerRequest('OPTIONS', 'https://example.test/api/v1/entities');
+
+        self::assertSame(204, $this->middleware->process($request, $this->passThrough())->getStatusCode());
+    }
+
     private function passThrough(): RequestHandlerInterface
     {
         return new class () implements RequestHandlerInterface {

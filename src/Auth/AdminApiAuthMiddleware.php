@@ -18,8 +18,9 @@ use Psr\Http\Server\RequestHandlerInterface;
  * Protection rules (first match wins):
  *  1. Always open: /health, /api/v1/auth/*, /api/v1/public/*, and the
  *     cron-triggered batch endpoints (process-scheduled / process-deliveries)
- *  2. Always protected (all HTTP methods): paths starting with /api/v1/settings
- *  3. Protected for non-GET methods: all other /api/v1/ paths
+ *  2. Always protected (all HTTP methods incl. OPTIONS): the ADMIN_ONLY_PREFIXES
+ *  3. Protected for every method except OPTIONS (CORS preflight): all other
+ *     /api/v1/ paths — GET and HEAD included. Fail-closed by default.
  *  4. Everything else: open (static assets, public HTML pages)
  */
 final readonly class AdminApiAuthMiddleware implements MiddlewareInterface
@@ -151,9 +152,16 @@ final readonly class AdminApiAuthMiddleware implements MiddlewareInterface
             }
         }
 
-        // 3. All /api/v1/* paths: protect non-GET methods
+        // 3. All other /api/v1/* paths: protect EVERY method except the CORS
+        //    preflight OPTIONS. GET/HEAD are protected too — admin reads must be
+        //    authenticated. The only unauthenticated reads are the dedicated
+        //    /api/v1/public/* surface and /api/v1/auth/* (both ALWAYS_OPEN above)
+        //    plus the cron batch endpoints. Fail-closed: a newly added admin
+        //    route is protected by default instead of leaking its GET response
+        //    (incl. drafts, webhook secrets, exports) until someone remembers to
+        //    add a prefix. See security assessment #824.
         if (str_starts_with($path, '/api/v1/')) {
-            return $method !== 'GET' && $method !== 'HEAD' && $method !== 'OPTIONS';
+            return $method !== 'OPTIONS';
         }
 
         // 4. Everything else: open (HTML pages, static assets)

@@ -1,0 +1,8 @@
+# Never commit secrets, captured tokens, or attack output.
+*.cookie
+*.cookies
+cook*.txt
+*.jwt
+out/
+*.log
+.env.app
