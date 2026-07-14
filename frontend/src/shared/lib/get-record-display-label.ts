@@ -1,8 +1,9 @@
 import type { TextField } from '@/entities/text-field'
 
 /**
- * Resolve a record's display label from its text fields: the `title` field if
- * present, else the first non-empty field, else the fallback.
+ * Resolve a record's display label: the `title` field if present, else the
+ * entity's SEO `metaTitle` when the caller provides one (#853), else the first
+ * non-empty field, else the fallback.
  *
  * When `locale` is given (public i18n, #540) each step prefers that locale, then
  * the locale-agnostic (null) row, then the first — so listings show titles in the
@@ -33,6 +34,7 @@ export function getRecordDisplayLabel(
   textFields: TextField[],
   fallback: string,
   locale: string | null = null,
+  metaTitle: string | null = null,
 ): string {
   const forEntity = textFields.filter(
     (item) => item.entityId === entityId && item.value.trim() !== '',
@@ -55,6 +57,12 @@ export function getRecordDisplayLabel(
   const title = pick(forEntity.filter((item) => item.fieldKey === 'title'))
   if (title !== undefined) {
     return title.value.trim()
+  }
+
+  // SEO meta_title beats the derived excerpt: bespoke pages sharing one html
+  // field would otherwise all show the same stripped header/nav text (#853).
+  if (metaTitle !== null && metaTitle.trim() !== '') {
+    return metaTitle.trim()
   }
 
   const first = pick(forEntity)

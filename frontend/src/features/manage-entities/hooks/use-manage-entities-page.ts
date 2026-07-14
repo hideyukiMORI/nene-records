@@ -120,6 +120,8 @@ export function useManageEntitiesPage(entityTypeId: number) {
           Number(entity.id),
           textFields,
           t('admin.entityRecord.id', { id: entity.id }),
+          null,
+          entity.metaTitle,
         ),
       ]),
     )
