@@ -133,7 +133,8 @@ export function useManageEntitiesPage(entityTypeId: number) {
         (f) => f.entityId === Number(entity.id) && f.fieldKey === 'body',
       )
       if (bodyField !== undefined && bodyField.value.trim() !== '') {
-        result[String(entity.id)] = bodyField.value.trim()
+        // One truncated preview line in the UI — never mount a huge body verbatim (#849).
+        result[String(entity.id)] = bodyField.value.trim().slice(0, 200)
       }
     }
     return result
