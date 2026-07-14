@@ -1438,6 +1438,10 @@ export const fr: Partial<MessageCatalog> = {
   // ── Admin · settings · analytics consent default ──────────────────────────
   'admin.settings.consentDefault.denied': 'Refusé (valeur par défaut sûre pour l’UE)',
   'admin.settings.consentDefault.granted': 'Autorisé',
+  'admin.settings.maintenance.stateOn': 'Activé',
+  'admin.settings.maintenance.stateOff': 'Désactivé',
+  'admin.settings.maintenance.warning':
+    'Lorsque le mode maintenance est activé, les visiteurs du site public voient une page « En maintenance ». Le personnel connecté continue de voir le site normalement.',
 
   // ── Public · cookie consent ───────────────────────────────────────────────
   'public.consent.label': 'Consentement aux cookies',

@@ -1424,6 +1424,10 @@ export const ptBR: Partial<MessageCatalog> = {
   // ── Admin · settings · analytics consent default ──────────────────────────
   'admin.settings.consentDefault.denied': 'Negado (padrão seguro na UE)',
   'admin.settings.consentDefault.granted': 'Concedido',
+  'admin.settings.maintenance.stateOn': 'Ativado',
+  'admin.settings.maintenance.stateOff': 'Desativado',
+  'admin.settings.maintenance.warning':
+    'Enquanto o modo de manutenção está ativado, os visitantes do site público veem uma página “Em manutenção”. A equipe conectada continua vendo o site normalmente.',
 
   // ── Public · cookie consent ───────────────────────────────────────────────
   'public.consent.label': 'Consentimento de cookies',

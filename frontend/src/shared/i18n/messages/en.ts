@@ -1410,6 +1410,10 @@ export const en = {
   // ── Admin · settings · analytics consent default ──────────────────────────
   'admin.settings.consentDefault.denied': 'Denied (EU-safe default)',
   'admin.settings.consentDefault.granted': 'Granted',
+  'admin.settings.maintenance.stateOn': 'On',
+  'admin.settings.maintenance.stateOff': 'Off',
+  'admin.settings.maintenance.warning':
+    'While maintenance mode is on, visitors to the public site see an “Under maintenance” page. Signed-in staff still see the site normally.',
 
   // ── Public · cookie consent ───────────────────────────────────────────────
   'public.consent.label': 'Cookie consent',

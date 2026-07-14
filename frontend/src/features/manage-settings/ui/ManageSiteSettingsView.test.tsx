@@ -68,3 +68,44 @@ describe('ManageSiteSettingsView · analytics_consent_default', () => {
     expect(input.tagName).toBe('INPUT')
   })
 })
+
+const maintenanceItem: SettingItem = {
+  settingKey: 'maintenance_mode',
+  label: 'Maintenance mode',
+  dataType: 'bool',
+  defaultValue: 'false',
+  isPublic: false,
+  value: 'false',
+  updatedAt: null,
+}
+
+describe('ManageSiteSettingsView · maintenance_mode', () => {
+  it('renders an off switch with no warning when maintenance is disabled', () => {
+    renderView(maintenanceItem)
+
+    const toggle = screen.getByRole<HTMLInputElement>('switch')
+    expect(toggle.checked).toBe(false)
+    expect(screen.queryByRole('status')).toBeNull()
+  })
+
+  it('turns maintenance on and shows the visitor warning', () => {
+    const { onSave } = renderView(maintenanceItem)
+
+    fireEvent.click(screen.getByRole('switch'))
+
+    expect(onSave).toHaveBeenCalledWith('maintenance_mode', 'true')
+    expect(screen.getByRole('status')).toBeTruthy()
+  })
+
+  it('reflects the on state and turns maintenance off on toggle', () => {
+    const { onSave } = renderView({ ...maintenanceItem, value: 'true' })
+
+    const toggle = screen.getByRole<HTMLInputElement>('switch')
+    expect(toggle.checked).toBe(true)
+    expect(screen.getByRole('status')).toBeTruthy()
+
+    fireEvent.click(toggle)
+
+    expect(onSave).toHaveBeenCalledWith('maintenance_mode', 'false')
+  })
+})

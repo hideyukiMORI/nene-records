@@ -1413,6 +1413,10 @@ export const ja: Partial<MessageCatalog> = {
   // ── Admin · settings · analytics consent default ──────────────────────────
   'admin.settings.consentDefault.denied': '拒否（EU 安全側の既定）',
   'admin.settings.consentDefault.granted': '許可',
+  'admin.settings.maintenance.stateOn': 'オン',
+  'admin.settings.maintenance.stateOff': 'オフ',
+  'admin.settings.maintenance.warning':
+    'メンテナンスモードがオンの間、公開サイトの来訪者には「メンテナンス中」ページが表示されます。ログイン中のスタッフには通常どおり表示されます。',
 
   // ── Public · cookie consent ───────────────────────────────────────────────
   'public.consent.label': 'Cookie の同意',
