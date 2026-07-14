@@ -80,3 +80,23 @@ describe('derived (non-title) fallback normalization (#849)', () => {
     expect(getRecordDisplayLabel(1, [tf(1, 'title', title)], 'fb')).toBe(title)
   })
 })
+
+describe('metaTitle priority (#853)', () => {
+  it('prefers metaTitle over the derived excerpt when there is no title field', () => {
+    const html = '<header><a href="/">AYANE</a> Home</header>'
+    expect(getRecordDisplayLabel(1, [tf(1, 'content', html)], 'fb', null, '会社案内｜AYANE')).toBe(
+      '会社案内｜AYANE',
+    )
+  })
+
+  it('never beats an explicit title field', () => {
+    expect(getRecordDisplayLabel(1, [tf(1, 'title', 'Hello')], 'fb', null, 'Meta')).toBe('Hello')
+  })
+
+  it('ignores empty or whitespace-only metaTitle', () => {
+    expect(getRecordDisplayLabel(1, [tf(1, 'body', 'Body text')], 'fb', null, '  ')).toBe(
+      'Body text',
+    )
+    expect(getRecordDisplayLabel(1, [], 'fb', null, null)).toBe('fb')
+  })
+})
