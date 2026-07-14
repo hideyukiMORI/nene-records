@@ -48,24 +48,37 @@ final readonly class OrgExportServiceProvider implements ServiceProviderInterfac
                 },
             )
             ->set(
+                OrgExportPayloadBuilder::class,
+                static function (ContainerInterface $c): OrgExportPayloadBuilder {
+                    $repo  = $c->get(OrgExportRepositoryInterface::class);
+                    $clock = $c->get(ClockInterface::class);
+                    if (
+                        !$repo instanceof OrgExportRepositoryInterface
+                        || !$clock instanceof ClockInterface
+                    ) {
+                        throw new LogicException('OrgExportPayloadBuilder dependencies are invalid.');
+                    }
+
+                    return new OrgExportPayloadBuilder($repo, $clock);
+                },
+            )
+            ->set(
                 ExportOrganizationHandler::class,
                 static function (ContainerInterface $c): ExportOrganizationHandler {
-                    $repo    = $c->get(OrgExportRepositoryInterface::class);
+                    $builder = $c->get(OrgExportPayloadBuilder::class);
                     $orgs    = $c->get(OrganizationRepositoryInterface::class);
                     $json    = $c->get(JsonResponseFactory::class);
                     $problem = $c->get(ProblemDetailsResponseFactory::class);
-                    $clock   = $c->get(ClockInterface::class);
                     if (
-                        !$repo instanceof OrgExportRepositoryInterface
+                        !$builder instanceof OrgExportPayloadBuilder
                         || !$orgs instanceof OrganizationRepositoryInterface
                         || !$json instanceof JsonResponseFactory
                         || !$problem instanceof ProblemDetailsResponseFactory
-                        || !$clock instanceof ClockInterface
                     ) {
                         throw new LogicException('ExportOrganizationHandler dependencies are invalid.');
                     }
 
-                    return new ExportOrganizationHandler($repo, $orgs, $json, $problem, $clock);
+                    return new ExportOrganizationHandler($builder, $orgs, $json, $problem);
                 },
             )
             ->set(
