@@ -52,20 +52,8 @@ final readonly class CreateNotificationChannelHandler
             config: $config,
         ));
 
-        return $this->response->create($this->serialize($channel), 201);
-    }
-
-    /** @return array<string,mixed> */
-    private function serialize(NotificationChannel $ch): array
-    {
-        return [
-            'id'           => $ch->id,
-            'channel_type' => $ch->channelType,
-            'label'        => $ch->label,
-            'is_enabled'   => $ch->isEnabled,
-            'config'       => $ch->config,
-            'created_at'   => $ch->createdAt,
-            'updated_at'   => $ch->updatedAt,
-        ];
+        // config capability secrets are write-only on read (#845): reuse the
+        // shared mapper so create/list/update share one redacted shape.
+        return $this->response->create(NotificationChannelHttpMapper::toArray($channel), 201);
     }
 }

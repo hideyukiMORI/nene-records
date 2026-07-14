@@ -140,6 +140,44 @@ final class NotificationChannelUseCaseTest extends TestCase
         self::assertSame('new@example.com', $updated->config['to_address']);
     }
 
+    public function testUpdateKeepsSensitiveConfigWhenOmitted(): void
+    {
+        $repo = new InMemoryNotificationChannelRepository();
+        $created = $repo->create('slack', 'Slack', true, ['webhook_url' => 'https://hooks.slack.com/keep']);
+
+        // Write-only contract (#845): an omitted capability secret is preserved,
+        // so the notify path (which reads the stored config) still has it.
+        (new UpdateNotificationChannelUseCase($repo))->execute(new UpdateNotificationChannelInput(
+            id: $created->id,
+            label: 'Renamed',
+            isEnabled: true,
+            config: [],
+        ));
+
+        $updated = $repo->findById($created->id);
+        self::assertNotNull($updated);
+        self::assertSame('Renamed', $updated->label);
+        self::assertSame('https://hooks.slack.com/keep', $updated->config['webhook_url']);
+    }
+
+    public function testUpdateReplacesSensitiveConfigWhenProvided(): void
+    {
+        $repo = new InMemoryNotificationChannelRepository();
+        $created = $repo->create('chatwork', 'ChatWork', true, ['api_token' => 'old-tok', 'room_id' => '1']);
+
+        (new UpdateNotificationChannelUseCase($repo))->execute(new UpdateNotificationChannelInput(
+            id: $created->id,
+            label: 'ChatWork',
+            isEnabled: true,
+            config: ['api_token' => 'new-tok', 'room_id' => '2'],
+        ));
+
+        $updated = $repo->findById($created->id);
+        self::assertNotNull($updated);
+        self::assertSame('new-tok', $updated->config['api_token']);
+        self::assertSame('2', $updated->config['room_id']);
+    }
+
     public function testUpdateNonExistentChannelThrows(): void
     {
         $repo = new InMemoryNotificationChannelRepository();

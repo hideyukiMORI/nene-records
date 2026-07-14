@@ -1246,6 +1246,10 @@ export const fr: Partial<MessageCatalog> = {
   'admin.notifications.form.isEnabledLabel': 'Activé',
   'admin.notifications.form.labelRequired': 'Le libellé est requis.',
   'admin.notifications.form.fieldRequired': '{field} est requis.',
+  'admin.notifications.form.secretHint':
+    "Enregistré en écriture seule et jamais réaffiché après l'enregistrement.",
+  'admin.notifications.form.secretConfiguredHint':
+    'Une valeur est déjà configurée. Laissez vide pour la conserver, ou saisissez une nouvelle valeur pour la remplacer.',
 
   // ── Media library ───────────────────────────────────────────────────────
   'admin.nav.media': 'Médias',

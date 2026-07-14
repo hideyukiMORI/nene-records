@@ -7606,6 +7606,13 @@ components:
           type: boolean
         config:
           type: object
+          description: >-
+            Channel-specific settings. Capability secrets (Slack/Discord
+            `webhook_url`, ChatWork `api_token`, generic webhook `url` /
+            `headers_json`) are write-only: they are never returned on read.
+            Instead a `has_<key>` boolean (e.g. `has_webhook_url`) reports
+            whether one is configured (defense-in-depth, #845). Non-sensitive
+            keys are returned verbatim.
           additionalProperties: true
         created_at:
           type: string
@@ -7641,6 +7648,9 @@ components:
           default: true
         config:
           type: object
+          description: >-
+            Channel-specific settings including capability secrets (write-only;
+            never returned on read — see NotificationChannelResponse.config).
           additionalProperties: true
       additionalProperties: false
     UpdateNotificationChannelRequest:
@@ -7655,5 +7665,9 @@ components:
           type: boolean
         config:
           type: object
+          description: >-
+            Channel-specific settings. Omit (or send an empty/null value for) a
+            capability secret to keep the stored one; send a new value to
+            replace it. Write-only: never returned on read (#845).
           additionalProperties: true
       additionalProperties: false
