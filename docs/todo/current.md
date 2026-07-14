@@ -1,8 +1,49 @@
 # Current Work
 
-Last updated: 2026-07-13
+Last updated: 2026-07-14
 
-## 最新: 移送経路の仕上げ＋公開サイト堅牢化バッチ（2026-07-12〜13・main 反映）
+## 最新: 残フォローアップ一掃バッチ（2026-07-14・main 反映・本番デプロイ未実施）
+
+> repo-status で洗い出した「次の一手・リスク」のうち自走可能な全件を、並列サブエージェント＋指揮レビューで
+> 一括出荷した。**7 PR すべて main マージ済み・CI 緑**。⚠️ **本番デプロイは未実施**（施主 GO 待ち）。
+
+- **#814（PR #837）メンテナンスモードの管理 UI トグル**: 一般設定に即保存スイッチ＋ON 時の注意表示
+  （来訪者=メンテ表示／ログイン中=通常）。#813 のフォローアップ完了。
+- **#836（PR #839）webhook secret を read で write-only 化**（#824 申し送り）: read から secret を完全除去し
+  `has_secret` で代替・省略更新は既存値維持・編集フォームは新値入力のみ。secret の明示解除の導線は無し（必要時に別 issue）。
+- **#845（PR #846）通知チャネル config の機微キーも write-only 化**（#836 と同型・レビュー時に新規発見）:
+  slack/discord `webhook_url`・chatwork `api_token`・webhook `url`/`headers_json` を read から除去し
+  config 内 `has_<key>` で代替。送信経路は repository の実値参照で不変（回帰テスト済み）。
+- **#796（PR #838）移送カバレッジ拡充**: comments / webhooks / webhook_deliveries / notification_channels /
+  user_profiles を export/import 対象化。**users は非移送**（パスワードハッシュを跨がせない）・user_profiles は
+  email 突合で再アタッチ（不一致は skip 件数を import 結果に報告）・webhook secret は移送しない（NULL 挿入）。
+- **#798（PR #842）メディア実ファイルの zip 同梱移送**: CLI 専用の zip 系統（`tools/export-org.php` /
+  `tools/import-org.php`）で DB＋`var/media` 原本を単一 zip に。派生画像はオンデマンド再生成のため原本のみ。
+  S3 ドライバは対象外を明示エラー化。zip-slip / パストラバーサルはガード＋テスト済み。
+  `docs/install-tier-a.md` の移送節を zip 手順に更新（rsync/FTP は代替として残置）。
+- **#802（PR #843）trusted-embed Phase 2 = 一級 widget プリミティブ** → **#802 全 Phase 完了・クローズ**:
+  widget 型 `trusted-embed`（origin/src/SRI 必須/data-* のみ）を保存側検証＋SSR（noscript シェル）＋SPA parity で描画。
+  allowlist 空なら公開ページ byte-for-byte 不変を回帰 pin。申し送り2点（SRI runbook・自己資産オリジンのみ信頼）は
+  `docs/security/trusted-embed.md` に収録。Phase 3（media 永続化）は #807 で完了済みと判定。
+  admin UI（allowlist 編集・data-* エディタ）＋staging 実測は **#844** へ。
+- **#709（PR #841）配布 ZIP のフォント分離**: base **66MB→14MB 実測**（フォント 53MB→2.0MB・非フォント下限 ~12MB）。
+  keep=管理 UI ＋既定テーマ consumer ＋ #818 公開フォント。残り 482 woff2 は `nene-records-fonts-<version>.zip`（52MB）
+  に分離（**次リリースから Release に両 zip＋sha256 を添付**）。未導入時はフォントピッカーに注記＋ヒント
+  （docroot の `font-pack.json` マーカーで判定・Docker/本番は無影響）。HTTP 自動取得は **#840** へ。
+- **本番実測**: #833/#835（www→apex 301）が **07-13 深夜ビルドで本番反映済み**なのを curl 実測で確認
+  （www が 301 → apex・SPA シェルに飲まれない）。
+- **#741**: 残ギャップ 4 件（#795/#796/#797/#798）が全てマージ済みになったため進捗コメントを投稿。
+  クローズは受入基準の「2 インスタンス実走」＝AYANE Tier A 移送の実走後に判定。
+
+### 残フォローアップ（open・2026-07-14 時点）
+
+- **#844** trusted-embed の admin UI 拡充＋staging 実ブラウザ実測（#802 引き継ぎ）。
+- **#840** フォントパックの管理画面/インストーラからの HTTP 自動取得（#709 引き継ぎ）。
+- **#774** ニュースレター購読フォームの実体。
+- **#741** クローズ判定（AYANE 移送の 2 インスタンス実走が e2e 検証を兼ねる）。
+- **本節 7 PR の本番デプロイ**（施主 GO 待ち。次リリース zip はフォント 2 分割になる点に注意）。
+
+## 前回: 移送経路の仕上げ＋公開サイト堅牢化バッチ（2026-07-12〜13・main 反映）
 
 > #741 Phase 1/2 のマージ後、移送の取りこぼしを埋めつつ公開サイト側の堅牢化を連続出荷した。
 > すべて main 反映済み・CI 緑。**本番デプロイは施主 GO（2026-07-13）** — 下記「本番デプロイ」参照。
@@ -47,12 +88,12 @@ Last updated: 2026-07-13
 - server 側 authoritative compose は `~/envs/suite-stg/records/compose.yaml`（repo `compose.prod.yaml` とは別・
   `records-media-data` volume も反映済み）。再デプロイ手順は runbook（private `nene-records-marketing/ops-inbox/records/`）。
 
-### 残フォローアップ（open）
+### 残フォローアップ（→ 2026-07-14 バッチで #774 以外すべて消化・上の最新節参照）
 
-- **#814** メンテナンスモードの管理 UI トグル（#813 の続き）。
-- **#802** trusted-embed Phase 2（widget プリミティブ）／Phase 3（media 同乗）。
-- **#796 / #798** 移送カバレッジ拡充（comments/webhooks/notification_channels/user_profiles／メディア実ファイルの zip 同梱）。
-- **#774** ニュースレター購読フォームの実体、**#709** 配布 ZIP フォントの on-demand 化（66MB→約11MB）。
+- ~~**#814** メンテナンスモードの管理 UI トグル~~ ✅ PR #837
+- ~~**#802** trusted-embed Phase 2／Phase 3~~ ✅ PR #843（クローズ・admin UI は #844）
+- ~~**#796 / #798** 移送カバレッジ拡充~~ ✅ PR #838 / #842
+- **#774** ニュースレター購読フォームの実体（未着手のまま）、~~**#709** 配布 ZIP フォントの on-demand 化~~ ✅ PR #841（HTTP 自動取得は #840）
 
 ## 進行中: #741 移送経路 Phase 1（SaaS org → Tier A・ブランチ feat/741-org-transport-phase1）
 
