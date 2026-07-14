@@ -10,6 +10,10 @@
   --color-surface: oklch(97% 0.006 75);
   --color-surface-raised: oklch(100% 0 0);
   --color-surface-overlay: oklch(94% 0.008 75);
+  /* sunken well (table stripes / empty thumbnail slots) — one step below the
+     page surface. Declared at the root @theme so `bg-surface-sunken` resolves
+     in the default theme (previously undefined here → silent no-op; #863). */
+  --color-surface-sunken: oklch(95.5% 0.006 75);
 
   /* ── Sidebar (dark even in light mode — WordPress style) ──────────────── */
   --color-sidebar-bg: oklch(19% 0.015 265);

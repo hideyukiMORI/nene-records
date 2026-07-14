@@ -196,22 +196,22 @@ export function ManageOrganizationsView({
           <table className="w-full text-sm">
             <thead className="border-b border-border bg-surface-raised">
               <tr>
-                <th className="px-4 py-3 text-left font-medium text-text-secondary">
+                <th className="px-4 py-3 text-left font-medium text-text-muted">
                   {t('admin.organizations.idColumn')}
                 </th>
-                <th className="px-4 py-3 text-left font-medium text-text-secondary">
+                <th className="px-4 py-3 text-left font-medium text-text-muted">
                   {t('common.field.name')}
                 </th>
-                <th className="px-4 py-3 text-left font-medium text-text-secondary">
+                <th className="px-4 py-3 text-left font-medium text-text-muted">
                   {t('common.field.slug')}
                 </th>
-                <th className="px-4 py-3 text-left font-medium text-text-secondary">
+                <th className="px-4 py-3 text-left font-medium text-text-muted">
                   {t('admin.organizations.plan')}
                 </th>
-                <th className="px-4 py-3 text-left font-medium text-text-secondary">
+                <th className="px-4 py-3 text-left font-medium text-text-muted">
                   {t('admin.organizations.status')}
                 </th>
-                <th className="px-4 py-3 text-left font-medium text-text-secondary">
+                <th className="px-4 py-3 text-left font-medium text-text-muted">
                   {t('admin.organizations.actions')}
                 </th>
               </tr>
@@ -221,7 +221,7 @@ export function ManageOrganizationsView({
                 <tr key={org.id} className="hover:bg-surface-raised/50">
                   <td className="px-4 py-3 text-text-muted">{org.id}</td>
                   <td className="px-4 py-3 font-medium text-text-primary">{org.name}</td>
-                  <td className="px-4 py-3 font-mono text-text-secondary">{org.slug}</td>
+                  <td className="px-4 py-3 font-mono text-text-muted">{org.slug}</td>
                   <td className="px-4 py-3">
                     <span className="inline-flex rounded-full bg-accent/10 px-2 py-0.5 text-xs font-medium text-accent">
                       {org.plan}

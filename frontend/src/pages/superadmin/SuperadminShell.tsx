@@ -19,7 +19,7 @@ function SuperadminNavItem({ to, icon, label }: SuperadminNavItemProps) {
           'flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors',
           isActive
             ? 'bg-accent text-white'
-            : 'text-text-secondary hover:bg-surface-hover hover:text-text-primary',
+            : 'text-text-muted hover:bg-surface-overlay hover:text-text-primary',
         ].join(' ')
       }
     >
@@ -65,7 +65,7 @@ export function SuperadminShell() {
         <div className="absolute bottom-0 left-0 w-56 border-t border-border p-3">
           <Link
             to="/admin"
-            className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-text-secondary hover:text-text-primary"
+            className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-text-muted hover:text-text-primary"
           >
             <IconHome size={16} />
             <span>{t('admin.superadmin.backToAdmin')}</span>
