@@ -1193,6 +1193,10 @@ export const ptBR: Partial<MessageCatalog> = {
   'admin.webhooks.form.entityTypeIdPlaceholder': 'Todos os tipos de entidade',
   'admin.webhooks.form.secretLabel': 'Segredo de assinatura (opcional)',
   'admin.webhooks.form.secretPlaceholder': 'Usado no cabeçalho HMAC-SHA256 X-NeNe-Signature',
+  'admin.webhooks.form.secretHint':
+    'Armazenado como somente gravação e nunca exibido novamente após salvar.',
+  'admin.webhooks.form.secretConfiguredHint':
+    'Um secret de assinatura está configurado. Deixe em branco para mantê-lo ou insira um novo valor para substituí-lo.',
   'admin.webhooks.form.isActiveLabel': 'Ativo',
 
   // ── Notification channels ────────────────────────────────────────────────

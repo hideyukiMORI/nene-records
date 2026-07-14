@@ -2929,7 +2929,8 @@ export interface components {
             events: ("entity.created" | "entity.updated" | "entity.deleted")[];
             /** Format: int64 */
             entity_type_id?: number | null;
-            secret?: string | null;
+            /** @description Whether a signing secret is configured. The secret itself is write-only and is never returned on read (defense-in-depth). */
+            has_secret: boolean;
             is_active: boolean;
             /** Format: date-time */
             created_at: string;
@@ -2945,6 +2946,7 @@ export interface components {
             events: ("entity.created" | "entity.updated" | "entity.deleted")[];
             /** Format: int64 */
             entity_type_id?: number | null;
+            /** @description Write-only HMAC-SHA256 signing secret. Never returned on read; use `has_secret` on the response to tell whether one is configured. */
             secret?: string | null;
             /** @default true */
             is_active: boolean;
@@ -2955,6 +2957,7 @@ export interface components {
             events: ("entity.created" | "entity.updated" | "entity.deleted")[];
             /** Format: int64 */
             entity_type_id?: number | null;
+            /** @description Write-only HMAC-SHA256 signing secret. Omit (or send null) to keep the existing secret; send a new value to replace it. Never returned on read. */
             secret?: string | null;
             is_active?: boolean;
         };

@@ -1141,6 +1141,8 @@ export const zhHans: Partial<MessageCatalog> = {
   'admin.webhooks.form.entityTypeIdPlaceholder': '所有实体类型',
   'admin.webhooks.form.secretLabel': '签名密钥（可选）',
   'admin.webhooks.form.secretPlaceholder': '用于 HMAC-SHA256 X-NeNe-Signature 标头',
+  'admin.webhooks.form.secretHint': '以只写方式存储，保存后不再显示。',
+  'admin.webhooks.form.secretConfiguredHint': '已配置签名密钥。留空以保留，或输入新值以替换。',
   'admin.webhooks.form.isActiveLabel': '已启用',
 
   // ── Notification channels ────────────────────────────────────────────────

@@ -7281,6 +7281,7 @@ components:
         - id
         - url
         - events
+        - has_secret
         - is_active
         - created_at
         - updated_at
@@ -7302,9 +7303,11 @@ components:
           type: integer
           format: int64
           nullable: true
-        secret:
-          type: string
-          nullable: true
+        has_secret:
+          type: boolean
+          description: >-
+            Whether a signing secret is configured. The secret itself is
+            write-only and is never returned on read (defense-in-depth).
         is_active:
           type: boolean
         created_at:
@@ -7351,6 +7354,9 @@ components:
         secret:
           type: string
           nullable: true
+          description: >-
+            Write-only HMAC-SHA256 signing secret. Never returned on read; use
+            `has_secret` on the response to tell whether one is configured.
         is_active:
           type: boolean
           default: true
@@ -7382,6 +7388,10 @@ components:
         secret:
           type: string
           nullable: true
+          description: >-
+            Write-only HMAC-SHA256 signing secret. Omit (or send null) to keep
+            the existing secret; send a new value to replace it. Never returned
+            on read.
         is_active:
           type: boolean
       additionalProperties: false

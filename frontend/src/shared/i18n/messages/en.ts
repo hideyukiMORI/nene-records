@@ -1182,6 +1182,9 @@ export const en = {
   'admin.webhooks.form.entityTypeIdPlaceholder': 'All entity types',
   'admin.webhooks.form.secretLabel': 'Signing secret (optional)',
   'admin.webhooks.form.secretPlaceholder': 'Used for HMAC-SHA256 X-NeNe-Signature header',
+  'admin.webhooks.form.secretHint': 'Stored write-only and never shown again after saving.',
+  'admin.webhooks.form.secretConfiguredHint':
+    'A signing secret is configured. Leave blank to keep it, or enter a new value to replace it.',
   'admin.webhooks.form.isActiveLabel': 'Active',
 
   // ── Notification channels ────────────────────────────────────────────────

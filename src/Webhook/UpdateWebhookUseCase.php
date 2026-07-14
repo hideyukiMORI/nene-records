@@ -24,12 +24,17 @@ final readonly class UpdateWebhookUseCase implements UpdateWebhookUseCaseInterfa
 
         $now = $this->clock->now()->format('Y-m-d H:i:s');
 
+        // Write-only secret (#836): an omitted secret (null) keeps the existing
+        // value so the write-only read contract does not break the update flow.
+        // A non-null secret replaces it.
+        $secret = $input->secret ?? $existing->secret;
+
         $updated = new Webhook(
             id: $input->id,
             url: $input->url,
             events: $input->events,
             entityTypeId: $input->entityTypeId,
-            secret: $input->secret,
+            secret: $secret,
             isActive: $input->isActive,
             createdAt: $existing->createdAt,
             updatedAt: $now,
@@ -42,7 +47,7 @@ final readonly class UpdateWebhookUseCase implements UpdateWebhookUseCaseInterfa
             url: $input->url,
             events: $input->events,
             entityTypeId: $input->entityTypeId,
-            secret: $input->secret,
+            secret: $secret,
             isActive: $input->isActive,
             createdAt: $existing->createdAt,
             updatedAt: $now,

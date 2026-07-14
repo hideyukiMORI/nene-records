@@ -95,7 +95,9 @@ final class WebhookHttpTest extends TestCase
         self::assertSame('https://example.com/hook', $payload['url']);
         self::assertSame(['entity.created', 'entity.updated'], $payload['events']);
         self::assertNull($payload['entity_type_id']);
-        self::assertNull($payload['secret']);
+        // Write-only secret (#836): never echoed; has_secret reports absence.
+        self::assertArrayNotHasKey('secret', $payload);
+        self::assertFalse($payload['has_secret']);
         self::assertTrue($payload['is_active']);
     }
 
@@ -116,8 +118,69 @@ final class WebhookHttpTest extends TestCase
 
         self::assertSame(201, $response->getStatusCode());
         self::assertSame(5, $payload['entity_type_id']);
-        self::assertSame('my-secret', $payload['secret']);
+        // Write-only secret (#836): a configured secret is reported but not echoed.
+        self::assertArrayNotHasKey('secret', $payload);
+        self::assertTrue($payload['has_secret']);
         self::assertFalse($payload['is_active']);
+    }
+
+    public function testGetAndListNeverExposeSecret(): void
+    {
+        $created = $this->createWebhookWithSecret('https://example.com/hook', ['entity.created'], 'top-secret');
+
+        $get = $this->decodeJson($this->application->handle(
+            $this->factory->createServerRequest('GET', "https://example.test/api/v1/webhooks/{$created['id']}"),
+        ));
+        self::assertArrayNotHasKey('secret', $get);
+        self::assertTrue($get['has_secret']);
+
+        $list = $this->decodeJson($this->application->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/api/v1/webhooks'),
+        ));
+        self::assertIsArray($list['items']);
+        foreach ($list['items'] as $item) {
+            self::assertIsArray($item);
+            self::assertArrayNotHasKey('secret', $item);
+        }
+        self::assertTrue($list['items'][0]['has_secret']);
+    }
+
+    public function testPutWithoutSecretKeepsExistingSecret(): void
+    {
+        $created = $this->createWebhookWithSecret('https://example.com/hook', ['entity.created'], 'keep-me');
+
+        $body = $this->factory->createStream(json_encode([
+            'url' => 'https://updated.example.com/hook',
+            'events' => ['entity.updated'],
+        ], JSON_THROW_ON_ERROR));
+
+        $payload = $this->decodeJson($this->application->handle(
+            $this->factory->createServerRequest('PUT', "https://example.test/api/v1/webhooks/{$created['id']}")->withBody($body),
+        ));
+
+        // Response stays write-only, but the stored secret must survive.
+        self::assertArrayNotHasKey('secret', $payload);
+        self::assertTrue($payload['has_secret']);
+        self::assertSame('keep-me', $this->webhooks->findById($created['id'])?->secret);
+    }
+
+    public function testPutWithSecretReplacesExistingSecret(): void
+    {
+        $created = $this->createWebhookWithSecret('https://example.com/hook', ['entity.created'], 'old-secret');
+
+        $body = $this->factory->createStream(json_encode([
+            'url' => 'https://example.com/hook',
+            'events' => ['entity.created'],
+            'secret' => 'new-secret',
+        ], JSON_THROW_ON_ERROR));
+
+        $payload = $this->decodeJson($this->application->handle(
+            $this->factory->createServerRequest('PUT', "https://example.test/api/v1/webhooks/{$created['id']}")->withBody($body),
+        ));
+
+        self::assertArrayNotHasKey('secret', $payload);
+        self::assertTrue($payload['has_secret']);
+        self::assertSame('new-secret', $this->webhooks->findById($created['id'])?->secret);
     }
 
     public function testPostWithMissingUrlReturns422(): void
@@ -257,6 +320,24 @@ final class WebhookHttpTest extends TestCase
     {
         $body = $this->factory->createStream(json_encode(
             compact('url', 'events'),
+            JSON_THROW_ON_ERROR,
+        ));
+
+        $response = $this->application->handle(
+            $this->factory->createServerRequest('POST', 'https://example.test/api/v1/webhooks')->withBody($body),
+        );
+
+        return $this->decodeJson($response);
+    }
+
+    /**
+     * @param list<string> $events
+     * @return array<string, mixed>
+     */
+    private function createWebhookWithSecret(string $url, array $events, string $secret): array
+    {
+        $body = $this->factory->createStream(json_encode(
+            compact('url', 'events', 'secret'),
             JSON_THROW_ON_ERROR,
         ));
 

@@ -6,6 +6,8 @@ import { Button, Card, Stack, Text } from '@/shared/ui'
 
 export interface WebhookFormProps {
   defaultValues?: Partial<CreateWebhookInput>
+  /** Whether a signing secret is already configured (write-only: value is never loaded). */
+  secretConfigured?: boolean
   isSubmitting: boolean
   serverErrorTitle: string | null
   submitLabel: string
@@ -15,6 +17,7 @@ export interface WebhookFormProps {
 
 export function WebhookForm({
   defaultValues,
+  secretConfigured = false,
   isSubmitting,
   serverErrorTitle,
   submitLabel,
@@ -129,7 +132,8 @@ export function WebhookForm({
           </label>
           <input
             id={`${fieldId}-secret`}
-            type="text"
+            type="password"
+            autoComplete="new-password"
             value={secret}
             disabled={isSubmitting}
             placeholder={t('admin.webhooks.form.secretPlaceholder')}
@@ -138,6 +142,11 @@ export function WebhookForm({
             }}
             className="rounded-md border border-border bg-surface px-3 py-2 font-sans text-body text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent disabled:opacity-50"
           />
+          <span className="font-sans text-caption text-text-muted">
+            {secretConfigured
+              ? t('admin.webhooks.form.secretConfiguredHint')
+              : t('admin.webhooks.form.secretHint')}
+          </span>
         </div>
 
         {/* Is active */}

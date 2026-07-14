@@ -3,7 +3,8 @@ export interface WebhookDto {
   url: string
   events: string[]
   entity_type_id: number | null
-  secret: string | null
+  /** Write-only secret: never returned on read; only whether one is configured. */
+  has_secret: boolean
   is_active: boolean
   created_at: string
   updated_at: string

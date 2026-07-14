@@ -7,7 +7,8 @@ export interface Webhook {
   url: string
   events: WebhookEvent[]
   entityTypeId: number | null
-  secret: string | null
+  /** Write-only: the secret value is never read back, only whether one is set. */
+  hasSecret: boolean
   isActive: boolean
   createdAt: string
   updatedAt: string

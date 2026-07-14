@@ -117,6 +117,59 @@ final class UpdateWebhookUseCaseTest extends TestCase
         self::assertSame(false, $output->isActive);
     }
 
+    public function testNullSecretKeepsExistingSecret(): void
+    {
+        $webhooks = new InMemoryWebhookRepository();
+        $createUseCase = new CreateWebhookUseCase($webhooks, new UtcClock());
+        $createUseCase->execute(new CreateWebhookInput(
+            url: 'https://example.com/hook',
+            events: ['entity.created'],
+            entityTypeId: null,
+            secret: 'existing-secret',
+            isActive: true,
+        ));
+
+        $updateUseCase = new UpdateWebhookUseCase($webhooks, new UtcClock());
+        $output = $updateUseCase->execute(new UpdateWebhookInput(
+            id: 1,
+            url: 'https://example.com/hook-updated',
+            events: ['entity.updated'],
+            entityTypeId: null,
+            secret: null,
+            isActive: true,
+        ));
+
+        // Write-only update (#836): an omitted secret keeps the stored value.
+        self::assertSame('existing-secret', $output->secret);
+        self::assertSame('existing-secret', $webhooks->findById(1)?->secret);
+    }
+
+    public function testNonNullSecretReplacesExistingSecret(): void
+    {
+        $webhooks = new InMemoryWebhookRepository();
+        $createUseCase = new CreateWebhookUseCase($webhooks, new UtcClock());
+        $createUseCase->execute(new CreateWebhookInput(
+            url: 'https://example.com/hook',
+            events: ['entity.created'],
+            entityTypeId: null,
+            secret: 'old-secret',
+            isActive: true,
+        ));
+
+        $updateUseCase = new UpdateWebhookUseCase($webhooks, new UtcClock());
+        $output = $updateUseCase->execute(new UpdateWebhookInput(
+            id: 1,
+            url: 'https://example.com/hook',
+            events: ['entity.created'],
+            entityTypeId: null,
+            secret: 'new-secret',
+            isActive: true,
+        ));
+
+        self::assertSame('new-secret', $output->secret);
+        self::assertSame('new-secret', $webhooks->findById(1)?->secret);
+    }
+
     public function testThrowsWebhookNotFoundExceptionIfNotFound(): void
     {
         $webhooks = new InMemoryWebhookRepository();
