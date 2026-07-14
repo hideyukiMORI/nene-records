@@ -7,7 +7,7 @@ export function mapWebhookDtoToModel(dto: WebhookDto): Webhook {
     url: dto.url,
     events: dto.events as WebhookEvent[],
     entityTypeId: dto.entity_type_id,
-    secret: dto.secret,
+    hasSecret: dto.has_secret,
     isActive: dto.is_active,
     createdAt: dto.created_at,
     updatedAt: dto.updated_at,

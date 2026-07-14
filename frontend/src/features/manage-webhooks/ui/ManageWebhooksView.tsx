@@ -97,9 +97,11 @@ export function ManageWebhooksView({
                   url: webhook.url,
                   events: webhook.events,
                   entityTypeId: webhook.entityTypeId,
-                  secret: webhook.secret ?? '',
+                  // Secret is write-only: never pre-filled. Blank keeps the existing one.
+                  secret: '',
                   isActive: webhook.isActive,
                 }}
+                secretConfigured={webhook.hasSecret}
                 isSubmitting={isUpdating}
                 serverErrorTitle={updateError}
                 submitLabel={t('common.actions.save')}

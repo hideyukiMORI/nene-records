@@ -1182,6 +1182,9 @@ export const ja: Partial<MessageCatalog> = {
   'admin.webhooks.form.entityTypeIdPlaceholder': '全エンティティタイプ',
   'admin.webhooks.form.secretLabel': '署名シークレット（省略可）',
   'admin.webhooks.form.secretPlaceholder': 'HMAC-SHA256 X-NeNe-Signature ヘッダーに使用',
+  'admin.webhooks.form.secretHint': '書き込み専用で保存され、保存後は再表示されません。',
+  'admin.webhooks.form.secretConfiguredHint':
+    '署名シークレットは設定済みです。空欄のままにすると保持し、新しい値を入力すると置き換えます。',
   'admin.webhooks.form.isActiveLabel': '有効',
 
   // ── Notification channels ────────────────────────────────────────────────

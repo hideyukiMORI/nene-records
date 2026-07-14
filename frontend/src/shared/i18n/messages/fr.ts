@@ -1202,6 +1202,10 @@ export const fr: Partial<MessageCatalog> = {
   'admin.webhooks.form.entityTypeIdPlaceholder': "Tous les types d'entité",
   'admin.webhooks.form.secretLabel': 'Secret de signature (facultatif)',
   'admin.webhooks.form.secretPlaceholder': "Utilisé pour l'en-tête HMAC-SHA256 X-NeNe-Signature",
+  'admin.webhooks.form.secretHint':
+    "Enregistré en écriture seule et jamais réaffiché après l'enregistrement.",
+  'admin.webhooks.form.secretConfiguredHint':
+    'Un secret de signature est configuré. Laissez vide pour le conserver, ou saisissez une nouvelle valeur pour le remplacer.',
   'admin.webhooks.form.isActiveLabel': 'Actif',
 
   // ── Notification channels ────────────────────────────────────────────────

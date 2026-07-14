@@ -54,16 +54,18 @@ final readonly class UpdateWebhookHandler
             isActive: $isActive,
         ));
 
-        return $this->response->create([
-            'id' => $output->id,
-            'url' => $output->url,
-            'events' => $output->events,
-            'entity_type_id' => $output->entityTypeId,
-            'secret' => $output->secret,
-            'is_active' => $output->isActive,
-            'created_at' => $output->createdAt,
-            'updated_at' => $output->updatedAt,
-        ]);
+        // Response is write-only for the secret: return `has_secret`, not the
+        // secret itself (#836). Reuse the shared read mapper for a single shape.
+        return $this->response->create(WebhookHttpMapper::toArray(new Webhook(
+            id: $output->id,
+            url: $output->url,
+            events: $output->events,
+            entityTypeId: $output->entityTypeId,
+            secret: $output->secret,
+            isActive: $output->isActive,
+            createdAt: $output->createdAt,
+            updatedAt: $output->updatedAt,
+        )));
     }
 
     /**

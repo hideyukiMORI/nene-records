@@ -1174,6 +1174,10 @@ export const de: Partial<MessageCatalog> = {
   'admin.webhooks.form.secretLabel': 'Signatur-Secret (optional)',
   'admin.webhooks.form.secretPlaceholder':
     'Wird für den HMAC-SHA256-Header X-NeNe-Signature verwendet',
+  'admin.webhooks.form.secretHint':
+    'Wird schreibgeschützt gespeichert und nach dem Speichern nicht mehr angezeigt.',
+  'admin.webhooks.form.secretConfiguredHint':
+    'Ein Signatur-Secret ist konfiguriert. Leer lassen, um es beizubehalten, oder einen neuen Wert eingeben, um es zu ersetzen.',
   'admin.webhooks.form.isActiveLabel': 'Aktiv',
   // ── Notification channels ────────────────────────────────────────────────
   'admin.notifications.title': 'Benachrichtigungskanäle',
