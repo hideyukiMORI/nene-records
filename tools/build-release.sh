@@ -72,6 +72,94 @@ cp -r "$ROOT/frontend/dist/assets" "$STAGE/public_html/assets"
 cp -r "$ROOT/frontend/dist/theme-thumbnails" "$STAGE/public_html/theme-thumbnails"
 
 # ----------------------------------------
+# 3b. フォントのオンデマンド分離（#709）
+# ----------------------------------------
+# 配布 ZIP の 8 割超は @fontsource の woff/woff2（特に CJK: Shippori Mincho /
+# Noto Sans JP / Noto Sans SC で ~48MB）。共有ホスティング勢が 66MB を FTP で
+# 上げるのは重いので、base zip には「設置直後に見た目が破綻しない最小セット」だけ
+# を残し、残りは別アーティファクト nene-records-fonts-<version>.zip として切り出す。
+# 両者は同一ビルドの成果物なので woff2 のハッシュ名（＝CSS が参照するパス）は完全
+# 一致し、フォントパックを FTP で上書き展開すれば全フォントが揃う。
+#
+# base 同梱（keep）= 管理 UI フォント（fonts.ts の Inter/Saira/Space Grotesk/
+# JetBrains）＋既定公開テーマ consumer の表示フォント Bricolage Grotesque ＋
+# #818 の公開サイトフォント（Zen Kaku Gothic New subset / IBM Plex Mono）。
+# それ以外（フォントピッカーの選択肢・テーマ固有フォント・CJK 大物）はパックへ。
+#
+# Docker/本番ビルド（docker/php/Dockerfile.prod）はこのスクリプトを通らないので
+# 影響しない（全部入りのまま）。keep 一覧を変える場合は frontend 側の
+# BASE_BUNDLED_FONT_FAMILIES（src/shared/lib/font-availability.ts）と揃えること。
+KEEP_FONT_FAMILIES=(
+    inter                          # 管理 UI body（--font-sans 既定）
+    saira-semi-condensed           # 管理 UI display（--font-display 既定）
+    space-grotesk                  # 管理 UI chrome（--font-chrome 既定）
+    jetbrains-mono                 # 管理 UI mono（--font-mono 既定）
+    bricolage-grotesque            # 既定公開テーマ consumer の display/chrome
+    zen-kaku-gothic-new-jp-subset  # #818 公開サイト日本語見出し/本文（subset 同梱）
+    ibm-plex-mono                  # #818 公開サイト mono ラベル/数字
+)
+FONTS_STAGE="$DIST/build/fonts-stage"
+mkdir -p "$FONTS_STAGE/public_html/assets"
+echo "→ splitting fonts (base keep-set vs on-demand pack)..."
+kept_fonts=0
+moved_fonts=0
+shopt -s nullglob
+for font in "$STAGE/public_html/assets/"*.woff "$STAGE/public_html/assets/"*.woff2; do
+    base_name="$(basename "$font")"
+    keep=0
+    for family in "${KEEP_FONT_FAMILIES[@]}"; do
+        # 末尾 '-' 境界で照合し saira-semi-condensed と saira-condensed 等の前方
+        # 一致衝突を防ぐ（Vite 出力は <family>-<subset>-<weight>-<hash>.woff2）。
+        case "$base_name" in
+            "$family"-*)
+                keep=1
+                break
+                ;;
+        esac
+    done
+    if [ "$keep" -eq 1 ]; then
+        kept_fonts=$((kept_fonts + 1))
+    else
+        mv "$font" "$FONTS_STAGE/public_html/assets/"
+        moved_fonts=$((moved_fonts + 1))
+    fi
+done
+shopt -u nullglob
+echo "  fonts: base に $kept_fonts 件 / フォントパックへ $moved_fonts 件"
+
+# フォントパック導入検出用マーカー（#709）。管理画面はフォントピッカーの @font-face を
+# 読み込まない（公開フォントは公開シェル/プレビュー iframe 側）ため、フォントの load
+# 試行では pack 有無を判定できない。そこで docroot 直下に静的マーカーを置き、frontend は
+# これを fetch して判定する（public_html/.htaccess は実在ファイルを素通しするので、
+# 存在すれば Apache がそのまま JSON を返す）。base は complete:false、フォントパックが
+# 同名ファイルで上書きして complete:true にする。Docker/本番/dev はこのファイルを持た
+# ない（front controller が 404 を返す）ので frontend は「完備」とみなし何も表示しない。
+printf '{"complete":false,"version":"%s"}\n' "$VERSION" > "$STAGE/public_html/font-pack.json"
+printf '{"complete":true,"version":"%s"}\n' "$VERSION" > "$FONTS_STAGE/public_html/font-pack.json"
+
+# フォントパックの設置手順（shell 無しの共有ホスティング前提）を同梱する。
+cat > "$FONTS_STAGE/READ-ME-FIRST.txt" <<'FONTPACK_README'
+NeNe Records — フォントパック / Font Pack
+========================================
+
+この ZIP は本体（nene-records-<version>.zip）から切り出した追加フォントです。
+本体だけでも管理画面・既定テーマ・日本語見出しは正しく表示されますが、テーマの
+フォントピッカーで選べる全フォント（Playfair Display・Oswald・Source Serif 4・
+CJK の Noto Sans JP/SC・Shippori Mincho など）を使うにはこのパックが必要です。
+
+導入方法（FTP）:
+  1. 本体と同じインストール先（public_html/ がある階層）に、この ZIP の中身を
+     フォルダ構成ごと **上書き** アップロードします。
+  2. public_html/assets/ に woff2/woff が追加されれば完了です（本体側の同名
+     ファイルとは衝突しません。ハッシュ名なので純粋に増えるだけです）。
+  3. 反映確認は管理画面「外観 > カスタマイズ」のフォント選択で、追加フォントの
+     「（フォントパック）」注記が消えることで分かります。
+
+バージョンは必ず本体 ZIP と同じ <version> のフォントパックを使ってください
+（ハッシュ名がビルドごとに変わるため、版がズレると反映されません）。
+FONTPACK_README
+
+# ----------------------------------------
 # 4. var/（空・書き込み先）
 # ----------------------------------------
 mkdir -p "$STAGE/var"
@@ -115,18 +203,29 @@ mkdir -p "$DIST"
 rm -f "$DIST/$ZIP_NAME"
 (cd "$STAGE" && zip -qr "$DIST/$ZIP_NAME" . -x "*.DS_Store")
 
+# フォントパック（#709）— base から切り出した残りフォントを別 ZIP に。
+FONTS_ZIP_NAME="nene-records-fonts-${VERSION}.zip"
+echo "→ zip: dist/${FONTS_ZIP_NAME}..."
+rm -f "$DIST/$FONTS_ZIP_NAME"
+(cd "$FONTS_STAGE" && zip -qr "$DIST/$FONTS_ZIP_NAME" . -x "*.DS_Store")
+
 # ----------------------------------------
 # 8. サイズ実測報告（受入④）
 # ----------------------------------------
 RAW_SIZE="$(du -sh "$STAGE" | cut -f1)"
 ZIP_SIZE="$(du -sh "$DIST/$ZIP_NAME" | cut -f1)"
-FONT_SIZE="$(du -ch "$STAGE/public_html/assets/"*.woff* 2>/dev/null | tail -1 | cut -f1)"
+FONTS_ZIP_SIZE="$(du -sh "$DIST/$FONTS_ZIP_NAME" | cut -f1)"
+BASE_FONT_SIZE="$(du -ch "$STAGE/public_html/assets/"*.woff* 2>/dev/null | tail -1 | cut -f1)"
 
 rm -rf "$DIST/build"
 
 echo ""
-echo "✓ ビルド完了: dist/${ZIP_NAME}"
+echo "✓ ビルド完了"
+echo "  本体:         dist/${ZIP_NAME}"
+echo "  フォントパック: dist/${FONTS_ZIP_NAME}"
 echo "  nene2:        ${NENE2_RESOLVED}"
 echo "  raw:          ${RAW_SIZE}"
-echo "  zip:          ${ZIP_SIZE}"
-echo "  内フォント:   ${FONT_SIZE}（woff/woff2・削減は別 Issue）"
+echo "  base zip:     ${ZIP_SIZE}（内フォント ${BASE_FONT_SIZE} / keep ${kept_fonts} 件）"
+echo "  fonts zip:    ${FONTS_ZIP_SIZE}（オンデマンド ${moved_fonts} 件）"
+echo ""
+echo "  → GitHub Release には両 ZIP と各 .sha256 を添付する（docs/install-tier-a.md）。"

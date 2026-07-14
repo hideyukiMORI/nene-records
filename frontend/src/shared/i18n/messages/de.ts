@@ -106,6 +106,9 @@ export const de: Partial<MessageCatalog> = {
   'admin.themeCustomize.fontDisplay': 'Display-Schrift',
   'admin.themeCustomize.fontMono': 'Monospace-Schrift',
   'admin.themeCustomize.fontBrand': 'Schriftart des Seitentitels',
+  'admin.themeCustomize.fontPackRequired': 'Schriftpaket',
+  'admin.themeCustomize.fontPackHint':
+    'Einige Schriftarten sind noch nicht installiert. Laden Sie das Schriftpaket-ZIP hoch, um alle Optionen zu aktivieren.',
   'admin.themeCustomize.brandSize': 'Größe des Seitentitels',
   'admin.themeCustomize.menuSize': 'Schriftgröße des Menüs',
   'admin.themeCustomize.width': 'Inhaltsbreite',

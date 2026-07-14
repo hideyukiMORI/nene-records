@@ -109,6 +109,9 @@ export const fr: Partial<MessageCatalog> = {
   'admin.themeCustomize.fontDisplay': "Police d'affichage",
   'admin.themeCustomize.fontMono': 'Police à chasse fixe',
   'admin.themeCustomize.fontBrand': 'Police du titre du site',
+  'admin.themeCustomize.fontPackRequired': 'pack de polices',
+  'admin.themeCustomize.fontPackHint':
+    'Certaines polices ne sont pas encore installées. Téléversez le ZIP du pack de polices pour activer toutes les options.',
   'admin.themeCustomize.brandSize': 'Taille du titre du site',
   'admin.themeCustomize.menuSize': 'Taille de police du menu',
   'admin.themeCustomize.width': 'Largeur du contenu',

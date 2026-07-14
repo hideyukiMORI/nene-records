@@ -1,5 +1,6 @@
-import { type ReactNode, useState } from 'react'
+import { type ReactNode, useEffect, useState } from 'react'
 import { useTranslation, type MessageKey } from '@/shared/i18n'
+import { isBaseBundledFontValue, probeFontPackInstalled } from '@/shared/lib/font-availability'
 import {
   BRAND_FONT_OPTIONS,
   BRAND_SIZE_OPTIONS,
@@ -223,16 +224,37 @@ function FlagSegment({
   )
 }
 
+/**
+ * Whether the on-demand font pack (#709) is installed. `null` while probing —
+ * treated as installed so a full/Docker install never flashes a nag. Only
+ * flips to `false` on a Tier A base-only install where the pack woff2 404s.
+ */
+function useFontPackInstalled(): boolean | null {
+  const [installed, setInstalled] = useState<boolean | null>(null)
+  useEffect(() => {
+    let active = true
+    void probeFontPackInstalled().then((result) => {
+      if (active) setInstalled(result)
+    })
+    return () => {
+      active = false
+    }
+  }, [])
+  return installed
+}
+
 /** Font select (many options — the one control kept as a dropdown). */
 function FontSelect({
   customize,
   knob,
   label,
+  fontPackInstalled,
   options,
 }: {
   customize: ThemeCustomizePageState
   knob: 'fontBody' | 'fontDisplay' | 'fontMono' | 'fontBrand'
   label: string
+  fontPackInstalled: boolean | null
   options: readonly KnobOption[]
 }) {
   const { t } = useTranslation()
@@ -248,11 +270,18 @@ function FontSelect({
         }}
       >
         <option value="">{t('admin.themeCustomize.themeDefault')}</option>
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
+        {options.map((option) => {
+          // On a Tier A base-only install, fonts not in the base ZIP need the
+          // font pack; flag them so the picker never silently falls back.
+          const needsPack = fontPackInstalled === false && !isBaseBundledFontValue(option.value)
+          return (
+            <option key={option.value} value={option.value}>
+              {needsPack
+                ? `${option.label} · ${t('admin.themeCustomize.fontPackRequired')}`
+                : option.label}
+            </option>
+          )
+        })}
       </select>
     </FieldRow>
   )
@@ -383,6 +412,7 @@ export function BrandPanel({
 
 export function TypographyPanel({ customize }: { customize: ThemeCustomizePageState }) {
   const { t } = useTranslation()
+  const fontPackInstalled = useFontPackInstalled()
   return (
     <div>
       <PanelHead title={t('admin.themeWs.navType')} desc={t('admin.themeWs.descType')} />
@@ -392,28 +422,37 @@ export function TypographyPanel({ customize }: { customize: ThemeCustomizePageSt
         noteKey="admin.themeWs.scopeOverridesNote"
       />
       <WsCard title={t('admin.themeWs.cardFonts')}>
+        {fontPackInstalled === false && (
+          <Text muted variant="caption" className="mb-2 block">
+            {t('admin.themeCustomize.fontPackHint')}
+          </Text>
+        )}
         <FontSelect
           customize={customize}
           knob="fontBody"
           label={t('admin.themeCustomize.font')}
+          fontPackInstalled={fontPackInstalled}
           options={FONT_OPTIONS}
         />
         <FontSelect
           customize={customize}
           knob="fontDisplay"
           label={t('admin.themeCustomize.fontDisplay')}
+          fontPackInstalled={fontPackInstalled}
           options={DISPLAY_FONT_OPTIONS}
         />
         <FontSelect
           customize={customize}
           knob="fontMono"
           label={t('admin.themeCustomize.fontMono')}
+          fontPackInstalled={fontPackInstalled}
           options={MONO_FONT_OPTIONS}
         />
         <FontSelect
           customize={customize}
           knob="fontBrand"
           label={t('admin.themeCustomize.fontBrand')}
+          fontPackInstalled={fontPackInstalled}
           options={BRAND_FONT_OPTIONS}
         />
       </WsCard>

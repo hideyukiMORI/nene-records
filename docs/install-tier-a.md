@@ -18,10 +18,18 @@ NeNe Records を「zip をアップロードして install ページを開くだ
 
    ```bash
    bash tools/build-release.sh <version>
-   # → dist/nene-records-<version>.zip（Packagist の NENE2 を解決した自己完結 zip）
+   # → dist/nene-records-<version>.zip        本体（Packagist の NENE2 を解決した自己完結 zip・約11MB）
+   # → dist/nene-records-fonts-<version>.zip   フォントパック（オンデマンドの追加フォント・約55MB）
    ```
 
-2. **アップロード**: ZIP を展開した中身一式をサーバーへアップロードする
+   本体 ZIP は「設置直後から見た目が破綻しない最小フォントセット」（管理画面フォント＋
+   既定テーマ＋日本語見出し）だけを同梱し、テーマのフォントピッカーで選べる残りの
+   フォント（CJK の Noto Sans JP/SC・Shippori Mincho ほか）は **フォントパック** に
+   分離している（#709）。GitHub Release には **本体・フォントパック両方の ZIP と各
+   `.sha256`** を添付する（Latest・target=main）。フォントパックは任意導入なので、まず
+   本体だけで設置を完了できる。詳細は後述の「フォントパック（任意）」を参照。
+
+2. **アップロード**: 本体 ZIP を展開した中身一式をサーバーへアップロードする
    （例: `~/web/nene-records/` 配下に `src/ vendor/ public_html/ …` が並ぶ形）。
 
 3. **公開フォルダを `public_html/` に向ける**: ホスティングの管理画面で、サイトの
@@ -40,6 +48,41 @@ NeNe Records を「zip をアップロードして install ページを開くだ
 
 5. **後片付け（推奨）**: サーバー上の `public_html/install/` ディレクトリを削除する。
    削除しなくても `var/.installed` マーカーと DB 検査により再実行は 403 で遮断される。
+
+## フォントパック（任意）
+
+本体 ZIP は配布サイズを抑えるため（66MB → 約11MB・#709）、フォントを最小セットだけ
+同梱している。**同梱済み**なのは次の用途:
+
+- 管理画面の UI フォント（Inter / Saira Semi Condensed / Space Grotesk / JetBrains Mono）
+- 既定の公開テーマ「consumer」の見出しフォント（Bricolage Grotesque）
+- 公開サイトの日本語見出し・本文（Zen Kaku Gothic New サブセット）と mono ラベル（IBM Plex Mono）
+
+これ以外の、テーマのフォントピッカーで選べるフォント（Playfair Display・Oswald・
+Source Serif 4・Roboto、および CJK 全域の Noto Sans JP/SC・Shippori Mincho など）は
+**フォントパック** に分離している。フォントパック未導入でも、選ばれたフォントは CSS の
+フォールバック（システムフォント）で描画されるため見た目は破綻しない。管理画面
+「外観 > カスタマイズ」のフォント選択では、未導入フォントに「（フォントパック）」の
+注記が付き、上部に導入を促すヒントが表示される。
+
+### フォントパックの導入（FTP）
+
+shell の無い共有ホスティングでも導入できる手動手順（正）:
+
+1. `dist/nene-records-fonts-<version>.zip` をローカルで展開する。
+2. 中身の `public_html/assets/` 配下の `*.woff2` / `*.woff` を、本体を設置したのと
+   **同じ階層**（`public_html/` がある場所）へ、フォルダ構成ごと **上書き** アップロード
+   する。既存ファイルとは衝突しない（ハッシュ名なので純粋に増えるだけ）。
+3. 反映確認は管理画面「外観 > カスタマイズ」のフォント選択で、追加フォントの
+   「（フォントパック）」注記が消えることで分かる。
+
+> **バージョン整合**: 必ず本体 ZIP と同じ `<version>` のフォントパックを使うこと。
+> Vite の出力ファイル名は版ごとにハッシュが変わるため、版がズレると CSS の参照先と
+> 一致せず反映されない。
+
+> **将来**: 管理画面／インストーラからフォントパックを HTTP 取得して自動展開する導線は
+> follow-up（PHP `ZipArchive` ＋ `allow_url_fopen`/curl 検出、失敗時は上記 FTP へ誘導）
+> として検討中。現時点では上記の FTP 手動導入が唯一の手段。
 
 ## サブディレクトリ設置
 
