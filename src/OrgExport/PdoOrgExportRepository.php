@@ -205,4 +205,76 @@ final readonly class PdoOrgExportRepository implements OrgExportRepositoryInterf
             [$orgId],
         );
     }
+
+    /** @return list<array<string, mixed>> */
+    public function findAllComments(int $orgId): array
+    {
+        return $this->query->fetchAll(
+            'SELECT * FROM comments WHERE organization_id = ? ORDER BY id',
+            [$orgId],
+        );
+    }
+
+    /**
+     * The `secret` column is deliberately excluded — HMAC secrets are not moved
+     * between instances (re-provisioned on the target, #836).
+     *
+     * @return list<array<string, mixed>>
+     */
+    public function findAllWebhooks(int $orgId): array
+    {
+        return $this->query->fetchAll(
+            'SELECT id, organization_id, url, events, entity_type_id, is_active, created_at, updated_at
+             FROM webhooks WHERE organization_id = ? ORDER BY id',
+            [$orgId],
+        );
+    }
+
+    /**
+     * webhook_deliveries has no organization_id — scope through the parent webhook.
+     * The per-delivery `secret` snapshot is excluded like findAllWebhooks.
+     *
+     * @return list<array<string, mixed>>
+     */
+    public function findAllWebhookDeliveries(int $orgId): array
+    {
+        return $this->query->fetchAll(
+            'SELECT d.id, d.webhook_id, d.event, d.entity_type_id, d.entity_id, d.target_url,
+                    d.payload, d.status, d.attempts, d.max_attempts, d.next_attempt_at,
+                    d.last_error, d.response_status, d.created_at, d.updated_at, d.delivered_at
+             FROM webhook_deliveries d
+             JOIN webhooks w ON w.id = d.webhook_id
+             WHERE w.organization_id = ?
+             ORDER BY d.id',
+            [$orgId],
+        );
+    }
+
+    /** @return list<array<string, mixed>> */
+    public function findAllNotificationChannels(int $orgId): array
+    {
+        return $this->query->fetchAll(
+            'SELECT * FROM notification_channels WHERE organization_id = ? ORDER BY id',
+            [$orgId],
+        );
+    }
+
+    /**
+     * user_profiles has no organization_id — scope through the owning user and
+     * carry the user's email so the target can re-attach the profile by email.
+     *
+     * @return list<array<string, mixed>>
+     */
+    public function findAllUserProfiles(int $orgId): array
+    {
+        return $this->query->fetchAll(
+            'SELECT p.id, p.user_id, p.display_name, p.full_name, p.job_title,
+                    p.created_at, p.updated_at, u.email AS user_email
+             FROM user_profiles p
+             JOIN users u ON u.id = p.user_id
+             WHERE u.organization_id = ?
+             ORDER BY p.id',
+            [$orgId],
+        );
+    }
 }

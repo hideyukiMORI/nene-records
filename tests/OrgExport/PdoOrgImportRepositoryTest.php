@@ -210,6 +210,62 @@ final class PdoOrgImportRepositoryTest extends TestCase
         self::assertSame(1, $counts['entity_relations']);
     }
 
+    public function testImportsPhase3TablesWithIdRemapAndSecretScrub(): void
+    {
+        $repository = new PdoOrgImportRepository(
+            new PdoDatabaseTransactionManager($this->factory),
+            new FixedClock(),
+        );
+
+        $counts = $repository->import(1, $this->phase3Payload());
+
+        $entity   = $this->executor->fetchOne("SELECT id FROM entities WHERE slug = 'hello-world'");
+        self::assertNotNull($entity);
+        $newEntityId = (int) $entity['id'];
+        $postsType   = $this->executor->fetchOne("SELECT id FROM entity_types WHERE organization_id = 1 AND slug = 'posts'");
+        self::assertNotNull($postsType);
+        $newTypeId = (int) $postsType['id'];
+
+        // comments: valid one imported + org-stamped; the one for a missing entity skipped.
+        $comment = $this->executor->fetchOne("SELECT * FROM comments WHERE author_email = 'jane@example.test'");
+        self::assertNotNull($comment);
+        self::assertSame($newEntityId, (int) $comment['entity_id']);
+        self::assertSame(1, (int) $comment['organization_id']);
+        self::assertSame('Nice post', $comment['body']);
+        self::assertSame(1, $counts['comments']);
+
+        // webhooks: secret dropped (NULL), entity_type_id remapped, org-stamped.
+        $webhook = $this->executor->fetchOne('SELECT * FROM webhooks WHERE organization_id = 1');
+        self::assertNotNull($webhook);
+        self::assertNull($webhook['secret']);
+        self::assertSame($newTypeId, (int) $webhook['entity_type_id']);
+        $newWebhookId = (int) $webhook['id'];
+
+        // webhook_deliveries: parent + entity remapped, secret dropped; orphan skipped.
+        $delivery = $this->executor->fetchOne("SELECT * FROM webhook_deliveries WHERE event = 'entity.created'");
+        self::assertNotNull($delivery);
+        self::assertNull($delivery['secret']);
+        self::assertSame($newWebhookId, (int) $delivery['webhook_id']);
+        self::assertSame($newEntityId, (int) $delivery['entity_id']);
+        self::assertSame($newTypeId, (int) $delivery['entity_type_id']);
+        self::assertSame(1, $counts['webhook_deliveries']);
+
+        // notification_channels: org-stamped, config preserved.
+        $channel = $this->executor->fetchOne('SELECT * FROM notification_channels WHERE organization_id = 1');
+        self::assertNotNull($channel);
+        self::assertSame('slack', $channel['channel_type']);
+        self::assertStringContainsString('hooks.slack', (string) $channel['config_json']);
+
+        // user_profiles: attached to the same-email target user; the ghost user is skipped + reported.
+        $targetUser = $this->executor->fetchOne("SELECT id FROM users WHERE email = 'admin@target.test'");
+        self::assertNotNull($targetUser);
+        $profile = $this->executor->fetchOne('SELECT * FROM user_profiles WHERE user_id = ?', [(int) $targetUser['id']]);
+        self::assertNotNull($profile);
+        self::assertSame('Rina', $profile['display_name']);
+        self::assertSame(1, $counts['user_profiles']);
+        self::assertSame(1, $counts['user_profiles_skipped']);
+    }
+
     public function testFailedImportRollsBackEntireOrg(): void
     {
         $repository = new PdoOrgImportRepository(
@@ -333,6 +389,41 @@ final class PdoOrgImportRepositoryTest extends TestCase
         ];
     }
 
+    /** @return array<string, mixed> */
+    private function phase3Payload(): array
+    {
+        return [
+            'meta'         => ['organization_id' => 77],
+            'entity_types' => [['id' => 10, 'name' => 'Posts', 'slug' => 'posts', 'is_pinned' => 1]],
+            'entities'     => [
+                ['id' => 30, 'entity_type_id' => 10, 'slug' => 'hello-world', 'status' => 'published'],
+            ],
+            'comments'     => [
+                ['id' => 200, 'entity_id' => 30, 'author_name' => 'Jane', 'author_email' => 'jane@example.test', 'body' => 'Nice post', 'is_approved' => 1, 'created_at' => '2026-05-01 00:00:00'],
+                // references a missing entity → skipped.
+                ['id' => 201, 'entity_id' => 999, 'author_name' => 'Ghost', 'author_email' => 'ghost@example.test', 'body' => 'orphan', 'is_approved' => 0],
+            ],
+            'webhooks'     => [
+                // secret is present in the source row but must be dropped on import.
+                ['id' => 300, 'url' => 'https://hook.test/x', 'events' => '["entity.created"]', 'entity_type_id' => 10, 'secret' => 'top-secret', 'is_active' => 1],
+            ],
+            'webhook_deliveries' => [
+                ['id' => 400, 'webhook_id' => 300, 'event' => 'entity.created', 'entity_type_id' => 10, 'entity_id' => 30, 'target_url' => 'https://hook.test/x', 'secret' => 'top-secret', 'payload' => '{}', 'status' => 'pending', 'attempts' => 0, 'max_attempts' => 5, 'next_attempt_at' => '2026-05-01 00:00:00', 'created_at' => '2026-05-01 00:00:00', 'updated_at' => '2026-05-01 00:00:00'],
+                // parent webhook missing → skipped.
+                ['id' => 401, 'webhook_id' => 999, 'event' => 'entity.updated', 'entity_type_id' => 10, 'entity_id' => 30, 'target_url' => 'https://hook.test/y', 'payload' => '{}', 'status' => 'failed', 'attempts' => 5, 'max_attempts' => 5, 'next_attempt_at' => '2026-05-01 00:00:00', 'created_at' => '2026-05-01 00:00:00', 'updated_at' => '2026-05-01 00:00:00'],
+            ],
+            'notification_channels' => [
+                ['id' => 500, 'channel_type' => 'slack', 'label' => 'Ops', 'is_enabled' => 1, 'config_json' => '{"webhook_url":"https://hooks.slack.test/abc"}', 'created_at' => '2026-05-01 00:00:00', 'updated_at' => '2026-05-01 00:00:00'],
+            ],
+            'user_profiles' => [
+                // same email as the seeded target admin → re-attached.
+                ['id' => 600, 'user_id' => 42, 'user_email' => 'admin@target.test', 'display_name' => 'Rina', 'full_name' => 'Rina R.', 'job_title' => 'Engineer', 'created_at' => '2026-05-01 00:00:00', 'updated_at' => '2026-05-01 00:00:00'],
+                // no such user on the target → skipped + reported.
+                ['id' => 601, 'user_id' => 43, 'user_email' => 'ghost@source.test', 'display_name' => 'Ghost'],
+            ],
+        ];
+    }
+
     private function seedFreshOrg(int $orgId): void
     {
         // Mirror the fresh-install seed: posts type + title/body field_defs, and one setting_def.
@@ -351,6 +442,12 @@ final class PdoOrgImportRepositoryTest extends TestCase
         $this->executor->execute(
             "INSERT INTO setting_defs (organization_id, setting_key, data_type, default_value, is_public, label, created_at, updated_at)
              VALUES (?, 'site_name', 'text', 'NeNe Records', 1, 'Site name', '2026-01-01 00:00:00', '2026-01-01 00:00:00')",
+            [$orgId],
+        );
+        // A target-org admin so an imported user_profile can be re-attached by email (#796).
+        $this->executor->execute(
+            "INSERT INTO users (email, password_hash, role, organization_id, org_role, created_at, updated_at)
+             VALUES ('admin@target.test', 'x', 'admin', ?, 'admin', '2026-01-01 00:00:00', '2026-01-01 00:00:00')",
             [$orgId],
         );
     }
@@ -379,9 +476,29 @@ final class PdoOrgImportRepositoryTest extends TestCase
             $projectRoot . '/database/schema/entity_relations.sql',
             $projectRoot . '/database/schema/url_redirects.sql',
             $projectRoot . '/database/schema/settings.sql',
+            $projectRoot . '/database/schema/comments.sql',
+            $projectRoot . '/database/schema/webhooks.sql',
+            $projectRoot . '/database/schema/webhook_deliveries.sql',
+            $projectRoot . '/database/schema/notification_channels.sql',
+            $projectRoot . '/database/schema/user_profiles.sql',
         ];
 
-        $statements = [];
+        // users.sql uses MySQL ENUM syntax SQLite cannot parse; user_profiles only
+        // needs id/email/organization_id here, so a minimal SQLite users table is
+        // created first (before user_profiles.sql, which carries the FK).
+        $statements = [
+            'CREATE TABLE users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                email VARCHAR(255) NOT NULL,
+                password_hash VARCHAR(255) NOT NULL DEFAULT \'\',
+                role VARCHAR(32) NOT NULL DEFAULT \'admin\',
+                organization_id INTEGER NULL DEFAULT NULL,
+                org_role VARCHAR(32) NULL DEFAULT NULL,
+                created_at DATETIME NOT NULL DEFAULT \'2026-01-01 00:00:00\',
+                updated_at DATETIME NOT NULL DEFAULT \'2026-01-01 00:00:00\'
+            )',
+            'CREATE UNIQUE INDEX users_email ON users (email)',
+        ];
         foreach ($paths as $path) {
             self::assertFileExists($path);
             $raw = trim((string) file_get_contents($path));

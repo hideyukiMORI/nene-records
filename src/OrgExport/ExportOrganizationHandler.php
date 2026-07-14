@@ -71,6 +71,11 @@ final readonly class ExportOrganizationHandler implements RequestHandlerInterfac
             'blocks_fields'    => $this->repository->findAllBlocksFields($id),
             'entity_relations' => $this->repository->findAllEntityRelations($id),
             'url_redirects'    => $this->repository->findAllUrlRedirects($id),
+            'comments'         => $this->repository->findAllComments($id),
+            'webhooks'         => $this->repository->findAllWebhooks($id),
+            'webhook_deliveries' => $this->repository->findAllWebhookDeliveries($id),
+            'notification_channels' => $this->repository->findAllNotificationChannels($id),
+            'user_profiles'    => $this->repository->findAllUserProfiles($id),
         ];
 
         return $this->json->create($payload);
