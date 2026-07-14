@@ -382,6 +382,11 @@ export const ptBR: Partial<MessageCatalog> = {
   'admin.widgets.menuPlaceholder': 'Selecione um menu…',
   'admin.widgets.tocSettings':
     'Mostra os títulos da página atual. Sem configurações — é renderizado em páginas que têm títulos.',
+  'admin.widgets.type.trusted-embed': 'Incorporação confiável',
+  'admin.widgets.trustedEmbedSettings': 'Configurações de incorporação confiável',
+  'admin.widgets.trustedEmbedOriginLabel': 'Origem permitida (https)',
+  'admin.widgets.trustedEmbedSrcLabel': 'URL do script',
+  'admin.widgets.trustedEmbedIntegrityLabel': 'Integridade (hash SRI)',
   'admin.widgets.searchSettings': 'Configurações de busca',
   'admin.widgets.searchPlaceholderLabel': 'Texto do campo (opcional)',
   'admin.widgets.tagCloudSettings':

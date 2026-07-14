@@ -2709,7 +2709,7 @@ export interface components {
         WidgetResponse: {
             id: number;
             /** @enum {string} */
-            widget_type: "recent-posts" | "menu" | "toc" | "search" | "tag-cloud" | "popular-posts" | "calendar";
+            widget_type: "recent-posts" | "menu" | "toc" | "search" | "tag-cloud" | "popular-posts" | "calendar" | "trusted-embed";
             /** @enum {string} */
             region: "header" | "sidebar" | "aside" | "footer";
             display_order: number;
@@ -2728,7 +2728,7 @@ export interface components {
         };
         CreateWidgetRequest: {
             /** @enum {string} */
-            widget_type: "recent-posts" | "menu" | "toc" | "search" | "tag-cloud" | "popular-posts" | "calendar";
+            widget_type: "recent-posts" | "menu" | "toc" | "search" | "tag-cloud" | "popular-posts" | "calendar" | "trusted-embed";
             /** @enum {string} */
             region: "header" | "sidebar" | "aside" | "footer";
             /** @default 0 */

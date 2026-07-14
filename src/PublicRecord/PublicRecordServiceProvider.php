@@ -25,6 +25,7 @@ use NeNeRecords\IntField\IntFieldRepositoryInterface;
 use NeNeRecords\Setting\ListPublicSettingsUseCaseInterface;
 use NeNeRecords\Setting\SettingRepositoryInterface;
 use NeNeRecords\TextField\TextFieldRepositoryInterface;
+use NeNeRecords\Widget\ListWidgetsUseCaseInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
@@ -252,6 +253,7 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
                     $projectRoot = $container->get(RuntimeServiceProvider::PROJECT_ROOT);
                     $responseFactory = $container->get(ResponseFactoryInterface::class);
                     $frontPage = $container->get(FrontPageSetting::class);
+                    $listWidgets = $container->get(ListWidgetsUseCaseInterface::class);
 
                     if (!$useCase instanceof GetPublicRecordViewUseCaseInterface) {
                         throw new LogicException('GetPublicRecordView use case service is invalid.');
@@ -281,6 +283,10 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
                         throw new LogicException('Front page setting service is invalid.');
                     }
 
+                    if (!$listWidgets instanceof ListWidgetsUseCaseInterface) {
+                        throw new LogicException('ListWidgets use case service is invalid.');
+                    }
+
                     return new RenderPublicRecordViewHandler(
                         $useCase,
                         $publicSettings,
@@ -290,6 +296,7 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
                         $responseFactory,
                         new PublicHtmlSanitizer(),
                         $frontPage,
+                        $listWidgets,
                         \NeNeRecords\Http\BasePath::fromEnv(),
                     );
                 },

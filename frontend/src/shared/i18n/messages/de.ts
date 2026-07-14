@@ -382,6 +382,11 @@ export const de: Partial<MessageCatalog> = {
   'admin.widgets.menuPlaceholder': 'Menü auswählen…',
   'admin.widgets.tocSettings':
     'Zeigt die Überschriften der aktuellen Seite an. Keine Einstellungen — es wird auf Seiten mit Überschriften dargestellt.',
+  'admin.widgets.type.trusted-embed': 'Vertrauenswürdige Einbettung',
+  'admin.widgets.trustedEmbedSettings': 'Einstellungen für vertrauenswürdige Einbettung',
+  'admin.widgets.trustedEmbedOriginLabel': 'Erlaubter Ursprung (https)',
+  'admin.widgets.trustedEmbedSrcLabel': 'Skript-URL',
+  'admin.widgets.trustedEmbedIntegrityLabel': 'Integrität (SRI-Hash)',
   'admin.widgets.searchSettings': 'Sucheinstellungen',
   'admin.widgets.searchPlaceholderLabel': 'Eingabe-Platzhalter (optional)',
   'admin.widgets.tagCloudSettings':

@@ -10,6 +10,7 @@ import { RecentPostsWidget } from './RecentPostsWidget'
 import { SearchWidget } from './SearchWidget'
 import { TagCloudWidget } from './TagCloudWidget'
 import { TocWidget } from './TocWidget'
+import { TrustedEmbedWidget } from './TrustedEmbedWidget'
 
 export type WidgetOrientation = 'vertical' | 'horizontal'
 
@@ -29,6 +30,7 @@ const WIDGET_REGISTRY: Record<
   'tag-cloud': () => <TagCloudWidget />,
   'popular-posts': (widget) => <PopularPostsWidget widget={widget} />,
   calendar: () => <CalendarWidget />,
+  'trusted-embed': (widget) => <TrustedEmbedWidget widget={widget} />,
 }
 
 // Header/footer are horizontal bars; side columns stack vertically.

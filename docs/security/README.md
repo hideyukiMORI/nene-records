@@ -5,6 +5,12 @@ Security posture, policy, and assessment records for NeNe Records.
 The vulnerability-reporting policy (how to report, response timelines, scope) lives in
 [`/SECURITY.md`](../../SECURITY.md).
 
+## Feature security notes
+
+- [Trusted external embeds](trusted-embed.md) — the `embed_allowlist` + `trusted-embed`
+  widget (#802): self-owned-origins-only trust model, what is validated, and the SRI
+  runbook (keeping the integrity hash in sync with the embed's own releases).
+
 ## Assessments
 
 Point-in-time **authorized self / maintainer-run** assessments — black-box live attack (ATK) against a

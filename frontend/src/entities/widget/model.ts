@@ -8,6 +8,7 @@ export type WidgetType =
   | 'tag-cloud'
   | 'popular-posts'
   | 'calendar'
+  | 'trusted-embed'
 
 export interface Widget {
   id: number

@@ -374,6 +374,11 @@ export const ja: Partial<MessageCatalog> = {
   'admin.widgets.menuPlaceholder': 'メニューを選択…',
   'admin.widgets.tocSettings':
     '現在ページの見出しを表示します。設定なし（見出しがあるページで描画）。',
+  'admin.widgets.type.trusted-embed': '信頼済み埋め込み',
+  'admin.widgets.trustedEmbedSettings': '信頼済み埋め込みの設定',
+  'admin.widgets.trustedEmbedOriginLabel': '許可オリジン（https）',
+  'admin.widgets.trustedEmbedSrcLabel': 'スクリプト URL',
+  'admin.widgets.trustedEmbedIntegrityLabel': '整合性（SRI ハッシュ）',
   'admin.widgets.searchSettings': '検索の設定',
   'admin.widgets.searchPlaceholderLabel': '入力欄のプレースホルダ（任意）',
   'admin.widgets.tagCloudSettings': '全タグをアーカイブページへのリンクで表示します。設定なし。',

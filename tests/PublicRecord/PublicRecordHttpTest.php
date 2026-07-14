@@ -46,7 +46,9 @@ use NeNeRecords\Tests\IntField\InMemoryIntFieldRepository;
 use NeNeRecords\Tests\Media\InMemoryMediaRepository;
 use NeNeRecords\Tests\Setting\InMemorySettingRepository;
 use NeNeRecords\Tests\TextField\InMemoryTextFieldRepository;
+use NeNeRecords\Tests\Widget\InMemoryWidgetRepository;
 use NeNeRecords\TextField\TextField;
+use NeNeRecords\Widget\ListWidgetsUseCase;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
@@ -175,7 +177,7 @@ final class PublicRecordHttpTest extends TestCase
             machineApiKey: null,
         );
 
-        $renderHandler = new RenderPublicRecordViewHandler($useCase, $publicSettings, $htmlResponse, $config, $projectRoot, $this->factory, new PublicHtmlSanitizer(), $frontPage, $basePath);
+        $renderHandler = new RenderPublicRecordViewHandler($useCase, $publicSettings, $htmlResponse, $config, $projectRoot, $this->factory, new PublicHtmlSanitizer(), $frontPage, new ListWidgetsUseCase(new InMemoryWidgetRepository()), $basePath);
         $this->renderHandler = $renderHandler;
         $customPermalink = new RenderCustomPermalinkHandler($entities, $entityTypes, $renderHandler);
         $registrar = new PublicRecordRouteRegistrar(
