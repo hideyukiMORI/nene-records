@@ -55,3 +55,28 @@ describe('getRecordDisplayLabel', () => {
     })
   })
 })
+
+describe('derived (non-title) fallback normalization (#849)', () => {
+  it('strips markup and collapses whitespace', () => {
+    const html = '<header style="position:sticky"><a href="/">AYANE</a>\n  Home</header>'
+    expect(getRecordDisplayLabel(1, [tf(1, 'content', html)], 'fb')).toBe('AYANE Home')
+  })
+
+  it('caps a long derived label at 120 chars with an ellipsis', () => {
+    const long = 'word '.repeat(100)
+    const label = getRecordDisplayLabel(1, [tf(1, 'content', long)], 'fb')
+    expect(label.length).toBeLessThanOrEqual(121)
+    expect(label.endsWith('…')).toBe(true)
+  })
+
+  it('falls back when the field is markup only', () => {
+    expect(getRecordDisplayLabel(1, [tf(1, 'content', '<div><span></span></div>')], 'fb')).toBe(
+      'fb',
+    )
+  })
+
+  it('never normalizes an explicit title field', () => {
+    const title = 'A <b>literal</b> title kept as-is'
+    expect(getRecordDisplayLabel(1, [tf(1, 'title', title)], 'fb')).toBe(title)
+  })
+})

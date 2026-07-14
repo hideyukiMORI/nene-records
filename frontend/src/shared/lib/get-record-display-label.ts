@@ -8,7 +8,26 @@ import type { TextField } from '@/entities/text-field'
  * the locale-agnostic (null) row, then the first — so listings show titles in the
  * visitor's language and fall back gracefully. With no `locale` the behavior is
  * unchanged (first match), so admin callers are unaffected.
+ *
+ * The non-title fallback is a *derived* label, so it is normalized for display:
+ * markup is stripped and the text capped (#849). A bespoke page whose only field
+ * is a full html document (bare layout, #799) must not dump its source into
+ * listings. An explicit `title` field is trusted as-is.
  */
+const FALLBACK_LABEL_MAX = 120
+
+/** Strip markup, collapse whitespace, and cap for use as a derived label. */
+export function toDerivedLabel(value: string): string {
+  const text = value
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+  if (text.length <= FALLBACK_LABEL_MAX) {
+    return text
+  }
+  return text.slice(0, FALLBACK_LABEL_MAX).trimEnd() + '…'
+}
+
 export function getRecordDisplayLabel(
   entityId: number,
   textFields: TextField[],
@@ -40,7 +59,10 @@ export function getRecordDisplayLabel(
 
   const first = pick(forEntity)
   if (first !== undefined) {
-    return first.value.trim()
+    const derived = toDerivedLabel(first.value)
+    if (derived !== '') {
+      return derived
+    }
   }
 
   return fallback

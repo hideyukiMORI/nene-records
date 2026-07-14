@@ -101,12 +101,12 @@ export function EntityListPanel({
 
             {/* 中央カラム: タイトル・ステータス・body・日時 */}
             <div className="min-w-0 flex-1">
-              {/* 行1: タイトル + ステータスバッジ */}
-              <div className="flex flex-wrap items-center gap-x-inline-sm gap-y-0.5">
-                <Text as="span" variant="heading-sm">
+              {/* 行1: タイトル + ステータスバッジ（タイトルは 1 行 truncate・#849） */}
+              <div className="flex items-center gap-x-inline-sm gap-y-0.5">
+                <Text as="span" variant="heading-sm" className="min-w-0 truncate">
                   {label}
                 </Text>
-                <StatusBadge status={item.status}>
+                <StatusBadge status={item.status} className="shrink-0">
                   {t(`admin.entityStatus.status.${item.status}`)}
                 </StatusBadge>
               </div>
