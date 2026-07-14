@@ -136,7 +136,9 @@ export function ManageNotificationChannelsView({
                   >
                     {t(`admin.notifications.channelType.${channel.channelType}`)}
                   </span>
-                  <span className="font-sans text-sm font-medium text-text">{channel.label}</span>
+                  <span className="font-sans text-sm font-medium text-text-primary">
+                    {channel.label}
+                  </span>
                   <span
                     className={`inline-block rounded px-1.5 py-0.5 font-sans text-caption ${
                       channel.isEnabled

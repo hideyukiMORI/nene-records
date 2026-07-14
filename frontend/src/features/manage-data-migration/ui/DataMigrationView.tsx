@@ -67,10 +67,10 @@ export function DataMigrationView({
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-border">
-                      <th className="pb-2 text-left font-medium text-text-secondary">
+                      <th className="pb-2 text-left font-medium text-text-muted">
                         {t('admin.dataMigration.table.name')}
                       </th>
-                      <th className="pb-2 text-right font-medium text-text-secondary">
+                      <th className="pb-2 text-right font-medium text-text-muted">
                         {t('admin.dataMigration.table.rows')}
                       </th>
                     </tr>

@@ -58,7 +58,7 @@ export function ManageOrganizationDetailView({
       <div>
         <Link
           to="/superadmin/organizations"
-          className="mb-2 flex items-center gap-1 text-sm text-text-secondary hover:text-text-primary"
+          className="mb-2 flex items-center gap-1 text-sm text-text-muted hover:text-text-primary"
         >
           <IconChevronLeft size={14} />
           {t('admin.organizations.pageTitle')}

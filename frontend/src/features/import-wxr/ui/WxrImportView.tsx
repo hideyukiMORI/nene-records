@@ -21,7 +21,7 @@ function ErrorAlert({ message }: { message: string }) {
 
 function Stat({ label, value }: { label: string; value: number }) {
   return (
-    <div className="flex flex-col gap-stack-3xs rounded-sm border border-border-subtle px-inline-md py-stack-xs">
+    <div className="flex flex-col gap-stack-3xs rounded-sm border border-border px-inline-md py-stack-xs">
       <span className="font-chrome text-tiny uppercase tracking-wide text-text-muted">{label}</span>
       <span className="font-sans text-heading-sm font-semibold text-text-primary">{value}</span>
     </div>
@@ -45,10 +45,7 @@ function PlanCard({ plan }: { plan: WxrImportPlanDto }) {
         {plan.planned.length > 0 ? (
           <ul className="flex flex-col gap-stack-3xs">
             {plan.planned.map((item) => (
-              <li
-                key={`${item.entity_type}/${item.slug}`}
-                className="text-caption text-text-secondary"
-              >
+              <li key={`${item.entity_type}/${item.slug}`} className="text-caption text-text-muted">
                 <span className="font-medium text-text-primary">{item.title || item.slug}</span>
                 {` — ${item.entity_type} · ${item.status}`}
                 {item.tags.length > 0 ? ` · ${item.tags.join(', ')}` : ''}
@@ -133,7 +130,7 @@ export function WxrImportView() {
             <input
               type="file"
               accept=".xml,application/xml,text/xml"
-              className="text-caption text-text-secondary"
+              className="text-caption text-text-muted"
               onChange={(event) => {
                 setFile(event.target.files?.[0] ?? null)
                 preview.reset()

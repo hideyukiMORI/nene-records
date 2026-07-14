@@ -204,7 +204,7 @@ export function NotificationChannelForm({
 
         {!isEdit && (
           <div>
-            <label className="mb-1 block font-sans text-sm font-medium text-text">
+            <label className="mb-1 block font-sans text-sm font-medium text-text-primary">
               {t('admin.notifications.form.channelTypeLabel')}
             </label>
             <select
@@ -214,7 +214,7 @@ export function NotificationChannelForm({
                 setConfig({})
                 setErrors({})
               }}
-              className="w-full rounded-md border border-border bg-surface px-3 py-2 font-sans text-sm text-text focus:outline-none focus:ring-2 focus:ring-accent"
+              className="w-full rounded-md border border-border bg-surface px-3 py-2 font-sans text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent"
             >
               {NOTIFICATION_CHANNEL_TYPES.map((type) => (
                 <option key={type} value={type}>
@@ -226,7 +226,7 @@ export function NotificationChannelForm({
         )}
 
         <div>
-          <label className="mb-1 block font-sans text-sm font-medium text-text">
+          <label className="mb-1 block font-sans text-sm font-medium text-text-primary">
             {t('admin.notifications.form.labelLabel')}
           </label>
           <input
@@ -236,7 +236,7 @@ export function NotificationChannelForm({
               setLabel(e.target.value)
             }}
             placeholder={t('admin.notifications.form.labelPlaceholder')}
-            className="w-full rounded-md border border-border bg-surface px-3 py-2 font-sans text-sm text-text placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent"
+            className="w-full rounded-md border border-border bg-surface px-3 py-2 font-sans text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent"
           />
           {errors['label'] !== undefined && (
             <p className="mt-1 font-sans text-xs text-danger">{errors['label']}</p>
@@ -245,7 +245,7 @@ export function NotificationChannelForm({
 
         {configFields.map((field) => (
           <div key={field.key}>
-            <label className="mb-1 block font-sans text-sm font-medium text-text">
+            <label className="mb-1 block font-sans text-sm font-medium text-text-primary">
               {field.label}
               {field.required && <span className="ml-1 text-danger">*</span>}
             </label>
@@ -257,7 +257,7 @@ export function NotificationChannelForm({
                 }}
                 placeholder={field.placeholder}
                 rows={3}
-                className="w-full rounded-md border border-border bg-surface px-3 py-2 font-mono text-sm text-text placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent"
+                className="w-full rounded-md border border-border bg-surface px-3 py-2 font-mono text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent"
               />
             ) : (
               <input
@@ -268,7 +268,7 @@ export function NotificationChannelForm({
                   setConfigField(field.key, e.target.value)
                 }}
                 placeholder={field.placeholder}
-                className="w-full rounded-md border border-border bg-surface px-3 py-2 font-sans text-sm text-text placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent"
+                className="w-full rounded-md border border-border bg-surface px-3 py-2 font-sans text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent"
               />
             )}
             {field.sensitive === true && (
@@ -294,7 +294,7 @@ export function NotificationChannelForm({
             }}
             className="h-4 w-4 rounded border-border text-accent"
           />
-          <label htmlFor={enabledId} className="font-sans text-sm text-text">
+          <label htmlFor={enabledId} className="font-sans text-sm text-text-primary">
             {t('admin.notifications.form.isEnabledLabel')}
           </label>
         </div>

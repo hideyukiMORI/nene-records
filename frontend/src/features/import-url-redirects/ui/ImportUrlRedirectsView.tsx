@@ -20,7 +20,7 @@ function ErrorAlert({ message }: { message: string }) {
 
 function Stat({ label, value }: { label: string; value: number }) {
   return (
-    <div className="flex flex-col gap-stack-3xs rounded-sm border border-border-subtle px-inline-md py-stack-xs">
+    <div className="flex flex-col gap-stack-3xs rounded-sm border border-border px-inline-md py-stack-xs">
       <span className="font-chrome text-tiny uppercase tracking-wide text-text-muted">{label}</span>
       <span className="font-sans text-heading-sm font-semibold text-text-primary">{value}</span>
     </div>
@@ -51,7 +51,7 @@ function ResultCard({ result }: { result: RedirectCsvImportDto }) {
             </Text>
             <ul className="flex flex-col gap-stack-3xs">
               {result.samples.map((sample) => (
-                <li key={sample.source} className="text-caption text-text-secondary">
+                <li key={sample.source} className="text-caption text-text-muted">
                   <code className="text-text-primary">{sample.source}</code>
                   {' → '}
                   <code className="text-text-primary">{sample.target}</code>
@@ -104,7 +104,7 @@ export function ImportUrlRedirectsView() {
             <input
               type="file"
               accept=".csv,text/csv"
-              className="text-caption text-text-secondary"
+              className="text-caption text-text-muted"
               onChange={(event) => {
                 setFile(event.target.files?.[0] ?? null)
                 preview.reset()
