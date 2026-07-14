@@ -1,4 +1,5 @@
 import js from '@eslint/js'
+import nene2 from '@hideyukimori/nene2-standards'
 import eslintConfigPrettier from 'eslint-config-prettier'
 import importPlugin from 'eslint-plugin-import'
 import jsxA11y from 'eslint-plugin-jsx-a11y'
@@ -180,4 +181,9 @@ export default tseslint.config(
     },
   },
   eslintConfigPrettier,
+  // 公認差異 records-cookie-auth（HttpOnly cookie＋X-Requested-With CSRF）の実行可能登録。
+  // 正本: nene2-fleet-tooling registries/fleet.jsonc（規約 01 §7-1 / 02 §11 AU-2・会議 R1④⑨）。
+  // gate-integrity は name `nene2/overrides/records-cookie-auth` で適用有無を照合する。
+  // 現時点の実体は marker config（緩和ルールなし — A-7 token store 検査の配布後に差し替え座席になる）。
+  ...nene2.overrides.recordsCookieAuth,
 )
