@@ -1,6 +1,6 @@
 import type { MessageCatalog } from './en'
 
-export const ja: Partial<MessageCatalog> = {
+export const ja = {
   // ── Common ──────────────────────────────────────────────────────────────
   'common.actions.edit': '編集',
   'common.actions.delete': '削除',
@@ -1552,4 +1552,4 @@ export const ja: Partial<MessageCatalog> = {
   // ── Misc (#728) ───────────────────────────────────────────────────────────
   'common.tableOfContents': '目次',
   'admin.entityRecords.breadcrumbLabel': 'パンくずリスト',
-}
+} satisfies Record<keyof MessageCatalog, string>

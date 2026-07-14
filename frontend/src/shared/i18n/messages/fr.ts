@@ -1,7 +1,7 @@
 import type { MessageCatalog } from './en'
 
 /** French — complete admin and public UI catalog. Missing keys fall back to English. */
-export const fr: Partial<MessageCatalog> = {
+export const fr = {
   // ── Common ──────────────────────────────────────────────────────────────
   'common.actions.edit': 'Modifier',
   'common.actions.delete': 'Supprimer',
@@ -1582,4 +1582,4 @@ export const fr: Partial<MessageCatalog> = {
   // ── Misc (#728) ───────────────────────────────────────────────────────────
   'common.tableOfContents': 'Table des matières',
   'admin.entityRecords.breadcrumbLabel': 'Fil d’Ariane',
-}
+} satisfies Record<keyof MessageCatalog, string>

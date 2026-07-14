@@ -1,7 +1,7 @@
 import type { MessageCatalog } from './en'
 
 /** Simplified Chinese (简体中文) message catalog. Missing keys fall back to English. */
-export const zhHans: Partial<MessageCatalog> = {
+export const zhHans = {
   // ── Common ──────────────────────────────────────────────────────────────
   'common.actions.edit': '编辑',
   'common.actions.delete': '删除',
@@ -1493,4 +1493,4 @@ export const zhHans: Partial<MessageCatalog> = {
   // ── Misc (#728) ───────────────────────────────────────────────────────────
   'common.tableOfContents': '目录',
   'admin.entityRecords.breadcrumbLabel': '面包屑导航',
-}
+} satisfies Record<keyof MessageCatalog, string>
