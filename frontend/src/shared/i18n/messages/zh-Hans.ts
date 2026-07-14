@@ -1363,6 +1363,10 @@ export const zhHans: Partial<MessageCatalog> = {
   // ── Admin · settings · analytics consent default ──────────────────────────
   'admin.settings.consentDefault.denied': '拒绝（欧盟安全默认）',
   'admin.settings.consentDefault.granted': '允许',
+  'admin.settings.maintenance.stateOn': '开启',
+  'admin.settings.maintenance.stateOff': '关闭',
+  'admin.settings.maintenance.warning':
+    '维护模式开启期间，公开站点的访客会看到“维护中”页面。已登录的员工仍可正常查看站点。',
 
   // ── Public · cookie consent ───────────────────────────────────────────────
   'public.consent.label': 'Cookie 同意',

@@ -160,6 +160,68 @@ function ConsentDefaultField({
   )
 }
 
+// ── Maintenance-mode setting field (immediate toggle) ────────────────────────
+
+interface MaintenanceModeFieldProps {
+  item: SettingItem
+  inputId: string
+  isSaving: boolean
+  canManageSettings: boolean
+  onSave: (settingKey: string, value: string) => Promise<void>
+}
+
+/**
+ * `maintenance_mode` (bool, admin-only) gates the public site (#813). A plain
+ * "true"/"false" text box is a footgun for non-technical operators, so this is a
+ * switch that saves immediately on toggle. When on, a notice spells out that
+ * visitors see the maintenance page while signed-in staff keep the normal site.
+ */
+function MaintenanceModeField({
+  item,
+  inputId,
+  isSaving,
+  canManageSettings,
+  onSave,
+}: MaintenanceModeFieldProps) {
+  const { t } = useTranslation()
+  // Optimistic local state; the card remounts on save (keyed by updatedAt), so
+  // it re-syncs to the server value after the mutation settles.
+  const [on, setOn] = useState(item.value === 'true')
+
+  return (
+    <div className="flex flex-col gap-stack-sm">
+      <div className="flex items-center gap-inline-sm">
+        <input
+          id={inputId}
+          type="checkbox"
+          role="switch"
+          checked={on}
+          disabled={isSaving || !canManageSettings}
+          onChange={(e) => {
+            const next = e.target.checked
+            setOn(next)
+            void onSave(item.settingKey, next ? 'true' : 'false')
+          }}
+          className="h-4 w-4 shrink-0 accent-accent disabled:cursor-not-allowed disabled:opacity-50"
+        />
+        <Text variant="caption" className="font-medium">
+          {on ? t('admin.settings.maintenance.stateOn') : t('admin.settings.maintenance.stateOff')}
+        </Text>
+      </div>
+      {on ? (
+        <div
+          role="status"
+          className="rounded-md border border-warning bg-warning-weak px-inline-sm py-stack-xs"
+        >
+          <Text variant="caption" className="text-warning">
+            {t('admin.settings.maintenance.warning')}
+          </Text>
+        </div>
+      ) : null}
+    </div>
+  )
+}
+
 // ── Setting card (local form state only) ─────────────────────────────────────
 
 interface SettingCardProps {
@@ -247,6 +309,14 @@ function SettingCard({
             </div>
           ) : null}
         </div>
+      ) : item.settingKey === 'maintenance_mode' ? (
+        <MaintenanceModeField
+          item={item}
+          inputId={inputId}
+          isSaving={isSaving}
+          canManageSettings={canManageSettings}
+          onSave={onSave}
+        />
       ) : item.settingKey === 'analytics_consent_default' ? (
         <ConsentDefaultField
           item={item}

@@ -1403,6 +1403,10 @@ export const de: Partial<MessageCatalog> = {
   // ── Admin · settings · analytics consent default ──────────────────────────
   'admin.settings.consentDefault.denied': 'Abgelehnt (EU-sicherer Standard)',
   'admin.settings.consentDefault.granted': 'Zugelassen',
+  'admin.settings.maintenance.stateOn': 'Ein',
+  'admin.settings.maintenance.stateOff': 'Aus',
+  'admin.settings.maintenance.warning':
+    'Solange der Wartungsmodus aktiv ist, sehen Besucher der öffentlichen Website eine „Wartungs“-Seite. Angemeldete Mitarbeitende sehen die Website weiterhin normal.',
 
   // ── Public · cookie consent ───────────────────────────────────────────────
   'public.consent.label': 'Cookie-Einwilligung',
