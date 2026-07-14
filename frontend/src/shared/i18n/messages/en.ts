@@ -384,6 +384,11 @@ export const en = {
   'admin.widgets.menuPlaceholder': 'Select a menu…',
   'admin.widgets.tocSettings':
     "Shows the current page's headings. No settings — it renders on pages that have headings.",
+  'admin.widgets.type.trusted-embed': 'Trusted embed',
+  'admin.widgets.trustedEmbedSettings': 'Trusted embed settings',
+  'admin.widgets.trustedEmbedOriginLabel': 'Allowed origin (https)',
+  'admin.widgets.trustedEmbedSrcLabel': 'Script URL',
+  'admin.widgets.trustedEmbedIntegrityLabel': 'Integrity (SRI hash)',
   'admin.widgets.searchSettings': 'Search settings',
   'admin.widgets.searchPlaceholderLabel': 'Input placeholder (optional)',
   'admin.widgets.tagCloudSettings': 'Shows all tags as links to their archive pages. No settings.',

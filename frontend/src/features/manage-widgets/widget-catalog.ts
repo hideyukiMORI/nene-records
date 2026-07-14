@@ -85,6 +85,20 @@ export const WIDGET_CATALOG: readonly WidgetCatalogEntry[] = [
     descKey: 'admin.widgets.tocSettings',
     settings: [],
   },
+  {
+    // Trusted-embed (#802): a self-owned, admin-vetted external <script> (SRI
+    // required). Origin must be on the org's embed allowlist; validated both on
+    // save (backend) and at render time (SSR + SPA). data-* attribute editing is
+    // a follow-up — the three core fields are enough to place a first embed.
+    type: 'trusted-embed',
+    labelKey: 'admin.widgets.type.trusted-embed',
+    descKey: 'admin.widgets.trustedEmbedSettings',
+    settings: [
+      { key: 'origin', labelKey: 'admin.widgets.trustedEmbedOriginLabel', editor: 'text' },
+      { key: 'src', labelKey: 'admin.widgets.trustedEmbedSrcLabel', editor: 'text' },
+      { key: 'integrity', labelKey: 'admin.widgets.trustedEmbedIntegrityLabel', editor: 'text' },
+    ],
+  },
 ]
 
 export const WIDGET_CATALOG_BY_TYPE: Record<WidgetType, WidgetCatalogEntry> = Object.fromEntries(

@@ -12,6 +12,11 @@ namespace NeNeRecords\Widget;
  * `search` (a search box linking to the results page); Phase 5 adds `tag-cloud`
  * (tags linking to tag archives), `popular-posts` (most-viewed records), and
  * `calendar` (a month grid linking to date archives).
+ *
+ * `trusted-embed` (#802) is the first-party trusted-embed primitive: a typed
+ * widget that loads an external `<script>` from a **self-owned, admin-vetted**
+ * origin (validated against the org's `embed_allowlist`, SRI required). Its
+ * settings shape is validated by {@see TrustedEmbedSettings}.
  */
 final class WidgetTypes
 {
@@ -24,6 +29,7 @@ final class WidgetTypes
         'tag-cloud',
         'popular-posts',
         'calendar',
+        'trusted-embed',
     ];
 
     public static function isValid(string $type): bool

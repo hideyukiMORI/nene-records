@@ -14,6 +14,7 @@ use NeNeRecords\Http\PublicHtmlCsp;
 use NeNeRecords\Http\WebAnalyticsConfig;
 use NeNeRecords\Http\WebAnalyticsHeadSnippet;
 use NeNeRecords\Setting\ListPublicSettingsUseCaseInterface;
+use NeNeRecords\Widget\ListWidgetsUseCaseInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -29,6 +30,7 @@ final readonly class RenderPublicRecordViewHandler implements PublicRecordViewRe
         private ResponseFactoryInterface $responseFactory,
         private PublicHtmlSanitizer $htmlSanitizer,
         private FrontPageSetting $frontPage,
+        private ListWidgetsUseCaseInterface $listWidgets,
         /** Sub-directory install prefix (`APP_BASE_PATH`); '' = served at root. */
         private string $basePath = '',
     ) {
@@ -121,6 +123,20 @@ final readonly class RenderPublicRecordViewHandler implements PublicRecordViewRe
         $analyticsNonce = $analytics->isEnabled() ? bin2hex(random_bytes(16)) : '';
         $analyticsHead = WebAnalyticsHeadSnippet::render($analytics, $analyticsNonce);
 
+        // Trusted-embed primitive (#802 Phase 2): when the org has an embed
+        // allowlist, render its `trusted-embed` widgets into the crawlable shell
+        // as validated <script> tags (see TrustedEmbedScripts). With no allowlist
+        // configured we skip the widget query entirely, so a page with no embed
+        // configured does exactly what it did before — no extra work, no output.
+        $embedAllowlist = EmbedAllowlist::fromSettings($settings);
+        $embedScripts = '';
+        if (!$embedAllowlist->isEmpty()) {
+            $embedScripts = TrustedEmbedScripts::render(
+                $this->listWidgets->execute()->items,
+                $embedAllowlist,
+            );
+        }
+
         // Canonical / og:url point at the user-facing permalink (not this /view/ twin).
         // For a negotiated locale the canonical self-references with `?lang=`, and
         // hreflang alternates advertise every locale variant (#540).
@@ -200,6 +216,9 @@ final readonly class RenderPublicRecordViewHandler implements PublicRecordViewRe
             'siteName' => $siteName,
             'metaDescription' => $metaDescription,
             'analyticsHead' => $analyticsHead,
+            // Validated trusted-embed <script> tags for the crawlable shell (#802);
+            // '' when the org has no allowlist / no trusted-embed widgets.
+            'embedScripts' => $embedScripts,
             'htmlLang' => $htmlLang,
             'alternateLinks' => $alternateLinks,
             'basePath' => $effectiveBase,
@@ -225,7 +244,7 @@ final readonly class RenderPublicRecordViewHandler implements PublicRecordViewRe
             PublicHtmlCsp::build(
                 $analytics,
                 $analyticsNonce !== '' ? $analyticsNonce : null,
-                EmbedAllowlist::fromSettings($settings),
+                $embedAllowlist,
             ),
         );
     }

@@ -6793,7 +6793,7 @@ components:
           minimum: 1
         widget_type:
           type: string
-          enum: [recent-posts, menu, toc, search, tag-cloud, popular-posts, calendar]
+          enum: [recent-posts, menu, toc, search, tag-cloud, popular-posts, calendar, trusted-embed]
         region:
           type: string
           enum: [header, sidebar, aside, footer]
@@ -6833,7 +6833,7 @@ components:
       properties:
         widget_type:
           type: string
-          enum: [recent-posts, menu, toc, search, tag-cloud, popular-posts, calendar]
+          enum: [recent-posts, menu, toc, search, tag-cloud, popular-posts, calendar, trusted-embed]
         region:
           type: string
           enum: [header, sidebar, aside, footer]

@@ -385,6 +385,11 @@ export const fr: Partial<MessageCatalog> = {
   'admin.widgets.menuPlaceholder': 'Sélectionnez un menu…',
   'admin.widgets.tocSettings':
     "Affiche les titres de la page actuelle. Aucun réglage — il s'affiche sur les pages comportant des titres.",
+  'admin.widgets.type.trusted-embed': 'Intégration de confiance',
+  'admin.widgets.trustedEmbedSettings': "Réglages de l'intégration de confiance",
+  'admin.widgets.trustedEmbedOriginLabel': 'Origine autorisée (https)',
+  'admin.widgets.trustedEmbedSrcLabel': 'URL du script',
+  'admin.widgets.trustedEmbedIntegrityLabel': 'Intégrité (empreinte SRI)',
   'admin.widgets.searchSettings': 'Réglages de la recherche',
   'admin.widgets.searchPlaceholderLabel': 'Texte indicatif du champ (facultatif)',
   'admin.widgets.tagCloudSettings':

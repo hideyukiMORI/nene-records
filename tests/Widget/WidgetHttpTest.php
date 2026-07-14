@@ -97,6 +97,50 @@ final class WidgetHttpTest extends TestCase
         self::assertSame(422, $response->getStatusCode());
     }
 
+    public function testCreateAcceptsValidTrustedEmbed(): void
+    {
+        $response = $this->post([
+            'widget_type' => 'trusted-embed',
+            'region' => 'footer',
+            'settings' => [
+                'origin' => 'https://widgets.example.com',
+                'src' => 'https://widgets.example.com/form.js',
+                'integrity' => 'sha384-abcDEF123+/=',
+            ],
+        ]);
+
+        self::assertSame(201, $response->getStatusCode());
+    }
+
+    public function testCreateRejectsTrustedEmbedWithoutSri(): void
+    {
+        $response = $this->post([
+            'widget_type' => 'trusted-embed',
+            'region' => 'footer',
+            'settings' => [
+                'origin' => 'https://widgets.example.com',
+                'src' => 'https://widgets.example.com/form.js',
+            ],
+        ]);
+
+        self::assertSame(422, $response->getStatusCode());
+    }
+
+    public function testCreateRejectsTrustedEmbedCrossOriginSrc(): void
+    {
+        $response = $this->post([
+            'widget_type' => 'trusted-embed',
+            'region' => 'footer',
+            'settings' => [
+                'origin' => 'https://widgets.example.com',
+                'src' => 'https://evil.example.net/form.js',
+                'integrity' => 'sha384-abcDEF123+/=',
+            ],
+        ]);
+
+        self::assertSame(422, $response->getStatusCode());
+    }
+
     public function testListAndPublicListReturnWidgets(): void
     {
         $this->post(['widget_type' => 'recent-posts', 'region' => 'sidebar', 'display_order' => 2]);

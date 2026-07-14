@@ -55,6 +55,14 @@ final readonly class WidgetRequestParser
         /** @var array<string, mixed> $settings */
         $settings = is_array($rawSettings) ? $rawSettings : [];
 
+        // The trusted-embed primitive (#802) has a strongly-typed settings shape
+        // (self-owned https origin, same-origin src, SRI required, data-* attrs).
+        // Validating it on the write path surfaces bad input to the admin; the
+        // read path (TrustedEmbedSettings::tryParse) re-checks as defense in depth.
+        if ($widgetType === 'trusted-embed') {
+            $errors = [...$errors, ...TrustedEmbedSettings::validate($settings)];
+        }
+
         return new self($widgetType, $region, $displayOrder, $title, $settings, $errors);
     }
 }

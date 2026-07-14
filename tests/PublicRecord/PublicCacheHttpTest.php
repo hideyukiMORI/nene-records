@@ -108,6 +108,7 @@ final class PublicCacheHttpTest extends TestCase
             $this->factory,
             new \NeNeRecords\PublicRecord\PublicHtmlSanitizer(),
             new \NeNeRecords\PublicRecord\FrontPageSetting(new \NeNeRecords\Tests\Setting\InMemorySettingRepository(), new InMemoryEntityRepository(), new InMemoryEntityTypeRepository()),
+            new \NeNeRecords\Widget\ListWidgetsUseCase(new \NeNeRecords\Tests\Widget\InMemoryWidgetRepository()),
         );
         $publicRecordRegistrar = new PublicRecordRouteRegistrar(
             new GetPublicRecordViewHandler($useCase, $jsonResponse, $this->factory),

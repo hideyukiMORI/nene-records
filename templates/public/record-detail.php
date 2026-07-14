@@ -202,6 +202,11 @@ if ($ogImageUrl !== null) {
         <span class="chapter-nav__pos">第<?= $e((string) $chapterNav->chapterNo) ?>章 / 全<?= $e((string) $chapterNav->chapterTotal) ?>章</span>
       </nav>
     <?php endif; ?>
+    <?php /* Trusted-embed widgets (#802): validated <script> tags, allowlist-gated
+             server-side (TrustedEmbedScripts). Emitted inside a <noscript> shell so
+             the SPA (live runtime) owns execution — never a double-load. '' when the
+             org has no allowlist / no trusted-embed widgets, keeping the page unchanged. */ ?>
+    <?= $embedScripts ?>
     </div>
     <script
       id="nene-records-public-record-bootstrap"
