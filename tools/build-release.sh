@@ -127,6 +127,16 @@ done
 shopt -u nullglob
 echo "  fonts: base に $kept_fonts 件 / フォントパックへ $moved_fonts 件"
 
+# フォントパック導入検出用マーカー（#709）。管理画面はフォントピッカーの @font-face を
+# 読み込まない（公開フォントは公開シェル/プレビュー iframe 側）ため、フォントの load
+# 試行では pack 有無を判定できない。そこで docroot 直下に静的マーカーを置き、frontend は
+# これを fetch して判定する（public_html/.htaccess は実在ファイルを素通しするので、
+# 存在すれば Apache がそのまま JSON を返す）。base は complete:false、フォントパックが
+# 同名ファイルで上書きして complete:true にする。Docker/本番/dev はこのファイルを持た
+# ない（front controller が 404 を返す）ので frontend は「完備」とみなし何も表示しない。
+printf '{"complete":false,"version":"%s"}\n' "$VERSION" > "$STAGE/public_html/font-pack.json"
+printf '{"complete":true,"version":"%s"}\n' "$VERSION" > "$FONTS_STAGE/public_html/font-pack.json"
+
 # フォントパックの設置手順（shell 無しの共有ホスティング前提）を同梱する。
 cat > "$FONTS_STAGE/READ-ME-FIRST.txt" <<'FONTPACK_README'
 NeNe Records — フォントパック / Font Pack

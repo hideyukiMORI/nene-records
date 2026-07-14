@@ -57,29 +57,40 @@ export function isBaseBundledFontValue(value: string | undefined): boolean {
 }
 
 /**
- * Representative pack-only family. The font pack is applied atomically (one ZIP),
- * so probing a single non-base family is enough to decide whether the whole pack
- * is present. Playfair Display is a common display pick and pack-only.
+ * Static marker the Tier A base ZIP drops at the app docroot (`font-pack.json`).
+ * `build-release.sh` writes `{"complete": false}` into the base ZIP and
+ * `{"complete": true}` into the font pack, which overwrites it on install.
+ * Resolved relative to `document.baseURI` so subdirectory installs work.
  */
-const PACK_PROBE_FAMILY = 'Playfair Display'
+const FONT_PACK_MARKER = 'font-pack.json'
 
 /**
- * Probe whether the on-demand font pack is installed. Attempts to load a
- * representative pack-only face: on a full install the woff2 exists and the load
- * resolves; on a base-only Tier A install the file 404s and the load rejects.
+ * Probe whether the on-demand font pack is installed. The admin font picker does
+ * not itself load the public/theme @font-face rules (those live in the public
+ * shell / preview iframe), so a Font Loading API check would be blind here.
+ * Instead we fetch the docroot marker that `build-release.sh` ships:
  *
- * Returns `true` (assume installed → do not nag) whenever the CSS Font Loading
- * API is unavailable (SSR, jsdom) so tests and server render never flag fonts.
+ * - Tier A base-only install → marker served with `complete: false` → not installed.
+ * - Tier A base + font pack   → pack overwrote the marker to `complete: true`.
+ * - Docker / production / dev → no marker file (front controller 404s) → treated
+ *   as installed, so a full build never nags.
+ *
+ * Any fetch/parse failure resolves to `true` (assume installed) so SSR, tests,
+ * and non-Tier-A installs never flag fonts.
  */
 export async function probeFontPackInstalled(): Promise<boolean> {
-  if (typeof document === 'undefined' || !('fonts' in document)) return true
+  if (typeof fetch === 'undefined' || typeof document === 'undefined') return true
   try {
-    // `document.fonts.load` fetches the matching @font-face; a missing woff2
-    // rejects → pack absent. A resolved load (with or without matched faces)
-    // means the file is reachable → pack present.
-    await document.fonts.load(`16px "${PACK_PROBE_FAMILY}"`)
+    const response = await fetch(new URL(FONT_PACK_MARKER, document.baseURI), {
+      headers: { Accept: 'application/json' },
+    })
+    if (!response.ok) return true
+    const data: unknown = await response.json()
+    if (data !== null && typeof data === 'object' && 'complete' in data) {
+      return (data as { complete?: unknown }).complete !== false
+    }
     return true
   } catch {
-    return false
+    return true
   }
 }
