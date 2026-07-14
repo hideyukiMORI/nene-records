@@ -20,16 +20,10 @@ final readonly class ListNotificationChannelsHandler
     {
         $output = $this->useCase->execute();
 
+        // config capability secrets are write-only on read (#845): the mapper
+        // strips them and exposes `has_<key>` flags instead.
         $items = array_map(
-            static fn (NotificationChannel $ch): array => [
-                'id'           => $ch->id,
-                'channel_type' => $ch->channelType,
-                'label'        => $ch->label,
-                'is_enabled'   => $ch->isEnabled,
-                'config'       => $ch->config,
-                'created_at'   => $ch->createdAt,
-                'updated_at'   => $ch->updatedAt,
-            ],
+            static fn (NotificationChannel $ch): array => NotificationChannelHttpMapper::toArray($ch),
             $output->items,
         );
 

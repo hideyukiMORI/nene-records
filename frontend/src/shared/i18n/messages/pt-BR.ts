@@ -1240,6 +1240,10 @@ export const ptBR: Partial<MessageCatalog> = {
   'admin.notifications.form.isEnabledLabel': 'Ativado',
   'admin.notifications.form.labelRequired': 'O rótulo é obrigatório.',
   'admin.notifications.form.fieldRequired': '{field} é obrigatório.',
+  'admin.notifications.form.secretHint':
+    'Armazenado como somente gravação e nunca exibido novamente após salvar.',
+  'admin.notifications.form.secretConfiguredHint':
+    'Um valor já está configurado. Deixe em branco para mantê-lo ou insira um novo valor para substituí-lo.',
 
   // ── Media library ───────────────────────────────────────────────────────
   'admin.nav.media': 'Mídia',

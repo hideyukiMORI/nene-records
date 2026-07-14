@@ -138,6 +138,102 @@ final class NotificationChannelHttpTest extends TestCase
         self::assertTrue($body['is_enabled']);
     }
 
+    public function testCreateRedactsSensitiveConfigButReportsPresence(): void
+    {
+        $response = $this->request('POST', '/api/v1/notification-channels', [
+            'channel_type' => 'slack',
+            'label'        => 'Slack Alerts',
+            'config'       => ['webhook_url' => 'https://hooks.slack.com/services/secret'],
+        ]);
+
+        self::assertSame(201, $response->getStatusCode());
+        $config = $this->json($response)['config'];
+        self::assertIsArray($config);
+        // Write-only (#845): the capability secret is never echoed on read.
+        self::assertArrayNotHasKey('webhook_url', $config);
+        self::assertTrue($config['has_webhook_url']);
+    }
+
+    public function testListNeverExposesSensitiveConfig(): void
+    {
+        $this->repository->create('slack', 'Slack', true, ['webhook_url' => 'https://hooks.slack.com/xxx']);
+        $this->repository->create('chatwork', 'ChatWork', true, ['api_token' => 'tok-123', 'room_id' => '42']);
+        $this->repository->create('webhook', 'Webhook', true, [
+            'url' => 'https://example.com/hook',
+            'headers_json' => '{"Authorization":"Bearer abc"}',
+        ]);
+        $this->repository->create('email', 'Email', true, ['to_address' => 'admin@example.com']);
+
+        $body = $this->json($this->request('GET', '/api/v1/notification-channels'));
+        self::assertCount(4, $body['items']);
+
+        [$slack, $chatwork, $webhook, $email] = $body['items'];
+
+        self::assertArrayNotHasKey('webhook_url', $slack['config']);
+        self::assertTrue($slack['config']['has_webhook_url']);
+
+        // Non-sensitive keys survive; only the token is redacted.
+        self::assertArrayNotHasKey('api_token', $chatwork['config']);
+        self::assertTrue($chatwork['config']['has_api_token']);
+        self::assertSame('42', $chatwork['config']['room_id']);
+
+        self::assertArrayNotHasKey('url', $webhook['config']);
+        self::assertArrayNotHasKey('headers_json', $webhook['config']);
+        self::assertTrue($webhook['config']['has_url']);
+        self::assertTrue($webhook['config']['has_headers_json']);
+
+        // Email has no capability secret: to_address stays visible.
+        self::assertSame('admin@example.com', $email['config']['to_address']);
+    }
+
+    public function testUpdateWithoutSecretKeepsStoredSecret(): void
+    {
+        $created = $this->repository->create('slack', 'Slack', true, ['webhook_url' => 'https://hooks.slack.com/keep']);
+
+        $response = $this->request('PATCH', "/api/v1/notification-channels/{$created->id}", [
+            'label'  => 'Renamed',
+            'config' => [], // secret omitted → must be preserved
+        ]);
+
+        self::assertSame(200, $response->getStatusCode());
+        $updated = $this->repository->findById($created->id);
+        self::assertNotNull($updated);
+        self::assertSame('Renamed', $updated->label);
+        self::assertSame('https://hooks.slack.com/keep', $updated->config['webhook_url']);
+    }
+
+    public function testUpdateWithSecretReplacesStoredSecret(): void
+    {
+        $created = $this->repository->create('slack', 'Slack', true, ['webhook_url' => 'https://hooks.slack.com/old']);
+
+        $response = $this->request('PATCH', "/api/v1/notification-channels/{$created->id}", [
+            'label'  => 'Slack',
+            'config' => ['webhook_url' => 'https://hooks.slack.com/new'],
+        ]);
+
+        self::assertSame(200, $response->getStatusCode());
+        $updated = $this->repository->findById($created->id);
+        self::assertNotNull($updated);
+        self::assertSame('https://hooks.slack.com/new', $updated->config['webhook_url']);
+    }
+
+    public function testUpdateIgnoresEchoedHasFlag(): void
+    {
+        $created = $this->repository->create('slack', 'Slack', true, ['webhook_url' => 'https://hooks.slack.com/keep']);
+
+        // Client echoes the read shape back (has_webhook_url, no secret).
+        $this->request('PATCH', "/api/v1/notification-channels/{$created->id}", [
+            'label'  => 'Slack',
+            'config' => ['has_webhook_url' => true],
+        ]);
+
+        $updated = $this->repository->findById($created->id);
+        self::assertNotNull($updated);
+        // The mirror flag is not stored; the real secret is kept.
+        self::assertArrayNotHasKey('has_webhook_url', $updated->config);
+        self::assertSame('https://hooks.slack.com/keep', $updated->config['webhook_url']);
+    }
+
     public function testCreateWithoutChannelTypeReturns422(): void
     {
         $response = $this->request('POST', '/api/v1/notification-channels', [

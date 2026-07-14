@@ -1228,6 +1228,9 @@ export const ja: Partial<MessageCatalog> = {
   'admin.notifications.form.isEnabledLabel': '有効',
   'admin.notifications.form.labelRequired': 'ラベルは必須です。',
   'admin.notifications.form.fieldRequired': '{field} は必須です。',
+  'admin.notifications.form.secretHint': '書き込み専用で保存され、保存後は再表示されません。',
+  'admin.notifications.form.secretConfiguredHint':
+    '値は設定済みです。空欄のままにすると保持し、新しい値を入力すると置き換えます。',
 
   // ── Media library ───────────────────────────────────────────────────────
   'admin.nav.media': 'メディア',

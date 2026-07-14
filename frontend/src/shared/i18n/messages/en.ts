@@ -1228,6 +1228,9 @@ export const en = {
   'admin.notifications.form.isEnabledLabel': 'Enabled',
   'admin.notifications.form.labelRequired': 'Label is required.',
   'admin.notifications.form.fieldRequired': '{field} is required.',
+  'admin.notifications.form.secretHint': 'Stored write-only and never shown again after saving.',
+  'admin.notifications.form.secretConfiguredHint':
+    'A value is already configured. Leave blank to keep it, or enter a new value to replace it.',
 
   // ── Media library ───────────────────────────────────────────────────────
   'admin.nav.media': 'Media',

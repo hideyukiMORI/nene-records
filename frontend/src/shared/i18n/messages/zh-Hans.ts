@@ -1183,6 +1183,8 @@ export const zhHans: Partial<MessageCatalog> = {
   'admin.notifications.form.isEnabledLabel': '已启用',
   'admin.notifications.form.labelRequired': '标签为必填项。',
   'admin.notifications.form.fieldRequired': '{field} 为必填项。',
+  'admin.notifications.form.secretHint': '以只写方式存储，保存后不再显示。',
+  'admin.notifications.form.secretConfiguredHint': '已配置该值。留空以保留，或输入新值以替换。',
 
   // ── Media library ───────────────────────────────────────────────────────
   'admin.nav.media': '媒体',

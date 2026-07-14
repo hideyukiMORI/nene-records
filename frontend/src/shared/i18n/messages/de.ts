@@ -1220,6 +1220,10 @@ export const de: Partial<MessageCatalog> = {
   'admin.notifications.form.isEnabledLabel': 'Aktiviert',
   'admin.notifications.form.labelRequired': 'Die Beschriftung ist erforderlich.',
   'admin.notifications.form.fieldRequired': '{field} ist erforderlich.',
+  'admin.notifications.form.secretHint':
+    'Wird schreibgeschützt gespeichert und nach dem Speichern nicht mehr angezeigt.',
+  'admin.notifications.form.secretConfiguredHint':
+    'Es ist bereits ein Wert konfiguriert. Leer lassen, um ihn beizubehalten, oder einen neuen Wert eingeben, um ihn zu ersetzen.',
   // ── Media library ───────────────────────────────────────────────────────
   'admin.nav.media': 'Medien',
   'admin.media.pageTitle': 'Medienbibliothek',

@@ -17,6 +17,15 @@ final readonly class UpdateNotificationChannelUseCase implements UpdateNotificat
             throw new NotificationChannelNotFoundException($input->id);
         }
 
-        $this->channels->update($input->id, $input->label, $input->isEnabled, $input->config);
+        // Write-only capability secrets (#845): an omitted sensitive config key
+        // keeps its stored value so the write-only read contract does not wipe
+        // the secret on an unrelated edit; a provided one replaces it.
+        $config = NotificationChannelHttpMapper::mergeConfigForUpdate(
+            $channel->channelType,
+            $channel->config,
+            $input->config,
+        );
+
+        $this->channels->update($input->id, $input->label, $input->isEnabled, $config);
     }
 }

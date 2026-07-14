@@ -27,13 +27,17 @@ type NotificationChannelFormProps =
       onCancel: () => void
     }
 
-function getConfigFields(channelType: NotificationChannelType): Array<{
+interface ConfigField {
   key: string
   label: string
   placeholder: string
   required: boolean
   multiline?: boolean
-}> {
+  /** Capability secret: write-only — never prefilled, blank keeps the stored value (#845). */
+  sensitive?: boolean
+}
+
+function getConfigFields(channelType: NotificationChannelType): ConfigField[] {
   switch (channelType) {
     case 'email':
       return [
@@ -51,6 +55,7 @@ function getConfigFields(channelType: NotificationChannelType): Array<{
           label: 'Webhook URL',
           placeholder: 'https://hooks.slack.com/services/...',
           required: true,
+          sensitive: true,
         },
       ]
     case 'discord':
@@ -60,11 +65,18 @@ function getConfigFields(channelType: NotificationChannelType): Array<{
           label: 'Webhook URL',
           placeholder: 'https://discord.com/api/webhooks/...',
           required: true,
+          sensitive: true,
         },
       ]
     case 'chatwork':
       return [
-        { key: 'api_token', label: 'API token', placeholder: 'ChatWork API token', required: true },
+        {
+          key: 'api_token',
+          label: 'API token',
+          placeholder: 'ChatWork API token',
+          required: true,
+          sensitive: true,
+        },
         { key: 'room_id', label: 'Room ID', placeholder: '123456', required: true },
       ]
     case 'webhook':
@@ -74,6 +86,7 @@ function getConfigFields(channelType: NotificationChannelType): Array<{
           label: 'Endpoint URL',
           placeholder: 'https://example.com/hook',
           required: true,
+          sensitive: true,
         },
         {
           key: 'headers_json',
@@ -81,6 +94,7 @@ function getConfigFields(channelType: NotificationChannelType): Array<{
           placeholder: '{"X-Token": "secret"}',
           required: false,
           multiline: true,
+          sensitive: true,
         },
       ]
   }
@@ -106,17 +120,27 @@ export function NotificationChannelForm({
   const [config, setConfig] = useState<Record<string, string>>(() => {
     if (defaultValues?.config == null) return {}
     return Object.fromEntries(
-      Object.entries(defaultValues.config).map(([k, v]) => [
-        k,
-        typeof v === 'string'
-          ? v
-          : typeof v === 'number' || typeof v === 'boolean'
-            ? String(v)
-            : '',
-      ]),
+      Object.entries(defaultValues.config)
+        // Capability secrets are write-only: the read payload never carries
+        // their values, only `has_<key>` flags — never prefill either (#845).
+        .filter(([k]) => !k.startsWith('has_'))
+        .map(([k, v]) => [
+          k,
+          typeof v === 'string'
+            ? v
+            : typeof v === 'number' || typeof v === 'boolean'
+              ? String(v)
+              : '',
+        ]),
     )
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
+
+  // Whether a capability secret is already stored (from the read `has_<key>`
+  // flag). A configured secret may be left blank on edit to keep it.
+  function isSecretConfigured(key: string): boolean {
+    return defaultValues?.config[`has_${key}`] === true
+  }
 
   function setConfigField(key: string, value: string) {
     setConfig((prev) => ({ ...prev, [key]: value }))
@@ -128,6 +152,8 @@ export function NotificationChannelForm({
       next['label'] = t('admin.notifications.form.labelRequired')
     }
     for (const field of getConfigFields(channelType)) {
+      // A configured write-only secret may be left blank to keep the stored one.
+      if (field.sensitive === true && isSecretConfigured(field.key)) continue
       if (field.required && !config[field.key]?.trim()) {
         next[field.key] = t('admin.notifications.form.fieldRequired', { field: field.label })
       }
@@ -235,7 +261,8 @@ export function NotificationChannelForm({
               />
             ) : (
               <input
-                type={field.key === 'api_token' ? 'password' : 'text'}
+                type={field.sensitive === true ? 'password' : 'text'}
+                autoComplete={field.sensitive === true ? 'new-password' : undefined}
                 value={config[field.key] ?? ''}
                 onChange={(e) => {
                   setConfigField(field.key, e.target.value)
@@ -243,6 +270,13 @@ export function NotificationChannelForm({
                 placeholder={field.placeholder}
                 className="w-full rounded-md border border-border bg-surface px-3 py-2 font-sans text-sm text-text placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent"
               />
+            )}
+            {field.sensitive === true && (
+              <p className="mt-1 font-sans text-xs text-text-muted">
+                {isSecretConfigured(field.key)
+                  ? t('admin.notifications.form.secretConfiguredHint')
+                  : t('admin.notifications.form.secretHint')}
+              </p>
             )}
             {errors[field.key] !== undefined && (
               <p className="mt-1 font-sans text-xs text-danger">{errors[field.key]}</p>
