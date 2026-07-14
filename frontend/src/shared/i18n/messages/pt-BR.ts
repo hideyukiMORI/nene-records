@@ -107,6 +107,9 @@ export const ptBR: Partial<MessageCatalog> = {
   'admin.themeCustomize.fontDisplay': 'Fonte de títulos',
   'admin.themeCustomize.fontMono': 'Fonte monoespaçada',
   'admin.themeCustomize.fontBrand': 'Fonte do título do site',
+  'admin.themeCustomize.fontPackRequired': 'pacote de fontes',
+  'admin.themeCustomize.fontPackHint':
+    'Algumas fontes ainda não estão instaladas. Envie o ZIP do pacote de fontes para habilitar todas as opções.',
   'admin.themeCustomize.brandSize': 'Tamanho do título do site',
   'admin.themeCustomize.menuSize': 'Tamanho da fonte do menu',
   'admin.themeCustomize.width': 'Largura do conteúdo',

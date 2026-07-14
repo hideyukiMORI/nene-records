@@ -106,6 +106,8 @@ export const zhHans: Partial<MessageCatalog> = {
   'admin.themeCustomize.fontDisplay': '标题字体',
   'admin.themeCustomize.fontMono': '等宽字体',
   'admin.themeCustomize.fontBrand': '站点标题字体',
+  'admin.themeCustomize.fontPackRequired': '字体包',
+  'admin.themeCustomize.fontPackHint': '部分字体尚未安装。上传字体包 ZIP 即可启用全部选项。',
   'admin.themeCustomize.brandSize': '站点标题字号',
   'admin.themeCustomize.menuSize': '菜单字号',
   'admin.themeCustomize.width': '内容宽度',

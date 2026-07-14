@@ -113,6 +113,9 @@ export const en = {
   'admin.themeCustomize.fontDisplay': 'Display font',
   'admin.themeCustomize.fontMono': 'Mono font',
   'admin.themeCustomize.fontBrand': 'Site title font',
+  'admin.themeCustomize.fontPackRequired': 'font pack',
+  'admin.themeCustomize.fontPackHint':
+    'Some fonts are not installed yet. Upload the font pack ZIP to enable every option.',
   'admin.themeCustomize.brandSize': 'Site title size',
   'admin.themeCustomize.menuSize': 'Menu font size',
   'admin.themeCustomize.width': 'Content width',

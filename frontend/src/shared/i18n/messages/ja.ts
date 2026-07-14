@@ -106,6 +106,9 @@ export const ja: Partial<MessageCatalog> = {
   'admin.themeCustomize.fontDisplay': '見出しフォント',
   'admin.themeCustomize.fontMono': 'モノスペースフォント',
   'admin.themeCustomize.fontBrand': 'サイトタイトルのフォント',
+  'admin.themeCustomize.fontPackRequired': 'フォントパック',
+  'admin.themeCustomize.fontPackHint':
+    '一部のフォントは未導入です。フォントパック ZIP をアップロードすると全ての選択肢が使えます。',
   'admin.themeCustomize.brandSize': 'サイトタイトルのサイズ',
   'admin.themeCustomize.menuSize': 'メニューの文字サイズ',
   'admin.themeCustomize.width': 'コンテンツ幅',
