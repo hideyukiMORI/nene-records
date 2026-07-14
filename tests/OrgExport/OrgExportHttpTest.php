@@ -239,6 +239,36 @@ final class StubOrgExportRepository implements OrgExportRepositoryInterface
     {
         return [];
     }
+
+    /** @return list<array<string, mixed>> */
+    public function findAllComments(int $orgId): array
+    {
+        return [];
+    }
+
+    /** @return list<array<string, mixed>> */
+    public function findAllWebhooks(int $orgId): array
+    {
+        return [];
+    }
+
+    /** @return list<array<string, mixed>> */
+    public function findAllWebhookDeliveries(int $orgId): array
+    {
+        return [];
+    }
+
+    /** @return list<array<string, mixed>> */
+    public function findAllNotificationChannels(int $orgId): array
+    {
+        return [];
+    }
+
+    /** @return list<array<string, mixed>> */
+    public function findAllUserProfiles(int $orgId): array
+    {
+        return [];
+    }
 }
 
 final class RecordingOrgImportRepository implements OrgImportRepositoryInterface

@@ -65,4 +65,35 @@ interface OrgExportRepositoryInterface
 
     /** @return list<array<string, mixed>> */
     public function findAllUrlRedirects(int $orgId): array;
+
+    /** @return list<array<string, mixed>> */
+    public function findAllComments(int $orgId): array;
+
+    /**
+     * Webhook config rows. The HMAC signing `secret` column is intentionally
+     * omitted from the payload — it is re-provisioned on the target (#836).
+     *
+     * @return list<array<string, mixed>>
+     */
+    public function findAllWebhooks(int $orgId): array;
+
+    /**
+     * Webhook delivery-queue rows, scoped through the parent webhook. The
+     * per-delivery `secret` snapshot is omitted (see findAllWebhooks).
+     *
+     * @return list<array<string, mixed>>
+     */
+    public function findAllWebhookDeliveries(int $orgId): array;
+
+    /** @return list<array<string, mixed>> */
+    public function findAllNotificationChannels(int $orgId): array;
+
+    /**
+     * User profiles, scoped through the owning user. Each row carries the
+     * owner's `user_email` so the target can re-attach it to a same-email user
+     * (users themselves are never exported — see PdoOrgImportRepository).
+     *
+     * @return list<array<string, mixed>>
+     */
+    public function findAllUserProfiles(int $orgId): array;
 }

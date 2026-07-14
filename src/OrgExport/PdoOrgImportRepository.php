@@ -575,6 +575,184 @@ final readonly class PdoOrgImportRepository implements OrgImportRepositoryInterf
         }
         $counts['setting_values'] = $settingValueCount;
 
+        // ── comments (append; entity_id remapped) (#625/#796) ──────────────
+        // comments has no user reference — only author_name/author_email are held,
+        // so nothing to scrub. Rows whose entity is missing on the target are skipped.
+        $commentCount = 0;
+        foreach ((array) ($payload['comments'] ?? []) as $row) {
+            $newEntityId = $entityMap[(int) $row['entity_id']] ?? null;
+            if ($newEntityId === null) {
+                continue;
+            }
+            $now = $this->clock->now()->format('Y-m-d H:i:s');
+            $query->insert(
+                'INSERT INTO comments
+                    (organization_id, entity_id, author_name, author_email, body, is_approved, created_at)
+                 VALUES (?, ?, ?, ?, ?, ?, ?)',
+                [
+                    $targetOrgId,
+                    $newEntityId,
+                    (string) $row['author_name'],
+                    (string) $row['author_email'],
+                    (string) $row['body'],
+                    (int) ($row['is_approved'] ?? 0),
+                    (string) ($row['created_at'] ?? $now),
+                ],
+            );
+            $commentCount++;
+        }
+        $counts['comments'] = $commentCount;
+
+        // ── webhooks (append; entity_type_id remapped, secret re-provisioned) (#285/#796) ─
+        // The HMAC `secret` is never transported — it is inserted NULL so the operator
+        // regenerates it on the target (#836 write-only). webhookMap feeds deliveries below.
+        /** @var array<int, int> $webhookMap  old_id → new_id */
+        $webhookMap  = [];
+        $webhookCount = 0;
+        foreach ((array) ($payload['webhooks'] ?? []) as $row) {
+            $oldId = (int) $row['id'];
+            $now   = $this->clock->now()->format('Y-m-d H:i:s');
+            $newEntityTypeId = isset($row['entity_type_id'])
+                ? ($entityTypeMap[(int) $row['entity_type_id']] ?? null)
+                : null;
+            $newId = $query->insert(
+                'INSERT INTO webhooks
+                    (organization_id, url, events, entity_type_id, secret, is_active, created_at, updated_at)
+                 VALUES (?, ?, ?, ?, NULL, ?, ?, ?)',
+                [
+                    $targetOrgId,
+                    (string) $row['url'],
+                    (string) $row['events'],
+                    $newEntityTypeId,
+                    (int) ($row['is_active'] ?? 1),
+                    (string) ($row['created_at'] ?? $now),
+                    (string) ($row['updated_at'] ?? $now),
+                ],
+            );
+            $webhookMap[$oldId] = $newId;
+            $webhookCount++;
+        }
+        $counts['webhooks'] = $webhookCount;
+
+        // ── webhook_deliveries (append; webhook_id/entity/entity_type remapped) (#285/#796) ─
+        // The delivery-queue snapshot rides along so in-flight/failed history survives a move.
+        // secret is NULL (re-provisioned like webhooks). Rows whose parent webhook or
+        // referenced entity/entity_type is missing on the target are skipped (all NOT NULL).
+        $deliveryCount = 0;
+        foreach ((array) ($payload['webhook_deliveries'] ?? []) as $row) {
+            $newWebhookId    = $webhookMap[(int) $row['webhook_id']] ?? null;
+            $newEntityTypeId = $entityTypeMap[(int) $row['entity_type_id']] ?? null;
+            $newEntityId     = $entityMap[(int) $row['entity_id']] ?? null;
+            if ($newWebhookId === null || $newEntityTypeId === null || $newEntityId === null) {
+                continue;
+            }
+            $now = $this->clock->now()->format('Y-m-d H:i:s');
+            $query->insert(
+                'INSERT INTO webhook_deliveries
+                    (webhook_id, event, entity_type_id, entity_id, target_url, secret, payload, status,
+                     attempts, max_attempts, next_attempt_at, last_error, response_status,
+                     created_at, updated_at, delivered_at)
+                 VALUES (?, ?, ?, ?, ?, NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                [
+                    $newWebhookId,
+                    (string) $row['event'],
+                    $newEntityTypeId,
+                    $newEntityId,
+                    (string) $row['target_url'],
+                    (string) $row['payload'],
+                    (string) ($row['status'] ?? 'pending'),
+                    (int) ($row['attempts'] ?? 0),
+                    (int) ($row['max_attempts'] ?? 5),
+                    (string) ($row['next_attempt_at'] ?? $now),
+                    isset($row['last_error']) ? (string) $row['last_error'] : null,
+                    isset($row['response_status']) ? (int) $row['response_status'] : null,
+                    (string) ($row['created_at'] ?? $now),
+                    (string) ($row['updated_at'] ?? $now),
+                    isset($row['delivered_at']) ? (string) $row['delivered_at'] : null,
+                ],
+            );
+            $deliveryCount++;
+        }
+        $counts['webhook_deliveries'] = $deliveryCount;
+
+        // ── notification_channels (append; org stamped) (#796) ─────────────
+        // config_json is the owner's own destination config (Slack/Discord/webhook URLs)
+        // and is transported verbatim so notifications keep working on the target.
+        $channelCount = 0;
+        foreach ((array) ($payload['notification_channels'] ?? []) as $row) {
+            $now = $this->clock->now()->format('Y-m-d H:i:s');
+            $query->insert(
+                'INSERT INTO notification_channels
+                    (organization_id, channel_type, label, is_enabled, config_json, created_at, updated_at)
+                 VALUES (?, ?, ?, ?, ?, ?, ?)',
+                [
+                    $targetOrgId,
+                    (string) $row['channel_type'],
+                    (string) $row['label'],
+                    (int) ($row['is_enabled'] ?? 1),
+                    (string) $row['config_json'],
+                    (string) ($row['created_at'] ?? $now),
+                    (string) ($row['updated_at'] ?? $now),
+                ],
+            );
+            $channelCount++;
+        }
+        $counts['notification_channels'] = $channelCount;
+
+        // ── user_profiles (re-attach by email; users are never exported) (#704/#796) ─
+        // Users carry password hashes + roles, so they are not transported. A profile is
+        // re-attached only when the target org already has a user with the same email;
+        // otherwise it is skipped and reported (user_profiles_skipped). user_id is UNIQUE,
+        // so an existing profile for that user is updated rather than duplicated.
+        $profileCount   = 0;
+        $profileSkipped = 0;
+        foreach ((array) ($payload['user_profiles'] ?? []) as $row) {
+            $email = isset($row['user_email']) ? (string) $row['user_email'] : '';
+            if ($email === '') {
+                $profileSkipped++;
+                continue;
+            }
+            $user = $query->fetchOne(
+                'SELECT id FROM users WHERE email = ? AND organization_id = ?',
+                [$email, $targetOrgId],
+            );
+            if ($user === null) {
+                $profileSkipped++;
+                continue;
+            }
+            $newUserId = (int) $user['id'];
+            $now       = $this->clock->now()->format('Y-m-d H:i:s');
+            $existing  = $query->fetchOne('SELECT id FROM user_profiles WHERE user_id = ?', [$newUserId]);
+            if ($existing !== null) {
+                $query->execute(
+                    'UPDATE user_profiles SET display_name = ?, full_name = ?, job_title = ?, updated_at = ? WHERE id = ?',
+                    [
+                        isset($row['display_name']) ? (string) $row['display_name'] : null,
+                        isset($row['full_name']) ? (string) $row['full_name'] : null,
+                        isset($row['job_title']) ? (string) $row['job_title'] : null,
+                        $now,
+                        (int) $existing['id'],
+                    ],
+                );
+            } else {
+                $query->insert(
+                    'INSERT INTO user_profiles (user_id, display_name, full_name, job_title, created_at, updated_at)
+                     VALUES (?, ?, ?, ?, ?, ?)',
+                    [
+                        $newUserId,
+                        isset($row['display_name']) ? (string) $row['display_name'] : null,
+                        isset($row['full_name']) ? (string) $row['full_name'] : null,
+                        isset($row['job_title']) ? (string) $row['job_title'] : null,
+                        (string) ($row['created_at'] ?? $now),
+                        (string) ($row['updated_at'] ?? $now),
+                    ],
+                );
+            }
+            $profileCount++;
+        }
+        $counts['user_profiles']         = $profileCount;
+        $counts['user_profiles_skipped'] = $profileSkipped;
+
         return $counts;
     }
 
