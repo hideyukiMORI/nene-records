@@ -9,6 +9,7 @@ import type { MessageKey } from './translate'
  * This mapping is for Admin UI error display — when you want a user-facing
  * localized description instead of the raw API title.
  */
+// [nene2-exemplar:problem-map] — fleet frontend-standards ER-2 problem→messageKey map exemplar (check:exemplars).
 export function mapProblemDetailsToMessageKey(error: AppError): MessageKey | null {
   switch (error.status) {
     case 401:
