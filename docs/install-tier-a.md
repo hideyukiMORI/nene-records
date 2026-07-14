@@ -65,12 +65,35 @@ cron を設定しない場合、即時公開・閲覧などの基本機能は動
 
 SaaS 側（例 `ayane.nene-records.com`）で制作したサイトを、この Tier A 設置へ丸ごと移す手順。
 コンテンツ（entity/フィールド/ブロック本文/リレーション）・タグ・ナビ/メニュー・ウィジェット・
-テーマ・設定（テーマ選択/レイアウト/フロントページ/カスタム permalink 等）・メディア DB 行・
-301 リダイレクトが移送対象。
+テーマ・設定（テーマ選択/レイアウト/フロントページ/カスタム permalink 等）・メディア（DB 行＋
+実ファイル）・301 リダイレクト・コメント・Webhook・通知チャンネル・ユーザプロフィールが移送対象。
 
-### 1. 移送元で JSON を書き出す
+### 推奨: zip 一括移送（DB＋メディア実ファイルを 1 ファイルで）（#798）
 
-SaaS 側の superadmin で org export API を叩き、JSON を 1 ファイルに保存する:
+`tools/export-org.php` は DB payload（`export.json`）とメディア原本（`var/media/` を
+`storage_key` の相対パスのまま同梱）を含む単一 zip を書き出す。`tools/import-org.php` が
+その zip を展開し、原本を `var/media/` へ配置してから DB 行を取り込むので、画像入りサイトが
+1 操作で移送先に表示される。派生画像（サムネイル等）は移送先で **オンデマンド再生成** される
+ため同梱しない（原本のみ）。**ローカルディスク保存（`MEDIA_STORAGE_DRIVER=local`）専用**。
+
+```
+# 1) 移送元で zip を書き出す（SSH シェルから）
+php tools/export-org.php --org=<id|slug> --out=org-export.zip
+#   docker: docker compose exec -T app php tools/export-org.php --org=aozora --out=/tmp/aozora.zip
+
+# 2) zip を移送先へ転送する（scp/rsync/FTP どれでも 1 ファイル）
+scp org-export.zip user@あなたのホスト:/path/to/app/
+
+# 3) 移送先で取り込む（DB 行＋メディア原本が同時に入る）
+php tools/import-org.php --file=org-export.zip --org=<id|slug>
+```
+
+### 代替: JSON export ＋ メディア実ファイル別送（rsync/FTP）
+
+zip が使えない場合（S3 ストレージ利用時・巨大メディアを個別転送したい場合など）は、従来どおり
+JSON export とメディアを別々に転送する。
+
+**1. 移送元で JSON を書き出す** — superadmin で org export API を叩く（media は DB 行のみ）:
 
 ```
 curl -fsS -H "Authorization: Bearer <superadmin-token>" \
@@ -78,33 +101,38 @@ curl -fsS -H "Authorization: Bearer <superadmin-token>" \
   -o org-export.json
 ```
 
-### 2. メディア実ファイルを転送する
-
-export JSON には media の **DB 行のみ** が入る。実ファイル（原本＋派生画像）は別送する。
-移送元の `var/media/` を、この設置の `var/media/` へ丸ごとコピーする（相対パス＝`storage_key`
-を保つこと。URL も相対で解決されるためブロック本文中の画像もそのまま表示される）:
+**2. メディア実ファイルを転送する** — 移送元の `var/media/` を、この設置の `var/media/` へ
+丸ごとコピーする（相対パス＝`storage_key` を保つこと。URL も相対で解決されるためブロック本文中の
+画像もそのまま表示される）:
 
 ```
 # SSH がある場合（HETEML 等）
 rsync -avz ./var/media/ user@あなたのホスト:/path/to/app/var/media/
 
 # FTP/SFTP しか無い場合: var/media/ 配下を同じ階層のままアップロード
-#   var/media/originals/... と var/media/derivatives/... を保持する
 ```
 
-### 3. この設置で JSON を取り込む（CLI）
-
-Tier A の installer は org admin しか作らず、export/import API は superadmin 専用のため、
-取り込みは同梱の CLI ツールで行う（SSH シェルから実行）:
+**3. この設置で JSON を取り込む（CLI）** — export/import API は superadmin 専用で Tier A の
+installer は org admin しか作らないため、取り込みは同梱の CLI ツールで行う:
 
 ```
 php tools/import-org.php --file=org-export.json --org=<id|slug>
 # 例: php tools/import-org.php --file=org-export.json --org=default
 ```
 
+### 取り込みの挙動（zip / JSON 共通）
+
 取り込みは 1 トランザクションで走り、失敗時は org 無傷（部分取り込みなし）。設置時に
 シード済みのコンテンツタイプ（posts/pages）・設定定義は **マージ**される（重複しない・
 移送元の値で更新）。取り込み後、公開ページの見た目と URL が移送元と一致することを確認する。
+
+- **Webhook の secret は移送されない**（移送先で再設定する。`webhooks` / `webhook_deliveries`
+  の secret はエクスポートに含めない）。
+- **ユーザ本体（パスワードハッシュ・ロール）は移送されない**。`user_profiles` は移送先に
+  同一 email のユーザが居れば再アタッチ、居なければ skip し件数を報告する。
+- **S3 ストレージ（`MEDIA_STORAGE_DRIVER=s3`）では zip 移送は使えない**（原本がバケットにあり
+  `var/media/` に無いため、export/import 双方が明示エラーで停止する）。バケットを別途複製し、
+  JSON export を使うこと。
 
 > **注意（現行の制限）**: ブロック本文や一部設定（`home_hero` / `footer_config` 等）の JSON に
 > 埋め込まれた **media URL・entity 参照は書き換えられない**（`logo_media_id` と

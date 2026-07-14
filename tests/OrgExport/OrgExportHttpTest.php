@@ -10,6 +10,7 @@ use Nene2\Http\RuntimeApplicationFactory;
 use NeNeRecords\Organization\Organization;
 use NeNeRecords\OrgExport\ExportOrganizationHandler;
 use NeNeRecords\OrgExport\ImportOrganizationHandler;
+use NeNeRecords\OrgExport\OrgExportPayloadBuilder;
 use NeNeRecords\OrgExport\OrgExportRepositoryInterface;
 use NeNeRecords\OrgExport\OrgExportRouteRegistrar;
 use NeNeRecords\OrgExport\OrgImportRepositoryInterface;
@@ -46,7 +47,7 @@ final class OrgExportHttpTest extends TestCase
         $problemDetails = new ProblemDetailsResponseFactory($this->factory, $this->factory);
 
         $registrar = new OrgExportRouteRegistrar(
-            new ExportOrganizationHandler($exportRepository, $this->orgs, $jsonResponse, $problemDetails, new FixedClock()),
+            new ExportOrganizationHandler(new OrgExportPayloadBuilder($exportRepository, new FixedClock()), $this->orgs, $jsonResponse, $problemDetails),
             new ImportOrganizationHandler($this->importRepository, $this->orgs, $jsonResponse, $problemDetails),
         );
 
