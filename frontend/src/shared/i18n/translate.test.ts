@@ -21,7 +21,7 @@ describe('translate', () => {
 
     it('falls back to English for keys absent from ja', () => {
       // Temporarily verify a key that is NOT in ja
-      const jaWithoutKey: typeof ja = { ...ja }
+      const jaWithoutKey: Partial<typeof ja> = { ...ja }
       delete jaWithoutKey['admin.nav.home']
       expect(translate(jaWithoutKey, 'admin.nav.home')).toBe('Home')
     })

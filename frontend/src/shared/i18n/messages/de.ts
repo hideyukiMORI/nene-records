@@ -1,7 +1,7 @@
 import type { MessageCatalog } from './en'
 
 /** German — complete CMS admin & public-site catalog. Missing keys fall back to English. */
-export const de: Partial<MessageCatalog> = {
+export const de = {
   // ── Common ──────────────────────────────────────────────────────────────
   'common.actions.edit': 'Bearbeiten',
   'common.actions.delete': 'Löschen',
@@ -1544,4 +1544,4 @@ export const de: Partial<MessageCatalog> = {
   // ── Misc (#728) ───────────────────────────────────────────────────────────
   'common.tableOfContents': 'Inhaltsverzeichnis',
   'admin.entityRecords.breadcrumbLabel': 'Brotkrümelnavigation',
-}
+} satisfies Record<keyof MessageCatalog, string>
