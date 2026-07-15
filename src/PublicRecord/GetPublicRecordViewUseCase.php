@@ -205,6 +205,11 @@ final readonly class GetPublicRecordViewUseCase implements GetPublicRecordViewUs
         // ordinary `/{type}/{slug}` records; populated for custom-permalink pages.
         $hierarchy = $this->hierarchyBuilder->build($entity->permalink, $canonicalPath, $pageTitle);
         $bootstrap['hierarchy'] = $hierarchy->toArray();
+        // The path the SPA will look this record up by. Without it the SPA re-asks
+        // /public/records/resolve for a page it was just handed, and renders the site
+        // shell ("Loading…") meanwhile — which flashes the standard layout over a
+        // `bare` page (#881). The server already knows the answer; ship it.
+        $bootstrap['canonicalPath'] = $canonicalPath;
 
         $ogImagePath = $this->resolveOgImagePath($displayFields);
 

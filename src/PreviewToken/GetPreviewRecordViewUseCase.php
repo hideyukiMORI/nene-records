@@ -202,6 +202,8 @@ final readonly class GetPreviewRecordViewUseCase implements GetPreviewRecordView
         // breadcrumb + child-list it will have once published (#651 PR2).
         $hierarchy = $this->hierarchyBuilder->build($entity->permalink, $canonicalPath, $pageTitle);
         $bootstrap['hierarchy'] = $hierarchy->toArray();
+        // Same seed the public page ships, so a preview mounts without the shell flash (#881).
+        $bootstrap['canonicalPath'] = $canonicalPath;
 
         $ogImagePath = null;
         foreach ($displayFields as $field) {

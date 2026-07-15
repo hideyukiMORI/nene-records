@@ -35,6 +35,8 @@ export interface PublicRecordBootstrapDto {
   relationTextFieldsByEntityTypeId: Record<string, PublicRecordBootstrapFieldListDto>
   publicSettings?: PublicSettingListDto
   hierarchy?: PublicRecordHierarchyDto
+  /** The path the SPA resolves this record by — lets us seed the resolve query (#881). */
+  canonicalPath?: string
 }
 
 export function readPublicRecordBootstrap(): PublicRecordBootstrapDto | null {
