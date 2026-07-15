@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useTranslation } from '@/shared/i18n'
 import { IconArrow, IconArrowUpRight, IconInbox } from '@/shared/ui/icons/magazine-icons'
+import { LoadingFeatured } from '@/shared/ui/loading'
 import type { HomeFeedItem, HomeTypeItem } from '../hooks/use-public-home-page'
 import heroUrl from './assets/hero.png'
 
@@ -198,7 +199,7 @@ export function PublicHomeBody({
         {isError ? (
           <FeedError title={errorTitle} onRetry={onRetry} />
         ) : isLoading ? (
-          <p className="meta">{t('public.home.latest.loading')}</p>
+          <LoadingFeatured count={3} />
         ) : featured === null ? (
           <EmptyFeed />
         ) : (

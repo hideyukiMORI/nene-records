@@ -36,6 +36,7 @@ import { InlineTableOfContents } from '@/shared/ui/markdown'
 import { useEntityIdBySlug } from './hooks/use-entity-id-by-slug'
 import { PublicSiteShell } from './PublicSiteShell'
 import { usePublicSite, type PublicSite } from './public-site-context'
+import { RouteProgress } from './RouteProgress'
 
 // ── Presentation helpers ──────────────────────────────────────────────────────
 
@@ -528,8 +529,8 @@ function PublicRecordDetailBySlug({
   if (isLoading) {
     // Same reason as the permalink resolver above (#885): the record's layout is not
     // known yet, so painting the themed shell here would flash chrome over a `bare`
-    // page. Render nothing until we know what this page is.
-    return null
+    // page. The body stays blank; only the layout-independent bar floats over it (#894).
+    return <RouteProgress theme={site.activeTheme} />
   }
   if (isError || entityId === null) {
     return (
@@ -632,13 +633,15 @@ export function PublicRecordByPermalink({
   )
 
   if (resolution.isLoading || entityTypeQuery.isLoading) {
-    // Render nothing rather than the themed shell: until this resolves we do not know
+    // Render no *page* rather than the themed shell: until this resolves we do not know
     // the record's layout, and guessing "standard" paints a header/footer/theme over
     // what may be a `bare` page — then rips it away (#885). On a full load the SSR
     // markup is already on screen and React keeps it until the first commit; on a
     // client-side navigation this is a brief blank instead of a wrong layout. A wrong
     // layout reads as a broken site; a blank reads as loading.
-    return null
+    // The blank stays; RouteProgress only floats a viewport-anchored bar + dots over
+    // it, which assume neither chrome nor column count (#894).
+    return <RouteProgress theme={site.activeTheme} />
   }
 
   const data = resolution.data
@@ -751,14 +754,12 @@ export function PublicRecordDetailPage() {
   )
 
   if (entityTypeQuery.isLoading) {
-    return (
-      <RecordShellMessage
-        site={site}
-        entityTypeSlug={entityTypeSlug}
-        title="Loading…"
-        description="Fetching this record."
-      />
-    )
+    // Was the themed shell + "Loading… / Fetching this record." — which is the very
+    // thing the two resolvers above refuse to do: the type is unresolved, so the
+    // layout is unknown, so `standard` chrome here flashes over `bare` pages (#894).
+    // (It was also the only public string hardcoded in English, and it offered a
+    // "Back to latest" button while merely loading.)
+    return <RouteProgress theme={site.activeTheme} />
   }
 
   if (entityType === undefined) {

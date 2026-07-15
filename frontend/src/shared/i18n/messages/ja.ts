@@ -422,7 +422,6 @@ export const ja = {
   'widgets.calendar.weekday.sat': '土',
   'public.dateArchive.dayTitle': 'アーカイブ: {{year}}年{{month}}月{{day}}日',
   'public.dateArchive.monthTitle': 'アーカイブ: {{year}}年{{month}}月',
-  'public.dateArchive.loading': '読み込み中…',
   'public.landing.heading': 'NeNe Records で、あなたのサイトを。',
   'public.landing.subheading':
     'AI ネイティブな CMS。設定なしで、柔軟で型付きのコンテンツサイトを数秒で。',
@@ -444,7 +443,6 @@ export const ja = {
   'public.search.inputLabel': '記事を検索',
   'public.search.submit': '検索',
   'public.search.prompt': 'キーワードを入力し Enter で公開記事を検索します。',
-  'public.search.loading': '検索中…',
   'public.search.error.title': '検索できませんでした',
   'public.search.resultCount.one': '「{{query}}」の結果 {{count}} 件',
   'public.search.resultCount.other': '「{{query}}」の結果 {{count}} 件',
@@ -452,7 +450,6 @@ export const ja = {
   'public.search.empty.description':
     '検索に一致する公開記事はありません。別の語句を試すか、種類から探してください。',
   'public.tagArchive.title': 'タグ: {{tag}}',
-  'public.tagArchive.loading': '読み込み中…',
   'public.tagArchive.subCount.one': '「{{tag}}」が付いた記事 {{count}} 件',
   'public.tagArchive.subCount.other': '「{{tag}}」が付いた記事 {{count}} 件',
   'public.tagArchive.error.title': 'このタグを読み込めませんでした',
@@ -469,7 +466,6 @@ export const ja = {
   'public.browse.viewToggle.label': '表示',
   'public.browse.viewToggle.list': 'リスト表示',
   'public.browse.viewToggle.grid': 'グリッド表示',
-  'public.browse.loading': '読み込み中…',
   'public.browse.error.title': '記事を読み込めませんでした',
   'public.browse.unknownType.title': 'エンティティ種別が見つかりません',
   'public.browse.unknownType.description': '「{{slug}}」の公開コンテンツが見つかりません。',
@@ -492,7 +488,6 @@ export const ja = {
   'public.home.hero.artTag': '型付き · 可読 · エージェント対応',
   'public.home.latest.eyebrow': '新着順',
   'public.home.latest.title': '最新の記事',
-  'public.home.latest.loading': '最新の記事を読み込み中…',
   'public.home.empty.title': '公開済みの記事はまだありません',
   'public.home.empty.description':
     '記事が公開されると、新着順にここへ表示されます。下書きと予約記事は公開時刻を過ぎるまで表示されません。',

@@ -426,7 +426,6 @@ export const fr = {
   'widgets.calendar.weekday.sat': 'Sa',
   'public.dateArchive.dayTitle': 'Archive : {{day}}/{{month}}/{{year}}',
   'public.dateArchive.monthTitle': 'Archive : {{month}}/{{year}}',
-  'public.dateArchive.loading': 'Chargement…',
   'public.landing.heading': 'Créez votre site avec NeNe Records',
   'public.landing.subheading':
     'Un CMS natif IA. Lancez un site en quelques secondes — contenu flexible et typé, sans configuration.',
@@ -449,7 +448,6 @@ export const fr = {
   'public.search.submit': 'Rechercher',
   'public.search.prompt':
     'Saisissez un mot-clé et appuyez sur Entrée pour rechercher des fiches publiées.',
-  'public.search.loading': 'Recherche…',
   'public.search.error.title': 'Impossible de rechercher',
   'public.search.resultCount.one': '{{count}} résultat pour « {{query}} »',
   'public.search.resultCount.other': '{{count}} résultats pour « {{query}} »',
@@ -457,7 +455,6 @@ export const fr = {
   'public.search.empty.description':
     'Aucune fiche publiée ne correspond à cette recherche. Essayez un autre mot, ou parcourez par type.',
   'public.tagArchive.title': 'Étiqueté : {{tag}}',
-  'public.tagArchive.loading': 'Chargement…',
   'public.tagArchive.subCount.one': '{{count}} fiche étiquetée « {{tag}} ».',
   'public.tagArchive.subCount.other': '{{count}} fiches étiquetées « {{tag}} ».',
   'public.tagArchive.error.title': 'Impossible de charger cette étiquette',
@@ -474,7 +471,6 @@ export const fr = {
   'public.browse.viewToggle.label': 'Affichage',
   'public.browse.viewToggle.list': 'Vue liste',
   'public.browse.viewToggle.grid': 'Vue grille',
-  'public.browse.loading': 'Chargement…',
   'public.browse.error.title': 'Impossible de charger les fiches',
   'public.browse.unknownType.title': "Type d'entité introuvable",
   'public.browse.unknownType.description': 'Aucun contenu public pour « {{slug}} ».',
@@ -497,7 +493,6 @@ export const fr = {
   'public.home.hero.artTag': 'typé · lisible · prêt pour les agents',
   'public.home.latest.eyebrow': 'Les plus récentes',
   'public.home.latest.title': 'Dernières fiches',
-  'public.home.latest.loading': 'Chargement des dernières fiches…',
   'public.home.empty.title': 'Aucune fiche publiée pour le moment',
   'public.home.empty.description':
     "Lorsque des fiches sont publiées, elles apparaissent ici, de la plus récente à la plus ancienne. Les brouillons et les fiches programmées restent masqués jusqu'à leur heure de publication.",

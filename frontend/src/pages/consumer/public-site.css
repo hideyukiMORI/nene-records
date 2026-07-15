@@ -2765,3 +2765,107 @@
   width: 100%;
   margin-block: var(--space-lg);
 }
+
+/* ══ Loading skeletons (#894) ═════════════════════════════════════════════
+   B群 = レイアウトが確定した後の読み込み中。ここは `.nene-public` の中なので
+   テーマ chrome が既に描かれており、スコープを付けるのが正しい（A群＝レイアウト
+   未確定時は逆に `.nene-public` を付けてはいけない。route-progress.css を参照）。
+
+   形は直後に出る実コンテンツに合わせる。差し替えた瞬間にレイアウトが飛ばない
+   ようにするため。色は全てトークン経由 — 26テーマ×ライト/ダークで総入れ替えになる。 */
+.nene-public .skeleton {
+  background: var(--color-surface-sunken);
+  border-radius: var(--radius-sm);
+  position: relative;
+  overflow: hidden;
+}
+.nene-public .skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in oklch, var(--color-text-muted) 12%, transparent) 50%,
+    transparent 100%
+  );
+  transform: translateX(-100%);
+  animation: nene-shimmer 1.15s var(--ease) infinite;
+}
+@keyframes nene-shimmer {
+  to {
+    transform: translateX(100%);
+  }
+}
+/* 140ms 遅らせる: 速い応答ではスケルトンを出さないまま実データに切り替わる。 */
+.nene-public .loading-view {
+  animation: nene-loading-in var(--dur-normal) var(--ease) 140ms both;
+}
+@keyframes nene-loading-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.nene-public .sk-count {
+  width: 240px;
+  max-width: 60%;
+  height: var(--text-meta);
+  margin: 0 0 var(--space-lg);
+}
+.nene-public .sk-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: var(--space-lg);
+}
+.nene-public .sk-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+.nene-public .sk-card__media {
+  aspect-ratio: 16 / 10;
+  border-radius: var(--radius-md);
+}
+.nene-public .sk-card__badge {
+  width: 62px;
+  height: var(--text-overline);
+}
+.nene-public .sk-card__title {
+  height: var(--text-body);
+}
+.nene-public .sk-card__title--short {
+  width: 62%;
+}
+.nene-public .sk-rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+.nene-public .sk-row {
+  height: var(--text-body);
+}
+.nene-public .sk-row--1 {
+  width: 72%;
+}
+.nene-public .sk-row--2 {
+  width: 84%;
+}
+.nene-public .sk-row--3 {
+  width: 56%;
+}
+.nene-public .sk-featured {
+  aspect-ratio: 16 / 7;
+  border-radius: var(--radius-lg);
+  margin: 0 0 var(--space-lg);
+}
+@media (prefers-reduced-motion: reduce) {
+  .nene-public .skeleton::after {
+    animation: none;
+  }
+  .nene-public .loading-view {
+    animation: none;
+  }
+}

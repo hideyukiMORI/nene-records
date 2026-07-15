@@ -5,6 +5,7 @@ import {
 } from '@/features/public-entity-results'
 import { useTranslation } from '@/shared/i18n'
 import { IconArrowLeft, IconInbox } from '@/shared/ui/icons/magazine-icons'
+import { LoadingCardGrid } from '@/shared/ui/loading'
 
 export interface PublicTagArchiveViewProps {
   tagName: string
@@ -43,7 +44,7 @@ export function PublicTagArchiveView({
       ) : null}
 
       {isLoading ? (
-        <p className="searchhint">{t('public.tagArchive.loading')}</p>
+        <LoadingCardGrid count={6} />
       ) : isError ? (
         <div className="empty" style={{ marginTop: '2rem' }}>
           <h3 className="empty__title">{t('public.tagArchive.error.title')}</h3>
