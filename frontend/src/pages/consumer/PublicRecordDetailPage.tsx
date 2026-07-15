@@ -526,14 +526,10 @@ function PublicRecordDetailBySlug({
   )
 
   if (isLoading) {
-    return (
-      <RecordShellMessage
-        site={site}
-        entityTypeSlug={entityTypeSlug}
-        title="Loading…"
-        description="Fetching this record."
-      />
-    )
+    // Same reason as the permalink resolver above (#885): the record's layout is not
+    // known yet, so painting the themed shell here would flash chrome over a `bare`
+    // page. Render nothing until we know what this page is.
+    return null
   }
   if (isError || entityId === null) {
     return (
@@ -636,14 +632,13 @@ export function PublicRecordByPermalink({
   )
 
   if (resolution.isLoading || entityTypeQuery.isLoading) {
-    return (
-      <RecordShellMessage
-        site={site}
-        entityTypeSlug={null}
-        title="Loading…"
-        description="Fetching this record."
-      />
-    )
+    // Render nothing rather than the themed shell: until this resolves we do not know
+    // the record's layout, and guessing "standard" paints a header/footer/theme over
+    // what may be a `bare` page — then rips it away (#885). On a full load the SSR
+    // markup is already on screen and React keeps it until the first commit; on a
+    // client-side navigation this is a brief blank instead of a wrong layout. A wrong
+    // layout reads as a broken site; a blank reads as loading.
+    return null
   }
 
   const data = resolution.data
