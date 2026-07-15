@@ -771,4 +771,69 @@ final class PublicRecordHttpTest extends TestCase
         self::assertStringContainsString('<h2>richbody</h2>', $html);
         self::assertStringContainsString('<h2>body</h2>', $html);
     }
+
+    /**
+     * #887: the SPA hydrates `useEntityTypeList` from this payload and never refetches,
+     * so a field missing here is missing forever. Shipping only id/name/slug left
+     * `defaultLayout` undefined, so `resolveLayout` fell back to `standard` and painted
+     * the themed chrome over a `bare` page until the record itself arrived.
+     *
+     * The same class of bug already cost #778 (visibility flags) and #816 (canonical
+     * identity) on the entity payload — pin the type payload so it is not a third.
+     */
+    public function testBootstrapEntityTypesCarryEveryFieldTheSpaReadsBack(): void
+    {
+        $html = (string) $this->application->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/article/10'),
+        )->getBody();
+
+        $item = $this->bootstrapOf($html)['entityTypes']['items'][0];
+
+        // Exactly the keys ListEntityTypesHandler emits — i.e. what the SPA would have
+        // fetched had it not been handed this payload instead.
+        self::assertSame(
+            [
+                'id',
+                'name',
+                'slug',
+                'is_pinned',
+                'labels',
+                'permalink_pattern',
+                'previous_permalink_pattern',
+                'display_order',
+                'default_layout',
+            ],
+            array_keys($item),
+        );
+    }
+
+    /** #887: a `bare` type default must survive into the bootstrap, not just the SSR. */
+    public function testBootstrapCarriesTheBareTypeDefaultSoTheSpaDoesNotGuessStandard(): void
+    {
+        $app = $this->buildApplication(true, $this->projectRoot, typeDefaultLayout: 'bare');
+
+        $html = (string) $app->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/article/10'),
+        )->getBody();
+
+        self::assertSame('bare', $this->bootstrapOf($html)['entityTypes']['items'][0]['default_layout']);
+    }
+
+    /** @return array<string, mixed> the SSR bootstrap payload the SPA hydrates from */
+    private function bootstrapOf(string $html): array
+    {
+        $matched = preg_match(
+            '~<script[^>]*id="nene-records-public-record-bootstrap"[^>]*>(.*?)</script>~s',
+            $html,
+            $m,
+        );
+
+        self::assertSame(1, $matched, 'the bootstrap script must be present');
+        self::assertArrayHasKey(1, $m);
+
+        /** @var array<string, mixed> $decoded */
+        $decoded = json_decode(html_entity_decode($m[1], ENT_QUOTES), true, 512, JSON_THROW_ON_ERROR);
+
+        return $decoded;
+    }
 }

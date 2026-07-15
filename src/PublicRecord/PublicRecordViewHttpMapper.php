@@ -48,12 +48,26 @@ final readonly class PublicRecordViewHttpMapper
         array $relationQueries,
         array $relationTextFieldRowsByEntityTypeId,
     ): array {
+        // The SPA hydrates useEntityTypeList from this payload and never refetches, so
+        // every field it reads must ride along — the same rule the entity payload below
+        // learned twice (#778 visibility flags, #816 canonical identity). Shipping only
+        // id/name/slug left `permalinkPattern` and `defaultLayout` undefined forever:
+        // record URLs fell back to the default pattern, and `resolveLayout` fell back to
+        // `standard`, painting the themed chrome over a `bare` page until the record
+        // itself arrived (#887). Keep this in step with ListEntityTypesHandler, which is
+        // what the SPA would have fetched.
         $entityTypesPayload = [
             'items' => array_map(
                 static fn (EntityType $item) => [
                     'id' => $item->id,
                     'name' => $item->name,
                     'slug' => $item->slug,
+                    'is_pinned' => $item->isPinned,
+                    'labels' => $item->labels ?? new \stdClass(),
+                    'permalink_pattern' => $item->permalinkPattern,
+                    'previous_permalink_pattern' => $item->previousPermalinkPattern,
+                    'display_order' => $item->displayOrder,
+                    'default_layout' => $item->defaultLayout,
                 ],
                 $allEntityTypes,
             ),
