@@ -1,5 +1,15 @@
-import type { MessageCatalog } from './en'
-
+/**
+ * Japanese message catalog — the authority catalog (Frontend Standard 04, I18N-8).
+ *
+ * `MessageKey` is derived from these keys (`keyof typeof ja`). Every other
+ * locale — including `en` — is checked against `Record<MessageKey, string>`
+ * and therefore mirrors this catalog exactly: adding or removing a key here
+ * surfaces as a compile error in the five other catalogs. Add new keys here
+ * first, then translate.
+ *
+ * Authority (who owns the key set) and fallback (who answers at runtime) are
+ * separate concerns: `en` remains `DEFAULT_LOCALE` and the runtime fallback.
+ */
 export const ja = {
   // ── Common ──────────────────────────────────────────────────────────────
   'common.actions.edit': '編集',
@@ -1552,4 +1562,14 @@ export const ja = {
   // ── Misc (#728) ───────────────────────────────────────────────────────────
   'common.tableOfContents': '目次',
   'admin.entityRecords.breadcrumbLabel': 'パンくずリスト',
-} satisfies Record<keyof MessageCatalog, string>
+}
+
+/** Authority key set (Frontend Standard 04, I18N-8): `MessageKey` derives from `ja`. */
+export type MessageKey = keyof typeof ja
+
+/**
+ * Complete message catalog type — keys owned by the authority catalog (`ja`),
+ * values widened to `string` so translated catalogs (en/de/…) aren't checked
+ * against the Japanese string literals (which would reject every translation).
+ */
+export type MessageCatalog = Record<MessageKey, string>
