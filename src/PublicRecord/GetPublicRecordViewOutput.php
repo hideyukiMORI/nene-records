@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace NeNeRecords\PublicRecord;
 
+use NeNeRecords\Layout\PublicLayouts;
+
 final readonly class GetPublicRecordViewOutput
 {
     /**
@@ -28,6 +30,12 @@ final readonly class GetPublicRecordViewOutput
         public ?PublicRecordChapterNav $chapterNav = null,
         public array $breadcrumbs = [],
         public array $childPages = [],
+        /**
+         * Effective page layout (`PublicLayouts::resolve`: entity override → type
+         * default → `standard`). The SSR must honour it or it renders chrome the SPA
+         * then removes — visible as a flash, and permanent for crawlers (#879).
+         */
+        public string $layout = PublicLayouts::DEFAULT,
     ) {
     }
 }

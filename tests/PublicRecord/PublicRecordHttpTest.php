@@ -79,9 +79,11 @@ final class PublicRecordHttpTest extends TestCase
         ?string $entity10Permalink = null,
         bool $withCollision = false,
         ?int $frontPageId = null,
+        ?string $entity10Layout = null,
+        string $typeDefaultLayout = 'standard',
     ): RequestHandlerInterface {
         $entityTypes = new InMemoryEntityTypeRepository([
-            new EntityType(name: 'Article', slug: 'article', id: 1),
+            new EntityType(name: 'Article', slug: 'article', id: 1, defaultLayout: $typeDefaultLayout),
         ]);
         $entityRecords = [
             new Entity(
@@ -93,6 +95,7 @@ final class PublicRecordHttpTest extends TestCase
                 publishedAt: new DateTimeImmutable('2026-01-15T00:00:00+00:00'),
                 updatedAt: new DateTimeImmutable('2026-02-20T00:00:00+00:00'),
                 metaDescription: 'A short summary.',
+                layout: $entity10Layout,
             ),
         ];
         $textFieldRecords = [
@@ -696,5 +699,76 @@ final class PublicRecordHttpTest extends TestCase
         }
 
         return $payload;
+    }
+
+    /**
+     * #879: `bare` means "no header/footer, no theme — fully custom page". The SSR used
+     * to ignore `layout` entirely and always emit the standard article scaffold, which
+     * flashed on every navigation and — because crawlers never run the SPA — was the
+     * only version they ever indexed ("← Article", a duplicate <h1>, `<h2>richbody</h2>`).
+     */
+    public function testBareLayoutOmitsArticleChromeFromTheCrawlableSsr(): void
+    {
+        $app = $this->buildApplication(true, $this->projectRoot, entity10Layout: 'bare');
+
+        $html = (string) $app->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/article/10'),
+        )->getBody();
+
+        self::assertStringNotContainsString('← Article', $html, 'backlink is article chrome');
+        self::assertStringNotContainsString('<h1>Hello world</h1>', $html, 'the page owns its own heading');
+        self::assertStringNotContainsString('<h2>richbody</h2>', $html, 'field-key labels are article chrome');
+        self::assertStringNotContainsString('<h2>body</h2>', $html);
+
+        // The content itself must still be server-rendered — that is the whole point.
+        self::assertStringContainsString('imported <strong>kept</strong>', $html);
+        self::assertStringContainsString('id="nene-records-public-record-bootstrap"', $html);
+    }
+
+    /** #879: the type default applies when the record itself does not override it. */
+    public function testBareTypeDefaultAlsoOmitsArticleChrome(): void
+    {
+        $app = $this->buildApplication(true, $this->projectRoot, typeDefaultLayout: 'bare');
+
+        $html = (string) $app->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/article/10'),
+        )->getBody();
+
+        self::assertStringNotContainsString('← Article', $html);
+        self::assertStringNotContainsString('<h1>Hello world</h1>', $html);
+    }
+
+    /** #879: a per-record layout beats the type default (PublicLayouts::resolve order). */
+    public function testRecordLayoutBeatsBareTypeDefault(): void
+    {
+        $app = $this->buildApplication(
+            true,
+            $this->projectRoot,
+            entity10Layout: 'standard',
+            typeDefaultLayout: 'bare',
+        );
+
+        $html = (string) $app->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/article/10'),
+        )->getBody();
+
+        self::assertStringContainsString('← Article', $html);
+        self::assertStringContainsString('<h1>Hello world</h1>', $html);
+    }
+
+    /**
+     * #879 regression pin: the default layout must keep emitting exactly what it did
+     * before, so fixing `bare` cannot quietly restyle every existing site.
+     */
+    public function testStandardLayoutKeepsArticleChromeUnchanged(): void
+    {
+        $html = (string) $this->application->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/article/10'),
+        )->getBody();
+
+        self::assertStringContainsString('← Article', $html);
+        self::assertStringContainsString('<h1>Hello world</h1>', $html);
+        self::assertStringContainsString('<h2>richbody</h2>', $html);
+        self::assertStringContainsString('<h2>body</h2>', $html);
     }
 }
