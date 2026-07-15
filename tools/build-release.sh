@@ -127,6 +127,19 @@ done
 shopt -u nullglob
 echo "  fonts: base に $kept_fonts 件 / フォントパックへ $moved_fonts 件"
 
+# OFL 表示義務のガード（#872）。Zen Kaku Gothic New subset は OFL 1.1 で、配布物は
+# 著作権表示とライセンス条文を含まなければならない。subset 化で font の name テーブルは
+# 空、CSS コメントは最小化で消えるため、frontend の vite.config.ts が assets/ へ emit する
+# この 1 ファイルだけが表示経路。ここが欠けたまま出荷するとライセンス違反になるので、
+# 静かに落ちないよう fail-loud にする（keep 判定は woff/woff2 のみを見るので通常は残る）。
+OFL_NOTICE="$STAGE/public_html/assets/OFL-ZenKakuGothicNew.txt"
+if [ ! -s "$OFL_NOTICE" ]; then
+    echo "ERROR: $(basename "$OFL_NOTICE") が base ZIP にありません（OFL 1.1 §2 違反）。" >&2
+    echo "       frontend/vite.config.ts の emitFontLicense() が生きているか確認してください（#872）。" >&2
+    exit 1
+fi
+echo "  fonts: OFL 表示 $(basename "$OFL_NOTICE") を base に同梱 ✔"
+
 # フォントパック導入検出用マーカー（#709）。管理画面はフォントピッカーの @font-face を
 # 読み込まない（公開フォントは公開シェル/プレビュー iframe 側）ため、フォントの load
 # 試行では pack 有無を判定できない。そこで docroot 直下に静的マーカーを置き、frontend は

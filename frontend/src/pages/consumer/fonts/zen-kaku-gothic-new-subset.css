@@ -1,14 +1,29 @@
 /*
+ * Zen Kaku Gothic New (subset)
+ * Copyright 2022 The Zen Kaku Gothic Project Authors (https://github.com/googlefonts/zen-kakugothic)
+ * Licensed under the SIL Open Font License, Version 1.1 — full text: ./OFL.txt
+ * (also at https://scripts.sil.org/OFL). Modified version: subset via fonttools pyftsubset.
+ * 上流は Reserved Font Name を宣言していないので family 名はそのまま維持してよい（実測・#872）。
+ *
+ * ⚠️ この著作権表示は **dist には残らない**（Vite 8/rolldown の CSS 最小化が `/*!` legal comment
+ * ごと削除することを実測で確認）。配布物側の OFL 表示は **`vite.config.ts` の
+ * `emitFontLicense()` が `assets/OFL-ZenKakuGothicNew.txt` を出力する経路が担っている**。
+ * pyftsubset がフォントの name テーブル（Copyright/License）を全削除するため、
+ * バイナリ側にもメタデータは残らない。**あの emit を外すと OFL 違反に戻る**（#872）。
+ *
  * Zen Kaku Gothic New — AYANE 公開サイト用 subset (#818)
  *
  * @fontsource の `japanese-*` サブセットは unicode-range 分割されておらず 1 ウェイト
  * ≈965KB（4 ウェイトで ≈3.9MB）と重すぎる。AYANE の全 11 ページで実際に使う文字に
  * ひらがな/カタカナ/ASCII/JP 約物/全角形を加えた ≈1,050 グリフへ subset し、
- * 1 ウェイト ≈97KB（4 ウェイト計 ≈389KB）に圧縮したものを同梱する（OFL・self-host）。
+ * 1 ウェイト ≈97KB（4 ウェイト計 ≈389KB）に圧縮したものを同梱する（self-host）。
  *
  * 生成: fonttools pyftsubset（Zen Kaku Gothic New v5.2.7 の japanese woff2 を入力）。
  * subset 文字集合を変えたい／新出漢字が増えたら再生成する（手順は #818 / redesign/DESIGN-SYSTEM.md）。
  * 欧文専用の Latin グリフは軽いので、この subset がそのまま賄う（unicode-range なし）。
+ *
+ * ⚠️ この subset は AYANE 専用（926 グリフ）。他 org が参照すると漢字が欠ける。
+ * 構造的な解決（org 単位のフォントアップロード）は #873。
  */
 @font-face {
   font-family: 'Zen Kaku Gothic New';

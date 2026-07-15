@@ -1,10 +1,42 @@
+import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
-import { defineConfig, loadEnv } from 'vite'
+import { defineConfig, loadEnv, type Plugin } from 'vite'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
+
+/**
+ * Ship the OFL license text next to the Zen Kaku Gothic New subset woff2 files (#872).
+ *
+ * OFL 1.1 §2 requires every redistributed copy to carry the copyright notice and
+ * the license. Our copy satisfies none of the three allowed channels on its own:
+ * `pyftsubset` strips the font's `name` table (no machine-readable metadata), and
+ * CSS comments — including `/*!` legal comments — are dropped by the minifier
+ * (measured: the notice does not survive `npm run build`). So the license travels
+ * as a stand-alone text file emitted next to the fonts it covers.
+ *
+ * Emitting into `assets/` (rather than `public/`) is deliberate: the built font
+ * files live there, the production Apache already aliases `/assets`, and
+ * `tools/build-release.sh` copies that directory into the release ZIP verbatim —
+ * so one emit covers the served site and both distribution ZIPs with no extra
+ * wiring. The filename is unhashed so it stays quotable from docs and headers.
+ */
+function emitFontLicense(): Plugin {
+  const source = path.resolve(__dirname, 'src/pages/consumer/fonts/OFL.txt')
+  return {
+    name: 'nene-emit-font-license',
+    apply: 'build',
+    generateBundle() {
+      this.emitFile({
+        type: 'asset',
+        fileName: 'assets/OFL-ZenKakuGothicNew.txt',
+        source: readFileSync(source, 'utf8'),
+      })
+    },
+  }
+}
 
 export default defineConfig(({ mode }) => {
   // Read NENE_RECORDS_PORT from the project-root .env (one level up from frontend/).
@@ -24,7 +56,7 @@ export default defineConfig(({ mode }) => {
     // runtime (#zip-install S2). The injected `<base href>` anchors them to the
     // configured base path; internal chunk imports resolve next to the entry.
     base: './',
-    plugins: [react(), tailwindcss()],
+    plugins: [react(), tailwindcss(), emitFontLicense()],
     build: {
       // Emit dist/.vite/manifest.json so the PHP single-origin SSR can resolve
       // the hashed entry JS/CSS and mount the built SPA on server-rendered pages.
