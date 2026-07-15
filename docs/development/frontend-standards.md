@@ -814,16 +814,22 @@ The browser is **hostile context**. Treat all rendered user content and all clie
 
 ### Locales
 
-6 locales matching the NENE2 docs locale set: `en` (default), `ja`, `fr`, `zh-Hans`, `pt-BR`, `de`.
+6 locales matching the NENE2 docs locale set: `ja` (**authority**), `en` (default, runtime fallback), `fr`, `zh-Hans`, `pt-BR`, `de`.
 Locale ID mapping to NENE2 docs is tracked in `shared/i18n/locales.ts`.
+
+**Authority: `ja`** (Frontend Standard 04, I18N-8). Message keys are authored in
+Japanese first and every other catalog — `en` included — mirrors that key set.
+`en` remains the default locale and the runtime fallback: authority (who owns
+the key set) and fallback (who answers at runtime) are separate concerns.
 
 ### Infrastructure
 
 | Module | Purpose |
 | --- | --- |
 | `shared/i18n/locales.ts` | `SupportedLocale` union + `LocaleMeta` (label, dir) |
-| `shared/i18n/messages/en.ts` | `MessageCatalog` type + complete English catalog (source of truth) |
-| `shared/i18n/messages/{locale}.ts` | `Partial<MessageCatalog>` — missing keys fall back to `en` |
+| `shared/i18n/messages/ja.ts` | Complete Japanese catalog (**authority**) + `MessageKey` / `MessageCatalog` types derived from it |
+| `shared/i18n/messages/en.ts` | Complete English catalog — reference locale and runtime fallback; re-exports the catalog types |
+| `shared/i18n/messages/{locale}.ts` | `satisfies Record<MessageKey, string>` — full parity with `ja` enforced at compile time |
 | `shared/i18n/i18n-context.tsx` | `I18nProvider` — locale detection, persistence, context |
 | `shared/i18n/use-translation.ts` | `useTranslation()` hook |
 | `shared/i18n/translate.ts` | Pure `translate()` function + `MessageKey` type |
@@ -834,8 +840,9 @@ Locale ID mapping to NENE2 docs is tracked in `shared/i18n/locales.ts`.
 
 - **No hardcoded user-facing strings** in Admin UI components → `t('admin.nav.home')`.
 - Key naming: `admin.{feature}.{element}` or `common.{element}`.
-- `en.ts` is the authoritative source; add new keys there first.
-- Other locales use `Partial<MessageCatalog>` — missing keys display English at runtime.
+- `ja.ts` is the authority catalog; add new keys there first, then translate into the other five in the same PR.
+- Every non-authority catalog (`en` included) is `satisfies Record<MessageKey, string>` — a missing or extra key is a compile error (Frontend Standard 04, I18N-9). `Partial` is not permitted.
+- `en` stays the runtime fallback: a key is displayed in English only when a catalog is bypassed at runtime, not because a key is optional.
 - Locale detection order: `localStorage['nene-locale']` → `navigator.language` → `en`.
 - Locale selector lives in `AppShell` header.
 

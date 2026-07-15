@@ -1,12 +1,19 @@
+import type { MessageCatalog, MessageKey } from './ja'
+
 /**
- * English message catalog — source of truth.
+ * English message catalog — the reference locale and runtime fallback.
+ *
+ * Authority note (Frontend Standard 04, I18N-8): the message key set is owned
+ * by `ja.ts` (`MessageKey = keyof typeof ja`). This catalog is checked against
+ * `Record<MessageKey, string>` (I18N-9), so it must mirror `ja` exactly — a key
+ * added to or removed from `ja` becomes a compile error here.
+ *
+ * `en` remains `DEFAULT_LOCALE` and the runtime fallback for every other
+ * catalog (see `translate`); only the key-set authority moved to `ja`.
  *
  * Key naming: admin.{feature}.{element} | common.{element}
  * Param interpolation: {{paramName}}
- *
- * All other locales are `Partial<MessageCatalog>` and fall back to these values.
  */
-
 export const en = {
   // ── Common ──────────────────────────────────────────────────────────────
   'common.actions.edit': 'Edit',
@@ -1546,11 +1553,11 @@ export const en = {
   // ── Misc (#728) ───────────────────────────────────────────────────────────
   'common.tableOfContents': 'Table of contents',
   'admin.entityRecords.breadcrumbLabel': 'Breadcrumb',
-} as const
+} satisfies Record<MessageKey, string>
 
 /**
- * Complete message catalog type — keys derived from the English source of truth,
- * values widened to `string` so translated catalogs (ja/de/…) aren't checked
- * against the English string literals (which would reject every translation).
+ * Catalog types re-exported from the authority catalog (`ja`) so that the other
+ * locale catalogs, `translate.ts` and `messages/index.ts` keep importing them
+ * from `./en` unchanged.
  */
-export type MessageCatalog = Record<keyof typeof en, string>
+export type { MessageCatalog, MessageKey }
