@@ -453,6 +453,72 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
                 },
             )
             ->set(
+                GetPublicTypeArchiveUseCase::class,
+                static function (ContainerInterface $container): GetPublicTypeArchiveUseCase {
+                    $entityTypes = $container->get(EntityTypeRepositoryInterface::class);
+                    $entities = $container->get(EntityRepositoryInterface::class);
+                    $textFields = $container->get(TextFieldRepositoryInterface::class);
+
+                    if (!$entityTypes instanceof EntityTypeRepositoryInterface) {
+                        throw new LogicException('Entity type repository service is invalid.');
+                    }
+                    if (!$entities instanceof EntityRepositoryInterface) {
+                        throw new LogicException('Entity repository service is invalid.');
+                    }
+                    if (!$textFields instanceof TextFieldRepositoryInterface) {
+                        throw new LogicException('Text field repository service is invalid.');
+                    }
+
+                    return new GetPublicTypeArchiveUseCase($entityTypes, $entities, $textFields);
+                },
+            )
+            ->set(
+                PublicTypeArchiveRendererInterface::class,
+                static function (ContainerInterface $container): PublicTypeArchiveRendererInterface {
+                    $publicSettings = $container->get(ListPublicSettingsUseCaseInterface::class);
+                    $html = $container->get(HtmlResponseFactory::class);
+                    $config = $container->get(AppConfig::class);
+                    $projectRoot = $container->get(RuntimeServiceProvider::PROJECT_ROOT);
+
+                    if (!$publicSettings instanceof ListPublicSettingsUseCaseInterface) {
+                        throw new LogicException('Public settings use case service is invalid.');
+                    }
+                    if (!$html instanceof HtmlResponseFactory) {
+                        throw new LogicException('Html response factory service is invalid.');
+                    }
+                    if (!$config instanceof AppConfig) {
+                        throw new LogicException('App config service is invalid.');
+                    }
+                    if (!is_string($projectRoot) || $projectRoot === '') {
+                        throw new LogicException('Project root is not configured.');
+                    }
+
+                    return new RenderPublicTypeArchiveRenderer(
+                        $publicSettings,
+                        $html,
+                        $config,
+                        $projectRoot,
+                        \NeNeRecords\Http\BasePath::fromEnv(),
+                    );
+                },
+            )
+            ->set(
+                RenderPublicTypeArchiveHandler::class,
+                static function (ContainerInterface $container): RenderPublicTypeArchiveHandler {
+                    $useCase = $container->get(GetPublicTypeArchiveUseCase::class);
+                    $renderer = $container->get(PublicTypeArchiveRendererInterface::class);
+
+                    if (!$useCase instanceof GetPublicTypeArchiveUseCase) {
+                        throw new LogicException('Public type archive use case service is invalid.');
+                    }
+                    if (!$renderer instanceof PublicTypeArchiveRendererInterface) {
+                        throw new LogicException('Public type archive renderer service is invalid.');
+                    }
+
+                    return new RenderPublicTypeArchiveHandler($useCase, $renderer);
+                },
+            )
+            ->set(
                 RenderPublicHomeHandler::class,
                 static function (ContainerInterface $container): RenderPublicHomeHandler {
                     $frontPage = $container->get(FrontPageSetting::class);

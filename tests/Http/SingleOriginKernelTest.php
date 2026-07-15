@@ -13,12 +13,17 @@ use NeNeRecords\Http\PublicPermalinkRendererInterface;
 use NeNeRecords\Http\SingleOriginKernel;
 use NeNeRecords\Http\SpaShellFallback;
 use NeNeRecords\PublicRecord\FrontPageSetting;
+use NeNeRecords\PublicRecord\GetPublicTypeArchiveOutput;
+use NeNeRecords\PublicRecord\GetPublicTypeArchiveUseCase;
 use NeNeRecords\PublicRecord\PublicRecordViewRendererInterface;
+use NeNeRecords\PublicRecord\PublicTypeArchiveRendererInterface;
 use NeNeRecords\PublicRecord\RenderPublicHomeHandler;
+use NeNeRecords\PublicRecord\RenderPublicTypeArchiveHandler;
 use NeNeRecords\Setting\SettingDef;
 use NeNeRecords\Tests\Entity\InMemoryEntityRepository;
 use NeNeRecords\Tests\EntityType\InMemoryEntityTypeRepository;
 use NeNeRecords\Tests\Setting\InMemorySettingRepository;
+use NeNeRecords\Tests\TextField\InMemoryTextFieldRepository;
 use NeNeRecords\Tests\UrlRedirect\InMemoryUrlRedirectRepository;
 use NeNeRecords\UrlRedirect\UrlRedirectResolver;
 use Nyholm\Psr7\Factory\Psr17Factory;
@@ -74,14 +79,55 @@ final class SingleOriginKernelTest extends TestCase
         RequestHandlerInterface $app,
         ?CustomPermalinkResolver $customPermalink = null,
         ?RenderPublicHomeHandler $frontPage = null,
+        ?RenderPublicTypeArchiveHandler $typeArchive = null,
     ): SingleOriginKernel {
         return new SingleOriginKernel(
             $app,
             $customPermalink ?? new CustomPermalinkResolver($this->nullPermalinkRenderer()),
             new UrlRedirectResolver($this->redirects, $this->factory),
+            $typeArchive ?? $this->typeArchive(),
             $frontPage ?? $this->frontPage(false),
             new SpaShellFallback($this->shellPath, $this->factory, $this->factory),
         );
+    }
+
+    /**
+     * A type-archive edge layer over the given entity types (#877). With no types
+     * seeded it resolves nothing and passes through — the default for tests that are
+     * about the other layers.
+     *
+     * @param list<EntityType> $types
+     * @param list<Entity>     $entities
+     */
+    private function typeArchive(array $types = [], array $entities = []): RenderPublicTypeArchiveHandler
+    {
+        return new RenderPublicTypeArchiveHandler(
+            new GetPublicTypeArchiveUseCase(
+                new InMemoryEntityTypeRepository($types),
+                new InMemoryEntityRepository($entities),
+                new InMemoryTextFieldRepository([]),
+            ),
+            $this->archiveRenderer(),
+        );
+    }
+
+    /** Tags the response so tests can assert the archive layer answered. */
+    private function archiveRenderer(): PublicTypeArchiveRendererInterface
+    {
+        return new class ($this->factory) implements PublicTypeArchiveRendererInterface {
+            public function __construct(private Psr17Factory $factory)
+            {
+            }
+
+            public function render(
+                GetPublicTypeArchiveOutput $archive,
+                ServerRequestInterface $request,
+            ): ResponseInterface {
+                return $this->factory->createResponse(200)
+                    ->withHeader('Content-Type', 'text/html')
+                    ->withHeader('X-Test-Archive', $archive->typeSlug);
+            }
+        };
     }
 
     /**
@@ -310,5 +356,105 @@ final class SingleOriginKernelTest extends TestCase
         $response = $this->kernel($this->appReturning(200))->handle($request);
 
         self::assertStringContainsString('id="root"', (string) $response->getBody());
+    }
+
+    /**
+     * #877: `/posts` was SPA-only — the router 404'd it and the shell fallback answered,
+     * so crawlers got a 1.6KB shell titled "NeNe Records Admin" instead of the listing.
+     */
+    public function testTypeArchiveRendersOn404ForAKnownTypeSlug(): void
+    {
+        $archive = $this->typeArchive(
+            [new EntityType(name: 'Posts', slug: 'posts', id: 2)],
+            [new Entity(id: 5, entityTypeId: 2, slug: 'hello', status: EntityStatus::Published)],
+        );
+
+        $response = $this->kernel($this->appReturning(404), null, null, $archive)->handle(
+            $this->factory->createServerRequest('GET', 'https://site.test/posts')
+                ->withHeader('Accept', 'text/html'),
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('posts', $response->getHeaderLine('X-Test-Archive'));
+    }
+
+    /** #877: an unknown slug is not an archive — it must keep falling through to the shell. */
+    public function testUnknownTypeSlugStillFallsThroughToTheShell(): void
+    {
+        $archive = $this->typeArchive([new EntityType(name: 'Posts', slug: 'posts', id: 2)]);
+
+        $response = $this->kernel($this->appReturning(404), null, null, $archive)->handle(
+            $this->factory->createServerRequest('GET', 'https://site.test/blog')
+                ->withHeader('Accept', 'text/html'),
+        );
+
+        self::assertSame('', $response->getHeaderLine('X-Test-Archive'));
+    }
+
+    /**
+     * #877 ordering: a real record parked at a path is explicit content and must beat the
+     * derived archive, even when its permalink happens to equal a type slug.
+     */
+    public function testCustomPermalinkRecordBeatsTheTypeArchiveOnTheSamePath(): void
+    {
+        $archive = $this->typeArchive([new EntityType(name: 'Posts', slug: 'posts', id: 2)]);
+
+        $response = $this->kernel(
+            $this->appReturning(404),
+            $this->permalinkResolverTagging(),
+            null,
+            $archive,
+        )->handle(
+            $this->factory->createServerRequest('GET', 'https://site.test/posts')
+                ->withHeader('Accept', 'text/html'),
+        );
+
+        self::assertSame('hit', $response->getHeaderLine('X-Test-Permalink'));
+        self::assertSame('', $response->getHeaderLine('X-Test-Archive'), 'archive must not override a real record');
+    }
+
+    /** #877: a deep path is a record route, never an archive. */
+    public function testTypeArchiveIgnoresMultiSegmentPaths(): void
+    {
+        $archive = $this->typeArchive([new EntityType(name: 'Posts', slug: 'posts', id: 2)]);
+
+        $response = $this->kernel($this->appReturning(404), null, null, $archive)->handle(
+            $this->factory->createServerRequest('GET', 'https://site.test/posts/hello')
+                ->withHeader('Accept', 'text/html'),
+        );
+
+        self::assertSame('', $response->getHeaderLine('X-Test-Archive'));
+    }
+
+    /** #877: a 200 from the app is the real answer — the archive only fills 404s. */
+    public function testTypeArchiveDoesNotTouchNon404Responses(): void
+    {
+        $archive = $this->typeArchive([new EntityType(name: 'Posts', slug: 'posts', id: 2)]);
+
+        $response = $this->kernel($this->appReturning(200), null, null, $archive)->handle(
+            $this->factory->createServerRequest('GET', 'https://site.test/posts')
+                ->withHeader('Accept', 'text/html'),
+        );
+
+        self::assertSame('', $response->getHeaderLine('X-Test-Archive'));
+    }
+
+    /** A permalink resolver that claims every 404 path, tagging the response. */
+    private function permalinkResolverTagging(): CustomPermalinkResolver
+    {
+        return new CustomPermalinkResolver(
+            new class ($this->factory) implements PublicPermalinkRendererInterface {
+                public function __construct(private Psr17Factory $factory)
+                {
+                }
+
+                public function renderByPermalink(string $path, ServerRequestInterface $request): ResponseInterface
+                {
+                    return $this->factory->createResponse(200)
+                        ->withHeader('Content-Type', 'text/html')
+                        ->withHeader('X-Test-Permalink', 'hit');
+                }
+            },
+        );
     }
 }

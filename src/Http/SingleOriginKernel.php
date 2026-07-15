@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeNeRecords\Http;
 
 use NeNeRecords\PublicRecord\RenderPublicHomeHandler;
+use NeNeRecords\PublicRecord\RenderPublicTypeArchiveHandler;
 use NeNeRecords\UrlRedirect\UrlRedirectResolver;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -14,11 +15,15 @@ use Psr\Http\Server\RequestHandlerInterface;
  * Outer request handler for single-origin serving: runs the full NENE2
  * application pipeline, then applies the single-origin edge layers in order on a
  * 404 — first a per-record custom permalink (#651), then the per-org 301 redirect
- * map (migrated old WordPress URLs), then the built SPA shell fallback for
- * client-routed navigations.
+ * map (migrated old WordPress URLs), then an entity type's archive listing (#877),
+ * then the built SPA shell fallback for client-routed navigations.
  *
  * Custom permalinks run before the redirect map so a live record sitting at a path
  * wins over a stale 301 whose source equals that path.
+ *
+ * The type archive runs after both: a record parked at `/posts` and an admin-authored
+ * 301 are explicit content decisions, while the archive is derived from a type slug,
+ * so it may only answer a path nothing else claimed.
  *
  * Composing these as one DI-wired PSR-15 handler (rather than procedural code in
  * the front controller) keeps the ordering explicit and end-to-end testable, and
@@ -31,6 +36,7 @@ final readonly class SingleOriginKernel implements RequestHandlerInterface
         private RequestHandlerInterface $application,
         private CustomPermalinkResolver $customPermalink,
         private UrlRedirectResolver $redirects,
+        private RenderPublicTypeArchiveHandler $typeArchive,
         private RenderPublicHomeHandler $frontPage,
         private SpaShellFallback $shell,
     ) {
@@ -41,6 +47,9 @@ final readonly class SingleOriginKernel implements RequestHandlerInterface
         $response = $this->application->handle($request);
         $response = $this->customPermalink->apply($request, $response);
         $response = $this->redirects->apply($request, $response);
+        // Entity type archive SSR (#877): `/posts` etc. were SPA-only, so crawlers got
+        // the shell instead of the listing.
+        $response = $this->typeArchive->apply($request, $response);
         // Front-page SSR (#701) runs before the shell so a pinned record renders at `/`
         // (SpaShellFallback then honours the resulting text/html instead of the shell).
         $response = $this->frontPage->apply($request, $response);
