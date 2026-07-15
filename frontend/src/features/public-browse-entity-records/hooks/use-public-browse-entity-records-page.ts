@@ -64,7 +64,19 @@ export function usePublicBrowseEntityRecordsPage(entityTypeSlug: string, offset:
       const id = Number(entity.id)
       return {
         id,
-        label: getRecordDisplayLabel(id, textFields, `Record #${String(id)}`, locale),
+        // metaTitle must be passed, or bespoke pages (one html field, no `title`)
+        // fall through to the derived excerpt and every row shows the same stripped
+        // header/nav text — and records whose title is outside the text-field
+        // window (#892) show the `Record #id` fallback. The SSR twin
+        // (RecordDisplayLabel::resolve) passes it, so omitting it here silently
+        // breaks SSR/SPA label parity (#891).
+        label: getRecordDisplayLabel(
+          id,
+          textFields,
+          `Record #${String(id)}`,
+          locale,
+          entity.metaTitle ?? null,
+        ),
         publicUrl: resolvePermalink(pattern, {
           typeSlug: entityTypeSlug,
           entitySlug: entity.slug ?? null,

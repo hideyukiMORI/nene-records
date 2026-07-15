@@ -5,15 +5,25 @@ import { getTagBySlug } from './tag'
 
 export type EntityStatusDto = 'draft' | 'published' | 'archived'
 
+/**
+ * Mirrors `EntityResponse` in docs/openapi/openapi.yaml. Every field the contract
+ * marks required must exist here, or a consumer can silently drop one and no test
+ * notices: `meta_title` was missing, so the public listing forgot to pass it to the
+ * label resolver and shipped raw html as record titles (#891).
+ */
 interface EntityRecord {
   id: number
   entity_type_id: number
   slug: string | null
   permalink: string | null
+  layout: string | null
   status: EntityStatusDto
   published_at: string | null
+  scheduled_at: string | null
   is_deleted: boolean
   deleted_at: string | null
+  meta_title: string | null
+  meta_description: string | null
   created_at: string | null
   updated_at: string | null
   /** Tri-state visibility overrides; null = follow record_page_config (#775). */
@@ -35,10 +45,14 @@ export function seedEntities(
     entity_type_id: number
     slug?: string | null
     permalink?: string | null
+    layout?: string | null
     status?: EntityStatusDto
     published_at?: string | null
+    scheduled_at?: string | null
     is_deleted: boolean
     deleted_at: string | null
+    meta_title?: string | null
+    meta_description?: string | null
     created_at?: string | null
     updated_at?: string | null
     show_comments?: boolean | null
@@ -49,8 +63,12 @@ export function seedEntities(
     ...item,
     slug: item.slug ?? null,
     permalink: item.permalink ?? null,
+    layout: item.layout ?? null,
     status: item.status ?? 'draft',
     published_at: item.published_at ?? null,
+    scheduled_at: item.scheduled_at ?? null,
+    meta_title: item.meta_title ?? null,
+    meta_description: item.meta_description ?? null,
     created_at: item.created_at ?? null,
     updated_at: item.updated_at ?? null,
     show_comments: item.show_comments ?? null,
@@ -208,7 +226,10 @@ export const entityHandlers = [
       entity_type_id?: number
       slug?: string | null
       permalink?: string | null
+      layout?: string | null
       status?: EntityStatusDto
+      meta_title?: string | null
+      meta_description?: string | null
       show_comments?: boolean | null
       show_related?: boolean | null
     }
@@ -232,10 +253,14 @@ export const entityHandlers = [
       entity_type_id: body.entity_type_id,
       slug: body.slug ?? null,
       permalink: body.permalink ?? null,
+      layout: body.layout ?? null,
       status: body.status ?? 'draft',
       published_at: null,
+      scheduled_at: null,
       is_deleted: false,
       deleted_at: null,
+      meta_title: body.meta_title ?? null,
+      meta_description: body.meta_description ?? null,
       created_at: now,
       updated_at: now,
       show_comments: body.show_comments ?? null,
