@@ -33,6 +33,10 @@ import {
   type PublicRecordBootstrapDto,
 } from '@/shared/lib/public-record-bootstrap'
 import {
+  publicPermalinkResolveKeys,
+  type PublicPermalinkResolutionDto,
+} from '@/shared/lib/public-permalink-resolve'
+import {
   EMPTY_PUBLIC_RECORD_HIERARCHY,
   publicRecordHierarchyKeys,
 } from '@/shared/lib/public-record-hierarchy'
@@ -119,5 +123,18 @@ export function seedPublicRecordViewCache(
       settingKeys.publicList(),
       mapPublicSettingListDtoToModel(bootstrap.publicSettings),
     )
+  }
+
+  // The permalink resolution for the very page we were served. Without it the SPA
+  // asks /public/records/resolve for a record the server already handed it, and
+  // `PublicRecordByPermalink` renders the site shell ("Loading…") while it waits —
+  // flashing the standard layout over a `bare` page for ~400ms (#881). The bootstrap
+  // carries the same answer the endpoint would give.
+  if (bootstrap.canonicalPath !== undefined && bootstrap.canonicalPath !== '') {
+    queryClient.setQueryData(publicPermalinkResolveKeys.byPath(bootstrap.canonicalPath), {
+      found: true,
+      entityId: bootstrap.entityId,
+      entityTypeSlug: bootstrap.entityTypeSlug,
+    } satisfies PublicPermalinkResolutionDto)
   }
 }
