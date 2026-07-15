@@ -1,8 +1,95 @@
 # Current Work
 
-Last updated: 2026-07-14
+Last updated: 2026-07-15
 
-## 最新: 残フォローアップ一掃バッチ（2026-07-14・main 反映・本番デプロイ未実施）
+## 最新: AYANE 内側デザイン反映＋公開SSR/SPA の連続修正（2026-07-15・**本番反映済み**）
+
+> ClaudeDesign から AYANE 内側11ページのデザインが届き本番反映。その検証中に**公開サイトの
+> SSR/SPA に4つの独立したバグ**が見つかり、すべて修正・デプロイした（第31〜34回）。
+> **8 PR マージ・全て CI 緑・本番実測で検証済み。**
+
+### AYANE 内側11ページ = 新デザイン本番反映（施主レビュー済み）
+
+- 納品を **`PublicHtmlSanitizer` に実際に通して**検証（43パターン）。全11ページで要素数・img 数・
+  data:URI 数が不変＝**無損失**。外部リソース依存ゼロ。守秘ルール・裏取り数字も機械チェック。
+- 画像は 07-13 と**バイト同一**だったので、本番実績のある `redesign/opt/` を踏襲
+  （ロゴ=PNG・ショット=WebP の data:URI）。
+- **home は再投入せず**（納品版は 07-13 の生ソースで、統合リナが直した「大手フィンテック経由」の
+  守秘違反が残っている。差分は組版のみ）。
+- 投入は単一トランザクション＋DBバックアップ。手順書 `_work/ayane-site-build/`。
+- ⚠️ **引き継ぎ書に無い12枚目 `/trust` が本番に存在**していた（07-14 追加）。DB を正とすること。
+
+### 🔴 公開SSR/SPA のちらつき — **同じ症状に独立した原因が4つ**あった
+
+施主が実機で3回「まだ出る」と指摘し、そのたびに別の原因が出た。**curl や DOM の一点観測では
+1つも検出できず**、決め手は毎回**実ブラウザ**（最後は Playwright の動画をフレーム分解）。
+
+| Issue | 原因 |
+|---|---|
+| **#879** | **SSR が `layout` を無視**。`bare` にも汎用 chrome（パンくず・`← ページ`・`<h2>content</h2>`）を出力。`PublicLayouts::resolve()` は実装もテストも存在したが**呼んでいるのは自身のテストだけ**だった＝配線漏れ。仕様書（docblock）自身が `bare: no header/footer, no theme` と書いており実装が仕様に違反 |
+| **#881** | SPA が bootstrap から **permalink 解決を seed していない** → resolve 待ちで `RecordShellMessage`（テーマ chrome＋Loading…）を描画。bootstrap に `canonicalPath` を追加して seed |
+| **#883** | ①1セグメント URL は SPA が**タイプ一覧**と解釈し `PublicBrowsePage` に入る。その型一覧クエリが seed と**キー不一致**（`{limit:20}` vs `{limit:100}`）②**blocks だけ seed 不能で毎回フェッチ**し `isLoading` を握っていた（サーバは型が宣言するデータ型しか読まない設計なのに SPA だけ無条件） |
+| **#887** | **bootstrap の `entityTypes` が `{id,name,slug}` だけ**。SPA は hydrate して二度と取り直さないので **`defaultLayout`/`permalinkPattern` が永久に undefined** → `resolveLayout` が `standard` に落ちる。**DB で `default_layout=bare` に直しても SPA に伝わっていなかった** |
+
+- **#887 は3度目の同型バグ**。`entity` payload には既に同じ教訓のコメントが2つある
+  （#778 可視性フラグ / #816 canonical identity）。個別に気づいて足す運用が破綻しているため、
+  **payload の形をテストでキー集合の厳密一致 pin** した。
+- 併せて **layout 未確定の間はテーマ chrome を推測描画しない**ように（推測は bare サイトで必ず外れる）。
+
+### #885 案A: bespoke ページが SPA 遷移になった
+
+- **実測で判明**: ayane（bespoke）は遷移のたび**フルリロード**、aozora（テーマ）は**クライアント遷移**。
+  原因は bespoke 機構の帰結で、`content` フィールドに React の `<Link>` を書けず生の `<a>` になるため。
+  **これが毎回 SPA を再マウントさせ、上記4バグを毎回顕在化させる土台**でもあった。
+- 公開シェルに**委譲クリックリスナ**（`resolveSpaLink` は純関数＋21テストで除外条件を固定）。
+- **案B（`custom` レイアウト＋デザインのテーマ化）は #885 に open のまま**。chrome の重複
+  （ナビ1項目の変更＝12ページ再生成）も同時に解決する本質策だが launch には間に合わない。
+
+### その他の本番反映
+
+- **#877/#878 タイプ一覧 SSR**: `/posts` 等が SPA 限定で title=「NeNe Records Admin」だった。
+  **aozora の `work` 1,114件が初めてクロール可能に**。SPA の `usePublicBrowseEntityRecordsPage` と
+  同条件（published のみ・PAGE_SIZE=20・id 降順）を意図的に写した。
+- **#872/#874 OFL 表示義務**: subset の name テーブルが空・OFL.txt 無し・CSS も一言のみで
+  **OFL 1.1 §2 の3経路すべてが空**だった。`vite.config.ts` から `assets/OFL-ZenKakuGothicNew.txt` を
+  emit（既存の Apache `/assets` alias で配信＋ZIP へも自動同梱）＋ build-release.sh に fail-loud guard。
+  ★実測: **`/*!` legal comment は Vite 8/rolldown の最小化で消える**のでライセンス表示に使えない。
+  ★上流に RFN 宣言が無いので family 改名は不要。
+- **#875/#876 公開ラベル導出**: `/company/ceo` のパンくず 60.5KB・JSON-LD 61.8KB が生HTML全文だった
+  （#849/#853 の**公開側の双子**。あの2本は管理画面側のみ）。→ 実測 298.7KB→114.4KB / JSON-LD 0.4KB。
+
+### 本番設定の是正（コード変更なし・即反映）
+
+- `theme_overrides` の**陳腐化した色**（accent `#ff0000` / surface `#8b2323`）→ デザイントークン
+  （`#D64525` / `#F6F3EC`）。bespoke はテーマを使わないので**背景色だけが漏れていた**。
+- 型 `pages` の **`default_layout` を `standard`→`bare`**（全12レコードが bare なのに型既定が
+  standard で、ロード中に standard chrome が描かれていた）。
+- **未使用 `posts` 型を削除**（0件・参照ゼロを確認し、製品の `DeleteEntityTypeUseCase` 経由）。
+
+### ⚠️ デプロイの前提（次回必読）
+
+**本番の NENE2 は sibling ディレクトリ（`~/envs/suite-stg/records/NENE2`）で `@dev` 解決**。
+07-15 時点で 7/8 相当（src 209ファイル）まで後れており、**そのまま main を載せると #869 の
+`enableAuthorizationHeaderFallback` が古い NENE2 に当たり起動不能**だった（デプロイ前チェックで捕捉）。
+
+- **CI は `git clone --depth=1` ＝ NENE2 main を使う**。`composer.json` も `"hideyukimori/nene2": "@dev"`。
+  → **v1.11.0 は「リリース済みだが誰も検証していない組み合わせ」で、main が実証済みの組み合わせ**。
+- `docker/php/Dockerfile.prod` は `additional_contexts: nene2` → `COPY --from=nene2 . /var/www/NENE2`。
+  **`NENE2/` を先に rsync しないとビルドしても古いまま**。
+- rsync `--delete` は NENE2 の `frontend/`（デモ用React）22件を消すだけで `src/` は無傷だが、**`--delete` は使わない**運用にした。
+
+## 残（open）
+
+- **#885 案B**（`custom` ＋ デザインのテーマ化）= chrome 重複の本質策・launch 後
+- **#873** org 単位のフォントアップロード（Font Library）。**AYANE 専用 subset が製品コアに焼き込まれ、
+  base ZIP に 389KB 常時同梱＋全 org の公開サイトで @font-face 登録**されている構造問題の解決
+- **#883 の残**: bootstrap に `blocksFields` を載せる（blocks を持つ型では依然フェッチ）
+- 遷移中の **~75ms の空白**（resolve 待ち・間違ったレイアウトではない）。hover プリフェッチで消せる見込み
+- **`/blog` の扱い**（bespoke ページ1枚を推奨・ナビ「ブログ」は 07-11 施主裁定）／`/for-accountants`
+  （**存在しない**・第2弾スコープ・フッターに13リンク）
+- #774 ニュースレター / #741 クローズ判定（AYANE Tier A 移送の実走待ち）
+
+## 前回: 残フォローアップ一掃バッチ（2026-07-14・main 反映・本番デプロイ済み）
 
 > repo-status で洗い出した「次の一手・リスク」のうち自走可能な全件を、並列サブエージェント＋指揮レビューで
 > 一括出荷した。**8 PR すべて main マージ済み・CI 緑**（#837/#838/#839/#841/#842/#843/#846 ＋追加の #850）。
