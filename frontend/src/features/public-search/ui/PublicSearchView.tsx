@@ -7,6 +7,7 @@ import {
 import { useTranslation } from '@/shared/i18n'
 import { IconArrowLeft, IconInbox } from '@/shared/ui/icons/magazine-icons'
 import { IconSearch } from '@/shared/ui/icons/Icons'
+import { LoadingRows } from '@/shared/ui/loading'
 
 export interface PublicSearchViewProps {
   query: string
@@ -68,7 +69,7 @@ export function PublicSearchView({
       {!hasQuery ? (
         <p className="searchhint">{t('public.search.prompt')}</p>
       ) : isLoading ? (
-        <p className="searchhint">{t('public.search.loading')}</p>
+        <LoadingRows />
       ) : isError ? (
         <div className="empty" style={{ marginTop: '2rem' }}>
           <h3 className="empty__title">{t('public.search.error.title')}</h3>

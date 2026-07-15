@@ -34,6 +34,7 @@ import {
   type ThemeLogo,
 } from '@/shared/lib/theme-customization'
 import type { PublicSite } from './public-site-context'
+import { RouteProgress } from './RouteProgress'
 
 function useSiteDocumentMeta(siteName: string, metaDescription: string): void {
   useEffect(() => {
@@ -180,7 +181,10 @@ export function PublicShell() {
   return (
     <>
       <ScrollRestoration />
-      <Suspense fallback={null}>
+      {/* The lazy route chunk is the one wait that happens before any page — and
+          therefore before any layout is known — so it gets the same
+          layout-independent signal as the in-page resolvers (#894). */}
+      <Suspense fallback={<RouteProgress theme={site.activeTheme} />}>
         <Outlet context={site} />
       </Suspense>
       <ConsentBanner config={analytics} />

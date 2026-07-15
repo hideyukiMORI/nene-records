@@ -423,7 +423,6 @@ export const de = {
   'widgets.calendar.weekday.sat': 'Sa',
   'public.dateArchive.dayTitle': 'Archiv: {{year}}/{{month}}/{{day}}',
   'public.dateArchive.monthTitle': 'Archiv: {{year}}/{{month}}',
-  'public.dateArchive.loading': 'Wird geladen…',
   'public.landing.heading': 'Baue deine Website mit NeNe Records',
   'public.landing.subheading':
     'Ein KI-natives CMS. Erstelle in Sekunden eine Website — flexibel, typisiert, ohne Einrichtung.',
@@ -446,7 +445,6 @@ export const de = {
   'public.search.submit': 'Suchen',
   'public.search.prompt':
     'Geben Sie ein Stichwort ein und drücken Sie die Eingabetaste, um veröffentlichte Datensätze zu durchsuchen.',
-  'public.search.loading': 'Wird gesucht…',
   'public.search.error.title': 'Suche nicht möglich',
   'public.search.resultCount.one': '{{count}} Ergebnis für „{{query}}“',
   'public.search.resultCount.other': '{{count}} Ergebnisse für „{{query}}“',
@@ -454,7 +452,6 @@ export const de = {
   'public.search.empty.description':
     'Kein veröffentlichter Datensatz passt zu dieser Suche. Versuchen Sie ein anderes Wort oder stöbern Sie nach Typ.',
   'public.tagArchive.title': 'Schlagwort: {{tag}}',
-  'public.tagArchive.loading': 'Wird geladen…',
   'public.tagArchive.subCount.one': '{{count}} Datensatz mit Schlagwort „{{tag}}“.',
   'public.tagArchive.subCount.other': '{{count}} Datensätze mit Schlagwort „{{tag}}“.',
   'public.tagArchive.error.title': 'Dieses Schlagwort konnte nicht geladen werden',
@@ -472,7 +469,6 @@ export const de = {
   'public.browse.viewToggle.label': 'Ansicht',
   'public.browse.viewToggle.list': 'Listenansicht',
   'public.browse.viewToggle.grid': 'Rasteransicht',
-  'public.browse.loading': 'Wird geladen…',
   'public.browse.error.title': 'Datensätze konnten nicht geladen werden',
   'public.browse.unknownType.title': 'Entitätstyp nicht gefunden',
   'public.browse.unknownType.description': 'Kein öffentlicher Inhalt für „{{slug}}“.',
@@ -495,7 +491,6 @@ export const de = {
   'public.home.hero.artTag': 'typisiert · lesbar · agentenbereit',
   'public.home.latest.eyebrow': 'Neueste zuerst',
   'public.home.latest.title': 'Neueste Datensätze',
-  'public.home.latest.loading': 'Neueste Datensätze werden geladen…',
   'public.home.empty.title': 'Noch keine veröffentlichten Datensätze',
   'public.home.empty.description':
     'Sobald Datensätze veröffentlicht werden, erscheinen sie hier, die neuesten zuerst. Entwürfe und geplante Datensätze bleiben verborgen, bis ihr Veröffentlichungszeitpunkt erreicht ist.',

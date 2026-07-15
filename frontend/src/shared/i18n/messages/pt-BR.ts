@@ -423,7 +423,6 @@ export const ptBR = {
   'widgets.calendar.weekday.sat': 'Sáb',
   'public.dateArchive.dayTitle': 'Arquivo: {{day}}/{{month}}/{{year}}',
   'public.dateArchive.monthTitle': 'Arquivo: {{month}}/{{year}}',
-  'public.dateArchive.loading': 'Carregando…',
   'public.landing.heading': 'Crie seu site com o NeNe Records',
   'public.landing.subheading':
     'Um CMS nativo de IA. Crie um site em segundos — conteúdo flexível e tipado, sem configuração.',
@@ -446,7 +445,6 @@ export const ptBR = {
   'public.search.submit': 'Buscar',
   'public.search.prompt':
     'Digite uma palavra-chave e pressione Enter para buscar registros publicados.',
-  'public.search.loading': 'Buscando…',
   'public.search.error.title': 'Não foi possível buscar',
   'public.search.resultCount.one': '{{count}} resultado para “{{query}}”',
   'public.search.resultCount.other': '{{count}} resultados para “{{query}}”',
@@ -454,7 +452,6 @@ export const ptBR = {
   'public.search.empty.description':
     'Nenhum registro publicado corresponde a essa busca. Tente outra palavra ou navegue por tipo.',
   'public.tagArchive.title': 'Marcado com: {{tag}}',
-  'public.tagArchive.loading': 'Carregando…',
   'public.tagArchive.subCount.one': '{{count}} registro marcado com “{{tag}}”.',
   'public.tagArchive.subCount.other': '{{count}} registros marcados com “{{tag}}”.',
   'public.tagArchive.error.title': 'Não foi possível carregar esta tag',
@@ -471,7 +468,6 @@ export const ptBR = {
   'public.browse.viewToggle.label': 'Visualização',
   'public.browse.viewToggle.list': 'Lista',
   'public.browse.viewToggle.grid': 'Grade',
-  'public.browse.loading': 'Carregando…',
   'public.browse.error.title': 'Não foi possível carregar os registros',
   'public.browse.unknownType.title': 'Tipo de entidade não encontrado',
   'public.browse.unknownType.description': 'Nenhum conteúdo público para “{{slug}}”.',
@@ -494,7 +490,6 @@ export const ptBR = {
   'public.home.hero.artTag': 'tipado · legível · pronto para agentes',
   'public.home.latest.eyebrow': 'Mais novos primeiro',
   'public.home.latest.title': 'Registros mais recentes',
-  'public.home.latest.loading': 'Carregando registros mais recentes…',
   'public.home.empty.title': 'Nenhum registro publicado ainda',
   'public.home.empty.description':
     'Quando os registros forem publicados, eles aparecem aqui, dos mais novos para os mais antigos. Rascunhos e registros agendados ficam ocultos até passar o horário de publicação.',

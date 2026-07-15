@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from '@/shared/i18n'
+import { LoadingCardGrid } from '@/shared/ui/loading'
 import {
   IconArrow,
   IconArrowLeft,
@@ -197,7 +198,7 @@ export function PublicRecordListView({
       </div>
 
       {isLoading ? (
-        <p className="searchhint">{t('public.browse.loading')}</p>
+        <LoadingCardGrid count={6} />
       ) : isError ? (
         <div className="empty" style={{ marginTop: '2rem' }}>
           <h3 className="empty__title">{t('public.browse.error.title')}</h3>

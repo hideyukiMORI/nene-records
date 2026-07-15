@@ -5,6 +5,7 @@ import {
 } from '@/features/public-entity-results'
 import { useTranslation } from '@/shared/i18n'
 import { IconArrowLeft, IconInbox } from '@/shared/ui/icons/magazine-icons'
+import { LoadingCardGrid } from '@/shared/ui/loading'
 
 export interface PublicDateArchiveViewProps {
   title: string
@@ -56,7 +57,7 @@ export function PublicDateArchiveView({
           </Link>
         </div>
       ) : isLoading ? (
-        <p className="searchhint">{t('public.dateArchive.loading')}</p>
+        <LoadingCardGrid count={6} />
       ) : isError ? (
         <div className="empty" style={{ marginTop: '2rem' }}>
           <h3 className="empty__title">{t('public.dateArchive.error.title')}</h3>

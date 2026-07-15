@@ -429,7 +429,6 @@ export const en = {
   'widgets.calendar.weekday.sat': 'Sa',
   'public.dateArchive.dayTitle': 'Archive: {{year}}/{{month}}/{{day}}',
   'public.dateArchive.monthTitle': 'Archive: {{year}}/{{month}}',
-  'public.dateArchive.loading': 'Loading…',
   'public.landing.heading': 'Build your site with NeNe Records',
   'public.landing.subheading':
     'An AI-native CMS. Spin up a site in seconds — flexible, typed content with no setup.',
@@ -451,7 +450,6 @@ export const en = {
   'public.search.inputLabel': 'Search records',
   'public.search.submit': 'Search',
   'public.search.prompt': 'Type a keyword and press Enter to search published records.',
-  'public.search.loading': 'Searching…',
   'public.search.error.title': 'Could not search',
   'public.search.resultCount.one': '{{count}} result for “{{query}}”',
   'public.search.resultCount.other': '{{count}} results for “{{query}}”',
@@ -459,7 +457,6 @@ export const en = {
   'public.search.empty.description':
     'No published records match that search. Try another word, or browse by type.',
   'public.tagArchive.title': 'Tagged: {{tag}}',
-  'public.tagArchive.loading': 'Loading…',
   'public.tagArchive.subCount.one': '{{count}} record tagged “{{tag}}”.',
   'public.tagArchive.subCount.other': '{{count}} records tagged “{{tag}}”.',
   'public.tagArchive.error.title': 'Could not load this tag',
@@ -476,7 +473,6 @@ export const en = {
   'public.browse.viewToggle.label': 'View',
   'public.browse.viewToggle.list': 'List view',
   'public.browse.viewToggle.grid': 'Grid view',
-  'public.browse.loading': 'Loading…',
   'public.browse.error.title': 'Could not load records',
   'public.browse.unknownType.title': 'Entity type not found',
   'public.browse.unknownType.description': 'No public content for “{{slug}}”.',
@@ -499,7 +495,6 @@ export const en = {
   'public.home.hero.artTag': 'typed · readable · agent-ready',
   'public.home.latest.eyebrow': 'Newest first',
   'public.home.latest.title': 'Latest records',
-  'public.home.latest.loading': 'Loading latest records…',
   'public.home.empty.title': 'No published records yet',
   'public.home.empty.description':
     'When records are published they appear here, newest first. Draft and scheduled records stay hidden until their publish time passes.',
