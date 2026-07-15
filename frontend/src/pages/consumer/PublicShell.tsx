@@ -12,6 +12,7 @@ import { useAnalyticsPageView } from '@/shared/lib/use-analytics-page-view'
 import { resolveWebAnalytics } from '@/shared/lib/web-analytics'
 import { parseLayoutConfig } from '@/shared/lib/layout-config'
 import { parseRecordPageConfig } from '@/shared/lib/record-page-config'
+import { useSpaLinkInterception } from './use-spa-link-interception'
 import {
   buildThemeStylesheet,
   readStoredRuntimeTheme,
@@ -70,6 +71,8 @@ export function PublicShell() {
   // SPA reports client-side navigations and offers the consent prompt.
   const analytics = useMemo(() => resolveWebAnalytics(settings), [settings])
   useAnalyticsPageView(analytics)
+  // Plain `<a href>` inside a bespoke page's own chrome would otherwise full-load (#885).
+  useSpaLinkInterception()
 
   // Apply the last-known theme synchronously on first paint, then reconcile with
   // the fetched setting — avoids a default→saved theme flash (FOUC) while the
