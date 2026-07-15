@@ -365,25 +365,13 @@ final readonly class GetPublicRecordViewUseCase implements GetPublicRecordViewUs
     /** @param list<TextField> $textFieldRows */
     private function resolveRecordLabel(int $entityId, array $textFieldRows, ?string $permalink = null): string
     {
-        foreach ($textFieldRows as $textField) {
-            if ($textField->entityId === $entityId && $textField->fieldKey === 'title' && trim($textField->value) !== '') {
-                return $textField->value;
-            }
-        }
-
-        foreach ($textFieldRows as $textField) {
-            if ($textField->entityId === $entityId && trim($textField->value) !== '') {
-                return $textField->value;
-            }
-        }
-
         // No title field → humanize the permalink's last segment before a bare id (#657).
         $segment = PermalinkLabel::lastSegment($permalink);
-        if ($segment !== null) {
-            return PermalinkLabel::humanize($segment);
-        }
+        $fallback = $segment !== null ? PermalinkLabel::humanize($segment) : 'Record #' . $entityId;
 
-        return 'Record #' . $entityId;
+        // Derives (strips + caps) the non-title fallback so a bespoke page's whole
+        // html body cannot become a relation label / page title (#875).
+        return RecordDisplayLabel::resolve($entityId, $textFieldRows, null, $fallback);
     }
 
     /**

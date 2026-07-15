@@ -122,4 +122,74 @@ final class PublicRecordHierarchyBuilderTest extends TestCase
         self::assertSame([], $hierarchy->breadcrumbs);
         self::assertSame([], $hierarchy->childPages);
     }
+
+    /**
+     * Regression (#875): a bespoke page (bare layout, one html field, no `title`)
+     * must not dump its whole source into an ancestor crumb or a child link.
+     * Production served a 57KB breadcrumb label and a 61.8KB JSON-LD BreadcrumbList
+     * this way — the public twin of the admin listing bug (#849/#853).
+     */
+    public function testTitlelessBespokeAncestorAndChildLabelsAreDerivedNotRawHtml(): void
+    {
+        $body = '<div style="background:#F6F3EC"><header>' . str_repeat('本文テキスト', 400) . '</header></div>';
+
+        $entities = new InMemoryEntityRepository([
+            new Entity(id: 1, entityTypeId: 1, slug: 'company', permalink: '/company', status: EntityStatus::Published),
+            new Entity(id: 2, entityTypeId: 1, slug: 'ceo', permalink: '/company/ceo', status: EntityStatus::Published),
+        ]);
+        $textFields = new InMemoryTextFieldRepository([
+            new TextField(entityId: 1, fieldKey: 'content', value: $body, id: 1),
+            new TextField(entityId: 2, fieldKey: 'content', value: $body, id: 2),
+        ], $entities);
+
+        $hierarchy = $this->builder($entities, $textFields)->buildById(2);
+
+        $ancestor = $hierarchy->breadcrumbs[0]->label;
+        self::assertStringNotContainsString('<div', $ancestor, 'markup must be stripped');
+        self::assertStringNotContainsString('style=', $ancestor);
+        self::assertLessThanOrEqual(121, mb_strlen($ancestor), 'derived label must stay capped');
+        self::assertStringEndsWith('…', $ancestor);
+
+        $child = $this->builder($entities, $textFields)->build('/company', '/company', 'Company')->childPages;
+        self::assertCount(1, $child);
+        self::assertStringNotContainsString('<div', $child[0]->title);
+        self::assertLessThanOrEqual(121, mb_strlen($child[0]->title));
+    }
+
+    /** #875: meta_title beats the derived excerpt, mirroring the admin listing (#853). */
+    public function testMetaTitleBeatsDerivedExcerptForTitlelessPages(): void
+    {
+        $body = '<div><nav>SERVICE PRODUCTS COMPANY</nav><h1>会社案内</h1></div>';
+
+        $entities = new InMemoryEntityRepository([
+            new Entity(id: 1, entityTypeId: 1, slug: 'company', permalink: '/company', status: EntityStatus::Published, metaTitle: '会社案内｜彩音インターナショナル株式会社'),
+            new Entity(id: 2, entityTypeId: 1, slug: 'ceo', permalink: '/company/ceo', status: EntityStatus::Published, metaTitle: '代表紹介 森 秀之'),
+        ]);
+        $textFields = new InMemoryTextFieldRepository([
+            new TextField(entityId: 1, fieldKey: 'content', value: $body, id: 1),
+            new TextField(entityId: 2, fieldKey: 'content', value: $body, id: 2),
+        ], $entities);
+
+        $hierarchy = $this->builder($entities, $textFields)->buildById(2);
+        self::assertSame('会社案内｜彩音インターナショナル株式会社', $hierarchy->breadcrumbs[0]->label);
+
+        $children = $this->builder($entities, $textFields)->build('/company', '/company', 'Company')->childPages;
+        self::assertSame('代表紹介 森 秀之', $children[0]->title);
+    }
+
+    /** #875: an explicit `title` field still wins over meta_title and is kept verbatim. */
+    public function testExplicitTitleFieldStillWinsOverMetaTitle(): void
+    {
+        $entities = new InMemoryEntityRepository([
+            new Entity(id: 1, entityTypeId: 1, slug: 'about', permalink: '/company/about', status: EntityStatus::Published, metaTitle: 'SEO Title'),
+            new Entity(id: 2, entityTypeId: 1, slug: 'team', permalink: '/company/about/team', status: EntityStatus::Published),
+        ]);
+        $textFields = new InMemoryTextFieldRepository([
+            new TextField(entityId: 1, fieldKey: 'title', value: 'About Us', id: 1),
+            new TextField(entityId: 2, fieldKey: 'title', value: 'Our Team', id: 2),
+        ], $entities);
+
+        $hierarchy = $this->builder($entities, $textFields)->buildById(2);
+        self::assertSame('About Us', $hierarchy->breadcrumbs[1]->label);
+    }
 }

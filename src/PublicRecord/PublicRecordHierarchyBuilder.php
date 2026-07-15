@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NeNeRecords\PublicRecord;
 
+use NeNeRecords\Entity\Entity;
 use NeNeRecords\Entity\EntityRepositoryInterface;
 use NeNeRecords\Entity\EntityStatus;
 use NeNeRecords\TextField\TextFieldRepositoryInterface;
@@ -52,7 +53,7 @@ final readonly class PublicRecordHierarchyBuilder
             return PublicRecordHierarchy::empty();
         }
 
-        $title = $this->titlesByIds([$entity->id])[$entity->id]
+        $title = $this->titlesByIds([$entity])[$entity->id]
             ?? $this->humanize(basename($entity->permalink));
 
         // A custom-permalink record's canonical path is the permalink itself (#651 PR1).
@@ -78,7 +79,7 @@ final readonly class PublicRecordHierarchyBuilder
         // Resolve ancestors (every segment but the last) so crumbs use the real
         // page title and only link to segments that are actually published pages.
         $ancestorIdByPath = [];
-        $ancestorIds = [];
+        $ancestors = [];
         $cumulative = '';
         foreach ($segments as $index => $segment) {
             $cumulative .= '/' . $segment;
@@ -93,11 +94,11 @@ final readonly class PublicRecordHierarchyBuilder
                 && $ancestor->status === EntityStatus::Published
             ) {
                 $ancestorIdByPath[$cumulative] = $ancestor->id;
-                $ancestorIds[] = $ancestor->id;
+                $ancestors[] = $ancestor;
             }
         }
 
-        $titlesById = $this->titlesByIds($ancestorIds);
+        $titlesById = $this->titlesByIds($ancestors);
 
         $crumbs = [];
         $cumulative = '';
@@ -129,14 +130,7 @@ final readonly class PublicRecordHierarchyBuilder
     {
         $children = $this->entities->findDirectChildrenByPermalink($permalink, self::CHILD_LIMIT);
 
-        $ids = [];
-        foreach ($children as $child) {
-            if ($child->id !== null) {
-                $ids[] = $child->id;
-            }
-        }
-
-        $titlesById = $this->titlesByIds($ids);
+        $titlesById = $this->titlesByIds($children);
 
         $links = [];
         foreach ($children as $child) {
@@ -153,27 +147,37 @@ final readonly class PublicRecordHierarchyBuilder
     }
 
     /**
-     * @param list<int> $entityIds
-     * @return array<int, string> entityId => display title
+     * Entities (not ids) because the label needs `meta_title`, which the callers
+     * already hold — re-fetching them here would be a second query for nothing.
+     *
+     * @param list<Entity> $entities
+     * @return array<int, string> entityId => display label
      */
-    private function titlesByIds(array $entityIds): array
+    private function titlesByIds(array $entities): array
     {
-        if ($entityIds === []) {
+        $ids = [];
+        $metaTitleById = [];
+        foreach ($entities as $entity) {
+            if ($entity->id === null) {
+                continue;
+            }
+            $ids[] = $entity->id;
+            $metaTitleById[$entity->id] = $entity->metaTitle;
+        }
+
+        if ($ids === []) {
             return [];
         }
 
-        $rows = $this->textFields->findByEntityIds($entityIds);
+        $rows = $this->textFields->findByEntityIds($ids);
         $byId = [];
 
-        foreach ($rows as $row) {
-            if ($row->fieldKey === 'title' && trim($row->value) !== '' && !isset($byId[$row->entityId])) {
-                $byId[$row->entityId] = $row->value;
-            }
-        }
-
-        foreach ($rows as $row) {
-            if (!isset($byId[$row->entityId]) && trim($row->value) !== '') {
-                $byId[$row->entityId] = $row->value;
+        foreach ($ids as $id) {
+            // Empty fallback: callers already humanize the permalink segment, which
+            // is a better last resort here than a bare id.
+            $label = RecordDisplayLabel::resolve($id, $rows, $metaTitleById[$id] ?? null, '');
+            if ($label !== '') {
+                $byId[$id] = $label;
             }
         }
 
