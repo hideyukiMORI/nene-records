@@ -27,7 +27,14 @@ export interface PublicBrowseType {
 
 export function usePublicBrowseEntityRecordsPage(entityTypeSlug: string, offset: number) {
   const { locale } = useTranslation()
-  const entityTypeQuery = useEntityTypeList()
+  // Must match the key `seedPublicRecordViewCache` primes from the SSR bootstrap
+  // ({limit:100}), or this misses the cache and refetches. That matters here beyond a
+  // wasted request: a single-segment bespoke URL (`/services`) routes to this page
+  // first, and until the type list answers we cannot know the slug is a permalink
+  // rather than a type — so the site chrome renders over a `bare` page and then
+  // disappears (#883). 100 is also what the other public consumers ask for, and it
+  // avoids truncating orgs with more than 20 types.
+  const entityTypeQuery = useEntityTypeList({ limit: 100, offset: 0 })
   const entityType = useMemo(
     () => findEntityTypeBySlug(entityTypeQuery.data?.items ?? [], entityTypeSlug),
     [entityTypeQuery.data?.items, entityTypeSlug],

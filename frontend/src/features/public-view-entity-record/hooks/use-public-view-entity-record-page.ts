@@ -44,7 +44,16 @@ export function usePublicViewEntityRecordPage(entityTypeId: number, entityId: nu
   const enumFieldQuery = useEnumFieldList(listParams)
   const boolFieldQuery = useBoolFieldList(listParams)
   const dateTimeFieldQuery = useDateTimeFieldList(listParams)
-  const blocksFieldQuery = useBlocksFieldList(listParams)
+  // Every other field list is primed from the SSR bootstrap, but `blocks` is not in
+  // it, so an unconditional fetch here is the one request that still gates
+  // `isLoading` — replacing the server-rendered page with "Loading…" on every visit
+  // (#883). The server itself only reads a field table when the type declares that
+  // data type; mirror that, so a type without a `blocks` field asks for nothing.
+  const hasBlocksField = useMemo(
+    () => (fieldDefQuery.data?.items ?? []).some((def) => def.dataType === 'blocks'),
+    [fieldDefQuery.data?.items],
+  )
+  const blocksFieldQuery = useBlocksFieldList(listParams, { enabled: hasBlocksField })
 
   const fieldRows = useMemo((): PublicFieldRow[] => {
     const fieldDefs = fieldDefQuery.data?.items ?? []
