@@ -20,11 +20,20 @@
       runtime container (RuntimeServiceProvider -> GuardedJwtSecretResolver) can
       resolve a secret without a real NENE2_LOCAL_JWT_SECRET. APP_ENV is local
       here, so production fail-closed behaviour is unaffected. This enables the
-      injected dev secret; it does NOT disable authentication. No current test
-      boots the full container (verified: suite passes without this too), but
-      this keeps the repo ready for one that does.
+      injected dev secret; it does NOT disable authentication.
     -->
     <env name="APP_ENV" value="local"/>
     <env name="NENE2_ALLOW_DEV_SECRET" value="1"/>
+    <!--
+      DB_ADAPTER/DB_NAME: AuthorizationHeaderFallbackE2ETest boots the full runtime
+      container (RuntimeContainerFactory) and needs a working connection. SQLite
+      in-memory keeps this hermetic (no external DB in CI). The container caches
+      DatabaseQueryExecutorInterface as a singleton per boot, so the schema the test
+      creates through that same service is visible to every repository the request
+      pipeline reads from during that boot. See NENE2
+      vendor/hideyukimori/nene2/docs/development/test-database-strategy.md.
+    -->
+    <env name="DB_ADAPTER" value="sqlite"/>
+    <env name="DB_NAME" value=":memory:"/>
   </php>
 </phpunit>
