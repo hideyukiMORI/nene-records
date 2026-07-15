@@ -120,8 +120,22 @@ if ($ogImageUrl !== null) {
     <!-- SSR content lives inside #root: crawlers / no-JS read it; the SPA
          (createRoot().render) replaces it with the interactive app on mount. -->
     <div id="root">
+    <?php
+      /*
+       * Layout scaffold (#879). `bare` = "no header/footer, no theme — fully custom
+       * page" and `custom` = a bundle host: the SPA renders neither the article chrome
+       * (backlink / title) nor per-field labels for them, so the SSR must not either.
+       * Emitting them anyway made every navigation flash the standard layout and — far
+       * worse — left it as the *only* thing crawlers ever saw.
+       */
+      $bareLayout = $layout === 'bare';
+      $customLayout = $layout === 'custom';
+      $showArticleChrome = !$bareLayout && !$customLayout;
+      /* `bare` owns the whole page: even the path chrome is the author's job. */
+      $showPathChrome = !$bareLayout;
+    ?>
     <?php /* Permalink-path breadcrumb (#651 PR2): populated only on custom-permalink pages. */ ?>
-    <?php if ($breadcrumbs !== []): ?>
+    <?php if ($showPathChrome && $breadcrumbs !== []): ?>
       <nav class="breadcrumb" aria-label="Breadcrumb">
         <ol>
           <li><a href="<?= $e($basePath) ?>/"><?= $e($siteName) ?></a></li>
@@ -137,10 +151,12 @@ if ($ogImageUrl !== null) {
         </ol>
       </nav>
     <?php endif; ?>
+    <?php if ($showArticleChrome): ?>
     <header>
       <p><a href="<?= $e($basePath) ?>/view/<?= $e($entityTypeSlug) ?>">← <?= $e($entityTypeName) ?></a></p>
       <h1><?= $e($pageTitle) ?></h1>
     </header>
+    <?php endif; ?>
     <article>
       <?php foreach ($displayFields as $field): ?>
         <?php if ($field->dataType === 'relation'): ?>
@@ -158,12 +174,15 @@ if ($ogImageUrl !== null) {
           </section>
         <?php elseif ($field->dataType === 'html'): ?>
           <section>
-            <h2><?= $e($field->fieldKey) ?></h2>
+            <?php /* The SPA renders body prose with no field-key label (it reads as an
+                     article, not a labelled definition row). Match that where the SPA
+                     drops the article chrome, so the SSR and the mounted DOM agree (#879). */ ?>
+            <?php if ($showArticleChrome): ?><h2><?= $e($field->fieldKey) ?></h2><?php endif; ?>
             <div class="markdown-body"><?= $renderHtml($field->displayValue) ?></div>
           </section>
         <?php elseif ($field->fieldKey === 'body'): ?>
           <section>
-            <h2><?= $e($field->fieldKey) ?></h2>
+            <?php if ($showArticleChrome): ?><h2><?= $e($field->fieldKey) ?></h2><?php endif; ?>
             <div class="markdown-body"><?= $renderMarkdown($field->displayValue) ?></div>
           </section>
         <?php elseif ($field->dataType === 'bundle'): ?>
@@ -179,7 +198,7 @@ if ($ogImageUrl !== null) {
       <?php endforeach; ?>
     </article>
     <?php /* Section child pages (#651 PR2): a section parent lists its direct children. */ ?>
-    <?php if ($childPages !== []): ?>
+    <?php if ($showPathChrome && $childPages !== []): ?>
       <nav class="child-pages" aria-label="In this section">
         <h2>In this section</h2>
         <ul>
@@ -190,7 +209,7 @@ if ($ogImageUrl !== null) {
       </nav>
     <?php endif; ?>
     <?php /* Derived chapter navigation (#novel): only on a chapter of a multi-chapter work. */ ?>
-    <?php if ($chapterNav !== null): ?>
+    <?php if ($showPathChrome && $chapterNav !== null): ?>
       <nav class="chapter-nav" aria-label="章ナビゲーション">
         <?php if ($chapterNav->prevUrl !== null): ?>
           <a rel="prev" href="<?= $e($basePath . $chapterNav->prevUrl) ?>">← 前の章</a>

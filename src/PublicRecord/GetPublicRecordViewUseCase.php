@@ -19,6 +19,7 @@ use NeNeRecords\FieldDef\FieldDef;
 use NeNeRecords\FieldDef\FieldDefRepositoryInterface;
 use NeNeRecords\IntField\IntField;
 use NeNeRecords\IntField\IntFieldRepositoryInterface;
+use NeNeRecords\Layout\PublicLayouts;
 use NeNeRecords\Media\MediaDerivativeUrl;
 use NeNeRecords\Setting\ListPublicSettingsUseCaseInterface;
 use NeNeRecords\Setting\SettingEntry;
@@ -223,6 +224,9 @@ final readonly class GetPublicRecordViewUseCase implements GetPublicRecordViewUs
             chapterNav: $chapterNav,
             breadcrumbs: $hierarchy->breadcrumbs,
             childPages: $hierarchy->childPages,
+            // Resolve here so the SSR renders the same scaffold the SPA will (#879):
+            // the resolver already existed but nothing on the render path called it.
+            layout: PublicLayouts::resolve($entity->layout, $entityType->defaultLayout),
         );
     }
 

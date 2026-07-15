@@ -208,6 +208,10 @@ final readonly class RenderPublicRecordViewHandler implements PublicRecordViewRe
             'chapterNav' => $output->chapterNav,
             // The front page is a site root, not a node in the path hierarchy: drop the
             // breadcrumb trail + its BreadcrumbList JSON-LD (the template hides both when empty).
+            // `bare` ships a fully custom page (its own chrome, its own CSS) and
+            // `custom` hosts a bundle: neither wants the article scaffold the SPA
+            // also omits. Passing the resolved layout lets the template match (#879).
+            'layout' => $output->layout,
             'breadcrumbs' => $asFrontPage ? [] : $output->breadcrumbs,
             'childPages' => $output->childPages,
             // og:type is `website` for the home page, `article` for a normal record.

@@ -19,6 +19,7 @@ use NeNeRecords\FieldDef\FieldDef;
 use NeNeRecords\FieldDef\FieldDefRepositoryInterface;
 use NeNeRecords\IntField\IntField;
 use NeNeRecords\IntField\IntFieldRepositoryInterface;
+use NeNeRecords\Layout\PublicLayouts;
 use NeNeRecords\Media\MediaDerivativeUrl;
 use NeNeRecords\PublicRecord\ChapterNavBuilder;
 use NeNeRecords\PublicRecord\GetPublicRecordViewOutput;
@@ -230,6 +231,8 @@ final readonly class GetPreviewRecordViewUseCase implements GetPreviewRecordView
             chapterNav: $chapterNav,
             breadcrumbs: $hierarchy->breadcrumbs,
             childPages: $hierarchy->childPages,
+            // Preview must scaffold exactly like the public page it previews (#879).
+            layout: PublicLayouts::resolve($entity->layout, $entityType->defaultLayout),
         );
     }
 
