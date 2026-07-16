@@ -1,3 +1,4 @@
+// [nene2-exemplar:problem-map] — fleet frontend-standards ER-2 RFC 9457 problem-details error model exemplar (check:exemplars).
 export interface ValidationError {
   field: string
   message: string
