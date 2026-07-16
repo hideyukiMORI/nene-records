@@ -473,7 +473,6 @@ export const zhHans = {
   'public.home.error.fallback': '出了点问题。请重试。',
   'public.home.readArticle': '阅读文章',
   'public.home.types.eyebrow': '入口',
-  'public.record.loading': '加载中…',
   'public.record.error.title': '无法加载记录',
   'public.record.noFields': '此记录未定义任何字段。',
   'public.record.chapterNav.prev': '上一章',

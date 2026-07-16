@@ -2861,6 +2861,29 @@
   border-radius: var(--radius-lg);
   margin: 0 0 var(--space-lg);
 }
+/* Article body (#905) — the record detail: a heading bar, then paragraph groups. */
+.nene-public .sk-article {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+.nene-public .sk-article__title {
+  width: 46%;
+  max-width: 22rem;
+  height: calc(var(--text-body) * 1.6);
+}
+.nene-public .sk-para {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+/* One dd-sized line (#905) — a relation field's value while it resolves. */
+.nene-public .sk-line {
+  display: block;
+  height: var(--text-body);
+  width: 84%;
+  max-width: 26rem;
+}
 @media (prefers-reduced-motion: reduce) {
   .nene-public .skeleton::after {
     animation: none;

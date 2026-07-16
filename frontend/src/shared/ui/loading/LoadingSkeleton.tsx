@@ -43,6 +43,24 @@ export function LoadingRows() {
   )
 }
 
+/** An article body — the record detail: a heading bar, then paragraph groups (#905). */
+export function LoadingArticle() {
+  return (
+    <div className="loading-view" aria-busy="true">
+      <div className="sk-article">
+        <div className="skeleton sk-article__title" />
+        {[0, 1].map((p) => (
+          <div className="sk-para" key={p}>
+            <div className="skeleton sk-row" />
+            <div className="skeleton sk-row sk-row--2" />
+            <div className="skeleton sk-row sk-row--3" />
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 /** A featured masthead above a card grid — the home feed. */
 export function LoadingFeatured({ count = 3 }: { count?: number }) {
   return (

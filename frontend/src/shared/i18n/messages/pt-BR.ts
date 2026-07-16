@@ -498,7 +498,6 @@ export const ptBR = {
   'public.home.error.fallback': 'Algo deu errado. Por favor, tente novamente.',
   'public.home.readArticle': 'Ler artigo',
   'public.home.types.eyebrow': 'Entradas',
-  'public.record.loading': 'Carregando…',
   'public.record.error.title': 'Não foi possível carregar o registro',
   'public.record.noFields': 'Nenhum campo definido para este registro.',
   'public.record.chapterNav.prev': 'Capítulo anterior',

@@ -503,7 +503,6 @@ export const en = {
   'public.home.error.fallback': 'Something went wrong. Please try again.',
   'public.home.readArticle': 'Read article',
   'public.home.types.eyebrow': 'Entrances',
-  'public.record.loading': 'Loading…',
   'public.record.error.title': 'Could not load record',
   'public.record.noFields': 'No fields defined for this record.',
   'public.record.chapterNav.prev': 'Previous chapter',

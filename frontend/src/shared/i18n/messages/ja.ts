@@ -496,7 +496,6 @@ export const ja = {
   'public.home.error.fallback': '問題が発生しました。もう一度お試しください。',
   'public.home.readArticle': '記事を読む',
   'public.home.types.eyebrow': '入口',
-  'public.record.loading': '読み込み中…',
   'public.record.error.title': 'レコードを読み込めませんでした',
   'public.record.noFields': 'このレコードにはフィールドが定義されていません。',
   'public.record.chapterNav.prev': '前の章',
