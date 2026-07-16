@@ -10,6 +10,7 @@ import {
 import { PublicRecordByPermalink } from './PublicRecordDetailPage'
 import { PublicSiteShell } from './PublicSiteShell'
 import { usePublicSite } from './public-site-context'
+import { usePublicDocumentTitle } from './use-public-document-title'
 
 export function PublicBrowsePage() {
   const site = usePublicSite()
@@ -31,6 +32,11 @@ export function PublicBrowsePage() {
     errorTitle,
     refetch,
   } = usePublicBrowseEntityRecordsPage(entityTypeSlug, offset)
+
+  // Tab title parity with the SSR type-archive `<title>` (#909), which uses the
+  // type's display name as the page title. When the slug turns out to be a
+  // custom permalink (isUnknownType), the delegate page owns the title instead.
+  usePublicDocumentTitle(isUnknownType ? undefined : (entityType?.name ?? null), site.siteName)
 
   const goToOffset = (nextOffset: number) => {
     const params = new URLSearchParams(searchParams)

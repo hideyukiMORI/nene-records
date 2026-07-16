@@ -36,12 +36,13 @@ import {
 import type { PublicSite } from './public-site-context'
 import { RouteProgress } from './RouteProgress'
 
-function useSiteDocumentMeta(siteName: string, metaDescription: string): void {
+function useSiteDocumentMeta(metaDescription: string): void {
   useEffect(() => {
-    if (siteName !== '') {
-      document.title = siteName
-    }
-
+    // document.title is deliberately NOT set here (#909). Parent effects run
+    // after child effects, so a shell-level write overwrote every page's own
+    // title on hydration — the SSR title collapsed to the bare site name. Pages
+    // own the title via usePublicDocumentTitle; its unmount cleanup restores the
+    // site name for pages that don't set one.
     let meta = document.querySelector('meta[name="description"]')
 
     if (metaDescription === '') {
@@ -56,7 +57,7 @@ function useSiteDocumentMeta(siteName: string, metaDescription: string): void {
     }
 
     meta.setAttribute('content', metaDescription)
-  }, [siteName, metaDescription])
+  }, [metaDescription])
 }
 
 export function PublicShell() {
@@ -169,7 +170,7 @@ export function PublicShell() {
     frontPagePath: settings.front_page ?? '',
   }
 
-  useSiteDocumentMeta(site.siteName, site.metaDescription)
+  useSiteDocumentMeta(site.metaDescription)
 
   // PublicShell only resolves site-wide data and the document meta. The visual
   // scaffold (header / footer / drawer / theme) is the magazine PublicSiteShell,

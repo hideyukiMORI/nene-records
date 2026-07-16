@@ -10,7 +10,8 @@
     <?php if ($metaDescription !== ''): ?>
       <meta name="description" content="<?= $e($metaDescription) ?>" />
     <?php endif; ?>
-    <title><?= $e($pageTitle) ?> — <?= $e($siteName) ?></title>
+    <?php /* Suffix skipped when the title already carries the site name (#909). */ ?>
+    <title><?= $e(\NeNeRecords\PublicRecord\PublicDocumentTitle::compose($pageTitle, $siteName)) ?></title>
     <link rel="canonical" href="<?= $e($canonicalUrl) ?>" />
     <?php /* hreflang alternates for the public content locales (#540). */ ?>
     <?php foreach ($alternateLinks as $alt): ?>
