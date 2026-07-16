@@ -37,7 +37,7 @@ export function PublicSearchView({
 
   return (
     <div className="pagehead">
-      <Link className="backlink" to="/">
+      <Link viewTransition className="backlink" to="/">
         <IconArrowLeft size={16} /> {t('public.nav.allRecords')}
       </Link>
       <h1 className="pagehead__title">{t('public.search.title')}</h1>
@@ -85,7 +85,7 @@ export function PublicSearchView({
           </span>
           <h3 className="empty__title">{t('public.search.empty.title', { query })}</h3>
           <p className="empty__text">{t('public.search.empty.description')}</p>
-          <Link className="btn btn--ghost" to="/">
+          <Link viewTransition className="btn btn--ghost" to="/">
             {t('public.nav.backToLatest')}
           </Link>
         </div>

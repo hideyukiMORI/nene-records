@@ -1,6 +1,7 @@
 import { Suspense, useEffect, useMemo } from 'react'
 import './consumer-theme.css'
 import './public-fonts'
+import './view-transition.css'
 import { Outlet, ScrollRestoration } from 'react-router-dom'
 import { ConsentBanner } from '@/features/consent-banner'
 import { usePublicNavigationItems } from '@/entities/navigation-item'

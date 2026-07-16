@@ -23,7 +23,9 @@ export function RecordBreadcrumb({ items }: RecordBreadcrumbProps) {
     <nav className="breadcrumb" aria-label={t('public.record.breadcrumb.label')}>
       <ol className="breadcrumb__list">
         <li className="breadcrumb__item">
-          <Link to="/">{t('public.record.breadcrumb.home')}</Link>
+          <Link viewTransition to="/">
+            {t('public.record.breadcrumb.home')}
+          </Link>
         </li>
         {items.map((crumb, index) => (
           <li className="breadcrumb__item" key={`${crumb.path ?? crumb.label}-${String(index)}`}>
@@ -32,7 +34,9 @@ export function RecordBreadcrumb({ items }: RecordBreadcrumbProps) {
             ) : crumb.path === null ? (
               <span>{crumb.label}</span>
             ) : (
-              <Link to={crumb.path}>{crumb.label}</Link>
+              <Link viewTransition to={crumb.path}>
+                {crumb.label}
+              </Link>
             )}
           </li>
         ))}

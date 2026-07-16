@@ -36,12 +36,12 @@ export function PublicEntityResultGroup({ entityType, entities }: PublicEntityRe
             <article key={id} className="row row--compact">
               <div className="row__body">
                 <div className="row__metarow">
-                  <Link className="tbadge" to={`/${entityType.slug}`}>
+                  <Link viewTransition className="tbadge" to={`/${entityType.slug}`}>
                     {entityType.name.toLowerCase()}
                   </Link>
                 </div>
                 <h3 className="row__title">
-                  <Link to={url}>
+                  <Link viewTransition to={url}>
                     {getRecordDisplayLabel(
                       id,
                       textFields,

@@ -71,6 +71,7 @@ export function PublicRelationFieldDisplay({
         <dd className="flex flex-col gap-stack-xs">
           {targets.map((target) => (
             <Link
+              viewTransition
               key={`${fieldDef.fieldKey}-${String(target.targetEntityId)}`}
               to={target.href}
               className="font-sans text-body text-accent hover:text-accent-hover"

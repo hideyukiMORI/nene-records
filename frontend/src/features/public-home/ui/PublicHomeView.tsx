@@ -18,7 +18,7 @@ function Eyecatch({ label, className }: { label: string; className: string }) {
 
 function TypeBadge({ slug, name }: { slug: string; name: string }) {
   return (
-    <Link className="tbadge" to={`/${slug}`}>
+    <Link viewTransition className="tbadge" to={`/${slug}`}>
       {name.toLowerCase()}
     </Link>
   )
@@ -35,11 +35,13 @@ function Featured({ item }: { item: HomeFeedItem }) {
           {item.publishedLabel !== '' ? <span className="meta">{item.publishedLabel}</span> : null}
         </div>
         <h3 className="featured__title">
-          <Link to={item.href}>{item.title}</Link>
+          <Link viewTransition to={item.href}>
+            {item.title}
+          </Link>
         </h3>
         {item.excerpt !== '' ? <p className="featured__excerpt">{item.excerpt}</p> : null}
         <div className="featured__foot">
-          <Link className="section__link" to={item.href}>
+          <Link viewTransition className="section__link" to={item.href}>
             {t('public.home.readArticle')} <IconArrow size={15} />
           </Link>
         </div>
@@ -51,7 +53,7 @@ function Featured({ item }: { item: HomeFeedItem }) {
 function ArticleCard({ item }: { item: HomeFeedItem }) {
   return (
     <article className="card">
-      <Link to={item.href}>
+      <Link viewTransition to={item.href}>
         <Eyecatch label={item.eyecatchLabel} className="card__media" />
       </Link>
       <div className="card__metarow">
@@ -59,7 +61,9 @@ function ArticleCard({ item }: { item: HomeFeedItem }) {
         {item.publishedLabel !== '' ? <span className="meta">{item.publishedLabel}</span> : null}
       </div>
       <h3 className="card__title">
-        <Link to={item.href}>{item.title}</Link>
+        <Link viewTransition to={item.href}>
+          {item.title}
+        </Link>
       </h3>
       {item.excerpt !== '' ? <p className="card__excerpt">{item.excerpt}</p> : null}
     </article>
@@ -75,7 +79,7 @@ function EmptyFeed() {
       </span>
       <h3 className="empty__title">{t('public.home.empty.title')}</h3>
       <p className="empty__text">{t('public.home.empty.description')}</p>
-      <Link className="btn btn--ghost" to="/search">
+      <Link viewTransition className="btn btn--ghost" to="/search">
         {t('public.home.empty.searchCta')}
       </Link>
     </div>
@@ -124,10 +128,10 @@ export function PublicHomeHero({
           </h1>
           {metaDescription !== '' ? <p className="hero__lead">{metaDescription}</p> : null}
           <div className="hero__cta">
-            <Link className="btn btn--primary" to="#latest">
+            <Link viewTransition className="btn btn--primary" to="#latest">
               {t('public.home.hero.ctaLatest')} <IconArrow size={17} />
             </Link>
-            <Link className="btn btn--ghost" to={browseHref}>
+            <Link viewTransition className="btn btn--ghost" to={browseHref}>
               {t('public.home.browseByType')}
             </Link>
           </div>
@@ -191,7 +195,7 @@ export function PublicHomeBody({
             </h2>
           </div>
           {types[0] !== undefined ? (
-            <Link className="section__link" to={types[0].href}>
+            <Link viewTransition className="section__link" to={types[0].href}>
               {t('public.nav.allRecords')} <IconArrowUpRight size={15} />
             </Link>
           ) : null}
@@ -228,7 +232,7 @@ export function PublicHomeBody({
           </div>
           <div className="types">
             {types.map((type) => (
-              <Link key={type.slug} className="typecard" to={type.href}>
+              <Link viewTransition key={type.slug} className="typecard" to={type.href}>
                 <span className="typecard__main">
                   <span className="typecard__name">{type.name}</span>
                   <span className="typecard__slug">/{type.slug}</span>

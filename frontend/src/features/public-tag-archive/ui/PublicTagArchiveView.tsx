@@ -30,7 +30,7 @@ export function PublicTagArchiveView({
 
   return (
     <div className="pagehead">
-      <Link className="backlink" to="/">
+      <Link viewTransition className="backlink" to="/">
         <IconArrowLeft size={16} /> {t('public.nav.allRecords')}
       </Link>
       <h1 className="pagehead__title">#{tagName}</h1>
@@ -60,7 +60,7 @@ export function PublicTagArchiveView({
           </span>
           <h3 className="empty__title">{t('public.tagArchive.empty.title', { tag: tagName })}</h3>
           <p className="empty__text">{t('public.tagArchive.empty.description')}</p>
-          <Link className="btn btn--ghost" to="/">
+          <Link viewTransition className="btn btn--ghost" to="/">
             {t('public.nav.backToLatest')}
           </Link>
         </div>
