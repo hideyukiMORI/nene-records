@@ -43,7 +43,9 @@ export function useSpaLinkInterception(): void {
       }
 
       event.preventDefault()
-      void navigate(to)
+      // viewTransition: the browser cross-fades the old and new page (#921).
+      // Unsupported browsers and prefers-reduced-motion swap instantly as before.
+      void navigate(to, { viewTransition: true })
     }
 
     document.addEventListener('click', onClick)

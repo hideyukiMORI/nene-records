@@ -45,7 +45,7 @@ export interface PublicRecordListViewProps {
 
 function TypeBadge({ slug, name }: { slug: string; name: string }) {
   return (
-    <Link className="tbadge" to={`/${slug}`}>
+    <Link viewTransition className="tbadge" to={`/${slug}`}>
       {name.toLowerCase()}
     </Link>
   )
@@ -73,7 +73,7 @@ function GridCard({
 }) {
   return (
     <article className="card">
-      <Link to={item.publicUrl}>
+      <Link viewTransition to={item.publicUrl}>
         <Eyecatch label="eyecatch · 16:10" className="card__media" />
       </Link>
       <div className="card__metarow">
@@ -81,7 +81,9 @@ function GridCard({
         {item.publishedLabel !== '' ? <span className="meta">{item.publishedLabel}</span> : null}
       </div>
       <h3 className="card__title">
-        <Link to={item.publicUrl}>{item.label}</Link>
+        <Link viewTransition to={item.publicUrl}>
+          {item.label}
+        </Link>
       </h3>
     </article>
   )
@@ -98,7 +100,7 @@ function ListRow({
 }) {
   return (
     <article className="row">
-      <Link to={item.publicUrl}>
+      <Link viewTransition to={item.publicUrl}>
         <Eyecatch label="eyecatch · 16:10" className="row__media" />
       </Link>
       <div className="row__body">
@@ -107,7 +109,9 @@ function ListRow({
           {item.publishedLabel !== '' ? <span className="meta">{item.publishedLabel}</span> : null}
         </div>
         <h3 className="row__title">
-          <Link to={item.publicUrl}>{item.label}</Link>
+          <Link viewTransition to={item.publicUrl}>
+            {item.label}
+          </Link>
         </h3>
       </div>
     </article>
@@ -154,7 +158,7 @@ export function PublicRecordListView({
 
   return (
     <div className="pagehead">
-      <Link className="backlink" to="/">
+      <Link viewTransition className="backlink" to="/">
         <IconArrowLeft size={16} /> {t('public.nav.allRecords')}
       </Link>
       <h1 className="pagehead__title">{typeName}</h1>
@@ -164,6 +168,7 @@ export function PublicRecordListView({
         <div className="filterchips">
           {entityTypes.map((type) => (
             <Link
+              viewTransition
               key={type.slug}
               className="chip"
               to={type.href}
@@ -216,7 +221,7 @@ export function PublicRecordListView({
           <p className="empty__text">
             {t('public.browse.unknownType.description', { slug: entityTypeSlug })}
           </p>
-          <Link className="btn btn--ghost" to="/">
+          <Link viewTransition className="btn btn--ghost" to="/">
             {t('public.nav.backToLatest')}
           </Link>
         </div>
@@ -229,7 +234,7 @@ export function PublicRecordListView({
             {t('public.browse.empty.title', { type: typeName.toLowerCase() })}
           </h3>
           <p className="empty__text">{t('public.browse.empty.description')}</p>
-          <Link className="btn btn--ghost" to="/">
+          <Link viewTransition className="btn btn--ghost" to="/">
             {t('public.nav.backToLatest')}
           </Link>
         </div>

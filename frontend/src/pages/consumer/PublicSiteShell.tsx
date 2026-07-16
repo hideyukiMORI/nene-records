@@ -73,6 +73,7 @@ function NavLinkItem({ link, onClick }: { link: ShellNavLink; onClick?: () => vo
   }
   return (
     <Link
+      viewTransition
       className="navlink"
       to={link.to}
       aria-current={link.current ? 'page' : undefined}
@@ -171,7 +172,7 @@ function Brand({ siteName, tagline, logo }: { siteName: string; tagline?: string
   // ロゴ未設定時はマーク枠ごと描画しない（サイト名のみ）。テナントのサイトに
   // プラットフォームのブランド（NeneMark）をフォールバック表示しない (#752)。
   return (
-    <Link className="brand" to="/">
+    <Link viewTransition className="brand" to="/">
       {logo !== undefined && logo !== '' ? (
         <span className="brand__mark">
           <img className="brand__logo" src={logo} alt={siteName} />
@@ -443,7 +444,13 @@ export function PublicSiteShell({
           </nav>
           <div className="hd__actions">
             {hasCta(site.headerConfig.cta) ? <HeaderCtaButton cta={site.headerConfig.cta} /> : null}
-            <Link className="iconbtn hd__search" to="/search" aria-label="Search" title="Search">
+            <Link
+              viewTransition
+              className="iconbtn hd__search"
+              to="/search"
+              aria-label="Search"
+              title="Search"
+            >
               <IconSearch size={18} />
             </Link>
             <LanguageSwitch />
@@ -524,7 +531,9 @@ export function PublicSiteShell({
                           {external ? (
                             <a href={href}>{item.label}</a>
                           ) : (
-                            <Link to={item.url}>{item.label}</Link>
+                            <Link viewTransition to={item.url}>
+                              {item.label}
+                            </Link>
                           )}
                         </li>
                       )
@@ -540,11 +549,15 @@ export function PublicSiteShell({
               <FooterColumn title="Content">
                 <ul>
                   <li>
-                    <Link to="/">Latest</Link>
+                    <Link viewTransition to="/">
+                      Latest
+                    </Link>
                   </li>
                   {footerTypeLinks.map((type) => (
                     <li key={type.slug}>
-                      <Link to={type.href}>{type.name}</Link>
+                      <Link viewTransition to={type.href}>
+                        {type.name}
+                      </Link>
                     </li>
                   ))}
                 </ul>
@@ -552,7 +565,7 @@ export function PublicSiteShell({
               <FooterColumn title="Browse">
                 <ul>
                   <li>
-                    <Link to="/search">
+                    <Link viewTransition to="/search">
                       <IconSearch size={14} /> Search
                     </Link>
                   </li>
@@ -590,7 +603,7 @@ export function PublicSiteShell({
                   {legal.label}
                 </a>
               ) : (
-                <Link key={`${legal.label}-${legal.url}`} to={legal.url}>
+                <Link viewTransition key={`${legal.label}-${legal.url}`} to={legal.url}>
                   {legal.label}
                 </Link>
               )

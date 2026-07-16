@@ -18,15 +18,15 @@ export function ChapterNav({ nav }: ChapterNavProps) {
   return (
     <nav className="chapter-nav" aria-label={t('public.record.chapterNav.index')}>
       {nav.prevUrl !== null ? (
-        <Link className="btn btn--ghost" rel="prev" to={nav.prevUrl}>
+        <Link viewTransition className="btn btn--ghost" rel="prev" to={nav.prevUrl}>
           ← {t('public.record.chapterNav.prev')}
         </Link>
       ) : null}
-      <Link className="btn btn--ghost" to={nav.indexUrl}>
+      <Link viewTransition className="btn btn--ghost" to={nav.indexUrl}>
         {t('public.record.chapterNav.index')}
       </Link>
       {nav.nextUrl !== null ? (
-        <Link className="btn btn--ghost" rel="next" to={nav.nextUrl}>
+        <Link viewTransition className="btn btn--ghost" rel="next" to={nav.nextUrl}>
           {t('public.record.chapterNav.next')} →
         </Link>
       ) : null}

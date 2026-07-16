@@ -24,7 +24,9 @@ export function RecordChildPages({ items }: RecordChildPagesProps) {
       <ul className="child-pages__list">
         {items.map((child) => (
           <li className="child-pages__item" key={child.path}>
-            <Link to={child.path}>{child.title}</Link>
+            <Link viewTransition to={child.path}>
+              {child.title}
+            </Link>
           </li>
         ))}
       </ul>

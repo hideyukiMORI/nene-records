@@ -1,0 +1,18 @@
+/**
+ * 公開サイトのページ遷移クロスフェード（#921）。
+ *
+ * 遷移そのものは View Transitions API（react-router の `viewTransition`）が行い、
+ * duration はブラウザ既定の 0.25s のまま（施主指定 2026-07-16）。ここにあるのは
+ * reduced-motion の無効化だけ — アニメを止めれば即時スワップに退化する。
+ *
+ * ::view-transition-* はドキュメントレベルの擬似要素なので `.nene-public` では
+ * スコープできない（route-progress.css と同じ理由で bare ページにも効かせる必要が
+ * ある）。admin 側は viewTransition 付きのナビゲーションを行わないため無影響。
+ */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

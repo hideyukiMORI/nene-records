@@ -45,7 +45,8 @@ export function PublicBrowsePage() {
     } else {
       params.set('offset', String(nextOffset))
     }
-    setSearchParams(params)
+    // Cross-fade pagination like every other public navigation (#921).
+    setSearchParams(params, { viewTransition: true })
   }
 
   // A single-segment URL whose slug isn't a known type may be a top-level custom

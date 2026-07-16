@@ -69,7 +69,7 @@ function RecordShellMessage({
   return (
     <PublicSiteShell site={site} activeTypeSlug={entityTypeSlug} withSidebar={false}>
       <div className="pagehead">
-        <Link className="backlink" to="/">
+        <Link viewTransition className="backlink" to="/">
           <IconArrowLeft size={16} /> Home
         </Link>
         <div className="empty">
@@ -80,7 +80,7 @@ function RecordShellMessage({
           ) : null}
           <h3 className="empty__title">{title}</h3>
           <p className="empty__text">{description}</p>
-          <Link className="btn btn--ghost" to="/">
+          <Link viewTransition className="btn btn--ghost" to="/">
             Back to latest
           </Link>
         </div>
@@ -115,14 +115,14 @@ function RelatedRecords({
             More from {entityTypeName}
           </h2>
         </div>
-        <Link className="section__link" to={`/${entityTypeSlug}`}>
+        <Link viewTransition className="section__link" to={`/${entityTypeSlug}`}>
           All {entityTypeName.toLowerCase()} <IconArrowUpRight size={15} />
         </Link>
       </div>
       <div className="cardgrid">
         {related.map((item) => (
           <article key={item.id} className="card">
-            <Link to={item.publicUrl}>
+            <Link viewTransition to={item.publicUrl}>
               <div
                 className="eyecatch card__media"
                 role="img"
@@ -131,7 +131,7 @@ function RelatedRecords({
               />
             </Link>
             <div className="card__metarow">
-              <Link className="tbadge" to={`/${entityTypeSlug}`}>
+              <Link viewTransition className="tbadge" to={`/${entityTypeSlug}`}>
                 {entityTypeName.toLowerCase()}
               </Link>
               {item.publishedLabel !== '' ? (
@@ -139,7 +139,9 @@ function RelatedRecords({
               ) : null}
             </div>
             <h3 className="card__title">
-              <Link to={item.publicUrl}>{item.label}</Link>
+              <Link viewTransition to={item.publicUrl}>
+                {item.label}
+              </Link>
             </h3>
           </article>
         ))}
@@ -376,12 +378,12 @@ function PublicRecordDetailContent({
       >
         <article className="article">
           <RecordBreadcrumb items={hierarchy.breadcrumbs} />
-          <Link className="backlink" to={`/${entityTypeSlug}`}>
+          <Link viewTransition className="backlink" to={`/${entityTypeSlug}`}>
             <IconArrowLeft size={16} /> Back to {entityTypeName}
           </Link>
           <header className="article__head">
             <div className="article__metarow">
-              <Link className="tbadge" to={`/${entityTypeSlug}`}>
+              <Link viewTransition className="tbadge" to={`/${entityTypeSlug}`}>
                 {entityTypeName.toLowerCase()}
               </Link>
             </div>
