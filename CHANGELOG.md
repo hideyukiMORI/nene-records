@@ -6,13 +6,14 @@ NeNe Records does not yet follow Semantic Versioning — entries are grouped by 
 
 ---
 
-## [ポスト #536 続 — Tier A インストーラ・移送経路・公開サイト堅牢化] — 2026-06-27 〜 2026-07-13
+## [ポスト #536 続 — Tier A インストーラ・移送経路・公開サイト堅牢化] — 2026-06-27 〜 2026-07-16
 
 > ポスト #536（本番 SaaS 稼働）以降、**共有ホスティング向け Tier A インストーラ**（自己完結 zip）を
 > GitHub Release として公開し、**SaaS org → Tier A の別インスタンス移送経路**を成立させ、公開サイト側の
 > 堅牢化を連続出荷した。Issue/PR の詳細内訳と再開手順は `docs/todo/current.md` を正本とする。
 > 版は **v0.5.0 → v0.5.2**（`VERSION` を単一ソース化）。本番は 2026-07-09 デプロイ（`php` 8.4.23 ピン）、
-> 2026-07-13 に本節の main 差分の本番反映を施主 GO。
+> 2026-07-13 に本節の main 差分の本番反映を施主 GO。07-14〜16 は AYANE サイト立ち上げと公開 SSR/SPA の
+> 是正を連続出荷し、都度本番反映（デプロイ第29〜36回・すべて施主 GO）。
 
 ### Added
 - **Tier A 共有ホスティング インストーラ（#707/#708）** — NENE2 `Nene2\Install` toolkit を配線した
@@ -32,6 +33,18 @@ NeNe Records does not yet follow Semantic Versioning — entries are grouped by 
 - **信頼済み外部埋め込みの per-org CSP allowlist（Phase 1、#802/#803）** — 公開ページ CSP に per-org の
   trusted-embed allowlist を導入（Phase 2 widget プリミティブ・Phase 3 media 同乗は継続）。
 - **bare レイアウトの単一 html 描画（#799/#800）** — 1 html フィールドの bespoke ページを inline＋bare layout で忠実描画。
+- **メンテナンスモードの管理 UI トグル（#814/#837）** — 一般設定に即保存スイッチ＋ON 時の注意表示（来訪者=メンテ表示／ログイン中=通常）。
+- **org 移送カバレッジ拡充（#796/#838）** — comments / webhooks / webhook_deliveries / notification_channels /
+  user_profiles を export/import 対象化（users は非移送・webhook secret は移送しない・user_profiles は email 突合）。
+- **メディア実ファイルの zip 同梱移送（#798/#842）** — CLI 専用 zip 系統（`tools/export-org.php` / `tools/import-org.php`）で
+  DB＋`var/media` 原本を単一 zip に。zip-slip / パストラバーサルはガード＋テスト済み。
+- **trusted-embed 一級 widget プリミティブ（Phase 2、#802/#843）** — origin/src/SRI 必須の widget 型を保存側検証＋
+  SSR（noscript シェル）＋SPA parity で描画。**#802 全 Phase 完了**。
+- **配布 ZIP のフォントをオンデマンド化（#709/#841）** — base zip を約 14MB に削減。
+- **エンティティタイプ一覧の SSR（#877/#878）** — `/posts` 等の型アーカイブをクロール可能に（aozora の `work` 1,114 件が初めて索引対象に）。
+- **bespoke ページの SPA 遷移（#885/#886）** — 生 `<a>` を公開シェルの委譲クリックリスナで横取りしフルリロードを排除。
+- **公開サイトの読み込み中表示（#894/#895）** — レイアウト未確定でも安全な上端バー(3px)＋中央3点。chrome・カラム数・テーマを推測描画しない。
+- **X-Authorization フォールバック受け口を opt-in 有効化（#869）**。
 
 ### Changed
 - **`VERSION` を 0.5.2 にバンプ（#808）** — 版の単一ソースを公開最新に一致（`/machine/health` も同値を報告）。
@@ -41,6 +54,10 @@ NeNe Records does not yet follow Semantic Versioning — entries are grouped by 
   org export・import API に到達できた緩さを capability で閉じる。
 - **本番 compose に `var/media` 永続ボリューム（#807/#809）** — 再ビルドでのメディア消失を防止。
 - **テーマサムネの配信（#705/#706）** — 本番 Apache が `/assets` のみ配信だった問題に `/theme-thumbnails` Alias を追加。
+- **i18n の型権威を en → ja に反転（#870/#871・規約 04 I18N-8）**、非権威カタログは `satisfies Record<MessageKey>` 化（AI-23、#868）。
+- **README を統一テンプレへ（#822/#823）** — 境界宣言新設・生数字撤去・Status 同期。
+- **admin 一覧のレコードラベル正規化（#849/#850・#853/#854）** — 非 title フォールバックをタグ除去＋120字キャップに、
+  meta_title を導出抜粋より優先（bare bespoke ページで一覧が 41,121px に爆発していた）。
 
 ### Fixed
 - **派生画像が AVIF 無しビルド環境で全 500（#737/#738）** — GD が AVIF 非対応（共有ホスティングで実在）でも
@@ -51,9 +68,24 @@ NeNe Records does not yet follow Semantic Versioning — entries are grouped by 
 - **再設置ガード素通し（#713）** — `.env` 無し早期 return が Docker 本番でガードを無効化していたのを probe 常時実行に。
 - **共有ホスティングの env ブリッジ** — phpdotenv v5 が putenv しない環境で getenv 直読み設定が全て既定値化する問題を
   front controller で写して解消。**APP_BASE_PATH の入口 prefix strip** も是正。
+- **公開 SSR/SPA のちらつき4連鎖（#879〜#888）** — 同じ症状に独立した原因が4つ:
+  SSR が `layout` を無視し bare にも汎用 chrome を出力（#879/#880）／SPA が bootstrap から permalink 解決を
+  seed していない（#881/#882）／型一覧クエリの seed キー不一致＋blocks の無条件フェッチ（#883/#884）／
+  bootstrap の `entityTypes` が `{id,name,slug}` だけで `defaultLayout` 等が永久 undefined（#887/#888）。
+  payload の形はキー集合の厳密一致でテスト pin。layout 未確定時の推測描画も全廃。
+- **公開タイプ一覧のラベル parity（#891/#893）** — SPA が `getRecordDisplayLabel()` に `metaTitle` を渡しておらず
+  人間にだけ `Record #1115` と壊れて表示。msw fixture を OpenAPI 契約と同形化し parity テスト5本を追加。
+- **www→apex 301 の回帰（#832/#833・#834/#835）** — subdomain SaaS モードで `www.<base>` を予約し、301 が SPA シェルに飲まれないように。
+- **パンくず/子一覧のラベルを導出＋meta_title 優先に正規化（#875/#876）**。
+- **Zen Kaku Gothic New subset に OFL の著作権表示・条文を同梱（#872/#874）**。
+- **default テーマの focus-ring を WCAG AA 3:1 へ是正（#864/#866）**・**codemod 写像表 v1 の silent no-op 群を契約語彙へ是正（#863/#865）**。
 
 ### Security
 - superadmin コンソール／org export・import API を capability で保護（#797）。
+- **自己診断 #824 の3連修正（#825/#827/#829）** — 未認証の管理 API 読取とクロステナント越境を封鎖、
+  公開サイトの login バウンス回帰を是正、匿名の content read を published-only に限定。
+- **webhook secret／通知チャネル config の機微キーを read で write-only 化（#836/#839・#845/#846）** —
+  read から除去し `has_secret` / config 内 `has_<key>` で代替。省略更新は既存値維持・送信経路は不変。
 
 ---
 
