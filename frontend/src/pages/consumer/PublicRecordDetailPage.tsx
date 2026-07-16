@@ -37,6 +37,7 @@ import { useEntityIdBySlug } from './hooks/use-entity-id-by-slug'
 import { PublicSiteShell } from './PublicSiteShell'
 import { usePublicSite, type PublicSite } from './public-site-context'
 import { RouteProgress } from './RouteProgress'
+import { usePublicDocumentTitle } from './use-public-document-title'
 
 // ── Presentation helpers ──────────────────────────────────────────────────────
 
@@ -245,6 +246,12 @@ function PublicRecordDetailContent({
     humanizeSlug(entity?.slug) ||
     humanizeSlug(permalinkSegments.at(-1)) ||
     `Record #${String(entityId)}`
+  // Tab title parity with the SSR `<title>` (#909): meta_title wins over the
+  // title field there (GetPublicRecordViewUseCase), so mirror that order here.
+  usePublicDocumentTitle(
+    entity === null ? null : entity.metaTitle?.trim() || resolvedTitle,
+    site.siteName,
+  )
   // Reserved chapter-nav metadata (series/chapter_no/chapter_total) is surfaced
   // as the derived chapter navigation, never as an ordinary field row.
   const contentRows = useMemo(

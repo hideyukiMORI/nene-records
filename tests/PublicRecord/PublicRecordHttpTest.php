@@ -277,6 +277,9 @@ final class PublicRecordHttpTest extends TestCase
         self::assertSame(200, $response->getStatusCode());
         self::assertStringContainsString('text/html', $response->getHeaderLine('Content-Type'));
         self::assertStringContainsString('<h1>Hello world</h1>', $html);
+        // Pins the PublicDocumentTitle wiring (#909): suffix present when the page
+        // title does not already carry the site name.
+        self::assertStringContainsString('<title>Hello world — NeNe Records</title>', $html);
         self::assertStringContainsString('id="nene-records-public-record-bootstrap"', $html);
         self::assertStringContainsString('"entityTypeSlug":"article"', $html);
         self::assertStringContainsString('<h2>Sample</h2>', $html);
