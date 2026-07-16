@@ -31,7 +31,7 @@ Flexible entity platform — lighter and more typed than WordPress post meta. Ad
 
 ## Current Status
 
-M1 – M16 complete plus the post-#536 frontier (crawlable SSR / WXR migration / public i18n / production SaaS + Tier A zip installer, v0.5.2 released). In production as a subdomain multi-tenant SaaS. Current frontier: SaaS → Tier A org transport (#741) and public-site hardening. See `docs/todo/current.md` (source of truth).
+M1 – M16 complete plus the post-#536 wave (crawlable SSR / WXR migration / public i18n / production SaaS + Tier A zip installer, v0.5.2 released). In production as a subdomain multi-tenant SaaS. The moving frontier is intentionally not tracked here — the top of `docs/todo/current.md` is the source of truth.
 
 ## Verification
 
