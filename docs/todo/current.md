@@ -1,6 +1,20 @@
 # Current Work
 
-Last updated: 2026-07-16（夜）
+Last updated: 2026-07-16（深夜）
+
+## 最新: AYANE launch 前倒し監査＋公開 title の parity 修正（2026-07-16 深夜・**本番反映済み・第38回**）
+
+> 施主「自走前倒し」GO（hub 経由）で go-live 手前の launch 準備監査を実施。**全13ページ機械監査は緑**
+> （200・soft404 なし・canonical/description/JSON-LD 完備・迷子リンク 0・robots/sitemap 配信・3PDF 200）。
+> 監査で見つけた title の2欠陥を #909/PR #910 で修正し**第38回デプロイで本番反映・live 検証済み**:
+> ①SSR `<title>` の社名二重（meta_title「◯◯｜社名」＋無条件サフィックス）→ `PublicDocumentTitle::compose`
+> （含有時サフィックス抑止・TS twin と両側 pin）②**SPA hydration 後に全ページのタブ題名が siteName だけに退化**
+> （公開側の document.title 書き込みが PublicShell の1箇所のみ・**親 effect は子より後に走る**ため
+> ページ側で設定しても必ず潰される構造）→ `usePublicDocumentTitle`（record=meta_title 優先・browse=型名・
+> unmount で siteName 復帰・委譲時は undefined でスキップ）。**GA4 page_view の title が全ページ同一**だった
+> 問題も同時解消。live 実測: `/services` hydration 後も「サービスと料金｜彩音…」、遷移後「会社案内｜彩音…」。
+> 残所見は issue 化: **#911**（sitemap の `/` 二重・front_page 設定時・軽微）**#912**（og:image が image
+> フィールド無しページで常に不在 → org 既定ソーシャルカードの製品判断・launch ブロッカーではない）。
 
 ## 最新: repo-status 齟齬解消＋#896 クローズ＋読み込み中文言の廃止漏れ修正（2026-07-16 午後〜夜・**本番反映済み**）
 
