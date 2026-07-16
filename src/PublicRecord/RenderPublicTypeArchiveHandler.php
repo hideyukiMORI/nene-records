@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NeNeRecords\PublicRecord;
 
+use NeNeRecords\Http\AcceptPrefersHtml;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
@@ -40,7 +41,9 @@ final readonly class RenderPublicTypeArchiveHandler
             return $response;
         }
 
-        if (!str_contains($request->getHeaderLine('Accept'), 'text/html')) {
+        // Same HTML-preference rule as the site root (#915): the catch-all wildcard and a missing
+        // Accept header get the archive page, not the framework's 404 JSON.
+        if (!AcceptPrefersHtml::check($request->getHeaderLine('Accept'))) {
             return $response;
         }
 

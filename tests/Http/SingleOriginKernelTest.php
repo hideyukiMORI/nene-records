@@ -439,6 +439,48 @@ final class SingleOriginKernelTest extends TestCase
         self::assertSame('', $response->getHeaderLine('X-Test-Archive'));
     }
 
+    /** #915: a catch-all Accept (plain curl, SNS unfurlers) must get the front page, not the JSON index. */
+    public function testFrontPageIsServedAtRootForCatchAllAccept(): void
+    {
+        $request = $this->factory
+            ->createServerRequest('GET', 'https://site.test/')
+            ->withHeader('Accept', '*/*');
+
+        $response = $this->kernel($this->appReturning(200), null, $this->frontPage(true))->handle($request);
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('1', $response->getHeaderLine('X-Front-Page'));
+    }
+
+    /** #915: an explicit non-HTML Accept keeps the framework's JSON answer at `/`. */
+    public function testExplicitJsonAcceptAtRootKeepsTheFrameworkAnswer(): void
+    {
+        $request = $this->factory
+            ->createServerRequest('GET', 'https://site.test/')
+            ->withHeader('Accept', 'application/json');
+
+        $response = $this->kernel($this->appReturning(200), null, $this->frontPage(true))->handle($request);
+
+        self::assertSame('', $response->getHeaderLine('X-Front-Page'));
+    }
+
+    /** #915: the type archive answers a catch-all Accept too — it was a 404 problem+json for unfurlers. */
+    public function testTypeArchiveRendersForCatchAllAccept(): void
+    {
+        $archive = $this->typeArchive(
+            [new EntityType(name: 'Posts', slug: 'posts', id: 2)],
+            [new Entity(id: 5, entityTypeId: 2, slug: 'hello', status: EntityStatus::Published)],
+        );
+
+        $response = $this->kernel($this->appReturning(404), null, null, $archive)->handle(
+            $this->factory->createServerRequest('GET', 'https://site.test/posts')
+                ->withHeader('Accept', '*/*'),
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('posts', $response->getHeaderLine('X-Test-Archive'));
+    }
+
     /** A permalink resolver that claims every 404 path, tagging the response. */
     private function permalinkResolverTagging(): CustomPermalinkResolver
     {
