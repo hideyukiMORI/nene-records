@@ -47,12 +47,30 @@ describe('SanitizedHtml', () => {
     expect(container.querySelector('p')?.textContent).toBe('kept')
   })
 
-  it('strips new-tab target from author links (no reverse-tabnabbing surface)', () => {
+  it('keeps new-tab target and forces noopener/noreferrer onto it (#939 — SSR parity)', () => {
     const { container } = render(
       <SanitizedHtml html={'<a href="https://example.com" target="_blank">x</a>'} />,
     )
     const a = container.querySelector('a')
     expect(a?.getAttribute('href')).toBe('https://example.com')
-    expect(a?.getAttribute('target')).toBeNull()
+    expect(a?.getAttribute('target')).toBe('_blank')
+    const rel = (a?.getAttribute('rel') ?? '').split(/\s+/)
+    expect(rel).toContain('noopener')
+    expect(rel).toContain('noreferrer')
+  })
+
+  it('preserves an existing rel while enforcing the tabnabbing guard', () => {
+    const { container } = render(
+      <SanitizedHtml html={'<a href="https://example.com" target="_blank" rel="me">x</a>'} />,
+    )
+    const rel = (container.querySelector('a')?.getAttribute('rel') ?? '').split(/\s+/)
+    expect(rel).toContain('me')
+    expect(rel).toContain('noopener')
+    expect(rel).toContain('noreferrer')
+  })
+
+  it('leaves targetless links without a forced rel', () => {
+    const { container } = render(<SanitizedHtml html={'<a href="/services">x</a>'} />)
+    expect(container.querySelector('a')?.getAttribute('rel')).toBeNull()
   })
 })
