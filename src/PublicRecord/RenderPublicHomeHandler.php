@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NeNeRecords\PublicRecord;
 
+use NeNeRecords\Http\AcceptPrefersHtml;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
@@ -37,7 +38,10 @@ final readonly class RenderPublicHomeHandler
             return $response;
         }
 
-        if (!str_contains($request->getHeaderLine('Accept'), 'text/html')) {
+        // The catch-all wildcard (plain curl, SNS unfurlers) and a missing header count as wanting
+        // HTML (#915) — only an explicit non-HTML Accept keeps the framework's
+        // JSON index at `/`.
+        if (!AcceptPrefersHtml::check($request->getHeaderLine('Accept'))) {
             return $response;
         }
 
