@@ -21,6 +21,7 @@ Claude Code / AI agent guide for this repository. Cursor summaries live in `.cur
 - **Commits**: Conventional Commits; type/scope English, description/body Japanese, include `(#issue)`.
 - **PR**: purpose, changes, verification, checklist name, `Closes #n`.
 - **Secrets**: never commit `.env`, tokens, or credentials.
+- **Daily reports**: `docs/daily/YYYY-MM-DD.md`（この repo の正。`docs/daily-reports/` は旧置き場・追記しない。フリート裁定 2026-07-16＝リポごとの慣習が正）.
 - **design-export/**: local claudeDesign working directory — keep it untracked (kept out of git via local `.git/info/exclude`, not the shared `.gitignore`); never `git add` it.
 - **Framework**: NENE2 via Composer — read `vendor/hideyukimori/nene2/docs/` for runtime patterns.
 - **MCP**: tools go through OpenAPI HTTP boundary only.
