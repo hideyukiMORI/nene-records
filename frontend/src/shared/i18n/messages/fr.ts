@@ -501,7 +501,6 @@ export const fr = {
   'public.home.error.fallback': 'Une erreur est survenue. Veuillez réessayer.',
   'public.home.readArticle': "Lire l'article",
   'public.home.types.eyebrow': 'Entrées',
-  'public.record.loading': 'Chargement…',
   'public.record.error.title': 'Impossible de charger la fiche',
   'public.record.noFields': 'Aucun champ défini pour cette fiche.',
   'public.record.chapterNav.prev': 'Chapitre précédent',

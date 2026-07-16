@@ -499,7 +499,6 @@ export const de = {
   'public.home.error.fallback': 'Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.',
   'public.home.readArticle': 'Artikel lesen',
   'public.home.types.eyebrow': 'Einstiege',
-  'public.record.loading': 'Wird geladen…',
   'public.record.error.title': 'Datensatz konnte nicht geladen werden',
   'public.record.noFields': 'Für diesen Datensatz sind keine Felder definiert.',
   'public.record.chapterNav.prev': 'Vorheriges Kapitel',

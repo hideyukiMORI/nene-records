@@ -1,1 +1,1 @@
-export { LoadingCardGrid, LoadingFeatured, LoadingRows } from './LoadingSkeleton'
+export { LoadingArticle, LoadingCardGrid, LoadingFeatured, LoadingRows } from './LoadingSkeleton'

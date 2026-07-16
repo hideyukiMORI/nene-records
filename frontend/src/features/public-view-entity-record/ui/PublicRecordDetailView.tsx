@@ -1,6 +1,7 @@
 import type { Entity } from '@/entities/entity'
 import { useTranslation } from '@/shared/i18n'
 import { Button, Stack, Text } from '@/shared/ui'
+import { LoadingArticle } from '@/shared/ui/loading'
 import type { PublicFieldRow } from '../hooks/use-public-view-entity-record-page'
 import { PublicRecordFieldList } from './PublicRecordFieldList'
 
@@ -28,7 +29,10 @@ export function PublicRecordDetailView({
   const { t } = useTranslation()
 
   if (isLoading) {
-    return <Text muted>{t('public.record.loading')}</Text>
+    // Skeleton, not text (#894/#905): the layout is known here (B群), so mirror the
+    // article body's shape — the swap must not move the page, and the signal must
+    // stay language-independent like the rest of the loading states.
+    return <LoadingArticle />
   }
 
   if (isError) {

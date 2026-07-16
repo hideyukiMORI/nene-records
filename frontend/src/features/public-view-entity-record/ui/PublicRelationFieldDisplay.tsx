@@ -26,14 +26,16 @@ export function PublicRelationFieldDisplay({
   )
 
   if (isLoading) {
+    // Skeleton, not text (#894/#905): the dt (field key) is real content and stays;
+    // only the resolving value gets a line-shaped placeholder.
     return (
       <div className="flex flex-col gap-stack-xs">
         <Text as="dt" variant="heading-sm">
           {fieldDef.fieldKey}
         </Text>
-        <Text as="dd" muted>
-          {t('public.record.loading')}
-        </Text>
+        <dd className="loading-view m-0" aria-busy="true">
+          <span className="skeleton sk-line" />
+        </dd>
       </div>
     )
   }
