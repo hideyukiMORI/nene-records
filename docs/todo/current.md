@@ -1,6 +1,24 @@
 # Current Work
 
-Last updated: 2026-07-16（深夜）
+Last updated: 2026-07-18（launch 当日）
+
+## 最新: 🚀 ayane.co.jp LAUNCH（2026-07-18・本番稼働・**このセクションと下の「残（open）」が正**）
+
+> **18年ぶりの刷新が本番稼働**。方式=DNS 不変の「同一サーバ公開フォルダ切替」（前夜ピボット・伝播ゼロ/SSL窓ゼロ）。
+> v0.5.3 zip を HETEML `~/web/domain/ayane_co_jp/www/` に Tier A 設置→fresh export/import→stg 検証
+> （受入=SaaS との URL 正規化 diff 6ページ差分ゼロ）→カットオーバー→apex 全検証緑・301 マップ投入・
+> 送信 E2E 201×2。**#741 は本番実走成立でクローズ**（残課題は #952 へ切り出し）。
+> お問い合わせは同一ドメイン化の上、**embed button モード＋朱スキン＋ブランドフォント**で完成
+> （contact/hub との step1-5 協調）。配布 PDF 3点も v2 化（HTML 版下方式）。詳細 = `docs/daily/2026-07-18.md`。
+
+### ⚠️ AYANE 運用の前提（次回必読）
+
+- **編集の正 = heteml の Tier A インスタンス**（`ssh heteml`・資格は Notion「会社（AYANE）>サイト管理」）。
+  SaaS 側 ayane org（ayane.nene-records.com）は旧制作コピー＝もう二重書き不要。
+- **`/contact` と `/inquiry` は docroot の静的ファイルがエンティティを上書き配信**。
+  この2ページは `public_html/contact/index.html` 等を直接編集（entity 編集では反映されない）。
+- DB 修正は permalink JOIN（entity_id は SaaS と別採番）＋ SET NAMES ＋ live 残存 grep の3点セット。
+- 旧WP = `xion.ayane.co.jp`（Basic 認証・別DB・保全）。stg = `stg.ayane.co.jp`（robots Disallow）。
 
 ## 最新: AYANE launch 前倒し監査＋公開 title の parity 修正（2026-07-16 深夜・**本番反映済み・第38回**）
 
@@ -181,37 +199,32 @@ Last updated: 2026-07-16（深夜）
   **`NENE2/` を先に rsync しないとビルドしても古いまま**。
 - rsync `--delete` は NENE2 の `frontend/`（デモ用React）22件を消すだけで `src/` は無傷だが、**`--delete` は使わない**運用にした。
 
-## 残（open）— **このリストが正**（2026-07-16 時点）
+## 残（open）— **このリストが正**（2026-07-18 launch 後）
 
-### AYANE 公開（07-19）まで
+### 監視・施主手番
 
-- **contact フォーム開通**（別リポ nene-contact）＝ **最後のブロッカー**。records 側の前提は解消済み
-  （下記 #896 クローズ・確定 URL 3本を統合リナ経由で連携済み・contact は差替を確定扱いに格上げ）
-- ~~**#896** `/downloads/*.pdf` 未配信~~ → **クローズ（07-16・受け入れ条件全達・本番は読み取り確認のみ無変更）**。
-  実は **3PDF とも 07-12 01:35 に media アップロード済みだった**（org=ayane・media id 1〜3）。canonical =
-  `https://ayane.nene-records.com/media/2026/07/<hash>.pdf`（本番実測 200/application/pdf・バイト一致）。
-  contact の実測 URL とも突合一致（contact の「4本目」は `/privacy` の HTML ページで PDF ではない）。
-  `/downloads/*.pdf` のソフト404 自体は残るが、参照 0 本・方針Aで不使用のため対応不要
+- ayane.co.jp 安定稼働の監視（旧 dir 温存・ロールバック可能状態を維持）
+- Search Console: 高被リンク旧 URL の個別 301 精緻化（幹線は投入済み・施主確認中）
+- #912 og:image 既定ソーシャルカード（**案1採用・hub 裁定済み**・カード素材=施主/ClaudeDesign 手番）
 
-### launch 後
+### 製品キュー（launch で生まれた・hub からの Issue 駆動発注待ち）
 
-- **#885 案B**（`custom` ＋ デザインのテーマ化）= chrome 重複の本質策
-- **#873** org 単位のフォントアップロード（Font Library）。**AYANE 専用 subset が製品コアに焼き込まれ、
-  base ZIP に 389KB 常時同梱＋全 org の公開サイトで @font-face 登録**されている構造問題の解決
-- **#892** 公開一覧の textFields 取得窓（`{limit:100, offset:0}` が表示窓 id 降順20件を覆っていない）。
-  #891 で出血は止血済みだが `meta_title` が空だと再発。SSR の `findByEntityIds($ids)` が正解の形
-- **#883 の残**: bootstrap に `blocksFields` を載せる（blocks を持つ型では依然フェッチ）
-- **#894 の割り切り**: org の override accent が読み込み中バーに届かない
-  （`buildOverrideCss` が `.nene-public[data-theme=…]` スコープ）→ 組み込みテーマの accent が出る
-- AYANE トップの「最近の動き」3カードが `/blog` と不整合（日付・タイトル違い／`NeNe invoice のデモ` は
-  記事が存在せず行き止まり）。**リンクは3枚とも200**＝壊れてはいない。日付整合と同じく ayane.co.jp 移行時に
-- #774 ニュースレター / #741 クローズ判定（AYANE Tier A 移送の実走待ち）
+- **#952** org-import: 型の slug マージ・既定 defs 生成抑止・wizard シード照合（launch 実走の上流バグ級発見）
+- **#949** media 派生: 書き込み失敗が 200/text/html で警告漏れ（500 or 原本フォールバックに）
+- **Contact 案1**（first-party ブロック＋connect-token・施主GO済み・スロット=リソース空き次第・contact 先行の公算）
+- SSR head への favicon link 正式対応＋org 別 favicon（現状は docroot 直置き・SaaS はテナント共通になるため撤去済み）
 
-### 完了（このリストから外したもの・2026-07-16）
+### 既存キュー（launch 前から継続）
 
-- ~~遷移中の ~75ms の空白~~ → **#894** で上端バー＋中央3点を出した（無描画は維持）
-- ~~`/blog` の扱い~~ → **実体化済み**（entity 1150・施主裁定「一次的に固定ページ」）
-- ~~`/for-accountants` フッターに13リンク~~ → **導線を全除去**（施主GO 07-16。トップの節も含む）
+- **#885 案B**（custom＋テーマ化）= chrome 重複の本質策 ／ **#873** Font Library ／ **#892** 一覧取得窓
+- **#883 の残**（bootstrap blocksFields）／ **#894 の割り切り**（override accent とローディングバー）
+- #858/#857 LP バンドル ／ #844 trusted-embed 管理UI ／ #840 フォントパック自動展開 ／ #774 ニュースレター
+- #676/#678/#679（ページ階層 R4/R5）／ #925 W-Records ／ #937 trusted-embed script（ポケット）
+
+### 判断待ち（施主）
+
+- 士業向け紹介 PDF の新規制作＋導線復活（07-16 に節ごと除去済み・作るなら骨子から）
+- AYANE トップ「最近の動き」3カードの日付整合（施主裁定=優先最下位・ayane.co.jp 完全移行時に）
 
 ## 前回: 残フォローアップ一掃バッチ（2026-07-14・main 反映・本番デプロイ済み）
 
