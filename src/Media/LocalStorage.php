@@ -24,31 +24,46 @@ final readonly class LocalStorage implements StorageInterface
     public function writeFromUpload(string $key, string $tmpPath): void
     {
         $dest = $this->resolve($key);
-        $dir = dirname($dest);
-
-        if (!is_dir($dir) && !mkdir($dir, 0755, true) && !is_dir($dir)) {
-            throw new RuntimeException('Failed to create media directory: ' . $dir);
-        }
+        $this->ensureDirectory(dirname($dest));
 
         // Fall back to copy() in test environments where the source is not an
         // actual HTTP upload and move_uploaded_file() therefore refuses it.
-        if (!move_uploaded_file($tmpPath, $dest) && !copy($tmpPath, $dest)) {
-            throw new RuntimeException('Failed to move uploaded file to: ' . $dest);
+        error_clear_last();
+        if (!@move_uploaded_file($tmpPath, $dest) && !@copy($tmpPath, $dest)) {
+            throw new RuntimeException('Failed to move uploaded file to: ' . $dest . ' (' . self::lastErrorMessage() . ')');
         }
     }
 
     public function write(string $key, string $contents): void
     {
         $dest = $this->resolve($key);
-        $dir = dirname($dest);
+        $this->ensureDirectory(dirname($dest));
 
-        if (!is_dir($dir) && !mkdir($dir, 0755, true) && !is_dir($dir)) {
-            throw new RuntimeException('Failed to create media directory: ' . $dir);
+        error_clear_last();
+        if (@file_put_contents($dest, $contents) === false) {
+            throw new RuntimeException('Failed to write media object: ' . $key . ' (' . self::lastErrorMessage() . ')');
         }
+    }
 
-        if (file_put_contents($dest, $contents) === false) {
-            throw new RuntimeException('Failed to write media object: ' . $key);
+    /**
+     * Failures must surface as the RuntimeException only — a raw PHP warning
+     * (mkdir/file_put_contents on an unwritable var/media) would be echoed into
+     * the response body on display_errors hosts, committing the 200 status
+     * before the handler can answer (#949).
+     */
+    private function ensureDirectory(string $dir): void
+    {
+        error_clear_last();
+        if (!is_dir($dir) && !@mkdir($dir, 0755, true) && !is_dir($dir)) {
+            throw new RuntimeException('Failed to create media directory: ' . $dir . ' (' . self::lastErrorMessage() . ')');
         }
+    }
+
+    private static function lastErrorMessage(): string
+    {
+        $error = error_get_last();
+
+        return $error === null ? 'unknown error' : $error['message'];
     }
 
     public function exists(string $key): bool

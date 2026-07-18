@@ -9,6 +9,7 @@ use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * On-demand image derivatives: GET /media/{preset}/{year}/{month}/{filename}.
@@ -25,6 +26,7 @@ final readonly class ServeDerivativeHandler
         private ImageProcessorInterface $processor,
         private ResponseFactoryInterface $responseFactory,
         private StreamFactoryInterface $streamFactory,
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -57,6 +59,7 @@ final readonly class ServeDerivativeHandler
 
         $base = pathinfo($filename, PATHINFO_FILENAME);
         $derivativeKey = "derivatives/{$preset}/{$format}/{$year}/{$month}/{$base}.{$ext}";
+        $etag = '"' . md5($derivativeKey) . '"';
 
         if (!$this->storage->exists($derivativeKey)) {
             try {
@@ -66,14 +69,32 @@ final readonly class ServeDerivativeHandler
                     MediaImagePresets::maxWidth($preset),
                     $format,
                 );
-                $this->storage->write($derivativeKey, $derived);
             } catch (\RuntimeException) {
                 // Source could not be decoded/encoded (corrupt or unsupported payload).
                 return $this->responseFactory->createResponse(404);
             }
-        }
 
-        $etag = '"' . md5($derivativeKey) . '"';
+            try {
+                $this->storage->write($derivativeKey, $derived);
+            } catch (\RuntimeException $e) {
+                // Only the CACHE write failed (unwritable var/media — permission or
+                // disk trouble); the derivative itself was generated fine. Serve it
+                // from memory instead of failing the image, and log so the broken
+                // cache directory is visible to operators (#949: this used to leak
+                // a PHP warning into a 200/text/html body and no log at all).
+                $this->logger->warning('media: derivative cache write failed, serving uncached', [
+                    'derivative_key' => $derivativeKey,
+                    'error' => $e->getMessage(),
+                ]);
+
+                return $this->responseFactory->createResponse(200)
+                    ->withHeader('Content-Type', $mime)
+                    ->withHeader('Content-Length', (string) strlen($derived))
+                    ->withHeader('Cache-Control', 'public, max-age=31536000, immutable')
+                    ->withHeader('ETag', $etag)
+                    ->withBody($this->streamFactory->createStream($derived));
+            }
+        }
 
         if (trim($request->getHeaderLine('If-None-Match')) === $etag) {
             return $this->responseFactory->createResponse(304)->withHeader('ETag', $etag);

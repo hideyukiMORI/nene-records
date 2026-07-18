@@ -33,6 +33,8 @@ use Nyholm\Psr7\Factory\Psr17Factory;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Psr\Log\AbstractLogger;
+use Psr\Log\NullLogger;
 
 final class MediaHttpTest extends TestCase
 {
@@ -93,7 +95,7 @@ final class MediaHttpTest extends TestCase
                 new UpdateMediaAltUseCase($this->repository),
                 $jsonResponse,
             ),
-            new ServeDerivativeHandler($this->storage, new GdImageProcessor(), $this->factory, $this->factory),
+            new ServeDerivativeHandler($this->storage, new GdImageProcessor(), $this->factory, $this->factory, new NullLogger()),
             new ListMediaUsagesHandler(
                 new FindMediaUsagesUseCase($this->repository),
                 $jsonResponse,
@@ -173,7 +175,7 @@ final class MediaHttpTest extends TestCase
             new DeleteMediaHandler(new DeleteMediaUseCase($emptyRepo, $this->storage), $this->factory),
             new ServeMediaHandler($this->storage, $this->factory, $this->factory),
             new UpdateMediaAltHandler(new UpdateMediaAltUseCase($emptyRepo), $jsonResponse),
-            new ServeDerivativeHandler($this->storage, new GdImageProcessor(), $this->factory, $this->factory),
+            new ServeDerivativeHandler($this->storage, new GdImageProcessor(), $this->factory, $this->factory, new NullLogger()),
             new ListMediaUsagesHandler(new FindMediaUsagesUseCase($emptyRepo), $jsonResponse),
         );
 
@@ -427,6 +429,46 @@ final class MediaHttpTest extends TestCase
         self::assertFileExists($this->storageRoot . '/derivatives/sm/png/2026/05/pic.png');
     }
 
+    public function testDerivativeCacheWriteFailureServesUncachedImageAndLogs(): void
+    {
+        // #949: var/media が web ユーザ非書き込みのとき、200 + text/html（mkdir の
+        // PHP Warning 本文）で画像だけ静かに壊れていた。派生自体は生成済みなので、
+        // キャッシュ書き込み失敗は「未キャッシュのまま画像を返す＋warning ログ」に落とす。
+        $this->seedStorageImage('2026/05/pic.png', 800, 400);
+        // derivatives/ の場所を平ファイルで塞ぐ — root 実行でも mkdir が必ず失敗する。
+        file_put_contents($this->storageRoot . '/derivatives', 'not a directory');
+
+        $log = new class () extends AbstractLogger {
+            /** @var list<array{level: string, message: string}> */
+            public array $records = [];
+
+            /** @param array<mixed> $context */
+            public function log($level, \Stringable|string $message, array $context = []): void
+            {
+                $this->records[] = ['level' => (string) (is_scalar($level) ? $level : ''), 'message' => (string) $message];
+            }
+        };
+        $handler = new ServeDerivativeHandler(
+            $this->storage,
+            new GdImageProcessor(),
+            $this->factory,
+            $this->factory,
+            $log,
+        );
+
+        $response = $handler->handle($this->derivativeRequest('sm', 'pic.png'));
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('image/png', $response->getHeaderLine('Content-Type'));
+        $info = getimagesizefromstring((string) $response->getBody());
+        self::assertNotFalse($info, 'the body is the resized image itself, not a PHP warning');
+        self::assertSame(320, $info[0], 'sm preset still constrains width to 320');
+        self::assertFileDoesNotExist($this->storageRoot . '/derivatives/sm/png/2026/05/pic.png');
+        self::assertCount(1, $log->records);
+        self::assertSame('warning', $log->records[0]['level']);
+        self::assertStringContainsString('derivative cache write failed', $log->records[0]['message']);
+    }
+
     public function testDerivativeNegotiatesWebpFromAcceptHeader(): void
     {
         $this->seedStorageImage('2026/05/pic.png', 200, 200);
@@ -546,7 +588,7 @@ final class MediaHttpTest extends TestCase
             }
         };
 
-        return new ServeDerivativeHandler($this->storage, $processor, $this->factory, $this->factory);
+        return new ServeDerivativeHandler($this->storage, $processor, $this->factory, $this->factory, new NullLogger());
     }
 
     private function derivativeRequest(string $preset, string $filename, string $query = ''): \Psr\Http\Message\ServerRequestInterface

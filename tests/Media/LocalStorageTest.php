@@ -25,6 +25,33 @@ final class LocalStorageTest extends TestCase
         $this->rmdirRecursive($this->root);
     }
 
+    public function testWriteFailureThrowsWithoutEmittingAPhpWarning(): void
+    {
+        // #949: display_errors な共有ホスティングでは、mkdir/file_put_contents の
+        // raw warning が HTTP 本文へ流れて 200/text/html を確定させてしまう。
+        // 失敗は RuntimeException だけで表面化しなければならない。
+        // 平ファイルでディレクトリの場所を塞ぐ — root 実行でも必ず失敗する。
+        file_put_contents($this->root . '/blocked', 'plain file');
+        $storage = new LocalStorage($this->root);
+
+        set_error_handler(static function (int $severity, string $message): bool {
+            if ((error_reporting() & $severity) !== 0) {
+                self::fail('an unsuppressed PHP warning leaked: ' . $message);
+            }
+
+            return true;
+        });
+
+        try {
+            $storage->write('blocked/2026/x.png', 'bytes');
+            self::fail('expected RuntimeException');
+        } catch (RuntimeException $e) {
+            self::assertStringContainsString('Failed to create media directory', $e->getMessage());
+        } finally {
+            restore_error_handler();
+        }
+    }
+
     public function testWriteFromUploadStoresFileUnderKey(): void
     {
         $storage = new LocalStorage($this->root);
