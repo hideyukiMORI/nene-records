@@ -70,7 +70,7 @@ AI clients (MCP)        ──┘
 | Public-site hardening | Superadmin-only console, CSP trusted-embed allowlist (Phase 1), org-level maintenance mode | ✅ merged (#797, #802 Phase 1, #813) |
 | Public-site hardening (remaining) | Trusted-embed Phase 2 (widget primitive) / Phase 3 (media); maintenance-mode admin UI toggle | 🔄 open (#802, #814) |
 
-NeNe Records runs in production as a subdomain multi-tenant SaaS and ships as a self-contained **Tier A zip installer** for shared hosting (current release **v0.5.2**, deployed to production 2026-07-13). Open follow-up work is tracked in [`docs/todo/current.md`](./docs/todo/current.md); see [`docs/roadmap.md`](./docs/roadmap.md) for direction.
+NeNe Records runs in production as a subdomain multi-tenant SaaS and ships as a self-contained **Tier A zip installer** for shared hosting (current release **v0.5.2**, deployed to production 2026-07-13). Open follow-up work is tracked privately in `nene-origin/internal-docs/records/todo/current.md`; see [`docs/roadmap.md`](./docs/roadmap.md) for direction.
 
 | Area | State |
 | --- | --- |

@@ -8,7 +8,7 @@ NeNe Records inherits AI workflow policy from [NENE2](https://github.com/hideyuk
 - Inheritance map: `docs/inheritance-from-nene2.md`
 - Workflow: `docs/workflow.md`
 - Coding rules: `docs/development/coding-standards.md`
-- Current state: `docs/todo/current.md`
+- Current state: private `nene-origin/internal-docs/records/todo/current.md`
 - Agent entry: `AGENTS.md`
 - Cursor summaries: `.cursor/rules/`
 

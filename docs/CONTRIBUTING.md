@@ -16,14 +16,14 @@ NeNe Records is built through small, Issue-driven changes. This document is the 
 | AI tools | `docs/integrations/ai-tools.md` |
 | Agent entry point | `AGENTS.md` |
 | Roadmap | `docs/roadmap.md` |
-| Current work | `docs/todo/current.md` |
+| Current work | private: `nene-origin/internal-docs/records/todo/current.md` |
 
 ## Collaboration Policy
 
 - Start work from a GitHub Issue.
 - Use one branch and one PR per focused work unit.
 - Do not commit directly to `main`.
-- Keep `docs/milestones/`, `docs/roadmap.md`, and `docs/todo/current.md` updated when direction changes.
+- Keep `docs/milestones/`, `docs/roadmap.md`, and the private current.md (`nene-origin/internal-docs/records/todo/`) updated when direction changes.
 - Explain intent, impact, verification, and remaining risk in PRs.
 - Prefer documentation that helps the next developer or AI agent decide what to do without rereading chat history.
 
