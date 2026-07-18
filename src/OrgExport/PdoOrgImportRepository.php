@@ -7,6 +7,7 @@ namespace NeNeRecords\OrgExport;
 use Nene2\Database\DatabaseQueryExecutorInterface;
 use Nene2\Database\DatabaseTransactionManagerInterface;
 use Nene2\Http\ClockInterface;
+use NeNeRecords\Organization\DefaultContentTypeSeederInterface;
 
 /**
  * Inserts an exported org payload into the target organization.
@@ -23,6 +24,14 @@ use Nene2\Http\ClockInterface;
  *    navigation_items.menu_id, media.alt_text/width/height/storage_key, …).
  *    The round-trip is exercised by tests/OrgExport/PdoOrgImportRepositoryTest so
  *    a future column addition that is not mirrored here fails CI.
+ *  - Seed residue is reconciled, not left behind (#952, found on the first real
+ *    Tier A transport): source-wins extends to the field-def SET of a merged
+ *    type (active target defs the source does not ship are soft-deleted —
+ *    otherwise the wizard-seeded title/body defs survive the merge and render
+ *    as empty "title / —" stubs on every public page), and a seeded default
+ *    type (SEED_SLUGS) that the source does not ship is removed entirely when
+ *    nothing references it (seeded types are pinned, so they leak into the
+ *    public bootstrap's entityTypes if left in place).
  */
 final readonly class PdoOrgImportRepository implements OrgImportRepositoryInterface
 {
@@ -59,6 +68,10 @@ final readonly class PdoOrgImportRepository implements OrgImportRepositoryInterf
         // ── entity_types (merge on org+slug) ───────────────────────────────
         /** @var array<int, int> $entityTypeMap  old_id → new_id */
         $entityTypeMap = [];
+        /** @var array<int, true> $mergedTypeIds  new_id of types that already existed on the target */
+        $mergedTypeIds = [];
+        /** @var array<string, true> $payloadTypeSlugs */
+        $payloadTypeSlugs = [];
         foreach ((array) ($payload['entity_types'] ?? []) as $row) {
             $oldId = (int) $row['id'];
             $slug  = (string) $row['slug'];
@@ -80,6 +93,7 @@ final readonly class PdoOrgImportRepository implements OrgImportRepositoryInterf
 
             if ($existing !== null) {
                 $newId = (int) $existing['id'];
+                $mergedTypeIds[$newId] = true;
                 $query->execute(
                     'UPDATE entity_types
                         SET name = ?, is_pinned = ?, default_layout = ?, display_order = ?,
@@ -96,13 +110,16 @@ final readonly class PdoOrgImportRepository implements OrgImportRepositoryInterf
                     [$targetOrgId, ...$params, $slug],
                 );
             }
-            $entityTypeMap[$oldId] = $newId;
+            $entityTypeMap[$oldId]   = $newId;
+            $payloadTypeSlugs[$slug] = true;
         }
         $counts['entity_types'] = count($entityTypeMap);
 
         // ── field_defs (merge on org+entity_type+field_key, active) ────────
         /** @var array<int, int> $fieldDefMap  old_id → new_id */
         $fieldDefMap = [];
+        /** @var array<int, list<int>> $keptDefIdsByType  new_type_id → def ids shipped by the source */
+        $keptDefIdsByType = [];
         foreach ((array) ($payload['field_defs'] ?? []) as $row) {
             $oldId           = (int) $row['id'];
             $newEntityTypeId = $entityTypeMap[(int) $row['entity_type_id']] ?? null;
@@ -160,9 +177,13 @@ final readonly class PdoOrgImportRepository implements OrgImportRepositoryInterf
                     ],
                 );
             }
-            $fieldDefMap[$oldId] = $newId;
+            $fieldDefMap[$oldId]                  = $newId;
+            $keptDefIdsByType[$newEntityTypeId][] = $newId;
         }
         $counts['field_defs'] = count($fieldDefMap);
+
+        $counts['field_defs_pruned']    = $this->pruneMergedTypeFieldDefs($query, $targetOrgId, $mergedTypeIds, $keptDefIdsByType);
+        $counts['seeded_types_removed'] = $this->removeUntouchedSeededTypes($query, $targetOrgId, $payloadTypeSlugs);
 
         // ── entities (append; carries permalink/menu_order/layout/flags) ───
         /** @var array<int, int> $entityMap  old_id → new_id */
@@ -754,6 +775,91 @@ final readonly class PdoOrgImportRepository implements OrgImportRepositoryInterf
         $counts['user_profiles_skipped'] = $profileSkipped;
 
         return $counts;
+    }
+
+    /**
+     * Soft-deletes active field_defs on MERGED types that the source did not ship (#952).
+     *
+     * Merge semantics are source-wins; that must extend to the def SET, or the
+     * wizard-seeded title/body defs survive the merge and the SPA renders them as
+     * empty "title / —" stubs above every record. Soft delete (not physical) so a
+     * mistaken import stays recoverable. Types created by this import only carry
+     * source defs, and types the source does not ship at all are left untouched.
+     *
+     * @param  array<int, true>      $mergedTypeIds
+     * @param  array<int, list<int>> $keptDefIdsByType
+     * @return int                   Number of defs soft-deleted.
+     */
+    private function pruneMergedTypeFieldDefs(
+        DatabaseQueryExecutorInterface $query,
+        int $targetOrgId,
+        array $mergedTypeIds,
+        array $keptDefIdsByType,
+    ): int {
+        $pruned = 0;
+        foreach (array_keys($mergedTypeIds) as $typeId) {
+            $keptIds = $keptDefIdsByType[$typeId] ?? [];
+            $sql     = 'UPDATE field_defs SET is_deleted = 1, deleted_at = ?
+                      WHERE organization_id = ? AND entity_type_id = ? AND is_deleted = 0';
+            $params  = [$this->clock->now()->format('Y-m-d H:i:s'), $targetOrgId, $typeId];
+            if ($keptIds !== []) {
+                $sql .= ' AND id NOT IN (' . implode(', ', array_fill(0, count($keptIds), '?')) . ')';
+                $params = [...$params, ...$keptIds];
+            }
+            $pruned += $query->execute($sql, $params);
+        }
+
+        return $pruned;
+    }
+
+    /**
+     * Removes seeded default types the source does not ship (#952).
+     *
+     * A fresh install seeds pinned Posts/Pages types; when the imported org does
+     * not have them, they linger as empty pinned types and leak into the public
+     * bootstrap's entityTypes. Removal is guarded three ways so it can never eat
+     * real data: slug must be one of the seeder's SEED_SLUGS, no entity row
+     * (deleted or not) may reference the type, and no active relation field_def
+     * may target it.
+     *
+     * @param  array<string, true> $payloadTypeSlugs
+     * @return int                 Number of seeded types removed.
+     */
+    private function removeUntouchedSeededTypes(
+        DatabaseQueryExecutorInterface $query,
+        int $targetOrgId,
+        array $payloadTypeSlugs,
+    ): int {
+        $removed = 0;
+        foreach (DefaultContentTypeSeederInterface::SEED_SLUGS as $slug) {
+            if (isset($payloadTypeSlugs[$slug])) {
+                continue;
+            }
+            $type = $query->fetchOne(
+                'SELECT id FROM entity_types WHERE organization_id = ? AND slug = ?',
+                [$targetOrgId, $slug],
+            );
+            if ($type === null) {
+                continue;
+            }
+            $typeId = (int) $type['id'];
+            $inUse  = $query->fetchOne('SELECT id FROM entities WHERE entity_type_id = ? LIMIT 1', [$typeId]);
+            if ($inUse !== null) {
+                continue;
+            }
+            $targeted = $query->fetchOne(
+                'SELECT id FROM field_defs WHERE target_entity_type_id = ? AND is_deleted = 0 LIMIT 1',
+                [$typeId],
+            );
+            if ($targeted !== null) {
+                continue;
+            }
+            $query->execute('DELETE FROM field_defs WHERE organization_id = ? AND entity_type_id = ?', [$targetOrgId, $typeId]);
+            $query->execute('DELETE FROM entity_types WHERE id = ?', [$typeId]);
+            $removed++;
+        }
+
+        return $removed;
     }
 
     /**

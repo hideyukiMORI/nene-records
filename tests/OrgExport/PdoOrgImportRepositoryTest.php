@@ -122,6 +122,112 @@ final class PdoOrgImportRepositoryTest extends TestCase
         self::assertSame(2, $counts['entity_types']);
     }
 
+    public function testExtendsSourceWinsToTheFieldDefSetOfMergedTypesAndRemovesUntouchedSeeds(): void
+    {
+        // The AYANE Tier A shape (#952): the source org's `pages` type carries a
+        // single bespoke `content` def, while the fresh target was wizard-seeded
+        // with pinned posts/pages + title/body defs.
+        $payload = [
+            'meta'         => ['organization_id' => 42],
+            'entity_types' => [['id' => 10, 'name' => 'Pages', 'slug' => 'pages', 'is_pinned' => 1]],
+            'field_defs'   => [
+                ['id' => 20, 'entity_type_id' => 10, 'field_key' => 'content', 'data_type' => 'html', 'is_deleted' => 0],
+            ],
+            'entities'     => [
+                ['id' => 30, 'entity_type_id' => 10, 'slug' => 'company', 'permalink' => '/company', 'status' => 'published'],
+            ],
+        ];
+
+        $repository = new PdoOrgImportRepository(
+            new PdoDatabaseTransactionManager($this->factory),
+            new FixedClock(),
+        );
+
+        $counts = $repository->import(1, $payload);
+
+        // Merged `pages` ends with exactly the source's def set — the seeded
+        // title/body defs are soft-deleted, not rendered as "title / —" stubs.
+        $activeDefs = $this->executor->fetchAll(
+            "SELECT f.field_key FROM field_defs f
+              JOIN entity_types t ON t.id = f.entity_type_id
+             WHERE t.slug = 'pages' AND f.is_deleted = 0 ORDER BY f.field_key",
+        );
+        self::assertSame(['content'], array_map(static fn ($r) => $r['field_key'], $activeDefs));
+
+        $prunedDefs = $this->executor->fetchAll(
+            "SELECT f.field_key, f.deleted_at FROM field_defs f
+              JOIN entity_types t ON t.id = f.entity_type_id
+             WHERE t.slug = 'pages' AND f.is_deleted = 1 ORDER BY f.field_key",
+        );
+        self::assertSame(['body', 'title'], array_map(static fn ($r) => $r['field_key'], $prunedDefs));
+        self::assertSame('2026-06-01 10:00:00', $prunedDefs[0]['deleted_at']);
+
+        // The seeded `posts` type is not in the payload and nothing references it
+        // → removed entirely (pinned seed types leak into the public bootstrap).
+        $posts = $this->executor->fetchAll("SELECT id FROM entity_types WHERE organization_id = 1 AND slug = 'posts'");
+        self::assertSame([], $posts);
+        $orphanDefs = $this->executor->fetchAll(
+            'SELECT f.id FROM field_defs f LEFT JOIN entity_types t ON t.id = f.entity_type_id
+              WHERE f.organization_id = 1 AND t.id IS NULL',
+        );
+        self::assertSame([], $orphanDefs);
+
+        self::assertSame(2, $counts['field_defs_pruned']);
+        self::assertSame(1, $counts['seeded_types_removed']);
+    }
+
+    public function testKeepsSeededTypesThatAreInUseReferencedOrNotSeedSlugs(): void
+    {
+        // posts holds a (soft-deleted, even) entity; pages is targeted by a live
+        // relation def; events is operator-created (not a seed slug). None of the
+        // three may be swept, and defs of types the source does not ship stay.
+        $posts = $this->executor->fetchOne("SELECT id FROM entity_types WHERE organization_id = 1 AND slug = 'posts'");
+        self::assertNotNull($posts);
+        $this->executor->execute(
+            "INSERT INTO entities (organization_id, entity_type_id, slug, status, is_deleted) VALUES (1, ?, 'old-post', 'draft', 1)",
+            [(int) $posts['id']],
+        );
+        $pages = $this->executor->fetchOne("SELECT id FROM entity_types WHERE organization_id = 1 AND slug = 'pages'");
+        self::assertNotNull($pages);
+        $peopleId = $this->executor->insert(
+            "INSERT INTO entity_types (organization_id, name, slug, is_pinned) VALUES (1, 'People', 'people', 0)",
+        );
+        $this->executor->execute(
+            "INSERT INTO field_defs (organization_id, entity_type_id, field_key, data_type, target_entity_type_id, cardinality)
+             VALUES (1, ?, 'homepage', 'relation', ?, 'one')",
+            [$peopleId, (int) $pages['id']],
+        );
+        $this->executor->execute(
+            "INSERT INTO entity_types (organization_id, name, slug, is_pinned) VALUES (1, 'Events', 'events', 0)",
+        );
+
+        $repository = new PdoOrgImportRepository(
+            new PdoDatabaseTransactionManager($this->factory),
+            new FixedClock(),
+        );
+
+        $counts = $repository->import(1, [
+            'meta'         => ['organization_id' => 42],
+            'entity_types' => [['id' => 11, 'name' => 'Books', 'slug' => 'books', 'is_pinned' => 0]],
+        ]);
+
+        $slugs = $this->executor->fetchAll('SELECT slug FROM entity_types WHERE organization_id = 1 ORDER BY slug');
+        self::assertSame(
+            ['books', 'events', 'pages', 'people', 'posts'],
+            array_map(static fn ($r) => $r['slug'], $slugs),
+        );
+
+        // posts was not merged (source did not ship it) → its seeded defs are untouched.
+        $postsDefs = $this->executor->fetchAll(
+            'SELECT field_key FROM field_defs WHERE entity_type_id = ? AND is_deleted = 0 ORDER BY field_key',
+            [(int) $posts['id']],
+        );
+        self::assertSame(['body', 'title'], array_map(static fn ($r) => $r['field_key'], $postsDefs));
+
+        self::assertSame(0, $counts['field_defs_pruned']);
+        self::assertSame(0, $counts['seeded_types_removed']);
+    }
+
     public function testImportsPhase2TablesWithIdRemap(): void
     {
         $repository = new PdoOrgImportRepository(
@@ -426,19 +532,22 @@ final class PdoOrgImportRepositoryTest extends TestCase
 
     private function seedFreshOrg(int $orgId): void
     {
-        // Mirror the fresh-install seed: posts type + title/body field_defs, and one setting_def.
-        $postsId = $this->executor->insert(
-            "INSERT INTO entity_types (organization_id, name, slug, is_pinned) VALUES (?, 'Posts', 'posts', 1)",
-            [$orgId],
-        );
-        $this->executor->execute(
-            "INSERT INTO field_defs (organization_id, entity_type_id, field_key, data_type) VALUES (?, ?, 'title', 'text')",
-            [$orgId, $postsId],
-        );
-        $this->executor->execute(
-            "INSERT INTO field_defs (organization_id, entity_type_id, field_key, data_type) VALUES (?, ?, 'body', 'markdown')",
-            [$orgId, $postsId],
-        );
+        // Mirror the fresh-install seed: posts + pages types with title/body
+        // field_defs each (DefaultContentTypeSeeder), and one setting_def.
+        foreach ([['Posts', 'posts'], ['Pages', 'pages']] as [$name, $slug]) {
+            $typeId = $this->executor->insert(
+                'INSERT INTO entity_types (organization_id, name, slug, is_pinned) VALUES (?, ?, ?, 1)',
+                [$orgId, $name, $slug],
+            );
+            $this->executor->execute(
+                "INSERT INTO field_defs (organization_id, entity_type_id, field_key, data_type) VALUES (?, ?, 'title', 'text')",
+                [$orgId, $typeId],
+            );
+            $this->executor->execute(
+                "INSERT INTO field_defs (organization_id, entity_type_id, field_key, data_type) VALUES (?, ?, 'body', 'markdown')",
+                [$orgId, $typeId],
+            );
+        }
         $this->executor->execute(
             "INSERT INTO setting_defs (organization_id, setting_key, data_type, default_value, is_public, label, created_at, updated_at)
              VALUES (?, 'site_name', 'text', 'NeNe Records', 1, 'Site name', '2026-01-01 00:00:00', '2026-01-01 00:00:00')",
