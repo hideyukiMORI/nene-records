@@ -11,7 +11,7 @@ Claude Code / AI agent guide for this repository. Cursor summaries live in `.cur
 | Workflow | `docs/workflow.md` |
 | Commits | `docs/development/commit-conventions.md` |
 | Coding | `docs/development/coding-standards.md` |
-| Current tasks | `docs/todo/current.md` |
+| Current tasks | private: `nene-origin/internal-docs/records/todo/current.md` |
 | Roadmap | `docs/roadmap.md` |
 
 ## Quick Rules
@@ -21,10 +21,15 @@ Claude Code / AI agent guide for this repository. Cursor summaries live in `.cur
 - **Commits**: Conventional Commits; type/scope English, description/body Japanese, include `(#issue)`.
 - **PR**: purpose, changes, verification, checklist name, `Closes #n`.
 - **Secrets**: never commit `.env`, tokens, or credentials.
-- **Daily reports**: `docs/daily/YYYY-MM-DD.md`（この repo の正。`docs/daily-reports/` は旧置き場・追記しない。フリート裁定 2026-07-16＝リポごとの慣習が正）.
+- **Daily reports**: private `nene-origin/internal-docs/records/daily/YYYY-MM-DD.md`（日報規約 v3 §11・2026-07-18 移設。公開リポには置かない）.
 - **design-export/**: local claudeDesign working directory — keep it untracked (kept out of git via local `.git/info/exclude`, not the shared `.gitignore`); never `git add` it.
 - **Framework**: NENE2 via Composer — read `vendor/hideyukimori/nene2/docs/` for runtime patterns.
 - **MCP**: tools go through OpenAPI HTTP boundary only.
+
+## Operational logs (moved)
+
+> 運用ログ（`docs/todo`・`docs/daily`・field-trials 相当）は private
+> `nene-origin/internal-docs/records/` に移設済み。最新の作業状況・申し送りはそちらを読むこと。
 
 ## Product Direction
 
@@ -32,7 +37,7 @@ Flexible entity platform — lighter and more typed than WordPress post meta. Ad
 
 ## Current Status
 
-M1 – M16 complete plus the post-#536 wave (crawlable SSR / WXR migration / public i18n / production SaaS + Tier A zip installer, v0.5.2 released). In production as a subdomain multi-tenant SaaS. The moving frontier is intentionally not tracked here — the top of `docs/todo/current.md` is the source of truth.
+M1 – M16 complete plus the post-#536 wave (crawlable SSR / WXR migration / public i18n / production SaaS + Tier A zip installer, v0.5.2 released). In production as a subdomain multi-tenant SaaS. The moving frontier is intentionally not tracked here — the top of the private current.md (`nene-origin/internal-docs/records/todo/`) is the source of truth.
 
 ## Verification
 

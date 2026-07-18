@@ -4,7 +4,7 @@ This file is the entry point for AI agents working on NeNe Records.
 
 ## Read First
 
-- **Current work & status:** `docs/todo/current.md` — M1–M9 完了。次フェーズ候補は current.md 末尾を参照
+- **Current work & status:** private `nene-origin/internal-docs/records/todo/current.md`（運用ログは移設済み・下記参照）
 - **Product vision:** `docs/explanation/product-vision.md`
 - Inheritance map: `docs/inheritance-from-nene2.md`
 - Human and AI collaboration: `docs/CONTRIBUTING.md`
@@ -22,7 +22,7 @@ This file is the entry point for AI agents working on NeNe Records.
 - Work from GitHub Issues. Create an Issue before implementation or doc changes that lack one.
 - Do not commit directly to `main`. Use branches named like `type/issue-number-summary`.
 - Read NENE2 upstream docs for framework behavior; read local docs for product rules.
-- Keep `docs/todo/current.md` and milestones aligned with Issues and PRs.
+- Keep the private current.md（nene-origin/internal-docs/records/todo/）and milestones aligned with Issues and PRs.
 - Keep changes focused. Do not mix governance, feature work, and unrelated cleanup in one PR.
 - Do not commit secrets, credentials, local `.env` files, or generated build outputs.
 - Prefer explicit, typed, testable code over hidden framework behavior.
@@ -42,3 +42,6 @@ NeNe Records is an API-first flexible entity platform on NENE2:
 ## Framework Reference
 
 Install `hideyukimori/nene2` via Composer. For HTTP runtime, middleware, Problem Details, and MCP patterns, NENE2 upstream documentation is authoritative unless a local ADR says otherwise.
+
+> 運用ログ（`docs/todo`・`docs/daily`・field-trials 相当）は private
+> `nene-origin/internal-docs/records/` に移設済み。最新の作業状況・申し送りはそちらを読むこと。
