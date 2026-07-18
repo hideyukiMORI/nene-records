@@ -49,6 +49,15 @@ NeNe Records を「zip をアップロードして install ページを開くだ
 5. **後片付け（推奨）**: サーバー上の `public_html/install/` ディレクトリを削除する。
    削除しなくても `var/.installed` マーカーと DB 検査により再実行は 403 で遮断される。
 
+6. **PHP タイムゾーンを UTC に固定する（推奨）**: 共有ホスティングは PHP の
+   `date.timezone` がローカル時（例: HETEML は `Asia/Tokyo`）のことがあり、そのままだと
+   JSON-LD 等の日時が `+09:00` で直列化されて他インスタンス（SaaS は `+00:00`）と実時刻が
+   9 時間ズレる（#952 実測）。`public_html/.user.ini` に 1 行置けば解消する:
+
+   ```ini
+   date.timezone=UTC
+   ```
+
 ## フォントパック（任意）
 
 本体 ZIP は配布サイズを抑えるため（66MB → 約11MB・#709）、フォントを最小セットだけ
@@ -167,7 +176,17 @@ php tools/import-org.php --file=org-export.json --org=<id|slug>
 
 取り込みは 1 トランザクションで走り、失敗時は org 無傷（部分取り込みなし）。設置時に
 シード済みのコンテンツタイプ（posts/pages）・設定定義は **マージ**される（重複しない・
-移送元の値で更新）。取り込み後、公開ページの見た目と URL が移送元と一致することを確認する。
+移送元の値で更新）。シード残骸も自動で照合される（#952）:
+
+- マージされた型の **フィールド定義は移送元の集合に揃う**（移送元に無いシード defs
+  （title/body）は論理削除される。残すと全公開ページに空の「title / —」スタブが出る）。
+- 移送元に無いシード型（posts/pages）は、**どのエンティティ・リレーション定義からも
+  参照されていない場合に限り**削除される（pinned のまま残ると公開 bootstrap に露出するため）。
+
+**取り込み後の検証は SSR の curl だけでは不十分**。SPA hydration 後にだけ出る崩れがある
+（#952 の「title / —」スタブは SSR に出ず curl では不可視だった）ので、実ブラウザで数ページ
+確認するか、移送元・移送先の公開ページを URL 正規化して diff する（AYANE 本走の受入は
+「正規化 diff 6 ページ差分ゼロ」で判定した）。
 
 - **Webhook の secret は移送されない**（移送先で再設定する。`webhooks` / `webhook_deliveries`
   の secret はエクスポートに含めない）。
@@ -177,11 +196,11 @@ php tools/import-org.php --file=org-export.json --org=<id|slug>
   `var/media/` に無いため、export/import 双方が明示エラーで停止する）。バケットを別途複製し、
   JSON export を使うこと。
 
-> **注意（現行の制限）**: ブロック本文や一部設定（`home_hero` / `footer_config` 等）の JSON に
-> 埋め込まれた **media URL・entity 参照は書き換えられない**（`logo_media_id` と
-> `navigation_items.menu_id`・ウィジェットの `menuId` は移送先 id に再マップ済み）。
-> メディアは手順 2 で同じ相対パスに置くため相対 URL は解決するが、絶対 URL を埋め込んでいる
-> 場合はドメインの読み替えが要る。
+> **注意（現行の制限）**: id 参照の再マップは `logo_media_id` / `front_page`（#801）/
+> `navigation_items.menu_id`・ウィジェットの `menuId`、およびブロック本文・`home_hero` に
+> 埋め込まれた media 参照（mediaId＋URL の相対化・#795）まで対応済み。ただし **テキスト系
+> フィールド値（html/markdown 等）の本文中に絶対 URL を直書きしている場合**は書き換えられない
+> ため、ドメインの読み替えが要る（内部リンクを相対 URL で書いていれば解決する）。
 
 ## 既知の制約（v1）
 
