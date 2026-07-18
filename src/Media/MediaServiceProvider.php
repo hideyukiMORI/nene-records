@@ -17,6 +17,7 @@ use NeNeRecords\Http\RuntimeServiceProvider;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
+use Psr\Log\LoggerInterface;
 
 final readonly class MediaServiceProvider implements ServiceProviderInterface
 {
@@ -251,6 +252,7 @@ final readonly class MediaServiceProvider implements ServiceProviderInterface
                     $processor = $c->get(ImageProcessorInterface::class);
                     $responseFactory = $c->get(ResponseFactoryInterface::class);
                     $streamFactory = $c->get(StreamFactoryInterface::class);
+                    $logger = $c->get(LoggerInterface::class);
 
                     if (!$storage instanceof StorageInterface) {
                         throw new LogicException('Media storage service is invalid.');
@@ -268,7 +270,11 @@ final readonly class MediaServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Stream factory service is invalid.');
                     }
 
-                    return new ServeDerivativeHandler($storage, $processor, $responseFactory, $streamFactory);
+                    if (!$logger instanceof LoggerInterface) {
+                        throw new LogicException('Logger service is invalid.');
+                    }
+
+                    return new ServeDerivativeHandler($storage, $processor, $responseFactory, $streamFactory, $logger);
                 },
             )
             ->set(
