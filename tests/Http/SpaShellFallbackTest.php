@@ -55,12 +55,30 @@ final class SpaShellFallbackTest extends TestCase
         self::assertStringContainsString("font-src 'self' data:", $csp);
     }
 
-    public function testServesShellForBrowsePath(): void
+    public function testUnknownPathGetsHardNotFoundWithShellBody(): void
     {
-        // 1-segment browse path (e.g. /posts) is not a record permalink → SPA shell.
-        $result = $this->fallback->apply($this->request('GET', '/posts'), $this->notFound());
+        // Valid type archives (/posts) and record permalinks are SSR'd upstream
+        // (#877/#701), so a path reaching the fallback is genuinely unknown. Serve the
+        // shell body (the SPA renders NotFound) but keep a hard 404 so crawlers don't
+        // index it as a soft 404 (#980).
+        foreach (['/nonexistent-abc', '/posts', '/blog/no-such-post', '/aaa/bbb'] as $path) {
+            $result = $this->fallback->apply($this->request('GET', $path), $this->notFound());
 
-        self::assertSame(200, $result->getStatusCode());
+            self::assertSame(404, $result->getStatusCode(), $path . ' must be a hard 404');
+            self::assertStringContainsString('<div id="root">', (string) $result->getBody(), $path . ' still serves the shell');
+        }
+    }
+
+    public function testKnownSpaRoutesKeep200(): void
+    {
+        // Real client-routed SPA surfaces render for the user, so the shell serves
+        // them at 200 even though the server router 404'd (they are not SSR'd).
+        foreach (['/admin/users', '/superadmin', '/login', '/signup', '/search', '/tag/design', '/archive/2026/07'] as $path) {
+            $result = $this->fallback->apply($this->request('GET', $path), $this->notFound());
+
+            self::assertSame(200, $result->getStatusCode(), $path . ' is a valid SPA route');
+            self::assertStringContainsString('<div id="root">', (string) $result->getBody());
+        }
     }
 
     public function testPassesThroughApiMediaViewAssetPaths(): void
@@ -187,7 +205,7 @@ final class SpaShellFallbackTest extends TestCase
     public function testNoAnalyticsWhenNoSettingsUseCase(): void
     {
         // Default construction (no settings) keeps the strict baseline policy.
-        $result = $this->fallback->apply($this->request('GET', '/posts'), $this->notFound());
+        $result = $this->fallback->apply($this->request('GET', '/search'), $this->notFound());
 
         self::assertSame(PublicHtmlCsp::POLICY, $result->getHeaderLine('Content-Security-Policy'));
         self::assertStringNotContainsString('googletagmanager', (string) $result->getBody());
@@ -196,7 +214,7 @@ final class SpaShellFallbackTest extends TestCase
     public function testInjectsAnalyticsOnPublicPathWhenConfigured(): void
     {
         $fallback = $this->fallbackWith(['analytics_ga4_id' => 'G-XYZ987']);
-        $result = $fallback->apply($this->request('GET', '/posts'), $this->notFound());
+        $result = $fallback->apply($this->request('GET', '/search'), $this->notFound());
 
         $body = (string) $result->getBody();
         $csp = $result->getHeaderLine('Content-Security-Policy');
@@ -232,7 +250,7 @@ final class SpaShellFallbackTest extends TestCase
         };
         $fallback = new SpaShellFallback($this->shellPath, $this->factory, $this->factory, $throwing);
 
-        $result = $fallback->apply($this->request('GET', '/posts'), $this->notFound());
+        $result = $fallback->apply($this->request('GET', '/search'), $this->notFound());
 
         // A failed lookup must never break the shell — serve it with the strict policy.
         self::assertSame(200, $result->getStatusCode());

@@ -30,6 +30,15 @@ final readonly class SpaShellFallback
     /** Surfaces that must never carry public analytics (logged-in / back office). */
     private const ANALYTICS_SKIP = '#^/(admin|login|superadmin)(/|$)#';
 
+    /**
+     * Real client-routed SPA surfaces (see `frontend/src/app/router.tsx`): the shell
+     * serves these at 200 because the router genuinely renders them. Everything else
+     * that reaches the fallback via a router 404 is an unknown page — type archives
+     * and record permalinks are SSR'd upstream (#877/#701), so a path landing here is
+     * not a valid public URL and must keep a hard 404 rather than a soft one (#980).
+     */
+    private const SPA_APP_ROUTES = '#^/(admin|superadmin|login|signup|verify-email|forbidden|search|tag|archive)(/|$)#';
+
     public function __construct(
         private string $shellPath,
         private ResponseFactoryInterface $responseFactory,
@@ -98,7 +107,14 @@ final readonly class SpaShellFallback
             $html = $this->injectIntoHead($html, WebAnalyticsHeadSnippet::render($analytics, $nonce));
         }
 
-        return $this->responseFactory->createResponse(200)
+        // Keep 200 for the HTML home and known client-routed SPA surfaces; a genuine
+        // router 404 on any other path is an unknown page, so serve the shell body
+        // (the SPA renders its NotFound) but preserve a hard 404 for crawlers (#980).
+        $status = ($response->getStatusCode() === 404 && $path !== '/' && preg_match(self::SPA_APP_ROUTES, $path) !== 1)
+            ? 404
+            : 200;
+
+        return $this->responseFactory->createResponse($status)
             ->withHeader('Content-Type', 'text/html; charset=utf-8')
             ->withHeader('Content-Security-Policy', PublicHtmlCsp::build($analytics, $nonce !== '' ? $nonce : null, $embeds))
             ->withBody($this->streamFactory->createStream($html));
