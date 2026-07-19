@@ -142,7 +142,20 @@ final class PublicRecordHttpTest extends TestCase
         }
 
         $frontPage = new FrontPageSetting($frontPageSettings, $entities, $entityTypes);
-        $publicSettings = new ListPublicSettingsUseCase(new InMemorySettingRepository($settingDefs), new InMemoryMediaRepository(), $frontPage);
+        // Media id 7 backs the `default_og_image` fallback (#912) in tests that seed
+        // that setting; other tests leave the setting absent, so it never resolves.
+        $mediaRepository = new InMemoryMediaRepository([
+            new \NeNeRecords\Media\Media(
+                id: 7,
+                originalName: 'card.png',
+                storedName: 'card.png',
+                mimeType: 'image/png',
+                size: 1000,
+                url: '/media/2026/06/card.png',
+                createdAt: '2026-06-01 00:00:00',
+            ),
+        ]);
+        $publicSettings = new ListPublicSettingsUseCase(new InMemorySettingRepository($settingDefs), $mediaRepository, $frontPage);
 
         $useCase = new GetPublicRecordViewUseCase(
             $entityTypes,
@@ -320,6 +333,24 @@ final class PublicRecordHttpTest extends TestCase
         self::assertStringContainsString('"datePublished":"2026-01-15T00:00:00+00:00"', $html);
         self::assertStringContainsString('"dateModified":"2026-02-20T00:00:00+00:00"', $html);
         self::assertStringContainsString('"image":"https://example.test/media/og/2026/06/hero.png"', $html);
+    }
+
+    public function testPerRecordImageWinsOverDefaultOgImage(): void
+    {
+        // With `default_og_image` set (media id 7 → card.png), a record that HAS its
+        // own image field must still use that image — the site default is only a
+        // fallback for image-less pages (#912).
+        $app = $this->buildApplication(true, $this->projectRoot, [
+            new SettingDef('site_name', 'text', 'NeNe Records', true, 'Site name'),
+            new SettingDef('default_og_image', 'media', '7', true, 'Default social image (og:image)'),
+        ]);
+
+        $html = (string) $app->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/article/10'),
+        )->getBody();
+
+        self::assertStringContainsString('property="og:image" content="https://example.test/media/og/2026/06/hero.png"', $html);
+        self::assertStringNotContainsString('/media/og/2026/06/card.png', $html);
     }
 
     public function testViewUrlRedirectsToCanonicalPermalink(): void

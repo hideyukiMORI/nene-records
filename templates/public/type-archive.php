@@ -27,8 +27,14 @@
     <?php endif; ?>
     <meta property="og:site_name" content="<?= $e($siteName) ?>" />
     <meta property="og:url" content="<?= $e($canonicalUrl) ?>" />
-    <meta name="twitter:card" content="summary" />
+    <?php if ($ogImageUrl !== null): ?>
+      <meta property="og:image" content="<?= $e($ogImageUrl) ?>" />
+    <?php endif; ?>
+    <meta name="twitter:card" content="<?= $ogImageUrl !== null ? 'summary_large_image' : 'summary' ?>" />
     <meta name="twitter:title" content="<?= $e($pageTitle) ?>" />
+    <?php if ($ogImageUrl !== null): ?>
+      <meta name="twitter:image" content="<?= $e($ogImageUrl) ?>" />
+    <?php endif; ?>
 
     <style>
       .archive__list { margin: 1rem 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 0.75rem; }

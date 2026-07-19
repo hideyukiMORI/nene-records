@@ -10,6 +10,7 @@ use NeNeRecords\Http\BasePath;
 use NeNeRecords\Http\PublicHtmlCsp;
 use NeNeRecords\Http\WebAnalyticsConfig;
 use NeNeRecords\Http\WebAnalyticsHeadSnippet;
+use NeNeRecords\Media\MediaDerivativeUrl;
 use NeNeRecords\Setting\ListPublicSettingsUseCaseInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -50,6 +51,14 @@ final readonly class RenderPublicTypeArchiveRenderer implements PublicTypeArchiv
         $baseUrl = $uri->getScheme() . '://' . $uri->getAuthority();
         $archiveUrl = $baseUrl . BasePath::prefix($effectiveBase, '/' . $archive->typeSlug);
 
+        // Archives have no image field of their own, so the social card comes from
+        // the site-wide `default_og_image` setting when set, else stays imageless (#912).
+        // The setting is already a media URL; run it through the 'og' derivative.
+        $ogImagePath = MediaDerivativeUrl::forPreset($settings['default_og_image'] ?? '', 'og');
+        $ogImageUrl = $ogImagePath === null
+            ? null
+            : (str_starts_with($ogImagePath, 'http') ? $ogImagePath : $baseUrl . BasePath::prefix($effectiveBase, $ogImagePath));
+
         $prev = $archive->prevOffset();
         $next = $archive->nextOffset();
 
@@ -81,6 +90,7 @@ final readonly class RenderPublicTypeArchiveRenderer implements PublicTypeArchiv
             'basePath' => $effectiveBase,
             'siteName' => $siteName,
             'metaDescription' => $metaDescription,
+            'ogImageUrl' => $ogImageUrl,
             'analyticsHead' => $analyticsHead,
             // The first page is the archive's canonical address; deeper pages carry
             // their offset so each paged view has its own stable URL.
