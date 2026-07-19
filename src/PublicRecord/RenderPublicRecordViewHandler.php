@@ -163,6 +163,16 @@ final readonly class RenderPublicRecordViewHandler implements PublicRecordViewRe
                 : $baseUrl . BasePath::prefix($effectiveBase, $output->ogImagePath);
         }
 
+        // Organization JSON-LD (#978): the company signal Google's knowledge panel reads.
+        // logo_media_id is resolved to a (base-relative) media URL by ListPublicSettings;
+        // absolutize it like the og:image so structured data carries an absolute URL.
+        $logoValue = $settings['logo_media_id'] ?? '';
+        $logoUrl = $logoValue === ''
+            ? null
+            : (str_starts_with($logoValue, 'http') ? $logoValue : $baseUrl . BasePath::prefix($effectiveBase, $logoValue));
+        $homeUrl = $baseUrl . BasePath::prefix($effectiveBase, '/');
+        $organizationLd = PublicOrganizationSchema::build($siteName, $homeUrl, $logoUrl, $settings);
+
         // Prefer the per-entity meta description, falling back to the site default.
         $metaDescription = $output->metaDescription !== ''
             ? $output->metaDescription
@@ -228,6 +238,7 @@ final readonly class RenderPublicRecordViewHandler implements PublicRecordViewRe
             'basePath' => $effectiveBase,
             'canonicalUrl' => $canonicalUrl,
             'ogImageUrl' => $ogImageUrl,
+            'organizationLd' => $organizationLd,
             'publishedAtIso' => $output->publishedAtIso,
             'updatedAtIso' => $output->updatedAtIso,
             'bootstrapJson' => $bootstrapJson,

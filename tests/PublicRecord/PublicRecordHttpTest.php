@@ -414,6 +414,44 @@ final class PublicRecordHttpTest extends TestCase
         self::assertStringNotContainsString('"dateModified"', $html);
     }
 
+    public function testFrontPageEmitsOrganizationJsonLdFromSettings(): void
+    {
+        // The front page carries a standalone Organization node (Google's company
+        // knowledge-panel signal) built from existing settings: sameAs from the
+        // footer social links, contactPoint from the header topbar (#978).
+        $this->buildApplication(true, $this->projectRoot, [
+            new SettingDef('site_name', 'text', '彩音インターナショナル株式会社', true, 'Site name'),
+            new SettingDef('footer_config', 'text', '{"social":[{"platform":"x","url":"https://twitter.com/ayane_inc"},{"platform":"facebook","url":"https://www.facebook.com/AyaneInternational"}]}', true, 'Footer content'),
+            new SettingDef('header_config', 'text', '{"topbar":{"enabled":true,"phone":"03-1234-5678","email":"info@ayane.co.jp","infoText":""}}', true, 'Header'),
+        ], frontPageId: 10);
+
+        $html = (string) $this->renderHandler->renderEntity(
+            'article',
+            null,
+            10,
+            $this->factory->createServerRequest('GET', 'https://example.test/'),
+            asFrontPage: true,
+        )->getBody();
+
+        self::assertStringContainsString('"@context":"https://schema.org","@type":"Organization"', $html);
+        self::assertStringContainsString('"name":"彩音インターナショナル株式会社"', $html);
+        self::assertStringContainsString('"url":"https://example.test/"', $html);
+        self::assertStringContainsString('"sameAs":["https://twitter.com/ayane_inc","https://www.facebook.com/AyaneInternational"]', $html);
+        self::assertStringContainsString('"contactPoint":{"@type":"ContactPoint","contactType":"sales","email":"info@ayane.co.jp","telephone":"03-1234-5678"}', $html);
+    }
+
+    public function testArticlePublisherIsEnrichedButNoStandaloneOrganization(): void
+    {
+        // A normal article's publisher Organization now carries url (not just name);
+        // the standalone Organization block is front-page-only (#978).
+        $html = (string) $this->application->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/article/10'),
+        )->getBody();
+
+        self::assertStringContainsString('"publisher":{"@type":"Organization","name":"NeNe Records","url":"https://example.test/"}', $html);
+        self::assertStringNotContainsString('"@context":"https://schema.org","@type":"Organization"', $html);
+    }
+
     public function testRealPermalinkServesCrawlableHtmlByIdPattern(): void
     {
         // The "article" type uses the default pattern /{type}/{id}, so /article/10 is the permalink.
