@@ -21,6 +21,7 @@ use NeNeRecords\IntField\IntField;
 use NeNeRecords\IntField\IntFieldRepositoryInterface;
 use NeNeRecords\Layout\PublicLayouts;
 use NeNeRecords\Media\MediaDerivativeUrl;
+use NeNeRecords\Setting\ListPublicSettingsOutput;
 use NeNeRecords\Setting\ListPublicSettingsUseCaseInterface;
 use NeNeRecords\Setting\SettingEntry;
 use NeNeRecords\Setting\SettingHttpMapper;
@@ -211,7 +212,12 @@ final readonly class GetPublicRecordViewUseCase implements GetPublicRecordViewUs
         // `bare` page (#881). The server already knows the answer; ship it.
         $bootstrap['canonicalPath'] = $canonicalPath;
 
-        $ogImagePath = $this->resolveOgImagePath($displayFields);
+        // Per-record image field first; site-wide `default_og_image` as the fallback
+        // so image-less pages (bespoke/front page/text records) still get a card (#912).
+        // The setting is already resolved to a media URL by ListPublicSettings; run it
+        // through the same 'og' derivative the per-record path uses ('' → no match → null).
+        $ogImagePath = $this->resolveOgImagePath($displayFields)
+            ?? MediaDerivativeUrl::forPreset($this->settingValue($publicSettingsOutput, 'default_og_image'), 'og');
 
         return new GetPublicRecordViewOutput(
             entityTypeSlug: $input->entityTypeSlug,
@@ -233,6 +239,18 @@ final readonly class GetPublicRecordViewUseCase implements GetPublicRecordViewUs
             // the resolver already existed but nothing on the render path called it.
             layout: PublicLayouts::resolve($entity->layout, $entityType->defaultLayout),
         );
+    }
+
+    /** Read a public setting's effective value by key; '' when absent. */
+    private function settingValue(ListPublicSettingsOutput $settings, string $key): string
+    {
+        foreach ($settings->items as $entry) {
+            if ($entry->def->settingKey === $key) {
+                return $entry->effectiveValue;
+            }
+        }
+
+        return '';
     }
 
     /**

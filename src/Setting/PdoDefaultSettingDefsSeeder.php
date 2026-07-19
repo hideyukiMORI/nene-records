@@ -35,6 +35,7 @@ final readonly class PdoDefaultSettingDefsSeeder implements DefaultSettingDefsSe
         ['setting_key' => 'active_theme', 'data_type' => 'text', 'default_value' => 'consumer', 'is_public' => 1, 'label' => 'Public site theme'],
         ['setting_key' => 'theme_overrides', 'data_type' => 'text', 'default_value' => '{}', 'is_public' => 1, 'label' => 'Theme customizations'],
         ['setting_key' => 'logo_media_id', 'data_type' => 'media', 'default_value' => '', 'is_public' => 1, 'label' => 'Logo'],
+        ['setting_key' => 'default_og_image', 'data_type' => 'media', 'default_value' => '', 'is_public' => 1, 'label' => 'Default social image (og:image)'],
         ['setting_key' => 'copyright_text', 'data_type' => 'text', 'default_value' => '© {year} {site}', 'is_public' => 1, 'label' => 'Copyright'],
         ['setting_key' => 'layout_config', 'data_type' => 'text', 'default_value' => '{"home":{"columns":2,"mainPos":"left","swap":false},"record":{"columns":3,"mainPos":"left","swap":false}}', 'is_public' => 1, 'label' => 'Layout'],
         ['setting_key' => 'excerpt_source', 'data_type' => 'text', 'default_value' => 'auto', 'is_public' => 0, 'label' => 'Excerpt source (auto / body / meta)'],
