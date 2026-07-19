@@ -47,7 +47,7 @@
           'headline' => $pageTitle,
           'url' => $canonicalUrl,
           'mainEntityOfPage' => $canonicalUrl,
-          'publisher' => ['@type' => 'Organization', 'name' => $siteName],
+          'publisher' => $organizationLd,
       ];
 if ($metaDescription !== '') {
     $jsonLd['description'] = $metaDescription;
@@ -63,6 +63,13 @@ if ($ogImageUrl !== null) {
 }
 ?>
     <script type="application/ld+json"><?= json_encode($jsonLd, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?></script>
+    <?php /* Standalone Organization on the front page — Google's company knowledge-panel
+             signal (logo/sameAs/contactPoint from settings); article pages carry it as
+             the publisher above instead (#978). */ ?>
+    <?php if ($ogType === 'website'): ?>
+    <?php $organizationStandalone = array_merge(['@context' => 'https://schema.org'], $organizationLd); ?>
+    <script type="application/ld+json"><?= json_encode($organizationStandalone, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?></script>
+    <?php endif; ?>
     <?php /* BreadcrumbList JSON-LD (#651 PR2): the path-hierarchy signal Google actually ranks on. */ ?>
     <?php if ($breadcrumbs !== []): ?>
     <?php
