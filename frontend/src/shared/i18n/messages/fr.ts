@@ -220,6 +220,8 @@ export const fr = {
   'admin.floatingCta.positionBl': 'En bas à gauche',
   'admin.floatingCta.accent': 'Couleur d’accent',
   'admin.floatingCta.icon': 'Icône (emoji)',
+  'admin.floatingCta.iconId': 'Icône',
+  'admin.floatingCta.iconNone': 'Aucune / emoji',
   'admin.floatingCta.label': 'Libellé',
   'admin.floatingCta.sub': 'Sous-texte',
   'admin.floatingCta.url': 'URL du lien',

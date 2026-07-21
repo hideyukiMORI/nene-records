@@ -38,6 +38,8 @@ final readonly class FloatingCta
         public string $position,
         public string $accent,
         public string $icon,
+        /** A curated icon id ({@see FloatingCtaIcons}), or '' to use $icon/none. Takes priority over $icon. */
+        public string $iconId,
         public string $label,
         public string $sub,
         public string $url,
@@ -50,7 +52,7 @@ final readonly class FloatingCta
 
     public static function disabled(): self
     {
-        return new self(false, 'br', self::DEFAULT_ACCENT, '', '', '', '', true, [], [], []);
+        return new self(false, 'br', self::DEFAULT_ACCENT, '', '', '', '', '', true, [], [], []);
     }
 
     /**
@@ -107,6 +109,9 @@ final readonly class FloatingCta
             position: $position,
             accent: $accent,
             icon: self::asString($content['icon'] ?? ''),
+            // A curated icon id only if it is one of the vetted keys; anything else → '' (falls
+            // back to the emoji). This read-side allowlist mirrors the write-side validator.
+            iconId: FloatingCtaIcons::has(self::asString($content['iconId'] ?? '')) ? self::asString($content['iconId'] ?? '') : '',
             label: $label,
             sub: self::asString($content['sub'] ?? ''),
             url: $url,

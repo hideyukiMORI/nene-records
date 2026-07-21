@@ -218,6 +218,8 @@ export const ptBR = {
   'admin.floatingCta.positionBl': 'Inferior esquerdo',
   'admin.floatingCta.accent': 'Cor de destaque',
   'admin.floatingCta.icon': 'Ícone (emoji)',
+  'admin.floatingCta.iconId': 'Ícone',
+  'admin.floatingCta.iconNone': 'Nenhum / emoji',
   'admin.floatingCta.label': 'Rótulo',
   'admin.floatingCta.sub': 'Texto secundário',
   'admin.floatingCta.url': 'URL do link',

@@ -230,6 +230,8 @@ export const en = {
   'admin.floatingCta.positionBl': 'Bottom left',
   'admin.floatingCta.accent': 'Accent color',
   'admin.floatingCta.icon': 'Icon (emoji)',
+  'admin.floatingCta.iconId': 'Icon',
+  'admin.floatingCta.iconNone': 'None / emoji',
   'admin.floatingCta.label': 'Label',
   'admin.floatingCta.sub': 'Sub text',
   'admin.floatingCta.url': 'Link URL',

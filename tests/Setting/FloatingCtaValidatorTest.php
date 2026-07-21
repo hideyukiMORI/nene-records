@@ -26,7 +26,7 @@ final class FloatingCtaValidatorTest extends TestCase
             'position' => 'bl',
             'trigger' => 'always',
             'accent' => '#D64525',
-            'content' => ['icon' => '📅', 'label' => '30分無料相談を予約', 'sub' => 'オンライン'],
+            'content' => ['icon' => '📅', 'iconId' => 'calendar', 'label' => '30分無料相談を予約', 'sub' => 'オンライン'],
             'link' => ['url' => 'https://calendar.app.google/x', 'newTab' => true],
             'conditions' => ['types' => ['page'], 'urlGlobs' => ['/services*'], 'exclude' => ['/admin*']],
         ]));
@@ -56,6 +56,7 @@ final class FloatingCtaValidatorTest extends TestCase
         yield 'protocol-relative url' => [(string) json_encode(['link' => ['url' => '//evil.test/x']] + ['enabled' => true, 'content' => ['label' => 'x']])];
         yield 'backslash authority url' => [(string) json_encode(['link' => ['url' => '/\\evil.test']] + ['enabled' => true, 'content' => ['label' => 'x']])];
         yield 'bad accent' => [(string) json_encode(['accent' => 'red'] + $base)];
+        yield 'unknown iconId (fail-closed)' => [(string) json_encode(['content' => ['label' => 'x', 'iconId' => 'skull']] + ['enabled' => true, 'link' => ['url' => 'https://x.test']])];
         yield 'enabled without label' => [(string) json_encode(['enabled' => true, 'link' => ['url' => 'https://x.test']])];
         yield 'enabled without url' => [(string) json_encode(['enabled' => true, 'content' => ['label' => 'x']])];
         yield 'conditions.types not array' => [(string) json_encode(['conditions' => ['types' => 'page']] + $base)];

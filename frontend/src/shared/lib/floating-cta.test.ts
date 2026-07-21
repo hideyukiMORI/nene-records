@@ -23,7 +23,7 @@ describe('parseFloatingCta', () => {
         enabled: true,
         position: 'bl',
         accent: '#D64525',
-        content: { icon: '📅', label: 'Book', sub: 'Online' },
+        content: { icon: '📅', iconId: 'calendar', label: 'Book', sub: 'Online' },
         link: { url: 'https://x.test', newTab: false },
         conditions: { types: ['page'], urlGlobs: ['/services*'], exclude: ['/admin*'] },
       }),
@@ -32,6 +32,7 @@ describe('parseFloatingCta', () => {
     expect(cfg.position).toBe('bl')
     expect(cfg.accent).toBe('#D64525')
     expect(cfg.content.label).toBe('Book')
+    expect(cfg.content.iconId).toBe('calendar')
     expect(cfg.link.newTab).toBe(false)
     expect(cfg.conditions.urlGlobs).toEqual(['/services*'])
   })
@@ -77,7 +78,7 @@ describe('isFloatingCtaRenderable', () => {
       isFloatingCtaRenderable({
         ...DEFAULT_FLOATING_CTA,
         enabled: true,
-        content: { icon: '', label: 'Book', sub: '' },
+        content: { icon: '', iconId: '', label: 'Book', sub: '' },
         link: { url: 'https://x.test', newTab: true },
       }),
     ).toBe(true)
@@ -85,7 +86,7 @@ describe('isFloatingCtaRenderable', () => {
       isFloatingCtaRenderable({
         ...DEFAULT_FLOATING_CTA,
         enabled: true,
-        content: { icon: '', label: 'Book', sub: '' },
+        content: { icon: '', iconId: '', label: 'Book', sub: '' },
         link: { url: 'javascript:alert(1)', newTab: true },
       }),
     ).toBe(false)
