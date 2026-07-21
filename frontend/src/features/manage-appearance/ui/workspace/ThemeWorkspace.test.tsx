@@ -1,11 +1,13 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, screen } from '@testing-library/react'
 import { http, HttpResponse } from 'msw'
+import { DEFAULT_FLOATING_CTA } from '@/shared/lib/floating-cta'
 import { DEFAULT_FOOTER_CONFIG } from '@/shared/lib/footer-config'
 import { DEFAULT_HEADER_CONFIG } from '@/shared/lib/header-config'
 import { PUBLIC_THEMES } from '@/shared/lib/public-themes'
 import { mswServer } from '@tests/msw/server'
 import { renderWithProviders } from '@tests/render/render-with-providers'
+import type { FloatingCtaPageState } from '../../hooks/useFloatingCtaPage'
 import type { FooterConfigPageState } from '../../hooks/useFooterConfigPage'
 import type { HeaderConfigPageState } from '../../hooks/useHeaderConfigPage'
 import type { HomeHeroPageState } from '../../hooks/useHomeHeroPage'
@@ -76,7 +78,18 @@ function makeStates(
     isSaving: false,
     isDirty: false,
   }
-  return { pick, customize, header, footer, hero }
+  const floatingCta: FloatingCtaPageState = {
+    draft: DEFAULT_FLOATING_CTA,
+    setConfig: vi.fn(),
+    setContent: vi.fn(),
+    setLink: vi.fn(),
+    setConditions: vi.fn(),
+    save: vi.fn(),
+    isLoading: false,
+    isSaving: false,
+    isDirty: false,
+  }
+  return { pick, customize, header, footer, hero, floatingCta }
 }
 
 function renderWorkspace(states = makeStates()) {
