@@ -137,6 +137,15 @@ final readonly class RenderPublicRecordViewHandler implements PublicRecordViewRe
             );
         }
 
+        // First-party floating CTA (#982): a fixed chrome button rendered verbatim into
+        // the shell (NOT sanitized) when enabled and the page matches the org's conditions.
+        // '' when disabled / no match — same "no config, no output" shape as analytics.
+        $floatingCta = FloatingCtaHtml::render(
+            FloatingCta::fromSettings($settings),
+            $output->entityTypeSlug,
+            $request->getUri()->getPath(),
+        );
+
         // Canonical / og:url point at the user-facing permalink (not this /view/ twin).
         // For a negotiated locale the canonical self-references with `?lang=`, and
         // hreflang alternates advertise every locale variant (#540).
@@ -233,6 +242,8 @@ final readonly class RenderPublicRecordViewHandler implements PublicRecordViewRe
             // Validated trusted-embed <script> tags for the crawlable shell (#802);
             // '' when the org has no allowlist / no trusted-embed widgets.
             'embedScripts' => $embedScripts,
+            // Server-generated floating CTA chrome (#982); '' when disabled / no match.
+            'floatingCta' => $floatingCta,
             'htmlLang' => $htmlLang,
             'alternateLinks' => $alternateLinks,
             'basePath' => $effectiveBase,

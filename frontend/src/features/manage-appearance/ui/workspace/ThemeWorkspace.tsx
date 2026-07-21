@@ -5,12 +5,14 @@ import { useTranslation, type MessageKey } from '@/shared/i18n'
 import { resolveDraftImageUrls, type ThemeImages } from '@/shared/lib/theme-customization'
 import { THEME_PREVIEW_PARAM } from '@/shared/lib/theme-preview-protocol'
 import { Button, Text } from '@/shared/ui'
+import type { FloatingCtaPageState } from '../../hooks/useFloatingCtaPage'
 import type { FooterConfigPageState } from '../../hooks/useFooterConfigPage'
 import type { HeaderConfigPageState } from '../../hooks/useHeaderConfigPage'
 import type { HomeHeroPageState } from '../../hooks/useHomeHeroPage'
 import type { PublicThemePageState } from '../../hooks/usePublicThemePage'
 import type { ThemeCustomizePageState } from '../../hooks/useThemeCustomizePage'
 import { useThemePreviewSender } from '../../hooks/useThemePreviewSender'
+import { FloatingCtaView } from '../FloatingCtaView'
 import { FooterContentView } from '../FooterContentView'
 import { HeaderContentView } from '../HeaderContentView'
 import { HeaderPreview } from '../HeaderPreview'
@@ -28,7 +30,16 @@ import {
   type ImageSlotHelpers,
 } from './CustomizePanels'
 
-type SectionId = 'theme' | 'brand' | 'type' | 'layout' | 'header' | 'advanced' | 'footer' | 'hero'
+type SectionId =
+  | 'theme'
+  | 'brand'
+  | 'type'
+  | 'layout'
+  | 'header'
+  | 'advanced'
+  | 'footer'
+  | 'hero'
+  | 'floatingCta'
 
 export interface ThemeWorkspaceProps {
   pick: PublicThemePageState
@@ -36,6 +47,7 @@ export interface ThemeWorkspaceProps {
   header: HeaderConfigPageState
   footer: FooterConfigPageState
   hero: HomeHeroPageState
+  floatingCta: FloatingCtaPageState
 }
 
 interface NavItem {
@@ -62,7 +74,14 @@ const IMAGE_SLOTS: ReadonlyArray<keyof ThemeImages> = ['logo', 'hero', 'backgrou
  * bar appears while that draft is dirty. Content sections (header_config /
  * footer_config / home_hero) keep their own in-place save buttons.
  */
-export function ThemeWorkspace({ pick, customize, header, footer, hero }: ThemeWorkspaceProps) {
+export function ThemeWorkspace({
+  pick,
+  customize,
+  header,
+  footer,
+  hero,
+  floatingCta,
+}: ThemeWorkspaceProps) {
   const { t } = useTranslation()
   const [section, setSection] = useState<SectionId>('theme')
   const [previewOpen, setPreviewOpen] = useState(false)
@@ -135,6 +154,7 @@ export function ThemeWorkspace({ pick, customize, header, footer, hero }: ThemeW
       items: [
         { id: 'footer', labelKey: 'admin.themeWs.navFooter', dirty: footer.isDirty },
         { id: 'hero', labelKey: 'admin.themeWs.navHero', dirty: hero.isDirty },
+        { id: 'floatingCta', labelKey: 'admin.themeWs.navFloatingCta', dirty: floatingCta.isDirty },
       ],
     },
   ]
@@ -231,6 +251,20 @@ export function ThemeWorkspace({ pick, customize, header, footer, hero }: ThemeW
                   noteKey="admin.themeWs.scopeInplaceNote"
                 />
                 <HomeHeroView {...hero} />
+              </div>
+            ) : null}
+            {section === 'floatingCta' ? (
+              <div>
+                <PanelHead
+                  title={t('admin.themeWs.navFloatingCta')}
+                  desc={t('admin.themeWs.descFloatingCta')}
+                />
+                <ScopeNote
+                  kind="independent"
+                  tagKey="admin.themeWs.tagInplace"
+                  noteKey="admin.themeWs.scopeInplaceNote"
+                />
+                <FloatingCtaView {...floatingCta} />
               </div>
             ) : null}
           </div>

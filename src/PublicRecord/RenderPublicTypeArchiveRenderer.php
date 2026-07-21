@@ -46,6 +46,14 @@ final readonly class RenderPublicTypeArchiveRenderer implements PublicTypeArchiv
         $analyticsNonce = $analytics->isEnabled() ? bin2hex(random_bytes(16)) : '';
         $analyticsHead = WebAnalyticsHeadSnippet::render($analytics, $analyticsNonce);
 
+        // First-party floating CTA (#982) for the type-archive shell — same server-rendered
+        // chrome as the record shell. '' when disabled / the archive type is excluded.
+        $floatingCta = FloatingCtaHtml::render(
+            FloatingCta::fromSettings($settings),
+            $archive->typeSlug,
+            $request->getUri()->getPath(),
+        );
+
         $effectiveBase = $this->basePath . (string) $request->getAttribute('nene2.base_prefix', '');
         $uri = $request->getUri();
         $baseUrl = $uri->getScheme() . '://' . $uri->getAuthority();
@@ -92,6 +100,8 @@ final readonly class RenderPublicTypeArchiveRenderer implements PublicTypeArchiv
             'metaDescription' => $metaDescription,
             'ogImageUrl' => $ogImageUrl,
             'analyticsHead' => $analyticsHead,
+            // Server-generated floating CTA chrome (#982); '' when disabled / no match.
+            'floatingCta' => $floatingCta,
             // The first page is the archive's canonical address; deeper pages carry
             // their offset so each paged view has its own stable URL.
             'canonicalUrl' => $archive->offset === 0 ? $archiveUrl : $this->pageUrl($archiveUrl, $archive->offset),

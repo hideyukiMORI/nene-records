@@ -4,6 +4,7 @@ import { currentUserHasCapability } from '@/entities/auth'
 import { useMenuList } from '@/entities/menu'
 import {
   ThemeWorkspace,
+  useFloatingCtaPage,
   useFooterConfigPage,
   useHeaderConfigPage,
   useHomeHeroPage,
@@ -43,6 +44,7 @@ function ThemeTab() {
   const headerContent = useHeaderConfigPage()
   const footerContent = useFooterConfigPage()
   const homeHero = useHomeHeroPage()
+  const floatingCta = useFloatingCtaPage()
   // Warn before leaving with unsaved customizer edits (route change + tab close).
   const blocker = useUnsavedChangesGuard(customize.isDirty)
   return (
@@ -53,6 +55,7 @@ function ThemeTab() {
         header={headerContent}
         footer={footerContent}
         hero={homeHero}
+        floatingCta={floatingCta}
       />
 
       {blocker.state === 'blocked' ? (
