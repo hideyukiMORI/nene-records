@@ -95,5 +95,7 @@
       <?php endforeach; ?>
       <script type="module" crossorigin src="<?= $e($basePath . $spaJs) ?>"></script>
     <?php endif; ?>
+    <?php /* First-party floating CTA chrome (#982): outside #root; '' when disabled. */ ?>
+    <?= $floatingCta ?? '' ?>
   </body>
 </html>

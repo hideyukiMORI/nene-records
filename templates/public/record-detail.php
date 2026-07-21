@@ -247,5 +247,8 @@ if ($ogImageUrl !== null) {
       <?php endforeach; ?>
       <script type="module" crossorigin src="<?= $e($basePath . $spaJs) ?>"></script>
     <?php endif; ?>
+    <?php /* First-party floating CTA chrome (#982): rendered outside #root so the SPA
+             mount does not wipe it; '' when disabled / no match. Pre-escaped server-side. */ ?>
+    <?= $floatingCta ?? '' ?>
   </body>
 </html>

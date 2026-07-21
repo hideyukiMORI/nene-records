@@ -51,6 +51,11 @@ final readonly class PdoDefaultSettingDefsSeeder implements DefaultSettingDefsSe
         ['setting_key' => 'analytics_consent_default', 'data_type' => 'text', 'default_value' => 'denied', 'is_public' => 1, 'label' => 'Analytics consent default (denied/granted)'],
         ['setting_key' => 'front_page', 'data_type' => 'text', 'default_value' => '', 'is_public' => 1, 'label' => 'Front page'],
         ['setting_key' => 'record_page_config', 'data_type' => 'text', 'default_value' => '{"comments":true,"related":true}', 'is_public' => 1, 'label' => 'Record page display'],
+        // First-party floating CTA (#982): a fixed call-to-action button rendered by the
+        // public SSR shell (chrome, not sanitized) on matching pages. JSON; disabled by
+        // default. Server-validated on write by FloatingCtaValidator (P1: structured
+        // content, position br/bl, trigger always, href scheme allowlist).
+        ['setting_key' => 'floating_cta', 'data_type' => 'text', 'default_value' => '{"enabled":false,"position":"br","trigger":"always","content":{"icon":"","label":"","sub":""},"link":{"url":"","newTab":true},"conditions":{"types":[],"urlGlobs":[],"exclude":[]}}', 'is_public' => 1, 'label' => 'Floating CTA'],
         // Per-org maintenance mode (#813): when 'true', anonymous visitors get a 503
         // maintenance page on the public surface; logged-in staff pass through.
         // Operational flag — not exposed via the public settings API (is_public 0).

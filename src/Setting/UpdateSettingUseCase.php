@@ -19,6 +19,9 @@ final readonly class UpdateSettingUseCase implements UpdateSettingUseCaseInterfa
     /** The setting that pins a single record as the public front page (#701). */
     private const FRONT_PAGE_SETTING = 'front_page';
 
+    /** The first-party floating CTA config (#982), server-validated then rendered as chrome. */
+    private const FLOATING_CTA_SETTING = 'floating_cta';
+
     /**
      * @param RequestScopedHolder<int> $orgId
      */
@@ -37,6 +40,13 @@ final readonly class UpdateSettingUseCase implements UpdateSettingUseCaseInterfa
         // ValidationException → 422 for malformed/unsafe documents.
         if (in_array($input->settingKey, self::BLOCKS_DOCUMENT_SETTINGS, true)) {
             (new BlocksDocumentValidator())->validate($input->value);
+        }
+
+        // The floating CTA (#982) is opaque `text` to the generic validator; enforce
+        // its P1-safe JSON contract here (fail-closed enums + href scheme allowlist)
+        // before it is emitted verbatim into the public shell.
+        if ($input->settingKey === self::FLOATING_CTA_SETTING) {
+            (new FloatingCtaValidator())->validate($input->value);
         }
 
         // The front page pins a record id; keep the invariant that it only ever points
