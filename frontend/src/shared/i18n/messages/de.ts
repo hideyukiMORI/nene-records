@@ -217,6 +217,8 @@ export const de = {
   'admin.floatingCta.positionBl': 'Unten links',
   'admin.floatingCta.accent': 'Akzentfarbe',
   'admin.floatingCta.icon': 'Symbol (Emoji)',
+  'admin.floatingCta.iconId': 'Symbol',
+  'admin.floatingCta.iconNone': 'Keine / Emoji',
   'admin.floatingCta.label': 'Beschriftung',
   'admin.floatingCta.sub': 'Untertext',
   'admin.floatingCta.url': 'Link-URL',

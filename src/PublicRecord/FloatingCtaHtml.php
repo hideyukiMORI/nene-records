@@ -37,9 +37,16 @@ final class FloatingCtaHtml
         $rel = $cta->newTab ? ' rel="noopener noreferrer"' : '';
         $target = $cta->newTab ? ' target="_blank"' : '';
 
-        $icon = $cta->icon !== ''
-            ? '<span class="nene-fab__icon" aria-hidden="true">' . self::e($cta->icon) . '</span>'
-            : '';
+        // A curated icon id (vetted first-party SVG) takes priority over the emoji. Only the
+        // one selected icon's markup is emitted, and it is our own repo-shipped SVG — never
+        // org-supplied — so verbatim output stays safe.
+        if ($cta->iconId !== '') {
+            $icon = '<span class="nene-fab__icon" aria-hidden="true">' . FloatingCtaIcons::svg($cta->iconId) . '</span>';
+        } elseif ($cta->icon !== '') {
+            $icon = '<span class="nene-fab__icon" aria-hidden="true">' . self::e($cta->icon) . '</span>';
+        } else {
+            $icon = '';
+        }
         $sub = $cta->sub !== ''
             ? '<span class="nene-fab__sub">' . self::e($cta->sub) . '</span>'
             : '';

@@ -226,6 +226,8 @@ export const ja = {
   'admin.floatingCta.positionBl': '左下',
   'admin.floatingCta.accent': 'アクセント色',
   'admin.floatingCta.icon': 'アイコン（絵文字）',
+  'admin.floatingCta.iconId': 'アイコン',
+  'admin.floatingCta.iconNone': 'なし / 絵文字',
   'admin.floatingCta.label': 'ラベル',
   'admin.floatingCta.sub': 'サブテキスト',
   'admin.floatingCta.url': 'リンク先URL',

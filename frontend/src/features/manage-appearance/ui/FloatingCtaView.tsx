@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { useTranslation } from '@/shared/i18n'
-import { joinList, parseList, safeHref } from '@/shared/lib/floating-cta'
+import { FLOATING_CTA_ICONS, joinList, parseList, safeHref } from '@/shared/lib/floating-cta'
 import { Button, Card, Stack, Text } from '@/shared/ui'
 import type { FloatingCtaPageState } from '../hooks/useFloatingCtaPage'
 
@@ -120,6 +120,42 @@ export function FloatingCtaView({
         </Stack>
 
         <Stack gap="sm">
+          <Row label={t('admin.floatingCta.iconId')}>
+            <div className="flex flex-wrap items-center gap-inline-sm">
+              <button
+                type="button"
+                aria-pressed={draft.content.iconId === ''}
+                className={
+                  draft.content.iconId === ''
+                    ? 'rounded-sm border-1.5 border-accent bg-surface px-inline-sm py-stack-xs font-chrome text-caption text-text-primary'
+                    : 'rounded-sm border border-border bg-surface px-inline-sm py-stack-xs font-chrome text-caption text-text-secondary'
+                }
+                onClick={() => {
+                  setContent({ iconId: '' })
+                }}
+              >
+                {t('admin.floatingCta.iconNone')}
+              </button>
+              {FLOATING_CTA_ICONS.map((icon) => (
+                <button
+                  key={icon.id}
+                  type="button"
+                  title={icon.id}
+                  aria-label={icon.id}
+                  aria-pressed={draft.content.iconId === icon.id}
+                  className={
+                    draft.content.iconId === icon.id
+                      ? 'inline-flex h-9 w-9 items-center justify-center rounded-sm border-1.5 border-accent bg-surface text-text-primary'
+                      : 'inline-flex h-9 w-9 items-center justify-center rounded-sm border border-border bg-surface text-text-secondary'
+                  }
+                  onClick={() => {
+                    setContent({ iconId: icon.id })
+                  }}
+                  dangerouslySetInnerHTML={{ __html: icon.svg }}
+                />
+              ))}
+            </div>
+          </Row>
           <Row label={t('admin.floatingCta.icon')}>
             <TextInput
               value={draft.content.icon}

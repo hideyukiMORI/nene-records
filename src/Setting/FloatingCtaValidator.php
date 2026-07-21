@@ -6,6 +6,7 @@ namespace NeNeRecords\Setting;
 
 use Nene2\Validation\ValidationError;
 use Nene2\Validation\ValidationException;
+use NeNeRecords\PublicRecord\FloatingCtaIcons;
 
 /**
  * Server-side validator for the `floating_cta` public setting (EPIC #982, P1).
@@ -77,6 +78,12 @@ final class FloatingCtaValidator
             $content = [];
         }
         $this->validateOptionalString('value.content.icon', $content['icon'] ?? null, self::MAX_ICON_LEN, $errors);
+        // iconId (P2) selects a curated first-party SVG; fail-closed against the shipped set.
+        // The allowed enum is derived from FloatingCtaIcons::keys() so it can never drift.
+        $iconId = $content['iconId'] ?? null;
+        if ($iconId !== null && $iconId !== '' && (!is_string($iconId) || !FloatingCtaIcons::has($iconId))) {
+            $errors[] = new ValidationError('value.content.iconId', 'iconId must be one of: ' . implode(', ', FloatingCtaIcons::keys()) . '.', 'invalid');
+        }
         $this->validateOptionalString('value.content.sub', $content['sub'] ?? null, self::MAX_SUB_LEN, $errors);
         $label = $content['label'] ?? null;
         $this->validateOptionalString('value.content.label', $label, self::MAX_LABEL_LEN, $errors);

@@ -81,4 +81,39 @@ final class FloatingCtaHtmlTest extends TestCase
         self::assertStringNotContainsString('target="_blank"', $html);
         self::assertStringNotContainsString('rel="noopener', $html);
     }
+
+    public function testCuratedIconIdRendersSvg(): void
+    {
+        $cta = self::cta([
+            'content' => ['label' => 'Book', 'iconId' => 'calendar'],
+            'link' => ['url' => 'https://x.test'],
+        ]);
+        $html = FloatingCtaHtml::render($cta, 'page', '/');
+        self::assertStringContainsString('<span class="nene-fab__icon"', $html);
+        self::assertStringContainsString('<svg width="18" height="18" viewBox="0 0 24 24"', $html);
+        self::assertStringContainsString('stroke="currentColor"', $html);
+    }
+
+    public function testIconIdTakesPriorityOverEmoji(): void
+    {
+        $cta = self::cta([
+            'content' => ['icon' => '📅', 'label' => 'Book', 'iconId' => 'video'],
+            'link' => ['url' => 'https://x.test'],
+        ]);
+        $html = FloatingCtaHtml::render($cta, 'page', '/');
+        self::assertStringContainsString('<svg', $html);
+        // The emoji is dropped in favour of the curated svg.
+        self::assertStringNotContainsString('📅', $html);
+    }
+
+    public function testInvalidIconIdFallsBackToEmoji(): void
+    {
+        $cta = self::cta([
+            'content' => ['icon' => '📅', 'label' => 'Book', 'iconId' => 'bogus'],
+            'link' => ['url' => 'https://x.test'],
+        ]);
+        $html = FloatingCtaHtml::render($cta, 'page', '/');
+        self::assertStringNotContainsString('<svg', $html);
+        self::assertStringContainsString('📅', $html);
+    }
 }

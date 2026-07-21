@@ -214,6 +214,8 @@ export const zhHans = {
   'admin.floatingCta.positionBl': '左下角',
   'admin.floatingCta.accent': '强调色',
   'admin.floatingCta.icon': '图标（表情）',
+  'admin.floatingCta.iconId': '图标',
+  'admin.floatingCta.iconNone': '无 / 表情',
   'admin.floatingCta.label': '文字',
   'admin.floatingCta.sub': '副文字',
   'admin.floatingCta.url': '链接地址',

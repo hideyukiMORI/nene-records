@@ -30,7 +30,7 @@ export interface FloatingCtaConfig {
   position: FloatingCtaPosition
   /** `#RRGGBB` accent, or '' to use the built-in default. */
   accent: string
-  content: { icon: string; label: string; sub: string }
+  content: { icon: string; iconId: string; label: string; sub: string }
   link: { url: string; newTab: boolean }
   conditions: FloatingCtaConditions
 }
@@ -39,7 +39,7 @@ export const DEFAULT_FLOATING_CTA: FloatingCtaConfig = {
   enabled: false,
   position: 'br',
   accent: '',
-  content: { icon: '', label: '', sub: '' },
+  content: { icon: '', iconId: '', label: '', sub: '' },
   link: { url: '', newTab: true },
   conditions: { types: [], urlGlobs: [], exclude: [] },
 }
@@ -92,6 +92,7 @@ export function parseFloatingCta(raw: string | undefined): FloatingCtaConfig {
     accent: /^#[0-9A-Fa-f]{6}$/.test(asString(record.accent)) ? asString(record.accent) : '',
     content: {
       icon: asString(content.icon),
+      iconId: asString(content.iconId),
       label: asString(content.label),
       sub: asString(content.sub),
     },
@@ -128,4 +129,52 @@ export function joinList(list: string[]): string {
 /** True when the CTA is enabled and resolves to a safe, labelled link. */
 export function isFloatingCtaRenderable(config: FloatingCtaConfig): boolean {
   return config.enabled && config.content.label.trim() !== '' && safeHref(config.link.url) !== ''
+}
+
+/**
+ * Curated first-party SVG icons for the floating CTA picker (#982 P2). The ids and
+ * markup mirror the backend `FloatingCtaIcons` (the server is the validation authority);
+ * this copy powers the admin picker preview. `svg` is our own constant markup — safe to
+ * render (no org input).
+ */
+export const FLOATING_CTA_ICONS: ReadonlyArray<{ id: string; svg: string }> = [
+  {
+    id: 'calendar',
+    svg: wrap(
+      '<rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/>',
+    ),
+  },
+  {
+    id: 'video',
+    svg: wrap('<rect x="2" y="6" width="13" height="12" rx="2"/><path d="M22 8.5 15 12l7 3.5z"/>'),
+  },
+  {
+    id: 'chat',
+    svg: wrap('<path d="M21 11.5a8.5 8.5 0 0 1-12.3 7.6L3 21l1.9-5.7A8.5 8.5 0 1 1 21 11.5z"/>'),
+  },
+  {
+    id: 'mail',
+    svg: wrap('<rect x="2" y="4.5" width="20" height="15" rx="2"/><path d="m3 6 9 7 9-7"/>'),
+  },
+  {
+    id: 'phone',
+    svg: wrap(
+      '<path d="M6.6 3H4a1.9 1.9 0 0 0-1.9 2.1 16.9 16.9 0 0 0 14.8 14.8A1.9 1.9 0 0 0 19 18v-2.6a1.3 1.3 0 0 0-1-1.3l-3-.6a1.3 1.3 0 0 0-1.2.4l-1 1a13 13 0 0 1-5-5l1-1a1.3 1.3 0 0 0 .4-1.3l-.6-3A1.3 1.3 0 0 0 6.6 3z"/>',
+    ),
+  },
+  { id: 'clock', svg: wrap('<circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2"/>') },
+  {
+    id: 'sparkle',
+    svg: wrap('<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/>'),
+  },
+  { id: 'arrow-right', svg: wrap('<path d="M4 12h15M13 6l6 6-6 6"/>') },
+]
+
+function wrap(inner: string): string {
+  return (
+    '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"' +
+    ' stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+    inner +
+    '</svg>'
+  )
 }
