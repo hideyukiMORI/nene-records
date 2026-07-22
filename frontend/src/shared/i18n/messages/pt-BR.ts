@@ -218,6 +218,9 @@ export const ptBR = {
   'admin.floatingCta.positionBl': 'Inferior esquerdo',
   'admin.floatingCta.accent': 'Cor de destaque',
   'admin.floatingCta.bottomOffset': 'Espaço inferior (px)',
+  'admin.floatingCta.dismissible': 'Dispensável (× para fechar)',
+  'admin.floatingCta.dismissibleHelp':
+    'Adiciona um × e memoriza o fechamento por dispositivo (usa um pequeno script).',
   'admin.floatingCta.bottomOffsetHelp':
     'Reserva espaço acima do rodapé para o botão não cobri-lo. 0 = desativado.',
   'admin.floatingCta.icon': 'Ícone (emoji)',

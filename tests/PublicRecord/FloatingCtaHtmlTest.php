@@ -40,7 +40,8 @@ final class FloatingCtaHtmlTest extends TestCase
         $html = FloatingCtaHtml::render($cta, 'page', '/');
 
         self::assertStringContainsString('<style>', $html);
-        self::assertStringContainsString('.nene-fab{position:fixed', $html);
+        self::assertStringContainsString('.nene-fab-wrap{position:fixed', $html);
+        self::assertStringContainsString('<div class="nene-fab-wrap" id="nene-fab-wrap">', $html);
         self::assertStringContainsString('#D64525', $html);
         self::assertStringContainsString('href="https://calendar.app.google/x"', $html);
         self::assertStringContainsString('target="_blank"', $html);
@@ -74,6 +75,57 @@ final class FloatingCtaHtmlTest extends TestCase
         $cta = self::cta(['content' => ['label' => 'x'], 'link' => ['url' => 'https://x.test']]);
         $html = FloatingCtaHtml::render($cta, 'page', '/');
         self::assertStringNotContainsString('body{padding-bottom', $html);
+    }
+
+    public function testDismissibleWithNonceEmitsButtonAndNoncedScript(): void
+    {
+        $cta = self::cta([
+            'content' => ['label' => 'x'], 'link' => ['url' => 'https://x.test'],
+            'dismissible' => true,
+        ]);
+        $html = FloatingCtaHtml::render($cta, 'page', '/', 'abc123', 'ja');
+
+        self::assertStringContainsString('class="nene-fab__dismiss"', $html);
+        self::assertStringContainsString('aria-label="閉じる"', $html);
+        self::assertStringContainsString('<script nonce="abc123">', $html);
+        self::assertStringContainsString("localStorage.setItem(k,'1')", $html);
+        self::assertStringContainsString("localStorage.getItem(k)==='1'", $html);
+        self::assertStringContainsString('.nene-fab__dismiss{position:absolute', $html);
+    }
+
+    public function testDismissibleWithoutNonceOmitsScript(): void
+    {
+        // No nonce available (analytics off, renderer supplies none) → no dismiss UI, but a
+        // fully working FAB still renders (graceful degradation, no CSP violation).
+        $cta = self::cta([
+            'content' => ['label' => 'x'], 'link' => ['url' => 'https://x.test'],
+            'dismissible' => true,
+        ]);
+        $html = FloatingCtaHtml::render($cta, 'page', '/');
+
+        self::assertStringNotContainsString('<script', $html);
+        self::assertStringNotContainsString('nene-fab__dismiss', $html);
+        self::assertStringContainsString('class="nene-fab"', $html);
+    }
+
+    public function testNonDismissibleNeverEmitsScriptEvenWithNonce(): void
+    {
+        $cta = self::cta(['content' => ['label' => 'x'], 'link' => ['url' => 'https://x.test']]);
+        $html = FloatingCtaHtml::render($cta, 'page', '/', 'abc123', 'en');
+
+        self::assertStringNotContainsString('<script', $html);
+        self::assertStringNotContainsString('nene-fab__dismiss', $html);
+    }
+
+    public function testDismissButtonSitsOnPositionSide(): void
+    {
+        $cta = self::cta([
+            'position' => 'bl', 'content' => ['label' => 'x'], 'link' => ['url' => 'https://x.test'],
+            'dismissible' => true,
+        ]);
+        $html = FloatingCtaHtml::render($cta, 'page', '/', 'n0nce', 'en');
+        self::assertStringContainsString('.nene-fab__dismiss{position:absolute;top:-9px;left:-9px', $html);
+        self::assertStringContainsString('aria-label="Close"', $html);
     }
 
     public function testEscapesAdminSuppliedText(): void

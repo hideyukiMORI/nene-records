@@ -214,6 +214,8 @@ export const zhHans = {
   'admin.floatingCta.positionBl': '左下角',
   'admin.floatingCta.accent': '强调色',
   'admin.floatingCta.bottomOffset': '底部留白（px）',
+  'admin.floatingCta.dismissible': '可关闭（× 关闭）',
+  'admin.floatingCta.dismissibleHelp': '显示 × 并在设备上记住已关闭（使用一小段脚本）。',
   'admin.floatingCta.bottomOffsetHelp': '在页脚上方预留空间，避免按钮遮挡。0 = 关闭。',
   'admin.floatingCta.icon': '图标（表情）',
   'admin.floatingCta.iconId': '图标',

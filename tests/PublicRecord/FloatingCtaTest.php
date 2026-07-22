@@ -73,6 +73,30 @@ final class FloatingCtaTest extends TestCase
         self::assertSame(0, FloatingCta::fromSettings(self::settings($base))->bottomOffset);
     }
 
+    public function testDismissibleIsParsed(): void
+    {
+        $base = ['enabled' => true, 'content' => ['label' => 'x'], 'link' => ['url' => 'https://x.test']];
+        self::assertFalse(FloatingCta::fromSettings(self::settings($base))->dismissible);
+        self::assertTrue(FloatingCta::fromSettings(self::settings($base + ['dismissible' => true]))->dismissible);
+        self::assertFalse(FloatingCta::fromSettings(self::settings($base + ['dismissible' => 'yes']))->dismissible);
+    }
+
+    public function testIsDismissActiveForRequiresEnabledDismissibleAndMatch(): void
+    {
+        $base = ['enabled' => true, 'dismissible' => true, 'content' => ['label' => 'x'], 'link' => ['url' => 'https://x.test']];
+
+        self::assertTrue(FloatingCta::fromSettings(self::settings($base))->isDismissActiveFor('page', '/'));
+        // Not dismissible → false even though it renders.
+        self::assertFalse(FloatingCta::fromSettings(self::settings(['dismissible' => false] + $base))->isDismissActiveFor('page', '/'));
+        // Page excluded → false even though dismissible.
+        self::assertFalse(
+            FloatingCta::fromSettings(self::settings($base + ['conditions' => ['exclude' => ['/secret*']]]))
+                ->isDismissActiveFor('page', '/secret'),
+        );
+        // Disabled → false.
+        self::assertFalse(FloatingCta::disabled()->isDismissActiveFor('page', '/'));
+    }
+
     public function testInvalidPositionFallsBackToBr(): void
     {
         $cta = FloatingCta::fromSettings(self::settings([

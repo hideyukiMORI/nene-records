@@ -43,15 +43,23 @@ final readonly class RenderPublicTypeArchiveRenderer implements PublicTypeArchiv
         $metaDescription = $settings['default_meta_description'] ?? '';
 
         $analytics = WebAnalyticsConfig::fromSettings($settings);
-        $analyticsNonce = $analytics->isEnabled() ? bin2hex(random_bytes(16)) : '';
-        $analyticsHead = WebAnalyticsHeadSnippet::render($analytics, $analyticsNonce);
 
         // First-party floating CTA (#982) for the type-archive shell — same server-rendered
-        // chrome as the record shell. '' when disabled / the archive type is excluded.
+        // chrome as the record shell. '' when disabled / the archive type is excluded. One
+        // nonce covers analytics AND the dismiss script (#982 P2 a); generated only when
+        // needed so pages with neither keep the strict `script-src 'self'`.
+        $floatingCtaConfig = FloatingCta::fromSettings($settings);
+        $fabPath = $request->getUri()->getPath();
+        $fabDismissActive = $floatingCtaConfig->isDismissActiveFor($archive->typeSlug, $fabPath);
+        $nonce = ($analytics->isEnabled() || $fabDismissActive) ? bin2hex(random_bytes(16)) : '';
+        $analyticsHead = WebAnalyticsHeadSnippet::render($analytics, $nonce);
+
         $floatingCta = FloatingCtaHtml::render(
-            FloatingCta::fromSettings($settings),
+            $floatingCtaConfig,
             $archive->typeSlug,
-            $request->getUri()->getPath(),
+            $fabPath,
+            $fabDismissActive ? $nonce : null,
+            PublicLocale::DEFAULT_LANG,
         );
 
         $effectiveBase = $this->basePath . (string) $request->getAttribute('nene2.base_prefix', '');
@@ -120,7 +128,7 @@ final readonly class RenderPublicTypeArchiveRenderer implements PublicTypeArchiv
             'spaPreload' => $spaPreload,
         ])->withHeader(
             'Content-Security-Policy',
-            PublicHtmlCsp::build($analytics, $analyticsNonce !== '' ? $analyticsNonce : null, null),
+            PublicHtmlCsp::build($analytics, $nonce !== '' ? $nonce : null, null),
         );
     }
 

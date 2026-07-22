@@ -11,15 +11,27 @@ use PHPUnit\Framework\TestCase;
 
 final class PublicHtmlCspTest extends TestCase
 {
-    public function testDisabledAnalyticsReturnsStrictBaseline(): void
+    public function testDisabledAnalyticsWithoutNonceReturnsStrictBaseline(): void
     {
-        $csp = PublicHtmlCsp::build(WebAnalyticsConfig::disabled(), 'noncevalue');
+        $csp = PublicHtmlCsp::build(WebAnalyticsConfig::disabled(), null);
 
         self::assertSame(PublicHtmlCsp::POLICY, $csp);
         self::assertStringNotContainsString('googletagmanager', $csp);
         self::assertStringNotContainsString('nonce-', $csp);
         // Scripts stay 'self' (inherited from default-src) — no script-src directive.
         self::assertStringNotContainsString('script-src', $csp);
+    }
+
+    public function testNonceWithoutAnalyticsWidensOnlyScriptSrc(): void
+    {
+        // #982 P2 (a): the floating-CTA dismiss script needs its nonce in script-src even
+        // with analytics off — but nothing else widens (no GTM / analytics hosts / connect).
+        $csp = PublicHtmlCsp::build(WebAnalyticsConfig::disabled(), 'fabnonce');
+
+        self::assertStringContainsString("script-src 'self' 'nonce-fabnonce'", $csp);
+        self::assertStringNotContainsString('googletagmanager', $csp);
+        self::assertStringNotContainsString('google-analytics', $csp);
+        self::assertStringNotContainsString('connect-src', $csp);
     }
 
     public function testEnabledAddsNonceAndTagManagerToScriptSrc(): void
@@ -71,8 +83,9 @@ final class PublicHtmlCspTest extends TestCase
         // The whole guarantee of the feature: an empty allowlist changes nothing.
         self::assertSame(
             PublicHtmlCsp::POLICY,
-            PublicHtmlCsp::build(WebAnalyticsConfig::disabled(), 'nonce', self::embeds([])),
+            PublicHtmlCsp::build(WebAnalyticsConfig::disabled(), null, self::embeds([])),
         );
+        // Holds with a nonce too: empty allowlist == no allowlist (both widen script-src only).
         self::assertSame(
             PublicHtmlCsp::build(WebAnalyticsConfig::disabled(), 'nonce'),
             PublicHtmlCsp::build(WebAnalyticsConfig::disabled(), 'nonce', self::embeds([])),

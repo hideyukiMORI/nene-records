@@ -52,6 +52,12 @@ describe('parseFloatingCta', () => {
     expect(parseFloatingCta('{}').bottomOffset).toBe(0)
   })
 
+  it('parses dismissible defensively (#982 P2 a)', () => {
+    expect(parseFloatingCta(JSON.stringify({ dismissible: true })).dismissible).toBe(true)
+    expect(parseFloatingCta(JSON.stringify({ dismissible: 'yes' })).dismissible).toBe(false)
+    expect(parseFloatingCta('{}').dismissible).toBe(false)
+  })
+
   it('round-trips through serialize', () => {
     const cfg = parseFloatingCta(
       JSON.stringify({ enabled: true, content: { label: 'x' }, link: { url: '/c' } }),
