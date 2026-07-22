@@ -226,6 +226,9 @@ export const ja = {
   'admin.floatingCta.positionBl': '左下',
   'admin.floatingCta.accent': 'アクセント色',
   'admin.floatingCta.bottomOffset': '下部クリアランス（px）',
+  'admin.floatingCta.dismissible': '閉じるボタン（×）を表示',
+  'admin.floatingCta.dismissibleHelp':
+    '× を表示し、閉じたことを端末に記憶します（小さなスクリプトを使用）。',
   'admin.floatingCta.bottomOffsetHelp':
     'フッターの上に余白を確保し、ボタンが重ならないようにします。0=なし。',
   'admin.floatingCta.icon': 'アイコン（絵文字）',

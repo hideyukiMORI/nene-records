@@ -23,7 +23,7 @@ namespace NeNeRecords\PublicRecord;
  */
 final class FloatingCtaHtml
 {
-    public static function render(FloatingCta $cta, string $typeSlug, string $path): string
+    public static function render(FloatingCta $cta, string $typeSlug, string $path, ?string $nonce = null, string $lang = 'en'): string
     {
         if (!$cta->shouldRender($typeSlug, $path)) {
             return '';
@@ -51,19 +51,37 @@ final class FloatingCtaHtml
             ? '<span class="nene-fab__sub">' . self::e($cta->sub) . '</span>'
             : '';
 
-        $style = self::style($accent, $side, $cta->bottomOffset);
+        // Dismiss (#982 P2 (a)): a "×" that remembers dismissal in localStorage via a small
+        // nonce'd inline script. The renderer only supplies a nonce when it will also add it
+        // to the CSP, so a missing nonce means "no dismiss UI" (graceful, still a working FAB).
+        $dismiss = $cta->dismissible && $nonce !== null && $nonce !== '';
 
-        return $style . "\n"
-            . '<a class="nene-fab" href="' . $href . '"' . $target . $rel . '>'
+        $style = self::style($accent, $side, $cta->bottomOffset, $dismiss);
+
+        $button = '<a class="nene-fab" href="' . $href . '"' . $target . $rel . '>'
             . $icon
             . '<span class="nene-fab__text">'
             . '<span class="nene-fab__label">' . $label . '</span>'
             . $sub
             . '</span>'
             . '</a>';
+
+        $dismissBtn = '';
+        $script = '';
+        if ($dismiss) {
+            $dismissBtn = '<button type="button" class="nene-fab__dismiss" aria-label="'
+                . self::e(self::dismissLabel($lang)) . '">&#215;</button>';
+            $script = self::script((string) $nonce);
+        }
+
+        // The wrapper is the fixed-positioned element so the dismiss button can sit at its
+        // corner; the SPA never touches it (rendered outside #root before </body>).
+        return $style . "\n"
+            . '<div class="nene-fab-wrap" id="nene-fab-wrap">' . $button . $dismissBtn . '</div>'
+            . $script;
     }
 
-    private static function style(string $accent, string $side, int $bottomOffset): string
+    private static function style(string $accent, string $side, int $bottomOffset, bool $dismiss): string
     {
         // Page-bottom clearance (#982 P2 (c)): reserve space so the fixed FAB never covers
         // footer content at scroll-end. Replaces the ad-hoc per-site `footer{padding-bottom}`
@@ -72,14 +90,24 @@ final class FloatingCtaHtml
             ? 'body{padding-bottom:calc(env(safe-area-inset-bottom,0px) + ' . $bottomOffset . 'px)}'
             : '';
 
-        // Scoped to `.nene-fab`; safe to inline (CSP style-src allows 'unsafe-inline').
-        // `$accent` is a validated hex and `$side` is a fixed keyword, so interpolation
-        // is injection-free.
+        // The dismiss "×" sits at the wrapper's outer corner (opposite side stays clear).
+        $dismissCss = $dismiss
+            ? '.nene-fab__dismiss{position:absolute;top:-9px;' . $side . ':-9px;width:24px;height:24px;'
+                . 'border:none;border-radius:999px;cursor:pointer;background:#14120F;color:#fff;'
+                . 'font-size:15px;line-height:1;padding:0;display:flex;align-items:center;justify-content:center;'
+                . 'box-shadow:0 2px 6px rgba(20,18,15,.3)}'
+                . '.nene-fab__dismiss:hover{filter:brightness(1.25)}'
+                . '.nene-fab__dismiss:focus-visible{outline:2px solid #14120F;outline-offset:2px}'
+            : '';
+
+        // Scoped to `.nene-fab*`; safe to inline (CSP style-src allows 'unsafe-inline').
+        // The wrapper carries the fixed position; `.nene-fab` is the button visual. `$accent`
+        // is a validated hex and `$side` a fixed keyword, so interpolation is injection-free.
         return '<style>'
             . $clearance
-            . '.nene-fab{position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 20px);'
-            . $side . ':calc(env(safe-area-inset-' . $side . ',0px) + 20px);z-index:2147483000;'
-            . 'display:inline-flex;align-items:center;gap:10px;'
+            . '.nene-fab-wrap{position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 20px);'
+            . $side . ':calc(env(safe-area-inset-' . $side . ',0px) + 20px);z-index:2147483000}'
+            . '.nene-fab{display:inline-flex;align-items:center;gap:10px;'
             . 'background:var(--nene-fab-bg,' . $accent . ');color:var(--nene-fab-fg,#fff);'
             . 'text-decoration:none;font-family:inherit;font-weight:700;font-size:.92rem;line-height:1.15;'
             . 'padding:13px 20px;border-radius:999px;'
@@ -91,9 +119,39 @@ final class FloatingCtaHtml
             . '.nene-fab__icon{font-size:1.2em;line-height:1}'
             . '.nene-fab__text{display:inline-flex;flex-direction:column}'
             . '.nene-fab__sub{font-size:.62rem;font-weight:500;letter-spacing:.04em;opacity:.85;margin-top:2px}'
-            . '@media(max-width:560px){.nene-fab{left:14px;right:14px;justify-content:center;padding:15px 18px}}'
+            . $dismissCss
+            . '@media(max-width:560px){.nene-fab-wrap{left:14px;right:14px}.nene-fab{display:flex;justify-content:center;padding:15px 18px}}'
             . '@media(prefers-reduced-motion:reduce){.nene-fab{transition:none}.nene-fab:hover{transform:none}}'
             . '</style>';
+    }
+
+    /**
+     * The nonce'd dismiss script: a first-party constant (no interpolated data) that hides
+     * the FAB immediately when already dismissed and remembers a "×" click in localStorage.
+     * `$nonce` is hex from the renderer, so attribute interpolation carries no injection.
+     */
+    private static function script(string $nonce): string
+    {
+        $n = self::e($nonce);
+        $js = "(function(){try{var k='nene-fab-dismissed',w=document.getElementById('nene-fab-wrap');"
+            . "if(!w)return;if(localStorage.getItem(k)==='1'){w.style.display='none';return}"
+            . "var b=w.querySelector('.nene-fab__dismiss');if(b){b.addEventListener('click',function(){"
+            . "try{localStorage.setItem(k,'1')}catch(e){}w.style.display='none'})}}catch(e){}})();";
+
+        return "<script nonce=\"{$n}\">{$js}</script>";
+    }
+
+    /** Localized accessible label for the dismiss button across the supported public locales. */
+    private static function dismissLabel(string $lang): string
+    {
+        return match ($lang) {
+            'ja' => '閉じる',
+            'de' => 'Schließen',
+            'fr' => 'Fermer',
+            'pt-BR' => 'Fechar',
+            'zh-Hans' => '关闭',
+            default => 'Close',
+        };
     }
 
     private static function e(string $value): string

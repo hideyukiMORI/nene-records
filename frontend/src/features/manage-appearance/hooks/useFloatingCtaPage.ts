@@ -16,7 +16,9 @@ export interface FloatingCtaPageState {
   draft: FloatingCtaConfig
   /** Patch top-level fields (enabled / position / accent). */
   setConfig: (
-    patch: Partial<Pick<FloatingCtaConfig, 'enabled' | 'position' | 'accent' | 'bottomOffset'>>,
+    patch: Partial<
+      Pick<FloatingCtaConfig, 'enabled' | 'position' | 'accent' | 'bottomOffset' | 'dismissible'>
+    >,
   ) => void
   /** Patch the content fields (icon / label / sub). */
   setContent: (patch: Partial<FloatingCtaConfig['content']>) => void

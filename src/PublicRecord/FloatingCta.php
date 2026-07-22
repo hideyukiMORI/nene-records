@@ -52,12 +52,14 @@ final readonly class FloatingCta
         public array $conditionExclude,
         /** Extra clearance (px) reserved at the page bottom so the fixed FAB never covers footer content; 0 = none (#982 P2 (c)). */
         public int $bottomOffset = 0,
+        /** When true, the FAB shows a dismiss (×) button and remembers dismissal in localStorage (#982 P2 (a)). */
+        public bool $dismissible = false,
     ) {
     }
 
     public static function disabled(): self
     {
-        return new self(false, 'br', self::DEFAULT_ACCENT, '', '', '', '', '', true, [], [], [], 0);
+        return new self(false, 'br', self::DEFAULT_ACCENT, '', '', '', '', '', true, [], [], [], 0, false);
     }
 
     /**
@@ -104,6 +106,8 @@ final readonly class FloatingCta
         $rawOffset = $decoded['bottomOffset'] ?? 0;
         $bottomOffset = is_int($rawOffset) ? max(0, min($rawOffset, self::MAX_BOTTOM_OFFSET)) : 0;
 
+        $dismissible = ($decoded['dismissible'] ?? false) === true;
+
         $label = self::asString($content['label'] ?? '');
         $url = self::asString($link['url'] ?? '');
 
@@ -130,6 +134,7 @@ final readonly class FloatingCta
             conditionUrlGlobs: self::asStringList($conditions['urlGlobs'] ?? []),
             conditionExclude: self::asStringList($conditions['exclude'] ?? []),
             bottomOffset: $bottomOffset,
+            dismissible: $dismissible,
         );
     }
 
@@ -169,6 +174,18 @@ final readonly class FloatingCta
         }
 
         return true;
+    }
+
+    /**
+     * Whether the FAB will render its dismiss UI on this page (#982 P2 (a)).
+     *
+     * True only when enabled, dismissible, and the page matches. The renderer uses this
+     * to decide whether a CSP script nonce is needed at all — so pages without a
+     * dismissible FAB keep the strict `script-src 'self'` (no nonce) policy.
+     */
+    public function isDismissActiveFor(string $typeSlug, string $path): bool
+    {
+        return $this->dismissible && $this->shouldRender($typeSlug, $path);
     }
 
     /**

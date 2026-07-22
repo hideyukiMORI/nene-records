@@ -51,19 +51,32 @@ final class PublicHtmlCsp
     ): string {
         $embedOrigins = $embeds?->origins() ?? [];
 
-        // ── Fast path: no embeds ⇒ existing behaviour, byte-for-byte unchanged ──
-        // (This block is intentionally identical to the pre-#802 implementation so
-        // adding the allowlist parameter cannot regress any analytics/nonce output.)
+        $hasNonce = $scriptNonce !== null && $scriptNonce !== '';
+
+        // ── Fast path: no embeds ──
         if ($embedOrigins === []) {
-            if (!$analytics->isEnabled()) {
+            // Nothing to widen: strict POLICY unchanged (byte-for-byte as pre-#802).
+            if (!$analytics->isEnabled() && !$hasNonce) {
                 return self::POLICY;
             }
 
             $scriptSrc = "'self'";
-            if ($scriptNonce !== null && $scriptNonce !== '') {
+            if ($hasNonce) {
                 $scriptSrc .= " 'nonce-{$scriptNonce}'";
             }
-            $scriptSrc .= ' https://www.googletagmanager.com';
+            if ($analytics->isEnabled()) {
+                $scriptSrc .= ' https://www.googletagmanager.com';
+            }
+
+            // A nonce with no analytics (e.g. the floating-CTA dismiss script, #982 P2 a)
+            // widens only script-src; the analytics-host img/connect stay off.
+            if (!$analytics->isEnabled()) {
+                return "default-src 'self'; "
+                    . "script-src {$scriptSrc}; "
+                    . "style-src 'self' 'unsafe-inline'; "
+                    . "font-src 'self' data:; "
+                    . "img-src 'self' data:";
+            }
 
             return "default-src 'self'; "
                 . "script-src {$scriptSrc}; "
@@ -77,7 +90,7 @@ final class PublicHtmlCsp
         $embedList = implode(' ', $embedOrigins);
 
         $script = "'self'";
-        if ($analytics->isEnabled() && $scriptNonce !== null && $scriptNonce !== '') {
+        if ($hasNonce) {
             $script .= " 'nonce-{$scriptNonce}'";
         }
         if ($analytics->isEnabled()) {

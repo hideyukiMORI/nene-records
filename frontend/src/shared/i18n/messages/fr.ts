@@ -220,6 +220,9 @@ export const fr = {
   'admin.floatingCta.positionBl': 'En bas à gauche',
   'admin.floatingCta.accent': 'Couleur d’accent',
   'admin.floatingCta.bottomOffset': 'Marge inférieure (px)',
+  'admin.floatingCta.dismissible': 'Fermable (× pour fermer)',
+  'admin.floatingCta.dismissibleHelp':
+    'Ajoute un × et mémorise la fermeture par appareil (utilise un petit script).',
   'admin.floatingCta.bottomOffsetHelp':
     'Réserve de l’espace au-dessus du pied de page pour que le bouton ne le masque pas. 0 = désactivé.',
   'admin.floatingCta.icon': 'Icône (emoji)',

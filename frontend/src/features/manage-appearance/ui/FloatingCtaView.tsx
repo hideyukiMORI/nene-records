@@ -145,6 +145,16 @@ export function FloatingCtaView({
               </Text>
             </div>
           </Row>
+          <Checkbox
+            checked={draft.dismissible}
+            label={t('admin.floatingCta.dismissible')}
+            onChange={(dismissible) => {
+              setConfig({ dismissible })
+            }}
+          />
+          <Text muted variant="caption">
+            {t('admin.floatingCta.dismissibleHelp')}
+          </Text>
         </Stack>
 
         <Stack gap="sm">

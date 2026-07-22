@@ -230,6 +230,9 @@ export const en = {
   'admin.floatingCta.positionBl': 'Bottom left',
   'admin.floatingCta.accent': 'Accent color',
   'admin.floatingCta.bottomOffset': 'Bottom clearance (px)',
+  'admin.floatingCta.dismissible': 'Dismissible (× to close)',
+  'admin.floatingCta.dismissibleHelp':
+    'Adds a × and remembers the dismissal per device (uses a small script).',
   'admin.floatingCta.bottomOffsetHelp':
     'Reserves space above the footer so the button never covers it. 0 = off.',
   'admin.floatingCta.icon': 'Icon (emoji)',

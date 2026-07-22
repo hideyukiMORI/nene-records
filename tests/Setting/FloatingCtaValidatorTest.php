@@ -30,6 +30,7 @@ final class FloatingCtaValidatorTest extends TestCase
             'link' => ['url' => 'https://calendar.app.google/x', 'newTab' => true],
             'conditions' => ['types' => ['page'], 'urlGlobs' => ['/services*'], 'exclude' => ['/admin*']],
             'bottomOffset' => 120,
+            'dismissible' => true,
         ]));
         $this->addToAssertionCount(1);
     }
@@ -65,6 +66,7 @@ final class FloatingCtaValidatorTest extends TestCase
         yield 'bottomOffset over max' => [(string) json_encode(['bottomOffset' => 9999] + $base)];
         yield 'bottomOffset negative' => [(string) json_encode(['bottomOffset' => -1] + $base)];
         yield 'bottomOffset not int' => [(string) json_encode(['bottomOffset' => '100'] + $base)];
+        yield 'dismissible not bool' => [(string) json_encode(['dismissible' => 'yes'] + $base)];
     }
 
     public function testMailtoAndTelAndRelativeAreAccepted(): void

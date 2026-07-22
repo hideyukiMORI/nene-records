@@ -513,6 +513,61 @@ final class PublicRecordHttpTest extends TestCase
         self::assertStringNotContainsString('googletagmanager', (string) $response->getBody());
     }
 
+    public function testSsrGivesDismissibleFabANonceEvenWithAnalyticsOff(): void
+    {
+        // Analytics OFF — the nonce must come from the dismissible FAB alone (#982 P2 a).
+        $cfg = (string) json_encode([
+            'enabled' => true,
+            'content' => ['label' => 'Book'],
+            'link' => ['url' => 'https://x.test'],
+            'dismissible' => true,
+        ]);
+        $app = $this->buildApplication(true, $this->projectRoot, [
+            new \NeNeRecords\Setting\SettingDef('floating_cta', 'text', $cfg, true, 'FAB'),
+        ]);
+
+        $response = $app->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/article/10'),
+        );
+        $html = (string) $response->getBody();
+        $csp = $response->getHeaderLine('Content-Security-Policy');
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertStringContainsString('class="nene-fab__dismiss"', $html);
+
+        // The FAB dismiss script carries a nonce that is present in the CSP script-src.
+        preg_match('/<script nonce="([0-9a-f]{32})">/', $html, $m);
+        $nonce = $m[1] ?? '';
+        self::assertNotSame('', $nonce);
+        self::assertStringContainsString("'nonce-{$nonce}'", $csp);
+        self::assertStringNotContainsString('googletagmanager', $csp);
+    }
+
+    public function testSsrKeepsStrictCspWhenFabNotDismissible(): void
+    {
+        $cfg = (string) json_encode([
+            'enabled' => true,
+            'content' => ['label' => 'Book'],
+            'link' => ['url' => 'https://x.test'],
+        ]);
+        $app = $this->buildApplication(true, $this->projectRoot, [
+            new \NeNeRecords\Setting\SettingDef('floating_cta', 'text', $cfg, true, 'FAB'),
+        ]);
+
+        $response = $app->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/article/10'),
+        );
+        $html = (string) $response->getBody();
+        $csp = $response->getHeaderLine('Content-Security-Policy');
+
+        // A working FAB renders, but with no dismiss script → strict `script-src 'self'`
+        // (the page's own bootstrap/dev scripts carry no nonce).
+        self::assertStringContainsString('class="nene-fab"', $html);
+        self::assertStringNotContainsString('nene-fab__dismiss', $html);
+        self::assertStringNotContainsString('<script nonce=', $html);
+        self::assertStringNotContainsString("'nonce-", $csp);
+    }
+
     public function testSitemapXmlListsHomeAndPublishedRecords(): void
     {
         $response = $this->application->handle(

@@ -38,6 +38,8 @@ export interface FloatingCtaConfig {
   conditions: FloatingCtaConditions
   /** Extra clearance (px) reserved at the page bottom so the fixed FAB never covers footer content; 0 = none. */
   bottomOffset: number
+  /** When true, the FAB shows a "×" and remembers dismissal in localStorage (needs a CSP nonce'd script). */
+  dismissible: boolean
 }
 
 export const DEFAULT_FLOATING_CTA: FloatingCtaConfig = {
@@ -48,6 +50,7 @@ export const DEFAULT_FLOATING_CTA: FloatingCtaConfig = {
   link: { url: '', newTab: true },
   conditions: { types: [], urlGlobs: [], exclude: [] },
   bottomOffset: 0,
+  dismissible: false,
 }
 
 /** Re-exported so the CTA editor shares the exact header-CTA scheme allowlist. */
@@ -119,6 +122,7 @@ export function parseFloatingCta(raw: string | undefined): FloatingCtaConfig {
       exclude: asStringList(conditions.exclude),
     },
     bottomOffset: asBottomOffset(record.bottomOffset),
+    dismissible: asBool(record.dismissible),
   }
 }
 

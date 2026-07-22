@@ -120,8 +120,14 @@ final readonly class RenderPublicRecordViewHandler implements PublicRecordViewRe
 
         // GA4 / GTM + Consent Mode v2 — emitted only when the org configured a tag id.
         $analytics = WebAnalyticsConfig::fromSettings($settings);
-        $analyticsNonce = $analytics->isEnabled() ? bin2hex(random_bytes(16)) : '';
-        $analyticsHead = WebAnalyticsHeadSnippet::render($analytics, $analyticsNonce);
+        // One per-response nonce covers analytics AND the floating-CTA dismiss script
+        // (#982 P2 a). It is generated — and added to the CSP script-src below — only when
+        // one of them needs it, so pages with neither keep the strict `script-src 'self'`.
+        $floatingCtaConfig = FloatingCta::fromSettings($settings);
+        $fabPath = $request->getUri()->getPath();
+        $fabDismissActive = $floatingCtaConfig->isDismissActiveFor($output->entityTypeSlug, $fabPath);
+        $nonce = ($analytics->isEnabled() || $fabDismissActive) ? bin2hex(random_bytes(16)) : '';
+        $analyticsHead = WebAnalyticsHeadSnippet::render($analytics, $nonce);
 
         // Trusted-embed primitive (#802 Phase 2): when the org has an embed
         // allowlist, render its `trusted-embed` widgets into the crawlable shell
@@ -141,9 +147,11 @@ final readonly class RenderPublicRecordViewHandler implements PublicRecordViewRe
         // the shell (NOT sanitized) when enabled and the page matches the org's conditions.
         // '' when disabled / no match — same "no config, no output" shape as analytics.
         $floatingCta = FloatingCtaHtml::render(
-            FloatingCta::fromSettings($settings),
+            $floatingCtaConfig,
             $output->entityTypeSlug,
-            $request->getUri()->getPath(),
+            $fabPath,
+            $fabDismissActive ? $nonce : null,
+            $locale ?? PublicLocale::DEFAULT_LANG,
         );
 
         // Canonical / og:url point at the user-facing permalink (not this /view/ twin).
@@ -269,7 +277,7 @@ final readonly class RenderPublicRecordViewHandler implements PublicRecordViewRe
             'Content-Security-Policy',
             PublicHtmlCsp::build(
                 $analytics,
-                $analyticsNonce !== '' ? $analyticsNonce : null,
+                $nonce !== '' ? $nonce : null,
                 $embedAllowlist,
             ),
         );

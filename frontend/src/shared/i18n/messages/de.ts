@@ -217,6 +217,9 @@ export const de = {
   'admin.floatingCta.positionBl': 'Unten links',
   'admin.floatingCta.accent': 'Akzentfarbe',
   'admin.floatingCta.bottomOffset': 'Abstand unten (px)',
+  'admin.floatingCta.dismissible': 'Schließbar (× zum Schließen)',
+  'admin.floatingCta.dismissibleHelp':
+    'Fügt ein × hinzu und merkt sich das Schließen pro Gerät (nutzt ein kleines Skript).',
   'admin.floatingCta.bottomOffsetHelp':
     'Reserviert Platz über der Fußzeile, damit die Schaltfläche sie nicht verdeckt. 0 = aus.',
   'admin.floatingCta.icon': 'Symbol (Emoji)',

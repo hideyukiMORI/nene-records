@@ -81,6 +81,11 @@ final class FloatingCtaValidator
             }
         }
 
+        // dismissible (#982 P2 (a)): whether the FAB shows a "×" and remembers dismissal.
+        if (isset($decoded['dismissible']) && !is_bool($decoded['dismissible'])) {
+            $errors[] = new ValidationError('value.dismissible', 'dismissible must be a boolean.', 'invalid');
+        }
+
         $content = $decoded['content'] ?? [];
         if (!is_array($content) || array_is_list($content)) {
             $errors[] = new ValidationError('value.content', 'content must be an object.', 'invalid');
