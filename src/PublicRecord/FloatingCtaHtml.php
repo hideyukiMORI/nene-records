@@ -51,7 +51,7 @@ final class FloatingCtaHtml
             ? '<span class="nene-fab__sub">' . self::e($cta->sub) . '</span>'
             : '';
 
-        $style = self::style($accent, $side);
+        $style = self::style($accent, $side, $cta->bottomOffset);
 
         return $style . "\n"
             . '<a class="nene-fab" href="' . $href . '"' . $target . $rel . '>'
@@ -63,12 +63,20 @@ final class FloatingCtaHtml
             . '</a>';
     }
 
-    private static function style(string $accent, string $side): string
+    private static function style(string $accent, string $side, int $bottomOffset): string
     {
+        // Page-bottom clearance (#982 P2 (c)): reserve space so the fixed FAB never covers
+        // footer content at scroll-end. Replaces the ad-hoc per-site `footer{padding-bottom}`
+        // hack with a first-party, no-JS config knob. `$bottomOffset` is a validated int.
+        $clearance = $bottomOffset > 0
+            ? 'body{padding-bottom:calc(env(safe-area-inset-bottom,0px) + ' . $bottomOffset . 'px)}'
+            : '';
+
         // Scoped to `.nene-fab`; safe to inline (CSP style-src allows 'unsafe-inline').
         // `$accent` is a validated hex and `$side` is a fixed keyword, so interpolation
         // is injection-free.
         return '<style>'
+            . $clearance
             . '.nene-fab{position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 20px);'
             . $side . ':calc(env(safe-area-inset-' . $side . ',0px) + 20px);z-index:2147483000;'
             . 'display:inline-flex;align-items:center;gap:10px;'

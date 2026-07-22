@@ -216,6 +216,9 @@ export const de = {
   'admin.floatingCta.positionBr': 'Unten rechts',
   'admin.floatingCta.positionBl': 'Unten links',
   'admin.floatingCta.accent': 'Akzentfarbe',
+  'admin.floatingCta.bottomOffset': 'Abstand unten (px)',
+  'admin.floatingCta.bottomOffsetHelp':
+    'Reserviert Platz über der Fußzeile, damit die Schaltfläche sie nicht verdeckt. 0 = aus.',
   'admin.floatingCta.icon': 'Symbol (Emoji)',
   'admin.floatingCta.iconId': 'Symbol',
   'admin.floatingCta.iconNone': 'Keine / Emoji',

@@ -6,6 +6,7 @@ namespace NeNeRecords\Setting;
 
 use Nene2\Validation\ValidationError;
 use Nene2\Validation\ValidationException;
+use NeNeRecords\PublicRecord\FloatingCta;
 use NeNeRecords\PublicRecord\FloatingCtaIcons;
 
 /**
@@ -69,6 +70,14 @@ final class FloatingCtaValidator
         if (isset($decoded['accent'])) {
             if (!is_string($decoded['accent']) || preg_match('/^#[0-9A-Fa-f]{6}$/', $decoded['accent']) !== 1) {
                 $errors[] = new ValidationError('value.accent', 'accent must be a #RRGGBB hex color.', 'invalid');
+            }
+        }
+
+        // bottomOffset (#982 P2 (c)): page-bottom clearance in px reserved for the FAB.
+        if (isset($decoded['bottomOffset'])) {
+            $offset = $decoded['bottomOffset'];
+            if (!is_int($offset) || $offset < 0 || $offset > FloatingCta::MAX_BOTTOM_OFFSET) {
+                $errors[] = new ValidationError('value.bottomOffset', 'bottomOffset must be an integer between 0 and ' . FloatingCta::MAX_BOTTOM_OFFSET . '.', 'invalid');
             }
         }
 

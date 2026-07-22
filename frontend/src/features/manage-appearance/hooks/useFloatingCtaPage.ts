@@ -15,7 +15,9 @@ export interface FloatingCtaPageState {
   /** Current draft (local edits, not yet saved). */
   draft: FloatingCtaConfig
   /** Patch top-level fields (enabled / position / accent). */
-  setConfig: (patch: Partial<Pick<FloatingCtaConfig, 'enabled' | 'position' | 'accent'>>) => void
+  setConfig: (
+    patch: Partial<Pick<FloatingCtaConfig, 'enabled' | 'position' | 'accent' | 'bottomOffset'>>,
+  ) => void
   /** Patch the content fields (icon / label / sub). */
   setContent: (patch: Partial<FloatingCtaConfig['content']>) => void
   /** Patch the link fields (url / newTab). */

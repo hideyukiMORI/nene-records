@@ -25,6 +25,9 @@ export interface FloatingCtaConditions {
   exclude: string[]
 }
 
+/** Upper bound for the page-bottom clearance reserved for the FAB (#982 P2 (c)). */
+export const MAX_FLOATING_CTA_BOTTOM_OFFSET = 400
+
 export interface FloatingCtaConfig {
   enabled: boolean
   position: FloatingCtaPosition
@@ -33,6 +36,8 @@ export interface FloatingCtaConfig {
   content: { icon: string; iconId: string; label: string; sub: string }
   link: { url: string; newTab: boolean }
   conditions: FloatingCtaConditions
+  /** Extra clearance (px) reserved at the page bottom so the fixed FAB never covers footer content; 0 = none. */
+  bottomOffset: number
 }
 
 export const DEFAULT_FLOATING_CTA: FloatingCtaConfig = {
@@ -42,6 +47,7 @@ export const DEFAULT_FLOATING_CTA: FloatingCtaConfig = {
   content: { icon: '', iconId: '', label: '', sub: '' },
   link: { url: '', newTab: true },
   conditions: { types: [], urlGlobs: [], exclude: [] },
+  bottomOffset: 0,
 }
 
 /** Re-exported so the CTA editor shares the exact header-CTA scheme allowlist. */
@@ -66,6 +72,13 @@ function asStringList(value: unknown): string[] {
 
 function asPosition(value: unknown): FloatingCtaPosition {
   return value === 'bl' ? 'bl' : 'br'
+}
+
+/** Clamp a stored bottom offset to a valid, non-negative px within bounds (#982 P2 (c)). */
+function asBottomOffset(value: unknown): number {
+  return typeof value === 'number' && Number.isInteger(value) && value >= 0
+    ? Math.min(value, MAX_FLOATING_CTA_BOTTOM_OFFSET)
+    : 0
 }
 
 /** Parse the stored `floating_cta` JSON defensively into a full config. */
@@ -105,6 +118,7 @@ export function parseFloatingCta(raw: string | undefined): FloatingCtaConfig {
       urlGlobs: asStringList(conditions.urlGlobs),
       exclude: asStringList(conditions.exclude),
     },
+    bottomOffset: asBottomOffset(record.bottomOffset),
   }
 }
 

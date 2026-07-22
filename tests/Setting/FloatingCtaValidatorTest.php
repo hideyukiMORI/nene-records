@@ -29,6 +29,7 @@ final class FloatingCtaValidatorTest extends TestCase
             'content' => ['icon' => '📅', 'iconId' => 'calendar', 'label' => '30分無料相談を予約', 'sub' => 'オンライン'],
             'link' => ['url' => 'https://calendar.app.google/x', 'newTab' => true],
             'conditions' => ['types' => ['page'], 'urlGlobs' => ['/services*'], 'exclude' => ['/admin*']],
+            'bottomOffset' => 120,
         ]));
         $this->addToAssertionCount(1);
     }
@@ -61,6 +62,9 @@ final class FloatingCtaValidatorTest extends TestCase
         yield 'enabled without url' => [(string) json_encode(['enabled' => true, 'content' => ['label' => 'x']])];
         yield 'conditions.types not array' => [(string) json_encode(['conditions' => ['types' => 'page']] + $base)];
         yield 'label too long' => [(string) json_encode(['enabled' => true, 'content' => ['label' => str_repeat('a', 61)], 'link' => ['url' => 'https://x.test']])];
+        yield 'bottomOffset over max' => [(string) json_encode(['bottomOffset' => 9999] + $base)];
+        yield 'bottomOffset negative' => [(string) json_encode(['bottomOffset' => -1] + $base)];
+        yield 'bottomOffset not int' => [(string) json_encode(['bottomOffset' => '100'] + $base)];
     }
 
     public function testMailtoAndTelAndRelativeAreAccepted(): void

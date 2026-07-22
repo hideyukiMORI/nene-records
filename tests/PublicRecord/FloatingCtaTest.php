@@ -61,6 +61,18 @@ final class FloatingCtaTest extends TestCase
         self::assertSame('Book', $cta->label);
     }
 
+    public function testBottomOffsetIsParsedAndClamped(): void
+    {
+        $base = ['enabled' => true, 'content' => ['label' => 'x'], 'link' => ['url' => 'https://x.test']];
+
+        self::assertSame(120, FloatingCta::fromSettings(self::settings($base + ['bottomOffset' => 120]))->bottomOffset);
+        // Out of range / wrong type all resolve to 0 (no clearance).
+        self::assertSame(FloatingCta::MAX_BOTTOM_OFFSET, FloatingCta::fromSettings(self::settings($base + ['bottomOffset' => 9999]))->bottomOffset);
+        self::assertSame(0, FloatingCta::fromSettings(self::settings($base + ['bottomOffset' => -50]))->bottomOffset);
+        self::assertSame(0, FloatingCta::fromSettings(self::settings($base + ['bottomOffset' => '80']))->bottomOffset);
+        self::assertSame(0, FloatingCta::fromSettings(self::settings($base))->bottomOffset);
+    }
+
     public function testInvalidPositionFallsBackToBr(): void
     {
         $cta = FloatingCta::fromSettings(self::settings([
