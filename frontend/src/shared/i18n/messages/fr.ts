@@ -1,4 +1,4 @@
-import type { MessageCatalog } from './en'
+import type { MessageKey } from './en'
 
 /** French — complete admin and public UI catalog. Missing keys fall back to English. */
 export const fr = {
@@ -1601,4 +1601,4 @@ export const fr = {
   // ── Misc (#728) ───────────────────────────────────────────────────────────
   'common.tableOfContents': 'Table des matières',
   'admin.entityRecords.breadcrumbLabel': 'Fil d’Ariane',
-} satisfies Record<keyof MessageCatalog, string>
+} satisfies Record<MessageKey, string>

@@ -1,4 +1,4 @@
-import type { MessageCatalog } from './en'
+import type { MessageKey } from './en'
 
 /** German — complete CMS admin & public-site catalog. Missing keys fall back to English. */
 export const de = {
@@ -1563,4 +1563,4 @@ export const de = {
   // ── Misc (#728) ───────────────────────────────────────────────────────────
   'common.tableOfContents': 'Inhaltsverzeichnis',
   'admin.entityRecords.breadcrumbLabel': 'Brotkrümelnavigation',
-} satisfies Record<keyof MessageCatalog, string>
+} satisfies Record<MessageKey, string>

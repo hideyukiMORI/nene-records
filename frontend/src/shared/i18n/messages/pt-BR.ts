@@ -1,4 +1,4 @@
-import type { MessageCatalog } from './en'
+import type { MessageKey } from './en'
 
 /** Brazilian Portuguese — complete admin/public UI catalog. Missing keys fall back to English. */
 export const ptBR = {
@@ -1583,4 +1583,4 @@ export const ptBR = {
   // ── Misc (#728) ───────────────────────────────────────────────────────────
   'common.tableOfContents': 'Sumário',
   'admin.entityRecords.breadcrumbLabel': 'Trilha de navegação',
-} satisfies Record<keyof MessageCatalog, string>
+} satisfies Record<MessageKey, string>

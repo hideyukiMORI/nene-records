@@ -1,4 +1,4 @@
-import type { MessageCatalog } from './en'
+import type { MessageKey } from './en'
 
 /** Simplified Chinese (简体中文) message catalog. Missing keys fall back to English. */
 export const zhHans = {
@@ -1512,4 +1512,4 @@ export const zhHans = {
   // ── Misc (#728) ───────────────────────────────────────────────────────────
   'common.tableOfContents': '目录',
   'admin.entityRecords.breadcrumbLabel': '面包屑导航',
-} satisfies Record<keyof MessageCatalog, string>
+} satisfies Record<MessageKey, string>
