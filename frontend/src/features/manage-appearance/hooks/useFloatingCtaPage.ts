@@ -17,7 +17,16 @@ export interface FloatingCtaPageState {
   /** Patch top-level fields (enabled / position / accent). */
   setConfig: (
     patch: Partial<
-      Pick<FloatingCtaConfig, 'enabled' | 'position' | 'accent' | 'bottomOffset' | 'dismissible'>
+      Pick<
+        FloatingCtaConfig,
+        | 'enabled'
+        | 'position'
+        | 'accent'
+        | 'bottomOffset'
+        | 'dismissible'
+        | 'trigger'
+        | 'triggerValue'
+      >
     >,
   ) => void
   /** Patch the content fields (icon / label / sub). */

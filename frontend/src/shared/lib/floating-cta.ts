@@ -16,6 +16,12 @@ import { safeHref } from '@/shared/lib/header-config'
 
 export type FloatingCtaPosition = 'br' | 'bl'
 
+/** When the FAB appears: immediately, or after a delay (#982 P2 d). `scroll` is reserved. */
+export type FloatingCtaTrigger = 'always' | 'delay'
+
+/** Delay-trigger bounds in seconds (#982 P2 d). */
+export const MAX_FLOATING_CTA_DELAY_SECONDS = 60
+
 export interface FloatingCtaConditions {
   /** Entity type slugs the CTA shows on; empty = all types. */
   types: string[]
@@ -40,6 +46,10 @@ export interface FloatingCtaConfig {
   bottomOffset: number
   /** When true, the FAB shows a "×" and remembers dismissal in localStorage (needs a CSP nonce'd script). */
   dismissible: boolean
+  /** When the FAB appears. */
+  trigger: FloatingCtaTrigger
+  /** Delay in seconds for the `delay` trigger (1–60); ignored for `always`. */
+  triggerValue: number
 }
 
 export const DEFAULT_FLOATING_CTA: FloatingCtaConfig = {
@@ -51,6 +61,8 @@ export const DEFAULT_FLOATING_CTA: FloatingCtaConfig = {
   conditions: { types: [], urlGlobs: [], exclude: [] },
   bottomOffset: 0,
   dismissible: false,
+  trigger: 'always',
+  triggerValue: 0,
 }
 
 /** Re-exported so the CTA editor shares the exact header-CTA scheme allowlist. */
@@ -82,6 +94,18 @@ function asBottomOffset(value: unknown): number {
   return typeof value === 'number' && Number.isInteger(value) && value >= 0
     ? Math.min(value, MAX_FLOATING_CTA_BOTTOM_OFFSET)
     : 0
+}
+
+function asTrigger(value: unknown): FloatingCtaTrigger {
+  return value === 'delay' ? 'delay' : 'always'
+}
+
+/** Delay seconds are only meaningful for the `delay` trigger; clamp to 1–60 there, else 0. */
+function asTriggerValue(trigger: FloatingCtaTrigger, value: unknown): number {
+  if (trigger !== 'delay' || typeof value !== 'number' || !Number.isInteger(value)) {
+    return trigger === 'delay' ? 1 : 0
+  }
+  return Math.max(1, Math.min(value, MAX_FLOATING_CTA_DELAY_SECONDS))
 }
 
 /** Parse the stored `floating_cta` JSON defensively into a full config. */
@@ -123,6 +147,8 @@ export function parseFloatingCta(raw: string | undefined): FloatingCtaConfig {
     },
     bottomOffset: asBottomOffset(record.bottomOffset),
     dismissible: asBool(record.dismissible),
+    trigger: asTrigger(record.trigger),
+    triggerValue: asTriggerValue(asTrigger(record.trigger), record.triggerValue),
   }
 }
 

@@ -56,7 +56,10 @@ final class FloatingCtaHtml
         // to the CSP, so a missing nonce means "no dismiss UI" (graceful, still a working FAB).
         $dismiss = $cta->dismissible && $nonce !== null && $nonce !== '';
 
-        $style = self::style($accent, $side, $cta->bottomOffset, $dismiss);
+        // Delay trigger (#982 P2 d): reveal after N seconds with a pure-CSS animation (no JS).
+        $delaySeconds = ($cta->trigger === 'delay' && $cta->triggerValue > 0) ? $cta->triggerValue : 0;
+
+        $style = self::style($accent, $side, $cta->bottomOffset, $dismiss, $delaySeconds);
 
         $button = '<a class="nene-fab" href="' . $href . '"' . $target . $rel . '>'
             . $icon
@@ -81,8 +84,21 @@ final class FloatingCtaHtml
             . $script;
     }
 
-    private static function style(string $accent, string $side, int $bottomOffset, bool $dismiss): string
+    private static function style(string $accent, string $side, int $bottomOffset, bool $dismiss, int $delaySeconds): string
     {
+        // Delay reveal (#982 P2 d): `animation-fill-mode:both` keeps the FAB at the 0%
+        // (hidden) keyframe during `animation-delay`, then fades it in — all in CSS, no JS.
+        // `$delaySeconds` is a validated int (1–60), so interpolation is injection-free.
+        $delayCss = $delaySeconds > 0
+            ? '@keyframes nene-fab-appear{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}'
+                . '.nene-fab-wrap{animation:nene-fab-appear .35s ease both;animation-delay:' . $delaySeconds . 's}'
+            : '';
+
+        // Reduced motion: keep the delay (appear after N s) but drop the fade/slide.
+        $reducedMotion = $delaySeconds > 0
+            ? '@media(prefers-reduced-motion:reduce){.nene-fab{transition:none}.nene-fab:hover{transform:none}.nene-fab-wrap{animation-duration:1ms}}'
+            : '@media(prefers-reduced-motion:reduce){.nene-fab{transition:none}.nene-fab:hover{transform:none}}';
+
         // Page-bottom clearance (#982 P2 (c)): reserve space so the fixed FAB never covers
         // footer content at scroll-end. Replaces the ad-hoc per-site `footer{padding-bottom}`
         // hack with a first-party, no-JS config knob. `$bottomOffset` is a validated int.
@@ -120,8 +136,9 @@ final class FloatingCtaHtml
             . '.nene-fab__text{display:inline-flex;flex-direction:column}'
             . '.nene-fab__sub{font-size:.62rem;font-weight:500;letter-spacing:.04em;opacity:.85;margin-top:2px}'
             . $dismissCss
+            . $delayCss
             . '@media(max-width:560px){.nene-fab-wrap{left:14px;right:14px}.nene-fab{display:flex;justify-content:center;padding:15px 18px}}'
-            . '@media(prefers-reduced-motion:reduce){.nene-fab{transition:none}.nene-fab:hover{transform:none}}'
+            . $reducedMotion
             . '</style>';
     }
 

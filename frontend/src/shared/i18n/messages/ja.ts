@@ -227,6 +227,10 @@ export const ja = {
   'admin.floatingCta.accent': 'アクセント色',
   'admin.floatingCta.bottomOffset': '下部クリアランス（px）',
   'admin.floatingCta.dismissible': '閉じるボタン（×）を表示',
+  'admin.floatingCta.trigger': '表示タイミング',
+  'admin.floatingCta.triggerAlways': 'すぐに表示',
+  'admin.floatingCta.triggerDelay': '遅らせて表示',
+  'admin.floatingCta.triggerDelaySeconds': '遅延（秒）',
   'admin.floatingCta.dismissibleHelp':
     '× を表示し、閉じたことを端末に記憶します（小さなスクリプトを使用）。',
   'admin.floatingCta.bottomOffsetHelp':

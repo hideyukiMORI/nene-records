@@ -221,6 +221,10 @@ export const fr = {
   'admin.floatingCta.accent': 'Couleur d’accent',
   'admin.floatingCta.bottomOffset': 'Marge inférieure (px)',
   'admin.floatingCta.dismissible': 'Fermable (× pour fermer)',
+  'admin.floatingCta.trigger': 'Afficher',
+  'admin.floatingCta.triggerAlways': 'Immédiatement',
+  'admin.floatingCta.triggerDelay': 'Après un délai',
+  'admin.floatingCta.triggerDelaySeconds': 'Délai (secondes)',
   'admin.floatingCta.dismissibleHelp':
     'Ajoute un × et mémorise la fermeture par appareil (utilise un petit script).',
   'admin.floatingCta.bottomOffsetHelp':

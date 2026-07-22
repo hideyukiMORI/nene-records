@@ -28,8 +28,8 @@ final class FloatingCtaValidator
     /** @var list<string> P1 position presets. `right-tab`/`bottom-bar` are reserved for P2. */
     private const POSITIONS = ['br', 'bl'];
 
-    /** @var list<string> P1 triggers. `scroll`/`delay`/`dismiss` are reserved for P2. */
-    private const TRIGGERS = ['always'];
+    /** @var list<string> Supported triggers. `delay` = pure-CSS reveal (#982 P2 d); `scroll` reserved. */
+    private const TRIGGERS = ['always', 'delay'];
 
     private const MAX_ICON_LEN = 16;
     private const MAX_LABEL_LEN = 60;
@@ -65,6 +65,17 @@ final class FloatingCtaValidator
         $trigger = $decoded['trigger'] ?? 'always';
         if (!is_string($trigger) || !in_array($trigger, self::TRIGGERS, true)) {
             $errors[] = new ValidationError('value.trigger', 'trigger must be one of: ' . implode(', ', self::TRIGGERS) . ' (others are not available yet).', 'invalid');
+        }
+
+        // triggerValue is the delay in seconds and is required (1–60) for the 'delay' trigger;
+        // for 'always' it is ignored, so only reject a wrong-typed value when present.
+        if ($trigger === 'delay') {
+            $triggerValue = $decoded['triggerValue'] ?? null;
+            if (!is_int($triggerValue) || $triggerValue < 1 || $triggerValue > FloatingCta::MAX_DELAY_SECONDS) {
+                $errors[] = new ValidationError('value.triggerValue', 'triggerValue must be an integer between 1 and ' . FloatingCta::MAX_DELAY_SECONDS . ' seconds for the delay trigger.', 'invalid');
+            }
+        } elseif (isset($decoded['triggerValue']) && !is_int($decoded['triggerValue'])) {
+            $errors[] = new ValidationError('value.triggerValue', 'triggerValue must be an integer.', 'invalid');
         }
 
         if (isset($decoded['accent'])) {

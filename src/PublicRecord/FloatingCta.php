@@ -54,12 +54,19 @@ final readonly class FloatingCta
         public int $bottomOffset = 0,
         /** When true, the FAB shows a dismiss (×) button and remembers dismissal in localStorage (#982 P2 (a)). */
         public bool $dismissible = false,
+        /** When the FAB appears: 'always' (immediately) or 'delay' (after $triggerValue seconds) (#982 P2 (d)). */
+        public string $trigger = 'always',
+        /** Trigger parameter: seconds for the 'delay' trigger (1–60); ignored for 'always'. */
+        public int $triggerValue = 0,
     ) {
     }
 
+    /** Delay-trigger bounds in seconds (#982 P2 (d)). */
+    public const MAX_DELAY_SECONDS = 60;
+
     public static function disabled(): self
     {
-        return new self(false, 'br', self::DEFAULT_ACCENT, '', '', '', '', '', true, [], [], [], 0, false);
+        return new self(false, 'br', self::DEFAULT_ACCENT, '', '', '', '', '', true, [], [], [], 0, false, 'always', 0);
     }
 
     /**
@@ -108,6 +115,14 @@ final readonly class FloatingCta
 
         $dismissible = ($decoded['dismissible'] ?? false) === true;
 
+        // Appearance trigger (#982 P2 (d)). Unknown values fall back to 'always'; the delay
+        // seconds are clamped defensively (the write-side validator is the real boundary).
+        $trigger = ($decoded['trigger'] ?? 'always') === 'delay' ? 'delay' : 'always';
+        $rawTrigger = $decoded['triggerValue'] ?? 0;
+        $triggerValue = $trigger === 'delay'
+            ? (is_int($rawTrigger) ? max(1, min($rawTrigger, self::MAX_DELAY_SECONDS)) : 1)
+            : 0;
+
         $label = self::asString($content['label'] ?? '');
         $url = self::asString($link['url'] ?? '');
 
@@ -135,6 +150,8 @@ final readonly class FloatingCta
             conditionExclude: self::asStringList($conditions['exclude'] ?? []),
             bottomOffset: $bottomOffset,
             dismissible: $dismissible,
+            trigger: $trigger,
+            triggerValue: $triggerValue,
         );
     }
 

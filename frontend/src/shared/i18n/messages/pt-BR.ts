@@ -219,6 +219,10 @@ export const ptBR = {
   'admin.floatingCta.accent': 'Cor de destaque',
   'admin.floatingCta.bottomOffset': 'Espaço inferior (px)',
   'admin.floatingCta.dismissible': 'Dispensável (× para fechar)',
+  'admin.floatingCta.trigger': 'Exibir',
+  'admin.floatingCta.triggerAlways': 'Imediatamente',
+  'admin.floatingCta.triggerDelay': 'Após um atraso',
+  'admin.floatingCta.triggerDelaySeconds': 'Atraso (segundos)',
   'admin.floatingCta.dismissibleHelp':
     'Adiciona um × e memoriza o fechamento por dispositivo (usa um pequeno script).',
   'admin.floatingCta.bottomOffsetHelp':

@@ -218,6 +218,10 @@ export const de = {
   'admin.floatingCta.accent': 'Akzentfarbe',
   'admin.floatingCta.bottomOffset': 'Abstand unten (px)',
   'admin.floatingCta.dismissible': 'Schließbar (× zum Schließen)',
+  'admin.floatingCta.trigger': 'Anzeigen',
+  'admin.floatingCta.triggerAlways': 'Sofort',
+  'admin.floatingCta.triggerDelay': 'Nach Verzögerung',
+  'admin.floatingCta.triggerDelaySeconds': 'Verzögerung (Sekunden)',
   'admin.floatingCta.dismissibleHelp':
     'Fügt ein × hinzu und merkt sich das Schließen pro Gerät (nutzt ein kleines Skript).',
   'admin.floatingCta.bottomOffsetHelp':
