@@ -59,6 +59,23 @@ final class FloatingCtaHtmlTest extends TestCase
         self::assertStringContainsString('left:calc(env(safe-area-inset-left', $html);
     }
 
+    public function testBottomOffsetEmitsFooterClearance(): void
+    {
+        $cta = self::cta([
+            'content' => ['label' => 'x'], 'link' => ['url' => 'https://x.test'],
+            'bottomOffset' => 120,
+        ]);
+        $html = FloatingCtaHtml::render($cta, 'page', '/');
+        self::assertStringContainsString('body{padding-bottom:calc(env(safe-area-inset-bottom,0px) + 120px)}', $html);
+    }
+
+    public function testNoBottomOffsetOmitsClearance(): void
+    {
+        $cta = self::cta(['content' => ['label' => 'x'], 'link' => ['url' => 'https://x.test']]);
+        $html = FloatingCtaHtml::render($cta, 'page', '/');
+        self::assertStringNotContainsString('body{padding-bottom', $html);
+    }
+
     public function testEscapesAdminSuppliedText(): void
     {
         $cta = self::cta([

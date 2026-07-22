@@ -225,6 +225,9 @@ export const ja = {
   'admin.floatingCta.positionBr': '右下',
   'admin.floatingCta.positionBl': '左下',
   'admin.floatingCta.accent': 'アクセント色',
+  'admin.floatingCta.bottomOffset': '下部クリアランス（px）',
+  'admin.floatingCta.bottomOffsetHelp':
+    'フッターの上に余白を確保し、ボタンが重ならないようにします。0=なし。',
   'admin.floatingCta.icon': 'アイコン（絵文字）',
   'admin.floatingCta.iconId': 'アイコン',
   'admin.floatingCta.iconNone': 'なし / 絵文字',

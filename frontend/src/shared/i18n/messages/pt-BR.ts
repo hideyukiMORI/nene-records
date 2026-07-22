@@ -217,6 +217,9 @@ export const ptBR = {
   'admin.floatingCta.positionBr': 'Inferior direito',
   'admin.floatingCta.positionBl': 'Inferior esquerdo',
   'admin.floatingCta.accent': 'Cor de destaque',
+  'admin.floatingCta.bottomOffset': 'Espaço inferior (px)',
+  'admin.floatingCta.bottomOffsetHelp':
+    'Reserva espaço acima do rodapé para o botão não cobri-lo. 0 = desativado.',
   'admin.floatingCta.icon': 'Ícone (emoji)',
   'admin.floatingCta.iconId': 'Ícone',
   'admin.floatingCta.iconNone': 'Nenhum / emoji',

@@ -1,6 +1,12 @@
 import type { ReactNode } from 'react'
 import { useTranslation } from '@/shared/i18n'
-import { FLOATING_CTA_ICONS, joinList, parseList, safeHref } from '@/shared/lib/floating-cta'
+import {
+  FLOATING_CTA_ICONS,
+  joinList,
+  MAX_FLOATING_CTA_BOTTOM_OFFSET,
+  parseList,
+  safeHref,
+} from '@/shared/lib/floating-cta'
 import { Button, Card, Stack, Text } from '@/shared/ui'
 import type { FloatingCtaPageState } from '../hooks/useFloatingCtaPage'
 
@@ -116,6 +122,28 @@ export function FloatingCtaView({
                 setConfig({ accent })
               }}
             />
+          </Row>
+          <Row label={t('admin.floatingCta.bottomOffset')}>
+            <div className="flex items-center gap-inline-sm">
+              <input
+                type="number"
+                min={0}
+                max={MAX_FLOATING_CTA_BOTTOM_OFFSET}
+                step={4}
+                className="w-24 rounded-sm border border-border bg-surface px-inline-sm py-stack-xs font-sans text-body text-text-primary"
+                value={draft.bottomOffset}
+                onChange={(event) => {
+                  const parsed = Number.parseInt(event.target.value, 10)
+                  const clamped = Number.isFinite(parsed)
+                    ? Math.max(0, Math.min(parsed, MAX_FLOATING_CTA_BOTTOM_OFFSET))
+                    : 0
+                  setConfig({ bottomOffset: clamped })
+                }}
+              />
+              <Text muted variant="caption">
+                {t('admin.floatingCta.bottomOffsetHelp')}
+              </Text>
+            </div>
           </Row>
         </Stack>
 

@@ -27,6 +27,9 @@ final readonly class FloatingCta
 {
     private const DEFAULT_ACCENT = '#1f6feb';
 
+    /** Upper bound for the page-bottom clearance reserved for the FAB (#982 P2 (c)). */
+    public const MAX_BOTTOM_OFFSET = 400;
+
     /**
      * @param 'br'|'bl'          $position
      * @param list<string>       $conditionTypes    entity type slugs; empty = all types
@@ -47,12 +50,14 @@ final readonly class FloatingCta
         public array $conditionTypes,
         public array $conditionUrlGlobs,
         public array $conditionExclude,
+        /** Extra clearance (px) reserved at the page bottom so the fixed FAB never covers footer content; 0 = none (#982 P2 (c)). */
+        public int $bottomOffset = 0,
     ) {
     }
 
     public static function disabled(): self
     {
-        return new self(false, 'br', self::DEFAULT_ACCENT, '', '', '', '', '', true, [], [], []);
+        return new self(false, 'br', self::DEFAULT_ACCENT, '', '', '', '', '', true, [], [], [], 0);
     }
 
     /**
@@ -94,6 +99,11 @@ final readonly class FloatingCta
         $link = is_array($decoded['link'] ?? null) ? $decoded['link'] : [];
         $conditions = is_array($decoded['conditions'] ?? null) ? $decoded['conditions'] : [];
 
+        // Page-bottom clearance (#982 P2 (c)). Clamp defensively; the write-side validator
+        // is the real boundary. Non-int / out-of-range → 0 (no clearance = P1 behaviour).
+        $rawOffset = $decoded['bottomOffset'] ?? 0;
+        $bottomOffset = is_int($rawOffset) ? max(0, min($rawOffset, self::MAX_BOTTOM_OFFSET)) : 0;
+
         $label = self::asString($content['label'] ?? '');
         $url = self::asString($link['url'] ?? '');
 
@@ -119,6 +129,7 @@ final readonly class FloatingCta
             conditionTypes: self::asStringList($conditions['types'] ?? []),
             conditionUrlGlobs: self::asStringList($conditions['urlGlobs'] ?? []),
             conditionExclude: self::asStringList($conditions['exclude'] ?? []),
+            bottomOffset: $bottomOffset,
         );
     }
 

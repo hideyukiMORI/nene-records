@@ -43,6 +43,15 @@ describe('parseFloatingCta', () => {
     expect(cfg.position).toBe('br')
   })
 
+  it('parses and clamps bottomOffset (#982 P2 c)', () => {
+    expect(parseFloatingCta(JSON.stringify({ bottomOffset: 120 })).bottomOffset).toBe(120)
+    expect(parseFloatingCta(JSON.stringify({ bottomOffset: 9999 })).bottomOffset).toBe(400)
+    expect(parseFloatingCta(JSON.stringify({ bottomOffset: -5 })).bottomOffset).toBe(0)
+    expect(parseFloatingCta(JSON.stringify({ bottomOffset: '80' })).bottomOffset).toBe(0)
+    expect(parseFloatingCta(JSON.stringify({ bottomOffset: 12.5 })).bottomOffset).toBe(0)
+    expect(parseFloatingCta('{}').bottomOffset).toBe(0)
+  })
+
   it('round-trips through serialize', () => {
     const cfg = parseFloatingCta(
       JSON.stringify({ enabled: true, content: { label: 'x' }, link: { url: '/c' } }),

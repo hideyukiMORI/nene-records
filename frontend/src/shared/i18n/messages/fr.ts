@@ -219,6 +219,9 @@ export const fr = {
   'admin.floatingCta.positionBr': 'En bas à droite',
   'admin.floatingCta.positionBl': 'En bas à gauche',
   'admin.floatingCta.accent': 'Couleur d’accent',
+  'admin.floatingCta.bottomOffset': 'Marge inférieure (px)',
+  'admin.floatingCta.bottomOffsetHelp':
+    'Réserve de l’espace au-dessus du pied de page pour que le bouton ne le masque pas. 0 = désactivé.',
   'admin.floatingCta.icon': 'Icône (emoji)',
   'admin.floatingCta.iconId': 'Icône',
   'admin.floatingCta.iconNone': 'Aucune / emoji',

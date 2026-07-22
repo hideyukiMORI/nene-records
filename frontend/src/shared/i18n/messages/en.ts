@@ -229,6 +229,9 @@ export const en = {
   'admin.floatingCta.positionBr': 'Bottom right',
   'admin.floatingCta.positionBl': 'Bottom left',
   'admin.floatingCta.accent': 'Accent color',
+  'admin.floatingCta.bottomOffset': 'Bottom clearance (px)',
+  'admin.floatingCta.bottomOffsetHelp':
+    'Reserves space above the footer so the button never covers it. 0 = off.',
   'admin.floatingCta.icon': 'Icon (emoji)',
   'admin.floatingCta.iconId': 'Icon',
   'admin.floatingCta.iconNone': 'None / emoji',
