@@ -110,4 +110,16 @@ final class RenderPublicTypeArchiveRendererTest extends TestCase
         self::assertStringNotContainsString('property="og:image"', $html);
         self::assertStringContainsString('name="twitter:card" content="summary"', $html);
     }
+
+    public function testDeclaresFaviconInHead(): void
+    {
+        // The archive shell must declare a favicon so Google/browsers use the real icon
+        // instead of an auto-generated letter monogram (#986). Base-relative paths.
+        $html = $this->renderArchive([
+            new SettingDef('site_name', 'text', 'NeNe Records', true, 'Site name'),
+        ]);
+
+        self::assertStringContainsString('<link rel="icon" href="assets/favicon/favicon.svg" type="image/svg+xml" />', $html);
+        self::assertStringContainsString('<link rel="manifest" href="assets/favicon/site.webmanifest" />', $html);
+    }
 }
