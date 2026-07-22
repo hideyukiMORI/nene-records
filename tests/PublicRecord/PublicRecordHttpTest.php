@@ -312,6 +312,10 @@ final class PublicRecordHttpTest extends TestCase
         self::assertSame(200, $response->getStatusCode());
         // Canonical / og:url point at the user-facing permalink (default /{type}/{id}), not /view/.
         self::assertStringContainsString('<link rel="canonical" href="https://example.test/article/10" />', $html);
+        // Favicon declared in the crawlable SSR head so Google uses the real icon, not a
+        // generated letter monogram (#986). Base-relative → resolves against <base>.
+        self::assertStringContainsString('<link rel="icon" href="assets/favicon/favicon.svg" type="image/svg+xml" />', $html);
+        self::assertStringContainsString('<link rel="apple-touch-icon" href="assets/favicon/apple-touch-icon.png" />', $html);
         self::assertStringContainsString('content="https://example.test/article/10"', $html);
         // Open Graph
         self::assertStringContainsString('property="og:type" content="article"', $html);
