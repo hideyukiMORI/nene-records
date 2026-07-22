@@ -225,6 +225,8 @@ export const fr = {
   'admin.floatingCta.triggerAlways': 'Immédiatement',
   'admin.floatingCta.triggerDelay': 'Après un délai',
   'admin.floatingCta.triggerDelaySeconds': 'Délai (secondes)',
+  'admin.floatingCta.triggerScroll': 'Après défilement',
+  'admin.floatingCta.triggerScrollPx': 'Distance de défilement (px)',
   'admin.floatingCta.dismissibleHelp':
     'Ajoute un × et mémorise la fermeture par appareil (utilise un petit script).',
   'admin.floatingCta.bottomOffsetHelp':

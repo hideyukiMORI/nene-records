@@ -16,11 +16,14 @@ import { safeHref } from '@/shared/lib/header-config'
 
 export type FloatingCtaPosition = 'br' | 'bl'
 
-/** When the FAB appears: immediately, or after a delay (#982 P2 d). `scroll` is reserved. */
-export type FloatingCtaTrigger = 'always' | 'delay'
+/** When the FAB appears: immediately, after a delay, or after scrolling N px (#982 P2 d). */
+export type FloatingCtaTrigger = 'always' | 'delay' | 'scroll'
 
 /** Delay-trigger bounds in seconds (#982 P2 d). */
 export const MAX_FLOATING_CTA_DELAY_SECONDS = 60
+
+/** Scroll-trigger threshold bounds in px (#982 P2 d). */
+export const MAX_FLOATING_CTA_SCROLL_PX = 5000
 
 export interface FloatingCtaConditions {
   /** Entity type slugs the CTA shows on; empty = all types. */
@@ -97,15 +100,19 @@ function asBottomOffset(value: unknown): number {
 }
 
 function asTrigger(value: unknown): FloatingCtaTrigger {
-  return value === 'delay' ? 'delay' : 'always'
+  return value === 'delay' || value === 'scroll' ? value : 'always'
 }
 
-/** Delay seconds are only meaningful for the `delay` trigger; clamp to 1–60 there, else 0. */
+/** triggerValue is seconds for `delay` (1–60) and px for `scroll` (1–5000); 0 for `always`. */
 function asTriggerValue(trigger: FloatingCtaTrigger, value: unknown): number {
-  if (trigger !== 'delay' || typeof value !== 'number' || !Number.isInteger(value)) {
-    return trigger === 'delay' ? 1 : 0
+  if (trigger === 'always') {
+    return 0
   }
-  return Math.max(1, Math.min(value, MAX_FLOATING_CTA_DELAY_SECONDS))
+  const max = trigger === 'delay' ? MAX_FLOATING_CTA_DELAY_SECONDS : MAX_FLOATING_CTA_SCROLL_PX
+  if (typeof value !== 'number' || !Number.isInteger(value)) {
+    return 1
+  }
+  return Math.max(1, Math.min(value, max))
 }
 
 /** Parse the stored `floating_cta` JSON defensively into a full config. */

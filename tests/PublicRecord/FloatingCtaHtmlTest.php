@@ -139,6 +139,54 @@ final class FloatingCtaHtmlTest extends TestCase
         self::assertStringNotContainsString('animation-delay', $html);
     }
 
+    public function testScrollTriggerHidesUntilNoncedScriptReveals(): void
+    {
+        $cta = self::cta([
+            'content' => ['label' => 'x'], 'link' => ['url' => 'https://x.test'],
+            'trigger' => 'scroll', 'triggerValue' => 400,
+        ]);
+        $html = FloatingCtaHtml::render($cta, 'page', '/', 'sc0ped', 'en');
+
+        // Hidden until revealed; script carries the threshold and toggles .is-visible.
+        self::assertStringContainsString('.nene-fab-wrap{opacity:0;pointer-events:none', $html);
+        self::assertStringContainsString('.nene-fab-wrap.is-visible{opacity:1', $html);
+        self::assertStringContainsString('<script nonce="sc0ped">', $html);
+        self::assertStringContainsString('var t=400;', $html);
+        self::assertStringContainsString("w.classList.add('is-visible')", $html);
+        // No-JS visitors still get the FAB.
+        self::assertStringContainsString('<noscript><style>.nene-fab-wrap{opacity:1;pointer-events:auto}</style></noscript>', $html);
+        // Scroll-only (no dismiss config) → no × button element (the script still queries for one).
+        self::assertStringNotContainsString('<button type="button" class="nene-fab__dismiss"', $html);
+    }
+
+    public function testScrollWithoutNonceFallsBackToAlwaysVisible(): void
+    {
+        // No nonce → the reveal script can't run, so the FAB must not be hidden (shows always).
+        $cta = self::cta([
+            'content' => ['label' => 'x'], 'link' => ['url' => 'https://x.test'],
+            'trigger' => 'scroll', 'triggerValue' => 400,
+        ]);
+        $html = FloatingCtaHtml::render($cta, 'page', '/');
+
+        self::assertStringNotContainsString('<script', $html);
+        self::assertStringNotContainsString('opacity:0', $html);
+        self::assertStringNotContainsString('<noscript', $html);
+    }
+
+    public function testScrollAndDismissShareOneScript(): void
+    {
+        $cta = self::cta([
+            'content' => ['label' => 'x'], 'link' => ['url' => 'https://x.test'],
+            'trigger' => 'scroll', 'triggerValue' => 250, 'dismissible' => true,
+        ]);
+        $html = FloatingCtaHtml::render($cta, 'page', '/', 'nn', 'en');
+
+        self::assertSame(1, substr_count($html, '<script nonce="nn">'));
+        self::assertStringContainsString('nene-fab__dismiss', $html);
+        self::assertStringContainsString('var t=250;', $html);
+        self::assertStringContainsString("localStorage.setItem(k,'1')", $html);
+    }
+
     public function testDismissButtonSitsOnPositionSide(): void
     {
         $cta = self::cta([

@@ -50,15 +50,15 @@ final readonly class RenderPublicTypeArchiveRenderer implements PublicTypeArchiv
         // needed so pages with neither keep the strict `script-src 'self'`.
         $floatingCtaConfig = FloatingCta::fromSettings($settings);
         $fabPath = $request->getUri()->getPath();
-        $fabDismissActive = $floatingCtaConfig->isDismissActiveFor($archive->typeSlug, $fabPath);
-        $nonce = ($analytics->isEnabled() || $fabDismissActive) ? bin2hex(random_bytes(16)) : '';
+        $fabNeedsScript = $floatingCtaConfig->needsScriptFor($archive->typeSlug, $fabPath);
+        $nonce = ($analytics->isEnabled() || $fabNeedsScript) ? bin2hex(random_bytes(16)) : '';
         $analyticsHead = WebAnalyticsHeadSnippet::render($analytics, $nonce);
 
         $floatingCta = FloatingCtaHtml::render(
             $floatingCtaConfig,
             $archive->typeSlug,
             $fabPath,
-            $fabDismissActive ? $nonce : null,
+            $fabNeedsScript ? $nonce : null,
             PublicLocale::DEFAULT_LANG,
         );
 

@@ -51,15 +51,19 @@ final class FloatingCtaHtml
             ? '<span class="nene-fab__sub">' . self::e($cta->sub) . '</span>'
             : '';
 
-        // Dismiss (#982 P2 (a)): a "×" that remembers dismissal in localStorage via a small
-        // nonce'd inline script. The renderer only supplies a nonce when it will also add it
-        // to the CSP, so a missing nonce means "no dismiss UI" (graceful, still a working FAB).
-        $dismiss = $cta->dismissible && $nonce !== null && $nonce !== '';
+        // Nonce-backed behaviours (#982 P2 a/d): the dismiss "×" (localStorage) and the
+        // scroll reveal both need a small nonce'd inline script. The renderer only supplies
+        // a nonce when it will also add it to the CSP, so a missing nonce means "no JS
+        // behaviour" (graceful: a dismissible FAB just loses its ×; a scroll FAB shows always).
+        $nonceOk = $nonce !== null && $nonce !== '';
+        $dismiss = $cta->dismissible && $nonceOk;
+        $scrollPx = ($cta->trigger === 'scroll' && $cta->triggerValue > 0 && $nonceOk) ? $cta->triggerValue : 0;
+        $hasScript = $dismiss || $scrollPx > 0;
 
         // Delay trigger (#982 P2 d): reveal after N seconds with a pure-CSS animation (no JS).
         $delaySeconds = ($cta->trigger === 'delay' && $cta->triggerValue > 0) ? $cta->triggerValue : 0;
 
-        $style = self::style($accent, $side, $cta->bottomOffset, $dismiss, $delaySeconds);
+        $style = self::style($accent, $side, $cta->bottomOffset, $dismiss, $delaySeconds, $scrollPx > 0);
 
         $button = '<a class="nene-fab" href="' . $href . '"' . $target . $rel . '>'
             . $icon
@@ -69,22 +73,26 @@ final class FloatingCtaHtml
             . '</span>'
             . '</a>';
 
-        $dismissBtn = '';
-        $script = '';
-        if ($dismiss) {
-            $dismissBtn = '<button type="button" class="nene-fab__dismiss" aria-label="'
-                . self::e(self::dismissLabel($lang)) . '">&#215;</button>';
-            $script = self::script((string) $nonce);
-        }
+        $dismissBtn = $dismiss
+            ? '<button type="button" class="nene-fab__dismiss" aria-label="'
+                . self::e(self::dismissLabel($lang)) . '">&#215;</button>'
+            : '';
+        $script = $hasScript ? self::script((string) $nonce, $scrollPx) : '';
+        // For a scroll-triggered FAB the CSS hides it until the script reveals it; give
+        // no-JS visitors a way to still see it (reveal immediately).
+        $noscript = $scrollPx > 0
+            ? '<noscript><style>.nene-fab-wrap{opacity:1;pointer-events:auto}</style></noscript>'
+            : '';
 
         // The wrapper is the fixed-positioned element so the dismiss button can sit at its
         // corner; the SPA never touches it (rendered outside #root before </body>).
         return $style . "\n"
             . '<div class="nene-fab-wrap" id="nene-fab-wrap">' . $button . $dismissBtn . '</div>'
+            . $noscript
             . $script;
     }
 
-    private static function style(string $accent, string $side, int $bottomOffset, bool $dismiss, int $delaySeconds): string
+    private static function style(string $accent, string $side, int $bottomOffset, bool $dismiss, int $delaySeconds, bool $scrollReveal): string
     {
         // Delay reveal (#982 P2 d): `animation-fill-mode:both` keeps the FAB at the 0%
         // (hidden) keyframe during `animation-delay`, then fades it in — all in CSS, no JS.
@@ -94,10 +102,19 @@ final class FloatingCtaHtml
                 . '.nene-fab-wrap{animation:nene-fab-appear .35s ease both;animation-delay:' . $delaySeconds . 's}'
             : '';
 
-        // Reduced motion: keep the delay (appear after N s) but drop the fade/slide.
-        $reducedMotion = $delaySeconds > 0
-            ? '@media(prefers-reduced-motion:reduce){.nene-fab{transition:none}.nene-fab:hover{transform:none}.nene-fab-wrap{animation-duration:1ms}}'
-            : '@media(prefers-reduced-motion:reduce){.nene-fab{transition:none}.nene-fab:hover{transform:none}}';
+        // Scroll reveal (#982 P2 d): hidden until the nonce'd script adds `.is-visible` past
+        // the px threshold. Delay and scroll are mutually exclusive (one trigger value).
+        $scrollCss = $scrollReveal
+            ? '.nene-fab-wrap{opacity:0;pointer-events:none;transition:opacity .3s ease}'
+                . '.nene-fab-wrap.is-visible{opacity:1;pointer-events:auto}'
+            : '';
+
+        // Reduced motion: keep the trigger behaviour but drop the fade/slide/transition.
+        $wrapReduce = $delaySeconds > 0
+            ? '.nene-fab-wrap{animation-duration:1ms}'
+            : ($scrollReveal ? '.nene-fab-wrap{transition:none}' : '');
+        $reducedMotion = '@media(prefers-reduced-motion:reduce){.nene-fab{transition:none}.nene-fab:hover{transform:none}'
+            . $wrapReduce . '}';
 
         // Page-bottom clearance (#982 P2 (c)): reserve space so the fixed FAB never covers
         // footer content at scroll-end. Replaces the ad-hoc per-site `footer{padding-bottom}`
@@ -137,6 +154,7 @@ final class FloatingCtaHtml
             . '.nene-fab__sub{font-size:.62rem;font-weight:500;letter-spacing:.04em;opacity:.85;margin-top:2px}'
             . $dismissCss
             . $delayCss
+            . $scrollCss
             . '@media(max-width:560px){.nene-fab-wrap{left:14px;right:14px}.nene-fab{display:flex;justify-content:center;padding:15px 18px}}'
             . $reducedMotion
             . '</style>';
@@ -147,13 +165,19 @@ final class FloatingCtaHtml
      * the FAB immediately when already dismissed and remembers a "×" click in localStorage.
      * `$nonce` is hex from the renderer, so attribute interpolation carries no injection.
      */
-    private static function script(string $nonce): string
+    private static function script(string $nonce, int $scrollPx): string
     {
         $n = self::e($nonce);
+        // `$scrollPx` is a validated int (0 when not scroll-triggered), so interpolation is safe.
         $js = "(function(){try{var k='nene-fab-dismissed',w=document.getElementById('nene-fab-wrap');"
             . "if(!w)return;if(localStorage.getItem(k)==='1'){w.style.display='none';return}"
             . "var b=w.querySelector('.nene-fab__dismiss');if(b){b.addEventListener('click',function(){"
-            . "try{localStorage.setItem(k,'1')}catch(e){}w.style.display='none'})}}catch(e){}})();";
+            . "try{localStorage.setItem(k,'1')}catch(e){}w.style.display='none'})}"
+            . "var t={$scrollPx};if(t>0){var s=function(){"
+            . 'if((window.pageYOffset||document.documentElement.scrollTop||0)>=t){'
+            . "w.classList.add('is-visible');window.removeEventListener('scroll',s)}};"
+            . "window.addEventListener('scroll',s,{passive:true});s()}"
+            . '}catch(e){}})();';
 
         return "<script nonce=\"{$n}\">{$js}</script>";
     }

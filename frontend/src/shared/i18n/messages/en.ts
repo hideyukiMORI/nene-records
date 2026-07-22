@@ -235,6 +235,8 @@ export const en = {
   'admin.floatingCta.triggerAlways': 'Immediately',
   'admin.floatingCta.triggerDelay': 'After a delay',
   'admin.floatingCta.triggerDelaySeconds': 'Delay (seconds)',
+  'admin.floatingCta.triggerScroll': 'After scrolling',
+  'admin.floatingCta.triggerScrollPx': 'Scroll distance (px)',
   'admin.floatingCta.dismissibleHelp':
     'Adds a × and remembers the dismissal per device (uses a small script).',
   'admin.floatingCta.bottomOffsetHelp':

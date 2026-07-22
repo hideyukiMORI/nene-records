@@ -54,15 +54,18 @@ final readonly class FloatingCta
         public int $bottomOffset = 0,
         /** When true, the FAB shows a dismiss (×) button and remembers dismissal in localStorage (#982 P2 (a)). */
         public bool $dismissible = false,
-        /** When the FAB appears: 'always' (immediately) or 'delay' (after $triggerValue seconds) (#982 P2 (d)). */
+        /** When the FAB appears: 'always', 'delay' (after N s), or 'scroll' (after N px) (#982 P2 (d)). */
         public string $trigger = 'always',
-        /** Trigger parameter: seconds for the 'delay' trigger (1–60); ignored for 'always'. */
+        /** Trigger parameter: seconds for 'delay' (1–60), px for 'scroll' (1–5000); 0 for 'always'. */
         public int $triggerValue = 0,
     ) {
     }
 
     /** Delay-trigger bounds in seconds (#982 P2 (d)). */
     public const MAX_DELAY_SECONDS = 60;
+
+    /** Scroll-trigger threshold bounds in px (#982 P2 (d)). */
+    public const MAX_SCROLL_PX = 5000;
 
     public static function disabled(): self
     {
@@ -116,12 +119,16 @@ final readonly class FloatingCta
         $dismissible = ($decoded['dismissible'] ?? false) === true;
 
         // Appearance trigger (#982 P2 (d)). Unknown values fall back to 'always'; the delay
-        // seconds are clamped defensively (the write-side validator is the real boundary).
-        $trigger = ($decoded['trigger'] ?? 'always') === 'delay' ? 'delay' : 'always';
+        // seconds / scroll px are clamped defensively (the write-side validator is the real
+        // boundary). `triggerValue` is seconds for 'delay' and px for 'scroll'.
+        $rawTriggerName = $decoded['trigger'] ?? 'always';
+        $trigger = in_array($rawTriggerName, ['delay', 'scroll'], true) ? $rawTriggerName : 'always';
         $rawTrigger = $decoded['triggerValue'] ?? 0;
-        $triggerValue = $trigger === 'delay'
-            ? (is_int($rawTrigger) ? max(1, min($rawTrigger, self::MAX_DELAY_SECONDS)) : 1)
-            : 0;
+        $triggerValue = match ($trigger) {
+            'delay' => is_int($rawTrigger) ? max(1, min($rawTrigger, self::MAX_DELAY_SECONDS)) : 1,
+            'scroll' => is_int($rawTrigger) ? max(1, min($rawTrigger, self::MAX_SCROLL_PX)) : 1,
+            default => 0,
+        };
 
         $label = self::asString($content['label'] ?? '');
         $url = self::asString($link['url'] ?? '');
@@ -194,15 +201,16 @@ final readonly class FloatingCta
     }
 
     /**
-     * Whether the FAB will render its dismiss UI on this page (#982 P2 (a)).
+     * Whether the FAB needs a nonce'd inline script on this page (#982 P2 a/d).
      *
-     * True only when enabled, dismissible, and the page matches. The renderer uses this
-     * to decide whether a CSP script nonce is needed at all — so pages without a
-     * dismissible FAB keep the strict `script-src 'self'` (no nonce) policy.
+     * True when enabled, the page matches, and either the dismiss "×" (localStorage) or
+     * the scroll trigger (reveal past a px threshold) is active — both require JS. The
+     * renderer uses this to decide whether a CSP script nonce is needed at all, so pages
+     * without either keep the strict `script-src 'self'` (no nonce) policy.
      */
-    public function isDismissActiveFor(string $typeSlug, string $path): bool
+    public function needsScriptFor(string $typeSlug, string $path): bool
     {
-        return $this->dismissible && $this->shouldRender($typeSlug, $path);
+        return ($this->dismissible || $this->trigger === 'scroll') && $this->shouldRender($typeSlug, $path);
     }
 
     /**

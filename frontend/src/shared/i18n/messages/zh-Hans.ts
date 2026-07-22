@@ -219,6 +219,8 @@ export const zhHans = {
   'admin.floatingCta.triggerAlways': '立即显示',
   'admin.floatingCta.triggerDelay': '延迟显示',
   'admin.floatingCta.triggerDelaySeconds': '延迟（秒）',
+  'admin.floatingCta.triggerScroll': '滚动后显示',
+  'admin.floatingCta.triggerScrollPx': '滚动距离（px）',
   'admin.floatingCta.dismissibleHelp': '显示 × 并在设备上记住已关闭（使用一小段脚本）。',
   'admin.floatingCta.bottomOffsetHelp': '在页脚上方预留空间，避免按钮遮挡。0 = 关闭。',
   'admin.floatingCta.icon': '图标（表情）',

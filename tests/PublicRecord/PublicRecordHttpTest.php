@@ -543,6 +543,34 @@ final class PublicRecordHttpTest extends TestCase
         self::assertStringNotContainsString('googletagmanager', $csp);
     }
 
+    public function testSsrGivesScrollFabANonceEvenWithAnalyticsOff(): void
+    {
+        // A scroll-triggered FAB needs its reveal script — so a nonce even with analytics off.
+        $cfg = (string) json_encode([
+            'enabled' => true,
+            'trigger' => 'scroll',
+            'triggerValue' => 300,
+            'content' => ['label' => 'Book'],
+            'link' => ['url' => 'https://x.test'],
+        ]);
+        $app = $this->buildApplication(true, $this->projectRoot, [
+            new \NeNeRecords\Setting\SettingDef('floating_cta', 'text', $cfg, true, 'FAB'),
+        ]);
+
+        $response = $app->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/article/10'),
+        );
+        $html = (string) $response->getBody();
+        $csp = $response->getHeaderLine('Content-Security-Policy');
+
+        self::assertStringContainsString('var t=300;', $html);
+        self::assertStringContainsString('.nene-fab-wrap{opacity:0', $html);
+        preg_match('/<script nonce="([0-9a-f]{32})">/', $html, $m);
+        $nonce = $m[1] ?? '';
+        self::assertNotSame('', $nonce);
+        self::assertStringContainsString("'nonce-{$nonce}'", $csp);
+    }
+
     public function testSsrKeepsStrictCspWhenFabNotDismissible(): void
     {
         $cfg = (string) json_encode([

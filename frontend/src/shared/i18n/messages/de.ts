@@ -222,6 +222,8 @@ export const de = {
   'admin.floatingCta.triggerAlways': 'Sofort',
   'admin.floatingCta.triggerDelay': 'Nach Verzögerung',
   'admin.floatingCta.triggerDelaySeconds': 'Verzögerung (Sekunden)',
+  'admin.floatingCta.triggerScroll': 'Nach dem Scrollen',
+  'admin.floatingCta.triggerScrollPx': 'Scroll-Distanz (px)',
   'admin.floatingCta.dismissibleHelp':
     'Fügt ein × hinzu und merkt sich das Schließen pro Gerät (nutzt ein kleines Skript).',
   'admin.floatingCta.bottomOffsetHelp':
