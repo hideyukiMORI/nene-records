@@ -19,10 +19,12 @@ import {
   useFieldDefList,
   type RelationFieldDef,
 } from '@/entities/field-def'
+import { publicSettingsToMap, usePublicSettings } from '@/entities/setting'
 import { useTagList } from '@/entities/tag'
 import { defaultTextFieldListParamsForEntityType, useTextFieldList } from '@/entities/text-field'
 import { useTranslation } from '@/shared/i18n'
 import { getRecordDisplayLabel } from '@/shared/lib/get-record-display-label'
+import { stripSiteNameSuffix } from '@/shared/lib/strip-site-name-suffix'
 import { type DirectoryRecord } from '../lib/build-permalink-tree'
 
 export const PAGE_SIZE_OPTIONS = [20, 50, 100] as const
@@ -110,22 +112,33 @@ export function useManageEntitiesPage(entityTypeId: number) {
 
   const items = useMemo(() => listQuery.data?.items ?? [], [listQuery.data?.items])
 
+  // Site name drives the `｜{site}` SEO-suffix trim on list labels (#990); an
+  // unauthenticated public-settings read, so it works in the admin shell too.
+  const publicSettingsQuery = usePublicSettings()
+  const siteName = useMemo(
+    () => publicSettingsToMap(publicSettingsQuery.data?.items ?? [])['site_name'] ?? '',
+    [publicSettingsQuery.data?.items],
+  )
+
   const recordLabels = useMemo((): Record<string, string> => {
     const textFields = textFieldQuery.data?.items ?? []
 
     return Object.fromEntries(
       items.map((entity) => [
         String(entity.id),
-        getRecordDisplayLabel(
-          Number(entity.id),
-          textFields,
-          t('admin.entityRecord.id', { id: entity.id }),
-          null,
-          entity.metaTitle,
+        stripSiteNameSuffix(
+          getRecordDisplayLabel(
+            Number(entity.id),
+            textFields,
+            t('admin.entityRecord.id', { id: entity.id }),
+            null,
+            entity.metaTitle,
+          ),
+          siteName,
         ),
       ]),
     )
-  }, [items, t, textFieldQuery.data?.items])
+  }, [items, siteName, t, textFieldQuery.data?.items])
 
   const recordBodyMap = useMemo((): Record<string, string> => {
     const textFields = textFieldQuery.data?.items ?? []
@@ -142,8 +155,10 @@ export function useManageEntitiesPage(entityTypeId: number) {
     return result
   }, [items, textFieldQuery.data?.items])
 
-  // Directory-mode records: only those carrying a custom permalink, labelled from
-  // the type-wide title fields (falling back to meta_title or the last segment).
+  // Directory-mode records: only those carrying a custom permalink. Labelled from
+  // the title field, then meta_title (bespoke pages share one html field, so the
+  // derived excerpt would repeat the same header text on every row — #853/#990),
+  // then the last permalink segment. The `｜{site}` suffix is trimmed for the list.
   const directoryRecords = useMemo((): DirectoryRecord[] => {
     const textFields = textFieldQuery.data?.items ?? []
     return (directoryQuery.data?.items ?? [])
@@ -151,21 +166,26 @@ export function useManageEntitiesPage(entityTypeId: number) {
       .map((entity) => {
         const permalink = entity.permalink ?? ''
         const lastSegment = permalink.split('/').filter(Boolean).pop() ?? String(entity.id)
-        const fallback =
-          entity.metaTitle !== null && entity.metaTitle.trim() !== ''
-            ? entity.metaTitle
-            : lastSegment
         return {
           id: Number(entity.id),
           permalink,
-          label: getRecordDisplayLabel(Number(entity.id), textFields, fallback),
+          label: stripSiteNameSuffix(
+            getRecordDisplayLabel(
+              Number(entity.id),
+              textFields,
+              lastSegment,
+              null,
+              entity.metaTitle,
+            ),
+            siteName,
+          ),
           status: entity.status,
           updatedAt: entity.updatedAt,
           menuOrder: entity.menuOrder,
           viewCount: entity.viewCount ?? 0,
         }
       })
-  }, [directoryQuery.data?.items, textFieldQuery.data?.items])
+  }, [directoryQuery.data?.items, siteName, textFieldQuery.data?.items])
 
   const toggleTagSlug = useCallback((slug: string) => {
     setSelectedTagSlugs((current) =>

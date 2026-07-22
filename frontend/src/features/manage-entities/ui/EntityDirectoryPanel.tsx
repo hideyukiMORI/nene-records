@@ -447,6 +447,11 @@ function DirectoryNodeRow({
             >
               {highlightMatch(record.label, query)}
             </Link>
+            {/* The permalink segment stays visible so pages whose names derive
+                from a shared bespoke body remain distinguishable by path (#990). */}
+            <span className="shrink-0 font-mono text-caption text-text-muted">
+              {highlightMatch(node.segment, query)}
+            </span>
             {hasChildren ? (
               <span className="shrink-0 font-mono text-caption text-text-muted">
                 ({node.children.length})
