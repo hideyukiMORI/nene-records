@@ -117,6 +117,28 @@ final class FloatingCtaHtmlTest extends TestCase
         self::assertStringNotContainsString('nene-fab__dismiss', $html);
     }
 
+    public function testDelayTriggerEmitsPureCssRevealNoScript(): void
+    {
+        $cta = self::cta([
+            'content' => ['label' => 'x'], 'link' => ['url' => 'https://x.test'],
+            'trigger' => 'delay', 'triggerValue' => 5,
+        ]);
+        $html = FloatingCtaHtml::render($cta, 'page', '/');
+
+        self::assertStringContainsString('@keyframes nene-fab-appear', $html);
+        self::assertStringContainsString('animation:nene-fab-appear .35s ease both;animation-delay:5s', $html);
+        // Pure CSS — no script / nonce for a delay-only FAB.
+        self::assertStringNotContainsString('<script', $html);
+    }
+
+    public function testAlwaysTriggerOmitsDelayCss(): void
+    {
+        $cta = self::cta(['content' => ['label' => 'x'], 'link' => ['url' => 'https://x.test']]);
+        $html = FloatingCtaHtml::render($cta, 'page', '/');
+        self::assertStringNotContainsString('nene-fab-appear', $html);
+        self::assertStringNotContainsString('animation-delay', $html);
+    }
+
     public function testDismissButtonSitsOnPositionSide(): void
     {
         $cta = self::cta([

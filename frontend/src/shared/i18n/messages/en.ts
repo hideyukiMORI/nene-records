@@ -231,6 +231,10 @@ export const en = {
   'admin.floatingCta.accent': 'Accent color',
   'admin.floatingCta.bottomOffset': 'Bottom clearance (px)',
   'admin.floatingCta.dismissible': 'Dismissible (× to close)',
+  'admin.floatingCta.trigger': 'Show',
+  'admin.floatingCta.triggerAlways': 'Immediately',
+  'admin.floatingCta.triggerDelay': 'After a delay',
+  'admin.floatingCta.triggerDelaySeconds': 'Delay (seconds)',
   'admin.floatingCta.dismissibleHelp':
     'Adds a × and remembers the dismissal per device (uses a small script).',
   'admin.floatingCta.bottomOffsetHelp':

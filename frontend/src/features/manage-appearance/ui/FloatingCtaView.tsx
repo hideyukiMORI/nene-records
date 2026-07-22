@@ -4,6 +4,7 @@ import {
   FLOATING_CTA_ICONS,
   joinList,
   MAX_FLOATING_CTA_BOTTOM_OFFSET,
+  MAX_FLOATING_CTA_DELAY_SECONDS,
   parseList,
   safeHref,
 } from '@/shared/lib/floating-cta'
@@ -155,6 +156,41 @@ export function FloatingCtaView({
           <Text muted variant="caption">
             {t('admin.floatingCta.dismissibleHelp')}
           </Text>
+          <Row label={t('admin.floatingCta.trigger')}>
+            <select
+              className="w-56 rounded-sm border border-border bg-surface px-inline-sm py-stack-xs font-sans text-body text-text-primary"
+              value={draft.trigger}
+              onChange={(event) => {
+                const trigger = event.target.value === 'delay' ? 'delay' : 'always'
+                setConfig({
+                  trigger,
+                  triggerValue: trigger === 'delay' ? Math.max(1, draft.triggerValue) : 0,
+                })
+              }}
+            >
+              <option value="always">{t('admin.floatingCta.triggerAlways')}</option>
+              <option value="delay">{t('admin.floatingCta.triggerDelay')}</option>
+            </select>
+          </Row>
+          {draft.trigger === 'delay' ? (
+            <Row label={t('admin.floatingCta.triggerDelaySeconds')}>
+              <input
+                type="number"
+                min={1}
+                max={MAX_FLOATING_CTA_DELAY_SECONDS}
+                step={1}
+                className="w-24 rounded-sm border border-border bg-surface px-inline-sm py-stack-xs font-sans text-body text-text-primary"
+                value={draft.triggerValue}
+                onChange={(event) => {
+                  const parsed = Number.parseInt(event.target.value, 10)
+                  const clamped = Number.isFinite(parsed)
+                    ? Math.max(1, Math.min(parsed, MAX_FLOATING_CTA_DELAY_SECONDS))
+                    : 1
+                  setConfig({ triggerValue: clamped })
+                }}
+              />
+            </Row>
+          ) : null}
         </Stack>
 
         <Stack gap="sm">

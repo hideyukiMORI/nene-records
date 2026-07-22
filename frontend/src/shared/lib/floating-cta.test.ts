@@ -58,6 +58,28 @@ describe('parseFloatingCta', () => {
     expect(parseFloatingCta('{}').dismissible).toBe(false)
   })
 
+  it('parses trigger + delay seconds, clamping to 1–60 (#982 P2 d)', () => {
+    const always = parseFloatingCta('{}')
+    expect(always.trigger).toBe('always')
+    expect(always.triggerValue).toBe(0)
+
+    expect(
+      parseFloatingCta(JSON.stringify({ trigger: 'delay', triggerValue: 8 })).triggerValue,
+    ).toBe(8)
+    expect(
+      parseFloatingCta(JSON.stringify({ trigger: 'delay', triggerValue: 999 })).triggerValue,
+    ).toBe(60)
+    expect(
+      parseFloatingCta(JSON.stringify({ trigger: 'delay', triggerValue: 0 })).triggerValue,
+    ).toBe(1)
+    expect(parseFloatingCta(JSON.stringify({ trigger: 'delay' })).triggerValue).toBe(1)
+
+    // Unknown trigger (e.g. reserved 'scroll') coerces to 'always' with no delay.
+    const scroll = parseFloatingCta(JSON.stringify({ trigger: 'scroll', triggerValue: 300 }))
+    expect(scroll.trigger).toBe('always')
+    expect(scroll.triggerValue).toBe(0)
+  })
+
   it('round-trips through serialize', () => {
     const cfg = parseFloatingCta(
       JSON.stringify({ enabled: true, content: { label: 'x' }, link: { url: '/c' } }),

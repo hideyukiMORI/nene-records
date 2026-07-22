@@ -97,6 +97,27 @@ final class FloatingCtaTest extends TestCase
         self::assertFalse(FloatingCta::disabled()->isDismissActiveFor('page', '/'));
     }
 
+    public function testTriggerAndDelayAreParsedAndClamped(): void
+    {
+        $base = ['enabled' => true, 'content' => ['label' => 'x'], 'link' => ['url' => 'https://x.test']];
+
+        $always = FloatingCta::fromSettings(self::settings($base));
+        self::assertSame('always', $always->trigger);
+        self::assertSame(0, $always->triggerValue);
+
+        $delay = FloatingCta::fromSettings(self::settings($base + ['trigger' => 'delay', 'triggerValue' => 8]));
+        self::assertSame('delay', $delay->trigger);
+        self::assertSame(8, $delay->triggerValue);
+
+        // Out-of-range delay clamps to 1–60; unknown trigger → always; delay w/o int → 1.
+        self::assertSame(60, FloatingCta::fromSettings(self::settings($base + ['trigger' => 'delay', 'triggerValue' => 9999]))->triggerValue);
+        self::assertSame(1, FloatingCta::fromSettings(self::settings($base + ['trigger' => 'delay', 'triggerValue' => 0]))->triggerValue);
+        self::assertSame(1, FloatingCta::fromSettings(self::settings($base + ['trigger' => 'delay', 'triggerValue' => '5']))->triggerValue);
+        $unknown = FloatingCta::fromSettings(self::settings($base + ['trigger' => 'scroll', 'triggerValue' => 300]));
+        self::assertSame('always', $unknown->trigger);
+        self::assertSame(0, $unknown->triggerValue);
+    }
+
     public function testInvalidPositionFallsBackToBr(): void
     {
         $cta = FloatingCta::fromSettings(self::settings([

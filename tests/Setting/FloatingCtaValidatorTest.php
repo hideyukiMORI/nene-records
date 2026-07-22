@@ -24,7 +24,8 @@ final class FloatingCtaValidatorTest extends TestCase
         (new FloatingCtaValidator())->validate((string) json_encode([
             'enabled' => true,
             'position' => 'bl',
-            'trigger' => 'always',
+            'trigger' => 'delay',
+            'triggerValue' => 5,
             'accent' => '#D64525',
             'content' => ['icon' => '📅', 'iconId' => 'calendar', 'label' => '30分無料相談を予約', 'sub' => 'オンライン'],
             'link' => ['url' => 'https://calendar.app.google/x', 'newTab' => true],
@@ -67,6 +68,10 @@ final class FloatingCtaValidatorTest extends TestCase
         yield 'bottomOffset negative' => [(string) json_encode(['bottomOffset' => -1] + $base)];
         yield 'bottomOffset not int' => [(string) json_encode(['bottomOffset' => '100'] + $base)];
         yield 'dismissible not bool' => [(string) json_encode(['dismissible' => 'yes'] + $base)];
+        yield 'delay without seconds' => [(string) json_encode(['trigger' => 'delay'] + $base)];
+        yield 'delay seconds too large' => [(string) json_encode(['trigger' => 'delay', 'triggerValue' => 61] + $base)];
+        yield 'delay seconds zero' => [(string) json_encode(['trigger' => 'delay', 'triggerValue' => 0] + $base)];
+        yield 'delay seconds not int' => [(string) json_encode(['trigger' => 'delay', 'triggerValue' => '5'] + $base)];
     }
 
     public function testMailtoAndTelAndRelativeAreAccepted(): void
