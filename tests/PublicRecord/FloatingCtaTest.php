@@ -81,20 +81,24 @@ final class FloatingCtaTest extends TestCase
         self::assertFalse(FloatingCta::fromSettings(self::settings($base + ['dismissible' => 'yes']))->dismissible);
     }
 
-    public function testIsDismissActiveForRequiresEnabledDismissibleAndMatch(): void
+    public function testNeedsScriptForRequiresEnabledAndDismissibleOrScrollAndMatch(): void
     {
-        $base = ['enabled' => true, 'dismissible' => true, 'content' => ['label' => 'x'], 'link' => ['url' => 'https://x.test']];
+        $link = ['content' => ['label' => 'x'], 'link' => ['url' => 'https://x.test']];
 
-        self::assertTrue(FloatingCta::fromSettings(self::settings($base))->isDismissActiveFor('page', '/'));
-        // Not dismissible → false even though it renders.
-        self::assertFalse(FloatingCta::fromSettings(self::settings(['dismissible' => false] + $base))->isDismissActiveFor('page', '/'));
-        // Page excluded → false even though dismissible.
+        // Dismissible → needs a script.
+        self::assertTrue(FloatingCta::fromSettings(self::settings(['enabled' => true, 'dismissible' => true] + $link))->needsScriptFor('page', '/'));
+        // Scroll trigger → needs a script (even without dismiss).
+        self::assertTrue(FloatingCta::fromSettings(self::settings(['enabled' => true, 'trigger' => 'scroll', 'triggerValue' => 300] + $link))->needsScriptFor('page', '/'));
+        // Neither dismissible nor scroll (e.g. delay) → no script.
+        self::assertFalse(FloatingCta::fromSettings(self::settings(['enabled' => true, 'trigger' => 'delay', 'triggerValue' => 3] + $link))->needsScriptFor('page', '/'));
+        self::assertFalse(FloatingCta::fromSettings(self::settings(['enabled' => true] + $link))->needsScriptFor('page', '/'));
+        // Page excluded → false even when dismissible.
         self::assertFalse(
-            FloatingCta::fromSettings(self::settings($base + ['conditions' => ['exclude' => ['/secret*']]]))
-                ->isDismissActiveFor('page', '/secret'),
+            FloatingCta::fromSettings(self::settings(['enabled' => true, 'dismissible' => true, 'conditions' => ['exclude' => ['/secret*']]] + $link))
+                ->needsScriptFor('page', '/secret'),
         );
         // Disabled → false.
-        self::assertFalse(FloatingCta::disabled()->isDismissActiveFor('page', '/'));
+        self::assertFalse(FloatingCta::disabled()->needsScriptFor('page', '/'));
     }
 
     public function testTriggerAndDelayAreParsedAndClamped(): void
@@ -113,9 +117,12 @@ final class FloatingCtaTest extends TestCase
         self::assertSame(60, FloatingCta::fromSettings(self::settings($base + ['trigger' => 'delay', 'triggerValue' => 9999]))->triggerValue);
         self::assertSame(1, FloatingCta::fromSettings(self::settings($base + ['trigger' => 'delay', 'triggerValue' => 0]))->triggerValue);
         self::assertSame(1, FloatingCta::fromSettings(self::settings($base + ['trigger' => 'delay', 'triggerValue' => '5']))->triggerValue);
-        $unknown = FloatingCta::fromSettings(self::settings($base + ['trigger' => 'scroll', 'triggerValue' => 300]));
-        self::assertSame('always', $unknown->trigger);
-        self::assertSame(0, $unknown->triggerValue);
+        // Scroll trigger: triggerValue is px, clamped to 1–5000.
+        $scroll = FloatingCta::fromSettings(self::settings($base + ['trigger' => 'scroll', 'triggerValue' => 300]));
+        self::assertSame('scroll', $scroll->trigger);
+        self::assertSame(300, $scroll->triggerValue);
+        self::assertSame(5000, FloatingCta::fromSettings(self::settings($base + ['trigger' => 'scroll', 'triggerValue' => 99999]))->triggerValue);
+        self::assertSame(1, FloatingCta::fromSettings(self::settings($base + ['trigger' => 'scroll', 'triggerValue' => 0]))->triggerValue);
     }
 
     public function testInvalidPositionFallsBackToBr(): void

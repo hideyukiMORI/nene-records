@@ -36,6 +36,18 @@ final class FloatingCtaValidatorTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
+    public function testScrollTriggerWithPxPasses(): void
+    {
+        (new FloatingCtaValidator())->validate((string) json_encode([
+            'enabled' => true,
+            'trigger' => 'scroll',
+            'triggerValue' => 600,
+            'content' => ['label' => 'Book'],
+            'link' => ['url' => 'https://x.test'],
+        ]));
+        $this->addToAssertionCount(1);
+    }
+
     #[DataProvider('provideInvalid')]
     public function testInvalidConfigThrows(string $json): void
     {
@@ -53,7 +65,7 @@ final class FloatingCtaValidatorTest extends TestCase
         yield 'reserved position right-tab (P2)' => [(string) json_encode(['position' => 'right-tab'] + $base)];
         yield 'reserved position bottom-bar (P2)' => [(string) json_encode(['position' => 'bottom-bar'] + $base)];
         yield 'unknown position' => [(string) json_encode(['position' => 'top'] + $base)];
-        yield 'reserved trigger scroll (P2)' => [(string) json_encode(['trigger' => 'scroll'] + $base)];
+        yield 'unknown trigger' => [(string) json_encode(['trigger' => 'hover'] + $base)];
         yield 'javascript: url' => [(string) json_encode(['link' => ['url' => 'javascript:alert(1)']] + ['enabled' => true, 'content' => ['label' => 'x']])];
         yield 'data: url' => [(string) json_encode(['link' => ['url' => 'data:text/html,x']] + ['enabled' => true, 'content' => ['label' => 'x']])];
         yield 'protocol-relative url' => [(string) json_encode(['link' => ['url' => '//evil.test/x']] + ['enabled' => true, 'content' => ['label' => 'x']])];
@@ -72,6 +84,9 @@ final class FloatingCtaValidatorTest extends TestCase
         yield 'delay seconds too large' => [(string) json_encode(['trigger' => 'delay', 'triggerValue' => 61] + $base)];
         yield 'delay seconds zero' => [(string) json_encode(['trigger' => 'delay', 'triggerValue' => 0] + $base)];
         yield 'delay seconds not int' => [(string) json_encode(['trigger' => 'delay', 'triggerValue' => '5'] + $base)];
+        yield 'scroll without px' => [(string) json_encode(['trigger' => 'scroll'] + $base)];
+        yield 'scroll px too large' => [(string) json_encode(['trigger' => 'scroll', 'triggerValue' => 5001] + $base)];
+        yield 'scroll px zero' => [(string) json_encode(['trigger' => 'scroll', 'triggerValue' => 0] + $base)];
     }
 
     public function testMailtoAndTelAndRelativeAreAccepted(): void

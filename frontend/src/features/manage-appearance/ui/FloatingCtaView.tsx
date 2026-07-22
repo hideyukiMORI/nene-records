@@ -5,6 +5,7 @@ import {
   joinList,
   MAX_FLOATING_CTA_BOTTOM_OFFSET,
   MAX_FLOATING_CTA_DELAY_SECONDS,
+  MAX_FLOATING_CTA_SCROLL_PX,
   parseList,
   safeHref,
 } from '@/shared/lib/floating-cta'
@@ -161,31 +162,44 @@ export function FloatingCtaView({
               className="w-56 rounded-sm border border-border bg-surface px-inline-sm py-stack-xs font-sans text-body text-text-primary"
               value={draft.trigger}
               onChange={(event) => {
-                const trigger = event.target.value === 'delay' ? 'delay' : 'always'
-                setConfig({
-                  trigger,
-                  triggerValue: trigger === 'delay' ? Math.max(1, draft.triggerValue) : 0,
-                })
+                const value = event.target.value
+                const trigger = value === 'delay' || value === 'scroll' ? value : 'always'
+                // Units differ (seconds vs px), so reset to a sensible per-trigger default.
+                const triggerValue = trigger === 'delay' ? 3 : trigger === 'scroll' ? 400 : 0
+                setConfig({ trigger, triggerValue })
               }}
             >
               <option value="always">{t('admin.floatingCta.triggerAlways')}</option>
               <option value="delay">{t('admin.floatingCta.triggerDelay')}</option>
+              <option value="scroll">{t('admin.floatingCta.triggerScroll')}</option>
             </select>
           </Row>
-          {draft.trigger === 'delay' ? (
-            <Row label={t('admin.floatingCta.triggerDelaySeconds')}>
+          {draft.trigger !== 'always' ? (
+            <Row
+              label={
+                draft.trigger === 'delay'
+                  ? t('admin.floatingCta.triggerDelaySeconds')
+                  : t('admin.floatingCta.triggerScrollPx')
+              }
+            >
               <input
                 type="number"
                 min={1}
-                max={MAX_FLOATING_CTA_DELAY_SECONDS}
-                step={1}
+                max={
+                  draft.trigger === 'delay'
+                    ? MAX_FLOATING_CTA_DELAY_SECONDS
+                    : MAX_FLOATING_CTA_SCROLL_PX
+                }
+                step={draft.trigger === 'delay' ? 1 : 50}
                 className="w-24 rounded-sm border border-border bg-surface px-inline-sm py-stack-xs font-sans text-body text-text-primary"
                 value={draft.triggerValue}
                 onChange={(event) => {
+                  const max =
+                    draft.trigger === 'delay'
+                      ? MAX_FLOATING_CTA_DELAY_SECONDS
+                      : MAX_FLOATING_CTA_SCROLL_PX
                   const parsed = Number.parseInt(event.target.value, 10)
-                  const clamped = Number.isFinite(parsed)
-                    ? Math.max(1, Math.min(parsed, MAX_FLOATING_CTA_DELAY_SECONDS))
-                    : 1
+                  const clamped = Number.isFinite(parsed) ? Math.max(1, Math.min(parsed, max)) : 1
                   setConfig({ triggerValue: clamped })
                 }}
               />

@@ -231,6 +231,8 @@ export const ja = {
   'admin.floatingCta.triggerAlways': 'すぐに表示',
   'admin.floatingCta.triggerDelay': '遅らせて表示',
   'admin.floatingCta.triggerDelaySeconds': '遅延（秒）',
+  'admin.floatingCta.triggerScroll': 'スクロール後に表示',
+  'admin.floatingCta.triggerScrollPx': 'スクロール量（px）',
   'admin.floatingCta.dismissibleHelp':
     '× を表示し、閉じたことを端末に記憶します（小さなスクリプトを使用）。',
   'admin.floatingCta.bottomOffsetHelp':

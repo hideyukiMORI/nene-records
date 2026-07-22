@@ -125,8 +125,8 @@ final readonly class RenderPublicRecordViewHandler implements PublicRecordViewRe
         // one of them needs it, so pages with neither keep the strict `script-src 'self'`.
         $floatingCtaConfig = FloatingCta::fromSettings($settings);
         $fabPath = $request->getUri()->getPath();
-        $fabDismissActive = $floatingCtaConfig->isDismissActiveFor($output->entityTypeSlug, $fabPath);
-        $nonce = ($analytics->isEnabled() || $fabDismissActive) ? bin2hex(random_bytes(16)) : '';
+        $fabNeedsScript = $floatingCtaConfig->needsScriptFor($output->entityTypeSlug, $fabPath);
+        $nonce = ($analytics->isEnabled() || $fabNeedsScript) ? bin2hex(random_bytes(16)) : '';
         $analyticsHead = WebAnalyticsHeadSnippet::render($analytics, $nonce);
 
         // Trusted-embed primitive (#802 Phase 2): when the org has an embed
@@ -150,7 +150,7 @@ final readonly class RenderPublicRecordViewHandler implements PublicRecordViewRe
             $floatingCtaConfig,
             $output->entityTypeSlug,
             $fabPath,
-            $fabDismissActive ? $nonce : null,
+            $fabNeedsScript ? $nonce : null,
             $locale ?? PublicLocale::DEFAULT_LANG,
         );
 

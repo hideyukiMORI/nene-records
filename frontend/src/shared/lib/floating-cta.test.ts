@@ -74,10 +74,21 @@ describe('parseFloatingCta', () => {
     ).toBe(1)
     expect(parseFloatingCta(JSON.stringify({ trigger: 'delay' })).triggerValue).toBe(1)
 
-    // Unknown trigger (e.g. reserved 'scroll') coerces to 'always' with no delay.
+    // Scroll trigger: triggerValue is px, clamped to 1–5000.
     const scroll = parseFloatingCta(JSON.stringify({ trigger: 'scroll', triggerValue: 300 }))
-    expect(scroll.trigger).toBe('always')
-    expect(scroll.triggerValue).toBe(0)
+    expect(scroll.trigger).toBe('scroll')
+    expect(scroll.triggerValue).toBe(300)
+    expect(
+      parseFloatingCta(JSON.stringify({ trigger: 'scroll', triggerValue: 99999 })).triggerValue,
+    ).toBe(5000)
+    expect(
+      parseFloatingCta(JSON.stringify({ trigger: 'scroll', triggerValue: 0 })).triggerValue,
+    ).toBe(1)
+
+    // A genuinely unknown trigger coerces to 'always'.
+    const unknown = parseFloatingCta(JSON.stringify({ trigger: 'hover', triggerValue: 5 }))
+    expect(unknown.trigger).toBe('always')
+    expect(unknown.triggerValue).toBe(0)
   })
 
   it('round-trips through serialize', () => {

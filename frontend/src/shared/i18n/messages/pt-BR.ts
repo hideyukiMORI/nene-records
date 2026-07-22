@@ -223,6 +223,8 @@ export const ptBR = {
   'admin.floatingCta.triggerAlways': 'Imediatamente',
   'admin.floatingCta.triggerDelay': 'Após um atraso',
   'admin.floatingCta.triggerDelaySeconds': 'Atraso (segundos)',
+  'admin.floatingCta.triggerScroll': 'Após rolagem',
+  'admin.floatingCta.triggerScrollPx': 'Distância de rolagem (px)',
   'admin.floatingCta.dismissibleHelp':
     'Adiciona um × e memoriza o fechamento por dispositivo (usa um pequeno script).',
   'admin.floatingCta.bottomOffsetHelp':
