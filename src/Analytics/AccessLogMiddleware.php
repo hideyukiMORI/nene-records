@@ -5,10 +5,8 @@ declare(strict_types=1);
 namespace NeNeRecords\Analytics;
 
 use Nene2\Http\ClockInterface;
-use Nene2\Http\RequestScopedHolder;
 use Nene2\Middleware\RequestIdMiddleware;
 use NeNeRecords\Http\ClientIp;
-use NeNeRecords\Setting\SettingRepositoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -21,28 +19,26 @@ use Throwable;
  * always recorded except for the infrastructure paths in {@see self::$excludedPaths}.
  *
  * When the owning org opts in (`analytics_visitor_tracking` = true, ADR 0006 / #1007) the
- * privacy-first visitor fields are additionally computed: a daily-salted org-scoped hash of
- * the client IP (the raw IP is never stored), the referer host only, the utm_* / ref
- * allowlist, and a coarse UA class + bot flag. Opt-in OFF (the default) reproduces the exact
- * pre-Path-B behaviour.
+ * privacy-first visitor fields are additionally computed via {@see VisitorFieldsResolver}:
+ * a daily-salted org-scoped hash of the client IP (the raw IP is never stored), the referer
+ * host only, the utm_* / ref allowlist, and a coarse UA class + bot flag. Opt-in OFF (the
+ * default) reproduces the exact pre-Path-B behaviour.
  *
  * Note: the homepage `/` is intentionally NOT excluded (Path B counts front-page visits);
- * only true infrastructure/health endpoints are skipped.
+ * only true infrastructure/health endpoints and the beacon ingest (recorded by its own
+ * handler as a BEACON row) are skipped.
  */
 final readonly class AccessLogMiddleware implements MiddlewareInterface
 {
     /**
-     * @param RequestScopedHolder<int> $orgId
-     * @param list<string>             $excludedPaths
+     * @param list<string> $excludedPaths
      */
     public function __construct(
         private AccessLogRepositoryInterface $accessLogs,
         private LoggerInterface $logger,
         private ClockInterface $clock,
-        private SettingRepositoryInterface $settings,
-        private AnalyticsSaltRepositoryInterface $salts,
-        private RequestScopedHolder $orgId,
-        private array $excludedPaths = ['/health', '/machine/health', '/examples/ping'],
+        private VisitorFieldsResolver $visitor,
+        private array $excludedPaths = ['/health', '/machine/health', '/examples/ping', '/api/v1/public/beacon'],
     ) {
     }
 
@@ -58,7 +54,12 @@ final readonly class AccessLogMiddleware implements MiddlewareInterface
         $response = $handler->handle($request);
 
         try {
-            $visitor = $this->resolveVisitor($request);
+            $visitor = $this->visitor->resolve(
+                ClientIp::resolve($request),
+                $request->getHeaderLine('Referer'),
+                $request->getUri()->getQuery(),
+                $request->getHeaderLine('User-Agent'),
+            );
 
             $this->accessLogs->insert(new AccessLogEntry(
                 requestId: $this->requestId($request),
@@ -85,52 +86,6 @@ final readonly class AccessLogMiddleware implements MiddlewareInterface
         }
 
         return $response;
-    }
-
-    /**
-     * @return array{
-     *     visitorHash: ?string, refererHost: ?string, utmSource: ?string, utmMedium: ?string,
-     *     utmCampaign: ?string, ref: ?string, clientType: ?string, isBot: ?bool
-     * }
-     */
-    private function resolveVisitor(ServerRequestInterface $request): array
-    {
-        $empty = [
-            'visitorHash' => null, 'refererHost' => null, 'utmSource' => null,
-            'utmMedium' => null, 'utmCampaign' => null, 'ref' => null,
-            'clientType' => null, 'isBot' => null,
-        ];
-
-        if (!$this->visitorTrackingEnabled()) {
-            return $empty;
-        }
-
-        $salt = $this->salts->saltForDate($this->clock->now());
-        $hash = VisitorHasher::hash($salt, ClientIp::resolve($request), (int) $this->orgId->get());
-        $attribution = QueryAttribution::fromQueryString($request->getUri()->getQuery());
-        $ua = UserAgentClassifier::classify($request->getHeaderLine('User-Agent'));
-
-        return [
-            'visitorHash' => $hash,
-            'refererHost' => RefererHost::fromReferer($request->getHeaderLine('Referer')),
-            'utmSource' => $attribution['utmSource'],
-            'utmMedium' => $attribution['utmMedium'],
-            'utmCampaign' => $attribution['utmCampaign'],
-            'ref' => $attribution['ref'],
-            'clientType' => $ua['type'],
-            'isBot' => $ua['isBot'],
-        ];
-    }
-
-    private function visitorTrackingEnabled(): bool
-    {
-        try {
-            $value = $this->settings->findValueByKey('analytics_visitor_tracking');
-        } catch (Throwable) {
-            return false;
-        }
-
-        return $value !== null && ($value->value === 'true' || $value->value === '1');
     }
 
     private function requestId(ServerRequestInterface $request): ?string

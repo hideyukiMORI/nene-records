@@ -11,10 +11,12 @@ use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Http\ClockInterface;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RequestScopedHolder;
+use Nene2\Middleware\RateLimitStorageInterface;
 use NeNeRecords\Entity\EntityRepositoryInterface;
 use NeNeRecords\Setting\SettingRepositoryInterface;
 use NeNeRecords\TextField\TextFieldRepositoryInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Log\LoggerInterface;
 
 final readonly class AnalyticsServiceProvider implements ServiceProviderInterface
@@ -129,6 +131,32 @@ final readonly class AnalyticsServiceProvider implements ServiceProviderInterfac
                 },
             )
             ->set(
+                VisitorFieldsResolver::class,
+                static function (ContainerInterface $c): VisitorFieldsResolver {
+                    $settings = $c->get(SettingRepositoryInterface::class);
+                    if (!$settings instanceof SettingRepositoryInterface) {
+                        throw new LogicException('Setting repository service is invalid.');
+                    }
+
+                    $salts = $c->get(AnalyticsSaltRepositoryInterface::class);
+                    if (!$salts instanceof AnalyticsSaltRepositoryInterface) {
+                        throw new LogicException('Analytics salt repository service is invalid.');
+                    }
+
+                    $clock = $c->get(ClockInterface::class);
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('ClockInterface service is invalid.');
+                    }
+
+                    $orgId = $c->get('nene-records.org_id_holder');
+                    if (!$orgId instanceof RequestScopedHolder) {
+                        throw new LogicException('Org ID holder service is invalid.');
+                    }
+
+                    return new VisitorFieldsResolver($settings, $salts, $clock, $orgId);
+                },
+            )
+            ->set(
                 AccessLogMiddleware::class,
                 static function (ContainerInterface $c): AccessLogMiddleware {
                     $repository = $c->get(AccessLogRepositoryInterface::class);
@@ -147,22 +175,43 @@ final readonly class AnalyticsServiceProvider implements ServiceProviderInterfac
                         throw new LogicException('ClockInterface service is invalid.');
                     }
 
-                    $settings = $c->get(SettingRepositoryInterface::class);
-                    if (!$settings instanceof SettingRepositoryInterface) {
-                        throw new LogicException('Setting repository service is invalid.');
+                    $visitor = $c->get(VisitorFieldsResolver::class);
+                    if (!$visitor instanceof VisitorFieldsResolver) {
+                        throw new LogicException('Visitor fields resolver service is invalid.');
                     }
 
-                    $salts = $c->get(AnalyticsSaltRepositoryInterface::class);
-                    if (!$salts instanceof AnalyticsSaltRepositoryInterface) {
-                        throw new LogicException('Analytics salt repository service is invalid.');
+                    return new AccessLogMiddleware($repository, $logger, $clock, $visitor);
+                },
+            )
+            ->set(
+                BeaconIngestHandler::class,
+                static function (ContainerInterface $c): BeaconIngestHandler {
+                    $repository = $c->get(AccessLogRepositoryInterface::class);
+                    if (!$repository instanceof AccessLogRepositoryInterface) {
+                        throw new LogicException('Access log repository service is invalid.');
                     }
 
-                    $orgId = $c->get('nene-records.org_id_holder');
-                    if (!$orgId instanceof RequestScopedHolder) {
-                        throw new LogicException('Org ID holder service is invalid.');
+                    $visitor = $c->get(VisitorFieldsResolver::class);
+                    if (!$visitor instanceof VisitorFieldsResolver) {
+                        throw new LogicException('Visitor fields resolver service is invalid.');
                     }
 
-                    return new AccessLogMiddleware($repository, $logger, $clock, $settings, $salts, $orgId);
+                    $clock = $c->get(ClockInterface::class);
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('ClockInterface service is invalid.');
+                    }
+
+                    $rateLimit = $c->get(RateLimitStorageInterface::class);
+                    if (!$rateLimit instanceof RateLimitStorageInterface) {
+                        throw new LogicException('Rate limit storage service is invalid.');
+                    }
+
+                    $responses = $c->get(ResponseFactoryInterface::class);
+                    if (!$responses instanceof ResponseFactoryInterface) {
+                        throw new LogicException('Response factory service is invalid.');
+                    }
+
+                    return new BeaconIngestHandler($repository, $visitor, $clock, $rateLimit, $responses);
                 },
             )
             ->set(
@@ -170,6 +219,7 @@ final readonly class AnalyticsServiceProvider implements ServiceProviderInterfac
                 static function (ContainerInterface $c): AnalyticsRouteRegistrar {
                     $handler = $c->get(GetAccessStatsByDateHandler::class);
                     $popularHandler = $c->get(GetPopularEntitiesHandler::class);
+                    $beaconHandler = $c->get(BeaconIngestHandler::class);
 
                     if (!$handler instanceof GetAccessStatsByDateHandler) {
                         throw new LogicException('GetAccessStatsByDate handler service is invalid.');
@@ -179,7 +229,11 @@ final readonly class AnalyticsServiceProvider implements ServiceProviderInterfac
                         throw new LogicException('GetPopularEntities handler service is invalid.');
                     }
 
-                    return new AnalyticsRouteRegistrar($handler, $popularHandler);
+                    if (!$beaconHandler instanceof BeaconIngestHandler) {
+                        throw new LogicException('Beacon ingest handler service is invalid.');
+                    }
+
+                    return new AnalyticsRouteRegistrar($handler, $popularHandler, $beaconHandler);
                 },
             );
     }

@@ -1592,6 +1592,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/public/beacon": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * LP visit beacon (Path B)
+         * @description Public, unauthenticated ingest for static landing-page visits (ADR 0006 / #1008). The page's beacon posts `{path, referrer, query}`; the server records a `BEACON` access-log row for allowlisted LP paths and — only when the org opts in — the privacy-first visitor fields (daily-salted hash, referer host, utm/ref allowlist, UA class). Raw IP/UA/referer/query are never stored. Fire-and-forget: always 204, or 429 when the per-IP rate limit is exceeded. Unknown paths are silently dropped.
+         */
+        post: operations["postVisitBeacon"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/analytics/popular-entities": {
         parameters: {
             query?: never;
@@ -2519,6 +2539,15 @@ export interface components {
             items: components["schemas"]["DateTimeFieldResponse"][];
             limit: number;
             offset: number;
+        };
+        /** @description LP beacon payload. `path` is matched against the server-side LP allowlist; `query` may be the raw location.search but only the utm_*\/ref allowlist is persisted (ADR 0006). */
+        VisitBeaconRequest: {
+            /** @description LP path (location.pathname). */
+            path?: string;
+            /** @description document.referrer (only its host is stored). */
+            referrer?: string;
+            /** @description location.search (raw; server keeps only utm_source/medium/campaign/ref). */
+            query?: string;
         };
         AccessStatsByDateResponse: {
             /** Format: date */
@@ -6831,6 +6860,35 @@ export interface operations {
             };
             422: components["responses"]["ValidationFailed"];
             500: components["responses"]["InternalServerError"];
+        };
+    };
+    postVisitBeacon: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["VisitBeaconRequest"];
+            };
+        };
+        responses: {
+            /** @description Accepted (recorded or silently dropped). */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Per-IP rate limit exceeded. */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
     };
     getPopularEntities: {

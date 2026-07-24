@@ -7,16 +7,22 @@ namespace NeNeRecords\Tests\Analytics;
 use DateTimeImmutable;
 use DateTimeZone;
 use Nene2\Http\JsonResponseFactory;
+use Nene2\Http\RequestScopedHolder;
 use Nene2\Http\RuntimeApplicationFactory;
 use Nene2\Http\UtcClock;
+use Nene2\Middleware\RateLimitStorageInterface;
 use NeNeRecords\Analytics\AccessLogEntry;
 use NeNeRecords\Analytics\AnalyticsRouteRegistrar;
+use NeNeRecords\Analytics\AnalyticsSaltRepositoryInterface;
+use NeNeRecords\Analytics\BeaconIngestHandler;
 use NeNeRecords\Analytics\GetAccessStatsByDateHandler;
 use NeNeRecords\Analytics\GetAccessStatsByDateUseCase;
 use NeNeRecords\Analytics\GetPopularEntitiesHandler;
 use NeNeRecords\Analytics\GetPopularEntitiesUseCase;
+use NeNeRecords\Analytics\VisitorFieldsResolver;
 use NeNeRecords\Entity\Entity;
 use NeNeRecords\Entity\EntityStatus;
+use NeNeRecords\Setting\SettingRepositoryInterface;
 use NeNeRecords\Tests\Entity\InMemoryEntityRepository;
 use NeNeRecords\Tests\TextField\InMemoryTextFieldRepository;
 use Nyholm\Psr7\Factory\Psr17Factory;
@@ -72,6 +78,24 @@ final class AnalyticsHttpTest extends TestCase
                     new UtcClock(),
                 ),
                 $jsonResponse,
+            ),
+            new BeaconIngestHandler(
+                $this->repository,
+                new VisitorFieldsResolver(
+                    $this->createStub(SettingRepositoryInterface::class),
+                    $this->createStub(AnalyticsSaltRepositoryInterface::class),
+                    new UtcClock(),
+                    (static function (): RequestScopedHolder {
+                        /** @var RequestScopedHolder<int> $holder */
+                        $holder = new RequestScopedHolder();
+                        $holder->set(0);
+
+                        return $holder;
+                    })(),
+                ),
+                new UtcClock(),
+                $this->createStub(RateLimitStorageInterface::class),
+                $this->factory,
             ),
         );
 
