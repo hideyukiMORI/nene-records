@@ -6,6 +6,45 @@ NeNe Records does not yet follow Semantic Versioning — entries are grouped by 
 
 ---
 
+## [AYANE launch ＋ 公開サイト機能拡充 — v0.5.3] — 2026-07-17 〜 2026-07-24
+
+> **AYANE（ayane.co.jp）が 2026-07-18 に Tier A（共有ホスティング）で本番稼働**したのを機に、公開サイト側の
+> 機能拡充と品質是正を連続出荷した。目玉は **フローティングCTA の first-party 機能化（epic #982）**。あわせて
+> 公開 SEO（og:image 既定・Organization JSON-LD・正規 404・favicon）を強化し、運用ログ（`docs/todo`・
+> `docs/daily` 相当）を private `internal-docs` へ移設した。版は **v0.5.2 → v0.5.3**（#948・`VERSION` 単一ソース、
+> `/machine/health` も同値を報告）。本番反映は都度施主 GO。Issue/PR の詳細内訳と再開手順は private
+> `internal-docs/records/todo/current.md` を正本とする。
+
+### Added
+- **フローティングCTA の first-party 機能化（epic #982）** — 管理画面で条件・位置・中身を設定し公開 SSR で描画する
+  第一者フローティング CTA。P1 基盤（#983）＋ キュレーション SVG アイコン（#985）＋ bottom offset フッター
+  クリアランス（#993）＋ ×で閉じて記憶する dismiss（#995）＋ delay トリガー（N 秒後・純 CSS #998）＋
+  scroll トリガー（Npx スクロール後 #1000）。
+- **画像なしページの og:image フォールバック（#912/#977）** — image フィールドが無い公開ページに org 既定の
+  ソーシャルカードを補完。
+- **公開 SSR head の favicon リンク出力（#986/#987）** — 公開ページの `<head>` に favicon を出力。
+
+### Changed
+- **公開ページの Organization JSON-LD 強化（#978/#979）** — 構造化データを拡充。
+- **`VERSION` を 0.5.3 にバンプ（#948）** — 版の単一ソースを更新（`/machine/health` も同値を報告）。
+- **運用ログを private `internal-docs` へ移設（#974/#975）＋ 公開 docs の生き導線を repoint（#976）** —
+  `docs/todo`・`docs/daily` 相当を公開リポから撤去し private へ集約。
+- **日報の追補・一般化（#968/#969・#970/#971）** — launch 後の製品修正・CI 是正・フロントテスト強化を追補し、
+  日報規約 v2 §8 に沿って該当行を一般化。
+
+### Fixed
+- **未知の公開パスをソフト 404 でなく正規の 404 にする（#980/#981）**。
+- **公開同梱フォント Zen Kaku Gothic New subset を JIS 第 1 水準へ拡張し漢字欠落を解消（#1003/#1004）**。
+- **管理のページ一覧ディレクトリ表示で bespoke ページ名が全行同一になるのを修正（#990/#991）**。
+- **メディア派生キャッシュの書き込み失敗を未キャッシュ配信＋警告ログに落として 500 を回避（#949/#958）**。
+- **org-export/import でシード残骸を照合し merged 型の defs を移送元に揃える（#952/#957）**。
+- **非権威 4 ロケールの `satisfies` 綴りを規約 I18N-9 の正例へ揃える（#988/#989）**。
+- **CI: backend/frontend の job 名衝突を `backend-check` / `frontend-check` に分離（#960/#961）**。
+- **フロントの テスト 0 を解消** — 認可 entities/auth（#962/#963）・公開 SSR seed 系（#964/#965）・
+  apiClient と permalink 解決（#966/#967）。
+
+---
+
 ## [ポスト #536 続 — Tier A インストーラ・移送経路・公開サイト堅牢化] — 2026-06-27 〜 2026-07-16
 
 > ポスト #536（本番 SaaS 稼働）以降、**共有ホスティング向け Tier A インストーラ**（自己完結 zip）を

@@ -60,6 +60,11 @@ final readonly class PdoDefaultSettingDefsSeeder implements DefaultSettingDefsSe
         // maintenance page on the public surface; logged-in staff pass through.
         // Operational flag — not exposed via the public settings API (is_public 0).
         ['setting_key' => 'maintenance_mode', 'data_type' => 'bool', 'default_value' => 'false', 'is_public' => 0, 'label' => 'Maintenance mode'],
+        // Path B visitor analytics opt-in (ADR 0006 / #1007): when 'true', the access-log
+        // middleware computes privacy-first visitor fields (daily-salted org-scoped hash,
+        // referer host, utm, UA class) — no raw IP stored. Default OFF preserves current
+        // behaviour. Operational flag — not exposed via the public settings API (is_public 0).
+        ['setting_key' => 'analytics_visitor_tracking', 'data_type' => 'bool', 'default_value' => 'false', 'is_public' => 0, 'label' => 'Visitor analytics tracking'],
     ];
 
     public function __construct(private DatabaseQueryExecutorInterface $query)
