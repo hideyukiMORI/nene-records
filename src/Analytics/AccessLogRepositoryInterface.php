@@ -32,4 +32,19 @@ interface AccessLogRepositoryInterface
      * `$limit`, highest first. Derived from Path B columns only (no raw PII).
      */
     public function aggregateVisitorSummary(DateTimeImmutable $from, DateTimeImmutable $to, int $limit): VisitorSummary;
+
+    /**
+     * Request counts grouped by HTTP status class ("2xx".."5xx") over the range.
+     *
+     * @return array<string, int>
+     */
+    public function statusDistribution(DateTimeImmutable $from, DateTimeImmutable $to): array;
+
+    /**
+     * Most-visited public page paths over the range (GET + LP BEACON hits, status < 400),
+     * excluding API, media, robots and sitemap. Highest first, capped at `$limit`.
+     *
+     * @return list<array{path: string, count: int}>
+     */
+    public function popularPages(DateTimeImmutable $from, DateTimeImmutable $to, int $limit): array;
 }

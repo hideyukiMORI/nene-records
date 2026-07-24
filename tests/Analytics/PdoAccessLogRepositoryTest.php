@@ -182,4 +182,63 @@ final class PdoAccessLogRepositoryTest extends TestCase
             isBot: $isBot,
         );
     }
+
+    public function testStatusDistribution(): void
+    {
+        $utc = new DateTimeZone('UTC');
+        $at = new DateTimeImmutable('2026-05-01T10:00:00+00:00', $utc);
+
+        foreach ([200, 200, 301, 404, 500] as $i => $status) {
+            $this->repository->insert(new AccessLogEntry(
+                requestId: null,
+                method: 'GET',
+                path: '/p' . $i,
+                statusCode: $status,
+                durationMs: 1.0,
+                accessedAt: $at,
+            ));
+        }
+
+        $dist = $this->repository->statusDistribution(
+            new DateTimeImmutable('2026-05-01', $utc),
+            new DateTimeImmutable('2026-05-01', $utc),
+        );
+
+        self::assertSame(['2xx' => 2, '3xx' => 1, '4xx' => 1, '5xx' => 1], $dist);
+    }
+
+    public function testPopularPagesCountsPublicPagesAndBeaconButExcludesApiMediaAndErrors(): void
+    {
+        $utc = new DateTimeZone('UTC');
+        $at = new DateTimeImmutable('2026-05-01T10:00:00+00:00', $utc);
+        $add = function (string $method, string $path, int $status) use ($at): void {
+            $this->repository->insert(new AccessLogEntry(
+                requestId: null,
+                method: $method,
+                path: $path,
+                statusCode: $status,
+                durationMs: 1.0,
+                accessedAt: $at,
+            ));
+        };
+
+        $add('GET', '/services', 200);
+        $add('GET', '/services', 200);
+        $add('BEACON', '/clear-lp', 204);      // LP beacon counts as a page view
+        $add('GET', '/api/v1/entities/1', 200); // excluded (api)
+        $add('GET', '/media/lg/x.jpg', 200);    // excluded (media)
+        $add('GET', '/robots.txt', 200);        // excluded
+        $add('GET', '/services', 404);          // excluded (error)
+
+        $pages = $this->repository->popularPages(
+            new DateTimeImmutable('2026-05-01', $utc),
+            new DateTimeImmutable('2026-05-01', $utc),
+            10,
+        );
+
+        self::assertSame([
+            ['path' => '/services', 'count' => 2],
+            ['path' => '/clear-lp', 'count' => 1],
+        ], $pages);
+    }
 }

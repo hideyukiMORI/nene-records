@@ -167,4 +167,58 @@ final class InMemoryAccessLogRepository implements AccessLogRepositoryInterface
             ref: $refItems,
         );
     }
+
+    public function statusDistribution(DateTimeImmutable $from, DateTimeImmutable $to): array
+    {
+        $fromDay = $from->format('Y-m-d');
+        $toDay = $to->format('Y-m-d');
+        $out = [];
+
+        foreach ($this->entries as $entry) {
+            $day = $entry->accessedAt->format('Y-m-d');
+            if ($day < $fromDay || $day > $toDay) {
+                continue;
+            }
+            $key = intdiv($entry->statusCode, 100) . 'xx';
+            $out[$key] = ($out[$key] ?? 0) + 1;
+        }
+
+        ksort($out);
+
+        return $out;
+    }
+
+    public function popularPages(DateTimeImmutable $from, DateTimeImmutable $to, int $limit): array
+    {
+        $fromDay = $from->format('Y-m-d');
+        $toDay = $to->format('Y-m-d');
+        $counts = [];
+
+        foreach ($this->entries as $entry) {
+            $day = $entry->accessedAt->format('Y-m-d');
+            if ($day < $fromDay || $day > $toDay) {
+                continue;
+            }
+            if (!in_array($entry->method, ['GET', 'BEACON'], true) || $entry->statusCode >= 400) {
+                continue;
+            }
+            if (
+                str_starts_with($entry->path, '/api/')
+                || str_starts_with($entry->path, '/media/')
+                || in_array($entry->path, ['/robots.txt', '/sitemap.xml'], true)
+            ) {
+                continue;
+            }
+            $counts[$entry->path] = ($counts[$entry->path] ?? 0) + 1;
+        }
+
+        arsort($counts);
+
+        $out = [];
+        foreach (array_slice($counts, 0, $limit, true) as $path => $count) {
+            $out[] = ['path' => (string) $path, 'count' => $count];
+        }
+
+        return $out;
+    }
 }
