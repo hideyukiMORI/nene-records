@@ -193,4 +193,40 @@ final readonly class PdoAccessLogRepository implements AccessLogRepositoryInterf
             ),
         );
     }
+
+    public function statusDistribution(DateTimeImmutable $from, DateTimeImmutable $to): array
+    {
+        $rows = $this->query->fetchAll(
+            'SELECT FLOOR(status_code / 100) AS cls, COUNT(*) AS cnt FROM access_logs
+             WHERE access_date >= ? AND access_date <= ? AND organization_id = ?
+             GROUP BY cls ORDER BY cls ASC',
+            [$from->format('Y-m-d'), $to->format('Y-m-d'), $this->orgId->get()],
+        );
+
+        $out = [];
+        foreach ($rows as $row) {
+            $out[((int) $row['cls']) . 'xx'] = (int) $row['cnt'];
+        }
+
+        return $out;
+    }
+
+    public function popularPages(DateTimeImmutable $from, DateTimeImmutable $to, int $limit): array
+    {
+        $cap = max(1, $limit);
+        $rows = $this->query->fetchAll(
+            "SELECT path, COUNT(*) AS cnt FROM access_logs
+             WHERE access_date >= ? AND access_date <= ? AND organization_id = ?
+               AND method IN ('GET', 'BEACON') AND status_code < 400
+               AND path NOT LIKE '/api/%' AND path NOT LIKE '/media/%'
+               AND path NOT IN ('/robots.txt', '/sitemap.xml')
+             GROUP BY path ORDER BY cnt DESC, path ASC LIMIT " . $cap,
+            [$from->format('Y-m-d'), $to->format('Y-m-d'), $this->orgId->get()],
+        );
+
+        return array_map(
+            static fn (array $r): array => ['path' => (string) $r['path'], 'count' => (int) $r['cnt']],
+            $rows,
+        );
+    }
 }

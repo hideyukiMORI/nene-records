@@ -147,6 +147,16 @@ final class AccessLogMiddlewareTest extends TestCase
             {
                 return new \NeNeRecords\Analytics\VisitorSummary(0, null, [], [], []);
             }
+
+            public function statusDistribution(DateTimeImmutable $from, DateTimeImmutable $to): array
+            {
+                return [];
+            }
+
+            public function popularPages(DateTimeImmutable $from, DateTimeImmutable $to, int $limit): array
+            {
+                return [];
+            }
         };
 
         $response = $this->makeMiddleware(repository: $throwing)->process(
