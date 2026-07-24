@@ -22,7 +22,7 @@ final readonly class PdoAccessLogRepository implements AccessLogRepositoryInterf
     public function insert(AccessLogEntry $entry): void
     {
         $this->query->execute(
-            'INSERT INTO access_logs (organization_id, request_id, method, path, status_code, duration_ms, accessed_at, access_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+            'INSERT INTO access_logs (organization_id, request_id, method, path, status_code, duration_ms, accessed_at, access_date, visitor_hash, referer_host, utm_source, utm_medium, utm_campaign, ref, client_type, is_bot) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
             [
                 $this->orgId->get(),
                 $entry->requestId,
@@ -32,6 +32,14 @@ final readonly class PdoAccessLogRepository implements AccessLogRepositoryInterf
                 $entry->durationMs,
                 $entry->accessedAt->format(DateTimeImmutable::ATOM),
                 $entry->accessedAt->format('Y-m-d'),
+                $entry->visitorHash,
+                $entry->refererHost,
+                $entry->utmSource,
+                $entry->utmMedium,
+                $entry->utmCampaign,
+                $entry->ref,
+                $entry->clientType,
+                $entry->isBot === null ? null : ($entry->isBot ? 1 : 0),
             ],
         );
     }
