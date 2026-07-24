@@ -3791,6 +3791,31 @@ paths:
           $ref: '#/components/responses/ValidationFailed'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /api/v1/public/beacon:
+    post:
+      tags:
+        - Analytics
+      summary: LP visit beacon (Path B)
+      description: >-
+        Public, unauthenticated ingest for static landing-page visits (ADR 0006 / #1008).
+        The page's beacon posts `{path, referrer, query}`; the server records a `BEACON`
+        access-log row for allowlisted LP paths and — only when the org opts in — the
+        privacy-first visitor fields (daily-salted hash, referer host, utm/ref allowlist,
+        UA class). Raw IP/UA/referer/query are never stored. Fire-and-forget: always 204,
+        or 429 when the per-IP rate limit is exceeded. Unknown paths are silently dropped.
+      operationId: postVisitBeacon
+      security: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VisitBeaconRequest'
+      responses:
+        '204':
+          description: Accepted (recorded or silently dropped).
+        '429':
+          description: Per-IP rate limit exceeded.
   /api/v1/analytics/popular-entities:
     get:
       tags:
@@ -6253,6 +6278,22 @@ components:
           type: integer
         offset:
           type: integer
+    VisitBeaconRequest:
+      type: object
+      description: >-
+        LP beacon payload. `path` is matched against the server-side LP allowlist; `query`
+        may be the raw location.search but only the utm_*/ref allowlist is persisted (ADR 0006).
+      properties:
+        path:
+          type: string
+          description: LP path (location.pathname).
+        referrer:
+          type: string
+          description: document.referrer (only its host is stored).
+        query:
+          type: string
+          description: location.search (raw; server keeps only utm_source/medium/campaign/ref).
+      additionalProperties: false
     AccessStatsByDateResponse:
       type: object
       required:

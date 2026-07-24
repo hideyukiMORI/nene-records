@@ -12,6 +12,7 @@ final readonly class AnalyticsRouteRegistrar
     public function __construct(
         private GetAccessStatsByDateHandler $getAccessStatsHandler,
         private GetPopularEntitiesHandler $getPopularEntitiesHandler,
+        private BeaconIngestHandler $beaconIngestHandler,
     ) {
     }
 
@@ -19,6 +20,7 @@ final readonly class AnalyticsRouteRegistrar
     {
         $getAccessStatsHandler = $this->getAccessStatsHandler;
         $getPopularEntitiesHandler = $this->getPopularEntitiesHandler;
+        $beaconIngestHandler = $this->beaconIngestHandler;
 
         $router->get(
             '/api/v1/analytics/access-stats',
@@ -27,6 +29,11 @@ final readonly class AnalyticsRouteRegistrar
         $router->get(
             '/api/v1/analytics/popular-entities',
             static fn (ServerRequestInterface $request) => $getPopularEntitiesHandler->handle($request),
+        );
+        // Public LP beacon (Path B). Always-open under /api/v1/public/*; no auth.
+        $router->post(
+            '/api/v1/public/beacon',
+            static fn (ServerRequestInterface $request) => $beaconIngestHandler->handle($request),
         );
     }
 }

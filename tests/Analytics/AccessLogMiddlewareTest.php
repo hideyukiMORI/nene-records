@@ -10,6 +10,7 @@ use Nene2\Http\UtcClock;
 use NeNeRecords\Analytics\AccessLogMiddleware;
 use NeNeRecords\Analytics\AccessLogRepositoryInterface;
 use NeNeRecords\Analytics\AnalyticsSaltRepositoryInterface;
+use NeNeRecords\Analytics\VisitorFieldsResolver;
 use NeNeRecords\Analytics\VisitorHasher;
 use NeNeRecords\Setting\SettingRepositoryInterface;
 use NeNeRecords\Setting\SettingValue;
@@ -178,9 +179,7 @@ final class AccessLogMiddlewareTest extends TestCase
             $repository ?? $this->repository,
             new NullLogger(),
             new UtcClock(),
-            $settings,
-            $salts,
-            $orgId,
+            new VisitorFieldsResolver($settings, $salts, new UtcClock(), $orgId),
         );
     }
 
