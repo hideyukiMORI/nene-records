@@ -51,7 +51,9 @@ if ($orgRef === null || $orgRef === '') {
 
 $date = summaryOption('date');
 if ($date === null || $date === '') {
-    $date = date('Y-m-d', time() - 86400);
+    // access_date is stored in UTC (the app's clock is UTC), so the default day must be
+    // UTC too — otherwise the cron misaligns at the UTC/JST boundary and drops rows.
+    $date = gmdate('Y-m-d', time() - 86400);
 }
 if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $date) !== 1) {
     fwrite(STDERR, "ERROR: --date must be YYYY-MM-DD.\n");
@@ -120,6 +122,7 @@ $out = [
         'ref' => $summary->ref,
     ] : null,
     'notes' => [
+        'day_basis' => 'UTC',
         'excludes' => ['/api/*', '/media/*', '/robots.txt', '/sitemap.xml'],
         'visitor_null_reason' => 'opt-in OFF or no Path B data for this range',
     ],
