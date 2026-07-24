@@ -110,4 +110,76 @@ final class PdoAccessLogRepositoryTest extends TestCase
         self::assertSame(1, $items[1]->requestCount);
         self::assertSame(30.0, $items[1]->avgDurationMs);
     }
+
+    public function testAggregateVisitorSummary(): void
+    {
+        $utc = new DateTimeZone('UTC');
+        $at = static fn (string $iso): DateTimeImmutable => new DateTimeImmutable($iso, $utc);
+
+        // Two distinct visitors (hashes h1, h2); h1 visits twice. One bot, three humans.
+        $this->repository->insert($this->visitorEntry($at('2026-05-01T10:00:00+00:00'), 'h1', 'google.com', 'news', 'email', 'lawfirm1', false));
+        $this->repository->insert($this->visitorEntry($at('2026-05-01T11:00:00+00:00'), 'h1', 'google.com', 'news', 'email', 'lawfirm1', false));
+        $this->repository->insert($this->visitorEntry($at('2026-05-02T09:00:00+00:00'), 'h2', 't.co', null, null, 'lawfirm2', false));
+        $this->repository->insert($this->visitorEntry($at('2026-05-02T09:30:00+00:00'), 'h3', null, null, null, null, true));
+
+        $summary = $this->repository->aggregateVisitorSummary($at('2026-05-01'), $at('2026-05-02'), 10);
+
+        self::assertSame(3, $summary->uniqueVisitors);
+        self::assertSame(0.25, $summary->botRate);
+        self::assertSame([['host' => 'google.com', 'count' => 2], ['host' => 't.co', 'count' => 1]], $summary->topReferrers);
+        self::assertSame([['source' => 'news', 'medium' => 'email', 'campaign' => null, 'count' => 2]], $summary->utm);
+        self::assertSame([['ref' => 'lawfirm1', 'count' => 2], ['ref' => 'lawfirm2', 'count' => 1]], $summary->ref);
+    }
+
+    public function testAggregateVisitorSummaryIsEmptyWhenNoVisitorData(): void
+    {
+        $utc = new DateTimeZone('UTC');
+        $this->repository->insert(new AccessLogEntry(
+            requestId: 'req-1',
+            method: 'GET',
+            path: '/api/v1/tags',
+            statusCode: 200,
+            durationMs: 10.0,
+            accessedAt: new DateTimeImmutable('2026-05-01T10:00:00+00:00', $utc),
+        ));
+
+        $summary = $this->repository->aggregateVisitorSummary(
+            new DateTimeImmutable('2026-05-01', $utc),
+            new DateTimeImmutable('2026-05-02', $utc),
+            10,
+        );
+
+        self::assertSame(0, $summary->uniqueVisitors);
+        self::assertNull($summary->botRate);
+        self::assertSame([], $summary->topReferrers);
+        self::assertSame([], $summary->utm);
+        self::assertSame([], $summary->ref);
+    }
+
+    private function visitorEntry(
+        DateTimeImmutable $at,
+        string $hash,
+        ?string $refererHost,
+        ?string $utmSource,
+        ?string $utmMedium,
+        ?string $ref,
+        bool $isBot,
+    ): AccessLogEntry {
+        return new AccessLogEntry(
+            requestId: null,
+            method: 'GET',
+            path: '/services',
+            statusCode: 200,
+            durationMs: 5.0,
+            accessedAt: $at,
+            visitorHash: $hash,
+            refererHost: $refererHost,
+            utmSource: $utmSource,
+            utmMedium: $utmMedium,
+            utmCampaign: null,
+            ref: $ref,
+            clientType: $isBot ? 'bot' : 'desktop',
+            isBot: $isBot,
+        );
+    }
 }

@@ -6259,6 +6259,7 @@ components:
         - from
         - to
         - items
+        - visitor
       properties:
         from:
           type: string
@@ -6270,6 +6271,82 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AccessStatsDayItem'
+        visitor:
+          nullable: true
+          allOf:
+            - $ref: '#/components/schemas/AccessStatsVisitorSummary'
+      additionalProperties: false
+    AccessStatsVisitorSummary:
+      type: object
+      description: >
+        Privacy-first range-level visitor aggregates (Path B / ADR 0006). Null on the parent
+        when the org collected no visitor data (opt-in OFF or a pre-Path-B range).
+      required:
+        - unique_visitors
+        - bot_rate
+        - top_referrers
+        - utm
+        - ref
+      properties:
+        unique_visitors:
+          type: integer
+          minimum: 0
+        bot_rate:
+          type: number
+          nullable: true
+          minimum: 0
+          maximum: 1
+        top_referrers:
+          type: array
+          items:
+            type: object
+            required:
+              - host
+              - count
+            properties:
+              host:
+                type: string
+              count:
+                type: integer
+                minimum: 0
+            additionalProperties: false
+        utm:
+          type: array
+          items:
+            type: object
+            required:
+              - source
+              - medium
+              - campaign
+              - count
+            properties:
+              source:
+                type: string
+                nullable: true
+              medium:
+                type: string
+                nullable: true
+              campaign:
+                type: string
+                nullable: true
+              count:
+                type: integer
+                minimum: 0
+            additionalProperties: false
+        ref:
+          type: array
+          items:
+            type: object
+            required:
+              - ref
+              - count
+            properties:
+              ref:
+                type: string
+              count:
+                type: integer
+                minimum: 0
+            additionalProperties: false
       additionalProperties: false
     AccessStatsDayItem:
       type: object

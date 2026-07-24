@@ -125,4 +125,72 @@ final readonly class PdoAccessLogRepository implements AccessLogRepositoryInterf
             $rows,
         );
     }
+
+    public function aggregateVisitorSummary(DateTimeImmutable $from, DateTimeImmutable $to, int $limit): VisitorSummary
+    {
+        $fromDay = $from->format('Y-m-d');
+        $toDay = $to->format('Y-m-d');
+        $org = $this->orgId->get();
+        // $limit is an internal integer (not user input); inlined because MySQL rejects a
+        // bound placeholder in LIMIT under emulated prepares.
+        $cap = max(1, $limit);
+
+        $unique = $this->query->fetchOne(
+            'SELECT COUNT(DISTINCT visitor_hash) AS c FROM access_logs
+             WHERE access_date >= ? AND access_date <= ? AND organization_id = ? AND visitor_hash IS NOT NULL',
+            [$fromDay, $toDay, $org],
+        );
+
+        $bot = $this->query->fetchOne(
+            'SELECT AVG(is_bot) AS r FROM access_logs
+             WHERE access_date >= ? AND access_date <= ? AND organization_id = ? AND is_bot IS NOT NULL',
+            [$fromDay, $toDay, $org],
+        );
+        $botRateRaw = $bot['r'] ?? null;
+        $botRate = $botRateRaw === null ? null : round((float) $botRateRaw, 4);
+
+        $referrers = $this->query->fetchAll(
+            'SELECT referer_host AS host, COUNT(*) AS cnt FROM access_logs
+             WHERE access_date >= ? AND access_date <= ? AND organization_id = ? AND referer_host IS NOT NULL
+             GROUP BY referer_host ORDER BY cnt DESC, referer_host ASC LIMIT ' . $cap,
+            [$fromDay, $toDay, $org],
+        );
+
+        $utm = $this->query->fetchAll(
+            'SELECT utm_source, utm_medium, utm_campaign, COUNT(*) AS cnt FROM access_logs
+             WHERE access_date >= ? AND access_date <= ? AND organization_id = ?
+               AND (utm_source IS NOT NULL OR utm_medium IS NOT NULL OR utm_campaign IS NOT NULL)
+             GROUP BY utm_source, utm_medium, utm_campaign ORDER BY cnt DESC LIMIT ' . $cap,
+            [$fromDay, $toDay, $org],
+        );
+
+        $refs = $this->query->fetchAll(
+            'SELECT ref, COUNT(*) AS cnt FROM access_logs
+             WHERE access_date >= ? AND access_date <= ? AND organization_id = ? AND ref IS NOT NULL
+             GROUP BY ref ORDER BY cnt DESC, ref ASC LIMIT ' . $cap,
+            [$fromDay, $toDay, $org],
+        );
+
+        return new VisitorSummary(
+            uniqueVisitors: (int) ($unique['c'] ?? 0),
+            botRate: $botRate,
+            topReferrers: array_map(
+                static fn (array $r): array => ['host' => (string) $r['host'], 'count' => (int) $r['cnt']],
+                $referrers,
+            ),
+            utm: array_map(
+                static fn (array $r): array => [
+                    'source' => $r['utm_source'] === null ? null : (string) $r['utm_source'],
+                    'medium' => $r['utm_medium'] === null ? null : (string) $r['utm_medium'],
+                    'campaign' => $r['utm_campaign'] === null ? null : (string) $r['utm_campaign'],
+                    'count' => (int) $r['cnt'],
+                ],
+                $utm,
+            ),
+            ref: array_map(
+                static fn (array $r): array => ['ref' => (string) $r['ref'], 'count' => (int) $r['cnt']],
+                $refs,
+            ),
+        );
+    }
 }

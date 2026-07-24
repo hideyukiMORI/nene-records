@@ -36,6 +36,30 @@ final readonly class GetAccessStatsByDateHandler
                 ],
                 $output->items,
             ),
+            'visitor' => $this->serializeVisitor($output->visitor),
         ]);
+    }
+
+    /**
+     * @return array{
+     *     unique_visitors: int, bot_rate: ?float,
+     *     top_referrers: list<array{host: string, count: int}>,
+     *     utm: list<array{source: ?string, medium: ?string, campaign: ?string, count: int}>,
+     *     ref: list<array{ref: string, count: int}>
+     * }|null
+     */
+    private function serializeVisitor(?VisitorSummary $visitor): ?array
+    {
+        if ($visitor === null) {
+            return null;
+        }
+
+        return [
+            'unique_visitors' => $visitor->uniqueVisitors,
+            'bot_rate' => $visitor->botRate,
+            'top_referrers' => $visitor->topReferrers,
+            'utm' => $visitor->utm,
+            'ref' => $visitor->ref,
+        ];
     }
 }
