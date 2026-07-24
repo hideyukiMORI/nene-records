@@ -12,6 +12,7 @@ use Nene2\Http\ClockInterface;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RequestScopedHolder;
 use NeNeRecords\Entity\EntityRepositoryInterface;
+use NeNeRecords\Setting\SettingRepositoryInterface;
 use NeNeRecords\TextField\TextFieldRepositoryInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
@@ -36,6 +37,22 @@ final readonly class AnalyticsServiceProvider implements ServiceProviderInterfac
                     }
 
                     return new PdoAccessLogRepository($query, $orgId);
+                },
+            )
+            ->set(
+                AnalyticsSaltRepositoryInterface::class,
+                static function (ContainerInterface $c): AnalyticsSaltRepositoryInterface {
+                    $query = $c->get(DatabaseQueryExecutorInterface::class);
+                    if (!$query instanceof DatabaseQueryExecutorInterface) {
+                        throw new LogicException('Database query executor service is invalid.');
+                    }
+
+                    $clock = $c->get(ClockInterface::class);
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('ClockInterface service is invalid.');
+                    }
+
+                    return new PdoAnalyticsSaltRepository($query, $clock);
                 },
             )
             ->set(
@@ -130,7 +147,22 @@ final readonly class AnalyticsServiceProvider implements ServiceProviderInterfac
                         throw new LogicException('ClockInterface service is invalid.');
                     }
 
-                    return new AccessLogMiddleware($repository, $logger, $clock);
+                    $settings = $c->get(SettingRepositoryInterface::class);
+                    if (!$settings instanceof SettingRepositoryInterface) {
+                        throw new LogicException('Setting repository service is invalid.');
+                    }
+
+                    $salts = $c->get(AnalyticsSaltRepositoryInterface::class);
+                    if (!$salts instanceof AnalyticsSaltRepositoryInterface) {
+                        throw new LogicException('Analytics salt repository service is invalid.');
+                    }
+
+                    $orgId = $c->get('nene-records.org_id_holder');
+                    if (!$orgId instanceof RequestScopedHolder) {
+                        throw new LogicException('Org ID holder service is invalid.');
+                    }
+
+                    return new AccessLogMiddleware($repository, $logger, $clock, $settings, $salts, $orgId);
                 },
             )
             ->set(
