@@ -26,4 +26,10 @@ interface AccessLogRepositoryInterface
      * @return array<int, int> entityId => viewCount, ordered by viewCount desc
      */
     public function aggregateEntityViews(string $sinceDate): array;
+
+    /**
+     * Range-level privacy-first visitor aggregates (ADR 0006). Breakdown lists are capped at
+     * `$limit`, highest first. Derived from Path B columns only (no raw PII).
+     */
+    public function aggregateVisitorSummary(DateTimeImmutable $from, DateTimeImmutable $to, int $limit): VisitorSummary;
 }

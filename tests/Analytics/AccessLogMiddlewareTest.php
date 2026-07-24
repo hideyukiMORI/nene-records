@@ -141,6 +141,11 @@ final class AccessLogMiddlewareTest extends TestCase
             {
                 return [];
             }
+
+            public function aggregateVisitorSummary(DateTimeImmutable $from, DateTimeImmutable $to, int $limit): \NeNeRecords\Analytics\VisitorSummary
+            {
+                return new \NeNeRecords\Analytics\VisitorSummary(0, null, [], [], []);
+            }
         };
 
         $response = $this->makeMiddleware(repository: $throwing)->process(

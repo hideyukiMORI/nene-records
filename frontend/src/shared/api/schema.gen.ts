@@ -2526,6 +2526,26 @@ export interface components {
             /** Format: date */
             to: string;
             items: components["schemas"]["AccessStatsDayItem"][];
+            visitor: components["schemas"]["AccessStatsVisitorSummary"] | null;
+        };
+        /** @description Privacy-first range-level visitor aggregates (Path B / ADR 0006). Null on the parent when the org collected no visitor data (opt-in OFF or a pre-Path-B range). */
+        AccessStatsVisitorSummary: {
+            unique_visitors: number;
+            bot_rate: number | null;
+            top_referrers: {
+                host: string;
+                count: number;
+            }[];
+            utm: {
+                source: string | null;
+                medium: string | null;
+                campaign: string | null;
+                count: number;
+            }[];
+            ref: {
+                ref: string;
+                count: number;
+            }[];
         };
         AccessStatsDayItem: {
             /** Format: date */

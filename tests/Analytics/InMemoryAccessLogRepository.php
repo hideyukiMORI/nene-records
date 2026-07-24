@@ -8,6 +8,7 @@ use DateTimeImmutable;
 use NeNeRecords\Analytics\AccessLogEntry;
 use NeNeRecords\Analytics\AccessLogRepositoryInterface;
 use NeNeRecords\Analytics\AccessStatsDayItem;
+use NeNeRecords\Analytics\VisitorSummary;
 
 final class InMemoryAccessLogRepository implements AccessLogRepositoryInterface
 {
@@ -106,5 +107,64 @@ final class InMemoryAccessLogRepository implements AccessLogRepositoryInterface
         }
 
         return $items;
+    }
+
+    public function aggregateVisitorSummary(DateTimeImmutable $from, DateTimeImmutable $to, int $limit): VisitorSummary
+    {
+        $fromDay = $from->format('Y-m-d');
+        $toDay = $to->format('Y-m-d');
+
+        $hashes = [];
+        $botFlags = [];
+        $referrers = [];
+        $utm = [];
+        $refs = [];
+
+        foreach ($this->entries as $entry) {
+            $day = $entry->accessedAt->format('Y-m-d');
+            if ($day < $fromDay || $day > $toDay) {
+                continue;
+            }
+
+            if ($entry->visitorHash !== null) {
+                $hashes[$entry->visitorHash] = true;
+            }
+            if ($entry->isBot !== null) {
+                $botFlags[] = $entry->isBot ? 1 : 0;
+            }
+            if ($entry->refererHost !== null) {
+                $referrers[$entry->refererHost] = ($referrers[$entry->refererHost] ?? 0) + 1;
+            }
+            if ($entry->utmSource !== null || $entry->utmMedium !== null || $entry->utmCampaign !== null) {
+                $key = ($entry->utmSource ?? '') . "\0" . ($entry->utmMedium ?? '') . "\0" . ($entry->utmCampaign ?? '');
+                $utm[$key] ??= ['source' => $entry->utmSource, 'medium' => $entry->utmMedium, 'campaign' => $entry->utmCampaign, 'count' => 0];
+                ++$utm[$key]['count'];
+            }
+            if ($entry->ref !== null) {
+                $refs[$entry->ref] = ($refs[$entry->ref] ?? 0) + 1;
+            }
+        }
+
+        arsort($referrers);
+        arsort($refs);
+        usort($utm, static fn (array $a, array $b): int => $b['count'] <=> $a['count']);
+
+        $topReferrers = [];
+        foreach (array_slice($referrers, 0, $limit, true) as $host => $count) {
+            $topReferrers[] = ['host' => (string) $host, 'count' => $count];
+        }
+
+        $refItems = [];
+        foreach (array_slice($refs, 0, $limit, true) as $ref => $count) {
+            $refItems[] = ['ref' => (string) $ref, 'count' => $count];
+        }
+
+        return new VisitorSummary(
+            uniqueVisitors: count($hashes),
+            botRate: $botFlags === [] ? null : round(array_sum($botFlags) / count($botFlags), 4),
+            topReferrers: $topReferrers,
+            utm: array_slice($utm, 0, $limit),
+            ref: $refItems,
+        );
     }
 }

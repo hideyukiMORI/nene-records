@@ -99,6 +99,8 @@ final class AnalyticsHttpTest extends TestCase
         self::assertSame('2026-05-01', $payload['items'][0]['date']);
         self::assertSame(1, $payload['items'][0]['request_count']);
         self::assertSame(10.0, $payload['items'][0]['avg_duration_ms']);
+        self::assertArrayHasKey('visitor', $payload);
+        self::assertNull($payload['visitor']); // no opt-in visitor data seeded → null
     }
 
     public function testGetPopularEntitiesReturnsPublishedRankedByViews(): void
