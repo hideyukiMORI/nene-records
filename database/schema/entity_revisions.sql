@@ -1,5 +1,6 @@
 CREATE TABLE entity_revisions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    organization_id INTEGER NOT NULL DEFAULT 0,
     entity_id INTEGER UNSIGNED NOT NULL,
     action VARCHAR(32) NOT NULL,
     status VARCHAR(32) NOT NULL,
@@ -11,3 +12,4 @@ CREATE TABLE entity_revisions (
     FOREIGN KEY (entity_id) REFERENCES entities (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 CREATE INDEX entity_revisions_entity_id_created_at ON entity_revisions (entity_id, created_at);
+CREATE INDEX idx_entity_revisions_org ON entity_revisions (organization_id);

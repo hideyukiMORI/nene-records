@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeNeRecords\Organization;
 
 use Nene2\Database\DatabaseQueryExecutorInterface;
+use Nene2\Database\DatabaseTransactionManagerInterface;
 use Nene2\Http\ClockInterface;
 use PDOException;
 
@@ -12,9 +13,16 @@ final readonly class PdoOrganizationRepository implements OrganizationRepository
 {
     private const COLUMNS = 'id, name, slug, external_id, custom_domain, plan, is_active, created_at, updated_at';
 
+    /**
+     * @param DatabaseTransactionManagerInterface|null $transactions Makes {@see delete()} atomic. Optional so the
+     *                                                              repository stays constructible without one; a
+     *                                                              null manager runs the purge unwrapped, which
+     *                                                              can leave a partial delete behind on failure.
+     */
     public function __construct(
         private DatabaseQueryExecutorInterface $query,
         private ClockInterface $clock,
+        private ?DatabaseTransactionManagerInterface $transactions = null,
     ) {
     }
 
@@ -129,6 +137,13 @@ final readonly class PdoOrganizationRepository implements OrganizationRepository
         );
     }
 
+    /**
+     * Deletes the organization **and every row scoped to it**.
+     *
+     * The org-scoped columns carry no foreign key to `organizations`, so nothing cascades
+     * on its own — the child rows are removed explicitly, children before parents. See
+     * {@see OrganizationScopedSchema} for the ordering rules and why each list exists (#1002).
+     */
     public function delete(int $id): void
     {
         $org = $this->findById($id);
@@ -137,7 +152,42 @@ final readonly class PdoOrganizationRepository implements OrganizationRepository
             throw new OrganizationNotFoundException($id);
         }
 
-        $this->query->execute('DELETE FROM organizations WHERE id = ?', [$id]);
+        if ($this->transactions === null) {
+            $this->purge($this->query, $id);
+
+            return;
+        }
+
+        $this->transactions->transactional(
+            function (DatabaseQueryExecutorInterface $query) use ($id): null {
+                $this->purge($query, $id);
+
+                return null;
+            },
+        );
+    }
+
+    /**
+     * Removes every org-scoped row, then the organization itself.
+     *
+     * Runs against the executor it is handed rather than `$this->query` so the transactional
+     * path purges inside the transaction's own connection.
+     */
+    private function purge(DatabaseQueryExecutorInterface $query, int $id): void
+    {
+        // Parents are still present here, so the subqueries can still resolve the org's rows.
+        foreach (OrganizationScopedSchema::DERIVED_PURGES as [$table, $where]) {
+            $query->execute(
+                "DELETE FROM {$table} WHERE {$where}",
+                array_fill(0, substr_count($where, '?'), $id),
+            );
+        }
+
+        foreach (OrganizationScopedSchema::ORG_SCOPED_TABLES as $table) {
+            $query->execute("DELETE FROM {$table} WHERE organization_id = ?", [$id]);
+        }
+
+        $query->execute('DELETE FROM organizations WHERE id = ?', [$id]);
     }
 
     /** @param array<string, mixed> $row */
