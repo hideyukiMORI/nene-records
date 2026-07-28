@@ -6,6 +6,7 @@ namespace NeNeRecords\Organization;
 
 use LogicException;
 use Nene2\Database\DatabaseQueryExecutorInterface;
+use Nene2\Database\DatabaseTransactionManagerInterface;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
@@ -63,7 +64,14 @@ final readonly class OrganizationServiceProvider implements ServiceProviderInter
                         throw new LogicException('ClockInterface service is invalid.');
                     }
 
-                    return new PdoOrganizationRepository($query, $clock);
+                    // Deleting an organization purges ~30 tables (#1002); without the manager
+                    // a mid-purge failure would leave the org half-deleted.
+                    $transactions = $c->get(DatabaseTransactionManagerInterface::class);
+                    if (!$transactions instanceof DatabaseTransactionManagerInterface) {
+                        throw new LogicException('Database transaction manager service is invalid.');
+                    }
+
+                    return new PdoOrganizationRepository($query, $clock, $transactions);
                 },
             )
             // ── Use cases ──────────────────────────────────────────────────────
