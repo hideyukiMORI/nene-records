@@ -132,10 +132,11 @@ final class PdoOrganizationRepositoryDeleteTest extends TestCase
     /**
      * Seeds one row in every org-scoped table plus the four tables purged through a parent.
      *
-     * Foreign keys are switched off for the seed only. The rows are generated generically
-     * (see {@see insertRow()}), so FK columns get placeholder ids that need not resolve —
-     * what matters is that the *delete* runs with enforcement on, which is where the
-     * RESTRICT ordering is actually proven.
+     * Foreign keys are switched off for the seed only, so the rows can be written in list
+     * order without a topological sort. The relationships themselves are real
+     * (see {@see insertRow()}): every child points at this organization's actual parent row.
+     * That is what lets enforcement — switched back on before the delete — reject a wrong
+     * delete order, which is the whole point of {@see OrganizationScopedSchema}'s ordering.
      */
     private function seedOrganization(int $org): void
     {
@@ -148,19 +149,19 @@ final class PdoOrganizationRepositoryDeleteTest extends TestCase
         );
 
         foreach (OrganizationScopedSchema::ORG_SCOPED_TABLES as $table) {
-            $this->insertRow($table, ['organization_id' => $org, 'id' => $this->rowId($org, $table)]);
+            $this->insertRow($org, $table, ['organization_id' => $org, 'id' => $this->rowId($org, $table)]);
         }
 
-        $this->insertRow('entity_tags', ['entity_id' => $this->entityId($org)]);
-        $this->insertRow('entity_relations', [
+        $this->insertRow($org, 'entity_tags', ['entity_id' => $this->entityId($org)]);
+        $this->insertRow($org, 'entity_relations', [
             'source_entity_id' => $this->entityId($org),
             'target_entity_id' => $this->entityId($org),
         ]);
-        $this->insertRow('webhook_deliveries', [
+        $this->insertRow($org, 'webhook_deliveries', [
             'webhook_id' => $this->webhookId($org),
             'entity_id' => $this->entityId($org),
         ]);
-        $this->insertRow('user_profiles', ['user_id' => $this->userId($org)]);
+        $this->insertRow($org, 'user_profiles', ['user_id' => $this->userId($org)]);
 
         $this->executor->execute('PRAGMA foreign_keys = ON');
     }
@@ -171,10 +172,18 @@ final class PdoOrganizationRepositoryDeleteTest extends TestCase
      * Generic on purpose: the point of the test is that *all* org-scoped tables are covered,
      * so hand-writing 26 inserts would rot the moment a column is added.
      *
+     * Foreign key columns are pointed at the organization's **real** parent row rather than a
+     * placeholder. Without that the children hang off ids that do not exist, and `RESTRICT`
+     * never fires however wrong the delete order is — a reordered
+     * {@see OrganizationScopedSchema::ORG_SCOPED_TABLES} then passes a green test suite while
+     * failing on MySQL.
+     *
      * @param array<string, int|string> $values
      */
-    private function insertRow(string $table, array $values): void
+    private function insertRow(int $org, string $table, array $values): void
     {
+        $foreignKeys = $this->foreignKeys($table);
+
         foreach ($this->columns($table) as $column) {
             $name = (string) $column['name'];
 
@@ -186,6 +195,14 @@ final class PdoOrganizationRepositoryDeleteTest extends TestCase
             $isRequired = (int) $column['notnull'] === 1 && $column['dflt_value'] === null;
 
             if ($isPrimaryKey || !$isRequired) {
+                continue;
+            }
+
+            $parent = $foreignKeys[$name] ?? null;
+
+            if ($parent !== null && in_array($parent, OrganizationScopedSchema::ORG_SCOPED_TABLES, true)) {
+                $values[$name] = $this->rowId($org, $parent);
+
                 continue;
             }
 
@@ -235,6 +252,22 @@ final class PdoOrganizationRepositoryDeleteTest extends TestCase
     private function columns(string $table): array
     {
         return $this->executor->fetchAll("PRAGMA table_info({$table})");
+    }
+
+    /**
+     * Foreign key columns of a table, mapped to the table they reference.
+     *
+     * @return array<string, string>
+     */
+    private function foreignKeys(string $table): array
+    {
+        $map = [];
+
+        foreach ($this->executor->fetchAll("PRAGMA foreign_key_list({$table})") as $row) {
+            $map[(string) $row['from']] = (string) $row['table'];
+        }
+
+        return $map;
     }
 
     /** Stable, collision-free ids so the derived tables can point at the right parents. */
