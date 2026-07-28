@@ -27,9 +27,10 @@ namespace NeNeRecords\Organization;
  *    the full set of affected tables is auditable from this one list rather than from the
  *    live schema.
  *
- * `entity_archive` is deliberately absent: it carries no `organization_id`, and no
- * migration creates it (only `database/schema/entity_archive.sql`, a test fixture), so
- * issuing a DELETE against it would fail on a real database.
+ * `entity_archive` was absent from the first version of this list: no migration created the
+ * table and it carried no `organization_id`, so a DELETE against it would have failed on a
+ * real database. #1017 created it properly — with `organization_id` from the start, exactly so
+ * that an organization's deletion cannot strand its archive — and it is purged here now.
  */
 final class OrganizationScopedSchema
 {
@@ -79,6 +80,9 @@ final class OrganizationScopedSchema
         'entities',
         // entity_type children — RESTRICT FK to entity_types, so these must precede it.
         'field_defs',
+        // Snapshots of purged entities, keyed by entity_type_id (no FK). #1017 created the table
+        // with organization_id precisely so an org deletion does not strand its archive.
+        'entity_archive',
         'entity_types',
         // No ordering constraints among the rest.
         'access_logs',

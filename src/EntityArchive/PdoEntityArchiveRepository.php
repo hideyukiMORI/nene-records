@@ -112,11 +112,13 @@ final readonly class PdoEntityArchiveRepository implements EntityArchiveReposito
             $this->query->execute(
                 <<<SQL
                     INSERT INTO entity_archive
-                        (original_entity_id, entity_type_id, entity_type_slug, entity_type_name,
-                         entity_slug, entity_status, deleted_at, archived_at, archived_reason, snapshot)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'entity_type_deleted', ?)
+                        (organization_id, original_entity_id, entity_type_id, entity_type_slug,
+                         entity_type_name, entity_slug, entity_status, deleted_at, archived_at,
+                         archived_reason, snapshot)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'entity_type_deleted', ?)
                     SQL,
                 [
+                    $this->orgId->get(),
                     $entityId,
                     $entityType->id,
                     $entityType->slug,

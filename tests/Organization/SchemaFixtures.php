@@ -8,24 +8,22 @@ namespace NeNeRecords\Tests\Organization;
  * Locates and loads the schema snapshots under `database/schema/`.
  *
  * The snapshots are the documented mirror of the migrations' end state
- * (`docs/development/backend-standards.md`), and all but two are already SQLite-parsable.
- * The two exceptions are handled here rather than by hand-writing replacement tables, so
- * a column added to a snapshot still reaches the tests that build from it:
+ * (`docs/development/backend-standards.md`), and **every one of them runs on SQLite**, so the
+ * tests build from the shipped shape rather than from hand-written replacement tables — a
+ * column added to a snapshot reaches them automatically.
  *
- * - `users.sql` declares `status ENUM('active', 'invited')`. SQLite has no ENUM, so it is
- *   rewritten to a VARCHAR of equivalent width — the tests never assert on the constraint.
- * - `entity_archive.sql` is full MySQL DDL (`INT UNSIGNED … AUTO_INCREMENT`, `ENGINE=InnoDB`)
- *   and is skipped outright. No migration creates that table, so it is absent from real
- *   databases as well (see OrganizationScopedSchema).
+ * One dialect gap is bridged here: `users.sql` declares `status ENUM('active', 'invited')` and
+ * SQLite has no ENUM, so it is rewritten to a VARCHAR of equivalent width. No test asserts on
+ * that constraint.
+ *
+ * (`entity_archive.sql` used to be skipped as unexecutable MySQL DDL — it was the one snapshot
+ * no migration backed, and its absence from real databases was the #1017 bug. The migration
+ * now exists and the snapshot was rewritten in the same dialect as the rest.)
  */
 final class SchemaFixtures
 {
-    /** Snapshots that cannot be executed on SQLite at all. */
-    private const NOT_EXECUTABLE = ['entity_archive.sql'];
-
     /**
-     * Every snapshot file, including the ones that cannot be executed — callers that read
-     * the DDL as text (coverage checks) still need to see them.
+     * Every snapshot file.
      *
      * @return list<string> absolute paths, sorted
      */
@@ -38,7 +36,7 @@ final class SchemaFixtures
     }
 
     /**
-     * Every executable DDL statement across the snapshots, ready to run one by one.
+     * Every DDL statement across the snapshots, ready to run one by one.
      *
      * @return list<string>
      */
@@ -47,10 +45,6 @@ final class SchemaFixtures
         $statements = [];
 
         foreach (self::files() as $path) {
-            if (in_array(basename($path), self::NOT_EXECUTABLE, true)) {
-                continue;
-            }
-
             $raw = trim((string) file_get_contents($path));
             $raw = (string) preg_replace('/\bENUM\s*\([^)]*\)/i', 'VARCHAR(32)', $raw);
 

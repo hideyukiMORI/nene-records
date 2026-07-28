@@ -1,7 +1,8 @@
 CREATE TABLE entity_archive (
-    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    original_entity_id INT UNSIGNED NOT NULL,
-    entity_type_id INT UNSIGNED NOT NULL,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    organization_id INTEGER NOT NULL DEFAULT 0,
+    original_entity_id INTEGER UNSIGNED NOT NULL,
+    entity_type_id INTEGER UNSIGNED NOT NULL,
     entity_type_slug VARCHAR(255) NOT NULL,
     entity_type_name VARCHAR(255) NOT NULL,
     entity_slug VARCHAR(255) DEFAULT NULL,
@@ -9,8 +10,8 @@ CREATE TABLE entity_archive (
     deleted_at DATETIME DEFAULT NULL,
     archived_at DATETIME NOT NULL,
     archived_reason VARCHAR(64) NOT NULL DEFAULT 'entity_type_deleted',
-    snapshot JSON NOT NULL,
-    PRIMARY KEY (id),
-    KEY idx_entity_type_id (entity_type_id),
-    KEY idx_original_entity_id (original_entity_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    snapshot TEXT NOT NULL
+);
+CREATE INDEX idx_entity_archive_org ON entity_archive (organization_id);
+CREATE INDEX idx_entity_archive_entity_type_id ON entity_archive (entity_type_id);
+CREATE INDEX idx_entity_archive_original_entity_id ON entity_archive (original_entity_id);
