@@ -307,4 +307,72 @@ final class CapabilityResolverTest extends TestCase
     {
         self::assertNull(CapabilityResolver::resolve('/api/v1/unknown', 'GET'));
     }
+
+    // ── GET / HEAD parity (#1023) ─────────────────────────────────────────────
+
+    /**
+     * HEAD must resolve to the same capability as GET, everywhere. It returns no body,
+     * but it returns the status code, so an unauthorized HEAD is an existence oracle
+     * (200 vs 404 on `/users/{id}`) and, where the server sets it, a size oracle.
+     *
+     * Table-driven and covering every branch of resolve(), not just the one that was
+     * broken: the defect was a habit (`$method === 'GET'`) rather than a one-off, and
+     * the next person adding a branch will copy whatever is nearest.
+     */
+    #[DataProvider('provideAuthorizedPaths')]
+    public function testHeadResolvesToTheSameCapabilityAsGet(string $path): void
+    {
+        self::assertSame(
+            CapabilityResolver::resolve($path, 'GET'),
+            CapabilityResolver::resolve($path, 'HEAD'),
+            sprintf('GET and HEAD must require the same capability for %s', $path),
+        );
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function provideAuthorizedPaths(): iterable
+    {
+        yield 'superadmin'          => ['/api/v1/superadmin/export'];
+        yield 'organizations'       => ['/api/v1/organizations'];
+        yield 'organization by id'  => ['/api/v1/organizations/2'];
+        yield 'account'             => ['/api/v1/account'];
+        yield 'settings'            => ['/api/v1/settings'];
+        yield 'navigation-items'    => ['/api/v1/navigation-items'];
+        yield 'widgets'             => ['/api/v1/widgets'];
+        yield 'entity-types'        => ['/api/v1/entity-types'];
+        yield 'archive csv'         => ['/api/v1/entity-types/5/archive.csv'];
+        yield 'field-defs'          => ['/api/v1/field-defs'];
+        yield 'tags'                => ['/api/v1/tags'];
+        yield 'media'               => ['/api/v1/media'];
+        yield 'media by id'         => ['/api/v1/media/9'];
+        yield 'users list'          => ['/api/v1/users'];
+        yield 'user by id'          => ['/api/v1/users/3'];
+        yield 'user me'             => ['/api/v1/users/me'];
+        yield 'own password'        => ['/api/v1/users/me/password'];
+        yield 'admin comments'      => ['/api/v1/admin/comments'];
+        yield 'entities'            => ['/api/v1/entities'];
+        yield 'text-fields'         => ['/api/v1/text-fields'];
+        yield 'public records'      => ['/api/v1/public/records/article/my-post'];
+        yield 'unknown'             => ['/api/v1/unknown'];
+    }
+
+    /**
+     * The specific regression: reading the user list is admin-only, and used to be
+     * admin-only for GET alone.
+     */
+    public function testUserListReadRequiresManageSettingsForHeadToo(): void
+    {
+        self::assertSame(Capability::ManageSettings, CapabilityResolver::resolve('/api/v1/users', 'HEAD'));
+        self::assertSame(Capability::ManageSettings, CapabilityResolver::resolve('/api/v1/users/3', 'HEAD'));
+    }
+
+    /**
+     * Parity must not be achieved by making everything require a capability: OPTIONS
+     * (CORS preflight) and the self-service password path stay open, as before.
+     */
+    public function testParityDoesNotWidenOptionsOrSelfServicePaths(): void
+    {
+        self::assertNull(CapabilityResolver::resolve('/api/v1/users/me/password', 'HEAD'));
+        self::assertNull(CapabilityResolver::resolve('/api/v1/entities/1', 'HEAD'));
+    }
 }
