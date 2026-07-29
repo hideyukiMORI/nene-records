@@ -36,7 +36,7 @@ final readonly class CustomPermalinkResolver
             return $response;
         }
 
-        if (strtoupper($request->getMethod()) !== 'GET') {
+        if (!PublicPageMethod::reads($request)) {
             return $response;
         }
 

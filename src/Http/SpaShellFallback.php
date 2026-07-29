@@ -53,7 +53,8 @@ final readonly class SpaShellFallback
 
     public function apply(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
-        $isGet = strtoupper($request->getMethod()) === 'GET';
+        // GET and HEAD both ask for the page's representation (#1021); only the body differs.
+        $isRead = PublicPageMethod::reads($request);
         $wantsHtml = str_contains($request->getHeaderLine('Accept'), 'text/html');
         $path = $request->getUri()->getPath();
 
@@ -66,14 +67,14 @@ final readonly class SpaShellFallback
         // www→apex 301 from WwwRedirectMiddleware, #834) is a deliberate answer and
         // must never be swallowed by the shell.
         $alreadyHtml = str_contains($response->getHeaderLine('Content-Type'), 'text/html');
-        $isHtmlHome = $isGet && $wantsHtml && $path === '/' && !$alreadyHtml
+        $isHtmlHome = $isRead && $wantsHtml && $path === '/' && !$alreadyHtml
             && $response->getStatusCode() === 200;
 
         if ($response->getStatusCode() !== 404 && !$isHtmlHome) {
             return $response;
         }
 
-        if (!$isGet) {
+        if (!$isRead) {
             return $response;
         }
 

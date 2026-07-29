@@ -481,6 +481,104 @@ final class SingleOriginKernelTest extends TestCase
         self::assertSame('posts', $response->getHeaderLine('X-Test-Archive'));
     }
 
+    // ── HEAD parity (#1021) ──────────────────────────────────────────────────
+    //
+    // Every edge layer used to guard on `!== 'GET'`, so HEAD skipped all five: real
+    // pages 404'd, `/` fell through to the framework's JSON API index (a 200, which
+    // is worse than a 404 — monitoring stays quiet while framework details leak), and
+    // the app-level 301 map never ran, so backlink checkers saw 404 where a browser
+    // sees a redirect.
+    //
+    // One test per layer on purpose: reverting any single guard to GET-only must fail
+    // something here. A combined test would let four regressions hide behind one.
+
+    /** The 301 map is the highest-impact layer: external backlink checkers use HEAD. */
+    public function testHeadFollowsTheRedirectMapJustLikeGet(): void
+    {
+        $this->redirects->save('/2024/01/hello-world', '/posts/1');
+
+        $request = $this->factory
+            ->createServerRequest('HEAD', 'https://site.test/2024/01/hello-world')
+            ->withHeader('Accept', 'text/html');
+
+        $response = $this->kernel($this->appReturning(404))->handle($request);
+
+        self::assertSame(301, $response->getStatusCode());
+        self::assertSame('/posts/1', $response->getHeaderLine('Location'));
+    }
+
+    public function testHeadResolvesCustomPermalinks(): void
+    {
+        $response = $this->kernel($this->appReturning(404), $this->permalinkResolverTagging())->handle(
+            $this->factory->createServerRequest('HEAD', 'https://site.test/company/about/team')
+                ->withHeader('Accept', 'text/html'),
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('hit', $response->getHeaderLine('X-Test-Permalink'));
+    }
+
+    public function testHeadRendersTheTypeArchive(): void
+    {
+        $archive = $this->typeArchive(
+            [new EntityType(name: 'Posts', slug: 'posts', id: 2)],
+            [new Entity(id: 5, entityTypeId: 2, slug: 'hello', status: EntityStatus::Published)],
+        );
+
+        $response = $this->kernel($this->appReturning(404), null, null, $archive)->handle(
+            $this->factory->createServerRequest('HEAD', 'https://site.test/posts')
+                ->withHeader('Accept', 'text/html'),
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('posts', $response->getHeaderLine('X-Test-Archive'));
+    }
+
+    /**
+     * The regression that hid the longest: `HEAD /` answered 200 with the framework's
+     * JSON index, so it looked healthy while serving the wrong thing entirely.
+     */
+    public function testHeadAtRootRendersTheFrontPageAndNotTheFrameworkJson(): void
+    {
+        $request = $this->factory
+            ->createServerRequest('HEAD', 'https://site.test/')
+            ->withHeader('Accept', 'text/html');
+
+        $response = $this->kernel($this->appReturning(200), null, $this->frontPage(true))->handle($request);
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('1', $response->getHeaderLine('X-Front-Page'));
+    }
+
+    public function testHeadFallsBackToTheSpaShell(): void
+    {
+        $request = $this->factory
+            ->createServerRequest('HEAD', 'https://site.test/admin/dashboard')
+            ->withHeader('Accept', 'text/html');
+
+        $response = $this->kernel($this->appReturning(404))->handle($request);
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertStringContainsString('text/html', $response->getHeaderLine('Content-Type'));
+    }
+
+    /**
+     * HEAD widens *which methods* reach the layers — not *what* they answer. A method
+     * that neither reads nor is routed (POST to an unknown path) must still 404.
+     */
+    public function testPostStillSkipsTheEdgeLayers(): void
+    {
+        $this->redirects->save('/2024/01/hello-world', '/posts/1');
+
+        $request = $this->factory
+            ->createServerRequest('POST', 'https://site.test/2024/01/hello-world')
+            ->withHeader('Accept', 'text/html');
+
+        $response = $this->kernel($this->appReturning(404))->handle($request);
+
+        self::assertSame(404, $response->getStatusCode());
+    }
+
     /** A permalink resolver that claims every 404 path, tagging the response. */
     private function permalinkResolverTagging(): CustomPermalinkResolver
     {
