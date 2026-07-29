@@ -1,3 +1,4 @@
+import type { SeoPageKind } from './api-types'
 import type { PublicLayoutKey } from '@/shared/lib/resolve-layout'
 import type { EntityTypeId } from './ids'
 
@@ -8,6 +9,11 @@ export interface EntityType {
   isPinned: boolean
   /** Default public-page layout for records of this type. Overridable per entity. */
   defaultLayout: PublicLayoutKey
+  /**
+   * How this type's records present themselves to crawlers. A standing page must not
+   * claim a publication date it does not have, so new types default to 'webpage'.
+   */
+  seoPageKind: SeoPageKind
   /** Sidebar / pinned ordering (ascending). Lower appears first. */
   displayOrder: number
   /** Locale-keyed display names. Empty object / undefined = no overrides. */
@@ -41,4 +47,5 @@ export interface UpdateEntityTypeInput {
   labels?: Record<string, string>
   permalinkPattern?: string | null
   defaultLayout?: PublicLayoutKey
+  seoPageKind?: SeoPageKind
 }

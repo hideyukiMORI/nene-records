@@ -241,8 +241,15 @@ final readonly class RenderPublicRecordViewHandler implements PublicRecordViewRe
             'layout' => $output->layout,
             'breadcrumbs' => $asFrontPage ? [] : $output->breadcrumbs,
             'childPages' => $output->childPages,
-            // og:type is `website` for the home page, `article` for a normal record.
-            'ogType' => $asFrontPage ? 'website' : 'article',
+            // The front page is the site home whatever its type says; otherwise the
+            // entity type decides (#1020). Before that setting existed every non-front
+            // record claimed `article` + BlogPosting, so contact pages advertised a
+            // publication date they do not have.
+            'ogType' => $asFrontPage ? 'website' : $output->seoPageKind->ogType(),
+            // Kept separate from ogType: the standalone Organization JSON-LD belongs to
+            // the site root alone, and since #1020 a non-front page can also be
+            // `website`, so og:type no longer identifies the front page (#978).
+            'isFrontPage' => $asFrontPage,
             'siteOrigin' => $baseUrl,
             'siteName' => $siteName,
             'metaDescription' => $metaDescription,

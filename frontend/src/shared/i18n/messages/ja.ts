@@ -702,6 +702,11 @@ export const ja = {
   'admin.entityTypes.starter.customPage':
     'カスタムページ（タイトル＋サンドボックスbundle・custom レイアウト）',
   'admin.entityTypes.editForm.title': 'コンテンツタイプを編集',
+  'admin.entityTypes.seoPageKind.label': '検索エンジンから見たページの種類',
+  'admin.entityTypes.seoPageKind.hint':
+    '固定ページに、実際には存在しない公開日を書かせないための設定です。レコードが本当に日付を持って公開されるタイプにだけ「日付のある記事」を選んでください。',
+  'admin.entityTypes.seoPageKind.webpage': '固定ページ（会社案内・お問い合わせ・サービス）',
+  'admin.entityTypes.seoPageKind.article': '日付のある記事（ブログ・お知らせ）',
   'admin.entityTypes.editForm.save': '変更を保存',
   'admin.entityTypes.editForm.saving': '保存中…',
   'admin.entityTypes.editForm.isPinned': 'サイドバーに表示',

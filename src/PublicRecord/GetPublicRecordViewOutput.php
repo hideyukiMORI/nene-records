@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NeNeRecords\PublicRecord;
 
+use NeNeRecords\EntityType\SeoPageKind;
 use NeNeRecords\Layout\PublicLayouts;
 
 final readonly class GetPublicRecordViewOutput
@@ -36,6 +37,14 @@ final readonly class GetPublicRecordViewOutput
          * then removes — visible as a flash, and permanent for crawlers (#879).
          */
         public string $layout = PublicLayouts::DEFAULT,
+        /**
+         * How this record's type presents itself to crawlers (#1020) — decides
+         * `og:type` and the JSON-LD `@type`. Comes from the entity type, not the
+         * record: "is this a catalogue of pages or a stream of dated posts?" is a
+         * property of the type. Rendering as the front page overrides it (a pinned
+         * record is the site home whatever its type says).
+         */
+        public SeoPageKind $seoPageKind = SeoPageKind::WebPage,
     ) {
     }
 }

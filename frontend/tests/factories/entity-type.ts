@@ -12,6 +12,7 @@ export function buildEntityType(overrides: Partial<EntityType> = {}): EntityType
     slug: 'article',
     isPinned: false,
     defaultLayout: 'standard',
+    seoPageKind: 'webpage',
     displayOrder: 0,
     ...overrides,
   }

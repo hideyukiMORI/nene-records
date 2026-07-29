@@ -1,5 +1,12 @@
 import type { PublicLayoutKey } from '@/shared/lib/resolve-layout'
 
+/**
+ * How a type's records present themselves to crawlers.
+ * `webpage` = standing page (og:type=website, JSON-LD WebPage, no dates).
+ * `article` = dated entry (og:type=article, JSON-LD BlogPosting, dates included).
+ */
+export type SeoPageKind = 'webpage' | 'article'
+
 export interface EntityTypeDto {
   id: number
   name: string
@@ -7,6 +14,8 @@ export interface EntityTypeDto {
   is_pinned: boolean
   /** Default public-page layout for records of this type. May be absent on older payloads. */
   default_layout?: PublicLayoutKey
+  /** Crawler-facing page kind. May be absent on older payloads. */
+  seo_page_kind?: SeoPageKind
   /** Sidebar / pinned ordering (ascending). May be absent on older payloads. */
   display_order?: number
   /** Locale-keyed display names, e.g. {"ja":"投稿","fr":"Articles"}. Empty object = no overrides. */
@@ -40,4 +49,5 @@ export interface UpdateEntityTypeDto {
   labels?: Record<string, string>
   permalink_pattern?: string | null
   default_layout?: PublicLayoutKey
+  seo_page_kind?: SeoPageKind
 }

@@ -37,6 +37,7 @@ final readonly class ListEntityTypesHandler
                         'previous_permalink_pattern'  => $item->previousPermalinkPattern,
                         'display_order'               => $item->displayOrder,
                         'default_layout'              => $item->defaultLayout,
+                        'seo_page_kind'               => $item->seoPageKind->value,
                     ],
                     $output->items,
                 ),

@@ -38,6 +38,7 @@ final readonly class GetEntityTypeByIdHandler
             'previous_permalink_pattern' => $output->previousPermalinkPattern,
             'display_order'              => $output->displayOrder,
             'default_layout'             => $output->defaultLayout,
+            'seo_page_kind'              => $output->seoPageKind->value,
         ]);
     }
 }

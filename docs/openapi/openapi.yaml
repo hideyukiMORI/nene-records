@@ -5173,6 +5173,10 @@ components:
           type: string
           enum: [standard, full, two-col, three-col, bare, custom]
           description: 'Default public-page layout (scaffold preset) for records of this type. Overridable per entity.'
+        seo_page_kind:
+          type: string
+          enum: [webpage, article]
+          description: 'How records of this type present themselves to crawlers. `webpage` = a standing page (og:type=website, JSON-LD WebPage, no publication dates). `article` = a dated entry (og:type=article, JSON-LD BlogPosting, dates included). New types default to `webpage`.'
     CreateEntityTypeRequest:
       type: object
       required:
@@ -5214,6 +5218,10 @@ components:
           type: string
           enum: [standard, full, two-col, three-col, bare, custom]
           description: 'Default public-page layout for records of this type. Defaults to standard.'
+        seo_page_kind:
+          type: string
+          enum: [webpage, article]
+          description: 'Crawler-facing page kind. Omitted = `webpage` (a standing page). Use `article` for types whose records are dated entries; only then are datePublished/dateModified emitted.'
       additionalProperties: false
     ReorderEntityTypesRequest:
       type: object

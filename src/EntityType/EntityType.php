@@ -11,6 +11,11 @@ final readonly class EntityType
      * @param string|null                $permalinkPattern   URL pattern for public records.
      *                                                        Tokens: {type} {slug} {id} {year} {month} {day}
      *                                                        Null = use default "/{type}/{id}".
+     * @param SeoPageKind                $seoPageKind        How this type's records present
+     *                                                        themselves to crawlers (#1020).
+     *                                                        New types default to a standing page;
+     *                                                        see {@see SeoPageKind} for why that
+     *                                                        direction is the safer default.
      */
     public function __construct(
         public string $name,
@@ -22,6 +27,7 @@ final readonly class EntityType
         public ?string $previousPermalinkPattern = null,
         public int $displayOrder = 0,
         public string $defaultLayout = 'standard',
+        public SeoPageKind $seoPageKind = SeoPageKind::WebPage,
     ) {
     }
 }

@@ -706,6 +706,11 @@ export const fr = {
   'admin.entityTypes.starter.customPage':
     'Page personnalisée (titre + bundle isolé, mise en page personnalisée)',
   'admin.entityTypes.editForm.title': 'Modifier le type de contenu',
+  'admin.entityTypes.seoPageKind.label': 'Type de page pour les moteurs de recherche',
+  'admin.entityTypes.seoPageKind.hint':
+    'Une page permanente ne doit pas annoncer une date de publication qu’elle n’a pas. Choisissez « Entrée datée » uniquement pour les types dont les enregistrements sont réellement publiés à une date.',
+  'admin.entityTypes.seoPageKind.webpage': 'Page permanente (à propos, contact, services)',
+  'admin.entityTypes.seoPageKind.article': 'Entrée datée (article de blog, actualité)',
   'admin.entityTypes.editForm.save': 'Enregistrer les modifications',
   'admin.entityTypes.editForm.saving': 'Enregistrement…',
   'admin.entityTypes.editForm.isPinned': 'Afficher dans la barre latérale',

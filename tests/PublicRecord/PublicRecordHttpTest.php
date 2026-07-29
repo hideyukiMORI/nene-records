@@ -16,6 +16,7 @@ use Nene2\View\NativePhpViewRenderer;
 use NeNeRecords\Entity\Entity;
 use NeNeRecords\Entity\EntityStatus;
 use NeNeRecords\EntityType\EntityType;
+use NeNeRecords\EntityType\SeoPageKind;
 use NeNeRecords\FieldDef\FieldDef;
 use NeNeRecords\PublicRecord\FrontPageSetting;
 use NeNeRecords\PublicRecord\GenerateSitemapUseCase;
@@ -81,9 +82,20 @@ final class PublicRecordHttpTest extends TestCase
         ?int $frontPageId = null,
         ?string $entity10Layout = null,
         string $typeDefaultLayout = 'standard',
+        SeoPageKind $seoPageKind = SeoPageKind::Article,
     ): RequestHandlerInterface {
         $entityTypes = new InMemoryEntityTypeRepository([
-            new EntityType(name: 'Article', slug: 'article', id: 1, defaultLayout: $typeDefaultLayout),
+            // Declared Article on purpose: most tests here assert the dated-entry
+            // rendering (og:type=article, BlogPosting, datePublished). Since #1020 that
+            // comes from the type, so the fixture has to say which kind it is — the
+            // default for a new type is a standing page.
+            new EntityType(
+                name: 'Article',
+                slug: 'article',
+                id: 1,
+                defaultLayout: $typeDefaultLayout,
+                seoPageKind: $seoPageKind,
+            ),
         ]);
         $entityRecords = [
             new Entity(
@@ -337,6 +349,65 @@ final class PublicRecordHttpTest extends TestCase
         self::assertStringContainsString('"datePublished":"2026-01-15T00:00:00+00:00"', $html);
         self::assertStringContainsString('"dateModified":"2026-02-20T00:00:00+00:00"', $html);
         self::assertStringContainsString('"image":"https://example.test/media/og/2026/06/hero.png"', $html);
+    }
+
+    /**
+     * #1020: a type declared as a standing page must not claim to be a dated article.
+     * This is the whole point of the setting — a contact page carrying `datePublished`
+     * is a factual claim to search engines that is simply untrue.
+     */
+    public function testWebPageKindTypeRendersAsWebPageWithoutDates(): void
+    {
+        $app = $this->buildApplication(true, $this->projectRoot, seoPageKind: SeoPageKind::WebPage);
+
+        $html = (string) $app->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/article/10'),
+        )->getBody();
+
+        self::assertStringContainsString('property="og:type" content="website"', $html);
+        self::assertStringContainsString('"@type":"WebPage"', $html);
+        self::assertStringNotContainsString('"@type":"BlogPosting"', $html);
+        // The record HAS both dates seeded; they must be withheld because the *type*
+        // says this is a standing page. Asserting on a record without dates would pass
+        // for the wrong reason.
+        self::assertStringNotContainsString('"datePublished"', $html);
+        self::assertStringNotContainsString('"dateModified"', $html);
+    }
+
+    /**
+     * The counterpart: nothing about the article rendering changed for types that say
+     * they are articles. Without this, the test above could be satisfied by a change
+     * that broke articles everywhere.
+     */
+    public function testArticleKindTypeStillRendersDatedBlogPosting(): void
+    {
+        $html = (string) $this->application->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/article/10'),
+        )->getBody();
+
+        self::assertStringContainsString('property="og:type" content="article"', $html);
+        self::assertStringContainsString('"@type":"BlogPosting"', $html);
+        self::assertStringContainsString('"datePublished":"2026-01-15T00:00:00+00:00"', $html);
+    }
+
+    /**
+     * #978 regression guard. The standalone Organization node used to be gated on
+     * `og:type === 'website'`, which was a stand-in for "is the front page" back when
+     * only the front page could be `website`. Since #1020 a normal page can be
+     * `website` too, and a site must declare its organization exactly once.
+     */
+    public function testWebPageKindTypeDoesNotEmitTheFrontPageOnlyOrganizationBlock(): void
+    {
+        $app = $this->buildApplication(true, $this->projectRoot, seoPageKind: SeoPageKind::WebPage);
+
+        $html = (string) $app->handle(
+            $this->factory->createServerRequest('GET', 'https://example.test/article/10'),
+        )->getBody();
+
+        self::assertStringContainsString('property="og:type" content="website"', $html);
+        self::assertStringNotContainsString('"@context":"https://schema.org","@type":"Organization"', $html);
+        // …while still carrying the organization as the publisher, as every page does.
+        self::assertStringContainsString('"publisher":{"@type":"Organization"', $html);
     }
 
     public function testPerRecordImageWinsOverDefaultOgImage(): void

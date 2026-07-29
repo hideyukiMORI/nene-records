@@ -699,6 +699,11 @@ export const de = {
   'admin.entityTypes.starter.customPage':
     'Individuelle Seite (Titel + isoliertes Bundle, eigenes Layout)',
   'admin.entityTypes.editForm.title': 'Inhaltstyp bearbeiten',
+  'admin.entityTypes.seoPageKind.label': 'Seitenart für Suchmaschinen',
+  'admin.entityTypes.seoPageKind.hint':
+    'Eine ständige Seite darf kein Veröffentlichungsdatum behaupten, das sie nicht hat. Wählen Sie „Datierter Eintrag“ nur für Typen, deren Datensätze wirklich zu einem Datum veröffentlicht werden.',
+  'admin.entityTypes.seoPageKind.webpage': 'Ständige Seite (Über uns, Kontakt, Leistungen)',
+  'admin.entityTypes.seoPageKind.article': 'Datierter Eintrag (Blogbeitrag, Neuigkeit)',
   'admin.entityTypes.editForm.save': 'Änderungen speichern',
   'admin.entityTypes.editForm.saving': 'Wird gespeichert…',
   'admin.entityTypes.editForm.isPinned': 'In Seitenleiste anzeigen',
