@@ -95,7 +95,7 @@ final class CapabilityResolver
             return Capability::ManageSettings;
         }
 
-        if (str_starts_with($path, '/api/v1/users') && self::isAdminReadPath($path) && $method === 'GET') {
+        if (str_starts_with($path, '/api/v1/users') && self::isAdminReadPath($path) && self::isReadMethod($method)) {
             return Capability::ManageSettings;
         }
 
@@ -116,6 +116,22 @@ final class CapabilityResolver
     private static function isMutationMethod(string $method): bool
     {
         return !in_array($method, ['GET', 'HEAD', 'OPTIONS'], true);
+    }
+
+    /**
+     * The representation-reading methods. `HEAD` must resolve to the same capability as
+     * `GET` (#1023): it returns no body, but it does return the status code, and the
+     * difference between 200 and 404 is an existence oracle for the resource.
+     *
+     * Written as a predicate, not as `$method === 'GET'` at each call site. Every branch
+     * above that enumerates `'GET', 'HEAD'` was correct; the one branch that compared
+     * against `'GET'` alone let HEAD past the authorization check entirely. The same
+     * single-equality habit was later found in two other products, so the shape of the
+     * mistake matters more than this one occurrence.
+     */
+    private static function isReadMethod(string $method): bool
+    {
+        return $method === 'GET' || $method === 'HEAD';
     }
 
     /**
