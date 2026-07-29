@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NeNeRecords\UrlRedirect;
 
+use NeNeRecords\Http\PublicPageMethod;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -35,7 +36,7 @@ final readonly class UrlRedirectResolver
             return $response;
         }
 
-        if (strtoupper($request->getMethod()) !== 'GET') {
+        if (!PublicPageMethod::reads($request)) {
             return $response;
         }
 

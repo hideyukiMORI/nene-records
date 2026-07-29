@@ -62,4 +62,6 @@ $response = $kernel->handle($request);
 
 $emitter = $container->get(ResponseEmitter::class);
 assert($emitter instanceof ResponseEmitter);
-$emitter->emit($response);
+// Pass the method so the emitter can drop the body on HEAD (RFC 9110 §9.3.2) while
+// keeping the headers. Omitting it made every HEAD response carry a full GET body (#1021).
+$emitter->emit($response, $request->getMethod());

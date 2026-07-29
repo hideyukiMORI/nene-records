@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeNeRecords\PublicRecord;
 
 use NeNeRecords\Http\AcceptPrefersHtml;
+use NeNeRecords\Http\PublicPageMethod;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
@@ -37,7 +38,7 @@ final readonly class RenderPublicTypeArchiveHandler
 
     public function apply(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
-        if ($response->getStatusCode() !== 404 || strtoupper($request->getMethod()) !== 'GET') {
+        if ($response->getStatusCode() !== 404 || !PublicPageMethod::reads($request)) {
             return $response;
         }
 

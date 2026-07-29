@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeNeRecords\PublicRecord;
 
 use NeNeRecords\Http\AcceptPrefersHtml;
+use NeNeRecords\Http\PublicPageMethod;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
@@ -33,8 +34,8 @@ final readonly class RenderPublicHomeHandler
 
     public function apply(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
-        // Only a browser navigation to the exact site root is a candidate.
-        if (strtoupper($request->getMethod()) !== 'GET' || $request->getUri()->getPath() !== '/') {
+        // Only a representation read (GET/HEAD, #1021) of the exact site root is a candidate.
+        if (!PublicPageMethod::reads($request) || $request->getUri()->getPath() !== '/') {
             return $response;
         }
 
