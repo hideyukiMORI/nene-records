@@ -18,6 +18,10 @@ describe('entity-type mapper', () => {
       slug: 'article',
       isPinned: true,
       defaultLayout: 'standard',
+      // A payload without the field comes from a server that predates it, where every
+      // record rendered as an article — so that, not the new default, is the honest
+      // reading of an absent value.
+      seoPageKind: 'article',
       displayOrder: 3,
       permalinkPattern: null,
       previousPermalinkPattern: null,
@@ -27,6 +31,17 @@ describe('entity-type mapper', () => {
   it('defaults displayOrder to 0 when absent', () => {
     const model = mapEntityTypeDtoToModel({ id: 9, name: 'X', slug: 'x', is_pinned: false })
     expect(model.displayOrder).toBe(0)
+  })
+
+  it('keeps the page kind the server sent', () => {
+    const model = mapEntityTypeDtoToModel({
+      id: 9,
+      name: 'Pages',
+      slug: 'pages',
+      is_pinned: false,
+      seo_page_kind: 'webpage',
+    })
+    expect(model.seoPageKind).toBe('webpage')
   })
 
   it('maps list dto to model', () => {

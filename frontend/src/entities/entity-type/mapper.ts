@@ -19,6 +19,9 @@ export function mapEntityTypeDtoToModel(dto: EntityTypeDto): EntityType {
     slug: dto.slug,
     isPinned: dto.is_pinned,
     defaultLayout: dto.default_layout ?? 'standard',
+    // Older payloads predate the field; 'article' is what the server rendered before it
+    // existed, so that is the honest fallback for data written by an older version.
+    seoPageKind: dto.seo_page_kind ?? 'article',
     displayOrder: dto.display_order ?? 0,
     ...(dto.labels && Object.keys(dto.labels).length > 0 ? { labels: dto.labels } : {}),
     permalinkPattern: dto.permalink_pattern ?? null,
@@ -50,5 +53,6 @@ export function mapUpdateInputToDto(input: UpdateEntityTypeInput): UpdateEntityT
     ...(input.labels !== undefined ? { labels: input.labels } : {}),
     ...(input.permalinkPattern !== undefined ? { permalink_pattern: input.permalinkPattern } : {}),
     ...(input.defaultLayout !== undefined ? { default_layout: input.defaultLayout } : {}),
+    ...(input.seoPageKind !== undefined ? { seo_page_kind: input.seoPageKind } : {}),
   }
 }

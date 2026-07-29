@@ -21,7 +21,7 @@ final readonly class PdoEntityTypeRepository implements EntityTypeRepositoryInte
     public function findById(int $id): ?EntityType
     {
         $row = $this->query->fetchOne(
-            'SELECT id, name, slug, is_pinned, labels, permalink_pattern, previous_permalink_pattern, display_order, default_layout FROM entity_types WHERE id = ? AND organization_id = ?',
+            'SELECT id, name, slug, is_pinned, labels, permalink_pattern, previous_permalink_pattern, display_order, default_layout, seo_page_kind FROM entity_types WHERE id = ? AND organization_id = ?',
             [$id, $this->orgId->get()],
         );
 
@@ -35,7 +35,7 @@ final readonly class PdoEntityTypeRepository implements EntityTypeRepositoryInte
     public function findBySlug(string $slug): ?EntityType
     {
         $row = $this->query->fetchOne(
-            'SELECT id, name, slug, is_pinned, labels, permalink_pattern, previous_permalink_pattern, display_order, default_layout FROM entity_types WHERE slug = ? AND organization_id = ?',
+            'SELECT id, name, slug, is_pinned, labels, permalink_pattern, previous_permalink_pattern, display_order, default_layout, seo_page_kind FROM entity_types WHERE slug = ? AND organization_id = ?',
             [$slug, $this->orgId->get()],
         );
 
@@ -50,7 +50,7 @@ final readonly class PdoEntityTypeRepository implements EntityTypeRepositoryInte
     public function findAll(int $limit, int $offset): array
     {
         $rows = $this->query->fetchAll(
-            'SELECT id, name, slug, is_pinned, labels, permalink_pattern, previous_permalink_pattern, display_order, default_layout FROM entity_types WHERE organization_id = ? ORDER BY display_order ASC, id ASC LIMIT ? OFFSET ?',
+            'SELECT id, name, slug, is_pinned, labels, permalink_pattern, previous_permalink_pattern, display_order, default_layout, seo_page_kind FROM entity_types WHERE organization_id = ? ORDER BY display_order ASC, id ASC LIMIT ? OFFSET ?',
             [$this->orgId->get(), $limit, $offset],
         );
 
@@ -67,7 +67,7 @@ final readonly class PdoEntityTypeRepository implements EntityTypeRepositoryInte
         $nextOrder = ((int) ($maxRow['max_order'] ?? -1)) + 1;
 
         $this->query->execute(
-            'INSERT INTO entity_types (organization_id, name, slug, is_pinned, labels, permalink_pattern, display_order, default_layout) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+            'INSERT INTO entity_types (organization_id, name, slug, is_pinned, labels, permalink_pattern, display_order, default_layout, seo_page_kind) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
             [
                 $this->orgId->get(),
                 $entityType->name,
@@ -77,6 +77,7 @@ final readonly class PdoEntityTypeRepository implements EntityTypeRepositoryInte
                 $entityType->permalinkPattern,
                 $nextOrder,
                 $entityType->defaultLayout,
+                $entityType->seoPageKind->value,
             ],
         );
 
@@ -104,7 +105,7 @@ final readonly class PdoEntityTypeRepository implements EntityTypeRepositoryInte
     public function update(EntityType $entityType): void
     {
         $this->query->execute(
-            'UPDATE entity_types SET name = ?, slug = ?, is_pinned = ?, labels = ?, permalink_pattern = ?, previous_permalink_pattern = ?, default_layout = ? WHERE id = ? AND organization_id = ?',
+            'UPDATE entity_types SET name = ?, slug = ?, is_pinned = ?, labels = ?, permalink_pattern = ?, previous_permalink_pattern = ?, default_layout = ?, seo_page_kind = ? WHERE id = ? AND organization_id = ?',
             [
                 $entityType->name,
                 $entityType->slug,
@@ -113,6 +114,7 @@ final readonly class PdoEntityTypeRepository implements EntityTypeRepositoryInte
                 $entityType->permalinkPattern,
                 $entityType->previousPermalinkPattern,
                 $entityType->defaultLayout,
+                $entityType->seoPageKind->value,
                 $entityType->id,
                 $this->orgId->get(),
             ],
@@ -157,6 +159,7 @@ final readonly class PdoEntityTypeRepository implements EntityTypeRepositoryInte
             defaultLayout: isset($row['default_layout']) && is_string($row['default_layout']) && $row['default_layout'] !== ''
                 ? $row['default_layout']
                 : 'standard',
+            seoPageKind: SeoPageKind::fromStorage($row['seo_page_kind'] ?? null),
         );
     }
 }

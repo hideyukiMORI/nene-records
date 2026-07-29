@@ -238,6 +238,7 @@ final readonly class GetPublicRecordViewUseCase implements GetPublicRecordViewUs
             // Resolve here so the SSR renders the same scaffold the SPA will (#879):
             // the resolver already existed but nothing on the render path called it.
             layout: PublicLayouts::resolve($entity->layout, $entityType->defaultLayout),
+            seoPageKind: $entityType->seoPageKind,
         );
     }
 

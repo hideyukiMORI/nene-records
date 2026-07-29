@@ -35,6 +35,11 @@ export const editEntityTypeFormSchema = createEntityTypeFormSchema.extend({
   defaultLayout: z
     .enum(['standard', 'full', 'two-col', 'three-col', 'bare', 'custom'])
     .default('standard'),
+  /**
+   * How this type's records present themselves to crawlers. Defaults to a standing
+   * page: claiming a publication date a page does not have is the worse error.
+   */
+  seoPageKind: z.enum(['webpage', 'article']).default('webpage'),
 })
 
 export type EditEntityTypeFormValues = z.infer<typeof editEntityTypeFormSchema>

@@ -182,6 +182,7 @@ export function EntityTypeEditForm({
     // null/undefined → store null; will default to DEFAULT_PERMALINK_PATTERN in the UI
     permalinkPattern: entityType.permalinkPattern ?? null,
     defaultLayout: entityType.defaultLayout,
+    seoPageKind: entityType.seoPageKind,
   })
 
   return (
@@ -286,6 +287,28 @@ export function EntityTypeEditForm({
               <option value="bare">{t('admin.layout.bare')}</option>
               <option value="custom">{t('admin.layout.custom')}</option>
             </Select>
+          )}
+        />
+
+        {/* ── Crawler-facing page kind (#1020) ── */}
+        <Controller
+          name="seoPageKind"
+          control={control}
+          render={({ field }) => (
+            <div className="space-y-1">
+              <Select
+                id="entity-type-edit-seo-page-kind"
+                label={t('admin.entityTypes.seoPageKind.label')}
+                disabled={isSubmitting}
+                value={field.value}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+              >
+                <option value="webpage">{t('admin.entityTypes.seoPageKind.webpage')}</option>
+                <option value="article">{t('admin.entityTypes.seoPageKind.article')}</option>
+              </Select>
+              <p className="text-xs text-text-muted">{t('admin.entityTypes.seoPageKind.hint')}</p>
+            </div>
           )}
         />
 

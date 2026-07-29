@@ -703,6 +703,11 @@ export const ptBR = {
   'admin.entityTypes.starter.customPage':
     'Página personalizada (título + bundle isolado, layout personalizado)',
   'admin.entityTypes.editForm.title': 'Editar tipo de conteúdo',
+  'admin.entityTypes.seoPageKind.label': 'Tipo de página para mecanismos de busca',
+  'admin.entityTypes.seoPageKind.hint':
+    'Uma página permanente não deve declarar uma data de publicação que não tem. Escolha “Entrada datada” apenas para tipos cujos registros são realmente publicados em uma data.',
+  'admin.entityTypes.seoPageKind.webpage': 'Página permanente (sobre, contato, serviços)',
+  'admin.entityTypes.seoPageKind.article': 'Entrada datada (post de blog, notícia)',
   'admin.entityTypes.editForm.save': 'Salvar alterações',
   'admin.entityTypes.editForm.saving': 'Salvando…',
   'admin.entityTypes.editForm.isPinned': 'Mostrar na barra lateral',

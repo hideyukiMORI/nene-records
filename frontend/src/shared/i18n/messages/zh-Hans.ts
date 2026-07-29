@@ -668,6 +668,11 @@ export const zhHans = {
   'admin.entityTypes.starter.richPage': '富页面（标题 + blocks 正文）',
   'admin.entityTypes.starter.customPage': '自定义页面（标题 + 沙盒 bundle，自定义布局）',
   'admin.entityTypes.editForm.title': '编辑内容类型',
+  'admin.entityTypes.seoPageKind.label': '搜索引擎眼中的页面类型',
+  'admin.entityTypes.seoPageKind.hint':
+    '固定页面不应声明并不存在的发布日期。仅当该类型的记录确实按日期发布时，才选择“带日期的条目”。',
+  'admin.entityTypes.seoPageKind.webpage': '固定页面（关于、联系、服务）',
+  'admin.entityTypes.seoPageKind.article': '带日期的条目（博客、新闻）',
   'admin.entityTypes.editForm.save': '保存更改',
   'admin.entityTypes.editForm.saving': '保存中…',
   'admin.entityTypes.editForm.isPinned': '在侧边栏显示',

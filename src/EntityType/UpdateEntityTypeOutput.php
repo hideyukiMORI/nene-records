@@ -18,6 +18,7 @@ final readonly class UpdateEntityTypeOutput
         public ?string $permalinkPattern = null,
         public ?string $previousPermalinkPattern = null,
         public string $defaultLayout = 'standard',
+        public SeoPageKind $seoPageKind = SeoPageKind::WebPage,
     ) {
     }
 }

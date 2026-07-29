@@ -34,21 +34,33 @@ final readonly class PdoDefaultContentTypeSeeder implements DefaultContentTypeSe
     ];
 
     /**
-     * @var list<array{name: string, slug: string, fields: list<array{field_key: string, data_type: string}>}>
+     * The built-in pair. `seo_page_kind` is the ONE deliberate exception to the
+     * "new types default to webpage" rule (#1020): `posts` is a stream of dated
+     * entries by definition, so seeding it as a standing page would ship every fresh
+     * install with its blog mistyped. `pages` takes the default and is listed
+     * explicitly here only so the two sit side by side and the contrast is visible.
+     *
+     * Keep the exception here and nowhere else. The default belongs to the column and
+     * to {@see \NeNeRecords\EntityType\SeoPageKind}; this is the single place that
+     * knows a specific slug's meaning, because it is the place that invents the slug.
+     *
+     * @var list<array{name: string, slug: string, seo_page_kind: string, fields: list<array{field_key: string, data_type: string}>}>
      */
     private const CONTENT_TYPES = [
         [
-            'name'   => 'Posts',
-            'slug'   => 'posts',
-            'fields' => [
+            'name'          => 'Posts',
+            'slug'          => 'posts',
+            'seo_page_kind' => 'article',
+            'fields'        => [
                 ['field_key' => 'title', 'data_type' => 'text'],
                 ['field_key' => 'body',  'data_type' => 'markdown'],
             ],
         ],
         [
-            'name'   => 'Pages',
-            'slug'   => 'pages',
-            'fields' => [
+            'name'          => 'Pages',
+            'slug'          => 'pages',
+            'seo_page_kind' => 'webpage',
+            'fields'        => [
                 ['field_key' => 'title', 'data_type' => 'text'],
                 ['field_key' => 'body',  'data_type' => 'markdown'],
             ],
@@ -62,7 +74,12 @@ final readonly class PdoDefaultContentTypeSeeder implements DefaultContentTypeSe
     public function seed(int $organizationId): void
     {
         foreach (self::CONTENT_TYPES as $type) {
-            $entityTypeId = $this->upsertEntityType($organizationId, $type['name'], $type['slug']);
+            $entityTypeId = $this->upsertEntityType(
+                $organizationId,
+                $type['name'],
+                $type['slug'],
+                $type['seo_page_kind'],
+            );
 
             foreach ($type['fields'] as $field) {
                 $this->upsertFieldDef($organizationId, $entityTypeId, $field['field_key'], $field['data_type']);
@@ -74,7 +91,7 @@ final readonly class PdoDefaultContentTypeSeeder implements DefaultContentTypeSe
      * Insert entity_type if it does not already exist for this org.
      * Returns the id of the existing or newly inserted row.
      */
-    private function upsertEntityType(int $organizationId, string $name, string $slug): int
+    private function upsertEntityType(int $organizationId, string $name, string $slug, string $seoPageKind): int
     {
         $existing = $this->query->fetchOne(
             'SELECT id FROM entity_types WHERE organization_id = ? AND slug = ?',
@@ -88,8 +105,8 @@ final readonly class PdoDefaultContentTypeSeeder implements DefaultContentTypeSe
         $labels = json_encode(self::LABELS[$slug] ?? [], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
 
         $this->query->execute(
-            'INSERT INTO entity_types (organization_id, name, slug, is_pinned, labels) VALUES (?, ?, ?, 1, ?)',
-            [$organizationId, $name, $slug, $labels],
+            'INSERT INTO entity_types (organization_id, name, slug, is_pinned, labels, seo_page_kind) VALUES (?, ?, ?, 1, ?, ?)',
+            [$organizationId, $name, $slug, $labels, $seoPageKind],
         );
 
         return $this->query->lastInsertId();

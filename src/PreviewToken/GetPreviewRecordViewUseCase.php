@@ -235,6 +235,7 @@ final readonly class GetPreviewRecordViewUseCase implements GetPreviewRecordView
             childPages: $hierarchy->childPages,
             // Preview must scaffold exactly like the public page it previews (#879).
             layout: PublicLayouts::resolve($entity->layout, $entityType->defaultLayout),
+            seoPageKind: $entityType->seoPageKind,
         );
     }
 

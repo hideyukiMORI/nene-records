@@ -42,6 +42,7 @@ final readonly class UpdateEntityTypeUseCase implements UpdateEntityTypeUseCaseI
             permalinkPattern: $input->permalinkPattern,
             previousPermalinkPattern: $previousPermalinkPattern,
             defaultLayout: $input->defaultLayout,
+            seoPageKind: $input->seoPageKind,
         );
         $this->entityTypes->update($updated);
 
@@ -54,6 +55,7 @@ final readonly class UpdateEntityTypeUseCase implements UpdateEntityTypeUseCaseI
             permalinkPattern: $input->permalinkPattern,
             previousPermalinkPattern: $previousPermalinkPattern,
             defaultLayout: $input->defaultLayout,
+            seoPageKind: $input->seoPageKind,
         );
     }
 }

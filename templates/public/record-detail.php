@@ -47,8 +47,11 @@
     <?php endif; ?>
 
     <?php
-      // As the front page (og:type=website) the record is the site home, not a dated
-      // article: type it WebPage and omit the publication dates (#701).
+      // The JSON-LD type follows og:type, so both stay consistent by construction and
+      // there is one decision, not two. `website` means a standing page: WebPage, and
+      // no publication dates. That covers the pinned front page (#701) and now any type
+      // configured as a standing page (#1020) — the dates are omitted precisely because
+      // such a page has none, and claiming one is a false statement to search engines.
       $jsonLd = [
           '@context' => 'https://schema.org',
           '@type' => $ogType === 'website' ? 'WebPage' : 'BlogPosting',
@@ -72,9 +75,14 @@ if ($ogImageUrl !== null) {
 ?>
     <script type="application/ld+json"><?= json_encode($jsonLd, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?></script>
     <?php /* Standalone Organization on the front page — Google's company knowledge-panel
-             signal (logo/sameAs/contactPoint from settings); article pages carry it as
-             the publisher above instead (#978). */ ?>
-    <?php if ($ogType === 'website'): ?>
+             signal (logo/sameAs/contactPoint from settings); every other page carries it
+             as the publisher above instead (#978).
+
+             Keyed on `isFrontPage`, NOT on og:type. Until #1020 the two were the same
+             thing (only the front page was `website`), so `$ogType === 'website'` read
+             as "is the front page". Now any type can be a standing page, and one site
+             must still declare its organization exactly once. */ ?>
+    <?php if ($isFrontPage): ?>
     <?php $organizationStandalone = array_merge(['@context' => 'https://schema.org'], $organizationLd); ?>
     <script type="application/ld+json"><?= json_encode($organizationStandalone, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?></script>
     <?php endif; ?>

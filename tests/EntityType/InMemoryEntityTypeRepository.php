@@ -37,6 +37,7 @@ final class InMemoryEntityTypeRepository implements EntityTypeRepositoryInterfac
                     previousPermalinkPattern: $entityType->previousPermalinkPattern,
                     displayOrder: $entityType->displayOrder,
                     defaultLayout: $entityType->defaultLayout,
+                    seoPageKind: $entityType->seoPageKind,
                 );
                 $this->byId[$id] = $stored;
                 $this->slugToId[$stored->slug] = $id;
@@ -85,6 +86,7 @@ final class InMemoryEntityTypeRepository implements EntityTypeRepositoryInterfac
             permalinkPattern: $entityType->permalinkPattern,
             previousPermalinkPattern: $entityType->previousPermalinkPattern,
             defaultLayout: $entityType->defaultLayout,
+            seoPageKind: $entityType->seoPageKind,
         );
         $this->byId[$id] = $stored;
         $this->slugToId[$stored->slug] = $id;
@@ -124,6 +126,7 @@ final class InMemoryEntityTypeRepository implements EntityTypeRepositoryInterfac
                     previousPermalinkPattern: $existing->previousPermalinkPattern,
                     displayOrder: $position,
                     defaultLayout: $existing->defaultLayout,
+                    seoPageKind: $existing->seoPageKind,
                 );
             }
             $position++;

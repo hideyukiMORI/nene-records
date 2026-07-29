@@ -707,6 +707,11 @@ export const en = {
   'admin.entityTypes.starter.richPage': 'Rich page (title + blocks body)',
   'admin.entityTypes.starter.customPage': 'Custom page (title + sandboxed bundle, custom layout)',
   'admin.entityTypes.editForm.title': 'Edit content type',
+  'admin.entityTypes.seoPageKind.label': 'Page kind for search engines',
+  'admin.entityTypes.seoPageKind.hint':
+    'A standing page must not claim a publication date it does not have. Choose “Dated entry” only for types whose records really are published on a date.',
+  'admin.entityTypes.seoPageKind.webpage': 'Standing page (about, contact, services)',
+  'admin.entityTypes.seoPageKind.article': 'Dated entry (blog post, news)',
   'admin.entityTypes.editForm.save': 'Save changes',
   'admin.entityTypes.editForm.saving': 'Saving…',
   'admin.entityTypes.editForm.isPinned': 'Show in sidebar',

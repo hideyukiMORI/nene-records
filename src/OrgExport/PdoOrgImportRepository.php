@@ -85,6 +85,10 @@ final readonly class PdoOrgImportRepository implements OrgImportRepositoryInterf
                 (string) $row['name'],
                 (int) ($row['is_pinned'] ?? 0),
                 (string) ($row['default_layout'] ?? 'standard'),
+                // A snapshot taken before #1020 has no seo_page_kind; 'article' is what
+                // the source install actually rendered, so importing it preserves the
+                // source's behaviour rather than silently retyping its pages.
+                (string) ($row['seo_page_kind'] ?? 'article'),
                 (int) ($row['display_order'] ?? 0),
                 isset($row['labels']) ? (string) $row['labels'] : null,
                 isset($row['permalink_pattern']) ? (string) $row['permalink_pattern'] : null,
@@ -96,7 +100,7 @@ final readonly class PdoOrgImportRepository implements OrgImportRepositoryInterf
                 $mergedTypeIds[$newId] = true;
                 $query->execute(
                     'UPDATE entity_types
-                        SET name = ?, is_pinned = ?, default_layout = ?, display_order = ?,
+                        SET name = ?, is_pinned = ?, default_layout = ?, seo_page_kind = ?, display_order = ?,
                             labels = ?, permalink_pattern = ?, previous_permalink_pattern = ?
                       WHERE id = ?',
                     [...$params, $newId],
@@ -104,9 +108,9 @@ final readonly class PdoOrgImportRepository implements OrgImportRepositoryInterf
             } else {
                 $newId = $query->insert(
                     'INSERT INTO entity_types
-                        (organization_id, name, is_pinned, default_layout, display_order,
+                        (organization_id, name, is_pinned, default_layout, seo_page_kind, display_order,
                          labels, permalink_pattern, previous_permalink_pattern, slug)
-                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
                     [$targetOrgId, ...$params, $slug],
                 );
             }

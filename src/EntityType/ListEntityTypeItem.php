@@ -19,6 +19,7 @@ final readonly class ListEntityTypeItem
         public ?string $previousPermalinkPattern = null,
         public int $displayOrder = 0,
         public string $defaultLayout = 'standard',
+        public SeoPageKind $seoPageKind = SeoPageKind::WebPage,
     ) {
     }
 }

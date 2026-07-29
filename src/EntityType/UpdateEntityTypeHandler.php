@@ -54,6 +54,16 @@ final readonly class UpdateEntityTypeHandler
             $errors[] = new ValidationError('default_layout', 'Unknown layout.', 'invalid');
         }
 
+        // seo_page_kind: optional; omitting it keeps the type a standing page (#1020).
+        // An unknown value is rejected rather than coerced — silently falling back would
+        // let a typo mistype every record of the type with no signal.
+        $rawSeoPageKind = trim((string) ($body['seo_page_kind'] ?? SeoPageKind::WebPage->value));
+        $seoPageKind = SeoPageKind::tryFrom($rawSeoPageKind === '' ? SeoPageKind::WebPage->value : $rawSeoPageKind);
+        if ($seoPageKind === null) {
+            $errors[] = new ValidationError('seo_page_kind', 'Unknown SEO page kind.', 'invalid');
+            $seoPageKind = SeoPageKind::WebPage;
+        }
+
         // labels: optional {"ja":"投稿","fr":"Articles"} – only string values are kept
         $rawLabels = $body['labels'] ?? null;
         $labels = null;
@@ -112,6 +122,7 @@ final readonly class UpdateEntityTypeHandler
             labels: $labels,
             permalinkPattern: $permalinkPattern,
             defaultLayout: $defaultLayout,
+            seoPageKind: $seoPageKind,
         ));
 
         return $this->response->create([
@@ -123,6 +134,7 @@ final readonly class UpdateEntityTypeHandler
             'permalink_pattern'          => $output->permalinkPattern,
             'previous_permalink_pattern' => $output->previousPermalinkPattern,
             'default_layout'             => $output->defaultLayout,
+            'seo_page_kind'              => $output->seoPageKind->value,
         ]);
     }
 }

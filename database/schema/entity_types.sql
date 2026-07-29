@@ -5,6 +5,7 @@ CREATE TABLE entity_types (
     slug VARCHAR(255) NOT NULL,
     is_pinned BOOLEAN NOT NULL DEFAULT 0,
     default_layout VARCHAR(32) NOT NULL DEFAULT 'standard',
+    seo_page_kind VARCHAR(16) NOT NULL DEFAULT 'webpage',
     display_order INTEGER NOT NULL DEFAULT 0,
     labels TEXT NULL DEFAULT NULL,
     permalink_pattern VARCHAR(255) NULL DEFAULT NULL,

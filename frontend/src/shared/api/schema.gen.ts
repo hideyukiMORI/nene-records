@@ -2110,6 +2110,11 @@ export interface components {
              * @enum {string}
              */
             default_layout?: "standard" | "full" | "two-col" | "three-col" | "bare" | "custom";
+            /**
+             * @description How records of this type present themselves to crawlers. `webpage` = a standing page (og:type=website, JSON-LD WebPage, no publication dates). `article` = a dated entry (og:type=article, JSON-LD BlogPosting, dates included). New types default to `webpage`.
+             * @enum {string}
+             */
+            seo_page_kind?: "webpage" | "article";
         };
         CreateEntityTypeRequest: {
             name: string;
@@ -2130,6 +2135,11 @@ export interface components {
              * @enum {string}
              */
             default_layout?: "standard" | "full" | "two-col" | "three-col" | "bare" | "custom";
+            /**
+             * @description Crawler-facing page kind. Omitted = `webpage` (a standing page). Use `article` for types whose records are dated entries; only then are datePublished/dateModified emitted.
+             * @enum {string}
+             */
+            seo_page_kind?: "webpage" | "article";
         };
         ReorderEntityTypesRequest: {
             /** @description Entity type ids in the desired display order (ascending). */
