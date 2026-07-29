@@ -15,11 +15,13 @@ use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RequestScopedHolder;
 use NeNeRecords\ApplicationServiceProvider;
 use NeNeRecords\Entitlement\EntitlementResolverInterface;
+use NeNeRecords\Media\StorageInterface;
 use NeNeRecords\Setting\DefaultSettingDefsSeederInterface;
 use NeNeRecords\Setting\PdoDefaultSettingDefsSeeder;
 use NeNeRecords\SystemConfig\SystemConfigRepositoryInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
+use Psr\Log\LoggerInterface;
 
 final readonly class OrganizationServiceProvider implements ServiceProviderInterface
 {
@@ -147,7 +149,21 @@ final readonly class OrganizationServiceProvider implements ServiceProviderInter
                         throw new LogicException('Organization repository service is invalid.');
                     }
 
-                    return new DeleteOrganizationUseCase($repo);
+                    // The media inventory and logger are optional collaborators: the
+                    // delete must still work if either is unavailable (#1018).
+                    $query   = $c->get(DatabaseQueryExecutorInterface::class);
+                    $storage = $c->get(StorageInterface::class);
+                    $logger  = $c->get(LoggerInterface::class);
+
+                    $inventory = ($query instanceof DatabaseQueryExecutorInterface && $storage instanceof StorageInterface)
+                        ? new PdoOrgMediaInventoryReader($query, $storage)
+                        : null;
+
+                    return new DeleteOrganizationUseCase(
+                        $repo,
+                        $inventory,
+                        $logger instanceof LoggerInterface ? $logger : null,
+                    );
                 },
             )
             // ── Handlers ───────────────────────────────────────────────────────
