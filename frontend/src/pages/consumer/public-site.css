@@ -2759,6 +2759,58 @@
   border-top: 1px solid var(--color-border);
   margin-block: var(--space-xl);
 }
+
+/* contact-form block (#1030). Rendered by the server for crawlers and no-JS, and by the SPA
+   from the same bootstrap payload after mount — one ruleset has to serve both, so the
+   selectors match the markup both sides emit. */
+.nene-public .block--contact-form {
+  display: grid;
+  gap: var(--space-md);
+  margin-block: var(--space-xl);
+}
+
+.nene-public .contact-form__field {
+  display: grid;
+  gap: var(--space-xs);
+  margin: 0;
+}
+
+.nene-public .contact-form__field label {
+  font-weight: 600;
+}
+
+.nene-public .contact-form__field input,
+.nene-public .contact-form__field textarea,
+.nene-public .contact-form__field select {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-xs) var(--space-sm);
+  font: inherit;
+  color: inherit;
+  background: var(--color-surface);
+}
+
+.nene-public .contact-form__field--consent {
+  grid-template-columns: 1fr;
+}
+
+.nene-public .contact-form__field--consent label {
+  display: flex;
+  gap: var(--space-xs);
+  align-items: flex-start;
+  font-weight: 400;
+}
+
+.nene-public .contact-form__actions {
+  margin: 0;
+}
+
+.nene-public .contact-form--unavailable {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-md);
+  color: var(--color-text-muted);
+}
 /* custom-layout page host (#311 / WS3-S3c): full content-width, chrome-less body. */
 .nene-public .custom-page {
   display: block;

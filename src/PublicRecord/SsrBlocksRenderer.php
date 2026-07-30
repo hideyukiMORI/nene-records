@@ -36,19 +36,20 @@ final readonly class SsrBlocksRenderer
      * @param string $scope        disambiguates generated element ids when more than one blocks
      *                             field is rendered on a page — pass the field key
      */
-    public function render(string $documentJson, string $scope = ''): string
+    public function render(string $documentJson, string $scope = ''): SsrBlocksRenderResult
     {
         if (trim($documentJson) === '') {
-            return '';
+            return new SsrBlocksRenderResult('');
         }
 
         $decoded = json_decode($documentJson, true);
 
         if (!is_array($decoded) || !array_is_list($decoded)) {
-            return '';
+            return new SsrBlocksRenderResult('');
         }
 
         $html = '';
+        $contactForms = [];
         $scanned = 0;
 
         foreach ($decoded as $index => $block) {
@@ -72,13 +73,65 @@ final readonly class SsrBlocksRenderer
             // This match *is* the allow-list. Every type not named here is rendered by the
             // client renderer after hydration, and emitting nothing for it is what keeps the
             // server-rendered HTML of every pre-#1030 document unchanged.
-            $html .= match ($type) {
-                'contact-form' => $this->renderContactForm($data, $this->idPrefix($scope, $block, $index)),
-                default => '',
-            };
+            if ($type === 'contact-form') {
+                $schema = $this->resolveSchema($data);
+
+                if ($schema !== null) {
+                    $contactForms[$schema->formKey] = $this->schemaToArray($schema);
+                }
+
+                $html .= $this->renderContactForm($data, $this->idPrefix($scope, $block, $index), $schema);
+
+                continue;
+            }
+
+            // Every other type is rendered by the client renderer after hydration. Emitting
+            // nothing for it is what keeps the server-rendered HTML of every pre-#1030
+            // document unchanged.
         }
 
-        return $html;
+        return new SsrBlocksRenderResult($html, $contactForms);
+    }
+
+    /**
+     * @param array<array-key, mixed> $data
+     */
+    private function resolveSchema(array $data): ?ContactFormSchema
+    {
+        $formKey = $data['formKey'] ?? null;
+
+        if (!is_string($formKey) || $formKey === '') {
+            return null;
+        }
+
+        return $this->schemas->schemaFor($formKey);
+    }
+
+    /**
+     * The shape the SPA reads out of the bootstrap. Only what is needed to draw the form —
+     * this is contact's public schema, and nothing else from records is added to it.
+     *
+     * @return array<string, mixed>
+     */
+    private function schemaToArray(ContactFormSchema $schema): array
+    {
+        return [
+            'formKey' => $schema->formKey,
+            'submitPath' => ContactSubmissionProxyRoute::PATH,
+            'consentRequired' => $schema->consentRequired,
+            'consentLabel' => $schema->consentLabel,
+            'submitLabel' => $schema->submitLabel,
+            'fields' => array_map(
+                static fn (ContactFormField $field): array => [
+                    'key' => $field->key,
+                    'label' => $field->label,
+                    'type' => $field->type,
+                    'required' => $field->required,
+                    'options' => $field->options,
+                ],
+                $schema->fields,
+            ),
+        ];
     }
 
     /**
@@ -107,15 +160,13 @@ final readonly class SsrBlocksRenderer
     /**
      * @param array<array-key, mixed> $data
      */
-    private function renderContactForm(array $data, string $idPrefix): string
+    private function renderContactForm(array $data, string $idPrefix, ?ContactFormSchema $schema): string
     {
         $formKey = $data['formKey'] ?? null;
 
         if (!is_string($formKey) || $formKey === '') {
             return '';
         }
-
-        $schema = $this->schemas->schemaFor($formKey);
 
         if ($schema === null) {
             // Fail-visible: an author who mistyped the key, or an outage at the issuing

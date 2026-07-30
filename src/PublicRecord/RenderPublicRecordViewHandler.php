@@ -43,11 +43,31 @@ final readonly class RenderPublicRecordViewHandler implements PublicRecordViewRe
      * OrgResolverMiddleware on `nene2.base_prefix`. '' = root single-tenant.
      */
     /**
+     * Merges every field's resolved contact-form schemas into one map for the bootstrap.
+     *
+     * @param array<string, SsrBlocksRenderResult> $blocks
+     *
+     * @return array<string, array<string, mixed>>
+     */
+    private function contactFormSchemas(array $blocks): array
+    {
+        $schemas = [];
+
+        foreach ($blocks as $result) {
+            foreach ($result->contactForms as $formKey => $schema) {
+                $schemas[$formKey] = $schema;
+            }
+        }
+
+        return $schemas;
+    }
+
+    /**
      * @param list<PublicRecordViewDisplayField> $displayFields
      *
-     * @return array<string, string> field key => server-rendered HTML ('' when nothing in the
-     *                               document is server-renderable, which is the case for every
-     *                               document written before #1030)
+     * @return array<string, SsrBlocksRenderResult> field key => render result (empty HTML when
+     *                               nothing in the document is server-renderable, which is the
+     *                               case for every document written before #1030)
      */
     private function renderBlocks(array $displayFields): array
     {
@@ -55,15 +75,18 @@ final readonly class RenderPublicRecordViewHandler implements PublicRecordViewRe
             return [];
         }
 
-        $html = [];
+        $rendered = [];
 
         foreach ($displayFields as $field) {
             if ($field->dataType === 'blocks' && $field->blocksDocument !== null) {
-                $html[$field->fieldKey] = $this->blocksRenderer->render($field->blocksDocument, $field->fieldKey);
+                $rendered[$field->fieldKey] = $this->blocksRenderer->render(
+                    $field->blocksDocument,
+                    $field->fieldKey,
+                );
             }
         }
 
-        return $html;
+        return $rendered;
     }
 
     private function effectiveBase(ServerRequestInterface $request): string
@@ -220,8 +243,19 @@ final readonly class RenderPublicRecordViewHandler implements PublicRecordViewRe
             ? $output->metaDescription
             : $defaultMetaDescription;
 
+        // Rendered once, then used twice: the HTML goes into the template and the schemas that
+        // produced it go into the bootstrap, so the SPA draws the same form from the same data
+        // instead of asking the issuing product again (#1030).
+        $blocks = $this->renderBlocks($output->displayFields);
+        $bootstrap = $output->bootstrap;
+        $contactForms = $this->contactFormSchemas($blocks);
+
+        if ($contactForms !== []) {
+            $bootstrap['contactForms'] = $contactForms;
+        }
+
         $bootstrapJson = json_encode(
-            $output->bootstrap,
+            $bootstrap,
             JSON_THROW_ON_ERROR | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE,
         );
 
@@ -260,7 +294,10 @@ final readonly class RenderPublicRecordViewHandler implements PublicRecordViewRe
             // Pre-rendered once per field: the renderer may reach the issuing product over the
             // network, so the template must not be able to trigger it twice by evaluating the
             // same expression in a condition and again in the body.
-            'blocksHtmlByFieldKey' => $this->renderBlocks($output->displayFields),
+            'blocksHtmlByFieldKey' => array_map(
+                static fn (SsrBlocksRenderResult $result): string => $result->html,
+                $blocks,
+            ),
             'chapterNav' => $output->chapterNav,
             // The front page is a site root, not a node in the path hierarchy: drop the
             // breadcrumb trail + its BreadcrumbList JSON-LD (the template hides both when empty).

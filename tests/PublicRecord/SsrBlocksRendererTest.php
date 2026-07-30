@@ -32,7 +32,7 @@ final class SsrBlocksRendererTest extends TestCase
      */
     public function testExistingBlockTypesRenderNothingOnTheServer(): void
     {
-        self::assertSame('', $this->renderer()->render(self::LEGACY_DOCUMENT));
+        self::assertSame('', $this->renderer()->render(self::LEGACY_DOCUMENT)->html);
     }
 
     /**
@@ -41,7 +41,7 @@ final class SsrBlocksRendererTest extends TestCase
      */
     public function testAContactFormDocumentDoesChangeTheOutput(): void
     {
-        $html = $this->renderer()->render('[{"id":"c","type":"contact-form","data":{"formKey":"ayane-contact"}}]');
+        $html = $this->renderer()->render('[{"id":"c","type":"contact-form","data":{"formKey":"ayane-contact"}}]')->html;
 
         self::assertNotSame('', $html);
         self::assertStringContainsString('<form', $html);
@@ -53,7 +53,7 @@ final class SsrBlocksRendererTest extends TestCase
      */
     public function testFormPostsToTheRecordsProxyAndLeaksNothing(): void
     {
-        $html = $this->renderer()->render('[{"id":"c","type":"contact-form","data":{"formKey":"ayane-contact"}}]');
+        $html = $this->renderer()->render('[{"id":"c","type":"contact-form","data":{"formKey":"ayane-contact"}}]')->html;
 
         self::assertStringContainsString('action="' . ContactSubmissionProxyRoute::PATH . '"', $html);
         self::assertStringContainsString('method="post"', $html);
@@ -68,7 +68,7 @@ final class SsrBlocksRendererTest extends TestCase
 
     public function testRendersOneControlPerSchemaFieldWithTypesAndRequiredness(): void
     {
-        $html = $this->renderer()->render('[{"id":"c","type":"contact-form","data":{"formKey":"ayane-contact"}}]');
+        $html = $this->renderer()->render('[{"id":"c","type":"contact-form","data":{"formKey":"ayane-contact"}}]')->html;
 
         self::assertStringContainsString('name="name"', $html);
         self::assertStringContainsString('type="email"', $html);
@@ -83,7 +83,7 @@ final class SsrBlocksRendererTest extends TestCase
             new ContactFormField('nickname', 'Nickname', 'colour-picker', false),
         ]));
 
-        $html = $renderer->render('[{"id":"c","type":"contact-form","data":{"formKey":"k"}}]');
+        $html = $renderer->render('[{"id":"c","type":"contact-form","data":{"formKey":"k"}}]')->html;
 
         self::assertStringContainsString('name="nickname"', $html);
         self::assertStringContainsString('type="text"', $html);
@@ -95,7 +95,7 @@ final class SsrBlocksRendererTest extends TestCase
             new ContactFormField('evil" onfocus="alert(1)', '<script>alert(1)</script>', 'text', false),
         ], submitLabel: '"><script>x</script>'));
 
-        $html = $renderer->render('[{"id":"c","type":"contact-form","data":{"formKey":"k"}}]');
+        $html = $renderer->render('[{"id":"c","type":"contact-form","data":{"formKey":"k"}}]')->html;
 
         self::assertStringNotContainsString('<script>', $html);
         self::assertStringNotContainsString('onfocus="alert(1)"', $html);
@@ -111,7 +111,7 @@ final class SsrBlocksRendererTest extends TestCase
             }
         });
 
-        $html = $renderer->render('[{"id":"c","type":"contact-form","data":{"formKey":"typo"}}]');
+        $html = $renderer->render('[{"id":"c","type":"contact-form","data":{"formKey":"typo"}}]')->html;
 
         // An empty region would look like a page that simply has no form; the author would
         // never learn the key was wrong.
@@ -121,9 +121,9 @@ final class SsrBlocksRendererTest extends TestCase
 
     public function testConsentCheckboxAppearsOnlyWhenTheFormRequiresIt(): void
     {
-        $without = $this->renderer()->render('[{"id":"c","type":"contact-form","data":{"formKey":"k"}}]');
+        $without = $this->renderer()->render('[{"id":"c","type":"contact-form","data":{"formKey":"k"}}]')->html;
         $with = $this->renderer(new ContactFormSchema('k', [], consentRequired: true))
-            ->render('[{"id":"c","type":"contact-form","data":{"formKey":"k"}}]');
+            ->render('[{"id":"c","type":"contact-form","data":{"formKey":"k"}}]')->html;
 
         self::assertStringNotContainsString('name="consent"', $without);
         self::assertStringContainsString('name="consent"', $with);
@@ -132,13 +132,13 @@ final class SsrBlocksRendererTest extends TestCase
     public function testMalformedOrEmptyDocumentsRenderNothing(): void
     {
         foreach (['', '   ', 'not json', '{"not":"a list"}', '[42]', '[{"type":"contact-form"}]'] as $document) {
-            self::assertSame('', $this->renderer()->render($document), 'Document: ' . $document);
+            self::assertSame('', $this->renderer()->render($document)->html, 'Document: ' . $document);
         }
     }
 
     public function testBlockWithoutAFormKeyRendersNothing(): void
     {
-        self::assertSame('', $this->renderer()->render('[{"id":"c","type":"contact-form","data":{"variant":"inline"}}]'));
+        self::assertSame('', $this->renderer()->render('[{"id":"c","type":"contact-form","data":{"variant":"inline"}}]')->html);
     }
 
     public function testTwoFormsOnOnePageDoNotShareElementIds(): void
@@ -150,7 +150,7 @@ final class SsrBlocksRendererTest extends TestCase
 
         $html = $this->renderer(new ContactFormSchema('k', [
             new ContactFormField('email', 'Email', 'email', true),
-        ]))->render($document, 'sections');
+        ]))->render($document, 'sections')->html;
 
         preg_match_all('/id="([^"]+)"/', $html, $matches);
         $ids = $matches[1];
@@ -166,8 +166,8 @@ final class SsrBlocksRendererTest extends TestCase
             new ContactFormField('email', 'Email', 'email', true),
         ]));
 
-        $first = $renderer->render($document, 'sections');
-        $second = $renderer->render($document, 'footer');
+        $first = $renderer->render($document, 'sections')->html;
+        $second = $renderer->render($document, 'footer')->html;
 
         self::assertNotSame(
             $this->firstId($first),
@@ -180,7 +180,7 @@ final class SsrBlocksRendererTest extends TestCase
     {
         $html = $this->renderer(new ContactFormSchema('k', [
             new ContactFormField('bad" onfocus="alert(1)', 'Bad', 'text', false),
-        ]))->render('[{"id":"a\" onload=\"x","type":"contact-form","data":{"formKey":"k"}}]', 'sc"ope');
+        ]))->render('[{"id":"a\" onload=\"x","type":"contact-form","data":{"formKey":"k"}}]', 'sc"ope')->html;
 
         // The escaped text `onfocus=` may legitimately appear inside an attribute *value*;
         // what must never appear is a real attribute break, i.e. an unescaped quote followed
@@ -201,7 +201,7 @@ final class SsrBlocksRendererTest extends TestCase
         // the control as filled in and `required` never fires.
         $html = $this->renderer(new ContactFormSchema('k', [
             new ContactFormField('topic', 'Topic', 'select', true, ['Sales', 'Support']),
-        ]))->render('[{"id":"c","type":"contact-form","data":{"formKey":"k"}}]');
+        ]))->render('[{"id":"c","type":"contact-form","data":{"formKey":"k"}}]')->html;
 
         self::assertStringContainsString('<option value="" selected disabled></option>', $html);
     }
@@ -210,7 +210,7 @@ final class SsrBlocksRendererTest extends TestCase
     {
         $html = $this->renderer(new ContactFormSchema('k', [
             new ContactFormField('topic', 'Topic', 'select', false, ['Sales']),
-        ]))->render('[{"id":"c","type":"contact-form","data":{"formKey":"k"}}]');
+        ]))->render('[{"id":"c","type":"contact-form","data":{"formKey":"k"}}]')->html;
 
         self::assertStringNotContainsString('<option value="" selected disabled>', $html);
     }
@@ -220,7 +220,7 @@ final class SsrBlocksRendererTest extends TestCase
         // The consent sentence is contact's legal text and the button is its copy; records
         // must not overwrite either with English.
         $html = $this->renderer(new ContactFormSchema('k', [], consentRequired: true, submitLabel: '送信する', consentLabel: '個人情報の取り扱いに同意します'))
-            ->render('[{"id":"c","type":"contact-form","data":{"formKey":"k"}}]');
+            ->render('[{"id":"c","type":"contact-form","data":{"formKey":"k"}}]')->html;
 
         self::assertStringContainsString('送信する', $html);
         self::assertStringContainsString('個人情報の取り扱いに同意します', $html);
@@ -232,10 +232,83 @@ final class SsrBlocksRendererTest extends TestCase
         // records has no SSR message catalogue yet (#1034). Until it does, the fallback must
         // not claim to be in the page's language — crawlers read this markup.
         $html = $this->renderer(new ContactFormSchema('k', [], consentRequired: true))
-            ->render('[{"id":"c","type":"contact-form","data":{"formKey":"k"}}]');
+            ->render('[{"id":"c","type":"contact-form","data":{"formKey":"k"}}]')->html;
 
         self::assertStringContainsString('<span lang="en">Send</span>', $html);
         self::assertStringContainsString('lang="en">I agree', $html);
+    }
+
+    // ── bootstrap 同梱（hub 裁定 (c)・2026-07-30）────────────────────────────
+
+    /**
+     * hub pin 1: only the resolved *public* schema travels in the bootstrap. No token, no
+     * internal URL, no reference to the connect-token module — same shelf as the #1029 pins.
+     */
+    public function testBootstrapCarriesOnlyThePublicSchema(): void
+    {
+        $result = $this->renderer(new ContactFormSchema('ayane-contact', [
+            new ContactFormField('email', 'Email', 'email', true),
+        ], consentRequired: true, submitLabel: '送信', consentLabel: '同意します'))
+            ->render('[{"id":"c","type":"contact-form","data":{"formKey":"ayane-contact"}}]');
+
+        self::assertArrayHasKey('ayane-contact', $result->contactForms);
+
+        $encoded = (string) json_encode($result->contactForms);
+
+        foreach (['token', 'Authorization', 'Bearer', 'ConnectToken', 'org_connect_tokens', 'http://', 'https://'] as $forbidden) {
+            self::assertStringNotContainsString($forbidden, $encoded, $forbidden . ' must not reach the bootstrap.');
+        }
+
+        // What it *does* carry: enough to draw the identical form, and the proxy path so the
+        // client cannot invent a different destination.
+        $schema = $result->contactForms['ayane-contact'];
+        self::assertSame(ContactSubmissionProxyRoute::PATH, $schema['submitPath']);
+        self::assertSame('送信', $schema['submitLabel']);
+        self::assertSame([['key' => 'email', 'label' => 'Email', 'type' => 'email', 'required' => true, 'options' => []]], $schema['fields']);
+    }
+
+    /**
+     * The point of (c): the schema handed to the client is the same one the server drew from,
+     * so the crawlable form and the hydrated form cannot disagree. Asserted by resolving once
+     * and checking every field of the HTML is described by the bootstrap entry.
+     */
+    public function testBootstrapDescribesExactlyWhatTheServerRendered(): void
+    {
+        $result = $this->renderer(new ContactFormSchema('k', [
+            new ContactFormField('email', 'Email', 'email', true),
+            new ContactFormField('message', 'Message', 'textarea', false),
+        ]))->render('[{"id":"c","type":"contact-form","data":{"formKey":"k"}}]');
+
+        preg_match_all('/name="([^"]+)"/', $result->html, $matches);
+        $rendered = array_values(array_diff($matches[1], ['form_key']));
+
+        $described = array_map(
+            static fn (array $field): string => (string) $field['key'],
+            $result->contactForms['k']['fields'],
+        );
+
+        self::assertSame($described, $rendered);
+    }
+
+    public function testAFormThatCouldNotBeResolvedContributesNothingToTheBootstrap(): void
+    {
+        $renderer = new SsrBlocksRenderer(new class () implements ContactFormSchemaProviderInterface {
+            public function schemaFor(string $formKey): ?ContactFormSchema
+            {
+                return null;
+            }
+        });
+
+        $result = $renderer->render('[{"id":"c","type":"contact-form","data":{"formKey":"typo"}}]');
+
+        // The visible failure notice is server-only; there is nothing for the client to draw.
+        self::assertSame([], $result->contactForms);
+        self::assertStringContainsString('contact-form--unavailable', $result->html);
+    }
+
+    public function testLegacyDocumentsAddNothingToTheBootstrap(): void
+    {
+        self::assertSame([], $this->renderer()->render(self::LEGACY_DOCUMENT)->contactForms);
     }
 
     private function firstId(string $html): string
