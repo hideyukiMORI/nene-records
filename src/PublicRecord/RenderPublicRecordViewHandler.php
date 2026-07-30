@@ -69,7 +69,7 @@ final readonly class RenderPublicRecordViewHandler implements PublicRecordViewRe
      *                               nothing in the document is server-renderable, which is the
      *                               case for every document written before #1030)
      */
-    private function renderBlocks(array $displayFields): array
+    private function renderBlocks(array $displayFields, string $returnPath): array
     {
         if ($this->blocksRenderer === null) {
             return [];
@@ -82,6 +82,7 @@ final readonly class RenderPublicRecordViewHandler implements PublicRecordViewRe
                 $rendered[$field->fieldKey] = $this->blocksRenderer->render(
                     $field->blocksDocument,
                     $field->fieldKey,
+                    $returnPath,
                 );
             }
         }
@@ -246,7 +247,7 @@ final readonly class RenderPublicRecordViewHandler implements PublicRecordViewRe
         // Rendered once, then used twice: the HTML goes into the template and the schemas that
         // produced it go into the bootstrap, so the SPA draws the same form from the same data
         // instead of asking the issuing product again (#1030).
-        $blocks = $this->renderBlocks($output->displayFields);
+        $blocks = $this->renderBlocks($output->displayFields, $request->getUri()->getPath());
         $bootstrap = $output->bootstrap;
         $contactForms = $this->contactFormSchemas($blocks);
 

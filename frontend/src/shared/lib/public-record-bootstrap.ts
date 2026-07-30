@@ -35,6 +35,8 @@ export interface PublicContactFormSchemaDto {
   formKey: string
   /** Where the form posts — always the records-side proxy, never the issuing product. */
   submitPath: string
+  /** Name of the hidden decoy input the proxy checks (#1031). */
+  honeypotField?: string
   consentRequired: boolean
   consentLabel: string | null
   submitLabel: string | null

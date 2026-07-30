@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace NeNeRecords\PublicRecord;
 
+use NeNeRecords\ContactSubmission\SubmitContactFormHandler;
+
 /**
  * Renders the *server-renderable* block types of a blocks document into HTML.
  *
@@ -35,8 +37,10 @@ final readonly class SsrBlocksRenderer
      * @param string $documentJson the stored blocks document; anything unparseable renders empty
      * @param string $scope        disambiguates generated element ids when more than one blocks
      *                             field is rendered on a page — pass the field key
+     * @param string $returnPath   where the visitor is sent back to after posting; the proxy
+     *                             refuses anything that is not a same-origin path (#1031)
      */
-    public function render(string $documentJson, string $scope = ''): SsrBlocksRenderResult
+    public function render(string $documentJson, string $scope = '', string $returnPath = ''): SsrBlocksRenderResult
     {
         if (trim($documentJson) === '') {
             return new SsrBlocksRenderResult('');
@@ -80,7 +84,7 @@ final readonly class SsrBlocksRenderer
                     $contactForms[$schema->formKey] = $this->schemaToArray($schema);
                 }
 
-                $html .= $this->renderContactForm($data, $this->idPrefix($scope, $block, $index), $schema);
+                $html .= $this->renderContactForm($data, $this->idPrefix($scope, $block, $index), $schema, $returnPath);
 
                 continue;
             }
@@ -118,6 +122,7 @@ final readonly class SsrBlocksRenderer
         return [
             'formKey' => $schema->formKey,
             'submitPath' => ContactSubmissionProxyRoute::PATH,
+            'honeypotField' => SubmitContactFormHandler::HONEYPOT_FIELD,
             'consentRequired' => $schema->consentRequired,
             'consentLabel' => $schema->consentLabel,
             'submitLabel' => $schema->submitLabel,
@@ -160,7 +165,7 @@ final readonly class SsrBlocksRenderer
     /**
      * @param array<array-key, mixed> $data
      */
-    private function renderContactForm(array $data, string $idPrefix, ?ContactFormSchema $schema): string
+    private function renderContactForm(array $data, string $idPrefix, ?ContactFormSchema $schema, string $returnPath = ''): string
     {
         $formKey = $data['formKey'] ?? null;
 
@@ -198,6 +203,15 @@ final readonly class SsrBlocksRenderer
         return '<form class="block block--contact-form" method="post" action="'
             . $this->escape(ContactSubmissionProxyRoute::PATH) . '">'
             . '<input type="hidden" name="form_key" value="' . $this->escape($schema->formKey) . '">'
+            . ($returnPath !== ''
+                ? '<input type="hidden" name="return_path" value="' . $this->escape($returnPath) . '">'
+                : '')
+            // Honeypot (#1031): hidden from people, inviting to a naive bot. `aria-hidden` and
+            // `tabindex="-1"` keep it away from assistive tech and keyboard order too — a trap a
+            // screen-reader user could fall into would be a bug, not a defence.
+            . '<p style="position:absolute;left:-9999px" aria-hidden="true">'
+            . '<label>Website<input type="text" name="' . $this->escape(SubmitContactFormHandler::HONEYPOT_FIELD)
+            . '" tabindex="-1" autocomplete="off"></label></p>'
             . $fields
             . '<p class="contact-form__actions"><button type="submit">'
             . $this->wording($schema->submitLabel, 'Send')

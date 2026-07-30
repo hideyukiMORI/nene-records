@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NeNeRecords\Tests\PublicRecord;
 
+use NeNeRecords\ContactSubmission\SubmitContactFormHandler;
 use NeNeRecords\PublicRecord\ContactFormField;
 use NeNeRecords\PublicRecord\ContactFormSchema;
 use NeNeRecords\PublicRecord\ContactFormSchemaProviderInterface;
@@ -280,7 +281,9 @@ final class SsrBlocksRendererTest extends TestCase
         ]))->render('[{"id":"c","type":"contact-form","data":{"formKey":"k"}}]');
 
         preg_match_all('/name="([^"]+)"/', $result->html, $matches);
-        $rendered = array_values(array_diff($matches[1], ['form_key']));
+        // Control inputs are records' own, not the schema's: the hidden form key and the
+        // honeypot (#1031) are excluded so this stays a check on schema parity.
+        $rendered = array_values(array_diff($matches[1], ['form_key', SubmitContactFormHandler::HONEYPOT_FIELD]));
 
         $described = array_map(
             static fn (array $field): string => (string) $field['key'],
