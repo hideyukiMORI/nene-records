@@ -59,7 +59,7 @@ final readonly class RenderPublicRecordViewHandler implements PublicRecordViewRe
 
         foreach ($displayFields as $field) {
             if ($field->dataType === 'blocks' && $field->blocksDocument !== null) {
-                $html[$field->fieldKey] = $this->blocksRenderer->render($field->blocksDocument);
+                $html[$field->fieldKey] = $this->blocksRenderer->render($field->blocksDocument, $field->fieldKey);
             }
         }
 

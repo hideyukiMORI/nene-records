@@ -133,12 +133,14 @@ final readonly class HttpContactFormSchemaProvider implements ContactFormSchemaP
         }
 
         $submitLabel = $payload['submitLabel'] ?? null;
+        $consentLabel = $payload['consentLabel'] ?? null;
 
         return new ContactFormSchema(
             formKey: $formKey,
             fields: $fields,
             consentRequired: (bool) ($payload['consentRequired'] ?? false),
             submitLabel: is_string($submitLabel) && $submitLabel !== '' ? $submitLabel : null,
+            consentLabel: is_string($consentLabel) && $consentLabel !== '' ? $consentLabel : null,
         );
     }
 

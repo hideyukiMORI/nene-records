@@ -141,6 +141,113 @@ final class SsrBlocksRendererTest extends TestCase
         self::assertSame('', $this->renderer()->render('[{"id":"c","type":"contact-form","data":{"variant":"inline"}}]'));
     }
 
+    public function testTwoFormsOnOnePageDoNotShareElementIds(): void
+    {
+        // Duplicate ids break every `<label for>` association silently — clicking a label
+        // focuses the first match, which is in the other form.
+        $document = '[{"id":"one","type":"contact-form","data":{"formKey":"k"}},'
+            . '{"id":"two","type":"contact-form","data":{"formKey":"k"}}]';
+
+        $html = $this->renderer(new ContactFormSchema('k', [
+            new ContactFormField('email', 'Email', 'email', true),
+        ]))->render($document, 'sections');
+
+        preg_match_all('/id="([^"]+)"/', $html, $matches);
+        $ids = $matches[1];
+
+        self::assertCount(2, $ids);
+        self::assertSame($ids, array_unique($ids), 'Generated element ids must be unique on a page.');
+    }
+
+    public function testTwoBlocksFieldsOnOnePageDoNotShareElementIds(): void
+    {
+        $document = '[{"id":"one","type":"contact-form","data":{"formKey":"k"}}]';
+        $renderer = $this->renderer(new ContactFormSchema('k', [
+            new ContactFormField('email', 'Email', 'email', true),
+        ]));
+
+        $first = $renderer->render($document, 'sections');
+        $second = $renderer->render($document, 'footer');
+
+        self::assertNotSame(
+            $this->firstId($first),
+            $this->firstId($second),
+            'The scope must disambiguate ids across blocks fields.',
+        );
+    }
+
+    public function testIdsBuiltFromCallerSuppliedStringsStaySafe(): void
+    {
+        $html = $this->renderer(new ContactFormSchema('k', [
+            new ContactFormField('bad" onfocus="alert(1)', 'Bad', 'text', false),
+        ]))->render('[{"id":"a\" onload=\"x","type":"contact-form","data":{"formKey":"k"}}]', 'sc"ope');
+
+        // The escaped text `onfocus=` may legitimately appear inside an attribute *value*;
+        // what must never appear is a real attribute break, i.e. an unescaped quote followed
+        // by a handler. Assert on the dangerous shape, not on the substring.
+        self::assertDoesNotMatchRegularExpression('/"\s+on[a-z]+\s*=/i', $html);
+
+        preg_match_all('/id="([^"]*)"/', $html, $matches);
+        self::assertNotSame([], $matches[1]);
+
+        foreach ($matches[1] as $id) {
+            self::assertMatchesRegularExpression('/^[A-Za-z0-9_-]+$/', $id, 'Generated ids must be attribute-safe.');
+        }
+    }
+
+    public function testRequiredSelectGetsAnEmptyFirstOptionSoRequiredMeansSomething(): void
+    {
+        // Without a placeholder the first option is already selected, so the browser treats
+        // the control as filled in and `required` never fires.
+        $html = $this->renderer(new ContactFormSchema('k', [
+            new ContactFormField('topic', 'Topic', 'select', true, ['Sales', 'Support']),
+        ]))->render('[{"id":"c","type":"contact-form","data":{"formKey":"k"}}]');
+
+        self::assertStringContainsString('<option value="" selected disabled></option>', $html);
+    }
+
+    public function testOptionalSelectHasNoPlaceholderOption(): void
+    {
+        $html = $this->renderer(new ContactFormSchema('k', [
+            new ContactFormField('topic', 'Topic', 'select', false, ['Sales']),
+        ]))->render('[{"id":"c","type":"contact-form","data":{"formKey":"k"}}]');
+
+        self::assertStringNotContainsString('<option value="" selected disabled>', $html);
+    }
+
+    public function testWordingSuppliedByTheIssuingProductIsUsedVerbatim(): void
+    {
+        // The consent sentence is contact's legal text and the button is its copy; records
+        // must not overwrite either with English.
+        $html = $this->renderer(new ContactFormSchema('k', [], consentRequired: true, submitLabel: '送信する', consentLabel: '個人情報の取り扱いに同意します'))
+            ->render('[{"id":"c","type":"contact-form","data":{"formKey":"k"}}]');
+
+        self::assertStringContainsString('送信する', $html);
+        self::assertStringContainsString('個人情報の取り扱いに同意します', $html);
+        self::assertStringNotContainsString('lang="en"', $html);
+    }
+
+    public function testEnglishFallbackWordingIsTaggedAsEnglish(): void
+    {
+        // records has no SSR message catalogue yet (#1034). Until it does, the fallback must
+        // not claim to be in the page's language — crawlers read this markup.
+        $html = $this->renderer(new ContactFormSchema('k', [], consentRequired: true))
+            ->render('[{"id":"c","type":"contact-form","data":{"formKey":"k"}}]');
+
+        self::assertStringContainsString('<span lang="en">Send</span>', $html);
+        self::assertStringContainsString('lang="en">I agree', $html);
+    }
+
+    private function firstId(string $html): string
+    {
+        preg_match_all('/id="([^"]+)"/', $html, $matches);
+        $ids = $matches[1];
+
+        self::assertNotSame([], $ids, 'The rendered form must carry at least one element id.');
+
+        return $ids[0];
+    }
+
     private function renderer(?ContactFormSchema $schema = null): SsrBlocksRenderer
     {
         $resolved = $schema ?? new ContactFormSchema('ayane-contact', [

@@ -33,8 +33,10 @@ final readonly class SsrBlocksRenderer
 
     /**
      * @param string $documentJson the stored blocks document; anything unparseable renders empty
+     * @param string $scope        disambiguates generated element ids when more than one blocks
+     *                             field is rendered on a page — pass the field key
      */
-    public function render(string $documentJson): string
+    public function render(string $documentJson, string $scope = ''): string
     {
         if (trim($documentJson) === '') {
             return '';
@@ -47,14 +49,14 @@ final readonly class SsrBlocksRenderer
         }
 
         $html = '';
-        $rendered = 0;
+        $scanned = 0;
 
-        foreach ($decoded as $block) {
-            if ($rendered >= self::MAX_BLOCKS) {
+        foreach ($decoded as $index => $block) {
+            if ($scanned >= self::MAX_BLOCKS) {
                 break;
             }
 
-            ++$rendered;
+            ++$scanned;
 
             if (!is_array($block)) {
                 continue;
@@ -71,7 +73,7 @@ final readonly class SsrBlocksRenderer
             // client renderer after hydration, and emitting nothing for it is what keeps the
             // server-rendered HTML of every pre-#1030 document unchanged.
             $html .= match ($type) {
-                'contact-form' => $this->renderContactForm($data),
+                'contact-form' => $this->renderContactForm($data, $this->idPrefix($scope, $block, $index)),
                 default => '',
             };
         }
@@ -80,9 +82,32 @@ final readonly class SsrBlocksRenderer
     }
 
     /**
+     * Element ids have to be unique across the whole page, not just within one form: two
+     * contact blocks, or a second blocks field using the same field keys, would otherwise
+     * produce duplicate ids and silently break every `<label for>` association.
+     *
+     * @param array<array-key, mixed> $block
+     */
+    private function idPrefix(string $scope, array $block, int|string $index): string
+    {
+        $blockId = $block['id'] ?? null;
+        $unique = is_string($blockId) && $blockId !== '' ? $blockId : (string) $index;
+
+        return $this->slug($scope) . '-' . $this->slug($unique);
+    }
+
+    /** Reduces a caller-supplied string to characters that are safe in an id attribute. */
+    private function slug(string $value): string
+    {
+        $slug = preg_replace('/[^A-Za-z0-9_-]/', '', $value);
+
+        return is_string($slug) && $slug !== '' ? $slug : '0';
+    }
+
+    /**
      * @param array<array-key, mixed> $data
      */
-    private function renderContactForm(array $data): string
+    private function renderContactForm(array $data, string $idPrefix): string
     {
         $formKey = $data['formKey'] ?? null;
 
@@ -97,26 +122,25 @@ final readonly class SsrBlocksRenderer
             // product, must be able to see that something is wrong. An empty region would
             // look like a page that simply has no form.
             return '<div class="block block--contact-form contact-form--unavailable">'
-                . '<p>This form is temporarily unavailable.</p>'
+                . '<p lang="en">This form is temporarily unavailable.</p>'
                 . '</div>';
         }
 
         $fields = '';
 
         foreach ($schema->fields as $field) {
-            $fields .= $this->renderField($field);
+            $fields .= $this->renderField($field, $idPrefix);
         }
 
         if ($schema->consentRequired) {
+            // The consent sentence is the issuing product's legal text. records only supplies
+            // a fallback, and marks it `lang="en"` so the markup does not claim to be in the
+            // page's language when it is not (SSR i18n gap: #1034).
             $fields .= '<p class="contact-form__field contact-form__field--consent">'
                 . '<label><input type="checkbox" name="consent" value="1" required> '
-                . 'I agree to the processing of my message.'
+                . $this->wording($schema->consentLabel, 'I agree to the processing of my message.')
                 . '</label></p>';
         }
-
-        $submitLabel = $schema->submitLabel !== null && trim($schema->submitLabel) !== ''
-            ? $schema->submitLabel
-            : 'Send';
 
         // The action is always the records-side proxy. Posting straight at the issuing
         // product would mean handing the browser the connect-token.
@@ -124,13 +148,15 @@ final readonly class SsrBlocksRenderer
             . $this->escape(ContactSubmissionProxyRoute::PATH) . '">'
             . '<input type="hidden" name="form_key" value="' . $this->escape($schema->formKey) . '">'
             . $fields
-            . '<p class="contact-form__actions"><button type="submit">' . $this->escape($submitLabel) . '</button></p>'
+            . '<p class="contact-form__actions"><button type="submit">'
+            . $this->wording($schema->submitLabel, 'Send')
+            . '</button></p>'
             . '</form>';
     }
 
-    private function renderField(ContactFormField $field): string
+    private function renderField(ContactFormField $field, string $idPrefix): string
     {
-        $id = 'contact-field-' . $this->escape($field->key);
+        $id = 'contact-' . $idPrefix . '-' . $this->slug($field->key);
         $required = $field->required ? ' required' : '';
         $label = '<label for="' . $id . '">' . $this->escape($field->label) . '</label>';
 
@@ -149,13 +175,30 @@ final readonly class SsrBlocksRenderer
 
     private function renderSelect(ContactFormField $field, string $id, string $required): string
     {
-        $options = '';
+        // A required `<select>` whose first option is already selected can never fail
+        // validation — the browser considers it filled in. An empty placeholder first is what
+        // makes `required` mean anything.
+        $options = $field->required ? '<option value="" selected disabled></option>' : '';
 
         foreach ($field->options as $option) {
             $options .= '<option value="' . $this->escape($option) . '">' . $this->escape($option) . '</option>';
         }
 
         return '<select id="' . $id . '" name="' . $this->escape($field->key) . '"' . $required . '>' . $options . '</select>';
+    }
+
+    /**
+     * Wording records did not author. When the issuing product supplies it, it is rendered as
+     * given; the English fallback is tagged so assistive tech and crawlers are not told it is
+     * in the page's language.
+     */
+    private function wording(?string $supplied, string $englishFallback): string
+    {
+        if ($supplied !== null && trim($supplied) !== '') {
+            return $this->escape($supplied);
+        }
+
+        return '<span lang="en">' . $this->escape($englishFallback) . '</span>';
     }
 
     private function escape(string $value): string
