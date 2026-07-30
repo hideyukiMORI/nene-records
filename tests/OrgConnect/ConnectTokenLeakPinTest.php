@@ -115,7 +115,15 @@ final class ConnectTokenLeakPinTest extends TestCase
         }
     }
 
-    /** Pin ③: nothing that builds the public bootstrap JSON knows about connect-tokens. */
+    /**
+     * Pin ③: nothing that builds the public bootstrap JSON knows about connect-tokens.
+     *
+     * Do not "upgrade" this to a behavioural test. The public render path reads entities and
+     * settings; connect-tokens live in their own table behind their own repository, so
+     * seeding a token and asserting it is absent from the bootstrap would pass whether or not
+     * the wiring were safe — a green that proves nothing. This form fails the moment the
+     * render path gains a reference to the module, which is the regression worth catching.
+     */
     public function testPublicBootstrapPayloadHasNoPathToConnectTokens(): void
     {
         $sources = [
@@ -135,7 +143,13 @@ final class ConnectTokenLeakPinTest extends TestCase
         }
     }
 
-    /** Pin ④: nor does anything that renders HTML — SSR templates or the admin SPA shell. */
+    /**
+     * Pin ④: nor does anything that renders HTML — SSR templates or the admin SPA shell.
+     *
+     * Structural for the same reason as pin ③: the renderers read entities and settings, so a
+     * behavioural version would be vacuous today and would stay green through an unsafe
+     * rewiring. Keep it structural, and add new render entry points to the globs below.
+     */
     public function testRenderedHtmlHasNoPathToConnectTokens(): void
     {
         $root = dirname(__DIR__, 2);
