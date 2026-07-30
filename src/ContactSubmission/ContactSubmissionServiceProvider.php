@@ -10,6 +10,7 @@ use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\ClockInterface;
 use Nene2\Middleware\RateLimitStorageInterface;
+use NeNeRecords\OrgConnect\ConnectTokenProviderInterface;
 use NeNeRecords\PublicRecord\ContactFormSchemaProviderInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -22,9 +23,22 @@ final readonly class ContactSubmissionServiceProvider implements ServiceProvider
         $builder
             ->set(
                 ContactSubmissionSenderInterface::class,
-                // Deliberately the failing implementation until the upstream contract is
-                // settled (#1031 §6). Swapping it is a one-line change here.
-                static fn (ContainerInterface $container): ContactSubmissionSenderInterface => new UnconfiguredContactSubmissionSender(),
+                static function (ContainerInterface $container): ContactSubmissionSenderInterface {
+                    $tokens = $container->get(ConnectTokenProviderInterface::class);
+
+                    if (!$tokens instanceof ConnectTokenProviderInterface) {
+                        throw new LogicException('Connect token provider service is invalid.');
+                    }
+
+                    // Same operator-configured host as the schema read. Unset is a normal state;
+                    // the sender then fails visibly rather than pretending to deliver.
+                    $baseUrl = getenv('NENE_RECORDS_CONTACT_BASE_URL');
+
+                    return new HttpContactSubmissionSender(
+                        is_string($baseUrl) ? $baseUrl : null,
+                        $tokens,
+                    );
+                },
             )
             ->set(
                 SubmitContactFormHandler::class,
