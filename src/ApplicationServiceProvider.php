@@ -25,6 +25,8 @@ use NeNeRecords\Comment\CommentNotFoundExceptionHandler;
 use NeNeRecords\Comment\CommentRouteRegistrar;
 use NeNeRecords\Comment\CommentServiceProvider;
 use NeNeRecords\Config\ConfigServiceProvider;
+use NeNeRecords\ContactSubmission\ContactSubmissionRouteRegistrar;
+use NeNeRecords\ContactSubmission\ContactSubmissionServiceProvider;
 use NeNeRecords\Dashboard\DashboardRouteRegistrar;
 use NeNeRecords\Dashboard\DashboardServiceProvider;
 use NeNeRecords\DataMigration\DataMigrationRouteRegistrar;
@@ -188,6 +190,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
             ->addProvider(new WidgetServiceProvider())
             ->addProvider(new WebhookServiceProvider())
             ->addProvider(new OrgConnectServiceProvider())
+            ->addProvider(new ContactSubmissionServiceProvider())
             ->addProvider(new PreviewTokenServiceProvider())
             ->addProvider(new DashboardServiceProvider())
             ->addProvider(new UserServiceProvider())
@@ -237,6 +240,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $widget = $container->get('nene-records.route_registrar.widget');
                     $webhook = $container->get('nene-records.route_registrar.webhook');
                     $connectToken = $container->get('nene-records.route_registrar.connect_token');
+                    $contactSubmission = $container->get('nene-records.route_registrar.contact_submission');
                     $previewToken = $container->get('nene-records.route_registrar.preview_token');
                     $dashboard = $container->get('nene-records.route_registrar.dashboard');
                     $account = $container->get('nene-records.route_registrar.account');
@@ -278,6 +282,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         || !$widget instanceof WidgetRouteRegistrar
                         || !$webhook instanceof WebhookRouteRegistrar
                         || !$connectToken instanceof ConnectTokenRouteRegistrar
+                        || !$contactSubmission instanceof ContactSubmissionRouteRegistrar
                         || !$previewToken instanceof PreviewTokenRouteRegistrar
                         || !$dashboard instanceof DashboardRouteRegistrar
                         || !$account instanceof AccountRouteRegistrar
@@ -323,6 +328,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $widget,
                         $webhook,
                         $connectToken,
+                        $contactSubmission,
                         $previewToken,
                         $dashboard,
                         $account,

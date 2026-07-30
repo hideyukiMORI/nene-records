@@ -124,6 +124,23 @@ function ConsumerContactForm({ formKey, blockId }: { formKey: string; blockId: s
   return (
     <form className="block block--contact-form" method="post" action={schema.submitPath}>
       <input type="hidden" name="form_key" value={schema.formKey} />
+      {/* Same two control inputs the server emits, so a hydrated form behaves identically:
+          where to return to, and the decoy the proxy checks. The decoy is kept out of the
+          keyboard order and the accessibility tree — a trap a screen-reader user could fall
+          into would be a bug, not a defence. */}
+      <input
+        type="hidden"
+        name="return_path"
+        value={typeof window === 'undefined' ? '' : window.location.pathname}
+      />
+      {schema.honeypotField === undefined ? null : (
+        <p style={{ position: 'absolute', left: '-9999px' }} aria-hidden="true">
+          <label>
+            Website
+            <input type="text" name={schema.honeypotField} tabIndex={-1} autoComplete="off" />
+          </label>
+        </p>
+      )}
       {schema.fields.map((field) => (
         <p className="contact-form__field" key={field.key}>
           <label htmlFor={fieldId(field.key)}>{field.label}</label>
