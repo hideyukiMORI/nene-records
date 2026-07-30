@@ -59,6 +59,9 @@ final readonly class AesGcmConfigCipher implements ConfigCipherInterface
 
         $plaintext = openssl_decrypt($ciphertext, self::CIPHER, $key, OPENSSL_RAW_DATA, $iv, $tag);
 
+        // An empty result is treated as failure, not as a valid empty secret: nothing that
+        // belongs in here is legitimately empty, and returning '' would hand a caller
+        // something that looks usable. The interface promises a non-empty-string.
         if ($plaintext === false || $plaintext === '') {
             throw new ConfigDecryptException('Configuration envelope could not be opened with the configured key.');
         }
