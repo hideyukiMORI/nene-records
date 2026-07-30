@@ -963,6 +963,17 @@ export const de = {
   'admin.blocks.spacerSize.md': 'Mittel',
   'admin.blocks.spacerSize.lg': 'Groß',
   'admin.blocks.divider.hint': 'Eine horizontale Linie — keine Einstellungen.',
+  // contact-form (#1030) — the form itself is rendered server-side (SSR), so the
+  // consumer renderer only shows the failure notice.
+  'admin.blocks.type.contactForm': 'Kontaktformular',
+  'admin.blocks.type.contactForm.desc': 'Ein eingebettetes Kontaktformular',
+  'admin.blocks.field.formKey': 'Formularschlüssel',
+  'admin.blocks.error.formKeyRequired': 'Ein Formularschlüssel ist erforderlich.',
+  'admin.blocks.error.formKeyInvalid':
+    'Erlaubt sind nur Buchstaben, Ziffern, Bindestrich und Unterstrich.',
+  'admin.blocks.contactForm.hint':
+    'Das Formular wird serverseitig gerendert und hier deshalb nicht als Vorschau angezeigt. Fügen Sie den Formularschlüssel aus dem Produkt „contact“ ein.',
+  'public.blocks.contactForm.unavailable': 'Dieses Formular ist vorübergehend nicht verfügbar.',
   // ── Home hero (#486) ──────────────────────────────────────────────────────
   'admin.homeHero.title': 'Startseiten-Hero',
   'admin.homeHero.description':

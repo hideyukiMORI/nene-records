@@ -67,6 +67,8 @@ function blockTypeIcon(type: BlockType) {
       return IconChevronDown
     case 'divider':
       return IconMenu
+    case 'contact-form':
+      return IconMessageCircle
   }
 }
 
@@ -95,6 +97,8 @@ function rawSummary(block: Block): string {
     case 'spacer':
     case 'divider':
       return ''
+    case 'contact-form':
+      return block.data.formKey
   }
 }
 

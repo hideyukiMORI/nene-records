@@ -972,6 +972,16 @@ export const ja = {
   'admin.blocks.spacerSize.md': '中',
   'admin.blocks.spacerSize.lg': '大',
   'admin.blocks.divider.hint': '水平の罫線です（設定なし）。',
+  // contact-form (#1030) — the form itself is rendered server-side (SSR), so the
+  // consumer renderer only shows the failure notice.
+  'admin.blocks.type.contactForm': 'お問い合わせフォーム',
+  'admin.blocks.type.contactForm.desc': '埋め込みのお問い合わせフォーム',
+  'admin.blocks.field.formKey': 'フォームキー',
+  'admin.blocks.error.formKeyRequired': 'フォームキーを入力してください。',
+  'admin.blocks.error.formKeyInvalid': '使用できるのは英数字・ハイフン・アンダースコアだけです。',
+  'admin.blocks.contactForm.hint':
+    'フォームはサーバー側で描画されるため、ここではプレビューされません。contact 製品のフォームキーを貼り付けてください。',
+  'public.blocks.contactForm.unavailable': 'このフォームは一時的にご利用いただけません。',
 
   // ── Home hero (#486) ──────────────────────────────────────────────────────
   'admin.homeHero.title': 'ホームヒーロー',

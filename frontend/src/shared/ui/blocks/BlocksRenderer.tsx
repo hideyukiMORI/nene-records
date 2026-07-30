@@ -82,6 +82,20 @@ function ConsumerBlock({ block }: { block: Block }) {
       return <div className="spacer" data-spacer-size={block.data.size} aria-hidden="true" />
     case 'divider':
       return <hr className="divider" />
+    // contact-form (#1030): deliberately not drawn here *yet*.
+    //
+    // The form is rendered server-side so it is crawlable and works without JS. But this
+    // SPA replaces the SSR markup on mount (see the comment above `#root` in
+    // templates/public/record-detail.php), so leaving this case empty means the form
+    // disappears for everyone who has JavaScript — i.e. almost everyone. Drawing it here
+    // needs the form schema on the client, which is why the open decision is to ship the
+    // resolved schema in the SSR bootstrap and render from that.
+    //
+    // Returning null is the honest placeholder while that is decided: it is what already
+    // happens, now written down. This block type must not ship until this case draws the
+    // same form the server did.
+    case 'contact-form':
+      return null
   }
 }
 

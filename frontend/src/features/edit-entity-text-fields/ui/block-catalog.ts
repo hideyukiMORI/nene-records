@@ -38,6 +38,11 @@ export const BLOCK_CATALOG: readonly BlockCatalogEntry[] = [
     labelKey: 'admin.blocks.type.divider',
     descKey: 'admin.blocks.type.divider.desc',
   },
+  {
+    type: 'contact-form',
+    labelKey: 'admin.blocks.type.contactForm',
+    descKey: 'admin.blocks.type.contactForm.desc',
+  },
 ]
 
 const CATALOG_BY_TYPE = Object.fromEntries(

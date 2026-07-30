@@ -974,6 +974,16 @@ export const en = {
   'admin.blocks.spacerSize.md': 'Medium',
   'admin.blocks.spacerSize.lg': 'Large',
   'admin.blocks.divider.hint': 'A horizontal rule — no settings.',
+  // contact-form (#1030) — the form itself is rendered server-side (SSR), so the
+  // consumer renderer only shows the failure notice.
+  'admin.blocks.type.contactForm': 'Contact form',
+  'admin.blocks.type.contactForm.desc': 'An embedded contact form',
+  'admin.blocks.field.formKey': 'Form key',
+  'admin.blocks.error.formKeyRequired': 'A form key is required.',
+  'admin.blocks.error.formKeyInvalid': 'Only letters, digits, hyphen and underscore are allowed.',
+  'admin.blocks.contactForm.hint':
+    'The form is rendered by the server, so it is not previewed here. Paste the form key from the contact product.',
+  'public.blocks.contactForm.unavailable': 'This form is temporarily unavailable.',
 
   // ── Home hero (#486) ──────────────────────────────────────────────────────
   'admin.homeHero.title': 'Home hero',
