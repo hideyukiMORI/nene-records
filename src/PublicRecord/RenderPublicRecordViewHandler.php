@@ -33,6 +33,7 @@ final readonly class RenderPublicRecordViewHandler implements PublicRecordViewRe
         private ListWidgetsUseCaseInterface $listWidgets,
         /** Sub-directory install prefix (`APP_BASE_PATH`); '' = served at root. */
         private string $basePath = '',
+        private ?SsrBlocksRenderer $blocksRenderer = null,
     ) {
     }
 
@@ -41,6 +42,30 @@ final readonly class RenderPublicRecordViewHandler implements PublicRecordViewRe
      * plus the per-request tenant prefix in directory mode (`/org1`), set by
      * OrgResolverMiddleware on `nene2.base_prefix`. '' = root single-tenant.
      */
+    /**
+     * @param list<PublicRecordViewDisplayField> $displayFields
+     *
+     * @return array<string, string> field key => server-rendered HTML ('' when nothing in the
+     *                               document is server-renderable, which is the case for every
+     *                               document written before #1030)
+     */
+    private function renderBlocks(array $displayFields): array
+    {
+        if ($this->blocksRenderer === null) {
+            return [];
+        }
+
+        $html = [];
+
+        foreach ($displayFields as $field) {
+            if ($field->dataType === 'blocks' && $field->blocksDocument !== null) {
+                $html[$field->fieldKey] = $this->blocksRenderer->render($field->blocksDocument);
+            }
+        }
+
+        return $html;
+    }
+
     private function effectiveBase(ServerRequestInterface $request): string
     {
         return $this->basePath . (string) $request->getAttribute('nene2.base_prefix', '');
@@ -232,6 +257,10 @@ final readonly class RenderPublicRecordViewHandler implements PublicRecordViewRe
             'entityTypeName' => $output->entityTypeName,
             'entityId' => $output->entityId,
             'displayFields' => $output->displayFields,
+            // Pre-rendered once per field: the renderer may reach the issuing product over the
+            // network, so the template must not be able to trigger it twice by evaluating the
+            // same expression in a condition and again in the body.
+            'blocksHtmlByFieldKey' => $this->renderBlocks($output->displayFields),
             'chapterNav' => $output->chapterNav,
             // The front page is a site root, not a node in the path hierarchy: drop the
             // breadcrumb trail + its BreadcrumbList JSON-LD (the template hides both when empty).

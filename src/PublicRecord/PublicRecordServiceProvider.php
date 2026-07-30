@@ -12,6 +12,7 @@ use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\View\HtmlResponseFactory;
 use Nene2\View\NativePhpViewRenderer;
+use NeNeRecords\BlocksField\BlocksFieldRepositoryInterface;
 use NeNeRecords\BoolField\BoolFieldRepositoryInterface;
 use NeNeRecords\DateTimeField\DateTimeFieldRepositoryInterface;
 use NeNeRecords\Entity\EntityRepositoryInterface;
@@ -100,6 +101,7 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
                     $entityRelations = $container->get(EntityRelationRepositoryInterface::class);
                     $publicSettings = $container->get(ListPublicSettingsUseCaseInterface::class);
                     $hierarchyBuilder = $container->get(PublicRecordHierarchyBuilder::class);
+                    $blocksFields = $container->get(BlocksFieldRepositoryInterface::class);
 
                     if (!$entityTypes instanceof EntityTypeRepositoryInterface) {
                         throw new LogicException('Entity type repository service is invalid.');
@@ -107,6 +109,10 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
 
                     if (!$entities instanceof EntityRepositoryInterface) {
                         throw new LogicException('Entity repository service is invalid.');
+                    }
+
+                    if (!$blocksFields instanceof BlocksFieldRepositoryInterface) {
+                        throw new LogicException('Blocks field repository service is invalid.');
                     }
 
                     if (!$hierarchyBuilder instanceof PublicRecordHierarchyBuilder) {
@@ -157,6 +163,7 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
                         $entityRelations,
                         $publicSettings,
                         $hierarchyBuilder,
+                        $blocksFields,
                     );
                 },
             )
@@ -244,6 +251,30 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
                 },
             )
             ->set(
+                ContactFormSchemaProviderInterface::class,
+                static function (ContainerInterface $container): ContactFormSchemaProviderInterface {
+                    // Operator-supplied, not tenant-supplied: one contact deployment serves the
+                    // whole records instance. Unset is a normal state — most tenants never place
+                    // a contact block — and the provider then reports "no schema", which the
+                    // renderer shows as a visible notice rather than an empty page region.
+                    $baseUrl = getenv('NENE_RECORDS_CONTACT_BASE_URL');
+
+                    return new HttpContactFormSchemaProvider(is_string($baseUrl) ? $baseUrl : null);
+                },
+            )
+            ->set(
+                SsrBlocksRenderer::class,
+                static function (ContainerInterface $container): SsrBlocksRenderer {
+                    $schemas = $container->get(ContactFormSchemaProviderInterface::class);
+
+                    if (!$schemas instanceof ContactFormSchemaProviderInterface) {
+                        throw new LogicException('Contact form schema provider service is invalid.');
+                    }
+
+                    return new SsrBlocksRenderer($schemas);
+                },
+            )
+            ->set(
                 RenderPublicRecordViewHandler::class,
                 static function (ContainerInterface $container): RenderPublicRecordViewHandler {
                     $useCase = $container->get(GetPublicRecordViewUseCaseInterface::class);
@@ -254,6 +285,7 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
                     $responseFactory = $container->get(ResponseFactoryInterface::class);
                     $frontPage = $container->get(FrontPageSetting::class);
                     $listWidgets = $container->get(ListWidgetsUseCaseInterface::class);
+                    $blocksRenderer = $container->get(SsrBlocksRenderer::class);
 
                     if (!$useCase instanceof GetPublicRecordViewUseCaseInterface) {
                         throw new LogicException('GetPublicRecordView use case service is invalid.');
@@ -287,6 +319,10 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
                         throw new LogicException('ListWidgets use case service is invalid.');
                     }
 
+                    if (!$blocksRenderer instanceof SsrBlocksRenderer) {
+                        throw new LogicException('SSR blocks renderer service is invalid.');
+                    }
+
                     return new RenderPublicRecordViewHandler(
                         $useCase,
                         $publicSettings,
@@ -298,6 +334,7 @@ final readonly class PublicRecordServiceProvider implements ServiceProviderInter
                         $frontPage,
                         $listWidgets,
                         \NeNeRecords\Http\BasePath::fromEnv(),
+                        $blocksRenderer,
                     );
                 },
             )

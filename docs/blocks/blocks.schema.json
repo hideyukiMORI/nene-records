@@ -28,7 +28,8 @@
             "group",
             "columns",
             "spacer",
-            "divider"
+            "divider",
+            "contact-form"
           ]
         },
         "data": { "type": "object" }
@@ -69,8 +70,31 @@
         {
           "if": { "properties": { "type": { "const": "divider" } } },
           "then": { "properties": { "data": { "$ref": "#/$defs/dividerData" } } }
+        },
+        {
+          "if": { "properties": { "type": { "const": "contact-form" } } },
+          "then": { "properties": { "data": { "$ref": "#/$defs/contactFormData" } } }
         }
       ]
+    },
+    "contactFormData": {
+      "type": "object",
+      "description": "A contact form issued by a sibling product, rendered server-side by records (#1030). The key is a handle, not a secret; the credential lives only on the submission path.",
+      "required": ["formKey"],
+      "properties": {
+        "formKey": {
+          "type": "string",
+          "description": "The issuing product's public form key. Restricted to URL-path-safe characters because it is interpolated into the schema fetch.",
+          "minLength": 1,
+          "maxLength": 64,
+          "pattern": "^[A-Za-z0-9_-]+$"
+        },
+        "variant": {
+          "enum": ["inline"],
+          "description": "Absent means inline. Only inline ships in the first version: modal and chat need a CSP nonce and client JS."
+        }
+      },
+      "additionalProperties": false
     },
     "spacerData": {
       "type": "object",

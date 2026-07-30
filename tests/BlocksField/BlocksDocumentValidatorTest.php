@@ -350,4 +350,60 @@ final class BlocksDocumentValidatorTest extends TestCase
         $this->expectException(ValidationException::class);
         $this->validator->validate('[{"id":"s","type":"spacer","data":{"size":"huge"}}]');
     }
+
+    // ── contact-form (#1030) ──────────────────────────────────────────────────
+
+    public function testAcceptsContactFormWithAndWithoutVariant(): void
+    {
+        // The variant is optional and defaults to inline, so a document written before a
+        // second variant exists stays valid once one is added.
+        $this->validator->validate('[{"id":"c","type":"contact-form","data":{"formKey":"ayane-contact"}}]');
+        $this->validator->validate('[{"id":"c","type":"contact-form","data":{"formKey":"ayane_contact-1","variant":"inline"}}]');
+        $this->addToAssertionCount(1);
+    }
+
+    public function testRejectsContactFormWithoutFormKey(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->validator->validate('[{"id":"c","type":"contact-form","data":{"variant":"inline"}}]');
+    }
+
+    public function testRejectsContactFormWithEmptyFormKey(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->validator->validate('[{"id":"c","type":"contact-form","data":{"formKey":""}}]');
+    }
+
+    public function testRejectsFormKeyThatCouldRedirectTheSchemaFetch(): void
+    {
+        // The key is interpolated into a URL path when the schema is fetched, so path
+        // traversal and absolute URLs must not survive validation.
+        $this->expectException(ValidationException::class);
+        $this->validator->validate('[{"id":"c","type":"contact-form","data":{"formKey":"../../admin/secrets"}}]');
+    }
+
+    public function testRejectsUnshippedVariant(): void
+    {
+        // modal / chat are deliberately not in the first version (they need a CSP nonce and
+        // client JS). Naming one must fail loudly rather than silently render inline.
+        $this->expectException(ValidationException::class);
+        $this->validator->validate('[{"id":"c","type":"contact-form","data":{"formKey":"k","variant":"modal"}}]');
+    }
+
+    public function testContactFormIsALeafSoItMayLiveInsideAGroup(): void
+    {
+        $this->validator->validate(json_encode([
+            [
+                'id' => 'g',
+                'type' => 'group',
+                'data' => [
+                    'tone' => 'card',
+                    'children' => [
+                        ['id' => 'c', 'type' => 'contact-form', 'data' => ['formKey' => 'ayane-contact']],
+                    ],
+                ],
+            ],
+        ], JSON_THROW_ON_ERROR));
+        $this->addToAssertionCount(1);
+    }
 }
