@@ -87,6 +87,10 @@ final class OrganizationScopedSchema
         // No ordering constraints among the rest.
         'access_logs',
         'media',
+        // Connect-tokens another product issued to this org (#1029). Purged with the org so a
+        // deleted tenant leaves no usable credential behind — revocation still belongs to the
+        // issuer, but records must not keep presenting a token for an org that no longer exists.
+        'org_connect_tokens',
         'menus',
         'navigation_items',
         'notification_channels',

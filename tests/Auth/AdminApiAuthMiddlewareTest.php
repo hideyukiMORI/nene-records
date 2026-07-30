@@ -144,7 +144,7 @@ final class AdminApiAuthMiddlewareTest extends TestCase
         // #824: sensitive reads (webhook signing secrets, notification-channel
         // configs, bulk export, org dashboard metrics) must require auth even for
         // GET — they are in ADMIN_ONLY_PREFIXES.
-        foreach (['/api/v1/webhooks', '/api/v1/notification-channels', '/api/v1/entities/export', '/api/v1/dashboard'] as $path) {
+        foreach (['/api/v1/webhooks', '/api/v1/connect-tokens', '/api/v1/notification-channels', '/api/v1/entities/export', '/api/v1/dashboard'] as $path) {
             $request = $this->factory->createServerRequest('GET', 'https://example.test' . $path);
             self::assertSame(
                 401,

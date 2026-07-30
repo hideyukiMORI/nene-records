@@ -85,6 +85,35 @@ final class CapabilityResolverTest extends TestCase
         );
     }
 
+    // ── Connect tokens ────────────────────────────────────────────────────────
+
+    /**
+     * Admin-only for every method, reads included (#1029). Deliberately stricter than the
+     * settings branch next door: an editor holds ReadSettings, and the masked list is still
+     * an inventory of which products this tenant is wired to.
+     */
+    #[DataProvider('provideConnectTokenMethods')]
+    public function testConnectTokensRequireManageSettingsForEveryMethod(string $method): void
+    {
+        self::assertSame(
+            Capability::ManageSettings,
+            CapabilityResolver::resolve('/api/v1/connect-tokens', $method),
+        );
+        self::assertSame(
+            Capability::ManageSettings,
+            CapabilityResolver::resolve('/api/v1/connect-tokens/contact', $method),
+        );
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function provideConnectTokenMethods(): iterable
+    {
+        yield 'GET'    => ['GET'];
+        yield 'HEAD'   => ['HEAD'];
+        yield 'PUT'    => ['PUT'];
+        yield 'DELETE' => ['DELETE'];
+    }
+
     // ── Navigation items ──────────────────────────────────────────────────────
 
     #[DataProvider('provideNavigationItemMutations')]
@@ -350,6 +379,8 @@ final class CapabilityResolverTest extends TestCase
         yield 'user me'             => ['/api/v1/users/me'];
         yield 'own password'        => ['/api/v1/users/me/password'];
         yield 'admin comments'      => ['/api/v1/admin/comments'];
+        yield 'connect-tokens'      => ['/api/v1/connect-tokens'];
+        yield 'connect-token by id' => ['/api/v1/connect-tokens/contact'];
         yield 'entities'            => ['/api/v1/entities'];
         yield 'text-fields'         => ['/api/v1/text-fields'];
         yield 'public records'      => ['/api/v1/public/records/article/my-post'];
