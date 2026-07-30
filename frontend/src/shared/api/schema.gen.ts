@@ -921,6 +921,53 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/connect-tokens": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List connect tokens
+         * @description Returns the connect tokens installed for the current organization, masked. Only a trailing hint is ever returned — never the token, never its stored ciphertext. Admin-only for every method including GET (#1029).
+         */
+        get: operations["listConnectTokens"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/connect-tokens/{service}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The product that issued the token. */
+                service: components["schemas"]["ConnectTokenService"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Install or replace a connect token
+         * @description Stores the token the named product issued to this organization, encrypted at rest. records never mints these — issuance and revocation stay with the issuing product. Replacing an existing token returns 200; the first install returns 201.
+         */
+        put: operations["saveConnectToken"];
+        post?: never;
+        /**
+         * Remove a connect token
+         * @description Deletes the stored token. This does not revoke it — revocation belongs to the issuing product.
+         */
+        delete: operations["deleteConnectToken"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/webhooks": {
         parameters: {
             query?: never;
@@ -2980,6 +3027,27 @@ export interface components {
             /** @description The full base engine stylesheet (includes flag implementations). */
             css: string;
             note: string;
+        };
+        /**
+         * @description Allow-list of products records may hold a connect token for. Not free text — the value is part of the storage key and of this URL.
+         * @enum {string}
+         */
+        ConnectTokenService: "contact";
+        ConnectTokenResponse: {
+            service: components["schemas"]["ConnectTokenService"];
+            /** @description Trailing characters of the installed token, so an operator can tell which one is in place. The token itself is never returned by any endpoint. */
+            token_hint: string;
+            /** Format: date-time */
+            created_at: string;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        ConnectTokenListResponse: {
+            items: components["schemas"]["ConnectTokenResponse"][];
+        };
+        SaveConnectTokenRequest: {
+            /** @description The raw token as issued by the other product. Write-only: it is encrypted before storage and no endpoint reads it back. */
+            token: string;
         };
         WebhookResponse: {
             /** Format: int64 */
@@ -5640,6 +5708,88 @@ export interface operations {
             };
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    listConnectTokens: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Installed connect tokens, masked. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConnectTokenListResponse"];
+                };
+            };
+        };
+    };
+    saveConnectToken: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The product that issued the token. */
+                service: components["schemas"]["ConnectTokenService"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaveConnectTokenRequest"];
+            };
+        };
+        responses: {
+            /** @description Existing token replaced. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConnectTokenResponse"];
+                };
+            };
+            /** @description Token installed. */
+            201: {
+                headers: {
+                    /** @example /api/v1/connect-tokens/contact */
+                    Location?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConnectTokenResponse"];
+                };
+            };
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["ValidationFailed"];
+        };
+    };
+    deleteConnectToken: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The product that issued the token. */
+                service: components["schemas"]["ConnectTokenService"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Token removed. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             404: components["responses"]["NotFound"];
         };
     };

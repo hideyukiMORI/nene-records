@@ -47,6 +47,14 @@ final class CapabilityResolver
             };
         }
 
+        // Connect-tokens are admin-only for every method, reads included (#1029). Editors get
+        // ReadSettings, which is why this is not folded into the settings branch above: the
+        // masked list is still an inventory of the tenant's integrations, and installing one
+        // is handing records a credential.
+        if (str_starts_with($path, '/api/v1/connect-tokens')) {
+            return Capability::ManageSettings;
+        }
+
         if (str_starts_with($path, '/api/v1/navigation-items')) {
             return match ($method) {
                 'POST', 'PUT', 'DELETE' => Capability::ManageSettings,

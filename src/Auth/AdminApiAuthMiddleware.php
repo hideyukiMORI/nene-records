@@ -69,6 +69,10 @@ final readonly class AdminApiAuthMiddleware implements MiddlewareInterface
         // (`/api/v1/webhooks/process-deliveries` stays open via ALWAYS_OPEN above,
         // which is matched first.)
         '/api/v1/webhooks',
+        // Connect-tokens: the credentials another product issued to this tenant. Reads are
+        // masked, but the list still says which integrations are installed, and PUT installs
+        // a credential — neither belongs on an anonymous surface. See #1029.
+        '/api/v1/connect-tokens',
         '/api/v1/notification-channels',
         '/api/v1/entities/export',
         '/api/v1/dashboard',

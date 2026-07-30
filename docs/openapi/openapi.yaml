@@ -48,6 +48,10 @@ tags:
     description: Ordered navigation link management for the public site header.
   - name: Webhooks
     description: Webhook endpoints for entity create/update/delete event notifications.
+  - name: ConnectTokens
+    description: >-
+      Credentials issued to this organization by a sibling product, held by records and
+      presented on server-to-server calls. Stored encrypted; never returned (#1029).
   - name: Users
     description: User account management (admin only) and self-service password change.
   - name: Themes
@@ -2534,6 +2538,81 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /api/v1/connect-tokens:
+    get:
+      tags:
+        - ConnectTokens
+      summary: List connect tokens
+      description: >-
+        Returns the connect tokens installed for the current organization, masked.
+        Only a trailing hint is ever returned — never the token, never its stored
+        ciphertext. Admin-only for every method including GET (#1029).
+      operationId: listConnectTokens
+      responses:
+        '200':
+          description: Installed connect tokens, masked.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectTokenListResponse'
+  /api/v1/connect-tokens/{service}:
+    parameters:
+      - name: service
+        in: path
+        required: true
+        description: The product that issued the token.
+        schema:
+          $ref: '#/components/schemas/ConnectTokenService'
+    put:
+      tags:
+        - ConnectTokens
+      summary: Install or replace a connect token
+      description: >-
+        Stores the token the named product issued to this organization, encrypted at
+        rest. records never mints these — issuance and revocation stay with the issuing
+        product. Replacing an existing token returns 200; the first install returns 201.
+      operationId: saveConnectToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SaveConnectTokenRequest'
+      responses:
+        '200':
+          description: Existing token replaced.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectTokenResponse'
+        '201':
+          description: Token installed.
+          headers:
+            Location:
+              schema:
+                type: string
+              example: /api/v1/connect-tokens/contact
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectTokenResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+    delete:
+      tags:
+        - ConnectTokens
+      summary: Remove a connect token
+      description: >-
+        Deletes the stored token. This does not revoke it — revocation belongs to the
+        issuing product.
+      operationId: deleteConnectToken
+      responses:
+        '204':
+          description: Token removed.
         '404':
           $ref: '#/components/responses/NotFound'
   /api/v1/webhooks:
@@ -7401,6 +7480,60 @@ components:
       additionalProperties: false
 
 
+    ConnectTokenService:
+      type: string
+      enum:
+        - contact
+      description: >-
+        Allow-list of products records may hold a connect token for. Not free text —
+        the value is part of the storage key and of this URL.
+    ConnectTokenResponse:
+      type: object
+      required:
+        - service
+        - token_hint
+        - created_at
+        - updated_at
+      properties:
+        service:
+          $ref: '#/components/schemas/ConnectTokenService'
+        token_hint:
+          type: string
+          maxLength: 8
+          description: >-
+            Trailing characters of the installed token, so an operator can tell which
+            one is in place. The token itself is never returned by any endpoint.
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      additionalProperties: false
+    ConnectTokenListResponse:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConnectTokenResponse'
+      additionalProperties: false
+    SaveConnectTokenRequest:
+      type: object
+      required:
+        - token
+      properties:
+        token:
+          type: string
+          minLength: 16
+          maxLength: 4096
+          pattern: '^[A-Za-z0-9._~+/=-]+$'
+          description: >-
+            The raw token as issued by the other product. Write-only: it is encrypted
+            before storage and no endpoint reads it back.
+      additionalProperties: false
     WebhookResponse:
       type: object
       required:

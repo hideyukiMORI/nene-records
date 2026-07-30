@@ -24,6 +24,7 @@ use NeNeRecords\BoolField\BoolFieldServiceProvider;
 use NeNeRecords\Comment\CommentNotFoundExceptionHandler;
 use NeNeRecords\Comment\CommentRouteRegistrar;
 use NeNeRecords\Comment\CommentServiceProvider;
+use NeNeRecords\Config\ConfigServiceProvider;
 use NeNeRecords\Dashboard\DashboardRouteRegistrar;
 use NeNeRecords\Dashboard\DashboardServiceProvider;
 use NeNeRecords\DataMigration\DataMigrationRouteRegistrar;
@@ -88,6 +89,9 @@ use NeNeRecords\Organization\OrganizationRouteRegistrar;
 use NeNeRecords\Organization\OrganizationServiceProvider;
 use NeNeRecords\Organization\OrganizationSlugConflictExceptionHandler;
 use NeNeRecords\Organization\TlsCheckRouteRegistrar;
+use NeNeRecords\OrgConnect\ConnectTokenNotFoundExceptionHandler;
+use NeNeRecords\OrgConnect\ConnectTokenRouteRegistrar;
+use NeNeRecords\OrgConnect\OrgConnectServiceProvider;
 use NeNeRecords\OrgExport\OrgExportRouteRegistrar;
 use NeNeRecords\OrgExport\OrgExportServiceProvider;
 use NeNeRecords\PreviewToken\PreviewTokenNotFoundExceptionHandler;
@@ -160,6 +164,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
         );
 
         $builder
+            ->addProvider(new ConfigServiceProvider())
             ->addProvider(new AccountServiceProvider())
             ->addProvider(new EntityArchiveServiceProvider())
             ->addProvider(new EntityTypeServiceProvider())
@@ -182,6 +187,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
             ->addProvider(new MenuServiceProvider())
             ->addProvider(new WidgetServiceProvider())
             ->addProvider(new WebhookServiceProvider())
+            ->addProvider(new OrgConnectServiceProvider())
             ->addProvider(new PreviewTokenServiceProvider())
             ->addProvider(new DashboardServiceProvider())
             ->addProvider(new UserServiceProvider())
@@ -230,6 +236,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $menu = $container->get('nene-records.route_registrar.menu');
                     $widget = $container->get('nene-records.route_registrar.widget');
                     $webhook = $container->get('nene-records.route_registrar.webhook');
+                    $connectToken = $container->get('nene-records.route_registrar.connect_token');
                     $previewToken = $container->get('nene-records.route_registrar.preview_token');
                     $dashboard = $container->get('nene-records.route_registrar.dashboard');
                     $account = $container->get('nene-records.route_registrar.account');
@@ -270,6 +277,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         || !$menu instanceof MenuRouteRegistrar
                         || !$widget instanceof WidgetRouteRegistrar
                         || !$webhook instanceof WebhookRouteRegistrar
+                        || !$connectToken instanceof ConnectTokenRouteRegistrar
                         || !$previewToken instanceof PreviewTokenRouteRegistrar
                         || !$dashboard instanceof DashboardRouteRegistrar
                         || !$account instanceof AccountRouteRegistrar
@@ -314,6 +322,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $menu,
                         $widget,
                         $webhook,
+                        $connectToken,
                         $previewToken,
                         $dashboard,
                         $account,
@@ -380,6 +389,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $menuNotFound = $container->get(MenuNotFoundExceptionHandler::class);
                     $widgetNotFound = $container->get(WidgetNotFoundExceptionHandler::class);
                     $webhookNotFound = $container->get(WebhookNotFoundExceptionHandler::class);
+                    $connectTokenNotFound = $container->get(ConnectTokenNotFoundExceptionHandler::class);
                     $previewTokenNotFound = $container->get(PreviewTokenNotFoundExceptionHandler::class);
                     $userNotFound = $container->get(UserNotFoundExceptionHandler::class);
                     $userEmailConflict = $container->get(UserEmailConflictExceptionHandler::class);
@@ -433,6 +443,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $menuNotFound,
                         $widgetNotFound,
                         $webhookNotFound,
+                        $connectTokenNotFound,
                         $previewTokenNotFound,
                         $userNotFound,
                         $userEmailConflict,
@@ -491,6 +502,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $menuNotFound,
                         $widgetNotFound,
                         $webhookNotFound,
+                        $connectTokenNotFound,
                         $previewTokenNotFound,
                         $userNotFound,
                         $userEmailConflict,
