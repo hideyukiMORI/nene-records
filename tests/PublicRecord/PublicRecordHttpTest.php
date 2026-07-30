@@ -13,11 +13,15 @@ use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RuntimeApplicationFactory;
 use Nene2\View\HtmlResponseFactory;
 use Nene2\View\NativePhpViewRenderer;
+use NeNeRecords\BlocksField\BlocksField;
 use NeNeRecords\Entity\Entity;
 use NeNeRecords\Entity\EntityStatus;
 use NeNeRecords\EntityType\EntityType;
 use NeNeRecords\EntityType\SeoPageKind;
 use NeNeRecords\FieldDef\FieldDef;
+use NeNeRecords\PublicRecord\ContactFormField;
+use NeNeRecords\PublicRecord\ContactFormSchema;
+use NeNeRecords\PublicRecord\ContactFormSchemaProviderInterface;
 use NeNeRecords\PublicRecord\FrontPageSetting;
 use NeNeRecords\PublicRecord\GenerateSitemapUseCase;
 use NeNeRecords\PublicRecord\GetPublicRecordHierarchyHandler;
@@ -34,8 +38,10 @@ use NeNeRecords\PublicRecord\RenderPublicRecordViewHandler;
 use NeNeRecords\PublicRecord\RenderRobotsHandler;
 use NeNeRecords\PublicRecord\RenderSitemapHandler;
 use NeNeRecords\PublicRecord\ResolvePublicPermalinkHandler;
+use NeNeRecords\PublicRecord\SsrBlocksRenderer;
 use NeNeRecords\Setting\ListPublicSettingsUseCase;
 use NeNeRecords\Setting\SettingDef;
+use NeNeRecords\Tests\BlocksField\InMemoryBlocksFieldRepository;
 use NeNeRecords\Tests\BoolField\InMemoryBoolFieldRepository;
 use NeNeRecords\Tests\DateTimeField\InMemoryDateTimeFieldRepository;
 use NeNeRecords\Tests\Entity\InMemoryEntityRepository;
@@ -83,6 +89,8 @@ final class PublicRecordHttpTest extends TestCase
         ?string $entity10Layout = null,
         string $typeDefaultLayout = 'standard',
         SeoPageKind $seoPageKind = SeoPageKind::Article,
+        ?string $blocksDocument = null,
+        ?ContactFormSchema $contactFormSchema = null,
     ): RequestHandlerInterface {
         $entityTypes = new InMemoryEntityTypeRepository([
             // Declared Article on purpose: most tests here assert the dated-entry
@@ -169,6 +177,13 @@ final class PublicRecordHttpTest extends TestCase
         ]);
         $publicSettings = new ListPublicSettingsUseCase(new InMemorySettingRepository($settingDefs), $mediaRepository, $frontPage);
 
+        $blocksFields = new InMemoryBlocksFieldRepository();
+
+        if ($blocksDocument !== null) {
+            $fieldDefs->save(new FieldDef(entityTypeId: 1, fieldKey: 'sections', dataType: 'blocks', id: 90));
+            $blocksFields->save(new BlocksField(10, 'sections', $blocksDocument));
+        }
+
         $useCase = new GetPublicRecordViewUseCase(
             $entityTypes,
             $entities,
@@ -181,6 +196,7 @@ final class PublicRecordHttpTest extends TestCase
             new InMemoryEntityRelationRepository(),
             $publicSettings,
             new PublicRecordHierarchyBuilder($entities, $textFields),
+            $blocksFields,
         );
 
         $jsonResponse = new JsonResponseFactory($this->factory, $this->factory);
@@ -205,7 +221,16 @@ final class PublicRecordHttpTest extends TestCase
             machineApiKey: null,
         );
 
-        $renderHandler = new RenderPublicRecordViewHandler($useCase, $publicSettings, $htmlResponse, $config, $projectRoot, $this->factory, new PublicHtmlSanitizer(), $frontPage, new ListWidgetsUseCase(new InMemoryWidgetRepository()), $basePath);
+        $renderHandler = new RenderPublicRecordViewHandler($useCase, $publicSettings, $htmlResponse, $config, $projectRoot, $this->factory, new PublicHtmlSanitizer(), $frontPage, new ListWidgetsUseCase(new InMemoryWidgetRepository()), $basePath, new SsrBlocksRenderer(new class ($contactFormSchema) implements ContactFormSchemaProviderInterface {
+            public function __construct(private readonly ?ContactFormSchema $schema)
+            {
+            }
+
+            public function schemaFor(string $formKey): ?ContactFormSchema
+            {
+                return $this->schema;
+            }
+        }));
         $this->renderHandler = $renderHandler;
         $customPermalink = new RenderCustomPermalinkHandler($entities, $entityTypes, $renderHandler);
         $registrar = new PublicRecordRouteRegistrar(
@@ -1047,6 +1072,56 @@ final class PublicRecordHttpTest extends TestCase
         )->getBody();
 
         self::assertSame('bare', $this->bootstrapOf($html)['entityTypes']['items'][0]['default_layout']);
+    }
+
+    // ── blocks SSR (#1030) ────────────────────────────────────────────────────
+
+    /**
+     * hub 検収条件1, at the level that actually ships. A record whose blocks document is made
+     * only of the pre-#1030 types must still render the labelled "—" row and no block markup:
+     * the template branch is entered on "the renderer produced HTML", not on "this is a blocks
+     * field", so an unchanged document takes the same path it always took.
+     *
+     * This asserts the rendered markup, not a byte diff against a build without the feature —
+     * that stronger claim is pinned one level down, where `SsrBlocksRenderer` returns '' for
+     * exactly this document (`SsrBlocksRendererTest`).
+     */
+    public function testLegacyBlocksDocumentRendersNoServerSideBlockMarkup(): void
+    {
+        $legacy = '[{"id":"t","type":"text","data":{"markdown":"hello"}},{"id":"d","type":"divider","data":{}}]';
+
+        $html = (string) $this->buildApplication(false, $this->projectRoot, blocksDocument: $legacy)
+            ->handle($this->factory->createServerRequest('GET', 'https://example.test/article/hello-world'))
+            ->getBody();
+
+        self::assertStringNotContainsString('blocks-ssr', $html);
+        self::assertStringNotContainsString('<form', $html);
+        self::assertStringContainsString('<h2>sections</h2>', $html);
+        self::assertStringContainsString('<p>—</p>', $html);
+    }
+
+    /** The positive control: a contact-form document does change the page. */
+    public function testContactFormBlockIsRenderedIntoTheCrawlableHtml(): void
+    {
+        $document = '[{"id":"c","type":"contact-form","data":{"formKey":"ayane-contact","variant":"inline"}}]';
+        $schema = new ContactFormSchema('ayane-contact', [
+            new ContactFormField('email', 'Email', 'email', true),
+            new ContactFormField('message', 'Message', 'textarea', true),
+        ]);
+
+        $html = (string) $this->buildApplication(
+            false,
+            $this->projectRoot,
+            blocksDocument: $document,
+            contactFormSchema: $schema,
+        )->handle($this->factory->createServerRequest('GET', 'https://example.test/article/hello-world'))->getBody();
+
+        self::assertStringContainsString('class="blocks-ssr"', $html);
+        self::assertStringContainsString('action="/api/v1/public/contact-submissions"', $html);
+        self::assertStringContainsString('type="email"', $html);
+        self::assertStringContainsString('<textarea', $html);
+        // The form is crawlable and JS-free, so the labelled "—" fallback must be gone.
+        self::assertStringNotContainsString('<h2>sections</h2>', $html);
     }
 
     /** @return array<string, mixed> the SSR bootstrap payload the SPA hydrates from */

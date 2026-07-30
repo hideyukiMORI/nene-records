@@ -52,6 +52,19 @@ final class BlocksDocumentValidator
 
     private const SPACER_SIZES = ['sm', 'md', 'lg'];
 
+    /**
+     * Display variants of the contact-form block (#1030). Only `inline` ships in the first
+     * version: it renders as pure SSR, while `modal` and `chat` would need a CSP nonce and
+     * client JS. Adding a variant later is additive — an old document naming a variant this
+     * list does not know is rejected on write, never silently downgraded.
+     *
+     * @var list<string>
+     */
+    private const CONTACT_FORM_VARIANTS = ['inline'];
+
+    /** contact's `public_form_key` — an opaque handle, not a secret. */
+    private const MAX_FORM_KEY_LEN = 64;
+
     private const MAX_GALLERY_ITEMS = 50;
     private const MAX_SERIES_POINTS = 60;
     private const MAX_SERIES_LABEL_LEN = 120;
@@ -145,6 +158,7 @@ final class BlocksDocumentValidator
             'group' => $this->validateGroupData($path, $data, $count, $errors),
             'columns' => $this->validateColumnsData($path, $data, $count, $errors),
             'spacer' => $this->validateSpacerData($path, $data, $errors),
+            'contact-form' => $this->validateContactFormData($path, $data, $errors),
             default => null,
         };
     }
@@ -234,6 +248,51 @@ final class BlocksDocumentValidator
         $size = $data['size'] ?? null;
         if (!is_string($size) || !in_array($size, self::SPACER_SIZES, true)) {
             $errors[] = new ValidationError("{$path}.data.size", 'Spacer size must be one of: ' . implode(', ', self::SPACER_SIZES) . '.', 'invalid');
+        }
+    }
+
+    /**
+     * `{ formKey, variant? }` — the author names a form that lives in another product; records
+     * fetches its schema server-side and renders the fields.
+     *
+     * The key is checked for shape only. Whether the form exists is not knowable here (it is
+     * contact's data, and this validator must not make a network call on save), so an author
+     * typo surfaces at render time as a visible failure rather than a silent blank — the same
+     * fail-visible rule the submission proxy follows (#1031).
+     *
+     * @param array<array-key, mixed> $data
+     * @param list<ValidationError>   $errors
+     */
+    private function validateContactFormData(string $path, array $data, array &$errors): void
+    {
+        $formKey = $data['formKey'] ?? null;
+
+        if (!is_string($formKey) || $formKey === '' || strlen($formKey) > self::MAX_FORM_KEY_LEN) {
+            $errors[] = new ValidationError(
+                "{$path}.data.formKey",
+                'Contact form block requires a form key (max ' . self::MAX_FORM_KEY_LEN . ' chars).',
+                'invalid',
+            );
+        } elseif (preg_match('/^[A-Za-z0-9_-]+$/', $formKey) !== 1) {
+            // The key is interpolated into a URL path when the schema is fetched. Restricting
+            // it here means the fetch cannot be talked into addressing something else.
+            $errors[] = new ValidationError(
+                "{$path}.data.formKey",
+                'Contact form key may only contain letters, digits, hyphen and underscore.',
+                'invalid',
+            );
+        }
+
+        $variant = $data['variant'] ?? null;
+
+        // Absent means `inline`. Storing the default explicitly is allowed but not required,
+        // so a document written before a second variant existed stays valid.
+        if ($variant !== null && (!is_string($variant) || !in_array($variant, self::CONTACT_FORM_VARIANTS, true))) {
+            $errors[] = new ValidationError(
+                "{$path}.data.variant",
+                'Contact form variant must be one of: ' . implode(', ', self::CONTACT_FORM_VARIANTS) . '.',
+                'invalid',
+            );
         }
     }
 

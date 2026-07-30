@@ -348,6 +348,36 @@ export function BlockInspector({
         </span>
       )
 
+    case 'contact-form': {
+      const data = block.data
+      return (
+        <Stack gap="sm">
+          <Input
+            id={`${idPrefix}-form-key`}
+            label={t('admin.blocks.field.formKey')}
+            value={data.formKey}
+            disabled={disabled}
+            autoComplete="off"
+            error={
+              errorCode === 'form-key-required'
+                ? t('admin.blocks.error.formKeyRequired')
+                : errorCode === 'form-key-invalid'
+                  ? t('admin.blocks.error.formKeyInvalid')
+                  : undefined
+            }
+            onChange={(event) => {
+              onChange({ ...data, formKey: event.target.value })
+            }}
+          />
+          {/* The form is drawn by the server, so the editor cannot preview it — say so rather
+              than leaving the author wondering why nothing appears here. */}
+          <span className="font-sans text-caption text-text-muted">
+            {t('admin.blocks.contactForm.hint')}
+          </span>
+        </Stack>
+      )
+    }
+
     case 'hero': {
       const data = block.data
       return (

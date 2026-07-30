@@ -14,6 +14,33 @@ export interface PublicRecordBootstrapRelationQuery {
   items: Array<{ field_key: string; target_entity_id: number }>
 }
 
+/**
+ * A contact form's public schema, resolved server-side while rendering the SSR form and
+ * handed to the client in the bootstrap (#1030).
+ *
+ * The client never fetches this itself: rendering from the same resolved data is what makes
+ * the crawlable form and the hydrated form provably identical, and it costs no extra request.
+ * Nothing secret is in here — the form key is a handle, and the credential lives only on the
+ * submission path (#1031).
+ */
+export interface PublicContactFormFieldDto {
+  key: string
+  label: string
+  type: string
+  required: boolean
+  options: string[]
+}
+
+export interface PublicContactFormSchemaDto {
+  formKey: string
+  /** Where the form posts — always the records-side proxy, never the issuing product. */
+  submitPath: string
+  consentRequired: boolean
+  consentLabel: string | null
+  submitLabel: string | null
+  fields: PublicContactFormFieldDto[]
+}
+
 export interface PublicRecordBootstrapDto {
   entityTypeSlug: string
   entityTypeId: number
@@ -37,6 +64,17 @@ export interface PublicRecordBootstrapDto {
   hierarchy?: PublicRecordHierarchyDto
   /** The path the SPA resolves this record by — lets us seed the resolve query (#881). */
   canonicalPath?: string
+  /** Form key => schema, for the contact-form blocks on this page (#1030). */
+  contactForms?: Record<string, PublicContactFormSchemaDto>
+}
+
+/**
+ * The schema for one contact form, or null when the page carries none (no block, or the
+ * server could not resolve it — in which case the server rendered a visible notice and there
+ * is nothing for the client to draw either).
+ */
+export function readContactFormSchema(formKey: string): PublicContactFormSchemaDto | null {
+  return readPublicRecordBootstrap()?.contactForms?.[formKey] ?? null
 }
 
 export function readPublicRecordBootstrap(): PublicRecordBootstrapDto | null {

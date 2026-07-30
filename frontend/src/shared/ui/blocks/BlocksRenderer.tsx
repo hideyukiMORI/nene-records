@@ -9,6 +9,10 @@ import {
   type GroupBlockData,
   type HeroBlockData,
 } from '@/shared/lib/blocks-document'
+import {
+  readContactFormSchema,
+  type PublicContactFormFieldDto,
+} from '@/shared/lib/public-record-bootstrap'
 import { PublicMarkdownContent } from '@/shared/ui/markdown'
 import { ResponsiveImage } from '@/shared/ui/media/ResponsiveImage'
 
@@ -82,7 +86,87 @@ function ConsumerBlock({ block }: { block: Block }) {
       return <div className="spacer" data-spacer-size={block.data.size} aria-hidden="true" />
     case 'divider':
       return <hr className="divider" />
+    case 'contact-form':
+      return <ConsumerContactForm formKey={block.data.formKey} blockId={block.id} />
   }
+}
+
+/**
+ * Contact form (#1030), drawn from the schema the *server* resolved and shipped in the SSR
+ * bootstrap.
+ *
+ * Why not fetch it here: this SPA replaces the server-rendered markup on mount (see the
+ * comment above `#root` in templates/public/record-detail.php). If the client asked the
+ * issuing product again it could get a different answer than the crawler saw. Rendering both
+ * from one resolved payload makes "the crawlable form and the hydrated form agree" structural
+ * rather than hopeful — and costs no extra request.
+ *
+ * The form posts to `submitPath`, which the server put in the bootstrap: the records-side
+ * proxy. A form posting straight at the issuing product would need the connect-token in the
+ * browser, which is the thing this whole design exists to prevent.
+ */
+function ConsumerContactForm({ formKey, blockId }: { formKey: string; blockId: string }) {
+  const { t } = useTranslation()
+  const schema = readContactFormSchema(formKey)
+
+  if (schema === null) {
+    // Matches the server's fail-visible notice: an empty region would read as "this page has
+    // no form" and the author would never learn the key was wrong.
+    return (
+      <div className="block block--contact-form contact-form--unavailable">
+        <p>{t('public.blocks.contactForm.unavailable')}</p>
+      </div>
+    )
+  }
+
+  const fieldId = (key: string) => `contact-${blockId}-${key}`
+
+  return (
+    <form className="block block--contact-form" method="post" action={schema.submitPath}>
+      <input type="hidden" name="form_key" value={schema.formKey} />
+      {schema.fields.map((field) => (
+        <p className="contact-form__field" key={field.key}>
+          <label htmlFor={fieldId(field.key)}>{field.label}</label>
+          <ContactFormControl field={field} id={fieldId(field.key)} />
+        </p>
+      ))}
+      {schema.consentRequired ? (
+        <p className="contact-form__field contact-form__field--consent">
+          <label>
+            <input type="checkbox" name="consent" value="1" required />{' '}
+            {schema.consentLabel ?? <span lang="en">I agree to the processing of my message.</span>}
+          </label>
+        </p>
+      ) : null}
+      <p className="contact-form__actions">
+        <button type="submit">{schema.submitLabel ?? <span lang="en">Send</span>}</button>
+      </p>
+    </form>
+  )
+}
+
+function ContactFormControl({ field, id }: { field: PublicContactFormFieldDto; id: string }) {
+  if (field.type === 'textarea') {
+    return <textarea id={id} name={field.key} rows={6} required={field.required} />
+  }
+
+  if (field.type === 'select') {
+    return (
+      <select id={id} name={field.key} required={field.required} defaultValue="">
+        {/* A required select whose first option is already chosen can never fail validation. */}
+        {field.required ? <option value="" disabled /> : null}
+        {field.options.map((option) => (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        ))}
+      </select>
+    )
+  }
+
+  const type = ['email', 'tel', 'url'].includes(field.type) ? field.type : 'text'
+
+  return <input type={type} id={id} name={field.key} required={field.required} />
 }
 
 /**

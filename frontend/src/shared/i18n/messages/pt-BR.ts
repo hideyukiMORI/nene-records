@@ -972,6 +972,16 @@ export const ptBR = {
   'admin.blocks.spacerSize.md': 'Médio',
   'admin.blocks.spacerSize.lg': 'Grande',
   'admin.blocks.divider.hint': 'Uma linha horizontal — sem configurações.',
+  // contact-form (#1030) — the form itself is rendered server-side (SSR), so the
+  // consumer renderer only shows the failure notice.
+  'admin.blocks.type.contactForm': 'Formulário de contato',
+  'admin.blocks.type.contactForm.desc': 'Um formulário de contato incorporado',
+  'admin.blocks.field.formKey': 'Chave do formulário',
+  'admin.blocks.error.formKeyRequired': 'A chave do formulário é obrigatória.',
+  'admin.blocks.error.formKeyInvalid': 'São permitidos apenas letras, dígitos, hífen e sublinhado.',
+  'admin.blocks.contactForm.hint':
+    'O formulário é renderizado pelo servidor, portanto não é pré-visualizado aqui. Cole a chave do formulário do produto contact.',
+  'public.blocks.contactForm.unavailable': 'Este formulário está temporariamente indisponível.',
 
   // ── Home hero (#486) ──────────────────────────────────────────────────────
   'admin.homeHero.title': 'Hero da home',

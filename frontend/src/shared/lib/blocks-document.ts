@@ -22,6 +22,7 @@ const BLOCK_TYPES = [
   'columns',
   'spacer',
   'divider',
+  'contact-form',
 ] as const
 export type BlockType = (typeof BLOCK_TYPES)[number]
 
@@ -42,6 +43,17 @@ export type GroupTone = (typeof GROUP_TONES)[number]
 
 export const SPACER_SIZES = ['sm', 'md', 'lg'] as const
 export type SpacerSize = (typeof SPACER_SIZES)[number]
+
+/**
+ * Display variants of the contact-form block (#1030). Only `inline` ships first: it renders
+ * as pure SSR, while modal/chat need a CSP nonce and client JS. Keep in sync with
+ * `BlocksDocumentValidator::CONTACT_FORM_VARIANTS`.
+ */
+export const CONTACT_FORM_VARIANTS = ['inline'] as const
+export type ContactFormVariant = (typeof CONTACT_FORM_VARIANTS)[number]
+
+/** Mirrors the server's `MAX_FORM_KEY_LEN`. */
+export const MAX_FORM_KEY_LENGTH = 64
 
 /** Block caps — mirror the server validator (`BlocksDocumentValidator`); enforced in the editor. */
 export const MAX_BLOCKS_PER_DOCUMENT = 200
@@ -115,6 +127,19 @@ export interface SpacerBlockData {
 /** Horizontal rule block (#491 WS2); no options. */
 export type DividerBlockData = Record<string, never>
 
+/**
+ * A contact form issued by a sibling product and rendered server-side by records (#1030).
+ *
+ * `formKey` is a handle, not a secret — the credential lives only on the submission path.
+ * The form itself is rendered by the SSR layer (`SsrBlocksRenderer`), so unlike every other
+ * block type the consumer renderer here does not draw the fields: it must not produce a
+ * second, JS-only form that disagrees with the crawlable one.
+ */
+export interface ContactFormBlockData {
+  formKey: string
+  variant?: ContactFormVariant
+}
+
 /** Leaf (non-container) blocks. A group's children are leaf blocks only (depth 2). */
 export type LeafBlock =
   | { id: string; type: 'text'; data: TextBlockData }
@@ -124,6 +149,7 @@ export type LeafBlock =
   | { id: string; type: 'chart'; data: ChartBlockData }
   | { id: string; type: 'spacer'; data: SpacerBlockData }
   | { id: string; type: 'divider'; data: DividerBlockData }
+  | { id: string; type: 'contact-form'; data: ContactFormBlockData }
 
 /** Layout container holding leaf child blocks (#491 WS2); not nestable in another container. */
 export interface GroupBlockData {
@@ -165,6 +191,8 @@ export type BlockValidationCode =
   | 'summary-required'
   | 'children-required'
   | 'children-invalid'
+  | 'form-key-required'
+  | 'form-key-invalid'
 
 function isBlockType(value: string): value is BlockType {
   return (BLOCK_TYPES as readonly string[]).includes(value)
@@ -185,6 +213,10 @@ function isGroupTone(value: unknown): value is GroupTone {
 /** True for non-container blocks (a container's children are leaf-only; depth 2). */
 function isLeafBlock(block: Block): block is LeafBlock {
   return block.type !== 'group' && block.type !== 'columns'
+}
+
+function isContactFormVariant(value: unknown): value is ContactFormVariant {
+  return typeof value === 'string' && (CONTACT_FORM_VARIANTS as readonly string[]).includes(value)
 }
 
 function isSpacerSize(value: unknown): value is SpacerSize {
@@ -306,6 +338,8 @@ export function createBlock(type: BlockType): Block {
       return { id: newBlockId(), type, data: { size: 'md' } }
     case 'divider':
       return { id: newBlockId(), type, data: {} }
+    case 'contact-form':
+      return { id: newBlockId(), type, data: { formKey: '', variant: 'inline' } }
   }
 }
 
@@ -449,6 +483,18 @@ function coerceBlock(raw: unknown, index: number, allowContainers: boolean): Blo
       return { id, type, data: { size: isSpacerSize(record.size) ? record.size : 'md' } }
     case 'divider':
       return { id, type, data: {} }
+    case 'contact-form':
+      return {
+        id,
+        type,
+        data: {
+          formKey: typeof record.formKey === 'string' ? record.formKey : '',
+          // Absent means inline, and an unrecognised variant coerces to inline rather than
+          // dropping the block: the server already rejected it on write, so seeing one here
+          // means old data, and showing the form beats showing nothing.
+          variant: isContactFormVariant(record.variant) ? record.variant : 'inline',
+        },
+      }
   }
 }
 
@@ -607,6 +653,17 @@ export function validateBlock(block: Block): BlockValidationCode | null {
     case 'spacer':
     case 'divider':
       return null
+    case 'contact-form': {
+      const formKey = block.data.formKey.trim()
+      if (formKey === '') {
+        return 'form-key-required'
+      }
+      // Same rule as the server: the key is interpolated into a URL path when the schema is
+      // fetched, so anything outside this set must not reach save.
+      return /^[A-Za-z0-9_-]+$/.test(formKey) && formKey.length <= MAX_FORM_KEY_LENGTH
+        ? null
+        : 'form-key-invalid'
+    }
   }
 }
 

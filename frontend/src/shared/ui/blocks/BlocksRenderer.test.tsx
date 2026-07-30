@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, screen } from '@testing-library/react'
 import { renderWithProviders } from '@tests/render/render-with-providers'
 import { BlocksRenderer } from './BlocksRenderer'
@@ -221,5 +221,82 @@ describe('BlocksRenderer', () => {
       (th) => th.textContent,
     )
     expect(headers).toEqual(['ラベル', '値'])
+  })
+
+  describe('contact-form (#1030)', () => {
+    const DOC = JSON.stringify([
+      { id: 'blk1', type: 'contact-form', data: { formKey: 'ayane-contact', variant: 'inline' } },
+    ])
+
+    function seedBootstrap(contactForms: unknown): void {
+      const script = document.createElement('script')
+      script.id = 'nene-records-public-record-bootstrap'
+      script.type = 'application/json'
+      script.textContent = JSON.stringify({ contactForms })
+      document.head.appendChild(script)
+    }
+
+    afterEach(() => {
+      document.getElementById('nene-records-public-record-bootstrap')?.remove()
+    })
+
+    it('renders the form from the SSR bootstrap without fetching again', () => {
+      // hub pin 2: the "no extra round trip" claim is a check, not a comment.
+      const fetchSpy = vi.spyOn(globalThis, 'fetch')
+      seedBootstrap({
+        'ayane-contact': {
+          formKey: 'ayane-contact',
+          submitPath: '/api/v1/public/contact-submissions',
+          consentRequired: false,
+          consentLabel: null,
+          submitLabel: null,
+          fields: [
+            { key: 'email', label: 'Email', type: 'email', required: true, options: [] },
+            { key: 'message', label: 'Message', type: 'textarea', required: false, options: [] },
+          ],
+        },
+      })
+
+      const { container } = renderWithProviders(<BlocksRenderer documentJson={DOC} />)
+
+      const form = container.querySelector('form.block--contact-form')
+      expect(form?.getAttribute('action')).toBe('/api/v1/public/contact-submissions')
+      expect(form?.getAttribute('method')).toBe('post')
+      expect(container.querySelector('input[type="email"][name="email"]')).not.toBeNull()
+      expect(container.querySelector('textarea[name="message"]')).not.toBeNull()
+      expect(fetchSpy).not.toHaveBeenCalled()
+
+      fetchSpy.mockRestore()
+    })
+
+    it('never exposes a credential or the issuing product URL in the markup', () => {
+      seedBootstrap({
+        'ayane-contact': {
+          formKey: 'ayane-contact',
+          submitPath: '/api/v1/public/contact-submissions',
+          consentRequired: true,
+          consentLabel: '同意します',
+          submitLabel: '送信',
+          fields: [],
+        },
+      })
+
+      const { container } = renderWithProviders(<BlocksRenderer documentJson={DOC} />)
+      const html = container.innerHTML
+
+      expect(html).not.toContain('Bearer')
+      expect(html).not.toContain('Authorization')
+      expect(html).not.toContain('https://')
+      expect(container.querySelector('input[name="consent"]')).not.toBeNull()
+      expect(html).toContain('送信')
+    })
+
+    it('falls back to a visible notice when the page carries no schema for the key', () => {
+      // Mirrors the server's fail-visible behaviour rather than rendering an empty region.
+      const { container } = renderWithProviders(<BlocksRenderer documentJson={DOC} />)
+
+      expect(container.querySelector('.contact-form--unavailable')).not.toBeNull()
+      expect(container.querySelector('form')).toBeNull()
+    })
   })
 })

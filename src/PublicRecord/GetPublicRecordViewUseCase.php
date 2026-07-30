@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace NeNeRecords\PublicRecord;
 
+use NeNeRecords\BlocksField\BlocksField;
+use NeNeRecords\BlocksField\BlocksFieldRepositoryInterface;
 use NeNeRecords\BoolField\BoolField;
 use NeNeRecords\BoolField\BoolFieldRepositoryInterface;
 use NeNeRecords\DateTimeField\DateTimeField;
@@ -46,6 +48,7 @@ final readonly class GetPublicRecordViewUseCase implements GetPublicRecordViewUs
         private EntityRelationRepositoryInterface $entityRelations,
         private ListPublicSettingsUseCaseInterface $publicSettings,
         private PublicRecordHierarchyBuilder $hierarchyBuilder,
+        private ?BlocksFieldRepositoryInterface $blocksFields = null,
     ) {
     }
 
@@ -102,6 +105,11 @@ final readonly class GetPublicRecordViewUseCase implements GetPublicRecordViewUs
         $dateTimeFieldRows = in_array('datetime', $dataTypes, true)
             ? $this->dateTimeFields->findByEntityId($entityId, self::FIELD_VALUE_LIMIT, 0)
             : [];
+        // Blocks are read only so the SSR template can render the block types that must exist
+        // before JavaScript does (#1030). The SPA keeps loading them from /api/v1/blocks-fields.
+        $blocksFieldRows = ($this->blocksFields !== null && in_array('blocks', $dataTypes, true))
+            ? $this->blocksFields->findByEntityId($entityId, self::FIELD_VALUE_LIMIT, 0)
+            : [];
 
         $allEntityTypes = $this->entityTypes->findAll(self::ENTITY_TYPE_LIMIT, 0);
         $entityTypeSlugById = [];
@@ -143,6 +151,7 @@ final readonly class GetPublicRecordViewUseCase implements GetPublicRecordViewUs
             $enumFieldRows,
             $boolFieldRows,
             $dateTimeFieldRows,
+            $blocksFieldRows,
             $entityId,
             $entityTypeSlugById,
             $relationTextFieldsByEntityTypeId,
@@ -284,6 +293,7 @@ final readonly class GetPublicRecordViewUseCase implements GetPublicRecordViewUs
      * @param list<EnumField> $enumFieldRows
      * @param list<BoolField> $boolFieldRows
      * @param list<DateTimeField> $dateTimeFieldRows
+     * @param list<BlocksField> $blocksFieldRows
      * @param array<int, string> $entityTypeSlugById
      * @param array<int, list<TextField>> $relationTextFieldsByEntityTypeId
      * @param array<string, list<ListEntityRelationItem>> $relationsByFieldKey
@@ -296,6 +306,7 @@ final readonly class GetPublicRecordViewUseCase implements GetPublicRecordViewUs
         array $enumFieldRows,
         array $boolFieldRows,
         array $dateTimeFieldRows,
+        array $blocksFieldRows,
         int $entityId,
         array $entityTypeSlugById,
         array $relationTextFieldsByEntityTypeId,
@@ -352,6 +363,9 @@ final readonly class GetPublicRecordViewUseCase implements GetPublicRecordViewUs
                 fieldKey: $fieldDef->fieldKey,
                 dataType: $fieldDef->dataType,
                 displayValue: PublicFieldDisplayFormatter::format($fieldDef->dataType, $raw),
+                blocksDocument: $fieldDef->dataType === 'blocks'
+                    ? $this->findBlocksDocument($blocksFieldRows, $fieldDef->fieldKey)
+                    : null,
             );
         }
 
@@ -494,6 +508,23 @@ final readonly class GetPublicRecordViewUseCase implements GetPublicRecordViewUs
 
     /** @param list<BoolField> $rows */
     private function findBoolValue(array $rows, string $fieldKey): ?bool
+    {
+        foreach ($rows as $row) {
+            if ($row->fieldKey === $fieldKey) {
+                return $row->value;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * The stored blocks document for a field, or null when the record has no value for it.
+     * Unlike the other finders this returns the raw JSON: the SSR renderer parses it itself.
+     *
+     * @param list<BlocksField> $rows
+     */
+    private function findBlocksDocument(array $rows, string $fieldKey): ?string
     {
         foreach ($rows as $row) {
             if ($row->fieldKey === $fieldKey) {

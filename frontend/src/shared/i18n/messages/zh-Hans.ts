@@ -929,6 +929,16 @@ export const zhHans = {
   'admin.blocks.spacerSize.md': '中',
   'admin.blocks.spacerSize.lg': '大',
   'admin.blocks.divider.hint': '一条水平分隔线——无需设置。',
+  // contact-form (#1030) — the form itself is rendered server-side (SSR), so the
+  // consumer renderer only shows the failure notice.
+  'admin.blocks.type.contactForm': '联系表单',
+  'admin.blocks.type.contactForm.desc': '嵌入式联系表单',
+  'admin.blocks.field.formKey': '表单密钥',
+  'admin.blocks.error.formKeyRequired': '请填写表单密钥。',
+  'admin.blocks.error.formKeyInvalid': '仅允许使用字母、数字、连字符和下划线。',
+  'admin.blocks.contactForm.hint':
+    '该表单由服务器渲染，因此此处不提供预览。请粘贴来自 contact 产品的表单密钥。',
+  'public.blocks.contactForm.unavailable': '该表单暂时不可用。',
 
   // ── Home hero (#486) ──────────────────────────────────────────────────────
   'admin.homeHero.title': '主页主视觉',

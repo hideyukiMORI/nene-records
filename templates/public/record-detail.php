@@ -213,6 +213,16 @@ if ($ogImageUrl !== null) {
           <section class="bundle-seo">
             <div class="markdown-body"><?= $renderBundleSeo($field->displayValue) ?></div>
           </section>
+        <?php /* Blocks that must exist before JavaScript does (#1030). The condition is
+                 "produced any HTML", not "is a blocks field": a document made only of the
+                 client-rendered types yields '' and falls through to the branch below, so
+                 its server-rendered output is exactly what it was before this branch
+                 existed. The HTML is built by SsrBlocksRenderer, which escapes everything
+                 it emits and never passes through caller-supplied markup. */ ?>
+        <?php elseif ($field->dataType === 'blocks' && ($blocksHtmlByFieldKey[$field->fieldKey] ?? '') !== ''): ?>
+          <section class="blocks-ssr">
+            <?= $blocksHtmlByFieldKey[$field->fieldKey] ?>
+          </section>
         <?php else: ?>
           <section>
             <h2><?= $e($field->fieldKey) ?></h2>

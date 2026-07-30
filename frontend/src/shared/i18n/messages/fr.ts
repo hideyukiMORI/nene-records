@@ -980,6 +980,17 @@ export const fr = {
   'admin.blocks.spacerSize.md': 'Moyen',
   'admin.blocks.spacerSize.lg': 'Grand',
   'admin.blocks.divider.hint': 'Un filet horizontal — aucun réglage.',
+  // contact-form (#1030) — the form itself is rendered server-side (SSR), so the
+  // consumer renderer only shows the failure notice.
+  'admin.blocks.type.contactForm': 'Formulaire de contact',
+  'admin.blocks.type.contactForm.desc': 'Un formulaire de contact intégré',
+  'admin.blocks.field.formKey': 'Clé du formulaire',
+  'admin.blocks.error.formKeyRequired': 'Une clé de formulaire est requise.',
+  'admin.blocks.error.formKeyInvalid':
+    'Seuls les lettres, chiffres, tirets et tirets bas sont autorisés.',
+  'admin.blocks.contactForm.hint':
+    "Le formulaire est rendu par le serveur : il n'est donc pas prévisualisé ici. Collez la clé du formulaire issue du produit contact.",
+  'public.blocks.contactForm.unavailable': 'Ce formulaire est temporairement indisponible.',
 
   // ── Home hero (#486) ──────────────────────────────────────────────────────
   'admin.homeHero.title': "Bannière d'accueil",
