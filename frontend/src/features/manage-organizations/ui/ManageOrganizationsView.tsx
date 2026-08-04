@@ -5,7 +5,7 @@ import type { CreateOrganizationInput, Organization } from '@/entities/organizat
 import { useTranslation } from '@/shared/i18n'
 import { Button, Card, ConfirmDialog, Input, PageHeader, Select, Stack, Text } from '@/shared/ui'
 import { IconBuilding, IconX } from '@/shared/ui/icons/Icons'
-import type { ManageOrganizationsPageState } from '../hooks/use-manage-organizations-page'
+import type { ManageOrganizationsPageState } from '../model/use-manage-organizations-page'
 
 // ── Internal create form (per-component exception: local form state only) ─────
 

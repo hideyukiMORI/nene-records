@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { useTranslation } from '@/shared/i18n'
 import { Button, Card, Stack, Text } from '@/shared/ui'
-import type { HeaderConfigPageState } from '../hooks/use-header-config-page'
+import type { HeaderConfigPageState } from '../model/use-header-config-page'
 
 function Row({ label, children }: { label: string; children: ReactNode }) {
   return (

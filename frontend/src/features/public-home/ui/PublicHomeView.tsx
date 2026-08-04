@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from '@/shared/i18n'
 import { IconArrow, IconArrowUpRight, IconInbox } from '@/shared/ui/icons/magazine-icons'
 import { LoadingFeatured } from '@/shared/ui/loading'
-import type { HomeFeedItem, HomeTypeItem } from '../hooks/use-public-home-page'
+import type { HomeFeedItem, HomeTypeItem } from '../model/use-public-home-page'
 import heroUrl from './assets/hero.png'
 
 function Eyecatch({ label, className }: { label: string; className: string }) {

@@ -1,7 +1,7 @@
 import type { RelationFieldDef } from '@/entities/field-def'
 import { useTranslation } from '@/shared/i18n'
 import { Button, Select, Stack, Text } from '@/shared/ui'
-import { useEntityRelationFilterField } from '../hooks/use-entity-relation-filter-field'
+import { useEntityRelationFilterField } from '../model/use-entity-relation-filter-field'
 
 export interface EntityRelationFilterFieldProps {
   fieldDef: RelationFieldDef

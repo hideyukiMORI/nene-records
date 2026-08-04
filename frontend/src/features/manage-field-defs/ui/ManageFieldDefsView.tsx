@@ -1,7 +1,7 @@
 import type { FieldDef } from '@/entities/field-def'
 import { useTranslation } from '@/shared/i18n'
 import { ConfirmDialog, Stack, Text } from '@/shared/ui'
-import type { CreateFieldDefFormValues } from '../hooks/use-create-field-def-form'
+import type { CreateFieldDefFormValues } from '../model/use-create-field-def-form'
 import { FieldDefCreateForm } from './FieldDefCreateForm'
 import { FieldDefEditForm } from './FieldDefEditForm'
 import { FieldDefListPanel } from './FieldDefListPanel'

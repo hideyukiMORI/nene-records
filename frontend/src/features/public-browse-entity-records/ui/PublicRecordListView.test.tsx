@@ -3,7 +3,7 @@ import { MemoryRouter } from 'react-router-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { I18nProvider } from '@/shared/i18n'
 import { PublicRecordListView, type PublicRecordListViewProps } from './PublicRecordListView'
-import type { PublicRecordListItem } from '../hooks/use-public-browse-entity-records-page'
+import type { PublicRecordListItem } from '../model/use-public-browse-entity-records-page'
 
 function makeItems(count: number): PublicRecordListItem[] {
   return Array.from({ length: count }, (_, i) => ({

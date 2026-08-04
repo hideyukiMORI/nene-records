@@ -2,7 +2,7 @@ import type { Entity } from '@/entities/entity'
 import { useTranslation } from '@/shared/i18n'
 import { Button, Stack, Text } from '@/shared/ui'
 import { LoadingArticle } from '@/shared/ui/loading'
-import type { PublicFieldRow } from '../hooks/use-public-view-entity-record-page'
+import type { PublicFieldRow } from '../model/use-public-view-entity-record-page'
 import { PublicRecordFieldList } from './PublicRecordFieldList'
 
 export interface PublicRecordDetailViewProps {

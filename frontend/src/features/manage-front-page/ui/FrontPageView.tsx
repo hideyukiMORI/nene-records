@@ -1,6 +1,6 @@
 import { useTranslation } from '@/shared/i18n'
 import { Button, Input, LoadingState, Select, Stack, Text } from '@/shared/ui'
-import type { FrontPageState } from '../hooks/use-front-page'
+import type { FrontPageState } from '../model/use-front-page'
 
 const RADIO_LABEL_CLASS =
   'flex cursor-pointer items-start gap-3 rounded-md border border-transparent p-2 hover:bg-surface-raised'

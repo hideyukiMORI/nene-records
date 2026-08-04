@@ -4,7 +4,7 @@ import { ConfirmDialog, Stack, Text } from '@/shared/ui'
 import type {
   CreateEntityTypeFormValues,
   EditEntityTypeFormValues,
-} from '../hooks/use-create-entity-type-form'
+} from '../model/use-create-entity-type-form'
 import { EntityTypeCreateForm } from './EntityTypeCreateForm'
 import { EntityTypeEditForm } from './EntityTypeEditForm'
 import { EntityTypeListPanel } from './EntityTypeListPanel'

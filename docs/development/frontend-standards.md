@@ -276,7 +276,7 @@ entities/entity-type/
 | Problem Details | `shared/api/errors.ts` |
 | Cross-resource API helpers | `shared/api/types/` |
 | Component props | same `.tsx` file as component |
-| Feature orchestration hooks | `features/{feature}/hooks/` |
+| Feature orchestration hooks | `features/{feature}/model/` |
 | Test render helpers | `tests/render/` |
 | MSW handlers | `tests/msw/{resource}.ts` or `entities/{resource}/__msw__/handlers.ts` |
 | Test factories | `tests/factories/{resource}.ts` |
@@ -286,6 +286,14 @@ entities/entity-type/
 | UI primitives | `shared/ui/primitives/` |
 | UI composed components | `shared/ui/components/` |
 | Component stories | `shared/ui/**/*.stories.tsx` (colocated) |
+
+> **Hooks segment location（2026-08-04 改訂）**: orchestration hooks は
+> `features/{feature}/model/` に置く。**fleet 規約が本リポの旧 binding（`hooks/`）を supersede する**
+> — 正本は `01-architecture.md:99`（スライス内＝`pages` / `features` / `entities` のサブディレクトリは
+> `ui` / `model` / `api` / `lib` / `config` の5語のみ・hook は `model/`）。
+> 物理移設は A1 codemod `nene2-a1-hooks-to-model` で実施済み（**手作業移設 MUST NOT**・#1041）。
+> 🔴 `pages/consumer/hooks/` の1件は codemod の射程外（道具は `features/` しか見ない）のため
+> **未移設で残っている**＝規約違反として実在する。#1043 で移設する。
 
 ### Import surface rules
 
@@ -328,7 +336,7 @@ API JSON
   → entities/{r}/api-types.ts     (wire shape)
   → entities/{r}/mapper.ts        (map to model)
   → entities/{r}/queries.ts       (TanStack Query cache)
-  → features/{f}/hooks/*.ts         (compose queries, derive view state)
+  → features/{f}/model/*.ts         (compose queries, derive view state)
   → features/{f}/ui/*.tsx           (render props)
 ```
 
@@ -342,7 +350,7 @@ Rules:
 
 ```text
 UI event
-  → features/{f}/hooks              (or entity mutation hook directly)
+  → features/{f}/model              (or entity mutation hook directly)
   → entities/{r}/mutations.ts       (useMutation)
   → shared/api/client.ts
   → API
@@ -388,7 +396,7 @@ Feature hooks return **narrowed view-model** (`{ status, data, error, retry }`) 
 
 | Pattern | Where | Purpose |
 | --- | --- | --- |
-| **Hook + View** | `features/{f}/hooks` + `features/{f}/ui` | Logic in hooks; UI is prop-driven |
+| **Hook + View** | `features/{f}/model` + `features/{f}/ui` | Logic in hooks; UI is prop-driven |
 | **Entity module** | `entities/{r}/` | Single resource: types, map, cache, API |
 | **Query key factory** | `query-keys.ts` | Hierarchical, typed keys — no string literals in features |
 | **Mapper purity** | `mapper.ts` | Pure functions; unit-tested; no side effects |

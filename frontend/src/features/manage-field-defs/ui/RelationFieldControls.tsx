@@ -4,7 +4,7 @@ import { RELATION_CARDINALITIES } from '@/entities/field-def'
 import { useTranslation } from '@/shared/i18n'
 import type { MessageKey } from '@/shared/i18n'
 import { Select } from '@/shared/ui'
-import type { CreateFieldDefFormValues } from '../hooks/use-create-field-def-form'
+import type { CreateFieldDefFormValues } from '../model/use-create-field-def-form'
 
 const CARDINALITY_LABEL_KEYS: Record<(typeof RELATION_CARDINALITIES)[number], MessageKey> = {
   one: 'admin.fieldDefs.relation.cardinalityOne',

@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import type { RelationFieldDef } from '@/entities/field-def'
 import { useTranslation } from '@/shared/i18n'
 import { Button, Stack, Text } from '@/shared/ui'
-import { usePublicRelationFieldDisplay } from '../hooks/use-public-relation-field-display'
+import { usePublicRelationFieldDisplay } from '../model/use-public-relation-field-display'
 
 export interface PublicRelationFieldDisplayProps {
   entityId: number

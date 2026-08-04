@@ -11,7 +11,7 @@ import {
   EDIT_LABEL_FIELDS,
   useEditEntityTypeForm,
   type EditEntityTypeFormValues,
-} from '../hooks/use-create-entity-type-form'
+} from '../model/use-create-entity-type-form'
 
 export interface EntityTypeEditFormProps {
   entityType: EntityType

@@ -5,7 +5,7 @@ import type {
   AdminResetPasswordFormValues,
   ChangeOwnPasswordFormValues,
   InviteFormValues,
-} from '../hooks/use-manage-users-page'
+} from '../model/use-manage-users-page'
 import { AdminResetPasswordForm } from './AdminResetPasswordForm'
 import { ChangeOwnPasswordForm } from './ChangeOwnPasswordForm'
 import { UserInviteForm } from './UserInviteForm'

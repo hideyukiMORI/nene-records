@@ -12,7 +12,7 @@ import {
 import type {
   PublicBrowseType,
   PublicRecordListItem,
-} from '../hooks/use-public-browse-entity-records-page'
+} from '../model/use-public-browse-entity-records-page'
 
 type BrowseView = 'list' | 'grid'
 const VIEW_STORAGE_KEY = 'nene_public_browse_view'

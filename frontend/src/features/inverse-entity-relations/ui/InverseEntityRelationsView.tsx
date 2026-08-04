@@ -1,6 +1,6 @@
 import { useTranslation } from '@/shared/i18n'
 import { Stack, Text } from '@/shared/ui'
-import { useInverseRelationFieldDefs } from '../hooks/use-inverse-relation-field-defs'
+import { useInverseRelationFieldDefs } from '../model/use-inverse-relation-field-defs'
 import { InverseRelationPanel } from './InverseRelationPanel'
 
 export interface InverseEntityRelationsViewProps {

@@ -1,6 +1,6 @@
 import { useTranslation } from '@/shared/i18n'
 import { Card, EmptyState, ErrorState, LoadingState, Stack, Text } from '@/shared/ui'
-import type { EntityTypeListItem } from '../hooks/use-entity-type-list-page'
+import type { EntityTypeListItem } from '../model/use-entity-type-list-page'
 
 export interface EntityTypeListViewProps {
   items: EntityTypeListItem[]

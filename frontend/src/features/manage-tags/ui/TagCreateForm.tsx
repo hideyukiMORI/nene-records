@@ -1,7 +1,7 @@
 import { Controller } from 'react-hook-form'
 import { useTranslation } from '@/shared/i18n'
 import { Button, Card, Input, SectionHeader, Stack, Text } from '@/shared/ui'
-import { useCreateTagForm } from '../hooks/use-create-tag-form'
+import { useCreateTagForm } from '../model/use-create-tag-form'
 
 export interface TagCreateFormProps {
   isSubmitting: boolean

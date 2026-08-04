@@ -4,7 +4,7 @@ import type { RelationFieldDef } from '@/entities/field-def'
 import { renderWithI18n } from '@/shared/i18n/test-helpers'
 import { PublicRelationFieldDisplay } from './PublicRelationFieldDisplay'
 
-vi.mock('../hooks/use-public-relation-field-display', () => ({
+vi.mock('../model/use-public-relation-field-display', () => ({
   usePublicRelationFieldDisplay: () => ({
     targets: [],
     isLoading: true,

@@ -6,7 +6,7 @@ import { Button, Card, Input, Select, Stack, Text } from '@/shared/ui'
 import {
   type CreateFieldDefFormValues,
   useEditFieldDefForm,
-} from '../hooks/use-create-field-def-form'
+} from '../model/use-create-field-def-form'
 import { RelationFieldControls } from './RelationFieldControls'
 
 const DATA_TYPE_LABEL_KEYS: Record<FieldDataType, MessageKey> = {
