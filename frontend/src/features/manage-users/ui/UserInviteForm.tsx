@@ -2,7 +2,7 @@ import { useCallback } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from '@/shared/i18n'
 import { Button, Card, Input, Select, Stack, Text } from '@/shared/ui'
-import type { InviteFormValues } from '../hooks/use-manage-users-page'
+import type { InviteFormValues } from '../model/use-manage-users-page'
 
 export interface UserInviteFormProps {
   isSubmitting: boolean

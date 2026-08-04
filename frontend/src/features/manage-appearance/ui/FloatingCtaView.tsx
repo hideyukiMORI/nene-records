@@ -10,7 +10,7 @@ import {
   safeHref,
 } from '@/shared/lib/floating-cta'
 import { Button, Card, Stack, Text } from '@/shared/ui'
-import type { FloatingCtaPageState } from '../hooks/use-floating-cta-page'
+import type { FloatingCtaPageState } from '../model/use-floating-cta-page'
 
 function Row({ label, children }: { label: string; children: ReactNode }) {
   return (

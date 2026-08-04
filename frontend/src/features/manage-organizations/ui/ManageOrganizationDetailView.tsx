@@ -4,7 +4,7 @@ import { PLANS } from '@/entities/organization'
 import { useTranslation } from '@/shared/i18n'
 import { Button, Card, ConfirmDialog, Input, PageHeader, Select, Stack, Text } from '@/shared/ui'
 import { IconChevronLeft, IconDownload, IconUpload } from '@/shared/ui/icons/Icons'
-import type { ManageOrganizationDetailPageState } from '../hooks/use-manage-organization-detail-page'
+import type { ManageOrganizationDetailPageState } from '../model/use-manage-organization-detail-page'
 
 export function ManageOrganizationDetailView({
   org,

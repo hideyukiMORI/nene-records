@@ -10,7 +10,7 @@ import {
 } from '@/shared/lib/layout-config'
 import type { WidgetRegion } from '@/shared/lib/resolve-layout'
 import { Button, Card, Stack, Text } from '@/shared/ui'
-import type { useManageWidgetsPage } from '../hooks/use-manage-widgets-page'
+import type { useManageWidgetsPage } from '../model/use-manage-widgets-page'
 import { LayoutConfigBar } from './LayoutConfigBar'
 import { LayoutPreview } from './LayoutPreview'
 import { WidgetInspector } from './WidgetInspector'

@@ -1,7 +1,7 @@
 import { BlocksFieldEditor } from '@/features/edit-entity-text-fields'
 import { useTranslation } from '@/shared/i18n'
 import { Button, LoadingState, Stack, Text } from '@/shared/ui'
-import type { HomeHeroPageState } from '../hooks/use-home-hero-page'
+import type { HomeHeroPageState } from '../model/use-home-hero-page'
 
 const HERO_ONLY = ['hero'] as const
 

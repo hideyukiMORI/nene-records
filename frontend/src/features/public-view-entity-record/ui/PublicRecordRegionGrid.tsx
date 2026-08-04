@@ -1,7 +1,7 @@
 import { SiteWidgets } from '@/features/render-widgets'
 import type { Entity } from '@/entities/entity'
 import { layoutRegions, type PublicLayoutKey, regionForLayout } from '@/shared/lib/resolve-layout'
-import type { PublicFieldRow } from '../hooks/use-public-view-entity-record-page'
+import type { PublicFieldRow } from '../model/use-public-view-entity-record-page'
 import { PublicRecordFieldList } from './PublicRecordFieldList'
 
 export interface PublicRecordRegionGridProps {

@@ -1,7 +1,7 @@
 import type { RelationFieldDef } from '@/entities/field-def'
 import { useTranslation } from '@/shared/i18n'
 import { Button, Card, ErrorState, LoadingState, Select, Stack, Text } from '@/shared/ui'
-import { useRelationFieldPanel } from '../hooks/use-relation-field-panel'
+import { useRelationFieldPanel } from '../model/use-relation-field-panel'
 
 export interface RelationFieldPanelProps {
   entityId: number

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import type { NavigationItem } from '@/entities/navigation-item'
 import { useTranslation } from '@/shared/i18n'
 import { Button, Card, EmptyState, Input, Stack, Text } from '@/shared/ui'
-import type { useManageMenusPage } from '../hooks/use-manage-menus-page'
+import type { useManageMenusPage } from '../model/use-manage-menus-page'
 
 export interface ManageMenusViewProps {
   page: ReturnType<typeof useManageMenusPage>

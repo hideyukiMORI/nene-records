@@ -3,7 +3,7 @@ import type { Widget } from '@/entities/widget'
 import { useTranslation } from '@/shared/i18n'
 import { formatPostDate } from '@/shared/lib/widget-post-meta'
 import { Text } from '@/shared/ui'
-import { useRecentPosts } from '../hooks/use-recent-posts'
+import { useRecentPosts } from '../model/use-recent-posts'
 
 export interface RecentPostsWidgetProps {
   widget: Widget

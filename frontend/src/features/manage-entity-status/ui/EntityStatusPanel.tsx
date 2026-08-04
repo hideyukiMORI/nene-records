@@ -4,7 +4,7 @@ import { useTranslation } from '@/shared/i18n'
 import type { MessageKey } from '@/shared/i18n'
 import type { PublicLayoutKey } from '@/shared/lib/resolve-layout'
 import { Button, Input, Select, Stack, StatusBadge, Text } from '@/shared/ui'
-import type { EntityStatusPanelState } from '../hooks/use-entity-status-panel'
+import type { EntityStatusPanelState } from '../model/use-entity-status-panel'
 
 const NEXT_STATUSES: Record<EntityStatus, EntityStatus[]> = {
   draft: ['published', 'archived'],

@@ -20,7 +20,7 @@ import {
   type ThemeImages,
 } from '@/shared/lib/theme-customization'
 import { Button, Card, ConfirmDialog, Input, Stack, Text, Textarea } from '@/shared/ui'
-import type { ThemeCustomizePageState } from '../../hooks/use-theme-customize-page'
+import type { ThemeCustomizePageState } from '../../model/use-theme-customize-page'
 import { ThemeImageField } from '../ThemeImageField'
 import { TokenOverridesEditor } from '../TokenOverridesEditor'
 import { Segmented } from './Segmented'

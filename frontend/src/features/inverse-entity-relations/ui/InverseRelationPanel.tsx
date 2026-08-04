@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import type { RelationFieldDef } from '@/entities/field-def'
 import { useTranslation } from '@/shared/i18n'
 import { Button, Card, ErrorState, LoadingState, Stack, Text } from '@/shared/ui'
-import { useInverseRelationPanel } from '../hooks/use-inverse-relation-panel'
+import { useInverseRelationPanel } from '../model/use-inverse-relation-panel'
 
 export interface InverseRelationPanelProps {
   fieldDef: RelationFieldDef

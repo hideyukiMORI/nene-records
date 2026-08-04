@@ -4,7 +4,7 @@ import { isMarkdownBodyField } from '@/shared/lib/is-markdown-body-field'
 import { SandboxedBundle, SanitizedHtml, Text } from '@/shared/ui'
 import { BlocksRenderer } from '@/shared/ui/blocks'
 import { PublicMarkdownContent } from '@/shared/ui/markdown'
-import type { PublicFieldRow } from '../hooks/use-public-view-entity-record-page'
+import type { PublicFieldRow } from '../model/use-public-view-entity-record-page'
 import { PublicRelationFieldDisplay } from './PublicRelationFieldDisplay'
 
 export interface PublicRecordFieldListProps {

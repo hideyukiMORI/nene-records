@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form'
 import type { User } from '@/entities/user'
 import { useTranslation } from '@/shared/i18n'
 import { Button, Card, Input, Stack, Text } from '@/shared/ui'
-import type { AdminResetPasswordFormValues } from '../hooks/use-manage-users-page'
+import type { AdminResetPasswordFormValues } from '../model/use-manage-users-page'
 
 export interface AdminResetPasswordFormProps {
   user: User

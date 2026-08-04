@@ -1,3 +1,3 @@
 export { ManageCommentsView } from './ui/ManageCommentsView'
-export { useManageCommentsPage } from './hooks/use-manage-comments-page'
-export type { ManageCommentsPageState } from './hooks/use-manage-comments-page'
+export { useManageCommentsPage } from './model/use-manage-comments-page'
+export type { ManageCommentsPageState } from './model/use-manage-comments-page'

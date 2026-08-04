@@ -4,8 +4,8 @@ import { Button, Card, Input, Select, Stack, Text } from '@/shared/ui'
 import type {
   CreateEntityTypeFormValues,
   EntityTypeStarter,
-} from '../hooks/use-create-entity-type-form'
-import { ENTITY_TYPE_STARTERS, useCreateEntityTypeForm } from '../hooks/use-create-entity-type-form'
+} from '../model/use-create-entity-type-form'
+import { ENTITY_TYPE_STARTERS, useCreateEntityTypeForm } from '../model/use-create-entity-type-form'
 
 const STARTER_LABEL_KEY: Record<EntityTypeStarter, MessageKey> = {
   blank: 'admin.entityTypes.starter.blank',

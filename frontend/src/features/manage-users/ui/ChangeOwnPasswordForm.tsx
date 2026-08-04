@@ -2,7 +2,7 @@ import { useCallback } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from '@/shared/i18n'
 import { Button, Card, Input, Stack, Text } from '@/shared/ui'
-import type { ChangeOwnPasswordFormValues } from '../hooks/use-manage-users-page'
+import type { ChangeOwnPasswordFormValues } from '../model/use-manage-users-page'
 
 export interface ChangeOwnPasswordFormProps {
   isSubmitting: boolean

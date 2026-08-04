@@ -2,7 +2,7 @@ import { Controller } from 'react-hook-form'
 import type { Tag } from '@/entities/tag'
 import { useTranslation } from '@/shared/i18n'
 import { Button, Card, Input, Stack, Text } from '@/shared/ui'
-import { useEditTagForm } from '../hooks/use-create-tag-form'
+import { useEditTagForm } from '../model/use-create-tag-form'
 
 export interface TagEditFormProps {
   tag: Tag
