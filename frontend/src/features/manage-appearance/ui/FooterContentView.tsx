@@ -3,7 +3,7 @@ import { useTranslation } from '@/shared/i18n'
 import { SOCIAL_PLATFORMS, type SocialPlatform } from '@/shared/lib/footer-config'
 import { Button, Card, Stack, Text } from '@/shared/ui'
 import { SocialIcon } from '@/shared/ui/icons/SocialIcons'
-import type { FooterConfigPageState } from '../hooks/useFooterConfigPage'
+import type { FooterConfigPageState } from '../hooks/use-footer-config-page'
 
 const inputClass =
   'w-56 rounded-sm border border-border bg-surface px-inline-sm py-stack-xs font-sans text-body text-text-primary'

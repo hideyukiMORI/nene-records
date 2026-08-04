@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { EntityStatusPanel } from './EntityStatusPanel'
-import type { EntityStatusPanelState } from '../hooks/useEntityStatusPanel'
+import type { EntityStatusPanelState } from '../hooks/use-entity-status-panel'
 import { toEntityId, type Entity } from '@/entities/entity'
 import { renderWithProviders } from '@tests/render/render-with-providers'
 

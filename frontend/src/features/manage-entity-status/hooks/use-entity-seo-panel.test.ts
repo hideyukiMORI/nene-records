@@ -1,7 +1,7 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import { act, waitFor } from '@testing-library/react'
 import { http, HttpResponse } from 'msw'
-import { useEntitySeoPanel } from './useEntitySeoPanel'
+import { useEntitySeoPanel } from './use-entity-seo-panel'
 import { toEntityId, type Entity } from '@/entities/entity'
 import { mswServer } from '@tests/msw/server'
 import { renderHookWithProviders } from '@tests/render/render-with-providers'
