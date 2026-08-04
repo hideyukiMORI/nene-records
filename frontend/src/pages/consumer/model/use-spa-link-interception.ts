@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getBasePath } from '@/shared/lib/base-path'
-import { resolveSpaLink } from './resolve-spa-link'
+import { resolveSpaLink } from '../resolve-spa-link'
 
 /**
  * Route plain `<a href>` clicks through the SPA router (#885).

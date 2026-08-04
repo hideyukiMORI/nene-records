@@ -16,10 +16,10 @@ import { SocialIcon } from '@/shared/ui/icons/SocialIcons'
 import { PublicMarkdownContent } from '@/shared/ui/markdown'
 import './public-site.css'
 import type { HeaderCta, HeaderTopbar } from '@/shared/lib/header-config'
-import { useConsumerMotion } from './use-consumer-motion'
+import { useConsumerMotion } from './model/use-consumer-motion'
 import type { PublicSite, PublicSiteNavItem } from './public-site-context'
-import { type ThemeMode, useConsumerTheme } from './use-consumer-theme'
-import { useThemePreviewBridge } from './use-theme-preview-bridge'
+import { type ThemeMode, useConsumerTheme } from './model/use-consumer-theme'
+import { useThemePreviewBridge } from './model/use-theme-preview-bridge'
 
 /** Repeating content blocks that scroll-reveal targets (#371 S1). */
 const REVEAL_SELECTOR = '.card, .typecard, .section__head, .article__head'

@@ -10,7 +10,7 @@ import {
 import { PublicRecordByPermalink } from './PublicRecordDetailPage'
 import { PublicSiteShell } from './PublicSiteShell'
 import { usePublicSite } from './public-site-context'
-import { usePublicDocumentTitle } from './use-public-document-title'
+import { usePublicDocumentTitle } from './model/use-public-document-title'
 
 export function PublicBrowsePage() {
   const site = usePublicSite()
