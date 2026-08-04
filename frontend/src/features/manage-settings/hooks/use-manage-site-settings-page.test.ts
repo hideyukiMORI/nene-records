@@ -1,6 +1,6 @@
 import { cleanup, renderHook } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { useManageSiteSettingsPage } from './useManageSiteSettingsPage'
+import { useManageSiteSettingsPage } from './use-manage-site-settings-page'
 
 // Mock the entity queries so the hook returns a fixed settings list; we only
 // care about which keys survive the DEDICATED_UI_KEYS filter (#541).

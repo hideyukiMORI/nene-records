@@ -1,6 +1,6 @@
 import { useTranslation } from '@/shared/i18n'
 import { Button, Card, PageHeader, Select, Stack, Text } from '@/shared/ui'
-import type { DataMigrationPageState } from '../hooks/useDataMigrationPage'
+import type { DataMigrationPageState } from '../hooks/use-data-migration-page'
 
 export function DataMigrationView({
   migrationStatus,

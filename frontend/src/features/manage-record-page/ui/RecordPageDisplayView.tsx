@@ -1,6 +1,6 @@
 import { useTranslation } from '@/shared/i18n'
 import { Button, LoadingState, Stack, Text } from '@/shared/ui'
-import type { RecordPageDisplayState } from '../hooks/useRecordPageDisplay'
+import type { RecordPageDisplayState } from '../hooks/use-record-page-display'
 
 const CHECK_LABEL_CLASS =
   'flex cursor-pointer items-start gap-3 rounded-md border border-transparent p-2 hover:bg-surface-raised'

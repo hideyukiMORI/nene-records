@@ -3,7 +3,7 @@ import { useTranslation } from '@/shared/i18n'
 import type { PublicThemeMeta } from '@/shared/lib/public-themes'
 import { Card, ConfirmDialog, Stack, Text, Textarea } from '@/shared/ui'
 import { IconCheck } from '@/shared/ui/icons/Icons'
-import type { PublicThemePageState } from '../hooks/usePublicThemePage'
+import type { PublicThemePageState } from '../hooks/use-public-theme-page'
 import { ThemeMiniPreview } from './ThemeMiniPreview'
 
 /** Format an ISO (YYYY-MM-DD) date for the active locale; '' if unparseable. */

@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { I18nProvider } from '@/shared/i18n'
 import { PUBLIC_THEMES } from '@/shared/lib/public-themes'
 import { PublicThemeView } from './PublicThemeView'
-import type { PublicThemePageState } from '../hooks/usePublicThemePage'
+import type { PublicThemePageState } from '../hooks/use-public-theme-page'
 
 afterEach(cleanup)
 

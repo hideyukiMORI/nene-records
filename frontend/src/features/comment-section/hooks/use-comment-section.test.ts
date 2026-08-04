@@ -1,7 +1,7 @@
 import type { SyntheticEvent } from 'react'
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import { act, waitFor } from '@testing-library/react'
-import { useCommentSection } from './useCommentSection'
+import { useCommentSection } from './use-comment-section'
 import { resetCommentStore, seedComments } from '@tests/msw/handlers/comment'
 import { mswServer } from '@tests/msw/server'
 import { renderHookWithProviders } from '@tests/render/render-with-providers'
