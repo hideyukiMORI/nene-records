@@ -33,7 +33,7 @@ import {
   IconUser,
 } from '@/shared/ui/icons/magazine-icons'
 import { InlineTableOfContents } from '@/shared/ui/markdown'
-import { useEntityIdBySlug } from './hooks/use-entity-id-by-slug'
+import { useEntityIdBySlug } from './model/use-entity-id-by-slug'
 import { PublicSiteShell } from './PublicSiteShell'
 import { usePublicSite, type PublicSite } from './public-site-context'
 import { RouteProgress } from './RouteProgress'
