@@ -13,7 +13,7 @@ import { useAnalyticsPageView } from '@/shared/lib/use-analytics-page-view'
 import { resolveWebAnalytics } from '@/shared/lib/web-analytics'
 import { parseLayoutConfig } from '@/shared/lib/layout-config'
 import { parseRecordPageConfig } from '@/shared/lib/record-page-config'
-import { useSpaLinkInterception } from './use-spa-link-interception'
+import { useSpaLinkInterception } from './model/use-spa-link-interception'
 import {
   buildThemeStylesheet,
   readStoredRuntimeTheme,

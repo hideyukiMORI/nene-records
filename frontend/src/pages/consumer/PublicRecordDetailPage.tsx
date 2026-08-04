@@ -37,7 +37,7 @@ import { useEntityIdBySlug } from './model/use-entity-id-by-slug'
 import { PublicSiteShell } from './PublicSiteShell'
 import { usePublicSite, type PublicSite } from './public-site-context'
 import { RouteProgress } from './RouteProgress'
-import { usePublicDocumentTitle } from './use-public-document-title'
+import { usePublicDocumentTitle } from './model/use-public-document-title'
 
 // ── Presentation helpers ──────────────────────────────────────────────────────
 
