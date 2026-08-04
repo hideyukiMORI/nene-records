@@ -17,6 +17,9 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     setupFiles: ['./tests/setup/vitest.setup.ts'],
+    // asyncUtilTimeout（5000ms・tests/setup/vitest.setup.ts）より十分上に置く。
+    // 同値以下だと、findBy* が読みやすい失敗を返す前にテスト全体がタイムアウトしてしまう。
+    testTimeout: 15000,
     include: ['src/**/*.test.ts', 'src/**/*.test.tsx', 'tests/**/*.test.ts', 'tests/**/*.test.tsx'],
   },
 })
