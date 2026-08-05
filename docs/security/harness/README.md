@@ -22,7 +22,11 @@ bash docs/security/harness/probe.sh
 2. Installs two orgs (`default`, `ayane`) each with an admin, logs in, and seeds a webhook (with a secret)
    and a draft entity.
 3. Runs the attack battery and asserts the expected result for each case:
-   - unauthenticated GET on admin routes → **401** (F-01)
+   - unauthenticated GET on sensitive routes (secrets / bulk export / org metrics / connect-tokens) → **401** (F-01)
+   - unauthenticated GET on the **public read surface** (entity-types / entities / text-fields / tags) → **200**.
+     This is a positive control, not an oversight: the first cut of #824 blanket-protected every GET and
+     bounced every visitor of the public site to `/login` (#826). #827 restored these deliberately, so the
+     harness asserts they stay open — re-tightening them fails loudly instead of shipping as a "fix".
    - cross-tenant cookie / JWT-bearer replay → **403** (F-02)
    - CSRF (cookie mutation without `X-Requested-With`) → **403**
    - superadmin route as non-superadmin → **403**, unauthenticated → **401** (#797)
