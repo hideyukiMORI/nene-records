@@ -33,7 +33,7 @@
     "codegen": "openapi-typescript ../docs/openapi/openapi.yaml -o src/shared/api/schema.gen.ts",
     "check:fast": "npm run type-check && npm run lint && npm run format && npm run test && npm run validate:themes",
     "knip": "knip",
-    "check": "npm run type-check && npm run lint && npm run format && npm run test && npm run validate:themes && npm run knip && npm run build-storybook",
+    "check": "npm run type-check && npm run lint && npm run format && npm run test && npm run validate:themes && npm run knip && npm run build && npm run build-storybook",
     "prepare": "husky",
     "gen:base-tokens": "node scripts/generate-base-theme-tokens.mjs",
     "audit": "audit-ci --config audit-ci.jsonc"

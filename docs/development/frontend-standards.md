@@ -940,10 +940,20 @@ Recommended scripts:
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "knip": "knip",
-    "check": "npm run type-check && npm run lint && npm run format && npm run test && npm run build-storybook"
+    "check": "npm run type-check && npm run lint && npm run format && npm run test && npm run knip && npm run build && npm run build-storybook"
   }
 }
 ```
+
+`check` must include **`build`** (the production bundle). `tsc` type-checks modules but never
+verifies that CSS/asset imports resolve to real files — they are typed by `vite/client`'s
+wildcard declarations — so a renamed or deleted asset breaks only `vite build`. In this repo
+573 of the 600 `.ts`/`.tsx` files reachable from `src/main.tsx` (**95%**) are never loaded by any
+story, so `build-storybook` cannot stand in for it (measured 2026-08-05, [#1052](https://github.com/hideyukiMORI/nene-records/issues/1052)).
+
+🔴 Do not over-read the scope: **`build` does not guard CSS.** Prettier-formatted invalid CSS
+(`color:;`) passes both `format` and `build`. CSS validity needs stylelint, which this repo does
+not have.
 
 CI on frontend PRs:
 
