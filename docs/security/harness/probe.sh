@@ -45,9 +45,22 @@ curl -s -c "$WORK/other.txt" -o /dev/null -X POST "$B/api/v1/auth/login" -H 'Con
 curl -s -b "$WORK/match.txt" -o /dev/null -X POST "$B/api/v1/webhooks" -H 'Content-Type: application/json' -H 'X-Requested-With: 1' \
   -d '{"url":"https://x.example/h","events":["entity.created"],"secret":"whsec_TEST","is_active":true}'
 
-echo "== F-01: unauthenticated admin GET must be 401 =="
-for p in /api/v1/webhooks /api/v1/entities /api/v1/entities/export /api/v1/text-fields /api/v1/notification-channels; do
+echo "== F-01: unauthenticated GET on sensitive routes must be 401 =="
+# The ADMIN_ONLY_PREFIXES of AdminApiAuthMiddleware: secrets, bulk export, org metrics,
+# and the credentials another product issued to this tenant (#1029).
+for p in /api/v1/webhooks /api/v1/notification-channels /api/v1/connect-tokens \
+         /api/v1/entities/export /api/v1/dashboard /api/v1/settings /api/v1/users; do
   check "unauth GET $p" 401 "$(code "$B$p")"
+done
+
+echo "== F-01 positive control: the public read surface must STAY open =="
+# 🔴 Do not "fix" these to 401. The first cut of #824 blanket-protected every GET and
+# took the public consumer site down with it (#826) — every visitor was bounced to
+# /login. #827 restored these deliberately: the site renders from them unauthenticated.
+# They are asserted here so that re-tightening the read surface fails loudly instead of
+# shipping as a "security improvement".
+for p in /api/v1/entity-types /api/v1/entities /api/v1/text-fields /api/v1/tags; do
+  check "unauth GET $p stays open" 200 "$(code "$B$p")"
 done
 check "public GET /api/v1/public/settings stays open" 200 "$(code "$B/api/v1/public/settings")"
 check "GET /health stays open" 200 "$(code "$B/health")"
