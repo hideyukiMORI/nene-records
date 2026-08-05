@@ -29,6 +29,18 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # npm run check = type-check + lint + format + test + validate:themes + knip
+      # + build（本番バンドル・#1052）+ build-storybook。
+      #
+      # 🔴 build の射程を誤読しないこと（#1052 で実測・2026-08-05 @ 44ee92c）:
+      # build は **CSS を守らない**。prettier 正規形に整形した不正 CSS（`color:;`）を
+      # theme/index.css に注入した実測では format rc=0・build rc=0 で全通過した。
+      # records には stylelint が無いので、CSS の妥当性ゲートは build を足しても増えない。
+      #
+      # build が実際に塞ぐのは **本番バンドル経路の解決性**。src/main.tsx から到達する
+      # .ts/.tsx 600 本のうち 573 本（95%）は story のどれからも到達せず、そこに
+      # 解決不能な import があっても type-check / lint / format / test / validate:themes /
+      # knip / build-storybook は 7つ全て rc=0 で素通りする（陽性対照の実測・#1052 参照）。
       - name: Run checks
         run: npm run check
 
