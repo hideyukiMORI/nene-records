@@ -31,6 +31,8 @@ final class OrgResolverMiddlewareTest extends TestCase
         $factory = new Psr17Factory();
         /** @var RequestScopedHolder<int> $orgId */
         $orgId = new RequestScopedHolder();
+        /** @var RequestScopedHolder<bool> $orgMissing */
+        $orgMissing = new RequestScopedHolder();
 
         $middleware = new OrgResolverMiddleware(
             $orgId,
@@ -42,6 +44,7 @@ final class OrgResolverMiddlewareTest extends TestCase
                     return null;
                 }
             },
+            $orgMissing,
         );
 
         $response = $middleware->process(
@@ -60,6 +63,8 @@ final class OrgResolverMiddlewareTest extends TestCase
 
         self::assertSame(200, $response->getStatusCode());
         self::assertSame(0, $orgId->get());
+        // A bypass route never names a tenant, so it is not a *missing* one (#1057).
+        self::assertFalse($orgMissing->isSet());
     }
 
     /**
@@ -72,6 +77,8 @@ final class OrgResolverMiddlewareTest extends TestCase
         $factory = new Psr17Factory();
         /** @var RequestScopedHolder<int> $orgId */
         $orgId = new RequestScopedHolder();
+        /** @var RequestScopedHolder<bool> $orgMissing */
+        $orgMissing = new RequestScopedHolder();
         $repository = new InMemoryOrganizationRepository();
         $repository->save(new Organization('My Shop', 'myshop', 'free', true));
 
@@ -80,6 +87,7 @@ final class OrgResolverMiddlewareTest extends TestCase
             $repository,
             new ProblemDetailsResponseFactory($factory, $factory),
             new PathPrefixResolutionStrategy(),
+            $orgMissing,
         );
 
         $capture = new class ($factory) implements RequestHandlerInterface {
@@ -108,6 +116,7 @@ final class OrgResolverMiddlewareTest extends TestCase
         // …and re-exposed for URL generation, alongside the resolved org.
         self::assertSame('/myshop', $capture->seen->getAttribute('nene2.base_prefix'));
         self::assertSame('myshop', $capture->seen->getAttribute('nene2.org.slug'));
+        self::assertFalse($orgMissing->isSet());
     }
 
     /**
@@ -119,12 +128,15 @@ final class OrgResolverMiddlewareTest extends TestCase
         $factory = new Psr17Factory();
         /** @var RequestScopedHolder<int> $orgId */
         $orgId = new RequestScopedHolder();
+        /** @var RequestScopedHolder<bool> $orgMissing */
+        $orgMissing = new RequestScopedHolder();
 
         $middleware = new OrgResolverMiddleware(
             $orgId,
             new InMemoryOrganizationRepository(),
             new ProblemDetailsResponseFactory($factory, $factory),
             new SubdomainResolutionStrategy('nene-records.com'),
+            $orgMissing,
         );
 
         $capture = new class ($factory) implements RequestHandlerInterface {
@@ -151,6 +163,8 @@ final class OrgResolverMiddlewareTest extends TestCase
         self::assertSame(0, $orgId->get()); // no-tenant sentinel
         self::assertNotNull($capture->seen);
         self::assertTrue($capture->seen->getAttribute('nene2.apex'));
+        // The apex is a real surface (landing / signup), not a missing tenant (#1057).
+        self::assertFalse($orgMissing->isSet());
     }
 
     public function testSubdomainUnknownTenantStill404s(): void
@@ -158,12 +172,15 @@ final class OrgResolverMiddlewareTest extends TestCase
         $factory = new Psr17Factory();
         /** @var RequestScopedHolder<int> $orgId */
         $orgId = new RequestScopedHolder();
+        /** @var RequestScopedHolder<bool> $orgMissing */
+        $orgMissing = new RequestScopedHolder();
 
         $middleware = new OrgResolverMiddleware(
             $orgId,
             new InMemoryOrganizationRepository(), // empty → "nope" not found
             new ProblemDetailsResponseFactory($factory, $factory),
             new SubdomainResolutionStrategy('nene-records.com'),
+            $orgMissing,
         );
 
         $response = $middleware->process(
@@ -181,5 +198,93 @@ final class OrgResolverMiddlewareTest extends TestCase
         );
 
         self::assertSame(404, $response->getStatusCode());
+        // #1057: the definite negative the single-origin edge layers read, so the
+        // 404 is not repainted as a 200 SPA shell for `/` and `/login`.
+        self::assertTrue($orgMissing->isSet());
+        self::assertTrue($orgMissing->get());
+    }
+
+    /**
+     * #1057: an inactive org is equally unserviceable. Its 403 never reaches the SPA
+     * shell today (the shell only fills 404s), but the flag must be consistent so a
+     * later change to that status — #973 proposes 404 — cannot silently reintroduce
+     * a 200 for a suspended tenant.
+     */
+    public function testInactiveTenantIsFlaggedAsUnserviceable(): void
+    {
+        $factory = new Psr17Factory();
+        /** @var RequestScopedHolder<int> $orgId */
+        $orgId = new RequestScopedHolder();
+        /** @var RequestScopedHolder<bool> $orgMissing */
+        $orgMissing = new RequestScopedHolder();
+        $repository = new InMemoryOrganizationRepository();
+        $repository->save(new Organization('Suspended', 'suspended', 'free', false));
+
+        $middleware = new OrgResolverMiddleware(
+            $orgId,
+            $repository,
+            new ProblemDetailsResponseFactory($factory, $factory),
+            new SubdomainResolutionStrategy('nene-records.com'),
+            $orgMissing,
+        );
+
+        $response = $middleware->process(
+            $factory->createServerRequest('GET', 'https://suspended.nene-records.com/'),
+            $this->passThrough($factory),
+        );
+
+        self::assertSame(403, $response->getStatusCode());
+        self::assertTrue($orgMissing->get());
+    }
+
+    /**
+     * #1057: a configuration gap is NOT a missing tenant. `org-not-resolved` means the
+     * deployment has no ORG_SLUG yet — flagging it would stop the SPA shell serving
+     * `/admin` and `/login`, locking the operator out of the surface they need to fix
+     * it. The 404 stays, the flag does not.
+     */
+    public function testUnconfiguredDeploymentIsNotFlaggedAsMissingOrg(): void
+    {
+        $factory = new Psr17Factory();
+        /** @var RequestScopedHolder<int> $orgId */
+        $orgId = new RequestScopedHolder();
+        /** @var RequestScopedHolder<bool> $orgMissing */
+        $orgMissing = new RequestScopedHolder();
+
+        $middleware = new OrgResolverMiddleware(
+            $orgId,
+            new InMemoryOrganizationRepository(),
+            new ProblemDetailsResponseFactory($factory, $factory),
+            new class () implements OrgResolutionStrategyInterface {
+                public function resolve(ServerRequestInterface $request): ?string
+                {
+                    return null; // e.g. EnvResolutionStrategy with no ORG_SLUG
+                }
+            },
+            $orgMissing,
+        );
+
+        $response = $middleware->process(
+            $factory->createServerRequest('GET', 'https://example.test/admin/dashboard'),
+            $this->passThrough($factory),
+        );
+
+        self::assertSame(404, $response->getStatusCode());
+        self::assertFalse($orgMissing->isSet());
+    }
+
+    /** A handler that answers 200 for anything that gets past the middleware. */
+    private function passThrough(Psr17Factory $factory): RequestHandlerInterface
+    {
+        return new readonly class ($factory) implements RequestHandlerInterface {
+            public function __construct(private Psr17Factory $factory)
+            {
+            }
+
+            public function handle(ServerRequestInterface $request): ResponseInterface
+            {
+                return $this->factory->createResponse(200);
+            }
+        };
     }
 }

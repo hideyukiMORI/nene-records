@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NeNeRecords\Http;
 
+use Nene2\Http\RequestScopedHolder;
 use NeNeRecords\PublicRecord\RenderPublicHomeHandler;
 use NeNeRecords\PublicRecord\RenderPublicTypeArchiveHandler;
 use NeNeRecords\UrlRedirect\UrlRedirectResolver;
@@ -32,6 +33,10 @@ use Psr\Http\Server\RequestHandlerInterface;
  */
 final readonly class SingleOriginKernel implements RequestHandlerInterface
 {
+    /**
+     * @param RequestScopedHolder<bool> $orgMissing raised by OrgResolverMiddleware when
+     *        the request named an organization that does not exist (or is inactive)
+     */
     public function __construct(
         private RequestHandlerInterface $application,
         private CustomPermalinkResolver $customPermalink,
@@ -39,12 +44,28 @@ final readonly class SingleOriginKernel implements RequestHandlerInterface
         private RenderPublicTypeArchiveHandler $typeArchive,
         private RenderPublicHomeHandler $frontPage,
         private SpaShellFallback $shell,
+        private RequestScopedHolder $orgMissing,
     ) {
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $response = $this->application->handle($request);
+
+        // Every layer below answers *for a tenant* — the permalink / 301 / archive
+        // lookups are org-scoped, and the shell is a tenant's page. When org
+        // resolution produced a definite negative, there is no tenant to answer for,
+        // so the pipeline's 404 (or the 403 for an inactive org) is the final answer.
+        //
+        // Without this the shell turned that 404 into a 200 for `/` and for every
+        // client-routed surface (`/login`, `/admin/...`, `/search`), so a decommissioned
+        // host stayed "up" in HTML while `/api/*` correctly 404'd — the shape that
+        // monitoring is least able to catch, and one that reappears every time an org
+        // is retired, independently of whether its DNS record is removed (#1057).
+        if ($this->orgMissing->isSet() && $this->orgMissing->get() === true) {
+            return $response;
+        }
+
         $response = $this->customPermalink->apply($request, $response);
         $response = $this->redirects->apply($request, $response);
         // Entity type archive SSR (#877): `/posts` etc. were SPA-only, so crawlers got

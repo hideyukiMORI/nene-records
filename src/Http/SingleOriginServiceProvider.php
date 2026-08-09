@@ -7,6 +7,8 @@ namespace NeNeRecords\Http;
 use LogicException;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
+use Nene2\Http\RequestScopedHolder;
+use NeNeRecords\ApplicationServiceProvider;
 use NeNeRecords\PublicRecord\RenderPublicHomeHandler;
 use NeNeRecords\PublicRecord\RenderPublicTypeArchiveHandler;
 use NeNeRecords\Setting\ListPublicSettingsUseCaseInterface;
@@ -89,6 +91,7 @@ final readonly class SingleOriginServiceProvider implements ServiceProviderInter
                     $typeArchive = $c->get(RenderPublicTypeArchiveHandler::class);
                     $frontPage = $c->get(RenderPublicHomeHandler::class);
                     $shell = $c->get(SpaShellFallback::class);
+                    $orgMissing = $c->get(ApplicationServiceProvider::ORG_MISSING_HOLDER);
 
                     if (!$application instanceof RequestHandlerInterface) {
                         throw new LogicException('Application request handler service is invalid.');
@@ -108,6 +111,10 @@ final readonly class SingleOriginServiceProvider implements ServiceProviderInter
                     if (!$shell instanceof SpaShellFallback) {
                         throw new LogicException('SPA shell fallback service is invalid.');
                     }
+                    if (!$orgMissing instanceof RequestScopedHolder) {
+                        throw new LogicException('Org missing holder service is invalid.');
+                    }
+                    /** @var RequestScopedHolder<bool> $orgMissing */
 
                     return new SingleOriginKernel(
                         $application,
@@ -116,6 +123,7 @@ final readonly class SingleOriginServiceProvider implements ServiceProviderInter
                         $typeArchive,
                         $frontPage,
                         $shell,
+                        $orgMissing,
                     );
                 },
             );

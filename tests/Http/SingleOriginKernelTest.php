@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeNeRecords\Tests\Http;
 
 use DateTimeImmutable;
+use Nene2\Http\RequestScopedHolder;
 use NeNeRecords\Entity\Entity;
 use NeNeRecords\Entity\EntityStatus;
 use NeNeRecords\EntityType\EntityType;
@@ -37,12 +38,17 @@ final class SingleOriginKernelTest extends TestCase
     private Psr17Factory $factory;
     private InMemoryUrlRedirectRepository $redirects;
     private string $shellPath;
+    /** @var RequestScopedHolder<bool> */
+    private RequestScopedHolder $orgMissing;
 
     protected function setUp(): void
     {
         parent::setUp();
         $this->factory = new Psr17Factory();
         $this->redirects = new InMemoryUrlRedirectRepository();
+        /** @var RequestScopedHolder<bool> $orgMissing */
+        $orgMissing = new RequestScopedHolder();
+        $this->orgMissing = $orgMissing;
 
         $shellPath = tempnam(sys_get_temp_dir(), 'shell_');
         self::assertNotFalse($shellPath);
@@ -88,6 +94,7 @@ final class SingleOriginKernelTest extends TestCase
             $typeArchive ?? $this->typeArchive(),
             $frontPage ?? $this->frontPage(false),
             new SpaShellFallback($this->shellPath, $this->factory, $this->factory),
+            $this->orgMissing,
         );
     }
 
@@ -577,6 +584,96 @@ final class SingleOriginKernelTest extends TestCase
         $response = $this->kernel($this->appReturning(404))->handle($request);
 
         self::assertSame(404, $response->getStatusCode());
+    }
+
+    // ── Decommissioned tenant (#1057) ────────────────────────────────────────
+    //
+    // `ayane.nene-records.com` kept answering `GET /` with 200 + the SPA shell for
+    // three weeks after its org was deleted, while `GET /api/health` correctly 404'd
+    // `org-not-found`. The 404 was real — SpaShellFallback repainted it, because `/`
+    // and every SPA_APP_ROUTES surface are served at 200 by design for a *live*
+    // tenant and the shell had no way to know there wasn't one.
+    //
+    // One test per surface: `/` and the client-routed routes reach 200 through two
+    // different branches of that status expression, so a partial revert must fail
+    // something here.
+
+    public function testMissingOrgKeepsTheHardNotFoundAtRoot(): void
+    {
+        $this->orgMissing->set(true);
+
+        $request = $this->factory
+            ->createServerRequest('GET', 'https://dead-tenant.test/')
+            ->withHeader('Accept', 'text/html');
+
+        $response = $this->kernel($this->appReturning(404))->handle($request);
+
+        self::assertSame(404, $response->getStatusCode());
+        self::assertStringNotContainsString('id="root"', (string) $response->getBody());
+    }
+
+    public function testMissingOrgKeepsTheHardNotFoundOnClientRoutedSurfaces(): void
+    {
+        // These are the paths SPA_APP_ROUTES serves at 200 for a live tenant. A
+        // decommissioned host must not offer a login form.
+        foreach (['/login', '/admin/dashboard', '/search', '/signup'] as $path) {
+            $this->orgMissing->reset();
+            $this->orgMissing->set(true);
+
+            $response = $this->kernel($this->appReturning(404))->handle(
+                $this->factory->createServerRequest('GET', 'https://dead-tenant.test' . $path)
+                    ->withHeader('Accept', 'text/html'),
+            );
+
+            self::assertSame(404, $response->getStatusCode(), $path . ' must stay a hard 404');
+            self::assertStringNotContainsString('id="root"', (string) $response->getBody(), $path);
+        }
+    }
+
+    public function testMissingOrgSkipsTheOrgScopedEdgeLayers(): void
+    {
+        // The 301 map, custom permalinks, the type archive and the front page are all
+        // org-scoped lookups. With no tenant there is nothing to look them up in, so
+        // they must not run at all — not merely fail to match.
+        $this->redirects->save('/2024/01/hello-world', '/posts/1');
+        $this->orgMissing->set(true);
+
+        $response = $this->kernel($this->appReturning(404), $this->permalinkResolverTagging())->handle(
+            $this->factory->createServerRequest('GET', 'https://dead-tenant.test/2024/01/hello-world')
+                ->withHeader('Accept', 'text/html'),
+        );
+
+        self::assertSame(404, $response->getStatusCode());
+        self::assertSame('', $response->getHeaderLine('Location'));
+        self::assertSame('', $response->getHeaderLine('X-Test-Permalink'));
+    }
+
+    public function testMissingOrgLeavesTheInactiveTenantForbiddenIntact(): void
+    {
+        // An inactive org answers 403 (org-inactive) and also raises the flag. The
+        // kernel must hand that response back untouched rather than swallow it.
+        $this->orgMissing->set(true);
+
+        $response = $this->kernel($this->appReturning(403))->handle(
+            $this->factory->createServerRequest('GET', 'https://suspended.test/')
+                ->withHeader('Accept', 'text/html'),
+        );
+
+        self::assertSame(403, $response->getStatusCode());
+    }
+
+    public function testUnflaggedRequestsStillGetTheShell(): void
+    {
+        // The guard reads a *definite negative*. An unconfigured deployment
+        // (`org-not-resolved`, flag never raised) keeps reaching /admin so the
+        // operator can finish setting it up.
+        $response = $this->kernel($this->appReturning(404))->handle(
+            $this->factory->createServerRequest('GET', 'https://unconfigured.test/admin/dashboard')
+                ->withHeader('Accept', 'text/html'),
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertStringContainsString('id="root"', (string) $response->getBody());
     }
 
     /** A permalink resolver that claims every 404 path, tagging the response. */

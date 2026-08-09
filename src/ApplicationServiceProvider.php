@@ -154,6 +154,19 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
     /** Container key for the shared RequestScopedHolder<int> that carries org_id. */
     public const ORG_ID_HOLDER = 'nene-records.org_id_holder';
 
+    /**
+     * Container key for the shared RequestScopedHolder<bool> that carries a *definite
+     * negative* from org resolution: the request named an organization and that
+     * organization does not exist (or is inactive).
+     *
+     * Distinct from "org_id was never set", which also covers configuration gaps
+     * (`org-not-resolved`) — those must keep working so an unconfigured install can
+     * still reach `/admin`. Written by OrgResolverMiddleware, read by
+     * SingleOriginKernel so the single-origin edge layers don't answer for a tenant
+     * that isn't there (#1057).
+     */
+    public const ORG_MISSING_HOLDER = 'nene-records.org_missing_holder';
+
     public function register(ContainerBuilder $builder): void
     {
         // Register the shared org_id holder so all repos and OrgResolverMiddleware share the same instance.
@@ -161,6 +174,15 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
             self::ORG_ID_HOLDER,
             static function (): RequestScopedHolder {
                 /** @var RequestScopedHolder<int> */
+                return new RequestScopedHolder();
+            },
+        );
+
+        // Shared "this host names an org that isn't serviceable" flag (#1057).
+        $builder->set(
+            self::ORG_MISSING_HOLDER,
+            static function (): RequestScopedHolder {
+                /** @var RequestScopedHolder<bool> */
                 return new RequestScopedHolder();
             },
         );
