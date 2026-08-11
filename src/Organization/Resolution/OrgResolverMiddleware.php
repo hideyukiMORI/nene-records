@@ -25,7 +25,8 @@ use Psr\Http\Server\RequestHandlerInterface;
  *  1. strategy->resolve() → slug or custom domain identifier
  *  2. OrganizationRepository::findBySlug() → Organization
  *  3. If not found by slug, try findByCustomDomain() (for CustomDomainStrategy)
- *  4. 404 if still not found
+ *  4. 404 if still not found — and raise the `$orgMissing` flag so the single-origin
+ *     edge layers stop turning that 404 into a 200 SPA shell (#1057)
  */
 final readonly class OrgResolverMiddleware implements MiddlewareInterface
 {
@@ -49,13 +50,19 @@ final readonly class OrgResolverMiddleware implements MiddlewareInterface
     ];
 
     /**
-     * @param RequestScopedHolder<int> $orgId
+     * @param RequestScopedHolder<int>  $orgId
+     * @param RequestScopedHolder<bool> $orgMissing marks a *definite negative*: the
+     *        request named an organization and no serviceable one exists for it. The
+     *        single-origin edge layers read this so they don't answer for a tenant
+     *        that isn't there (#1057). Deliberately NOT raised for `org-not-resolved`
+     *        (a configuration gap) — see process().
      */
     public function __construct(
         private RequestScopedHolder $orgId,
         private OrganizationRepositoryInterface $repository,
         private ProblemDetailsResponseFactory $problemDetails,
         private OrgResolutionStrategyInterface $strategy,
+        private RequestScopedHolder $orgMissing,
     ) {
     }
 
@@ -87,6 +94,11 @@ final readonly class OrgResolverMiddleware implements MiddlewareInterface
                 return $handler->handle($request->withAttribute('nene2.apex', true));
             }
 
+            // NOT flagged as "org missing": this is a configuration gap (e.g. no
+            // ORG_SLUG yet), not a dead tenant. Flagging it would stop the SPA shell
+            // from serving `/admin` and `/login` on an install that hasn't been
+            // configured yet — i.e. it would lock the operator out of the surface
+            // they need to fix it (#1057).
             return $this->problemDetails->create(
                 $request,
                 'org-not-resolved',
@@ -101,6 +113,8 @@ final readonly class OrgResolverMiddleware implements MiddlewareInterface
             ?? $this->repository->findByCustomDomain($identifier);
 
         if ($org === null) {
+            $this->orgMissing->set(true);
+
             return $this->problemDetails->create(
                 $request,
                 'org-not-found',
@@ -111,6 +125,8 @@ final readonly class OrgResolverMiddleware implements MiddlewareInterface
         }
 
         if (!$org->isActive) {
+            $this->orgMissing->set(true);
+
             return $this->problemDetails->create(
                 $request,
                 'org-inactive',

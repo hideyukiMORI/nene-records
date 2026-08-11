@@ -332,6 +332,14 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
                     }
                     /** @var RequestScopedHolder<int> $orgIdHolder */
 
+                    // "This host names an org that isn't serviceable" flag (#1057):
+                    // shared with SingleOriginKernel so the edge layers stop answering.
+                    $orgMissingHolder = $container->get(ApplicationServiceProvider::ORG_MISSING_HOLDER);
+                    if (!$orgMissingHolder instanceof RequestScopedHolder) {
+                        throw new LogicException('Org missing holder service is invalid.');
+                    }
+                    /** @var RequestScopedHolder<bool> $orgMissingHolder */
+
                     // DB の system_config から解決モードを読む（env フォールバック付き）。
                     // system_config は migration で tenant_* を空文字 '' で seed するため、`??`
                     // だと空文字（非 null）が env フォールバックを覆い隠す。`?:` で「空なら env」
@@ -363,7 +371,7 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
                     $wwwBaseDomain = $resolvedDomain === 'localhost' ? '' : $resolvedDomain;
                     $authMiddleware[] = new WwwRedirectMiddleware($responseFactory, $orgIdHolder, $wwwBaseDomain);
 
-                    $authMiddleware[] = new OrgResolverMiddleware($orgIdHolder, $orgRepo, $problemDetails, $strategy);
+                    $authMiddleware[] = new OrgResolverMiddleware($orgIdHolder, $orgRepo, $problemDetails, $strategy, $orgMissingHolder);
 
                     // Per-org maintenance mode (#813): gate the public surface for anonymous
                     // visitors when the resolved org's `maintenance_mode` setting is on. Placed
