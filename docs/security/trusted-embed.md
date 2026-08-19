@@ -86,6 +86,15 @@ re-validated settings — never from anything in the authored HTML. Authored mar
 choose *where* an embed goes; it can never choose *what* it is. A raw `<script>` in an
 `html` field is still stripped unconditionally, exactly as before.
 
+**Where the `div`-only rule actually lives.** On the SSR side the sanitizer enforces it
+(`allowAttribute(..., ['div'])`). On the SPA side it does **not**: DOMPurify keeps
+`data-*` on any element by default (`ALLOW_DATA_ATTR`), so the `data-nene-embed` entry
+in its `ADD_ATTR` list is currently a **no-op** — it only becomes load-bearing if that
+default is ever turned off. What holds the two sides together today is the *consumer*:
+`InlineTrustedEmbedHtml` checks the element itself (`tagName === 'DIV'`, no children)
+before it will place anything. If you change either sanitizer, that check — not the
+sanitizer config — is what keeps SSR and SPA agreeing on what a marker is.
+
 ## SRI runbook — keep the integrity hash in sync with the script
 
 Subresource Integrity pins the embed to an exact file. **If the self-owned script

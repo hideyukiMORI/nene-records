@@ -98,12 +98,15 @@ export function InlineTrustedEmbedHtml({ html, className }: InlineTrustedEmbedHt
       if (emitted.has(id)) {
         continue
       }
-      emitted.add(id)
 
       const embed = embeds.get(id)
       if (embed === undefined) {
         continue
       }
+
+      // Marked only once it actually resolved, so `emitted` means "emitted" and
+      // not "seen" — matching the SSR pass.
+      emitted.add(id)
 
       const script = document.createElement('script')
       // Content attributes, so the values are exactly what the browser's SRI +

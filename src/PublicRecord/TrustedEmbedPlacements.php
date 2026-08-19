@@ -55,8 +55,12 @@ final class TrustedEmbedPlacements
 
     /**
      * An empty `div` carrying `data-nene-embed="<digits>"` among its attributes.
-     * `[^>]*` cannot run past the tag because the sanitizer escapes `>` inside
-     * attribute values to `&gt;` (verified) — so the match can never span tags.
+     *
+     * The match cannot span tags, and that holds **independently of what the
+     * sanitizer does**: `[^>]*` stops at the first `>` by construction, so the
+     * attribute run can never escape the tag it started in. Nothing here relies
+     * on how attribute values happen to be escaped upstream — swapping the
+     * sanitizer cannot invalidate this pattern.
      */
     private const MARKER_PATTERN =
         '#<div\b([^>]*\s)?' . self::ATTRIBUTE . '="(\d{1,18})"([^>]*)>\s*</div>#i';
@@ -89,11 +93,18 @@ final class TrustedEmbedPlacements
                 if (isset($emitted[$id])) {
                     return '';
                 }
-                $emitted[$id] = true;
 
                 $spec = self::resolve($id, $widgets, $allowlist);
+                if ($spec === null) {
+                    return '';
+                }
 
-                return $spec === null ? '' : TrustedEmbedScripts::inlineTagFor($spec);
+                // Marked only once it actually resolved, so `$emitted` means
+                // "emitted" and not "seen": a marker that fails to resolve stays
+                // a fresh decision for every later occurrence of the same id.
+                $emitted[$id] = true;
+
+                return TrustedEmbedScripts::inlineTagFor($spec);
             },
             $sanitizedHtml,
         );
