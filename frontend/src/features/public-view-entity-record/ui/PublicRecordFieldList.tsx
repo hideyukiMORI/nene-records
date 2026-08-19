@@ -1,7 +1,8 @@
 import type { Entity } from '@/entities/entity'
 import { parseBundleDocument } from '@/shared/lib/bundle-document'
 import { isMarkdownBodyField } from '@/shared/lib/is-markdown-body-field'
-import { SandboxedBundle, SanitizedHtml, Text } from '@/shared/ui'
+import { InlineTrustedEmbedHtml } from '@/features/render-widgets'
+import { SandboxedBundle, Text } from '@/shared/ui'
 import { BlocksRenderer } from '@/shared/ui/blocks'
 import { PublicMarkdownContent } from '@/shared/ui/markdown'
 import type { PublicFieldRow } from '../model/use-public-view-entity-record-page'
@@ -60,7 +61,7 @@ export function PublicRecordFieldList({
         if (row.dataType === 'html') {
           return (
             <div key={row.fieldKey} className="prose">
-              <SanitizedHtml html={row.displayValue === '—' ? '' : row.displayValue} />
+              <InlineTrustedEmbedHtml html={row.displayValue === '—' ? '' : row.displayValue} />
             </div>
           )
         }

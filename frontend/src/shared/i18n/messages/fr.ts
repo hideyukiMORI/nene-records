@@ -446,6 +446,8 @@ export const fr = {
     'Les widgets placés dans la zone principale ne sont pas rendus sur le site public.',
   'admin.widgets.board.addHere': '+ Ajouter ici',
   'admin.widgets.board.empty': 'Aucun widget dans cette région pour le moment.',
+  'admin.widgets.board.inlineNote':
+    'Placé dans le contenu. Un widget ici ne s\'affiche pas seul — uniquement là où un champ html indique <div data-nene-embed="ID"></div>.',
   'widgets.recentPosts.unconfigured': 'Aucun type de contenu configuré.',
   'widgets.recentPosts.empty': 'Aucun article pour le moment.',
   'widgets.menu.empty': 'Aucun élément de menu pour le moment.',
@@ -1111,6 +1113,7 @@ export const fr = {
   'admin.region.sidebar': 'Barre latérale',
   'admin.region.aside': 'Aparté',
   'admin.region.footer': 'Pied de page',
+  'admin.region.inline': 'Dans le contenu (en ligne)',
   'admin.fieldDefs.displayOrder': "Ordre d'affichage",
   'admin.entityStatus.publish': 'Publier',
   'admin.entityStatus.publishedAt': 'Publié le {{date}}',

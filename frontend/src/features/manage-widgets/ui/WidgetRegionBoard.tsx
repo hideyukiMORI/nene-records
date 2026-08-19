@@ -29,6 +29,10 @@ const REGION_FLOW: Record<WidgetRegion, 'row' | 'col'> = {
   sidebar: 'col',
   aside: 'col',
   footer: 'col',
+  // `inline` is not a column on the page (#937): it is a holding area whose
+  // widgets render wherever an html field's marker calls them. It still lists
+  // and reorders like a stacked region here.
+  inline: 'col',
 }
 
 export function WidgetRegionBoard({
@@ -113,7 +117,11 @@ export function WidgetRegionBoard({
     const list = byRegion(region)
     const flow = REGION_FLOW[region]
     const cond =
-      region === 'sidebar' || region === 'aside' ? t(`admin.layout.cond.${region}`) : null
+      region === 'sidebar' || region === 'aside'
+        ? t(`admin.layout.cond.${region}`)
+        : region === 'inline'
+          ? t('admin.widgets.board.inlineNote')
+          : null
 
     const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
       if (!dnd || getDragPayload() === null) return
@@ -235,6 +243,8 @@ export function WidgetRegionBoard({
       </div>
 
       {renderRegion('footer')}
+
+      {renderRegion('inline')}
     </Stack>
   )
 }

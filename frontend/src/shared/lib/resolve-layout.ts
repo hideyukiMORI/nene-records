@@ -34,9 +34,25 @@ export const DEFAULT_REGION: ContentRegion = 'main'
  * regions, widgets place into the site chrome (header/footer) and side columns;
  * `main` is record content, not a widget target.
  */
-export type WidgetRegion = 'header' | 'sidebar' | 'aside' | 'footer'
+export type WidgetRegion = 'header' | 'sidebar' | 'aside' | 'footer' | 'inline'
 
-export const WIDGET_REGIONS: readonly WidgetRegion[] = ['header', 'sidebar', 'aside', 'footer']
+export const WIDGET_REGIONS: readonly WidgetRegion[] = [
+  'header',
+  'sidebar',
+  'aside',
+  'footer',
+  'inline',
+]
+
+/**
+ * `inline` is the one region that is not a place on the page (#937, mirrors
+ * `WidgetRegions::INLINE`): a widget parked there renders nowhere on its own and
+ * appears only where an `html` field's body references it with a
+ * `<div data-nene-embed="<id>"></div>` marker. Layout code must therefore never
+ * treat it as a column — the helpers below build from explicit column lists, and
+ * `SiteWidgets` filters by exact region, so it is excluded by construction.
+ */
+export const INLINE_REGION = 'inline' as const
 
 /** Regions each layout renders, in order (mirrors PublicLayouts::regions). */
 const LAYOUT_REGIONS: Record<PublicLayoutKey, readonly ContentRegion[]> = {

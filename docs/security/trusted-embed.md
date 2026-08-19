@@ -8,6 +8,8 @@ operational rules that keep it safe. Introduced across two phases:
 - **Phase 2** — the first-party `trusted-embed` widget emits the actual
   `<script src integrity crossorigin="anonymous" async>`, gated by the allowlist,
   on both the SSR shell and the SPA.
+- **Phase 3** (#937) — the same vetted embed can be placed at an **arbitrary point
+  inside a page's content**, via an inert marker, without relaxing the sanitizer.
 
 The content sanitizer is **never** relaxed: user-authored HTML still cannot carry a
 `<script>`. Embeds only come from this typed, admin-vetted path.
@@ -45,6 +47,53 @@ third, separate layer.
 
 Any failure ⇒ the embed is **not rendered** (and, on save, the admin gets a
 field-level error). A misconfiguration fails closed.
+
+## Placement: chrome regions vs inline (#937)
+
+A `trusted-embed` widget renders in one of two ways, decided by its **region**:
+
+| Region | Where it renders |
+|---|---|
+| `header` / `sidebar` / `aside` / `footer` | In that part of the site chrome, like any other widget. |
+| `inline` | **Nowhere on its own.** Only where a page's content references it by marker. |
+
+To place an embed inside the body of an `html` field, park the widget in the
+`inline` region and write the marker where you want it:
+
+```html
+<p>…copy…</p>
+<div data-nene-embed="12"></div>
+<p>…more copy…</p>
+```
+
+`12` is the widget's id (shown in the admin widget board). The rules are strict and
+identical on the SSR and SPA paths — a marker that breaks any of them renders nothing:
+
+- the marker must be a **`div`**, and it must be **empty** (`<div …></div>`);
+- the referenced widget must exist, be a `trusted-embed`, and be in the **`inline`**
+  region (a region-placed widget already renders in its region — honouring a marker
+  for it would load the same script twice);
+- its settings must pass every rule in *What is validated* above, allowlist included;
+- the same widget is emitted **at most once** per document, even if the marker is
+  repeated.
+
+### Why this is not a hole in the sanitizer
+
+The only concession is that the `data-nene-embed` **attribute** survives sanitizing on
+`div`. That attribute is inert: it carries no URL, no integrity hash and no code. The
+`<script>` itself is rebuilt **after** sanitizing, from the widget's stored,
+re-validated settings — never from anything in the authored HTML. Authored markup can
+choose *where* an embed goes; it can never choose *what* it is. A raw `<script>` in an
+`html` field is still stripped unconditionally, exactly as before.
+
+**Where the `div`-only rule actually lives.** On the SSR side the sanitizer enforces it
+(`allowAttribute(..., ['div'])`). On the SPA side it does **not**: DOMPurify keeps
+`data-*` on any element by default (`ALLOW_DATA_ATTR`), so the `data-nene-embed` entry
+in its `ADD_ATTR` list is currently a **no-op** — it only becomes load-bearing if that
+default is ever turned off. What holds the two sides together today is the *consumer*:
+`InlineTrustedEmbedHtml` checks the element itself (`tagName === 'DIV'`, no children)
+before it will place anything. If you change either sanitizer, that check — not the
+sanitizer config — is what keeps SSR and SPA agreeing on what a marker is.
 
 ## SRI runbook — keep the integrity hash in sync with the script
 

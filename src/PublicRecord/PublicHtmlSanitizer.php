@@ -27,6 +27,13 @@ final readonly class PublicHtmlSanitizer
             ->allowRelativeLinks()
             ->allowRelativeMedias()
             ->allowAttribute('style', '*')
+            // Inert placement marker for trusted embeds (#937): `data-nene-embed`
+            // survives on `div` so an author can say *where* a vetted embed goes.
+            // It carries no URL and no script — the tag itself is rebuilt from the
+            // widget's stored settings after this pass (see TrustedEmbedPlacements),
+            // so this is a positioning hook, never an execution path. `<script>`
+            // in an html field remains stripped unconditionally.
+            ->allowAttribute(TrustedEmbedPlacements::ATTRIBUTE, ['div'])
             // A full custom page body (a `bare`/custom page authored as one html
             // field) routinely exceeds Symfony's 20 KB default, which would
             // silently truncate the crawlable SSR mid-page. Raise the cap to a

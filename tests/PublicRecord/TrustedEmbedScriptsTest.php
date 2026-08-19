@@ -12,12 +12,12 @@ use PHPUnit\Framework\TestCase;
 final class TrustedEmbedScriptsTest extends TestCase
 {
     /** @param array<string, mixed> $settings */
-    private function widget(string $type, array $settings): Widget
+    private function widget(string $type, array $settings, string $region = 'footer'): Widget
     {
         return new Widget(
             id: 1,
             widgetType: $type,
-            region: 'footer',
+            region: $region,
             displayOrder: 0,
             title: null,
             settings: $settings,
@@ -39,6 +39,15 @@ final class TrustedEmbedScriptsTest extends TestCase
             'src' => 'https://widgets.example.com/form.js',
             'integrity' => 'sha384-abcDEF123+/=',
         ];
+    }
+
+    public function testInlineRegionWidgetIsNotRenderedIntoTheChrome(): void
+    {
+        // #937: an inline widget is placed by a marker inside the content
+        // (TrustedEmbedPlacements). Rendering it here too would load it twice.
+        $widgets = [$this->widget('trusted-embed', $this->validSettings(), 'inline')];
+
+        self::assertSame('', TrustedEmbedScripts::render($widgets, $this->allowlist()));
     }
 
     public function testEmptyAllowlistRendersNothing(): void
