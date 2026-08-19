@@ -7001,7 +7001,11 @@ components:
           enum: [recent-posts, menu, toc, search, tag-cloud, popular-posts, calendar, trusted-embed]
         region:
           type: string
-          enum: [header, sidebar, aside, footer]
+          enum: [header, sidebar, aside, footer, inline]
+          description: >-
+            Layout region the widget is placed into. `inline` is not a place on the
+            page: the widget renders only where an `html` field's body references it
+            with a `<div data-nene-embed="<id>"></div>` marker (#937).
         display_order:
           type: integer
           minimum: 0
@@ -7041,7 +7045,11 @@ components:
           enum: [recent-posts, menu, toc, search, tag-cloud, popular-posts, calendar, trusted-embed]
         region:
           type: string
-          enum: [header, sidebar, aside, footer]
+          enum: [header, sidebar, aside, footer, inline]
+          description: >-
+            Layout region the widget is placed into. `inline` is not a place on the
+            page: the widget renders only where an `html` field's body references it
+            with a `<div data-nene-embed="<id>"></div>` marker (#937).
         display_order:
           type: integer
           minimum: 0

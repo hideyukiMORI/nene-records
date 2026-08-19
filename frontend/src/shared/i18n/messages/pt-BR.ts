@@ -443,6 +443,8 @@ export const ptBR = {
     'Widgets colocados na área principal não são renderizados no site público.',
   'admin.widgets.board.addHere': '+ Adicionar aqui',
   'admin.widgets.board.empty': 'Nenhum widget nesta região ainda.',
+  'admin.widgets.board.inlineNote':
+    'Colocado dentro do conteúdo. Um widget aqui não é renderizado sozinho — apenas onde um campo html indica <div data-nene-embed="ID"></div>.',
   'widgets.recentPosts.unconfigured': 'Nenhum tipo de conteúdo configurado.',
   'widgets.recentPosts.empty': 'Nenhum post ainda.',
   'widgets.menu.empty': 'Nenhum item de menu ainda.',
@@ -1101,6 +1103,7 @@ export const ptBR = {
   'admin.region.sidebar': 'Barra lateral',
   'admin.region.aside': 'Lateral',
   'admin.region.footer': 'Rodapé',
+  'admin.region.inline': 'No conteúdo (inline)',
   'admin.fieldDefs.displayOrder': 'Ordem de exibição',
   'admin.entityStatus.publish': 'Publicar',
   'admin.entityStatus.publishedAt': 'Publicado {{date}}',

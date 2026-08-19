@@ -184,12 +184,13 @@ final readonly class RenderPublicRecordViewHandler implements PublicRecordViewRe
         // configured we skip the widget query entirely, so a page with no embed
         // configured does exactly what it did before — no extra work, no output.
         $embedAllowlist = EmbedAllowlist::fromSettings($settings);
+        $embedWidgets = [];
         $embedScripts = '';
         if (!$embedAllowlist->isEmpty()) {
-            $embedScripts = TrustedEmbedScripts::render(
-                $this->listWidgets->execute()->items,
-                $embedAllowlist,
-            );
+            // Fetched once and reused by both embed paths: the chrome regions
+            // (here) and inline markers inside html fields (renderHtml below).
+            $embedWidgets = $this->listWidgets->execute()->items;
+            $embedScripts = TrustedEmbedScripts::render($embedWidgets, $embedAllowlist);
         }
 
         // First-party floating CTA (#982): a fixed chrome button rendered verbatim into
@@ -343,7 +344,11 @@ final readonly class RenderPublicRecordViewHandler implements PublicRecordViewRe
             'renderMarkdown' => static fn (string $markdown): string => PublicMarkdownRenderer::toSafeHtml($markdown),
             // html-typed fields (e.g. WXR-imported content): sanitize server-side so the
             // crawlable SSR shows the same trusted markup the SPA renders via DOMPurify.
-            'renderHtml' => fn (string $rawHtml): string => $this->htmlSanitizer->sanitize($rawHtml),
+            'renderHtml' => fn (string $rawHtml): string => TrustedEmbedPlacements::apply(
+                $this->htmlSanitizer->sanitize($rawHtml),
+                $embedWidgets,
+                $embedAllowlist,
+            ),
             // A bundle's crawlable twin (#311): render its seoText markdown server-side
             // (the sandboxed iframe itself is SPA-only / invisible to crawlers).
             'renderBundleSeo' => static fn (string $raw): string => PublicMarkdownRenderer::toSafeHtml(BundleDocumentValidator::seoTextOf($raw)),

@@ -443,6 +443,8 @@ export const de = {
     'Widgets im Hauptbereich werden auf der öffentlichen Website nicht dargestellt.',
   'admin.widgets.board.addHere': '+ Hier hinzufügen',
   'admin.widgets.board.empty': 'Noch keine Widgets in diesem Bereich.',
+  'admin.widgets.board.inlineNote':
+    'Im Inhalt platziert. Ein Widget hier wird allein nicht gerendert — nur dort, wo ein html-Feld <div data-nene-embed="ID"></div> angibt.',
   'widgets.recentPosts.unconfigured': 'Kein Inhaltstyp konfiguriert.',
   'widgets.recentPosts.empty': 'Noch keine Beiträge.',
   'widgets.menu.empty': 'Noch keine Menüeinträge.',
@@ -1088,6 +1090,7 @@ export const de = {
   'admin.region.sidebar': 'Seitenleiste',
   'admin.region.aside': 'Randspalte',
   'admin.region.footer': 'Fußzeile',
+  'admin.region.inline': 'Im Inhalt (inline)',
   'admin.fieldDefs.displayOrder': 'Anzeigereihenfolge',
   'admin.entityStatus.publish': 'Veröffentlichen',
   'admin.entityStatus.publishedAt': 'Veröffentlicht {{date}}',

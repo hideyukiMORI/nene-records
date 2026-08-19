@@ -17,8 +17,13 @@ export interface SanitizedHtmlProps {
  * an SSR/SPA parity break (#891 family). The reverse-tabnabbing surface that
  * justified stripping is closed by the hook below instead, which forces
  * `rel="noopener noreferrer"` onto every anchor that carries a `target`.
+ *
+ * `data-nene-embed` is listed for the same parity reason (#937): it is the inert
+ * marker that says *where* a vetted trusted-embed goes. It carries no URL and no
+ * script — `InlineTrustedEmbedHtml` is what turns a marker into a tag, and only
+ * from the widget's stored, re-validated settings.
  */
-const SANITIZE_CONFIG = { FORBID_TAGS: ['style'], ADD_ATTR: ['target'] }
+const SANITIZE_CONFIG = { FORBID_TAGS: ['style'], ADD_ATTR: ['target', 'data-nene-embed'] }
 
 DOMPurify.addHook('afterSanitizeAttributes', (node) => {
   if (node.tagName === 'A' && node.getAttribute('target') !== null) {

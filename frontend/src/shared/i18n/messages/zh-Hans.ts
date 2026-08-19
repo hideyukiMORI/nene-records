@@ -419,6 +419,8 @@ export const zhHans = {
   'admin.widgets.board.mainNote': '放在主栏的小部件不会在公共站点上渲染。',
   'admin.widgets.board.addHere': '＋ 在此添加',
   'admin.widgets.board.empty': '此区域还没有小部件。',
+  'admin.widgets.board.inlineNote':
+    '放在正文中。此处的挂件不会单独渲染——只在 html 字段写有 <div data-nene-embed="ID"></div> 的位置出现。',
   'widgets.recentPosts.unconfigured': '未配置内容类型。',
   'widgets.recentPosts.empty': '还没有文章。',
   'widgets.menu.empty': '还没有菜单项。',
@@ -1055,6 +1057,7 @@ export const zhHans = {
   'admin.region.sidebar': '侧边栏',
   'admin.region.aside': '边栏',
   'admin.region.footer': '页脚',
+  'admin.region.inline': '正文内（内联）',
   'admin.fieldDefs.displayOrder': '显示顺序',
   'admin.entityStatus.publish': '发布',
   'admin.entityStatus.publishedAt': '已于 {{date}} 发布',

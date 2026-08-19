@@ -442,6 +442,8 @@ export const ja = {
   'admin.widgets.board.mainNote': 'main に置いたウィジェットは公開サイトでは描画されません。',
   'admin.widgets.board.addHere': '＋ ここに追加',
   'admin.widgets.board.empty': 'この領域にウィジェットはまだありません。',
+  'admin.widgets.board.inlineNote':
+    '本文内に置く領域。ここのウィジェットは単独では描画されず、html フィールドに <div data-nene-embed="ID"></div> と書いた位置にだけ出ます。',
   'widgets.recentPosts.unconfigured': 'コンテンツタイプが未設定です。',
   'widgets.recentPosts.empty': '投稿がまだありません。',
   'widgets.menu.empty': 'メニュー項目がまだありません。',
@@ -1101,6 +1103,7 @@ export const ja = {
   'admin.region.sidebar': 'サイドバー',
   'admin.region.aside': 'アサイド',
   'admin.region.footer': 'フッター',
+  'admin.region.inline': '本文内（インライン）',
   'admin.fieldDefs.displayOrder': '表示順',
   'admin.entityStatus.publish': '公開',
   'admin.entityStatus.publishedAt': '{{date}} に公開',

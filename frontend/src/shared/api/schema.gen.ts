@@ -2816,8 +2816,11 @@ export interface components {
             id: number;
             /** @enum {string} */
             widget_type: "recent-posts" | "menu" | "toc" | "search" | "tag-cloud" | "popular-posts" | "calendar" | "trusted-embed";
-            /** @enum {string} */
-            region: "header" | "sidebar" | "aside" | "footer";
+            /**
+             * @description Layout region the widget is placed into. `inline` is not a place on the page: the widget renders only where an `html` field's body references it with a `<div data-nene-embed="<id>"></div>` marker (#937).
+             * @enum {string}
+             */
+            region: "header" | "sidebar" | "aside" | "footer" | "inline";
             display_order: number;
             title: string | null;
             /** @description Widget-type-specific configuration. */
@@ -2835,8 +2838,11 @@ export interface components {
         CreateWidgetRequest: {
             /** @enum {string} */
             widget_type: "recent-posts" | "menu" | "toc" | "search" | "tag-cloud" | "popular-posts" | "calendar" | "trusted-embed";
-            /** @enum {string} */
-            region: "header" | "sidebar" | "aside" | "footer";
+            /**
+             * @description Layout region the widget is placed into. `inline` is not a place on the page: the widget renders only where an `html` field's body references it with a `<div data-nene-embed="<id>"></div>` marker (#937).
+             * @enum {string}
+             */
+            region: "header" | "sidebar" | "aside" | "footer" | "inline";
             /** @default 0 */
             display_order: number;
             title?: string | null;

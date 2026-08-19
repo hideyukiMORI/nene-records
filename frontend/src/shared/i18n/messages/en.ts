@@ -449,6 +449,8 @@ export const en = {
   'admin.widgets.board.mainNote': 'Widgets placed in main are not rendered on the public site.',
   'admin.widgets.board.addHere': '+ Add here',
   'admin.widgets.board.empty': 'No widgets in this region yet.',
+  'admin.widgets.board.inlineNote':
+    'Placed inside content. A widget here renders nowhere on its own — only where an html field says <div data-nene-embed="ID"></div>.',
   'widgets.recentPosts.unconfigured': 'No content type configured.',
   'widgets.recentPosts.empty': 'No posts yet.',
   'widgets.menu.empty': 'No menu items yet.',
@@ -1102,6 +1104,7 @@ export const en = {
   'admin.region.sidebar': 'Sidebar',
   'admin.region.aside': 'Aside',
   'admin.region.footer': 'Footer',
+  'admin.region.inline': 'In content (inline)',
   'admin.fieldDefs.displayOrder': 'Display order',
   'admin.entityStatus.publish': 'Publish',
   'admin.entityStatus.publishedAt': 'Published {{date}}',

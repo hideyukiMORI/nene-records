@@ -7,6 +7,7 @@ namespace NeNeRecords\PublicRecord;
 use NeNeRecords\Http\EmbedAllowlist;
 use NeNeRecords\Widget\TrustedEmbedSettings;
 use NeNeRecords\Widget\Widget;
+use NeNeRecords\Widget\WidgetRegions;
 
 /**
  * First-party server-side renderer for `trusted-embed` widgets (#802): turns a
@@ -61,6 +62,13 @@ final class TrustedEmbedScripts
                 continue;
             }
 
+            // Inline-region widgets are placed by a marker inside the content
+            // (#937, TrustedEmbedPlacements), not into the chrome. Emitting them
+            // here too would load the same script twice.
+            if ($widget->region === WidgetRegions::INLINE) {
+                continue;
+            }
+
             $spec = TrustedEmbedSettings::tryParse($widget->settings);
             if ($spec === null) {
                 continue;
@@ -81,6 +89,17 @@ final class TrustedEmbedScripts
         // Inert shell copy: present for parity + crawlable markup, never a second
         // execution (the SPA is the live runtime — see class docblock).
         return '<noscript data-nene-trusted-embed>' . implode('', $tags) . '</noscript>';
+    }
+
+    /**
+     * One validated embed, wrapped for inline placement inside an `html` field's
+     * body (#937). Same tag and the same inert `<noscript>` shell as the chrome
+     * path above — for the same reason: the SPA owns the live runtime, so the
+     * server-rendered copy must never be the one that executes.
+     */
+    public static function inlineTagFor(TrustedEmbedSettings $spec): string
+    {
+        return '<noscript data-nene-trusted-embed>' . self::tag($spec) . '</noscript>';
     }
 
     private static function tag(TrustedEmbedSettings $spec): string
