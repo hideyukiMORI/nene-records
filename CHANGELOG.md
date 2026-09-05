@@ -32,6 +32,11 @@ NeNe Records does not yet follow Semantic Versioning — entries are grouped by 
 - **公開ページの種別を entity type 単位で選べるようにする（#1020）** — schema.org 型の出し分け。
 - **配布 zip に `tools/export-org.php` を同梱する（#972）** — export は import と対で移送経路の半分。
   同梱していなかったため、Tier A インスタンスは供給された経路でバックアップ・移送・stg refresh ができなかった。
+- **org 単位のファビコン登録（#1073）** — 管理画面でアップロードした画像を公開サイトの `<link rel="icon">` に
+  適用する。`logo_media_id` / `default_og_image` と同型の `media` 型 org 設定で、SVG は原本のまま、
+  ラスタは `icon32` / `icon180` / `icon192` の派生に解決される。未設定の org は従来どおり製品既定。
+  🔴 **これが無かったため、製品既定と違うアイコンを出したい設置は `templates/public/` をサーバ上で
+  直接書き換えるしか手が無く、その改変は配備のたびに黙って戻っていた**（ayane.co.jp で実際に起きていた）。
 - **org 削除で残るメディアの棚卸し（#1018）**。
 
 ### Changed
@@ -53,6 +58,8 @@ NeNe Records does not yet follow Semantic Versioning — entries are grouped by 
 - **発行元スキーマの honeypot 型を描画も転送もしない（#1066）** — contact が返す `field_type: honeypot` が
   「知らない型は素のテキスト入力にする」既定に落ち、**利用者に見える空ラベルの入力欄**になっていた。
   入力しても上流が honeypot として捨てるため、書いた内容がエラーも出さずに消える状態だった。
+- **サブディレクトリ設置でメディア由来のファビコンが 404 する問題（#1073）** — ルート相対の `/media/...` は
+  `<base href>` を無視するため、base を明示的に前置しないと解決できない。og:image と同じ経路に揃えた。
 - **`export-access-summary` の既定日付を UTC 基準にする（#1007）**。
 - **`findBy*` の待ちが `testTimeout` の予算を使い切らない設定に直す（#1035）**。
 - **security-harness `probe.sh` の F-01 期待値を #827 後の仕様へ揃える（#1054）**。
