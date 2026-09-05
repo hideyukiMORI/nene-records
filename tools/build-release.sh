@@ -48,6 +48,9 @@ mkdir -p "$STAGE/tools"
 cp "$ROOT/tools/hosting-precheck.php" "$STAGE/tools/"
 cp "$ROOT/tools/install.php" "$STAGE/tools/"
 cp "$ROOT/tools/import-org.php" "$STAGE/tools/"
+# export は import と対で移送経路の半分。同梱しないと Tier A インスタンスは供給された
+# 経路でバックアップ・移送・stg refresh ができない（#972）。
+cp "$ROOT/tools/export-org.php" "$STAGE/tools/"
 cp "$ROOT/tools/webhook-worker.php" "$STAGE/tools/"
 cp "$ROOT/.env.example" "$STAGE/.env.example"
 cp "$ROOT/phinx.php" "$STAGE/phinx.php"
