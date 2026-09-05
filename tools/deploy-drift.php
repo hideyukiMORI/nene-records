@@ -41,7 +41,12 @@ $root = dirname(__DIR__);
 function readManifest(string $file): array
 {
     $map = [];
-    foreach (file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
+    $lines = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    if ($lines === false) {
+        return [];
+    }
+
+    foreach ($lines as $line) {
         // md5sum の出力は "<hash>  <path>"（空白2つ）。バイナリモードの "*" 接頭辞も剥がす。
         if (preg_match('/^([0-9a-f]{32})\s+\*?(.+)$/', trim($line), $m) !== 1) {
             continue;
