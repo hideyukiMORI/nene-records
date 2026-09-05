@@ -270,7 +270,11 @@ final readonly class SubmitContactFormHandler
         $declared = [];
 
         foreach ($schema->fields as $field) {
-            $declared[$field->key] = true;
+            // Declared but never rendered (#1066), so it is accepted like a control field and
+            // dropped rather than forwarded: the issuing product discards honeypot values on
+            // ingest anyway, and refusing the whole submission would punish a browser that still
+            // holds a page rendered before the fix.
+            $declared[$field->key] = $field->isHoneypot() ? 'drop' : true;
         }
 
         $values = [];
@@ -284,6 +288,10 @@ final readonly class SubmitContactFormHandler
 
             if (!isset($declared[$key])) {
                 return null;
+            }
+
+            if ($declared[$key] === 'drop') {
+                continue;
             }
 
             $values[$key] = is_string($value) ? $value : '';

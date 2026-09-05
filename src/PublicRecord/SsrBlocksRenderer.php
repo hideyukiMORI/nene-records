@@ -221,6 +221,14 @@ final readonly class SsrBlocksRenderer
 
     private function renderField(ContactFormField $field, string $idPrefix): string
     {
+        // The issuing product's honeypot is declared so records *knows about* it, not so records
+        // shows it. Falling through to `default` would print a visible, empty-labelled text box
+        // whose contents the issuing product then drops without an error (#1066). records has its
+        // own hidden trap above; this one stays unrendered.
+        if ($field->isHoneypot()) {
+            return '';
+        }
+
         $id = 'contact-' . $idPrefix . '-' . $this->slug($field->key);
         $required = $field->required ? ' required' : '';
         $label = '<label for="' . $id . '">' . $this->escape($field->label) . '</label>';
