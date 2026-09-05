@@ -6,6 +6,61 @@ NeNe Records does not yet follow Semantic Versioning — entries are grouped by 
 
 ---
 
+## [Contact ネイティブ埋め込み ＋ プライバシー優先の訪問解析 — v0.5.4] — 2026-07-25 〜 2026-09-05
+
+> 目玉は2つ。**Contact ネイティブ埋め込み 案1（epic #1001）** — connect-token をサーバ側だけで保持し、
+> 公開 SSR が first-party の問い合わせフォームを描いて records 側の proxy が上流へ送る方式で、
+> ブラウザにトークンを渡さず CSP も変えずに実 URL で索引できる。**プライバシー優先の訪問解析 Path B
+> （epic #1007・ADR 0006）** — 生 IP を保持せず日次ソルト hash ＋ org_id で導出し、opt-in 既定 OFF で
+> 収集・集計・export・保持 prune までを揃えた。あわせて **trusted-embed を本文の任意位置へ置けるように**し
+> （#937）、テナント解決・HEAD メソッド・org 削除まわりの実害バグを潰した。フロントは hooks を
+> `model/` へ寄せる構造整理と、依存脆弱性ゲート `audit-ci` の導入。版は **v0.5.3 → v0.5.4**
+> （`VERSION` 単一ソース、`/machine/health` も同値を報告）。本番反映は都度施主 GO。Issue/PR の詳細内訳と
+> 再開手順は private `internal-docs/records/todo/current.md` を正本とする。
+
+### Added
+- **Contact ネイティブ埋め込み 案1（epic #1001）** — connect-token の保管・提示（#1029）＋ contact-form ブロックの
+  型・サーバ側検証・SSR 描画（#1030）＋ 送信 proxy の受け皿5点（#1031）。ブラウザは上流を直接叩かず
+  records 側 proxy を経由するので、**トークンがクライアントへ出ない**。honeypot（`website_url`）と
+  訪問者IP／フォーム単位の二重 throttle を records 側に持つ。
+- **プライバシー優先の訪問解析 Path B（epic #1007・ADR 0006）** — 土台となる ADR・visitor 列 migration・
+  opt-in 設定 def（#1007）＋ opt-in 時のみ visitor 派生を記録する収集層（#1007）＋ stats に visitor サマリ
+  （unique / referrer / utm / ref / bot率）を nullable 追加（#1007）＋ 公開LPビーコン `POST /api/v1/public/beacon`
+  （#1007）＋ export CLI・保持 prune・集計メソッド（#1007 / #1008）。**生 IP は保持しない。**
+- **trusted-embed を本文の任意位置へ置けるようにする（#937）** — `data-nene-embed` マーカーで
+  header / sidebar / aside / footer / inline を指定。マーカーはタグを跨げない。
+- **公開ページの種別を entity type 単位で選べるようにする（#1020）** — schema.org 型の出し分け。
+- **配布 zip に `tools/export-org.php` を同梱する（#972）** — export は import と対で移送経路の半分。
+  同梱していなかったため、Tier A インスタンスは供給された経路でバックアップ・移送・stg refresh ができなかった。
+- **org 削除で残るメディアの棚卸し（#1018）**。
+
+### Changed
+- **フロントエンドの構造整理** — `features/*/hooks/` の camelCase を `use-kebab-case` へ（#1040）、
+  hooks segment を A1 codemod で `model/` へ移設し doc を改訂（#1041）、`pages/consumer/hooks/`（#1043）と
+  `pages/consumer/` 直下の平置き hook 8件（#1047）を `model/` へ。
+- **依存脆弱性ゲート `audit-ci` を導入**し high 残債を bump で解消（フリート展開）。
+  以後 **allowlist は空・high は例外なし運用**（#1050）。
+- **CI** — check に本番 build を配線（射程はバンドル解決性であって CSS ではない・#1052）、
+  weekly schedule ＋ failure-issue harness を Frontend CI に追加（#1059）、backend CI に `composer audit` を追加（#1061）。
+- **版数表記を実測へ揃え、リリース手順に自リポ版数同期を足す（#1039）** — `CLAUDE.md` / `README.md` が
+  v0.5.2 のまま止まっていた。手順が無かったのが原因なので、Release 節に手順を新設した。
+
+### Fixed
+- **org 不在のホストが HTML で 200 を返すのを止める（#1057）** — 廃止した org のサブドメインが「偽緑」を返していた。
+- **org 削除で子データが孤児化するのを直す（#1002）**／**`entity_archive` を作る migration を追加（#1017）**。
+- **公開HTMLルートが HEAD で壊れるのを直す（#1021）**／**`/api/v1/users` の読み取り認可が HEAD を
+  素通りさせるのを直す（#1023）**。
+- **発行元スキーマの honeypot 型を描画も転送もしない（#1066）** — contact が返す `field_type: honeypot` が
+  「知らない型は素のテキスト入力にする」既定に落ち、**利用者に見える空ラベルの入力欄**になっていた。
+  入力しても上流が honeypot として捨てるため、書いた内容がエラーも出さずに消える状態だった。
+- **`export-access-summary` の既定日付を UTC 基準にする（#1007）**。
+- **`findBy*` の待ちが `testTimeout` の予算を使い切らない設定に直す（#1035）**。
+- **security-harness `probe.sh` の F-01 期待値を #827 後の仕様へ揃える（#1054）**。
+- **依存** — npm audit の high 2件と prod 露出の dompurify を解消し allowlist を空にする（#1050）、
+  `league/commonmark` を 2.10.0 へ lock only（#1061）、`fast-uri` を 3.1.7 へ lock only（#1067）。
+
+---
+
 ## [AYANE launch ＋ 公開サイト機能拡充 — v0.5.3] — 2026-07-17 〜 2026-07-24
 
 > **AYANE（ayane.co.jp）が 2026-07-18 に Tier A（共有ホスティング）で本番稼働**したのを機に、公開サイト側の

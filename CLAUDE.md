@@ -37,7 +37,7 @@ Flexible entity platform — lighter and more typed than WordPress post meta. Ad
 
 ## Current Status
 
-M1 – M16 complete plus the post-#536 wave (crawlable SSR / WXR migration / public i18n / production SaaS + Tier A zip installer, v0.5.3 released). In production as a subdomain multi-tenant SaaS. The moving frontier is intentionally not tracked here — the top of the private current.md (`nene-origin/internal-docs/records/todo/`) is the source of truth.
+M1 – M16 complete plus the post-#536 wave (crawlable SSR / WXR migration / public i18n / production SaaS + Tier A zip installer, v0.5.4 released). In production as a subdomain multi-tenant SaaS. The moving frontier is intentionally not tracked here — the top of the private current.md (`nene-origin/internal-docs/records/todo/`) is the source of truth.
 
 ## Verification
 
@@ -101,8 +101,10 @@ composer migrations:rollback  # rollback last batch
 1. `VERSION` をバンプする（版の単一ソース。`/machine/health` も同じ値を報告する・#586）。
 2. `bash tools/build-release.sh <version>` で配布 zip を作る（→ `dist/nene-records-<version>.zip`。詳細は `docs/install-tier-a.md`）。
 3. zip と `.sha256` を GitHub Release に添付して公開する（Latest・target=main）。
-4. **自リポの版数表記を同期する** — `CLAUDE.md` の Current Status と `README.md` の版数・本番反映日。
-   🔴 ここが抜けていたため v0.5.2 → v0.5.3 で1版ずれたまま出荷した（#1039）。**`VERSION` を上げた PR の中で同時に直す。**
+4. **自リポの版数表記を同期する** — `CLAUDE.md` の Current Status と `README.md` の版数を、**`VERSION` を上げた PR の中で同時に直す**。
+   🔴 ここが抜けていたため v0.5.2 → v0.5.3 で1版ずれたまま出荷した（#1039）。
+   ⚠️ **「本番反映日」はこの時点では書けない**（まだ反映していない）。版数と反映日は別の事実なので `README.md` でも別々に書き、
+   **反映日は本番反映した回に直す**（#1071・手順4 を実際に踏んで判明）。
 5. Release 公開後、プロフィール README（github.com/hideyukiMORI/hideyukiMORI）の版数・状況表を同期する（At a glance / Platform products / What shipped recently の該当行）。
 
 ## OpenAPI → TypeScript types
