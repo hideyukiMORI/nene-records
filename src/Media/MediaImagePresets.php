@@ -20,6 +20,12 @@ final class MediaImagePresets
         // Social card width (og:image / twitter:image). Aspect is preserved
         // (width-constrained), which social platforms crop/letterbox as needed.
         'og' => 1200,
+        // Favicon sizes (#1073). Named rather than free-form for the same reason as the rest
+        // of this list: the closed set is what stops arbitrary-size generation being used as a
+        // disk/CPU DoS. 180 is the apple-touch-icon size; 192 covers the web app manifest.
+        'icon32' => 32,
+        'icon180' => 180,
+        'icon192' => 192,
     ];
 
     public static function isValid(string $name): bool

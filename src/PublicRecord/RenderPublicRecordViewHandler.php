@@ -322,6 +322,8 @@ final readonly class RenderPublicRecordViewHandler implements PublicRecordViewRe
             'siteName' => $siteName,
             'metaDescription' => $metaDescription,
             'analyticsHead' => $analyticsHead,
+            // Org favicon when set, product default otherwise (#1073).
+            'faviconLinks' => PublicFaviconLinks::render($settings, $effectiveBase),
             // Validated trusted-embed <script> tags for the crawlable shell (#802);
             // '' when the org has no allowlist / no trusted-embed widgets.
             'embedScripts' => $embedScripts,

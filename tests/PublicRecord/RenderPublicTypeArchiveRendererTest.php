@@ -122,4 +122,24 @@ final class RenderPublicTypeArchiveRendererTest extends TestCase
         self::assertStringContainsString('<link rel="icon" href="assets/favicon/favicon.svg" type="image/svg+xml" />', $html);
         self::assertStringContainsString('<link rel="manifest" href="assets/favicon/site.webmanifest" />', $html);
     }
+
+    /**
+     * #1073 end to end: the org setting must actually reach the rendered <head>. The unit test
+     * on {@see \NeNeRecords\PublicRecord\PublicFaviconLinks} would still pass if the template
+     * variable were misspelled, so this asserts through the real renderer.
+     */
+    public function testOrgFaviconSettingReachesTheRenderedHead(): void
+    {
+        $html = $this->renderArchive([
+            new SettingDef('site_name', 'text', 'NeNe Records', true, 'Site name'),
+            new SettingDef('favicon_media_id', 'media', '7', true, 'Favicon'),
+        ]);
+
+        self::assertStringContainsString('href="/media/icon32/2026/06/card.png" sizes="32x32"', $html);
+        self::assertStringContainsString('rel="apple-touch-icon" href="/media/icon180/2026/06/card.png"', $html);
+
+        // The product default must be replaced, not appended — two rel="icon" blocks would let
+        // the browser pick whichever came first.
+        self::assertStringNotContainsString('assets/favicon/favicon.svg', $html);
+    }
 }
