@@ -260,6 +260,32 @@ final class SubmitContactFormHandlerTest extends TestCase
         self::assertTrue($this->logger->has('info', 'honeypot'), 'A silent drop makes "it never arrived" unanswerable.');
     }
 
+    /**
+     * #1066: the issuing product's honeypot is declared by the schema, so it must not trip the
+     * "key outside the schema" refusal — a browser still holding a page rendered before the fix
+     * would otherwise have its submission thrown away. It is accepted and dropped instead, the
+     * way a control field is: the issuing product discards honeypot values on ingest anyway.
+     */
+    public function testIssuingProductHoneypotIsAcceptedButNeverForwarded(): void
+    {
+        $handler = (new SubmitContactFormHandlerFactory($this))->build(schema: new ContactFormSchema('k', [
+            new ContactFormField('email', 'Email', 'email', true),
+            new ContactFormField('website', '', ContactFormField::TYPE_HONEYPOT, false),
+        ]));
+
+        $response = $handler->handle($this->request([
+            'form_key' => 'k',
+            'email' => 'a@example.test',
+            'website' => 'https://spam.example',
+        ]));
+
+        self::assertSame(303, $response->getStatusCode());
+        self::assertSame([['email' => 'a@example.test']], array_map(
+            static fn (array $sent): array => $sent['values'],
+            $this->sender->sent,
+        ), 'The schema-declared honeypot must not reach the issuing product.');
+    }
+
     // ── redirect safety ───────────────────────────────────────────────────────
 
     /**

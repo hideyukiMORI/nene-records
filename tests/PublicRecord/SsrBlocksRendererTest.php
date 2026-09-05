@@ -90,6 +90,34 @@ final class SsrBlocksRendererTest extends TestCase
         self::assertStringContainsString('type="text"', $html);
     }
 
+    /**
+     * #1066: the issuing product declares its own honeypot so records *knows about* it, not so
+     * records shows it. Before the fix it fell through to the `default` arm above and printed a
+     * visible, empty-labelled text box whose contents the issuing product then discarded without
+     * an error.
+     *
+     * Both halves matter: deleting every honeypot would also satisfy the first assertion, so the
+     * second pins that records' own hidden trap survives.
+     */
+    public function testIssuingProductHoneypotIsNotRenderedButRecordsOwnTrapStillIs(): void
+    {
+        $renderer = $this->renderer(new ContactFormSchema('k', [
+            new ContactFormField('message', 'Message', 'textarea', true),
+            new ContactFormField('website', '', ContactFormField::TYPE_HONEYPOT, false),
+        ]));
+
+        $html = $renderer->render('[{"id":"c","type":"contact-form","data":{"formKey":"k"}}]')->html;
+
+        // Nothing a person could see or type into. `name="website"` is not a substring of
+        // `name="website_url"`, so this does not accidentally assert against records' own trap.
+        self::assertStringNotContainsString('name="website"', $html);
+        self::assertStringNotContainsString('contact-c-website"', $html);
+
+        // records' own hidden trap is still emitted, and the real fields still render.
+        self::assertStringContainsString('name="' . SubmitContactFormHandler::HONEYPOT_FIELD . '"', $html);
+        self::assertStringContainsString('name="message"', $html);
+    }
+
     public function testSchemaValuesAreEscapedIntoAttributesAndText(): void
     {
         $renderer = $this->renderer(new ContactFormSchema('k', [
