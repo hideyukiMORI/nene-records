@@ -5,14 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <?php /* Runtime base path: anchors the SPA (router/API derive it from <base>). #zip-install S2 */ ?>
     <base href="<?= $e($basePath . '/') ?>" />
-    <?php /* Favicon: the crawlable SSR shell must declare it so Google/browsers use the
-             real icon instead of an auto-generated letter monogram (#986). Base-relative
-             paths resolve against <base> on any deep path; assets ship in dist/assets/favicon. */ ?>
-    <link rel="icon" href="assets/favicon/favicon.svg" type="image/svg+xml" />
-    <link rel="icon" href="assets/favicon/favicon-32.png" sizes="32x32" />
-    <link rel="icon" href="assets/favicon/favicon-16.png" sizes="16x16" />
-    <link rel="apple-touch-icon" href="assets/favicon/apple-touch-icon.png" />
-    <link rel="manifest" href="assets/favicon/site.webmanifest" />
+    <?php /* Favicon: org setting when set, product default otherwise (#1073).
+             Built server-side so the crawlable shell declares the real icon (#986). */ ?>
+    <?= $faviconLinks ?>
     <?php /* GA4 / GTM + Consent Mode v2 — pre-built, nonce'd, '' when analytics is off. */ ?>
     <?= $analyticsHead ?>
     <?php if ($metaDescription !== ''): ?>

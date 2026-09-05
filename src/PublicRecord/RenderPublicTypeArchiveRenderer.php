@@ -108,6 +108,8 @@ final readonly class RenderPublicTypeArchiveRenderer implements PublicTypeArchiv
             'metaDescription' => $metaDescription,
             'ogImageUrl' => $ogImageUrl,
             'analyticsHead' => $analyticsHead,
+            // Org favicon when set, product default otherwise (#1073).
+            'faviconLinks' => PublicFaviconLinks::render($settings, $effectiveBase),
             // Server-generated floating CTA chrome (#982); '' when disabled / no match.
             'floatingCta' => $floatingCta,
             // The first page is the archive's canonical address; deeper pages carry
