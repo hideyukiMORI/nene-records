@@ -1,5 +1,5 @@
-# CVE-2026-12184 / CVE-2026-14355 対応で patch level を固定（8.4.23 以上を維持・#744）
-FROM php:8.4.23-apache
+# CVE-2026-109618 / CVE-2026-109619（PHP2Shell）対応で patch level を固定（8.4.27 以上を維持）。旧: 8.4.23（CVE-2026-12184 / 14355・#744）
+FROM php:8.4.27-apache
 
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
